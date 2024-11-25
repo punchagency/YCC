@@ -7,7 +7,7 @@ import LoginForm from '../../components/login'
 const Login = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
   return (
-    <div className="flex flex-row h-screen align-content-start justify-content-center gap-0 login">
+    <div className="flex flex-column lg:flex-row h-screen align-content-start justify-content-center gap-0 login">
         <div className='flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center' style={{ backgroundImage: `url(${backgroundImage})` }}>
           <div className='login-content'>
               <h2 className='font-semibold text-white m-0 mb-5'>{title}</h2>

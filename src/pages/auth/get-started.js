@@ -26,7 +26,7 @@ const GetStarted = ({ name }) => {
   };
 
   return (
-    <div className="flex flex-row h-screen align-content-start justify-content-center gap-0 get-started">
+    <div className="flex flex-column lg:flex-row h-screen align-content-start justify-content-center gap-0 get-started">
        <div className='flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center' style={{ backgroundImage: `url(${backgroundImage})` }}>
           <div className="border-circle mb-3 bg-white font-bold flex align-items-center justify-content-center logo" style={{ width: '181px', height: '181px' }}>
               <img src={logo} alt="Company logo" className='image-full' />

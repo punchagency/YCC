@@ -1,11 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import backgroundImage from '../../assets/images/captain_login_bg.jpg'
 import logo from '../../assets/images/logo-login.png'
+import SignupForm from '../../components/signup'
 
 const Signup = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
   return (
-    <div className="flex flex-row h-screen align-content-start justify-content-center gap-0 login">
+    <div className="flex flex-column lg:flex-row h-screen align-content-start justify-content-center gap-0 login">
         <div className='flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center' style={{ backgroundImage: `url(${backgroundImage})` }}>
           <div className='login-content'>
               <h2 className='font-semibold text-white m-0 mb-5'>{title}</h2>
@@ -19,11 +21,11 @@ const Signup = () => {
                  </div>
               </div>
               <div className='login-heading'>
-                  <h2 className='font-medium mb-1'>Sign UP</h2>
-                  <p>Don’t have an account? Create new!</p>
+                  <h2 className='font-medium mb-1'>Create an account</h2>
+                  <p>Already a member? <Link to="/login">Sign in!</Link></p>
               </div>
               <div className='login-form captain-login-form'>
-
+                  <SignupForm/>
               </div>
           </div>  
         </div>
