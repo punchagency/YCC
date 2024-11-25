@@ -1,0 +1,34 @@
+
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+
+.login-content{
+  max-width: 444px;
+}
+
+.login-right-component{
+  max-width: 550px;
+  width: 100%;
+  .logo-wraper{
+    margin-bottom: 48px;
+    .logo{
+       width: 180px;
+       display: block;
+    }
+  }
+  .login-heading{
+    text-align: left;
+    margin-bottom: 38px;
+  }
+  .login-form{
+    text-align: left;
+  }
+  .p-field-checkbox{
+    margin-bottom: 41px;
+    display: flex;
+    justify-content: space-between;
+    a{
+      font-size: 14px;
+    }
+  }
+}

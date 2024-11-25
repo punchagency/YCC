@@ -1,0 +1,357 @@
+
+$media-queries: true;
+
+@mixin bp($point) {
+  @if ($media-queries) {
+    $bp-large-screen: 1920px;
+    $bp-bigscreen: 1920px;
+    $bp-custome-1850: 1850px;
+    $bp-custome-1750: 1750px;
+    $bp-custome-1600: 1600px;
+    $bp-custome-1440: 1440px;
+    $bp-mid-desktop-min: 1440px;
+    $bp-custome-1439: 1439px;
+    $bp-mid-desktop-max: 1399px;
+    $bp-custome-1366: 1366px;
+    $bp-mid-desktop2-max: 1280px;
+    $bp-mid-desktop2-min: 1280px;
+    $bp-custome-min-1240: 1240px;
+    $bp-custome-1279: 1279px;
+    $bp-custome-1239: 1239px;
+    $bp-custome-1230: 1230px;
+    $bp-mid-desktop3-max: 1199px;
+    $bp-custome-1050: 1050px;
+    $bp-ipad-max: 1024px;
+    $bp-pre-desktop-max: 1023px;
+    $bp-tab-mid-max: 992px;
+    $bp-tab-mid-min: 991px;
+    $bp-custome-992: 992px;
+    $bp-custome-991: 991px;
+    $bp-custome-960: 960px;
+    $bp-custome-959: 959px;
+    $bp-custome-850: 850px;
+    $bp-ipad-min: 768px;
+    $bp-phone-max: 767px;
+    $bp-custome-700: 700px;
+    $bp-custome-600: 600px;
+    $bp-iphone5-max: 568px;
+    $bp-iphone5-greater: 569px;
+    $bp-custome-568: 568px;
+    $bp-custome-500: 500px;
+    $bp-iphone-max: 480px;
+    $bp-custome-479: 479px;
+    $bp-custome-414: 414px;
+    $bp-common-phone-min: 400px;
+    $bp-custome-375: 375px;
+    $bp-custome-360: 360px;
+    $bp-custome-359: 359px;
+    $bp-iphone-min: 320px;
+    $bp-custome-330: 330px;
+    $bp-custome-320: 320px;
+    // **
+    // --------------------
+    // Options of screen breakpoints:
+    // 1. large-screen - from 1824px
+    // 2. big-screen - to 1824px
+    // 3. ipad-mini - to 758px
+    // 4. ipad - from 758px to 1024px
+    // 5. ipad-portrait - to 758px
+    // 6. iphone5-landscape - to 568px
+    // 7. iphone - from 320px to 480px
+    // 8. iphone-portrait - to 320px
+    // --------------------
+    // **
+    @if $point == large-screen {
+      @media 
+      all and (min-width: #{$bp-large-screen}),
+      all and (min-device-width: #{$bp-large-screen}) {
+        @content;
+      }
+    }
+    @if $point == big-screen {
+       @media
+        all and (max-width: #{$bp-bigscreen}){
+          @content;
+        }
+    }
+
+    @if $point == mid-desktop {
+        @media
+        all and (max-width: #{$bp-mid-desktop-max}){
+          @content;
+        }
+    }
+    @if $point == custome-1600 {
+        @media 
+        all and (max-width: #{$bp-custome-1600}){
+          @content;
+        }
+    }
+    @if $point == custome-1750 {
+        @media 
+        all and (max-width: #{$bp-custome-1750}){
+          @content;
+        }
+    }
+    @if $point == custome-1850 {
+        @media 
+        all and (max-width: #{$bp-custome-1850}){
+          @content;
+        }
+    }
+    @if $point == custome-1440 {
+        @media 
+        all and (max-width: #{$bp-custome-1440}){
+          @content;
+        }
+    }
+    @if $point == custome-1439 {
+        @media 
+        all and (max-width: #{$bp-custome-1439}){
+          @content;
+        }
+    }
+    @if $point == min-desktop {
+        @media
+        all and (min-width: #{$bp-mid-desktop-min}){
+          @content;
+        }
+    }
+    @if $point == desktop-start {
+        @media
+        all and (min-width: #{$bp-ipad-max}){
+          @content;
+        }
+    }
+    @if $point == custome-1366 {
+        @media 
+        all and (max-width: #{$bp-custome-1366}){
+          @content;
+        }
+    }
+    @if $point == mid-desktop2 {
+        @media
+        all and (max-width: #{$bp-mid-desktop2-max}){
+          @content;
+        }
+    }
+    @if $point == mid-desktop2-min {
+        @media
+        all and (min-width: #{$bp-mid-desktop2-min}){
+          @content;
+        }
+    }
+    @if $point == custome-min-1240 {
+        @media
+        all and (min-width: #{$bp-custome-min-1240}){
+          @content;
+        }
+    }
+    @if $point == custome-1279 {
+        @media 
+        all and (max-width: #{$bp-custome-1279}){
+          @content;
+        }
+    }
+    @if $point == custome-1239 {
+        @media 
+        all and (max-width: #{$bp-custome-1239}){
+          @content;
+        }
+    }
+    @if $point == custome-1230 {
+        @media 
+        all and (max-width: #{$bp-custome-1230}){
+          @content;
+        }
+    }
+    @if $point == mid-desktop3 {
+        @media
+        all and (max-width: #{$bp-mid-desktop3-max}){
+          @content;
+        }
+    }
+    @if $point == custome-1050 {
+        @media 
+        all and (max-width: #{$bp-custome-1050}){
+          @content;
+        }
+    }
+    @if $point == ipad {
+      @media
+      all and (max-width: #{$bp-ipad-max}){
+        @content;
+      }
+    }
+    @if $point == pre-desktop {
+        @media 
+        all and (max-width: #{$bp-pre-desktop-max}){
+          @content;
+        }
+    }
+    @if $point == tab-mid {
+        @media 
+        all and (max-width: #{$bp-tab-mid-min}){
+          @content;
+        }
+    }
+    @if $point == ipad-portrait {
+      @media 
+      all and (max-width: #{$bp-ipad-min})
+                  and (orientation: portrait) {
+        @content;
+      }
+    }
+    @if $point == ipad-mini {
+        @media
+        all and (max-width: #{$bp-ipad-min}){
+          @content;
+        }
+    }
+    @if $point == ipad-start {
+        @media
+        all and (min-width: #{$bp-ipad-min}){
+          @content;
+        }
+    }
+    @if $point == phone-end {
+        @media 
+        all and (max-width: #{$bp-phone-max}){
+          @content;
+        }
+    }
+    @if $point == custome-992 {
+        @media 
+        all and (max-width: #{$bp-custome-992}){
+          @content;
+        }
+    }
+    @if $point == custome-991 {
+        @media 
+        all and (max-width: #{$bp-custome-991}){
+          @content;
+        }
+    }
+    @if $point == custome-960 {
+        @media 
+        all and (max-width: #{$bp-custome-960}){
+          @content;
+        }
+    }
+    @if $point == custome-959 {
+        @media 
+        all and (max-width: #{$bp-custome-959}){
+          @content;
+        }
+    }
+    @if $point == custome-850 {
+        @media 
+        all and (max-width: #{$bp-custome-850}){
+          @content;
+        }
+    }
+    @if $point == custome-700 {
+        @media 
+        all and (max-width: #{$bp-custome-700}){
+          @content;
+        }
+    }
+    @if $point == custome-600 {
+        @media 
+        all and (max-width: #{$bp-custome-600}){
+          @content;
+        }
+    }
+    @if $point == custome-568 {
+        @media 
+        all and (max-width: #{$bp-custome-568}){
+          @content;
+        }
+    }
+    @if $point == custome-500 {
+        @media 
+        all and (max-width: #{$bp-custome-500}){
+          @content;
+        }
+    }
+    @if $point == iphone5-landscape-greater {
+      @media
+      all and (min-width: #{$bp-iphone5-greater}) {
+        @content;
+      }
+    }
+    @if $point == iphone5-landscape {
+      @media
+      all and (max-width: #{$bp-iphone5-max}) {
+        @content;
+      }
+    }
+    @if $point == iphone {
+      @media 
+      all and (max-width: #{$bp-iphone-max})
+                  and (min-width: #{$bp-iphone-min}) {
+        @content;
+      }
+    }
+    @if $point == custome-479 {
+        @media 
+        all and (max-width: #{$bp-custome-479}){
+          @content;
+        }
+    }
+    @if $point == custome-414 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-414}) {
+        @content;
+      }
+    }
+    @if $point == common-phone-start {
+      @media 
+      all and (max-width: #{$bp-common-phone-min}) {
+        @content;
+      }
+    }
+    @if $point == big-screen {
+       @media
+        all and (max-width: #{$bp-bigscreen}){
+          @content;
+        }
+    }
+    @if $point == custome-375 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-375}) {
+        @content;
+      }
+    }
+    @if $point == custome-360 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-360}) {
+        @content;
+      }
+    }
+    @if $point == custome-359 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-359}) {
+        @content;
+      }
+    }
+    @if $point == custome-330 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-330}) {
+        @content;
+      }
+    }
+    @if $point == custome-320 {
+      @media
+      all and (min-device-pixel-ratio: 2),
+      all and (max-width: #{$bp-custome-320}) {
+        @content;
+      }
+    }
+  }
+}

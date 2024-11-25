@@ -1,0 +1,98 @@
+@use './variables' as vars;
+@use '../mixins/transition' as *;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1{
+  font-size: vars.$h1-font-size;
+  line-height: 36px;
+  font-weight: vars.$bold;
+  color: vars.$light-black; 
+  margin: 0;
+}
+
+h2{
+  font-size: vars.$h2-font-size;
+  line-height: 30px;
+  font-weight: vars.$bold;
+  color: vars.$light-black; 
+  margin: 0;
+}
+
+h6{
+  font-size: vars.$h6-font-size;
+  line-height: 23px;
+  color: vars.$light-black;
+  font-weight: vars.$medium;
+  margin: 0;
+}
+
+p{
+  font-size: vars.$body-font-size;
+  line-height: 22px;
+  margin: 0;
+  color: vars.$gray-color;
+}
+
+a{
+  text-decoration: none;
+  color: #255BD4;
+  font-weight: 500;
+}
+
+ul{
+  margin: 0;
+  padding: 0;
+}
+
+.p-button{
+  color: vars.$color-white;
+  background: vars.$blue-color;
+  border: 1px solid vars.$blue-color;
+  font-size: 14px;
+  @include transition(all, 0.3s, ease-in-out);
+  &:hover{
+    background: vars.$dark-blue-color;
+    border-color: vars.$dark-blue-color;
+  }
+}
+
+.image-full {
+  max-width: 100% !important;
+  display: block;
+}
+
+.get-started-content{
+  max-width: 444px;
+}
+
+.p-password{
+  .p-icon-field-right, .p-password-input{
+    width: 100%;
+  }
+}
+
+.login-form{
+  label{
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: vars.$light-black;
+  }
+  .p-field{
+    margin-bottom: 17px;
+  }
+  .p-checkbox{
+    margin-right: 11px;
+  }
+  .p-field-checkbox{
+    label{
+      color: #495057;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 22px;
+    }
+  }
+}

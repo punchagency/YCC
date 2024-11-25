@@ -1,0 +1,84 @@
+
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+
+.get-started-content{
+  max-width: 444px;
+}
+
+.get-started-right-component{
+  max-width: 550px;
+  width: 100%;
+  h6{
+    margin-bottom: 5px;
+  }
+  h2{
+    margin-bottom: 12px;
+  }
+  ul{
+    list-style: none;
+    li{
+        display: flex;
+        border-bottom: 1px solid vars.$gray-light-color;
+        padding: 39px 0;
+        justify-content: space-between;
+        cursor: pointer;
+        .content{
+            display: flex;
+            .icons{
+              width: 53px;
+              height: 53px;
+            }
+            .text{
+                padding-left: 21px;
+                font-size: 24px;
+                font-weight: 500;
+                color: vars.$light-black; 
+                @include transition(all, 0.3s, ease-in-out);
+                p{
+                  text-align: left;
+                  font-weight: 500;
+                  color: vars.$light-black; 
+                  margin-bottom: 5px;
+                }
+            }
+        }
+        .arrow{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .arrow-wraper{
+            width: 47px;
+            height: 47px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            @include transition(all, 0.3s, ease-in-out);
+            i{
+              font-size: 24px;
+              @include transition(all, 0.3s, ease-in-out);
+            }
+          }
+        }
+        &:hover{
+          .content{
+            .text{
+              color: vars.$blue-color;
+            }
+          }
+          .arrow{
+            .arrow-wraper{
+               background-color: vars.$blue-color;
+              i{
+                color: vars.$color-white;
+              }
+            }
+          }
+        }
+        &:last-child{
+          border-bottom: 0px;
+        }
+      }
+  }
+}
