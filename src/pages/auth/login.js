@@ -4,7 +4,7 @@ import backgroundImage from '../../assets/images/captain_login_bg.jpg'
 import logo from '../../assets/images/logo-login.png'
 import LoginForm from '../../components/login'
 
-const CaptainLogin = () => {
+const Login = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
   return (
     <div className="flex flex-row h-screen align-content-start justify-content-center gap-0 login">
@@ -22,7 +22,7 @@ const CaptainLogin = () => {
               </div>
               <div className='login-heading'>
                   <h2 className='font-medium mb-1'>Sign in</h2>
-                  <p>Don’t have an account? <Link to="/captain-signup">Create new!</Link></p>
+                  <p>Don’t have an account? <Link to="/signup">Create new!</Link></p>
               </div>
               <div className='login-form captain-login-form'>
                   <LoginForm/>
@@ -33,4 +33,4 @@ const CaptainLogin = () => {
   );
 };
 
-export default CaptainLogin;
+export default Login;

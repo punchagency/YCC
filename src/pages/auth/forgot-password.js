@@ -2,7 +2,7 @@ import React from 'react';
 import backgroundImage from '../../assets/images/captain_login_bg.jpg'
 import logo from '../../assets/images/logo-login.png'
 
-const CaptainSignup = () => {
+const ForgotPassword = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
   return (
     <div className="flex flex-row h-screen align-content-start justify-content-center gap-0 login">
@@ -19,7 +19,7 @@ const CaptainSignup = () => {
                  </div>
               </div>
               <div className='login-heading'>
-                  <h2 className='font-medium mb-1'>Sign UP</h2>
+                  <h2 className='font-medium mb-1'>Forgot Password</h2>
                   <p>Don’t have an account? Create new!</p>
               </div>
               <div className='login-form captain-login-form'>
@@ -31,4 +31,4 @@ const CaptainSignup = () => {
   );
 };
 
-export default CaptainSignup;
+export default ForgotPassword;

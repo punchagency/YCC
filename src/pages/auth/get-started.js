@@ -13,9 +13,9 @@ const GetStarted = ({ name }) => {
 
   // Define the options for the user roles
   const roles = [
-    { image: captain, alt: 'captain', text: 'Captain/Manager', path: '/captain-login' },
-    { image: hod, alt: 'hod', text: 'Head of Department', path: '/hod-login' },
-    { image: crew, alt: 'crew', text: 'Crew Member', path: '/crew-login' }
+    { image: captain, alt: 'captain', text: 'Captain/Manager', path: '/login' },
+    { image: hod, alt: 'hod', text: 'Head of Department', path: '/login' },
+    { image: crew, alt: 'crew', text: 'Crew Member', path: '/login' }
   ]
 
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation

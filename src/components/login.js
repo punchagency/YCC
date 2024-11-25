@@ -93,7 +93,7 @@ const LoginForm = () => {
                                 Remember Me
                             </label>
                         </div>
-                        <Link to="/captain-forgot-password">Forgot Your Password?</Link>
+                        <Link to="/forgot-password">Forgot Your Password?</Link>
                     </div>
                     <Button
                         type="submit"
