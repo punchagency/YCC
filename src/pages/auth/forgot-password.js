@@ -1,6 +1,8 @@
 import React from 'react';
 import backgroundImage from '../../assets/images/captain_login_bg.jpg'
 import logo from '../../assets/images/logo-login.png'
+import ForgotPasswordForm from '../../components/forgot-password'
+import { Link } from 'react-router-dom';
 
 const ForgotPassword = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
@@ -20,10 +22,10 @@ const ForgotPassword = () => {
               </div>
               <div className='login-heading'>
                   <h2 className='font-medium mb-1'>Forgot Password</h2>
-                  <p>Don’t have an account? Create new!</p>
+                  <p>Forgot your password? <Link to="/login">Back to Login</Link></p>
               </div>
               <div className='login-form captain-login-form'>
-
+                  <ForgotPasswordForm/>
               </div>
           </div>  
         </div>

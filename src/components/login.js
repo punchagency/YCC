@@ -3,7 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
     const [credentials, setCredentials] = useState({
@@ -42,14 +42,28 @@ const LoginForm = () => {
         }
     };
 
+
+    const navigate = useNavigate();  // Add useNavigate hook
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (emailError || !credentials.email || !credentials.password) {
-            alert('Please fix the errors before submitting.');
+        
+        // Validate if email and password are provided and the email is valid
+        if (!credentials.email || !credentials.password) {
+            alert('Please fill in both email and password.');
             return;
         }
+        
+        if (emailError) {
+            alert('Please correct the errors before submitting.');
+            return;
+        }
+
         console.log('Login Credentials:', credentials);
         // Add your login logic here
+
+        // Assuming login is successful, navigate to Dashboard
+        navigate('/dashboard');
     };
 
     return (

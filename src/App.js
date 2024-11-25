@@ -4,6 +4,7 @@ import GetStarted from './pages/auth/get-started'; // Adjust the import accordin
 import Login from './pages/auth/login';
 import Signup from './pages/auth/signup';
 import ForgotPassword from './pages/auth/forgot-password';
+import Dashboard from './pages/dashboard';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </div>
   );

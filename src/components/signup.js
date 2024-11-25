@@ -3,7 +3,7 @@ import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
     const [credentials, setCredentials] = useState({
@@ -64,6 +64,8 @@ const SignupForm = () => {
         }
     };
 
+    const navigate = useNavigate();  // Add useNavigate hook
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (emailError || passwordError || confirmPasswordError || !credentials.fullName || !credentials.email || !credentials.password || !credentials.confirmPassword) {
@@ -72,6 +74,9 @@ const SignupForm = () => {
         }
         console.log('Signup Credentials:', credentials);
         // Add your signup logic here
+
+        // Assuming login is successful, navigate to Dashboard
+        navigate('/dashboard');
     };
 
     return (
