@@ -17,7 +17,7 @@ const Login = () => {
           <div className='login-right-component'>
               <div className='logo-wraper'>
                  <div className='logo'>
-                      <img src={logo} alt="Company logo" className='image-full' />
+                    <img src={logo} alt="Company logo" className='image-full' />
                  </div>
               </div>
               <div className='login-heading'>
