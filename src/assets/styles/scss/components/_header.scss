@@ -1,0 +1,50 @@
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+
+.p-menubar {
+  padding: 0.5rem 25px;
+  background: vars.$color-white;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid vars.$light-gray-color;
+}
+
+.profile{
+  .profile-image{
+     width: 28px;
+     height: 28px;
+     border-radius: 50%;
+     object-fit: cover;
+  }
+  .profile-name{
+    padding-left: 8px;
+    font-size: vars.$body-font-size;
+    color: vars.$light-black;
+    font-weight: 400;
+  }
+}
+
+
+.notifications{
+   &.p-button{
+     &.p-button-icon-only{
+       width: auto;
+       padding: 0;
+       .p-button-icon {
+          font-size: 22px;
+          color:#9E9E9E
+       }
+     }
+     &.p-button-text:not(:disabled){
+       &:hover{
+           background: transparent;
+           border-color: transparent;
+       }
+       &:focus{
+           background: transparent;
+           border-color: transparent;
+           box-shadow: 0 0 0 0px #ffffff, 0 0 0 0px #b1b3f8, 0 0px 0px 0 rgb(0, 0, 0);
+       }
+     }
+   }
+}

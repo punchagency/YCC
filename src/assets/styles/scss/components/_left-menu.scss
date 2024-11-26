@@ -1,0 +1,185 @@
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+
+.left-menu {
+  max-width: 280px;
+  width: 100%;
+  height: 100vh;
+  background: vars.$color-white;
+  border-right: 1px solid vars.$light-gray-color;
+  padding: 18px;
+  box-sizing: border-box;
+
+  .p-panelmenu {
+    width: 100%;
+    border: 0;
+    padding: 0;
+
+    .p-panelmenu-header {
+      .p-panelmenu-header-content {
+        border: 0px solid;
+        color: vars.$gray-color-text;
+        background: vars.$color-white;
+        border-radius: 6px;
+
+        .p-panelmenu-header-link {
+          padding: 0.70rem 0.65rem;
+          border-radius: 6px;
+          color: vars.$gray-color-text;
+          position: relative;
+
+          .p-menuitem-text {
+            color: vars.$gray-color-text;
+            font-size: vars.$body-font-size;
+          }
+
+          .p-menuitem-icon {
+            color: vars.$gray-color-text;
+          }
+
+          .p-submenu-icon {
+            position: absolute;
+            right: 0;
+          }
+
+          .custom-icon {
+            margin-right: 0.5rem;
+          }
+
+          .custom-icon-maintenance {
+            margin-right: 0.5rem;
+          }
+        }
+
+        &:hover {
+          background-color: vars.$blue-color;
+
+          .p-panelmenu-header-link {
+            color: vars.$color-white;
+
+            .p-menuitem-text {
+              color: vars.$color-white;
+            }
+
+            .p-menuitem-icon {
+              color: vars.$color-white;
+            }
+
+            .custom-icon {
+              margin-right: 0.5rem;
+
+              path {
+                stroke: vars.$color-white;
+              }
+            }
+
+            .custom-icon-maintenance {
+              margin-right: 0.5rem;
+
+              path {
+                fill: vars.$color-white;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .p-panelmenu-panel {
+      margin-bottom: 12px;
+
+      &>.p-panelmenu-content {
+        border-radius: 6px;
+
+        .p-panelmenu-link {
+          padding: 0.70rem 0.65rem;
+          border-radius: 6px;
+
+          .p-panelmenu-text {
+            color: vars.$gray-color-text;
+          }
+
+          .p-panelmenu-icon {
+            color: vars.$gray-color-text;
+          }
+        }
+
+        &:hover {
+          background-color: vars.$blue-color;
+
+          .p-panelmenu-link {
+            .p-panelmenu-text {
+              color: vars.$color-white;
+            }
+
+            .p-panelmenu-icon {
+              color: vars.$color-white;
+            }
+          }
+        }
+      }
+    }
+
+    .p-panelmenu-content {
+      padding: 0.5rem 1.5rem;
+      border: 0px solid;
+
+      .p-menuitem {
+        margin-bottom: 3px;
+        &>.p-menuitem-content {
+          border-radius: 6px;
+
+          .p-menuitem-link {
+            padding: 0.70rem 0.65rem;
+            border-radius: 6px;
+            color: vars.$gray-color-text;
+            position: relative;
+
+            .p-menuitem-text {
+              color: vars.$gray-color-text;
+              font-size: vars.$body-font-size;
+            }
+
+            .p-menuitem-icon {
+              color: vars.$gray-color-text;
+            }
+
+            .p-submenu-icon {
+              position: absolute;
+              right: 0;
+            }
+          }
+
+          &:hover {
+            background-color: vars.$blue-color;
+            color: vars.$color-white;
+
+            .p-menuitem-link {
+              color: vars.$color-white;
+
+              .p-menuitem-text {
+                color: vars.$color-white;
+              }
+
+              .p-panelmenu-icon {
+                color: vars.$color-white;
+              }
+            }
+          }
+        }
+        &.p-focus{
+          background-color: vars.$blue-color;
+          border-radius: 6px;
+        }
+      }
+    }
+  }
+
+  .logo-wraper {
+    margin-bottom: 27px;
+
+    .logo {
+      max-width: 127px;
+    }
+  }
+}
