@@ -3,7 +3,6 @@ import { Menu } from 'primereact/menu';
 import { Button } from 'primereact/button';
 import LeftMenu from '../components/menu';
 import AdminHeader from '../components/header';
-import SubHeaderPanel from '../components/sub-header';
 import { Card } from 'primereact/card';
 import { Chart } from 'primereact/chart';
 import { Dropdown } from 'primereact/dropdown';
@@ -163,7 +162,18 @@ const Dashboard = () => {
       <LeftMenu />
       <div className='w-full right-panel-component'>
         <AdminHeader />
-        <SubHeaderPanel />
+        <div className="flex align-items-center justify-content-between sub-header-panel">
+            {/* Left Section: Heading and Subheading */}
+            <div className="sub-header-left">
+                <h3>Dashboard</h3>
+                <p>Overview of all important data</p>
+            </div>
+
+            {/* Right Section: Action Button */}
+            <div className="sub-header-right">
+                {/* <Button label="Action" icon="pi pi-plus" className="p-button-primary" /> */}
+            </div>
+        </div>
         <div className='card-wrapper-gap'>
           <div className='v-grid v-grid-two-column'>
             <div className='item'>
@@ -371,7 +381,6 @@ const Dashboard = () => {
                 </Card>
               </div>
             </div>
-
           </div>
         </div>
       </div>

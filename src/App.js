@@ -5,6 +5,8 @@ import Login from './pages/auth/login';
 import Signup from './pages/auth/signup';
 import ForgotPassword from './pages/auth/forgot-password';
 import Dashboard from './pages/dashboard';
+import Role from './pages/user-management/role';
+import Users from './pages/user-management/users';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/user-management/role" element={<Role />} />
+          <Route path="/user-management/users" element={<Users />} />
       </Routes>
     </div>
   );

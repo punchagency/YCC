@@ -1,0 +1,31 @@
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+
+.dashboard-overview {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  .dashboard-overview-item {
+    width: 50%;
+    height: 103px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: vars.$light-black;
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    &:nth-last-child(1){
+      margin-bottom: 0;
+    }
+    &:nth-last-child(2){
+      margin-bottom: 0;
+    }
+    p{
+      color: #9E9E9E;
+      margin-bottom: 0;
+      margin-top: 5px;
+    }
+  }
+}

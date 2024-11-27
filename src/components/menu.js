@@ -1,20 +1,34 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom'; 
 import { PanelMenu } from "primereact/panelmenu";
 import logo from '../assets/images/logo-login.png';
 
 export default function LeftMenu() {
+    const navigate = useNavigate();
     const menuItems = [
         { 
             label: "Dashboard", 
             icon: "pi pi-home", 
-            command: () => console.log("Dashboard clicked") 
+            command: () => {
+                navigate('/dashboard'); // Navigate to the dashboard
+            }
         },
         { 
             label: "User Management", 
             icon: "pi pi-users", 
             items: [
-                { label: "Role", command: () => console.log("Role clicked") },
-                { label: "User", command: () => console.log("Userclicked") },
+                { 
+                    label: "Role", 
+                    command: () => {
+                        navigate('/user-management/role'); // Navigate to the dashboard
+                    }
+                },
+                {   
+                    label: "User", 
+                    command: () => {
+                        navigate('/user-management/users'); // Navigate to the dashboard
+                    }
+                },
             ]
         },
         { 

@@ -166,34 +166,40 @@ ul{
     padding: 0;
     padding-top: 15px;
   }
-}
-
-.dashboard-overview {
-  display: flex;
-  width: 100%;
-  flex-wrap: wrap;
-  .dashboard-overview-item {
-    width: 50%;
-    height: 103px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #212121;
-    font-size: 24px;
-    font-weight: 500;
-    margin-bottom: 15px;
-    &:nth-last-child(1){
-      margin-bottom: 0;
-    }
-    &:nth-last-child(2){
-      margin-bottom: 0;
-    }
-    p{
-      color: #9E9E9E;
-      margin-bottom: 0;
-      margin-top: 5px;
-    }
+  &.role-card{
+     .p-card-body{
+        .p-card-content{
+           padding-top: 0px;
+           .card-header{
+              margin-bottom: 20px;
+              .card-icon{
+                 max-width: 49px;
+              }
+              .card-heading{
+                 padding-left: 20px;
+                 h3{
+                    &.title{
+                       font-size: 18px;
+                       font-weight: 500;
+                       color: #212121;
+                    }
+                 }
+                 p{
+                   &.subtitle{
+                     font-size: 12px;
+                     font-weight: 500;
+                     color: #757575;
+                   }
+                 }
+              }
+           }
+           .card-content{
+              font-size: 14px;
+              font-weight: 400;
+              color: #757575
+           }
+        }
+     }
   }
 }
 
@@ -207,4 +213,23 @@ ul{
   width: 400px;
   height: 400px;
   margin: 0 auto;
+}
+
+.card-wraper{
+   padding: 30px;
+   box-sizing: border-box;
+   background-color: vars.$color-white;
+   border-radius: 10px;
+}
+
+.sub-header-right{
+   .search{
+      .pi-search{
+        padding-left: 14px;
+      }
+      .p-inputtext{
+         padding: 0.6rem 0.75rem;
+         padding-left: 40px;
+      }
+   }
 }
