@@ -34,7 +34,7 @@ const Users = () => {
         { id: 15, name: 'Laura White', role: 'Editor', email: 'laura@example.com' },
         { id: 16, name: 'Mark Taylor', role: 'Viewer', email: 'mark@example.com' },
       ];
-      setUsers(fetchedUsers.slice(0, 10)); // Initialize the first page with 10 users
+      setUsers(fetchedUsers.slice(0, 20)); // Initialize the first page with 10 users
       setLoading(false);
     }, 1000); // Simulates a 1-second delay
   }, []);
@@ -92,7 +92,7 @@ const Users = () => {
           </div>
         </div>
         <div className="card-wrapper-gap">
-          <DataTable value={users} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
+          <DataTable value={users} paginator rows={10} rowsPerPageOptions={[10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
             <Column field="id" header="ID" style={{ width: '10%' }} body={loading ? skeletonTemplate : null} />
             <Column field="name" header="Name" style={{ width: '30%' }} body={loading ? skeletonTemplate : null} />
             <Column field="email" header="Email" style={{ width: '30%' }} body={loading ? skeletonTemplate : null} />
