@@ -54,12 +54,12 @@ ul{
 }
 
 .p-button{
+  font-size: 14px;
+  @include transition(all, 0.3s, ease-in-out);
   &.p-button-primary{
     color: vars.$color-white;
     background: vars.$blue-color;
     border: 1px solid vars.$blue-color;
-    font-size: 14px;
-    @include transition(all, 0.3s, ease-in-out);
     &:hover{
       background: vars.$dark-blue-color;
       border-color: vars.$dark-blue-color;
@@ -201,6 +201,45 @@ ul{
         }
      }
   }
+  &.details-card{
+      .p-card-title{
+          padding-bottom: 8px;
+      }
+     .p-card-content{
+          border-top: 1px solid #E0E0E0;
+          .details-content {
+              display: flex;
+              border-bottom: 1px solid #dfe7ef;
+              width: 100%;
+              margin-bottom: 14px;
+              flex-wrap: wrap;
+              .details-content-lable{
+                width: 30%;
+                padding-bottom: 14px;
+                color: #9e9e9e;
+                font-size: 14px;
+                font-weight: 500;
+                word-wrap: break-word;
+              }
+              .details-content-text{
+                width: 70%;
+                padding-bottom: 14px;
+                color: #111;
+                font-size: 14px;
+                font-weight: 400;
+                word-wrap: break-word;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                overflow-wrap: anywhere;
+              }
+              &:last-child{
+                border-bottom: 0px solid #dfe7ef;
+                margin-bottom: 0px;
+              }
+          } 
+     }
+  }
 }
 
 .right-aligned-menu .p-menu {
@@ -232,4 +271,182 @@ ul{
          padding-left: 40px;
       }
    }
+}
+
+
+.p-datatable{
+  .p-datatable-table{
+    min-width: 50rem;
+    padding-top: 10px;
+    background: #e9ecef;
+    border-radius: 10px;
+    .p-datatable-thead{
+      th{
+         .p-column-header-content{
+            .p-column-title{
+                font-size: 14px;
+                font-weight: 600;
+                color: #343A40;
+            }
+         }
+      }
+    }
+    .p-datatable-tbody{
+      td{
+         font-size: 14px;
+         font-weight: 400;
+         color: #495057;
+         .p-button{
+          &.p-button-rounded{
+            &.p-button-icon-only{
+              border-radius: 0;
+              height: auto;
+              width: auto;
+              padding: 0px;
+              .p-button-icon{
+                 &:before{
+                   color: #212121;
+                 }
+              }
+            }
+          }
+          &.p-button-text:not(:disabled){
+            &:hover{
+                background: transparent;
+                border-color: transparent;
+            }
+            &:focus{
+                background: transparent;
+                border-color: transparent;
+                box-shadow: 0 0 0 0px #ffffff, 0 0 0 0px #b1b3f8, 0 0px 0px 0 rgb(0, 0, 0);
+            }
+          }
+        }
+      }
+    }
+    .pointer-row{
+      cursor: pointer;
+    }
+  }
+  .p-paginator-bottom{
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+}
+
+.datatable-overlaypanel{
+  border: 1px solid #DEE2E6;
+  box-shadow: 0 0px 0px rgba(0, 0, 0, 0.3);
+  &.p-overlaypanel{
+     &:before{
+       display: none;
+     }
+     &:after{
+      display: none;
+    }
+    .p-overlaypanel-content{
+       .p-button-text{
+         text-align: left;
+         padding: 0.75rem;
+         .p-button-icon{
+           color: #6C757D;
+           margin-right: 15px;
+         }
+         .p-button-label{
+            color: #212121;
+            font-size: 14px;
+            font-weight: 500;
+         }
+         &:not(:disabled):active{
+          background: transparent;
+          color: #212121;
+          border-color: transparent;
+         }
+         &:focus{
+            box-shadow: 0 0 0 0px #ffffff, 0 0 0 0px #b1b3f8, 0 0px 0px 0 rgb(0, 0, 0);
+         }
+       }
+    }
+  }
+}
+
+.p-tabview{
+   &.tabview-detaols{
+      .p-tabview-panels{
+        background: transparent;
+        padding: 1.25rem 0;
+        border: 0 none;
+        color: #212121;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+      .p-tabview-nav-container{
+         .p-tabview-nav{
+            .p-unselectable-text{
+                .p-tabview-nav-link{
+                   .p-tabview-title{
+                     color: #37404C;
+                     font-size: 14px;
+                     font-weight: 500;
+                   }
+                }
+            }
+         }
+      }
+   }
+}
+
+
+.v-tab {
+  display: flex;
+  flex-direction: row;
+  &.p-tabview{
+    display: flex;
+    .p-tabview-nav-container{
+       position: relative;
+       .p-tabview-nav-content{
+          scroll-padding-inline: 3rem;
+          .p-tabview-nav{
+            display: flex;
+            flex-direction: column;
+            width: 240px;
+            box-sizing: border-box;
+            padding-right: 25px;
+            background: none;
+            border: 0px solid #dfe7ef;
+            border-width: 0 0 0px 0;
+            li{
+              margin-right: 0;
+              .p-tabview-nav-link{
+                color: #6c757d;
+                font-size: 14px;
+                font-weight: 600;
+                word-wrap: break-word;
+                background: none;
+                border-color: transparent;
+                border-radius: 6px;
+                padding: 1rem 1.25rem;
+                margin-bottom: 5px;
+                border: solid #dfe7ef;
+                border-width: 0;
+                .p-tabview-title{
+                  white-space: revert-layer;
+                  line-height: 18px;
+                  color: #616161;
+                  font-size: 16px;
+                  font-weight: 500;
+                }
+              }
+              &.p-highlight{
+                .p-tabview-nav-link{
+                  background: #f8f9fa;
+                  border-color: transparent;
+                }
+              }
+            }
+          }
+       }
+    }
+  }
 }

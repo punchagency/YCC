@@ -9,6 +9,16 @@
   border-bottom: 1px solid vars.$light-gray-color;
   .sub-header-left{
     text-align: left;
+    &.sub-header-left-with-arrow{
+      display: flex;
+      flex-direction: row;
+    }
+    .arrow{
+      padding-right: 10px;
+      a{
+         color: #212121;
+      }
+    }
     h3{
       font-size: 18px;
       font-weight: 500;

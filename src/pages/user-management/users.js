@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'; // Ensure useRef is imported
+import React, { useState, useEffect, useRef } from 'react'; 
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import LeftMenu from '../../components/menu';
 import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
@@ -9,34 +10,34 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { Skeleton } from 'primereact/skeleton';
 
 const Users = () => {
-  const [users, setUsers] = useState([]); // Store paginated users
+  const [users, setUsers] = useState([]); 
   const [loading, setLoading] = useState(true);
-  const menuRef = useRef(null); // `useRef` is now correctly imported
+  const menuRef = useRef(null); 
+  const navigate = useNavigate(); // Initialize the navigate hook
 
   useEffect(() => {
-    // Simulate a fetch call
     setTimeout(() => {
       const fetchedUsers = [
-        { id: 1, name: 'John Doe', role: 'Admin', email: 'john@example.com' },
-        { id: 2, name: 'Jane Smith', role: 'Editor', email: 'jane@example.com' },
-        { id: 3, name: 'Emily Davis', role: 'Viewer', email: 'emily@example.com' },
-        { id: 4, name: 'Michael Brown', role: 'Admin', email: 'michael@example.com' },
-        { id: 5, name: 'Sarah Wilson', role: 'Editor', email: 'sarah@example.com' },
-        { id: 6, name: 'Chris Evans', role: 'Viewer', email: 'chris@example.com' },
-        { id: 7, name: 'Laura White', role: 'Editor', email: 'laura@example.com' },
-        { id: 8, name: 'Mark Taylor', role: 'Viewer', email: 'mark@example.com' },
-        { id: 9, name: 'John Doe', role: 'Admin', email: 'john@example.com' },
-        { id: 10, name: 'Jane Smith', role: 'Editor', email: 'jane@example.com' },
-        { id: 11, name: 'Emily Davis', role: 'Viewer', email: 'emily@example.com' },
-        { id: 12, name: 'Michael Brown', role: 'Admin', email: 'michael@example.com' },
-        { id: 13, name: 'Sarah Wilson', role: 'Editor', email: 'sarah@example.com' },
-        { id: 14, name: 'Chris Evans', role: 'Viewer', email: 'chris@example.com' },
-        { id: 15, name: 'Laura White', role: 'Editor', email: 'laura@example.com' },
-        { id: 16, name: 'Mark Taylor', role: 'Viewer', email: 'mark@example.com' },
+        { id: 1, name: 'John Doe', role: 'Engineer', email: 'john@example.com', contact: '(480) 555-0103', department: 'Engineering'},
+        { id: 2, name: 'Jane Smith', role: 'Administrator', email: 'jane@example.com', contact: '(480) 555-0112', department: 'Exterior' },
+        { id: 3, name: 'Emily Davis', role: 'HOD', email: 'emily@example.com', contact: '(480) 555-0144', department: 'Interior' },
+        { id: 4, name: 'Michael Brown', role: 'Engineer', email: 'michael@example.com', contact: '(480) 555-0106', department: 'Engineering' },
+        { id: 5, name: 'Sarah Wilson', role: 'Administrator', email: 'sarah@example.com', contact: '(480) 555-0133', department: 'Interior' },
+        { id: 6, name: 'Chris Evans', role: 'HOD', email: 'chris@example.com', contact: '(480) 555-0158', department: 'Exterior' },
+        { id: 7, name: 'Laura White', role: 'Administrator', email: 'laura@example.com', contact: '(480) 555-0177', department: 'Captain' },
+        { id: 8, name: 'Mark Taylor', role: 'Engineer', email: 'mark@example.com', contact: '(480) 555-0160', department: 'Chef' },
+        { id: 9, name: 'John Doe', role: 'HOD', email: 'john@example.com', contact: '(480) 555-0122', department: 'Engineering' },
+        { id: 10, name: 'Jane Smith', role: 'Engineer', email: 'jane@example.com', contact: '(480) 555-0199', department: 'Exterior' },
+        { id: 11, name: 'Emily Davis', role: 'HOD', email: 'emily@example.com', contact: '(480) 555-0100', department: 'Chef' },
+        { id: 12, name: 'Michael Brown', role: 'Administrator', email: 'michael@example.com', contact: '(480) 555-0155', department: 'Interior' },
+        { id: 13, name: 'Sarah Wilson', role: 'Engineer', email: 'sarah@example.com', contact: '(480) 555-0185', department: 'Engineering' },
+        { id: 14, name: 'Chris Evans', role: 'HOD', email: 'chris@example.com', contact: '(480) 555-0125', department: 'Chef' },
+        { id: 15, name: 'Laura White', role: 'HOD', email: 'laura@example.com', contact: '(480) 555-0124', department: 'Engineering' },
+        { id: 16, name: 'Mark Taylor', role: 'Engineer', email: 'mark@example.com', contact: '(480) 555-0141', department: 'Interior' },
       ];
-      setUsers(fetchedUsers.slice(0, 20)); // Initialize the first page with 10 users
+      setUsers(fetchedUsers.slice(0, 20)); 
       setLoading(false);
-    }, 1000); // Simulates a 1-second delay
+    }, 500);
   }, []);
 
   const actionBodyTemplate = (rowData) => (
@@ -46,7 +47,7 @@ const Users = () => {
         className="p-button-rounded p-button-text"
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <OverlayPanel ref={menuRef} dismissable>
+      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
         <Button
           label="Edit"
           icon="pi pi-pencil"
@@ -65,13 +66,23 @@ const Users = () => {
 
   const skeletonTemplate = () => (
     <>
-      <Skeleton width="10%" className="mr-2" />
-      <Skeleton width="30%" className="mr-2" />
-      <Skeleton width="30%" className="mr-2" />
-      <Skeleton width="20%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
       <Skeleton width="10%" />
     </>
   );
+
+  // Function to handle row click and navigate to user details page
+  const handleRowClick = (rowData) => {
+    navigate(`/user-management/users/${rowData.id}`); // Navigate to the user details page with the user ID
+  };
+
+  const goToAddUserPage = () => {
+    navigate("/user-management/users/new");
+  };
 
   return (
     <main className="flex h-screen page">
@@ -80,7 +91,7 @@ const Users = () => {
         <AdminHeader />
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
-            <h3>Users</h3>
+            <h3>Users </h3>
             <p>List of all users assigned to each role. You can also add new users to a specific role.</p>
           </div>
           <div className="sub-header-right">
@@ -88,15 +99,26 @@ const Users = () => {
               <i className="pi pi-search" />
               <InputText type="search" placeholder="Search" />
             </div>
-            <Button label="Add User" icon="pi pi-plus" className="p-button-primary" />
+            <Button label="Add User" icon="pi pi-plus" onClick={goToAddUserPage} className="p-button-primary" />
           </div>
         </div>
         <div className="card-wrapper-gap">
-          <DataTable value={users} paginator rows={10} rowsPerPageOptions={[10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
-            <Column field="id" header="ID" style={{ width: '10%' }} body={loading ? skeletonTemplate : null} />
-            <Column field="name" header="Name" style={{ width: '30%' }} body={loading ? skeletonTemplate : null} />
-            <Column field="email" header="Email" style={{ width: '30%' }} body={loading ? skeletonTemplate : null} />
-            <Column field="role" header="Role" style={{ width: '20%' }} body={loading ? skeletonTemplate : null} />
+          <DataTable 
+            value={users} 
+            paginator 
+            rows={10} 
+            rowsPerPageOptions={[10, 25, 50]} 
+            tableStyle={{ minWidth: '50rem' }}
+            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            onRowClick={(e) => handleRowClick(e.data)} // Attach handleRowClick to the onRowClick event
+            rowClassName="pointer-row"
+          >
+            <Column field="name" header="Name" style={{ width: '18%' }} body={loading ? skeletonTemplate : null} />
+            <Column field="role" header="Job Role" style={{ width: '18%' }} body={loading ? skeletonTemplate : null} />
+            <Column field="email" header="Email" style={{ width: '18%' }} body={loading ? skeletonTemplate : null} />
+            <Column field="contact" header="Contact no" style={{ width: '18%' }} body={loading ? skeletonTemplate : null} />
+            <Column field="department" header="Department" style={{ width: '18%' }} body={loading ? skeletonTemplate : null} />
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
         </div>

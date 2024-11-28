@@ -7,6 +7,8 @@ import ForgotPassword from './pages/auth/forgot-password';
 import Dashboard from './pages/dashboard';
 import Role from './pages/user-management/role';
 import Users from './pages/user-management/users';
+import UserDetails from './pages/user-management/users-details';
+import AddUser from './pages/user-management/add-users';
 
 function App() {
   return (
@@ -19,9 +21,14 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management/role" element={<Role />} />
           <Route path="/user-management/users" element={<Users />} />
+          <Route path="/user-management/users/new" element={<AddUser />} />
+          {/* Dynamic Route for User Details */}
+          <Route path="/user-management/users/:id" element={<UserDetails />} />
       </Routes>
     </div>
   );
 }
 
 export default App;
+
+
