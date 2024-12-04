@@ -1,0 +1,37 @@
+@use '../layout/variables' as vars;
+@use '../mixins/transition' as *;
+.form-container {
+    margin: 5px;
+  .p-calendar {
+    .p-button {
+      background: none;
+      border: 1px solid vars.$gray-color-border;
+      border-left: none;
+    }
+    svg {
+      color: #000;
+    }
+   
+  }
+  .p-input-calender {
+    border-right: 0 ;
+  }
+  label {
+    color:vars.$light-black;;
+  }
+  h3 {
+    color: vars.$light-black;;
+  }
+  .border-line {
+    border: 0;
+    height: 1px;
+    background-color: vars.$gray-color-border;
+    margin: 1.5rem 0;
+  }
+  .p-button{
+    background: none;
+    color: #64748b;
+    font-weight: 700;
+    border: 1px solid #64748b;
+  }
+}

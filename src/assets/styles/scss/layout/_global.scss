@@ -272,6 +272,11 @@ ul{
       }
    }
 }
+.p-calendar-w-btn-right{
+  .p-inputtext{
+    border-right: 0;
+  }
+}
 
 
 .p-datatable{
@@ -397,10 +402,15 @@ ul{
    }
 }
 
-
 .v-tab {
   display: flex;
   flex-direction: row;
+  // &.v-tab-two{
+  //     .p-tabview-nav{
+  //       display: flex;
+  //       flex-direction: row;
+  //     }
+  // }
   &.p-tabview{
     display: flex;
     .p-tabview-nav-container{
@@ -440,7 +450,7 @@ ul{
               }
               &.p-highlight{
                 .p-tabview-nav-link{
-                  background: #f8f9fa;
+                  background: #fff;
                   border-color: transparent;
                 }
               }
@@ -449,4 +459,7 @@ ul{
        }
     }
   }
+}
+.p-tabview-panels{
+  width: 100%;
 }

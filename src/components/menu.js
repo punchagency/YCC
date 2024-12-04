@@ -48,7 +48,12 @@ export default function LeftMenu() {
                 </svg>
             ), 
             items: [
-                { label: "Vessel", command: () => console.log("Vessel clicked") }
+                { 
+                    label: "Vessel", 
+                    command: () => {
+                        navigate('/vessel-management/vessels'); 
+                    }
+                }
             ]
         },
         { 

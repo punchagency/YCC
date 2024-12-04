@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'; 
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import LeftMenu from '../../components/menu';
 import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
@@ -13,7 +13,7 @@ const Users = () => {
   const [users, setUsers] = useState([]); 
   const [loading, setLoading] = useState(true);
   const menuRef = useRef(null); 
-  const navigate = useNavigate(); // Initialize the navigate hook
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     setTimeout(() => {

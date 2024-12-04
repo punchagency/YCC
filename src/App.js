@@ -9,6 +9,8 @@ import Role from './pages/user-management/role';
 import Users from './pages/user-management/users';
 import UserDetails from './pages/user-management/users-details';
 import AddUser from './pages/user-management/add-users';
+import Vessels from './pages/vessel-management/vessels';
+import AddVessel from './pages/vessel-management/add-vessels';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/user-management/role" element={<Role />} />
           <Route path="/user-management/users" element={<Users />} />
           <Route path="/user-management/users/new" element={<AddUser />} />
+          <Route path="/vessel-management/vessels" element={<Vessels />} />
+          <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
           {/* Dynamic Route for User Details */}
           <Route path="/user-management/users/:id" element={<UserDetails />} />
       </Routes>
