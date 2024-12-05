@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef, useCallback } from 'react'; 
 import { useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
@@ -6,11 +7,14 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
+import { Skeleton } from 'primereact/skeleton';
+import { OverlayPanel } from 'primereact/overlaypanel';
 
 const Vessels = () => {
   const [vessels, setVessels] = useState([]);
   const [filteredVessels, setFilteredVessels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const menuRef = useRef(null); 
 
   // State for filters
   const [selectedType, setSelectedType] = useState(null);
@@ -37,7 +41,7 @@ const Vessels = () => {
   }, []);
 
   // Handle filter logic
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filteredData = vessels;
 
     if (selectedType) {
@@ -51,12 +55,12 @@ const Vessels = () => {
     }
 
     setFilteredVessels(filteredData);
-  };
+  }, [vessels, selectedType, selectedYear, selectedStatus]);
 
-  // Apply filters whenever the selection changes
-  useEffect(() => {
+  // Apply filters when dependencies change
+   useEffect(() => {
     applyFilters();
-  }, [selectedType, selectedYear, selectedStatus]);
+  }, [applyFilters]);
 
   // Dropdown options
   const vesselTypes = [
@@ -74,6 +78,41 @@ const Vessels = () => {
   const goToAddVesselPage = () => {
     navigate("/vessel-management/vessels/new");
   };
+
+  const actionBodyTemplate = (rowData) => (
+    <>
+      <Button
+        icon="pi pi-ellipsis-v"
+        className="p-button-rounded p-button-text"
+        onClick={(e) => menuRef.current.toggle(e)}
+      />
+      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
+        <Button
+          label="Edit"
+          icon="pi pi-pencil"
+          className="p-button-text w-full"
+          onClick={() => console.log('Edit', rowData)}
+        />
+        <Button
+          label="Delete"
+          icon="pi pi-trash"
+          className="p-button-text w-full"
+          onClick={() => console.log('Delete', rowData)}
+        />
+      </OverlayPanel>
+    </>
+  );
+
+  const skeletonTemplate = () => (
+    <>
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="10%" />
+    </>
+  );
 
   return (
     <main className="flex h-screen page">
@@ -153,6 +192,7 @@ const Vessels = () => {
                 </span>
               )}
             />
+            <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
         </div>
       </div>

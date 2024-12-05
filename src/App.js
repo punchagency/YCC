@@ -28,6 +28,7 @@ function App() {
           <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
           {/* Dynamic Route for User Details */}
           <Route path="/user-management/users/:id" element={<UserDetails />} />
+          <Route path="/user-management/users/edit/:id" element={<AddUser />} />
       </Routes>
     </div>
   );

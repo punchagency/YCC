@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "react-scripts": "^5.0.1",
-    "sass": "^1.81.0",
+    "sass": "^1.82.0",
     "sass-loader": "^16.0.3"
   }
 }

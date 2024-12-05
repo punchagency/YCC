@@ -9,6 +9,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Password } from 'primereact/password';
+import { FileUpload } from 'primereact/fileupload';
 
 const AddUser = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const AddUser = () => {
   const [selectedCertification, setSelectedCertification] = useState(null);
   const [personalAddress, setPersonalAddress] = useState(null);
   const [professionalAddress, setProfessionalAddress] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
+//   const [filePreview, setFilePreview] = useState(null);
   const [selectedAllergies, setSelectedAllergies] = useState(null);
 
   const nationalities = [
@@ -63,21 +64,25 @@ const AddUser = () => {
     navigate("/user-management/users");
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFilePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleCancel = () => {
+    navigate("/user-management/users"); // Navigate to the desired page
   };
 
-  const handleFileClick = (e) => {
-    e.preventDefault(); 
-    document.getElementById("upload-cv").click(); 
-  };
+//   const handleFileChange = (event) => {
+//     const file = event.target.files[0];
+//     if (file) {
+//       const reader = new FileReader();
+//       reader.onload = () => {
+//         setFilePreview(reader.result);
+//       };
+//       reader.readAsDataURL(file);
+//     }
+//   };
+
+//   const handleFileClick = (e) => {
+//     e.preventDefault(); 
+//     document.getElementById("upload-cv").click(); 
+//   };
 
   return (
     <main className="flex h-screen page">
@@ -103,6 +108,7 @@ const AddUser = () => {
               severity="secondary"
               outlined
               className="p-button-secondary mr-3"
+              onClick={handleCancel} // Add onClick handler
             />
             <Button
               onClick={goUserPage}
@@ -119,65 +125,67 @@ const AddUser = () => {
               <div className="form-container">
                 <h3>Personal Information</h3>
                 <hr className="border-line"></hr>
-                <form className="grid">
-                  <div className="col-12">
-                    <label htmlFor="name">Full Name</label>
-                    <InputText
-                      id="name"
-                      placeholder="Enter full name"
-                      className="w-full mt-2 p-inputtext p-component"
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label htmlFor="dob">Date of Birth</label>
-                    <Calendar
-                      id="dob"
-                      value={date}
-                      onChange={(e) => setDate(e.value)}
-                      showIcon
-                      placeholder="Date of birth"
-                      className="w-full mt-2 p-input-calender"
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label htmlFor="nationality">Nationality</label>
-                    <Dropdown
-                      id="nationality"
-                      value={selectedNationality}
-                      onChange={(e) => setSelectedNationality(e.value)}
-                      options={nationalities}
-                      optionLabel="name"
-                      placeholder="Select a nationality"
-                      className="w-full mt-2"
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label htmlFor="phone">Phone</label>
-                    <InputText
-                      id="phone"
-                      placeholder="Phone no"
-                      className="w-full mt-2 p-inputtext p-component"
-                    />
-                  </div>
-                  <div className="col-6">
-                    <label htmlFor="phone">Email</label>
-                    <InputText
-                      id="email"
-                      placeholder="Enter Email"
-                      className="w-full mt-2 p-inputtext p-component"
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label htmlFor="address">Address (optional)</label>
-                    <InputTextarea
-                      id="address"
-                      value={personalAddress}
-                      onChange={(e) => setPersonalAddress(e.target.value)}
-                      rows={5}
-                      className="w-full mt-2 p-inputtext p-component"
-                      placeholder="Address"
-                    />
-                  </div>
+                <form>
+                    <div className="grid">
+                      <div className="col-12">
+                        <label htmlFor="name">Full Name</label>
+                        <InputText
+                          id="name"
+                          placeholder="Enter full name"
+                          className="w-full mt-2 p-inputtext p-component"
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label htmlFor="dob">Date of Birth</label>
+                        <Calendar
+                          id="dob"
+                          value={date}
+                          onChange={(e) => setDate(e.value)}
+                          showIcon
+                          placeholder="Date of birth"
+                          className="w-full mt-2 p-input-calender"
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label htmlFor="nationality">Nationality</label>
+                        <Dropdown
+                          id="nationality"
+                          value={selectedNationality}
+                          onChange={(e) => setSelectedNationality(e.value)}
+                          options={nationalities}
+                          optionLabel="name"
+                          placeholder="Select a nationality"
+                          className="w-full mt-2"
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label htmlFor="phone">Phone</label>
+                        <InputText
+                          id="phone"
+                          placeholder="Phone no"
+                          className="w-full mt-2 p-inputtext p-component"
+                        />
+                      </div>
+                      <div className="col-6">
+                        <label htmlFor="phone">Email</label>
+                        <InputText
+                          id="email"
+                          placeholder="Enter Email"
+                          className="w-full mt-2 p-inputtext p-component"
+                        />
+                      </div>
+                      <div className="col-12">
+                        <label htmlFor="address">Address (optional)</label>
+                        <InputTextarea
+                          id="address"
+                          value={personalAddress}
+                          onChange={(e) => setPersonalAddress(e.target.value)}
+                          rows={5}
+                          className="w-full mt-2 p-inputtext p-component"
+                          placeholder="Address"
+                        />
+                      </div>
+                    </div>
                 </form>
               </div>
             </TabPanel>
@@ -246,34 +254,36 @@ const AddUser = () => {
                     />
                   </div>
                   <div className="col-6">
-                    <label htmlFor="upload-cv">Upload CV</label>
-                    <div className="flex">
-                    <div>
-                        {filePreview && (
-                          <div className="mt-2">
-                            <img
-                              src={filePreview}
-                              alt="File preview"
-                              className="w-20 mr-3"
+                    <label htmlFor="upload-cv">Upload CV (Upload pdf or doc)</label>
+                    <div className="flex upload-cv-component">
+                        {/* <div className="upload-cv-image">
+                            {filePreview && (
+                            <div className="mt-2">
+                                <img
+                                src={filePreview}
+                                alt="File preview"
+                                className="w-20 mr-3"
+                                />
+                            </div>
+                            )}
+                        </div>
+                        <div className="custom-file-upload">
+                            <input
+                            id="upload-cv"
+                            type="file"
+                            onChange={handleFileChange}
+                            accept=".pdf, .docx"
+                            hidden
                             />
-                          </div>
-                        )}
-                      </div>
-                      <div className="custom-file-upload">
-                        <input
-                          id="upload-cv"
-                          type="file"
-                          onChange={handleFileChange}
-                          accept=".pdf, .docx"
-                          hidden
-                        />
-                        <Button
-                          label="Upload"
-                          icon="pi pi-upload"
-                          className="p-button-secondary mt-2"
-                          onClick={handleFileClick}
-                        />
-                      </div>
+                            <Button
+                            label="Upload"
+                            icon="pi pi-upload"
+                            className="p-button-secondary mt-2"
+                            onClick={handleFileClick}
+                            />
+                        </div> */}
+
+                        <FileUpload mode="basic" name="demo[]"  accept=".pdf,.xls" url="/api/upload" maxFileSize={1000000} className="mt-2"/>
                     </div>
                   </div>
                 </form>

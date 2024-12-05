@@ -101,7 +101,9 @@ export default function LeftMenu() {
         <div className="left-menu">
             <div className='flex justify-content-center align-items-center logo-wraper'>
                 <div className='logo'>
-                    <img src={logo} alt="Company logo" className='image-full' />
+                    <a href="/dashboard">
+                        <img src={logo} alt="Company logo" className='image-full' />
+                    </a>
                 </div>
             </div>
             <PanelMenu model={menuItems} />
