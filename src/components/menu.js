@@ -59,7 +59,9 @@ export default function LeftMenu() {
         { 
             label: "Document Management", 
             icon: "pi pi-file", 
-            command: () => console.log("Document clicked")
+            command: () => {
+                navigate('/document-management/documents'); 
+            }
         },
         { 
             label: "Maintenance scheduling", 
@@ -69,7 +71,9 @@ export default function LeftMenu() {
                 </svg>
             ), 
             items: [
-                { label: "Create task", command: () => console.log("Create task clicked") },
+                { label: "Create task",  command: () => {
+                    navigate('/maintenance-scheduling/maintenance'); 
+                } },
                 { label: "Schedule calendar", command: () => console.log("Schedule calendar ") },
                 { label: "Equipment & parts", command: () => console.log("Schedule calendar ") },
                 { label: "Warranty", command: () => console.log("Warranty ") }

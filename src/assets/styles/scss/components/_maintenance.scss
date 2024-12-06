@@ -1,0 +1,62 @@
+.task-details-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.task-details-card {
+ 
+}
+
+.task-details-grid {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0; /* Adds border below the grid */
+    padding-bottom: 15px;
+}
+
+.task-details-column {
+    flex: 1;
+}
+
+.task-details-item {
+    margin-bottom: 15px;
+    padding-bottom: 10px; /* Add space inside item */
+    border-bottom: 1px solid #e0e0e0; /* Add underline below each item */
+}
+
+.task-details-item strong {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.task-details-item span {
+    display: block;
+}
+
+.task-details-notes {
+    margin-bottom: 20px;
+    padding-bottom: 10px; /* Add space */
+    border-bottom: 1px solid #e0e0e0; /* Add border below notes */
+}
+
+.task-details-notes p {
+    margin: 5px 0 0 0;
+}
+
+.task-details-download {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0; /* Add border above download */
+    margin-top: 15px;
+}
+
+.task-details-icon {
+    font-size: 1.5rem;
+    color: red;
+}

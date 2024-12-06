@@ -35,6 +35,18 @@ const AddVassel = () => {
   const [actionStatus, setActionStatus] = useState(null);
   const [inspectionDate, setInspectionDate] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [complianceStatus, setComplianceStatus] = useState(null);
+  const [scheduledDate,setScheduledDate] = useState(null);
+  const [scheduledType,setScheduledType] = useState(null);
+  const [reminder,setReminder] = useState(null);
+  const [taskDescription,setTaskDescription] = useState(null);
+  const [taskCategory,setTaskCategory] = useState(null);
+  const [maintenanceDate,setMaintenanceDate] = useState(null);
+  const [serviceType,setServiceType] = useState(null);
+  const [workDescription,setWorkDescription] = useState(null);
+  const [replacementDate,setReplacementDate] = useState(null);
+  const [financeCategory,setFinanceCategory] = useState(null);
+  const [revenueSource,setRevenueSource] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
 
   const goVasselPage = () => {
@@ -49,18 +61,23 @@ const AddVassel = () => {
   const handlePhoneChange = (e) => {
     setPhone(e.value);
   }
-
   const handleFileSelect = (event) => {
-    const files = Array.from(event.target.files).map((file) => ({
+    const files = Array.from(event.target.files);
+    const newUploadedFiles = files.map((file) => ({
       name: file.name,
-      url: URL.createObjectURL(file),
+      type: file.type || '',
+      url: URL.createObjectURL(file), // Create a temporary URL for images
     }));
-    setUploadedFiles((prev) => [...prev, ...files]);
+
+    // Update state with selected files
+    setUploadedFiles((prevFiles) => [...prevFiles, ...newUploadedFiles]);
   };
 
-  // Function to remove a file
+  // Remove a file from the uploaded list
   const removeFile = (fileName) => {
-    setUploadedFiles((prev) => prev.filter((file) => file.name !== fileName));
+    setUploadedFiles((prevFiles) =>
+      prevFiles.filter((file) => file.name !== fileName)
+    );
   };
 
   const nationalities = [
@@ -117,6 +134,35 @@ const AddVassel = () => {
   const actionStatuses = [
     { name: "Not Started" },
     { name: "Started" }
+  ];
+
+  const complianceStatuses = [
+    { name: "Yes" },
+    { name: "No" }
+  ];
+
+  const scheduledTypes = [
+    { name: "Port State Control (PSC) Inspection" },
+    { name: "Inspection" }
+  ];
+
+  const taskCategories = [
+    { name: "Engine & Propulsion Systems" },
+    { name: "Engine & Propulsion" }
+  ];
+
+  const serviceTypes = [
+    { name: "Internal (Crew)" },
+    { name: "External (Crew)" }
+  ];
+
+  const financeCategories = [
+    { name: "Maintenance" },
+    { name: "Maintenance 2" }
+  ];
+  const revenueSources = [
+    { name: "Charter" },
+    { name: "Charter 2" }
   ];
 
   return (
@@ -543,97 +589,626 @@ const AddVassel = () => {
                           </div>
 
                           <div className="col-6">
-                          <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                          <div className="flex align-content-center gap-4">
-                              <div className="flex">
-                                {uploadedFiles.map((file, index) => (
-                                  <div
-                                    key={index}
-                                    style={{
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      alignItems: "center",
-                                      textAlign: "center",
-                                      position: "relative",
-                                    }}
-                                  >
-                                    <i
-                                      className="pi pi-file-pdf"
-                                      style={{
-                                        fontSize: "2rem",
-                                        color: "red",
-                                        position: "relative",
-                                      }}
-                                    ></i>
-                                    <span className="uploadfiles"
-                                      style={{
-                                        fontSize: "0.4rem",
-                                        cursor: "pointer",
-                                        color: "red",
-                                        position: "absolute",
-                                        top: "-5px",
-                                        right: "-10px",
-                                        backgroundColor: "white",
-                                        borderRadius: "50%",
-                                        padding: "2px",
-                                      }}
-                                      onClick={() => removeFile(file.name)}
-                                    >
-                                      <i className="pi pi-times"></i>
-                                    </span>
-                                  </div>
-                                ))}
+                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                            <div className="flex align-content-center gap-4 mt-3">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                              <label
-                                htmlFor="file-upload"
-                                style={{
-                                  display: "inline-block",
-                                  backgroundColor: "#007ad9",
-                                  color: "white",
-                                  padding: "0.5rem 1rem",
-                                  borderRadius: "5px",
-                                  cursor: "pointer",
-                                  fontWeight: "bold",
-                                  marginTop:"10px"
-                                }}
-                              >
-                                <i className="pi pi-upload mr-2"></i>
-                                Upload
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
                               </label>
                               <input
                                 type="file"
                                 id="file-upload"
                                 multiple
-                                accept=".pdf"
-                                style={{ display: "none" }}
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
                                 onChange={handleFileSelect}
                               />
                             </div>
                           </div>
+
 
                         </div>
                       </form>
                     </div>
                   </TabPanel>
                   <TabPanel header="Compliance Verification">
-                    ghjghjgh
+                    <div className="form-container">
+                      <h5>Compliance Verification</h5>
+                      <form>
+                        <div className="grid">
+                          <div className="col-6">
+                            <label htmlFor="complianceStatus">Return to Compliance</label>
+                            <Dropdown
+                              id="complianceStatus"
+                              value={complianceStatus}
+                              onChange={(e) => setComplianceStatus(e.value)}
+                              options={complianceStatuses}
+                              optionLabel="name"
+                              placeholder={complianceStatuses.length > 0 ? complianceStatuses[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="verificationOfficerName">Verification Officer Name (Optional)</label>
+                            <InputText
+                              id="verificationOfficerName"
+                              placeholder="Enter Officer’s Name"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+                          <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                            <div className="flex align-content-center gap-4 mt-3">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+
+
+
+                        </div>
+                      </form>
+                    </div>
                   </TabPanel>
                   <TabPanel header="Next Scheduled">
-                    yoiuioui
+                  <div className="form-container">
+                      <h5 className="mt-4">Next Scheduled</h5>
+                      <form>
+                        <div className="grid">
+                          <div className="col-6">
+                          <label htmlFor="scheduledDate">Date</label>
+
+                          <Calendar
+                              id="scheduledDate"
+                              value={scheduledDate}
+                              onChange={(e) => setScheduledDate(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+                      
+                          <div className="col-6">
+                            <label htmlFor="scheduledType">Type</label>
+                            <Dropdown
+                              id="scheduledType"
+                              value={scheduledType}
+                              onChange={(e) => setScheduledType(e.value)}
+                              options={scheduledTypes}
+                              optionLabel="name"
+                              placeholder={scheduledTypes.length > 0 ? scheduledTypes[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          
+                          <div className="col-12">
+                          <label htmlFor="reminder">Automatic Reminder</label>
+
+                          <Calendar
+                              id="reminder"
+                              value={reminder}
+                              onChange={(e) => setReminder(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+                        </div>
+                      </form>
+                    </div>
                   </TabPanel>
                 </TabView>
               </div>
             </TabPanel>
+
+
+
+
+
+
+
+
+
+
+
             <TabPanel header="Maintenance history">
               <div className="form-container">
-                <h3>Medical Information</h3>
-                <form className="grid"></form>
+              <TabView>
+                  <TabPanel header="Maintenance Logs">
+                    <div className="form-container">
+                      <h5>Maintenance Logs</h5>
+                      <form>
+                        <div className="grid">
+                        <div className="col-12">
+                            <label htmlFor="taskDescription" className="font-medium">Task Title (A brief description of the maintenance task)</label>
+                            <InputTextarea
+                              id="taskDescription"
+                              value={taskDescription}
+                              onChange={(e) => setTaskDescription(e.target.value)}
+                              rows={5}
+                              cols={10}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="taskCategory">Task Category</label>
+                            <Dropdown
+                              id="taskCategory"
+                              value={taskCategory}
+                              onChange={(e) => setTaskCategory(e.value)}
+                              options={taskCategories}
+                              optionLabel="name"
+                              placeholder={taskCategories.length > 0 ? taskCategories[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="maintenanceDate">Date of Maintenance</label>
+                            <Calendar
+                              id="maintenanceDate"
+                              value={maintenanceDate}
+                              onChange={(e) => setMaintenanceDate(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="serviceType">Service Provide Type</label>
+                            <Dropdown
+                              id="serviceType"
+                              value={serviceType}
+                              onChange={(e) => setServiceType(e.value)}
+                              options={serviceTypes}
+                              optionLabel="name"
+                              placeholder={serviceTypes.length > 0 ? serviceTypes[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="maintenanceDate">Date of Maintenance</label>
+                            <Calendar
+                              id="maintenanceDate"
+                              value={maintenanceDate}
+                              onChange={(e) => setMaintenanceDate(e.value)}
+                              showIcon
+                              placeholder="Motor Yacht"
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="workDescription" className="font-medium">Description of Work Done</label>
+                            <InputTextarea
+                              id="workDescription"
+                              value={workDescription}
+                              onChange={(e) => setWorkDescription(e.target.value)}
+                              rows={5}
+                              cols={10}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
+                            <div className="flex align-content-center gap-4">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+
+
+
+                        </div>
+                      </form>
+                    </div>
+                  
+                  </TabPanel>
+                  <TabPanel header="Corrective Action Plan">
+                    <div className="form-container">
+                      <h5>Spare Parts and Inventory</h5>
+                      <form>
+                        <div className="grid">
+                        <div className="col-6">
+                            <label htmlFor="partName">Parts Name</label>
+                            <InputText
+                              id="partName"
+                              placeholder="Inverters & Converters"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="quantity">Quantity</label>
+                            <InputText
+                              id="quantity"
+                              placeholder="2"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+                          <div className="col-6">
+                            <label htmlFor="replacementDate">Date of Replacement</label>
+                            <Calendar
+                              id="replacementDate"
+                              value={replacementDate}
+                              onChange={(e) => setReplacementDate(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="serviceType">Service Provide Type</label>
+                            <Dropdown
+                              id="serviceType"
+                              value={serviceType}
+                              onChange={(e) => setServiceType(e.value)}
+                              options={serviceTypes}
+                              optionLabel="name"
+                              placeholder={serviceTypes.length > 0 ? serviceTypes[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="supplierPhone">Supplier phone</label>
+                            <InputText
+                              id="supplierPhone"
+                              placeholder="897(789067)"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+                          <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                            <div className="flex align-content-center gap-4">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </form>
+                    </div>
+                  </TabPanel>
+                 
+               
+                </TabView>
               </div>
             </TabPanel>
             <TabPanel header="Financial Information">
               <div className="form-container">
-                <h3>Emergency Contact</h3>
-                <form className="grid"></form>
+              <TabView>
+                  <TabPanel header="Operational Expenses">
+                    <div className="form-container">
+                      <h5>Operational Expenses</h5>
+                      <form>
+                        <div className="grid">
+                      
+
+                          <div className="col-6">
+                            <label htmlFor="financeCategory">Category</label>
+                            <Dropdown
+                              id="financeCategory"
+                              value={financeCategory}
+                              onChange={(e) => setFinanceCategory(e.value)}
+                              options={financeCategories}
+                              optionLabel="name"
+                              placeholder={financeCategories.length > 0 ? financeCategories[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="amount">Amount</label>
+                            <InputText
+                              id="amount"
+                              placeholder="$400"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+
+                       
+
+                          <div className="col-12">
+                            <label htmlFor="date">Date</label>
+                            <Calendar
+                              id="date"
+                              value={date}
+                              onChange={(e) => setDate(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+
+                          <div className="col-12">
+                            <label htmlFor="workDescription" className="font-medium">Description <span className="text-xs">(A brief description of the maintenance task)</span></label>
+                            <InputTextarea
+                              id="workDescription"
+                              value={workDescription}
+                              onChange={(e) => setWorkDescription(e.target.value)}
+                              rows={5}
+                              cols={10}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
+                            <div className="flex align-content-center gap-4">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+
+
+
+                        </div>
+                      </form>
+                    </div>
+                  
+                  </TabPanel>
+                  <TabPanel header="Revenue">
+                  <div className="form-container">
+                      <h5>Revenue</h5>
+                      <form>
+                        <div className="grid">
+                      
+
+                          <div className="col-6">
+                            <label htmlFor="revenueSource">Revenue Source</label>
+                            <Dropdown
+                              id="revenueSource"
+                              value={revenueSource}
+                              onChange={(e) => setRevenueSource(e.value)}
+                              options={revenueSources}
+                              optionLabel="name"
+                              placeholder={revenueSources.length > 0 ? revenueSources[0].name : "Select"}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="amount">Amount</label>
+                            <InputText
+                              id="amount"
+                              placeholder="$400"
+                              className="w-full mt-2 p-inputtext p-component"
+                            />
+                          </div>
+
+                       
+
+                          <div className="col-12">
+                            <label htmlFor="date">Date</label>
+                            <Calendar
+                              id="date"
+                              value={date}
+                              onChange={(e) => setDate(e.value)}
+                              showIcon
+                              placeholder={currentDate}
+                              className="w-full mt-2 p-input-calender"
+                            />
+                          </div>
+
+                          <div className="col-12">
+                            <label htmlFor="workDescription" className="font-medium">Description <span className="text-xs">(A brief description of the maintenance task)</span></label>
+                            <InputTextarea
+                              id="workDescription"
+                              value={workDescription}
+                              onChange={(e) => setWorkDescription(e.target.value)}
+                              rows={5}
+                              cols={10}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
+                            <div className="flex align-content-center gap-4">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+
+
+
+                        </div>
+                      </form>
+                    </div>
+                  </TabPanel>
+                 
+               
+                </TabView>
               </div>
             </TabPanel>
           </TabView>

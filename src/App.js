@@ -11,24 +11,35 @@ import UserDetails from './pages/user-management/users-details';
 import AddUser from './pages/user-management/add-users';
 import Vessels from './pages/vessel-management/vessels';
 import AddVessel from './pages/vessel-management/add-vessels';
+import Documents from './pages/document-management/documents';
+import Maintenance from './pages/maintenance-scheduling/maintenance';
+import AddMaintenance from './pages/maintenance-scheduling/add-maintenance';
+import MaintenanceDetails from './pages/maintenance-scheduling/maintenance-details';
 
 function App() {
   return (
     <div className="App">
       <Routes>
-          <Route path="/" element={<GetStarted />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/user-management/role" element={<Role />} />
-          <Route path="/user-management/users" element={<Users />} />
-          <Route path="/user-management/users/new" element={<AddUser />} />
-          <Route path="/vessel-management/vessels" element={<Vessels />} />
-          <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
-          {/* Dynamic Route for User Details */}
-          <Route path="/user-management/users/:id" element={<UserDetails />} />
-          <Route path="/user-management/users/edit/:id" element={<AddUser />} />
+        <Route path="/" element={<GetStarted />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/user-management/role" element={<Role />} />
+        <Route path="/user-management/users" element={<Users />} />
+        <Route path="/user-management/users/new" element={<AddUser />} />
+        <Route path="/vessel-management/vessels" element={<Vessels />} />
+        <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
+        <Route path="/document-management/documents" element={<Documents />} />
+        <Route path="/maintenance-scheduling"  >
+          <Route path='maintenance' element={<Maintenance />} />
+          <Route path='maintenance/:id' element={< MaintenanceDetails/>} />
+
+        </Route>
+        <Route path="/maintenance-scheduling/maintenance/new" element={<AddMaintenance />} />
+        {/* Dynamic Route for User Details */}
+        <Route path="/user-management/users/:id" element={<UserDetails />} />
+        <Route path="/user-management/users/edit/:id" element={<AddUser />} />
       </Routes>
     </div>
   );
