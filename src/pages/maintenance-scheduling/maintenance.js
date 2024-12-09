@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'; 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
@@ -13,30 +13,32 @@ import { InputText } from 'primereact/inputtext';
 
 const Maintenance = () => {
   const [maintenanceTasks, setMaintenanceTasks] = useState([]);
-  const [filteredVessels, setFilteredVessels] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const menuRef = useRef(null); 
+  const menuRef = useRef(null);
 
   // State for filters
-  const [selectedType, setSelectedType] = useState(null);
+  const [selectedVesselName, setSelectedVesselName] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null)
 
   const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
-      const fetchedVessels = [
-        { id: 1, name: "Sea Dreamer", number: "CA 1234 AB", type: "Sailing Yacht", manufacturer: "Feadship", yearbuilt: "2024", status: "Active",attachment: "file1.pdf" },
-        { id: 2, name: "Excellence", number: "FL 5678 CD", type: "Motor Yacht", manufacturer: "Benetti", yearbuilt: "2024", status: "Inactive", attachment: "file1.pdf"},
-        { id: 3, name: "Serenity", number: "CA 1234 AB", type: "Catamaran", manufacturer: "Lürssen", yearbuilt: "2021", status: "Active",attachment: "file1.pdf" },
-        { id: 4, name: "Odyssey", number: "FL 5678 CD", type: "Motor Yacht", manufacturer: "Gulf Craft", yearbuilt: "2020", status: "Active",attachment: "file1.pdf" },
-        { id: 5, name: "Harmony", number: "CA 1234 AB", type: "Expedition Yacht", manufacturer: "Hatteras Yachts", yearbuilt: "2024", status: "Active",attachment: "file1.pdf" },
-        { id: 6, name: "Ocean Pearl", number: "HODCA 1234 AB", type: "Luxury Yacht", manufacturer: "Westport Yachts", yearbuilt: "2023", status: "Inactive",attachment: "file1.pdf" },
-        { id: 7, name: "Sea Breeze", number: "FL 5678 CD", type: "Trimaran", manufacturer: "Viking Yachts", yearbuilt: "2024", status: "Active",attachment: "file1.pdf" },
+      const fetchedTasks = [
+        { id: 1, taskName: "Oil Change", vesselName: "Sea Dreamer", assignPersonal: "Courtney Henry", date: "26/10/2024", priority: "High", status: "Completed", attachment: "file1.pdf" },
+        { id: 2, taskName: "Filter Replacement", vesselName: "AquaHolic", assignPersonal: "Theresa Webb", date: "23/10/2024", priority: "Medium", status: "InProgress", attachment: "file1.pdf" },
+        { id: 3, taskName: "Oil Change", vesselName: "Andiamo", assignPersonal: "Bessie Cooper", date: "12/10/2024", priority: "Low", status: "Completed", attachment: "file1.pdf" },
+        { id: 4, taskName: "Oil Change", vesselName: "Andiamo", assignPersonal: "Bessie Cooper", date: "12/10/2024", priority: "Low", status: "Completed", attachment: "file1.pdf" },
+        { id: 5, taskName: "Oil Change", vesselName: "Andiamo", assignPersonal: "Bessie Cooper", date: "12/10/2024", priority: "Low", status: "Completed", attachment: "file1.pdf" },
+        { id: 6, taskName: "Oil Change", vesselName: "Sea Dreamer", assignPersonal: "Courtney Henry", date: "26/10/2024", priority: "High", status: "Pending", attachment: "file1.pdf" },
+        { id: 7, taskName: "Filter Replacement", vesselName: "AquaHolic", assignPersonal: "Theresa Webb", date: "23/10/2024", priority: "Medium", status: "InProgress", attachment: "file1.pdf" },
+
       ];
-      setMaintenanceTasks(fetchedVessels);
-      setFilteredVessels(fetchedVessels); 
+      setMaintenanceTasks(fetchedTasks);
+      setFilteredTasks(fetchedTasks);
       setLoading(false);
     }, 500);
   }, []);
@@ -45,32 +47,37 @@ const Maintenance = () => {
   const applyFilters = useCallback(() => {
     let filteredData = maintenanceTasks;
 
-    if (selectedType) {
-      filteredData = filteredData.filter((vessel) => vessel.type === selectedType);
+    if (selectedVesselName) {
+      filteredData = filteredData.filter((vessel) => vessel.vesselName === selectedVesselName);
     }
-    if (selectedYear) {
-      filteredData = filteredData.filter((vessel) => vessel.yearbuilt === selectedYear);
+    if (selectedDate) {
+      filteredData = filteredData.filter((expense) => {
+        const expenseDate = new Date(expense.date.split('/').reverse().join('-'));
+        const filterDate = new Date(selectedDate.split('/').reverse().join('-'));
+        return expenseDate.getTime() === filterDate.getTime();
+      });
     }
     if (selectedStatus) {
       filteredData = filteredData.filter((vessel) => vessel.status === selectedStatus);
     }
 
-    setFilteredVessels(filteredData);
-  }, [maintenanceTasks, selectedType, selectedYear, selectedStatus]);
+    setFilteredTasks(filteredData);
+  }, [maintenanceTasks, selectedVesselName, selectedDate, selectedStatus]);
 
   // Apply filters when dependencies change
-   useEffect(() => {
+  useEffect(() => {
     applyFilters();
   }, [applyFilters]);
 
   // Dropdown options
-  const vesselTypes = [
-    ...new Set(maintenanceTasks.map((vessel) => vessel.type)),
-  ].map((type) => ({ name: type, value: type }));
+  const vesselName = [
+    ...new Set(maintenanceTasks.map((vessel) => vessel.vesselName)),
+  ].map((vesselName) => ({ name: vesselName, value: vesselName }));
 
-  const years = [
-    ...new Set(maintenanceTasks.map((vessel) => vessel.yearbuilt)),
-  ].map((year) => ({ name: year, value: year }));
+  const date = [
+    ...new Set(maintenanceTasks.map((vessel) => vessel.date)),
+  ].map((date) => ({ name: date, value: date }));
+
 
   const statuses = [
     ...new Set(maintenanceTasks.map((vessel) => vessel.status)),
@@ -136,31 +143,31 @@ const Maintenance = () => {
             <p>list of all Maintenance Task</p>
           </div>
           <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-      <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-      <InputText 
-        placeholder="Search" 
-        className="pl-4 mr-3"
-      />
-    </div>
-            
+            <div className="flex align-items-center relative">
+              <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
+              <InputText
+                placeholder="Search"
+                className="pl-4 mr-3"
+              />
+            </div>
 
-         
+
+
             <Dropdown
-              value={selectedType}
-              options={vesselTypes}
-              onChange={(e) => setSelectedType(e.value)}
+              value={selectedVesselName}
+              options={vesselName}
+              onChange={(e) => setSelectedVesselName(e.value)}
               optionLabel="name"
               placeholder="Vessel Type"
               className="mr-3 "
             />
-            
+
             <Dropdown
-              value={selectedYear}
-              options={years}
-              onChange={(e) => setSelectedYear(e.value)}
+              value={selectedDate}
+              options={date}
+              onChange={(e) => setSelectedDate(e.value)}
               optionLabel="name"
-              placeholder="Year Built"
+              placeholder="Date"
               className="mr-3"
             />
             <Dropdown
@@ -172,7 +179,7 @@ const Maintenance = () => {
               className="mr-3"
             />
             <Button
-              label="Add Vessels"
+              label="Create New Tasks"
               icon="pi pi-plus"
               onClick={goToAddVesselPage}
               className="p-button-primary"
@@ -181,7 +188,7 @@ const Maintenance = () => {
         </div>
         <div className="card-wrapper-gap">
           <DataTable
-            value={filteredVessels}
+            value={filteredTasks}
             paginator
             rows={10}
             rowsPerPageOptions={[10, 25, 50]}
@@ -191,11 +198,11 @@ const Maintenance = () => {
             onRowClick={(e) => navigate(`/maintenance-scheduling/maintenance/${e.data.id}`)}
             rowClassName="pointer-row"
           >
-            <Column field="name" header="Vessel Name" />
-            <Column field="number" header="Registration Number" />
-            <Column field="type" header="Vessel Type" />
-            <Column field="manufacturer" header="Manufacturer" />
-            <Column field="yearbuilt" header="Year Built" />
+            <Column field="taskName" header="Task Name" />
+            <Column field="vesselName" header="Vessel Name" />
+            <Column field="assignPersonal" header="Assign Personal" />
+            <Column field="date" header="Date" />
+            <Column field="priority" header="Priority" />
             <Column
               field="status"
               header="Status"
@@ -214,7 +221,7 @@ const Maintenance = () => {
                 </span>
               )}
             />
-                        <Column header="Attachment" body={attachmentTemplate}></Column>
+            <Column header="Attachment" body={attachmentTemplate}></Column>
 
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
 

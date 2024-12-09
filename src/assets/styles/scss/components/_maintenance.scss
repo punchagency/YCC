@@ -1,62 +1,159 @@
-.task-details-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 50px;
-}
+// .detail-item {
+//     padding: 10px 0;
+//     border-bottom: 1px solid #ddd; /* Adds the underline */
+// }
+// .detail-item:last-child {
+//     border-bottom: none; /* Removes the underline for the last item */
+// }
 
-.task-details-card {
- 
-}
+// h5 {
+//     margin-bottom: 20px;
+//     color: #444;
+// }
 
-.task-details-grid {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #e0e0e0; /* Adds border below the grid */
-    padding-bottom: 15px;
-}
+// .upload-container {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     flex-direction: column;
+//     padding: 60px;
+//     background-color: #F8F8F8;
+//     border-radius: 10px;
+//     margin-top: 20px;
+//     width: 100%;
+//   }
+  
+//   .custom-upload-button {
+//     display: inline-block;
+//     font-weight: 600;
+//     font-size: 14px;
+//     color: #3d7abf;
+//     background-color: transparent;
+//     border: 1px solid #d1d1d1;
+//     border-radius: 4px;
+//     padding: 10px 20px;
+//     cursor: pointer;
+//     transition: all 0.3s ease;
+//     margin-top: 10px;
+//   }
+  
+//   .custom-upload-button:hover {
+//     background-color: #e0e0e0; /* Slightly darker hover effect */
+//   }
+  
+//   .file-upload-input {
+//     display: none;
+//   }
+  
+//   /* File item container */
+//   .file-item {
+//     display: inline-flex;
+//     align-items: center;
+//     justify-content: center;
+//     margin: 5px;
+//     position: relative;
+//   }
+  
+//   .file-icon {
+//     width: 40px;
+//     height: 40px;
+//     object-fit: cover;
+//     border-radius: 4px;
+//     margin-right: 10px;
+//   }
+  
+//   .uploadfiles {
+//     position: absolute;
+//     top: 0;
+//     right: 0;
+//     background-color: rgba(0, 0, 0, 0.5);
+//     color: white;
+//     padding: 5px;
+//     border-radius: 50%;
+//     cursor: pointer;
+//   }
+  
+//   .uploadfiles:hover {
+//     background-color: red;
+//   }
+  
 
-.task-details-column {
-    flex: 1;
-}
+  .right-panel-component{
+    .card-wrapper-gap{
+      .p-p-4{
+        .detail-item{
+          padding: 10px 0;
+          border-bottom: 1px solid #ddd;
+          .detail-item:last-child {
+            border-bottom: none; 
+        }
+        }
+      }
 
-.task-details-item {
-    margin-bottom: 15px;
-    padding-bottom: 10px; /* Add space inside item */
-    border-bottom: 1px solid #e0e0e0; /* Add underline below each item */
-}
+      .upload-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 60px;
+        background-color: #F8F8F8;
+        border-radius: 10px;
+        margin-top: 20px;
+        width: 100%;
 
-.task-details-item strong {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
+        .custom-upload-button {
+          display: inline-block;
+          font-weight: 600;
+          font-size: 14px;
+          color: #3d7abf;
+          background-color: transparent;
+          border: 1px solid #d1d1d1;
+          border-radius: 4px;
+          padding: 10px 20px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          margin-top: 10px;
 
-.task-details-item span {
-    display: block;
-}
+          .custom-upload-button:hover {
+            background-color: #e0e0e0; /* Slightly darker hover effect */
+          }
+      
 
-.task-details-notes {
-    margin-bottom: 20px;
-    padding-bottom: 10px; /* Add space */
-    border-bottom: 1px solid #e0e0e0; /* Add border below notes */
-}
+        }
+        .file-upload-input{
+          display: none;
 
-.task-details-notes p {
-    margin: 5px 0 0 0;
-}
+        }
+        .file-item{
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin: 5px;
+          position: relative;
 
-.task-details-download {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #e0e0e0; /* Add border above download */
-    margin-top: 15px;
-}
+          .file-icon{
+            width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
 
-.task-details-icon {
-    font-size: 1.5rem;
-    color: red;
-}
+          }
+          .uploadfiles {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+            .uploadfiles:hover {
+              background-color: red;
+            }
+          }
+        }
+      }
+
+    }
+  }

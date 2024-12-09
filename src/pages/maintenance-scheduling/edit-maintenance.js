@@ -1,0 +1,253 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { TabView, TabPanel } from 'primereact/tabview';
+import { Button } from 'primereact/button';
+import LeftMenu from '../../components/menu';
+import AdminHeader from '../../components/header';
+import { InputText } from 'primereact/inputtext';
+import { Card } from 'primereact/card';
+import { Dropdown } from 'primereact/dropdown';
+import { Calendar } from 'primereact/calendar';
+import { InputTextarea } from 'primereact/inputtextarea';
+
+
+const Editmaintenance = () => {
+
+    const [taskTitle,setTaskTitle] = useState(null);
+    const [vesselName,setVesselName] = useState(null);
+    const [equipmentName,setEquipmentName] = useState(null);
+    const [assignedCrew,setAssignedCrew] = useState(null);
+    const [date,setDate] = useState(null);
+    const [prioriy,setPriority] = useState(null);
+    const [status,setStatus] = useState(null);
+    const [frequency,setFrequency] = useState(null);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [additionalDescription,setAdditionalDescription] = useState(null);
+    const currentDate = new Date().toLocaleDateString("en-US");
+
+    const navigate = useNavigate()
+
+    const handleFileSelect = (event) => {
+        const files = Array.from(event.target.files);
+        const newUploadedFiles = files.map((file) => ({
+          name: file.name,
+          type: file.type || '',
+          url: URL.createObjectURL(file), // Create a temporary URL for images
+        }));
+    
+        // Update state with selected files
+        setUploadedFiles((prevFiles) => [...prevFiles, ...newUploadedFiles]);
+      };
+    
+      // Remove a file from the uploaded list
+      const removeFile = (fileName) => {
+        setUploadedFiles((prevFiles) =>
+          prevFiles.filter((file) => file.name !== fileName)
+        );
+      };
+
+      const crews = [
+        { name: "Courtney Henry" },
+        { name: "Sailboat Yacht" }
+      ];
+
+      const priorities = [
+        { name: "High" },
+        { name: "Low" }
+      ];
+
+      const statuses = [
+        {name:"Assigned"},
+        {name:"Unassigned"}
+      ];
+
+      const frequencies = [
+        {name:"Weekly"},
+        {name:"Monthly"}
+      ]
+
+      const goVasselPage = () => {
+        console.log("Navigating to /user-management/users");
+        navigate("/user-management/users");
+      };
+    
+
+
+
+  return (
+    <main className="flex h-screen page">
+      <LeftMenu />
+      <div className="w-full right-panel-component">
+        <AdminHeader />
+        <div className="flex align-items-center justify-content-between sub-header-panel">
+          <div className="sub-header-left sub-header-left-with-arrow">
+            <div className="arrow">
+              <Link to="/maintenance-scheduling/maintenance">
+                <i className="pi pi-angle-left"></i>
+              </Link>
+            </div>
+            <div className="content">
+              <h3>Oil Change</h3>
+              <p>All informations are below</p>
+            </div>
+          </div>
+          <div className="sub-header-right">
+            <Button
+              label="Cancel"
+              icon="pi pi-times-circle"
+              severity="secondary"
+              outlined
+              className="p-button-secondary mr-3"
+            />
+            <Button
+              onClick={goVasselPage}
+              label="Save"
+              icon="pi pi-save"
+              className="p-button-primary"
+              type="button"
+            />
+          </div>
+        </div>
+        <div className='card-wrapper-gap'>
+                    <div className="card">
+                        <div className="card-wraper">
+                            <div className="form-container">
+                                <h5>Add Warranty</h5>
+                                <form>
+                                    <div className="grid">
+                                        <div className="col-6">
+                                            <label htmlFor="equipmentName">Equipment/Part Name</label>
+                                            <InputText
+                                                id="equipmentName"
+                                                placeholder="Alternator"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="serialNo">Serial Number</label>
+                                            <InputText
+                                                id="serialNo"
+                                                placeholder="12345-CAT"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+
+
+                                        <div className="col-6">
+                                            <label htmlFor="warranty">Warranty Status</label>
+                                      
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="date">Warranty Expiration Date</label>
+                                            <Calendar
+                                                id="date"
+                                                value={date}
+                                                onChange={(e) => setDate(e.value)}
+                                                showIcon
+                                                placeholder={currentDate}
+                                                className="w-full mt-2 p-input-calender"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="warrantyCoverage">Warranty Coverage</label>
+                                            <InputText
+                                                id="warrantyCoverage"
+                                                placeholder="Parts"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="manufacturer">Manufacturer</label>
+                                            <InputText
+                                                id="manufacturer"
+                                                placeholder="Viking"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <label htmlFor="supplierName">Supplier name</label>
+                                            <InputText
+                                                id="supplierName"
+                                                placeholder="Robert"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+
+                                        <div className="col-6">
+                                            <label htmlFor="supplierNo">Supplier phone no</label>
+                                            <InputText
+                                                id="supplierNo"
+                                                placeholder="+01 6789 7890"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+
+                                        <div className="col-6">
+                                            <label htmlFor="warrantyTime">Warranty expiration Soon Threshold ( Reminder)</label>
+                                            <InputText
+                                                id="warrantyTime"
+                                                placeholder="2"
+                                                className="w-full mt-2 p-inputtext p-component"
+                                            />
+                                        </div>
+
+
+
+                                        <div className="col-6 mt-3">
+
+                                         
+                                        </div>
+                                        <div className="upload-container">
+                                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                                            <div className="flex align-content-center gap-4 mt-3">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {uploadedFiles.map((file, index) => {
+                                                        const isImage =
+                                                            file.type.includes("image") ||
+                                                            file.name.toLowerCase().endsWith(".jpg") ||
+                                                            file.name.toLowerCase().endsWith(".jpeg") ||
+                                                            file.name.toLowerCase().endsWith(".png") ||
+                                                            file.name.toLowerCase().endsWith(".gif");
+
+                                                        return (
+                                                            <div key={index} className="file-item">
+                                                                {isImage ? (
+                                                                    <img src={file.url} alt={file.name} className="file-icon" />
+                                                                ) : (
+                                                                    <i className="pi pi-file-pdf file-icon"></i>
+                                                                )}
+                                                                <span
+                                                                    className="uploadfiles"
+                                                                    onClick={() => removeFile(file.name)}
+                                                                >
+                                                                    <i className="pi pi-times"></i>
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <label htmlFor="file-upload" className="custom-upload-button">
+                                                    <i className="pi pi-upload mr-2"></i>Upload
+                                                </label>
+                                                <input
+                                                    type="file"
+                                                    id="file-upload"
+                                                    multiple
+                                                    accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                                    className="file-upload-input"
+                                                    onChange={handleFileSelect}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+      </div>
+    </main>
+  );
+};
+
+export default Editmaintenance;
