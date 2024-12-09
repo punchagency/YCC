@@ -11,6 +11,8 @@ import UserDetails from './pages/user-management/users-details';
 import AddUser from './pages/user-management/add-users';
 import Vessels from './pages/vessel-management/vessels';
 import AddVessel from './pages/vessel-management/add-vessels';
+import Reports from './pages/reports/reports';
+import ReportDetails from './pages/reports/report-details';
 
 function App() {
   return (
@@ -29,6 +31,9 @@ function App() {
           {/* Dynamic Route for User Details */}
           <Route path="/user-management/users/:id" element={<UserDetails />} />
           <Route path="/user-management/users/edit/:id" element={<AddUser />} />
+          {/* Report Route */}
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:reportType" element={<ReportDetails />} />
       </Routes>
     </div>
   );

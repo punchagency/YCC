@@ -1,0 +1,78 @@
+@use '../layout/variables' as vars;
+
+.report-card {
+    height: 230px;
+
+    .p-card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        padding: 28px;
+
+        .p-card-content {
+            padding-top: 0;
+
+            h3 {
+                font-size: 18px;
+                line-height: 21.78px;
+                font-weight: vars.$medium;
+                color: #37404C;
+            }
+
+            p {
+                font-size: 12px;
+                line-height: 14.52px;
+                font-weight: vars.$normal;
+                color: #9E9E9E;
+            }
+            
+        }
+
+        .p-card-footer {
+            .p-button {
+                border-radius: 5rem;
+                padding: 5.25px 10.5px;
+                font-size: 14px;
+                line-height: 21px;
+                font-weight: vars.$normal;
+                color: vars.$gray-color-label;
+                background-color: vars.$medium-gray-color;
+                border-color: vars.$medium-gray-color;
+            }
+        }
+    }
+}
+.report-table{
+    .p-datatable-table{
+        .p-datatable-thead{
+            .p-selection-column{
+                .p-column-header-content{
+                    .p-checkbox {
+                        &.p-component{
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.p-float-label {
+    label{
+        padding-left: .75rem;
+    }
+    .p-inputtext{
+        &:hover{
+            border-color: vars.$gray-color-border;
+        }
+    }
+    .p-calendar {
+        .p-button {
+            background-color: transparent;
+            color: vars.$gray-color-text;
+            border-color: vars.$gray-color-border;
+            border-left: 0;
+        }
+    }
+}

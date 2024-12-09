@@ -89,7 +89,10 @@ export default function LeftMenu() {
         },
         { 
             label: "Reports", 
-            icon: "pi pi-chart-pie"
+            icon: "pi pi-chart-pie", 
+            command: () => {
+                navigate('/reports');
+            }
         },
         { 
             label: "Settings", 
