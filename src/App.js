@@ -38,6 +38,9 @@ import ComplianceDetails from './pages/compliance-management/compliance-details'
 import Reports from './pages/reports/reports';
 import ReportDetails from './pages/reports/report-details';
 import Notifications from './pages/notification/notifications';
+import DashboardCrew from './pages/crew/dashboard';
+
+
 
 function App() {
   return (
@@ -108,6 +111,8 @@ function App() {
           <Route path="/reports/:reportType" element={<ReportDetails />} />
           {/* Notification Route */}
           <Route path="/notifications" element={<Notifications />} />
+
+        <Route path="/crew/dashboard" element={<DashboardCrew />} />  
       </Routes>
     </div>
   );

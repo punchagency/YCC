@@ -28,4 +28,15 @@
       margin-top: 5px;
     }
   }
+  &.dashboard-overview-three-row{
+     .dashboard-overview-item {
+         width: 33.3333%;
+     }
+  }
+}
+
+.item{
+   .p-datatable{
+      width: 100%;
+   }
 }
