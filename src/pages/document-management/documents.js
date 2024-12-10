@@ -86,7 +86,7 @@ const Documents = () => {
     ...new Set(documents.map((vessel) => vessel.status)),
   ].map((status) => ({ name: status, value: status }));
 
-  const goToAddVesselPage = () => {
+  const goToAddDocumentPage = () => {
     navigate("/document-management/documents/new");
   };
 
@@ -121,13 +121,13 @@ const Documents = () => {
         onClick={(e) => menuRef.current.toggle(e)}
       />
       <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
-      <Button
+        <Button
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
           onClick={() => console.log('Edit', rowData)}
         />
-           <Button
+        <Button
           label="Update"
           icon="pi pi-list-check"
           className="p-button-text w-full"
@@ -139,13 +139,13 @@ const Documents = () => {
           className="p-button-text w-full"
           onClick={() => console.log('Delete', rowData)}
         />
-         <Button
+        <Button
           label="Renew"
           icon="pi pi-refresh"
           className="p-button-text w-full"
           onClick={() => console.log('Renew', rowData)}
         />
-        
+
       </OverlayPanel>
     </>
   );
@@ -172,15 +172,16 @@ const Documents = () => {
             <p>list of all documents</p>
           </div>
           <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-              <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
+            <div className="flex align-items-center relative">
+              <i className="pi pi-search absolute left-0 ml-2 text-gray-500" style={{ marginRight: '5px' }}></i>
               <InputText
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search"
-                className="pl-4 mr-3"
+                className="pl-6 mr-3"
               />
             </div>
+
             <Dropdown
               value={selectedAuthority}
               options={issueAuthorities}
@@ -208,7 +209,7 @@ const Documents = () => {
             <Button
               label="Add Documents"
               icon="pi pi-plus"
-              onClick={goToAddVesselPage}
+              onClick={goToAddDocumentPage}
               className="p-button-primary"
             />
           </div>
