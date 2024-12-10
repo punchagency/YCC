@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const LoginForm = () => {
     const [credentials, setCredentials] = useState({
@@ -43,7 +44,9 @@ const LoginForm = () => {
     };
 
 
-    const navigate = useNavigate();  // Add useNavigate hook
+    const navigate = useNavigate(); // Add useNavigate hook
+    const location = useLocation(); 
+    const role = location.state?.role || 'Guest'; // Default to 'Guest' if no role is passed 
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -64,6 +67,15 @@ const LoginForm = () => {
 
         // Assuming login is successful, navigate to Dashboard
         navigate('/dashboard');
+
+        // Navigate to different dashboards based on the role
+        if (role === 'Captain/Manager') {
+            navigate('/dashboard');
+        } else if (role === 'Crew Member') {
+            navigate('/crew/dashboard');
+        } else {
+            alert('Unknown role. Please try again.');
+        }
     };
 
     return (

@@ -37,6 +37,12 @@ import AddCompliance from './pages/compliance-management/add-compliance';
 import ComplianceDetails from './pages/compliance-management/compliance-details';
 import AddRole from './pages/user-management/add-role';
 import VesselDetails from './pages/vessel-management/vessel-details';
+import Reports from './pages/reports/reports';
+import ReportDetails from './pages/reports/report-details';
+import Notifications from './pages/notification/notifications';
+import DashboardCrew from './pages/crew/dashboard';
+
+
 
 function App() {
   return (
@@ -103,6 +109,15 @@ function App() {
         <Route path="/user-management/users/edit/:id" element={<AddUser />} />
         <Route path="/user-management/role/new" element={<AddRole />} />
 
+
+
+        {/* Report Route */}
+        <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:reportType" element={<ReportDetails />} />
+          {/* Notification Route */}
+          <Route path="/notifications" element={<Notifications />} />
+
+        <Route path="/crew/dashboard" element={<DashboardCrew />} />  
       </Routes>
     </div>
   );
