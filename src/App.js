@@ -13,6 +13,7 @@ import Vessels from './pages/vessel-management/vessels';
 import AddVessel from './pages/vessel-management/add-vessels';
 import Reports from './pages/reports/reports';
 import ReportDetails from './pages/reports/report-details';
+import Notifications from './pages/notification/notifications';
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
           {/* Report Route */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:reportType" element={<ReportDetails />} />
+          {/* Notification Route */}
+          <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </div>
   );

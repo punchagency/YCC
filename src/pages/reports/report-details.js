@@ -13,16 +13,32 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
+import { Menu } from "primereact/menu";
 
 export default function ReportDetails() {
   const [date, setDate] = useState(null);
   const menuRef = useRef(null);
+  const menuRight = useRef(null);
   const navigate = useNavigate();
-  const { reportType } = useParams(); // Extract the report type from the URL// Fetch the data based on the URL parameter
+  const { reportType } = useParams();
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(null);
   const [rowClick, setRowClick] = useState(true);
   const [loading, setLoading] = useState(true);
+  const items = [
+    {
+      label: ".PDF",
+      icon: "pi pi-refresh",
+    },
+    {
+      label: ".CSV",
+      icon: "pi pi-upload",
+    },
+    {
+      label: ".XLSX",
+      icon: "pi pi-upload",
+    },
+  ];
   const reportData = {
     "document-compliance-report": {
       title: "Document Compliance Report",
@@ -51,13 +67,6 @@ export default function ReportDetails() {
   };
 
   const report = reportData[reportType];
-  const [isProfileBoxVisible, setIsProfileBoxVisible] = useState(false);
-  const profileBoxRef = useRef(null);
-  const buttonRef = useRef(null);
-
-  const toggleProfileBox = () => {
-    setIsProfileBoxVisible(!isProfileBoxVisible);
-  };
 
   const skeletonTemplate = () => (
     <>
@@ -99,7 +108,7 @@ export default function ReportDetails() {
   );
   const backtoPreviousScreen = () => {
     navigate(-1);
-  }
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -160,25 +169,6 @@ export default function ReportDetails() {
     }, 500);
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        profileBoxRef.current &&
-        !profileBoxRef.current.contains(event.target) &&
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target)
-      ) {
-        setIsProfileBoxVisible(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <main className="flex h-screen page">
       <LeftMenu />
@@ -222,46 +212,20 @@ export default function ReportDetails() {
             </FloatLabel>
             <div className="lg:col-3 py-0">
               <Button
-                className="nav-profile cursor-pointer w-full text-center p-button-primary"
-                onClick={toggleProfileBox}
-                aria-expanded={isProfileBoxVisible}
-                ref={buttonRef}
-              >
-                <i className="pi pi-download" />
-                <span className="mx-3">Export</span>
-                <i className="pi pi-ellipsis-v" />
-              </Button>
-              {isProfileBoxVisible && (
-                <div
-                  className="nav-profile-box absolute z-4"
-                  ref={profileBoxRef}
-                >
-                  <div className="nav-profile__details flex gap-3 align-items-center">
-                    <div className="nav-profile__avatar">
-                      <Avatar
-                        image="/images/avatar.png"
-                        shape="circle"
-                        className="nav-avatar"
-                      />
-                    </div>
-                    <div className="nav-profile__info">
-                      <div className="nav-profile__name font-medium">
-                        Kate Winslet
-                      </div>
-                      <div className="nav-profile__email font-normal">
-                        kate.winslet@innofied.com
-                      </div>
-                    </div>
-                  </div>
-
-                  <ul className="nav-profile__menu">
-                    <li className="font-medium">
-                      <Link to="/profile-management">Profile Management</Link>
-                    </li>
-                    <li className="font-medium">Logout</li>
-                  </ul>
-                </div>
-              )}
+                label="Export"
+                icon="pi pi-download"
+                className="p-button-primary w-full"
+                onClick={(event) => menuRight.current.toggle(event)}
+                aria-controls="popup_menu_right"
+                aria-haspopup
+              />
+              <Menu
+                model={items}
+                popup
+                ref={menuRight}
+                id="popup_menu_right"
+                popupAlignment="right"
+              />
             </div>
           </div>
         </div>
