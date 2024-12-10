@@ -5,15 +5,15 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { useEffect, useRef, useState } from "react";
 import { FloatLabel } from "primereact/floatlabel";
-import { Toast } from "primereact/toast";
-import { SpeedDial } from "primereact/speeddial";
-import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
+import Pdf from '../../assets/images/pdf.svg';
+import Csv from '../../assets/images/csv.svg';
+import Xlsx from '../../assets/images/xls.svg';
 
 export default function ReportDetails() {
   const [date, setDate] = useState(null);
@@ -28,15 +28,15 @@ export default function ReportDetails() {
   const items = [
     {
       label: ".PDF",
-      icon: "pi pi-refresh",
+      icon: <img src={Pdf} alt="PDF icon"/>,
     },
     {
       label: ".CSV",
-      icon: "pi pi-upload",
+      icon: <img src={Csv} alt="CSV icon" />,
     },
     {
       label: ".XLSX",
-      icon: "pi pi-upload",
+      icon: <img src={Xlsx} alt="XLSX icon" />,
     },
   ];
   const reportData = {
@@ -212,14 +212,13 @@ export default function ReportDetails() {
             </FloatLabel>
             <div className="lg:col-3 py-0">
               <Button
-                label="Export"
-                icon="pi pi-download"
-                className="p-button-primary w-full"
+                className="p-button-primary w-full flex justify-content-between"
                 onClick={(event) => menuRight.current.toggle(event)}
                 aria-controls="popup_menu_right"
                 aria-haspopup
-              />
+              ><i className="pi pi-download" /> <span className="mx-3">Export</span> <i className="pi pi-ellipsis-v" /></Button>
               <Menu
+                className="export-menu"
                 model={items}
                 popup
                 ref={menuRight}
