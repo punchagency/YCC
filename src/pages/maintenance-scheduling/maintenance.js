@@ -15,6 +15,9 @@ const Maintenance = () => {
   const [maintenanceTasks, setMaintenanceTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [searchText, setSearchText] = useState("");
+
   const menuRef = useRef(null);
 
   // State for filters
@@ -60,9 +63,17 @@ const Maintenance = () => {
     if (selectedStatus) {
       filteredData = filteredData.filter((vessel) => vessel.status === selectedStatus);
     }
-
+    
+    if (searchText.trim()) {
+      filteredData = filteredData.filter((doc) =>
+        Object.values(doc)
+          .some((value) =>
+            String(value).toLowerCase().includes(searchText.toLowerCase())
+          )
+      );
+    }
     setFilteredTasks(filteredData);
-  }, [maintenanceTasks, selectedVesselName, selectedDate, selectedStatus]);
+  }, [maintenanceTasks, selectedVesselName, selectedDate, selectedStatus,searchText]);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -110,6 +121,49 @@ const Maintenance = () => {
       </OverlayPanel>
     </>
   );
+
+  const priorityTemplate = (rowData) => {
+    let color = "";
+    switch (rowData.priority) {
+        case "High":
+            color = "#FF3D32";
+            break;
+        case "Medium":
+            color = "#C79807";
+            break;
+        case "Low":
+            color = "#8183F4";
+            break;
+        default:
+            color = "black";
+    }
+
+    return (
+        <span style={{ color, fontWeight: "bold" }}>
+            {rowData.priority}
+        </span>
+    );
+};
+
+const statusStyles = {
+  Completed: {
+    backgroundColor: "#94E0ED",
+    color: "#047F94",
+  },
+  InProgress: {
+    backgroundColor: "#CAF1D8",
+    color: "#188A42",
+  },
+  Pending: {
+    backgroundColor: "#FEDDC7",
+    color: "#D46213",
+  },
+  Default: {
+    backgroundColor: "#FEDDC7",
+    color: "#000000",
+  },
+};
+
   const attachmentTemplate = (rowData) => {
     return (
       <Button
@@ -143,9 +197,11 @@ const Maintenance = () => {
             <p>list of all Maintenance Task</p>
           </div>
           <div className="sub-header-right flex align-items-center">
-            <div className="flex align-items-center relative">
+          <div className="flex align-items-center relative">
               <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
               <InputText
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search"
                 className="pl-4 mr-3"
               />
@@ -158,7 +214,7 @@ const Maintenance = () => {
               options={vesselName}
               onChange={(e) => setSelectedVesselName(e.value)}
               optionLabel="name"
-              placeholder="Vessel Type"
+              placeholder="Vessel Name"
               className="mr-3 "
             />
 
@@ -202,24 +258,28 @@ const Maintenance = () => {
             <Column field="vesselName" header="Vessel Name" />
             <Column field="assignPersonal" header="Assign Personal" />
             <Column field="date" header="Date" />
-            <Column field="priority" header="Priority" />
+        
+            <Column field="priority" header="Priority" body={priorityTemplate} />
+
             <Column
               field="status"
               header="Status"
-              body={(rowData) => (
-                <span
-                  style={{
-                    backgroundColor: rowData.status === "Active" ? "#CAF1D8" : "#EF4444",
-                    color: rowData.status === "Active" ? "#256029" : "#FFFFFF",
-                    fontWeight: "bold",
-                    padding: "5px 10px",
-                    borderRadius: "6px",
-                    display: "inline-block",
-                  }}
-                >
-                  {rowData.status}
-                </span>
-              )}
+              body={(rowData) => {
+                const styles = statusStyles[rowData.status] || statusStyles.Default; // Fallback to Default if no match
+                return (
+                  <span
+                    style={{
+                      ...styles,
+                      fontWeight: "bold",
+                      padding: "5px 10px",
+                      borderRadius: "6px",
+                      display: "inline-block",
+                    }}
+                  >
+                    {rowData.status}
+                  </span>
+                );
+              }}
             />
             <Column header="Attachment" body={attachmentTemplate}></Column>
 

@@ -17,6 +17,8 @@ const MaintenanceDetails = () => {
   ]); 
 
   const [isEditing, setIsEditing] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
 
   const handleEdit = () => {
       setIsEditing(!isEditing);
@@ -60,39 +62,46 @@ const MaintenanceDetails = () => {
         </div>
 
         <div className="card-wrapper-gap">
-          <TabView>
-            <TabPanel header="Overview">
-              <div className="p-p-4">
+            <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} className="tabview-detaols">
+                <TabPanel header="Overview">
+                    <div className="card-wraper">
+                    <div className="p-p-4">
                 <div>
                   <h5 className='text-base'>General Information</h5>
                   <div style={{ lineHeight: '2' }}>
-                    <div className="detail-item">
-                      <strong>Task Title </strong> Oil Change
+                    <div className="detail-item flex gap-6">
+                      <span>Task Title</span>Oil Change
                     </div>
-                    <div className="detail-item">
-                      <strong>Vessel Name:</strong> Sea Dreamer
+                    <div className="detail-item flex gap-6">
+                      <span>Vessle Name</span> Sea Dreamer
                     </div>
-                    <div className="detail-item">
-                      <strong>Equipment Name:</strong> Fuel System
+                    <div className="detail-item flex gap-6">
+                      <span>Equipment Name</span> Fuel System
                     </div>
-                    <div className="detail-item">
-                      <strong>Assigned Crew:</strong> Courtney Henry
+                    <div className="detail-item flex gap-6">
+                      <span> Assigned Crew </span> Courtney Henry
                     </div>
-                    <div className="detail-item">
-                      <strong>Date:</strong> 12/10/2024
+                    <div className="detail-item flex gap-6">
+                      <span>Date</span> 12/10/2024
                     </div>
-                    <div className="detail-item">
-                      <strong>Priority Level:</strong> High
+                    <div className="detail-item flex gap-6">
+                      <span>Priority Level</span>High
                     </div>
-                    <div className="detail-item">
-                      <strong>Maintenance Frequency:</strong> Weekly
+                    <div className="detail-item flex gap-4">
+                      <span>Maintenance Frequency</span> Weekly
                     </div>
-                    <div className="detail-item">
-                      <strong>Status:</strong> <span style={{ color: 'green' }}>In Progress</span>
+               
+                
+                    <div className="detail-item flex gap-4">
+                      <span>Status</span> <span style={{color:"#22C55E"}}>In Progress</span>
                     </div>
-                    <div className="detail-item">
-                      <strong>Notes:</strong> Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components.
+
+                    <div className="detail-item flex gap-4">
+                      <span>Note</span> Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components
                     </div>
+
+                
+
                     <div className="detail-item flex">
                       <div className="p-grid p-dir-col p-mt-3">
                         {uploadedFiles.map((file, index) => {
@@ -127,9 +136,12 @@ const MaintenanceDetails = () => {
                   </div>
                 </div>
               </div>
-            </TabPanel>
-          </TabView>
-        </div>
+                    </div>
+               
+                  
+                </TabPanel>
+            </TabView>
+          </div>
       </div>
     </main>
   );

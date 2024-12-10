@@ -91,6 +91,7 @@ const AddDocument = () => {
           </div>
           <div className="sub-header-right">
             <Button
+            onClick={goDocumentPage}
               label="Cancel"
               icon="pi pi-times-circle"
               severity="secondary"
@@ -189,7 +190,7 @@ const AddDocument = () => {
                     </div>
 
                     <div className="col-6">
-                      <label htmlFor="issuingAuthority">Associated vessel</label>
+                      <label htmlFor="issuingAuthority">Issuing Authority</label>
                       <Dropdown
                         id="issuingAuthority"
                         value={issuingAuthority}

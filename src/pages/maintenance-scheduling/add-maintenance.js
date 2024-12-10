@@ -15,38 +15,16 @@ import { FileUpload } from "primereact/fileupload";
 const AddMaintenance = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
-  const [selectedFlug, setSelectedFlug] = useState(null);
-  const [selectedVesselType, setVesselType] = useState(null);
-  const [selectedVesselStatus, setVesselStatus] = useState(null);
-  const [selectedEngineType, setSelectedEngineType] = useState(null);
-  const [selectedInspection, setSelectedInspection] = useState(null);
-  const [selectedAuthority, setSelectedAuthority] = useState(null);
+const [crew,setCrews] = useState(null);
   const [email, setEmail] = useState(null);
   const [phone, setPhone] = useState(null);
-  const [outcome, setOutcome] = useState(null);
-  const [report, setReport] = useState(null);
-  const [category, setCategory] = useState(null);
-  const [deficiency, setDeficiency] = useState(null);
-  const [action, setAction] = useState(true);
-  const [actionDescription, setActionDescription] = useState(null);
-  const [description, setDescription] = useState(null);
-  const [department, setDepartment] = useState(null);
-  const [targetCompletionDate, setTargetCompletionDate] = useState(null);
-  const [actionStatus, setActionStatus] = useState(null);
-  const [inspectionDate, setInspectionDate] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [complianceStatus, setComplianceStatus] = useState(null);
-  const [scheduledDate, setScheduledDate] = useState(null);
-  const [scheduledType, setScheduledType] = useState(null);
-  const [reminder, setReminder] = useState(null);
-  const [taskDescription, setTaskDescription] = useState(null);
-  const [taskCategory, setTaskCategory] = useState(null);
-  const [maintenanceDate, setMaintenanceDate] = useState(null);
-  const [serviceType, setServiceType] = useState(null);
-  const [workDescription, setWorkDescription] = useState(null);
-  const [replacementDate, setReplacementDate] = useState(null);
-  const [financeCategory, setFinanceCategory] = useState(null);
-  const [revenueSource, setRevenueSource] = useState(null);
+  const [priority,setPriority] = useState(null);
+  const [status,setStatus] = useState(null);
+const [additionalNotes,setAdditionalNotes] = useState(null);
+  const [frequency,setFrequency] = useState(null);
+
+ 
   const currentDate = new Date().toLocaleDateString("en-US");
 
   const goVasselPage = () => {
@@ -80,89 +58,27 @@ const AddMaintenance = () => {
     );
   };
 
-  const nationalities = [
-    { name: "American", code: "US" },
-    { name: "Indian", code: "IN" },
-    { name: "British", code: "UK" },
-    { name: "Australian", code: "AU" },
+
+
+  const priorities = [
+    { name: "High" },
+    { name: "Low" }
   ];
 
-  const vessel = [
-    { name: "Motor Yacht" },
-    { name: "Sailboat Yacht" }
-  ];
-
-  const status = [
+  const statuses = [
     { name: "Active" },
     { name: "Inactive" }
   ];
 
-  const engine = [
-    { name: "Gas Turbine" },
-    { name: "Oil Turbine" }
+  const frequencies = [
+    { name: "Weekly" },
+    { name: "Monthly" }
   ];
 
-  const inspection = [
-    { name: "Flag State Inspection 1" },
-    { name: "Flag State Inspection 2" }
-  ];
-
-  const authority = [
-    { name: "USCG" },
-    { name: "USCB" }
-  ];
-
-  const outcomes = [
-    { name: "demo1" },
-    { name: "demo2" }
-  ];
-
-  const categories = [
-    { name: "Environmental" },
-    { name: "demo2" }
-  ];
-  const deficiencies = [
-    { name: "demo1" },
-    { name: "demo2" }
-  ];
-
-  const departments = [
-    { name: "Chief Engineer" },
-    { name: "Junior Chief Engineer" }
-  ];
-
-  const actionStatuses = [
-    { name: "Not Started" },
-    { name: "Started" }
-  ];
-
-  const complianceStatuses = [
-    { name: "Yes" },
-    { name: "No" }
-  ];
-
-  const scheduledTypes = [
-    { name: "Port State Control (PSC) Inspection" },
-    { name: "Inspection" }
-  ];
-
-  const taskCategories = [
-    { name: "Engine & Propulsion Systems" },
-    { name: "Engine & Propulsion" }
-  ];
-
-  const serviceTypes = [
-    { name: "Internal (Crew)" },
-    { name: "External (Crew)" }
-  ];
-
-  const financeCategories = [
-    { name: "Maintenance" },
-    { name: "Maintenance 2" }
-  ];
-  const revenueSources = [
-    { name: "Charter" },
-    { name: "Charter 2" }
+  
+  const crews = [
+    { name: "Flag State Authority" },
+    { name: "Flag State Authority 2" }
   ];
 
   return (
@@ -173,7 +89,7 @@ const AddMaintenance = () => {
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/vessel-management/vessels">
+              <Link to="/maintenance-scheduling/maintenance">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>
@@ -184,6 +100,7 @@ const AddMaintenance = () => {
           </div>
           <div className="sub-header-right">
             <Button
+            onClick={goVasselPage}
               label="Cancel"
               icon="pi pi-times-circle"
               severity="secondary"
@@ -202,82 +119,148 @@ const AddMaintenance = () => {
         <div className="card-wrapper-gap">
           <div className="form-container border-round-sm" style={{ backgroundColor: '#FFFFFF', padding: "28px" }}>
 
-            <h5>Inspection Details</h5>
+            <h5>Add New Task</h5>
             <form>
               <div className="grid">
+                
+              <div className="col-12">
+                  <label htmlFor="task">Task Title</label>
+                  <InputText
+                    id="task"
+                    placeholder="Enter Task Title"
+                    className="w-full mt-2 p-inputtext p-component"
+                  />
+                </div>
                 <div className="col-6">
-                  <label htmlFor="inspection">Inspection Details</label>
+                  <label htmlFor="vesselName">Vessel Name</label>
+                  <InputText
+                    id="vesselName"
+                    placeholder="Enter Vessel Name"
+                    className="w-full mt-2 p-inputtext p-component"
+                  />
+                </div>
+
+                <div className="col-6">
+                  <label htmlFor="equipmentName">Equipment Name</label>
+                  <InputText
+                    id="equipmentName"
+                    placeholder="Enter Equipment Name"
+                    className="w-full mt-2 p-inputtext p-component"
+                  />
+                </div>
+                <div className="col-6">
+                  <label htmlFor="crew">Assigned Crew </label>
                   <Dropdown
-                    id="inspection"
-                    value={selectedInspection}
-                    onChange={(e) => setSelectedInspection(e.value)}
-                    options={inspection}
+                    id="crew"
+                    value={crew}
+                    onChange={(e) => setCrews(e.value)}
+                    options={crews}
                     optionLabel="name"
-                    placeholder="Select a Flag State Inspection"
+                    placeholder={crews.length > 0 ? crews[0].name : "Select"}
                     className="w-full mt-2"
                   />
                 </div>
                 <div className="col-6">
-                  <label htmlFor="flagState">Inspection Date</label>
+                  <label htmlFor="date">Date</label>
                   <Calendar
-                    id="dob"
+                    id="date"
                     value={date}
                     onChange={(e) => setDate(e.value)}
                     showIcon
-                    placeholder="Date of birth"
+                    placeholder={currentDate}
                     className="w-full mt-2 p-input-calender"
                   />
                 </div>
-
                 <div className="col-6">
-                  <label htmlFor="authority">Issuing Authority</label>
+                  <label htmlFor="priority">Priority Level </label>
                   <Dropdown
-                    id="authority"
-                    value={selectedAuthority}
-                    onChange={(e) => setSelectedAuthority(e.value)}
-                    options={authority}
+                    id="priority"
+                    value={priority}
+                    onChange={(e) => setPriority(e.value)}
+                    options={priorities}
                     optionLabel="name"
-                    placeholder="Select a Issuing Authority"
+                    placeholder="Choose priority"
                     className="w-full mt-2"
                   />
                 </div>
 
                 <div className="col-6">
-                  <label htmlFor="inspectorName">Inspector’s Name</label>
-                  <InputText
-                    id="inspectorName"
-                    placeholder="Enter Inspector’s Name"
-                    className="w-full mt-2 p-inputtext p-component"
-                  />
-                </div>
-                <div className="col-6">
-                  <label htmlFor="inspectorEmail">Email address</label>
-                  <InputText
-                    id="inspectorEmail"
-                    value={email}
-                    onChange={handleEmailChange}
+                  <label htmlFor="status">Status</label>
+                  <Dropdown
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.value)}
+                    options={statuses}
+                    optionLabel="name"
+                    placeholder="Enter Status"
                     className="w-full mt-2"
-                    placeholder="Inspector’s email"
                   />
                 </div>
+
                 <div className="col-6">
-                  <label htmlFor="inspectorPhone">Phone no</label>
-                  <InputText
-                    id="inspectorPhone"
-                    value={phone}
-                    onChange={handlePhoneChange}
+                  <label htmlFor="frequency">Maintenance Frequency</label>
+                  <Dropdown
+                    id="frequency"
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.value)}
+                    options={frequencies}
+                    optionLabel="name"
+                    placeholder={frequencies.length > 0 ? frequencies[0].name : "Select"}
                     className="w-full mt-2"
-                    placeholder="Inspector’s Ph no"
                   />
                 </div>
-                <div className="col-12">
-                  <label htmlFor="organizationName">Affiliated Organization</label>
-                  <InputText
-                    id="organizationName"
-                    placeholder="Affiliated Organization name"
-                    className="w-full mt-2 p-inputtext p-component"
-                  />
-                </div>
+
+                <div className="col-6">
+                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                            <div className="flex align-content-center gap-4 mt-3">
+                              <div className="flex flex-wrap gap-1">
+                                {uploadedFiles.map((file, index) => {
+                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+
+                                  return (
+                                    <div key={index} className="file-item">
+                                      {isImage ? (
+                                        <img
+                                          src={file.url}
+                                          alt={file.name}
+                                          className="file-icon"
+                                        />
+                                      ) : (
+                                        <i className="pi pi-file-pdf file-icon"></i>
+
+                                      )}
+                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                        <i className="pi pi-times"></i>
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <label htmlFor="file-upload" className="custom-upload-button">
+                                <i className="pi pi-upload mr-2"></i>Upload
+                              </label>
+                              <input
+                                type="file"
+                                id="file-upload"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                className="file-upload-input"
+                                onChange={handleFileSelect}
+                              />
+                            </div>
+                          </div>
+                          <div className="col-12">
+                            <label htmlFor="additionalNotes" className="font-medium">Additional Notes</label>
+                            <InputTextarea
+                              id="additionalNotes"
+                              value={additionalNotes}
+                              onChange={(e) => setAdditionalNotes(e.target.value)}
+                              rows={5}
+                              cols={10}
+                              className="w-full mt-2"
+                            />
+                          </div>
+
               </div>
             </form>
 
