@@ -59,7 +59,9 @@ export default function LeftMenu() {
         { 
             label: "Document Management", 
             icon: "pi pi-file", 
-            command: () => console.log("Document clicked")
+            command: () => {
+                navigate('/document-management/documents'); 
+            }
         },
         { 
             label: "Maintenance scheduling", 
@@ -69,23 +71,36 @@ export default function LeftMenu() {
                 </svg>
             ), 
             items: [
-                { label: "Create task", command: () => console.log("Create task clicked") },
+                { label: "Create task",  command: () => {
+                    navigate('/maintenance-scheduling/maintenance'); 
+                } },
                 { label: "Schedule calendar", command: () => console.log("Schedule calendar ") },
-                { label: "Equipment & parts", command: () => console.log("Schedule calendar ") },
-                { label: "Warranty", command: () => console.log("Warranty ") }
+                { label: "Equipment & parts", command: () => {
+                    navigate('/maintenance-scheduling/equipment'); 
+                } },
+                { label: "Warranty", command: () => {
+                    navigate('/maintenance-scheduling/warranty'); 
+                }}
             ]
         },
         { 
             label: "Financial management", 
             icon: "pi pi-dollar", 
             items: [
-                { label: "Expense", command: () => console.log("Expense clicked") },
-                { label: "Invoice", command: () => console.log("Invoice calendar ") }
+                { label: "Expense", command: () => {
+                    navigate('/finance-management/expense'); 
+                } },
+                { label: "Invoice",command: () => {
+                    navigate('/finance-management/invoice'); 
+                } }
             ]
         },
         { 
             label: "Compliance tracking", 
-            icon: "pi pi-folder-open"
+            icon: "pi pi-folder-open",
+            command: () => {
+                navigate('/compliance-management/compliance'); 
+            }
         },
         { 
             label: "Reports", 
