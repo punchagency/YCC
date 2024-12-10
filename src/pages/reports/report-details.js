@@ -11,7 +11,7 @@ import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
-import Pdf from '../../assets/images/pdf.svg';
+import Pdf from '../../assets/images/pdf-file.svg';
 import Csv from '../../assets/images/csv.svg';
 import Xlsx from '../../assets/images/xls.svg';
 

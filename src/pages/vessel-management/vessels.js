@@ -93,12 +93,25 @@ const Vessels = () => {
           className="p-button-text w-full"
           onClick={() => console.log('Edit', rowData)}
         />
+           <Button
+          label="Update"
+          icon="pi pi-list-check"
+          className="p-button-text w-full"
+          onClick={() => console.log('Update', rowData)}
+        />
         <Button
           label="Delete"
           icon="pi pi-trash"
           className="p-button-text w-full"
           onClick={() => console.log('Delete', rowData)}
         />
+         <Button
+          label="Renew"
+          icon="pi pi-refresh"
+          className="p-button-text w-full"
+          onClick={() => console.log('Renew', rowData)}
+        />
+        
       </OverlayPanel>
     </>
   );

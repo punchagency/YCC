@@ -1,0 +1,76 @@
+.page {
+    .right-panel-component {
+        .card-wrapper-gap {
+            .v-tab {
+                .form-container {
+                    .action-toggle {
+                        .action-label {
+                            font-size: 14px;
+                            color: #212121;
+                        }
+                    }
+
+                 
+
+                    .file-item {
+                        text-align: center;
+                        position: relative;
+                        margin: 5px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+
+
+
+                        .file-icon {
+                            width: 50px;
+                            height: 50px;
+                            object-fit: cover;
+                            border-radius: 5px;
+                            position: relative;
+                        }
+
+                        .pi-file-pdf {
+                            font-size: 2rem;
+                            color: red;
+                        }
+
+                        .uploadfiles {
+                            cursor: pointer;
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            font-size: 1.2rem;
+                            color: red;
+                        }
+                    }
+
+                    .custom-upload-button {
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        border-radius: 6px;
+                        border: 1px solid #64748B;
+                        padding: 12px 30px;
+                        color: #6C757D;
+                        font-size: 14px;
+                        white-space: nowrap;
+                        margin-top: 10px; 
+                        box-sizing: border-box; 
+                        height: auto; 
+
+                    
+                    }
+
+                    .file-upload-input {
+                        display: none;
+
+                    }
+
+
+                }
+            }
+        }
+    }
+
+}
