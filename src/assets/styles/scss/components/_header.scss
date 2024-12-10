@@ -27,6 +27,11 @@
 
 .notifications{
    &.p-button{
+    background-color: transparent;
+    border: 0;
+    &:focus{
+      box-shadow: none;
+    }
      &.p-button-icon-only{
        width: auto;
        padding: 0;
@@ -49,4 +54,8 @@
    }
 }
 
-
+.notification-menu{
+  &.p-menu{
+    width: max-content;
+  }
+}

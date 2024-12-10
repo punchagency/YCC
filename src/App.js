@@ -35,6 +35,9 @@ import InvoiceDetails from './pages/finance-management/invoice-details';
 import Compliance from './pages/compliance-management/compliance';
 import AddCompliance from './pages/compliance-management/add-compliance';
 import ComplianceDetails from './pages/compliance-management/compliance-details';
+import Reports from './pages/reports/reports';
+import ReportDetails from './pages/reports/report-details';
+import Notifications from './pages/notification/notifications';
 
 function App() {
   return (
@@ -98,6 +101,13 @@ function App() {
         {/* Dynamic Route for User Details */}
         <Route path="/user-management/users/:id" element={<UserDetails />} />
         <Route path="/user-management/users/edit/:id" element={<AddUser />} />
+
+
+        {/* Report Route */}
+        <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:reportType" element={<ReportDetails />} />
+          {/* Notification Route */}
+          <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </div>
   );
