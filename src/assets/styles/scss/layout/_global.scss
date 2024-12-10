@@ -65,6 +65,17 @@ ul{
       border-color: vars.$dark-blue-color;
     }
   }
+  &.p-outline-button-primary{
+    color: vars.$blue-color;
+    background: transparent;
+    border: 1px solid vars.$blue-color;
+    padding: 8.5px 17.5px;
+    &:hover{
+      background: vars.$dark-blue-color;
+      border-color: vars.$dark-blue-color;
+      color: vars.$color-white;
+    }
+  }
 }
 
 .p-inputtext:enabled:focus {
