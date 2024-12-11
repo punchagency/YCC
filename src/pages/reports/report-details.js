@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AdminHeader from "../../components/header";
 import LeftMenu from "../../components/menu";
 import { InputText } from "primereact/inputtext";
@@ -11,7 +11,7 @@ import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
-import Pdf from '../../assets/images/pdf-file.svg';
+import Pdf from '../../assets/images/pdf.svg';
 import Csv from '../../assets/images/csv.svg';
 import Xlsx from '../../assets/images/xls.svg';
 
@@ -23,7 +23,7 @@ export default function ReportDetails() {
   const { reportType } = useParams();
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(null);
-  const [rowClick, setRowClick] = useState(true);
+  const [rowClick ] = useState(true);
   const [loading, setLoading] = useState(true);
   const items = [
     {

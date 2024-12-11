@@ -1,72 +1,154 @@
-import React from 'react';
-import LeftMenu from '../../components/menu';
-import AdminHeader from '../../components/header';
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
-import captain from '../../assets/images/captain1.svg'; 
-import crew from '../../assets/images/mechanic1.svg'; 
-import hod from '../../assets/images/HOD.svg'; 
 
+import React, { useState, useEffect, useRef, useCallback } from 'react'; 
+import { useNavigate } from "react-router-dom";
+import LeftMenu from "../../components/menu";
+import AdminHeader from "../../components/header";
+import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Dropdown } from "primereact/dropdown";
+import { Skeleton } from 'primereact/skeleton';
+import { OverlayPanel } from 'primereact/overlaypanel';
 
 const Role = () => {
+  const [roles, setRoles] = useState([]);
+  const [filteredVessels, setFilteredVessels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const menuRef = useRef(null); 
+
+  // State for filters
+  const [selectedType, setSelectedType] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setTimeout(() => {
+      const fetchedRoles = [
+        { id: 1, name: "Captain/Manager",permission:"demo permission", status: "Active" },
+        { id: 2, name: "Crew Manager",permission:"demo permission", status: "Inactive" },
+        { id: 3, name: "HOD",permission:"demo permission", status: "Active" },
+
+       ];
+       
+   
+       setRoles(fetchedRoles);
+       setFilteredVessels(fetchedRoles); 
+       setLoading(false);
+     }, 500);;
+  }, []);
+
+
+
+
+  const goToRolePage = () => {
+    navigate("/user-management/roles");
+  };
+
+  const actionBodyTemplate = (rowData) => (
+    <>
+      <Button
+        icon="pi pi-ellipsis-v"
+        className="p-button-rounded p-button-text"
+        onClick={(e) => menuRef.current.toggle(e)}
+      />
+      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
+        <Button
+          label="Edit"
+          icon="pi pi-pencil"
+          className="p-button-text w-full"
+          onClick={() => console.log('Edit', rowData)}
+        />
+           <Button
+          label="Update"
+          icon="pi pi-list-check"
+          className="p-button-text w-full"
+          onClick={() => console.log('Update', rowData)}
+        />
+        <Button
+          label="Delete"
+          icon="pi pi-trash"
+          className="p-button-text w-full"
+          onClick={() => console.log('Delete', rowData)}
+        />
+         <Button
+          label="Renew"
+          icon="pi pi-refresh"
+          className="p-button-text w-full"
+          onClick={() => console.log('Renew', rowData)}
+        />
+        
+      </OverlayPanel>
+    </>
+  );
+
+  const skeletonTemplate = () => (
+    <>
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="18%" className="mr-2" />
+      <Skeleton width="10%" />
+    </>
+  );
+
   return (
     <main className="flex h-screen page">
       <LeftMenu />
-      <div className='w-full right-panel-component'>
+      <div className="w-full right-panel-component">
         <AdminHeader />
         <div className="flex align-items-center justify-content-between sub-header-panel">
-          {/* Left Section: Heading and Subheading */}
           <div className="sub-header-left">
             <h3>Roles</h3>
-            <p>Lists of different roles with accessibility </p>
+            <p>List of all Roles</p>
           </div>
-
-          {/* Right Section: Action Button */}
-          <div className="sub-header-right">
-            <Button label="Add Roles" icon="pi pi-plus" className="p-button-primary" />
+          <div className="sub-header-right flex align-items-center">
+           
+            <Button
+              label="Save"
+              icon="pi pi-save"
+              onClick={goToRolePage}
+              className="p-button-primary"
+            />
           </div>
         </div>
-        <div className='card-wrapper-gap'>
-          <div className="card">
-            <div className="card-wraper">
-              <Card className="mb-4 role-card">
-                <div className="card-header flex align-items-center">
-                  <img src={captain} alt="Icon" className="card-icon" />
-                  <div className="card-heading">
-                    <h3 className="title m-0">Captain/Manager</h3>
-                    <p className="subtitle m-0">Role</p>
-                  </div>
-                </div>
-                <p className="m-0 card-content">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque quas!
-                </p>
-              </Card>
-              <Card className="mb-4 role-card">
-                <div className="card-header flex align-items-center">
-                  <img src={crew} alt="Icon" className="card-icon" />
-                  <div className="card-heading">
-                    <h3 className="title m-0">Crew Member</h3>
-                    <p className="subtitle m-0">Role</p>
-                  </div>
-                </div>
-                <p className="m-0 card-content">
-                  Crew has access mainly related to task execution and maintenance management, along with access to necessary documentation and notifications.
-                </p>
-              </Card>
-              <Card className="role-card">
-                <div className="card-header flex align-items-center">
-                  <img src={hod} alt="Icon" className="card-icon" />
-                  <div className="card-heading">
-                    <h3 className="title m-0">Head of Department</h3>
-                    <p className="subtitle m-0">Role</p>
-                  </div>
-                </div>
-                <p className="m-0 card-content">
-                    The Yacht Head of Department (HOD) is responsible for overseeing their department's operations, ensuring all tasks are executed efficiently, safely, and to the highest standard of service. They manage crew members, coordinate schedules, and ensure compliance with yacht protocols while maintaining seamless communication with the captain and other departments.
-                </p>
-              </Card>
-            </div>
-          </div>
+        <div className="card-wrapper-gap">
+          <DataTable
+            value={filteredVessels}
+            paginator
+            rows={10}
+            rowsPerPageOptions={[10, 25, 50]}
+            tableStyle={{ minWidth: "50rem" }}
+            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            onRowClick={(e) => navigate(`/vessel-management/vessels/${e.data.id}`)}
+            rowClassName="pointer-row"
+          >
+            <Column field="name" header="Role Name" />
+            <Column field="permission" header="Permission" />
+           
+            <Column
+              field="status"
+              header="Status"
+              body={(rowData) => (
+                <span
+                  style={{
+                    backgroundColor: rowData.status === "Active" ? "#CAF1D8" : "#EF4444",
+                    color: rowData.status === "Active" ? "#256029" : "#FFFFFF",
+                    fontWeight: "bold",
+                    padding: "5px 10px",
+                    borderRadius: "6px",
+                    display: "inline-block",
+                  }}
+                >
+                  {rowData.status}
+                </span>
+              )}
+            />
+            <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
+          </DataTable>
         </div>
       </div>
     </main>

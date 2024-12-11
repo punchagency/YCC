@@ -1,14 +1,66 @@
-.activity-log{
-    .p-card {
-      
-        width: 100%;
-        margin: 10px auto
-    }
-    .p-datatable .p-datatable-table {
-        min-width: auto;
-        background-color: #ffff;
-    }
-   
 
-}
+   
+    .card-wrapper-gap{
+        .item{
+            .activity-log{
+                .p-card {
+                  
+                    width: 100%;
+                    margin: 10px auto
+                }
+                .p-datatable .p-datatable-table {
+                    min-width: auto;
+                    background-color: #ffff;
+                }
+            }
+
+            .details-card{
+                .details-overview{
+                    .detail-item{
+                        .p-button-label{
+                            color: #3B82F6;
+                        }
+                        .p-button-icon{
+                            color: #3B82F6;
+                        }
+                        .download-btn{
+                            border: 1px solid #3B82F6;
+                            border-radius: 6px;
+                          
+                        }
+                       
+                    }
+                }
+            }
+
+        }
+
+        .card-wraper{
+            .form-container{
+                .p-button-label{
+                    color: #3B82F6;
+                    font-weight: 700;
+                }
+                .p-button-icon{
+                    color:#3B82F6 ;
+                }
+                .upload-container{
+                    background-color: #F8F8F8;
+                    border-radius: 10px;
+                    padding: 20px;
+                    width: 100%;
+                    .custom-upload-button{
+                        border: 1px solid #64748B;
+                        color:#64748B;
+                        .pi-upload{
+                            color: #64748B;
+                        }
+                    }
+                }
+            }
+        }
+       
+    }
+
+
 

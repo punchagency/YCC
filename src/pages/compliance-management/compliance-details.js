@@ -5,10 +5,27 @@ import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from 'primereact/card';
+import PDFIcon from '../../assets/images/pdf.svg'
 const ComplianceDetails = () => {
     // Access the userId from the URL
     useParams();
     const [activeIndex, setActiveIndex] = useState(0);
+    const [uploadedFiles] = useState([
+        {
+            name: 'Crew Certification (STCW)',
+            type: 'application/pdf',
+            url: 'path/to/example.pdf',
+        }
+    ]);
+    const downloadAllFiles = () => {
+        uploadedFiles.forEach((file) => {
+            const a = document.createElement('a');
+            a.href = file.url;
+            a.download = file.name;
+            a.click();
+        });
+    };
+
 
     // You can now use the userId to fetch or display the specific user details
     return (
@@ -202,19 +219,37 @@ const ComplianceDetails = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="details-content">
-                                                    <button
-                                                        className="p-button p-component p-button-primary"
-                                                        onClick={() => {
-                                                            const link = document.createElement("a");
-                                                            link.href = "/path/to/your/file.pdf";
-                                                            link.download = "Report.pdf";
-                                                            link.click();
-                                                        }}
-                                                    >
-                                                        <i className="pi pi-download" style={{ marginRight: "8px" }}></i>
-                                                        Download
-                                                    </button>
+                                                <div className="detail-item flex">
+                                                    <div className="p-grid p-dir-col p-mt-3">
+                                                        {uploadedFiles.map((file, index) => {
+                                                            const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+                                                            return (
+                                                                <div key={index} className="p-col-12 p-md-6 p-lg-4 p-d-flex p-ai-center p-jc-between">
+                                                                    <div className="p-d-flex p-ai-center flex">
+                                                                        {isPdf ? (
+                                                                            <>
+
+
+                                                                                <img src={PDFIcon} className="file-icon mr-2" />
+                                                                                <span className="flex align-items-center">{file.name}</span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="p-d-flex p-jc-end">
+                                                        <Button
+                                                            icon="pi pi-download"
+                                                            label="Download"
+                                                            className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                            onClick={downloadAllFiles}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Card>
@@ -250,20 +285,38 @@ const ComplianceDetails = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="details-content">
-                                                <button
-                                                    className="p-button p-component p-button-primary"
-                                                    onClick={() => {
-                                                        const link = document.createElement("a");
-                                                        link.href = "/path/to/your/file.pdf";
-                                                        link.download = "Report.pdf";
-                                                        link.click();
-                                                    }}
-                                                >
-                                                    <i className="pi pi-download" style={{ marginRight: "8px" }}></i>
-                                                    Download
-                                                </button>
-                                            </div>
+                                            <div className="detail-item flex">
+                          <div className="p-grid p-dir-col p-mt-3">
+                            {uploadedFiles.map((file, index) => {
+                              const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+                              return (
+                                <div key={index} className="p-col-12 p-md-6 p-lg-4 p-d-flex p-ai-center p-jc-between">
+                                  <div className="p-d-flex p-ai-center flex">
+                                    {isPdf ? (
+                                      <>
+
+
+                                        <img src={PDFIcon} className="file-icon mr-2" />
+                                        <span className="flex align-items-center">{file.name}</span>
+                                      </>
+                                    ) : (
+                                      <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          <div className="p-d-flex p-jc-end">
+                            <Button
+                              icon="pi pi-download"
+                              label="Download"
+                              className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                              onClick={downloadAllFiles}
+                            />
+                          </div>
+                        </div>
                                         </Card>
                                     </div>
                                 </div>

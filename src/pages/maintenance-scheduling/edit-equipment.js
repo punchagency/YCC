@@ -67,7 +67,7 @@ const EditEquipment = () => {
                 <div className="flex align-items-center justify-content-between sub-header-panel">
                     <div className="sub-header-left sub-header-left-with-arrow">
                         <div className="arrow">
-                            <Link to="/maintenance-scheduling/maintenance">
+                            <Link to="/maintenance-scheduling/equipment">
                                 <i className="pi pi-angle-left"></i>
                             </Link>
                         </div>
@@ -88,7 +88,7 @@ const EditEquipment = () => {
                             onClick={goEquipmentPage}
                             label="Save"
                             icon="pi pi-save"
-                            className="p-button-primary"
+                            className="p-button-primary mr-3"
                             type="button"
                         />
                          <Button
@@ -207,7 +207,7 @@ const EditEquipment = () => {
                                         </div>
                                         <div className="upload-container">
                                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                                            <div className="flex align-content-center gap-4 mt-3">
+                                            <div className="flex align-content-center mt-3">
                                                 <div className="flex flex-wrap gap-1">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isImage =

@@ -15,14 +15,14 @@ const GetStarted = ({ name }) => {
   const roles = [
     { image: captain, alt: 'captain', text: 'Captain/Manager', path: '/login' },
     { image: hod, alt: 'hod', text: 'Head of Department', path: '' },
-    { image: crew, alt: 'crew', text: 'Crew Member', path: '' }
+    { image: crew, alt: 'crew', text: 'Crew Member', path: '/login' }
   ]
 
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
 
   // Function to handle navigation
-  const handleRoleSelect = (path) => {
-    navigate(path); // Navigate to the selected path
+  const handleRoleSelect = (path, role) => {
+    navigate(path, { state: { role } }); // Pass the role as state
   };
 
   return (
@@ -44,7 +44,7 @@ const GetStarted = ({ name }) => {
               <div className='get-started-right-component-content'>
                   <ul>
                   {roles.map((role, index) => (
-                    <li key={index} onClick={() => handleRoleSelect(role.path)}>
+                    <li key={index} onClick={() => handleRoleSelect(role.path, role.text)}>
                       <div className='content'>
                         <div className='icons'>
                           <img src={role.image} alt={role.alt} className='image-full' />
