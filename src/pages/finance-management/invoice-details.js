@@ -53,7 +53,7 @@ const editInvoicePage = () => {
   // You can now use the userId to fetch or display the specific user details
   return (
     <main className="flex h-screen page">
-       <LeftMenu />
+       <LeftMenu role="Captain/Manager" />
        <div className="w-full right-panel-component">
           <AdminHeader />
           <div className="flex align-items-center justify-content-between sub-header-panel">
