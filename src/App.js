@@ -35,6 +35,8 @@ import InvoiceDetails from './pages/finance-management/invoice-details';
 import Compliance from './pages/compliance-management/compliance';
 import AddCompliance from './pages/compliance-management/add-compliance';
 import ComplianceDetails from './pages/compliance-management/compliance-details';
+import AddRole from './pages/user-management/add-role';
+import VesselDetails from './pages/vessel-management/vessel-details';
 import Reports from './pages/reports/reports';
 import ReportDetails from './pages/reports/report-details';
 import Notifications from './pages/notification/notifications';
@@ -56,6 +58,7 @@ function App() {
         <Route path="/user-management/users/new" element={<AddUser />} />
         <Route path="/vessel-management/vessels" element={<Vessels />} />
         <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
+        <Route path="/vessel-management/vessels/:id" element={<VesselDetails />} />
 
         <Route path="/document-management">
         <Route path="documents" element={<Documents />} />
@@ -104,6 +107,8 @@ function App() {
         {/* Dynamic Route for User Details */}
         <Route path="/user-management/users/:id" element={<UserDetails />} />
         <Route path="/user-management/users/edit/:id" element={<AddUser />} />
+        <Route path="/user-management/role/new" element={<AddRole />} />
+
 
 
         {/* Report Route */}

@@ -215,7 +215,7 @@ const AddDocument = () => {
                     </div>
 
                     <div className="upload-container">
-                      <div className="flex align-content-center gap-4 mt-3">
+                      <div className="flex align-content-center mt-3 justify-content-center">
                         <label htmlFor="file-upload" className="custom-upload-button">
                           <i className="pi pi-upload mr-2"></i>Upload
                         </label>
@@ -228,10 +228,10 @@ const AddDocument = () => {
                           onChange={handleFileSelect}
                         />
                       </div>
-                      <label htmlFor="uploadDocuments" className="mt-2 font-semibold text-lg">
+                      <label htmlFor="uploadDocuments" className="mt-2 font-semibold text-lg flex justify-content-center">
                         Select Files to Upload
                       </label>
-                      <label htmlFor="uploadDocuments" className="mt-2">
+                      <label htmlFor="uploadDocuments" className="mt-2 flex justify-content-center">
                       or Drag and Drop, Copy and Paste Files
                       </label>
                       <div className="flex flex-wrap gap-1 mt-3">

@@ -91,7 +91,7 @@ const AddWarranty = () => {
                             className="p-button-primary mr-3"
                             type="button"
                         />
-                         <Button
+                        <Button
                             onClick={goEquipmentPage}
                             label="Save & Add Another"
                             icon="pi pi-save"
@@ -206,47 +206,51 @@ const AddWarranty = () => {
                                             />
                                         </div>
                                         <div className="upload-container">
-                                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                                            <div className="flex align-content-center gap-4 mt-3">
-                                                <div className="flex flex-wrap gap-1">
-                                                    {uploadedFiles.map((file, index) => {
-                                                        const isImage =
-                                                            file.type.includes("image") ||
-                                                            file.name.toLowerCase().endsWith(".jpg") ||
-                                                            file.name.toLowerCase().endsWith(".jpeg") ||
-                                                            file.name.toLowerCase().endsWith(".png") ||
-                                                            file.name.toLowerCase().endsWith(".gif");
+  <div className="flex align-items-center justify-content-center mt-3">
+    <label htmlFor="file-upload" className="custom-upload-button">
+      <i className="pi pi-upload mr-2"></i> Upload Warranty Document
+    </label>
+    <input
+      type="file"
+      id="file-upload"
+      multiple
+      accept=".pdf,.jpg,.jpeg,.png,.gif"
+      className="file-upload-input"
+      onChange={handleFileSelect}
+    />
+  </div>
+  <p className="mt-4 font-semibold text-lg text-center">Select Files to Upload</p>
+  <p className="text-sm text-gray-500 text-center">
+    or Drag and Drop, Copy and Paste Files
+  </p>
+  <div className="flex flex-wrap gap-3 mt-4 justify-content-center">
+    {uploadedFiles.map((file, index) => {
+      const isImage =
+        file.type.includes("image") ||
+        file.name.toLowerCase().endsWith(".jpg") ||
+        file.name.toLowerCase().endsWith(".jpeg") ||
+        file.name.toLowerCase().endsWith(".png") ||
+        file.name.toLowerCase().endsWith(".gif");
 
-                                                        return (
-                                                            <div key={index} className="file-item">
-                                                                {isImage ? (
-                                                                    <img src={file.url} alt={file.name} className="file-icon" />
-                                                                ) : (
-                                                                    <i className="pi pi-file-pdf file-icon"></i>
-                                                                )}
-                                                                <span
-                                                                    className="uploadfiles"
-                                                                    onClick={() => removeFile(file.name)}
-                                                                >
-                                                                    <i className="pi pi-times"></i>
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                                <label htmlFor="file-upload" className="custom-upload-button">
-                                                    <i className="pi pi-upload mr-2"></i>Upload
-                                                </label>
-                                                <input
-                                                    type="file"
-                                                    id="file-upload"
-                                                    multiple
-                                                    accept=".pdf,.jpg,.jpeg,.png,.gif"
-                                                    className="file-upload-input"
-                                                    onChange={handleFileSelect}
-                                                />
-                                            </div>
-                                        </div>
+      return (
+        <div key={index} className="file-item">
+          {isImage ? (
+            <img src={file.url} alt={file.name} className="file-icon" />
+          ) : (
+            <i className="pi pi-file-pdf file-icon"></i>
+          )}
+          <span
+            className="uploadfiles"
+            onClick={() => removeFile(file.name)}
+          >
+            <i className="pi pi-times"></i>
+          </span>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
                                     </div>
                                 </form>
                             </div>

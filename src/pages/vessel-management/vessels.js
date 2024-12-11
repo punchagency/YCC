@@ -179,7 +179,7 @@ const Vessels = () => {
             tableStyle={{ minWidth: "50rem" }}
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            onRowClick={(e) => navigate(`/vassel-management/vessels/${e.data.id}`)}
+            onRowClick={(e) => navigate(`/vessel-management/vessels/${e.data.id}`)}
             rowClassName="pointer-row"
           >
             <Column field="name" header="Vessel Name" />

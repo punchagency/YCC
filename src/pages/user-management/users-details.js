@@ -30,7 +30,7 @@ const UserDetails = () => {
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary mr-3"/>
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary"/>
               <Button label="Assign task" icon="pi pi-clipboard" className="p-button-primary" />
             </div>
           </div>
