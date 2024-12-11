@@ -1,5 +1,6 @@
 @use './variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
 
 body {
   margin: 0;
@@ -12,6 +13,9 @@ h1{
   font-weight: vars.$bold;
   color: vars.$light-black; 
   margin: 0;
+  @include bp.bp(custome-1440) {
+    font-size: 28px; // Applies when screen width is max 1440px
+  }
 }
 
 h2{
