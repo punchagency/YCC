@@ -41,45 +41,10 @@ const [uploadedFiles] = useState([
     });
   };
 
-const activityTemplate = (rowData) => {
-    return (
-        <span
-            className="activity-button"
-           
-        >
-            {rowData.activity}
-        </span>
-    );
-};
 
 
-const cardStyle = {
-    borderRadius: '8px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-};
-
-const headerStyle = {
-    fontSize: '16px',
-    fontWeight: 'bold',
-    marginBottom: '0.5rem',
-};
-
-const renewalStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: '0.5rem',
-    fontSize: '14px',
-    color: '#555',
-};
-
-
-const imageStyle = {
-    width: '20px',
-    height: '20px',
-};
-const editEquipmentPage = () => {
-    navigate("/finance-management/expense/edit");
+const editExpensePage = () => {
+    navigate("/finance-management/expense/new");
   };
 
   // You can now use the userId to fetch or display the specific user details
@@ -91,7 +56,7 @@ const editEquipmentPage = () => {
           <div className="flex align-items-center justify-content-between sub-header-panel">
             <div className="sub-header-left sub-header-left-with-arrow">
               <div className='arrow'>
-                  <Link to="/user-management/users"> 
+                  <Link to="/finance-management/expense"> 
                     <i className="pi pi-angle-left"></i>
                   </Link>
               </div>
@@ -101,7 +66,7 @@ const editEquipmentPage = () => {
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editEquipmentPage} />
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editExpensePage} />
             </div>
           </div>
           <div className="card-wrapper-gap">

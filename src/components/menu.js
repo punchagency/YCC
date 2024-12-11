@@ -112,6 +112,9 @@ const LeftMenu = ({ role }) => {
         },
         { 
             label: "Settings", 
+            command: () => {
+                navigate('/settings'); 
+            },
             icon: "pi pi-cog"
         },
     ];
@@ -139,20 +142,20 @@ const LeftMenu = ({ role }) => {
                 </svg>
             ), 
             items: [
-                { label: "Create task",  command: () => {
+                { label: "My task",  command: () => {
+                    navigate('/crew/maintenance-task/mytask'); 
+                } },
+                { label: "Maintenance History",command: () => {
                     navigate('/maintenance-scheduling/maintenance'); 
-                } },
-                { label: "Schedule calendar", command: () => console.log("Schedule calendar ") },
-                { label: "Equipment & parts", command: () => {
-                    navigate('/maintenance-scheduling/equipment'); 
-                } },
-                { label: "Warranty", command: () => {
-                    navigate('/maintenance-scheduling/warranty'); 
-                }}
+                }  },
+               
             ]
         },
         { 
             label: "Settings", 
+            command: () => {
+                navigate('/settings'); 
+            } ,
             icon: "pi pi-cog"
         },
     ];

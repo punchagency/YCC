@@ -75,7 +75,7 @@ const MyTask = () => {
 
     return (
         <main className="flex h-screen page">
-            <LeftMenu />
+            <LeftMenu role="Crew Member"/>
             <div className="w-full right-panel-component">
                 <AdminHeader />
                 <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -259,13 +259,13 @@ const MyTask = () => {
                     </TabView> */}
 
                     <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
-                        <TabPanel header="In Progress" headerStyle={{color:"#188A42"}}>
+                        <TabPanel header="In Progress" style={{color:"#188A42"}}>
                             {renderTaskTable(filterTasks('In Progress'))}
                         </TabPanel>
-                        <TabPanel header="Pending" headerStyle={{color:"#D9712A"}}>
+                        <TabPanel header="Pending" style={{color:"#D9712A"}}>
                             {renderTaskTable(filterTasks('Pending'))}
                         </TabPanel>
-                        <TabPanel header="Completed" headerStyle={{color:"Completed"}}>
+                        <TabPanel header="Completed" style={{color:"#337E89"}}>
                             {renderTaskTable(filterTasks('Completed'))}
                         </TabPanel>
                     </TabView>

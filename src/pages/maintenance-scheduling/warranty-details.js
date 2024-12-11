@@ -28,8 +28,8 @@ const WarrantyDetails = () => {
     });
   };
 
-  const editEquipmentPage = () => {
-    navigate("/maintenance-scheduling/equipment/edit");
+  const editWarrantyPage = () => {
+    navigate("/maintenance-scheduling/warranty/new");
   };
 
   // You can now use the userId to fetch or display the specific user details
@@ -41,7 +41,7 @@ const WarrantyDetails = () => {
           <div className="flex align-items-center justify-content-between sub-header-panel">
             <div className="sub-header-left sub-header-left-with-arrow">
               <div className='arrow'>
-                  <Link to="/user-management/users"> 
+                  <Link to="/maintenance-scheduling/warranty"> 
                     <i className="pi pi-angle-left"></i>
                   </Link>
               </div>
@@ -51,7 +51,7 @@ const WarrantyDetails = () => {
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editEquipmentPage} />
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editWarrantyPage} />
             </div>
           </div>
           <div className="card-wrapper-gap">

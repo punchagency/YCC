@@ -30,7 +30,7 @@ const AddExpense = () => {
 
     const [department, setDepartment] = useState(null);
     const [frequency, setFrequency] = useState(null);
-    const [maintenanceFrequency,setMaintenanceFrequency] = useState(null);
+    const [maintenanceFrequency, setMaintenanceFrequency] = useState(null);
     const currentDate = new Date().toLocaleDateString("en-US");
 
     const navigate = useNavigate();
@@ -80,7 +80,7 @@ const AddExpense = () => {
         { name: "Yearly" }
     ];
 
-    const goEquipmentPage = () => {
+    const goExpensePage = () => {
 
         navigate("/finance-management/expense");
     };
@@ -95,7 +95,7 @@ const AddExpense = () => {
                 <div className="flex align-items-center justify-content-between sub-header-panel">
                     <div className="sub-header-left sub-header-left-with-arrow">
                         <div className="arrow">
-                            <Link to="/maintenance-scheduling/warranty">
+                            <Link to="/finance-management/expense">
                                 <i className="pi pi-angle-left"></i>
                             </Link>
                         </div>
@@ -106,6 +106,7 @@ const AddExpense = () => {
                     </div>
                     <div className="sub-header-right">
                         <Button
+                        onClick={goExpensePage}
                             label="Cancel"
                             icon="pi pi-times-circle"
                             severity="secondary"
@@ -113,14 +114,14 @@ const AddExpense = () => {
                             className="p-button-secondary mr-3"
                         />
                         <Button
-                            onClick={goEquipmentPage}
+                            onClick={goExpensePage}
                             label="Save"
                             icon="pi pi-save"
                             className="p-button-primary mr-3"
                             type="button"
                         />
                         <Button
-                            onClick={goEquipmentPage}
+                            onClick={goExpensePage}
                             label="Save & Add Another"
                             icon="pi pi-save"
                             className="p-button-primary mr-3"
@@ -308,44 +309,44 @@ const AddExpense = () => {
 
 
                                         <div className="col-6">
-                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center">
-                              <div className="flex flex-wrap gap-1">
-                                {uploadedFiles.map((file, index) => {
-                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+                                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                                            <div className="flex align-content-center">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {uploadedFiles.map((file, index) => {
+                                                        const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
 
-                                  return (
-                                    <div key={index} className="file-item">
-                                      {isImage ? (
-                                        <img
-                                          src={file.url}
-                                          alt={file.name}
-                                          className="file-icon"
-                                        />
-                                      ) : (
-                                        <i className="pi pi-file-pdf file-icon"></i>
+                                                        return (
+                                                            <div key={index} className="file-item">
+                                                                {isImage ? (
+                                                                    <img
+                                                                        src={file.url}
+                                                                        alt={file.name}
+                                                                        className="file-icon"
+                                                                    />
+                                                                ) : (
+                                                                    <i className="pi pi-file-pdf file-icon"></i>
 
-                                      )}
-                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
-                                        <i className="pi pi-times"></i>
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              <label htmlFor="file-upload" className="custom-upload-button">
-                                <i className="pi pi-upload mr-2"></i>Upload
-                              </label>
-                              <input
-                                type="file"
-                                id="file-upload"
-                                multiple
-                                accept=".pdf,.jpg,.jpeg,.png,.gif"
-                                className="file-upload-input"
-                                onChange={handleFileSelect}
-                              />
-                            </div>
-                          </div>
+                                                                )}
+                                                                <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                                                                    <i className="pi pi-times"></i>
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <label htmlFor="file-upload" className="custom-upload-button">
+                                                    <i className="pi pi-upload mr-2"></i>Upload
+                                                </label>
+                                                <input
+                                                    type="file"
+                                                    id="file-upload"
+                                                    multiple
+                                                    accept=".pdf,.jpg,.jpeg,.png,.gif"
+                                                    className="file-upload-input"
+                                                    onChange={handleFileSelect}
+                                                />
+                                            </div>
+                                        </div>
 
                                     </div>
                                 </form>

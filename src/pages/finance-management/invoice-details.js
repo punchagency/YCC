@@ -47,7 +47,7 @@ const [uploadedFiles] = useState([
 
 
 const editInvoicePage = () => {
-    navigate("/finance-management/invoice/edit");
+    navigate("/finance-management/invoice/new");
   };
 
   // You can now use the userId to fetch or display the specific user details
@@ -59,7 +59,7 @@ const editInvoicePage = () => {
           <div className="flex align-items-center justify-content-between sub-header-panel">
             <div className="sub-header-left sub-header-left-with-arrow">
               <div className='arrow'>
-                  <Link to="/user-management/users"> 
+                  <Link to="/finance-management/invoice"> 
                     <i className="pi pi-angle-left"></i>
                   </Link>
               </div>

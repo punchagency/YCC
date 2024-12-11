@@ -4,6 +4,7 @@ import { Checkbox } from "primereact/checkbox";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
+import { Link } from "react-router-dom";
 const AddRole = () => {
     const [roleTitle, setRoleTitle] = useState("");
     const [permissions, setPermissions] = useState([]);
@@ -29,24 +30,29 @@ const AddRole = () => {
 
     return (
         <main className="flex h-screen page">
-        <LeftMenu />
+        <LeftMenu role="Captain/Manager"/>
         <div className='w-full right-panel-component'>
           <AdminHeader />
           <div className="flex align-items-center justify-content-between sub-header-panel">
-            {/* Left Section: Heading and Subheading */}
-            <div className="sub-header-left">
-              <h3>Roles</h3>
-              <p>Lists of different roles with accessibility </p>
-            </div>
+          <div className="sub-header-left sub-header-left-with-arrow">
+                        <div className="arrow">
+                            <Link to="/user-management/role">
+                                <i className="pi pi-angle-left"></i>
+                            </Link>
+                        </div>
+                        <div className="content">
+                            <h3>Add New Role</h3>
+                            <p>All all details here</p>
+                        </div>
+                    </div>
   
-            {/* Right Section: Action Button */}
             <div className="sub-header-right">
               <Button label="Save" icon="pi pi-save" className="p-button-primary" />
             </div>
           </div>
           <div className='card-wrapper-gap'>
             <div className="card">
-              <div className="card-wraper">
+              <div className="card-wraper pr-6 pt-3">
              
         <h4 className="mb-3">Role Information</h4>
         <div className="field mb-3">

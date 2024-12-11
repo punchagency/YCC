@@ -41,6 +41,9 @@ import Reports from './pages/reports/reports';
 import ReportDetails from './pages/reports/report-details';
 import Notifications from './pages/notification/notifications';
 import DashboardCrew from './pages/crew/dashboard';
+import MyTask from './pages/crew/maintenanace-task/mytask';
+import Settings from './pages/Settings';
+import RoleDetails from './pages/user-management/role-details';
 
 
 
@@ -107,14 +110,19 @@ function App() {
         <Route path="/user-management/users/:id" element={<UserDetails />} />
         <Route path="/user-management/users/edit/:id" element={<AddUser />} />
         <Route path="/user-management/role/new" element={<AddRole />} />
+        <Route path="/user-management/role/:id" element={<RoleDetails />} />
 
         {/* Report Route */}
         <Route path="/reports" element={<Reports />} />
         <Route path="/reports/:reportType" element={<ReportDetails />} />
         {/* Notification Route */}
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/settings" element={<Settings />} />  
+
 
         <Route path="/crew/dashboard" element={<DashboardCrew />} />  
+        <Route path="/crew/maintenance-task/mytask" element={<MyTask />} />  
+
       </Routes>
     </div>
   );

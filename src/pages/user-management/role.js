@@ -43,7 +43,7 @@ const Role = () => {
 
 
   const goToRolePage = () => {
-    navigate("/user-management/roles");
+    navigate("/user-management/role/new");
   };
 
   const actionBodyTemplate = (rowData) => (
@@ -107,8 +107,8 @@ const Role = () => {
           <div className="sub-header-right flex align-items-center">
            
             <Button
-              label="Save"
-              icon="pi pi-save"
+              label="Add Roles"
+              icon="pi pi-plus"
               onClick={goToRolePage}
               className="p-button-primary"
             />
@@ -123,7 +123,7 @@ const Role = () => {
             tableStyle={{ minWidth: "50rem" }}
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            onRowClick={(e) => navigate(`/vessel-management/vessels/${e.data.id}`)}
+            onRowClick={(e) => navigate(`/user-management/role/${e.data.id}`)}
             rowClassName="pointer-row"
           >
             <Column field="name" header="Role Name" />

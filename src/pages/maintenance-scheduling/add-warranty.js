@@ -52,7 +52,7 @@ const AddWarranty = () => {
         { name: "Months" }
     ]
 
-    const goEquipmentPage = () => {
+    const goWarantyPage = () => {
 
         navigate("/maintenance-scheduling/warranty");
     };
@@ -78,6 +78,7 @@ const AddWarranty = () => {
                     </div>
                     <div className="sub-header-right">
                         <Button
+                        onClick={goWarantyPage}
                             label="Cancel"
                             icon="pi pi-times-circle"
                             severity="secondary"
@@ -85,14 +86,14 @@ const AddWarranty = () => {
                             className="p-button-secondary mr-3"
                         />
                         <Button
-                            onClick={goEquipmentPage}
+                            onClick={goWarantyPage}
                             label="Save"
                             icon="pi pi-save"
                             className="p-button-primary mr-3"
                             type="button"
                         />
                         <Button
-                            onClick={goEquipmentPage}
+                            onClick={goWarantyPage}
                             label="Save & Add Another"
                             icon="pi pi-save"
                             className="p-button-primary mr-3"

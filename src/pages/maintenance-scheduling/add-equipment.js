@@ -27,9 +27,9 @@ const [category,setCategory] = useState(null);
  const [manufacturer,setManufacturer] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
 
-  const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+  const goEquipmentPage = () => {
+    
+    navigate("/maintenance-scheduling/equipment");
   };
 
   const handleEmailChange = (e) => {
@@ -98,7 +98,7 @@ const manufacturers =[
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/maintenance-scheduling/maintenance">
+              <Link to="/maintenance-scheduling/equipment">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>
@@ -109,7 +109,7 @@ const manufacturers =[
           </div>
           <div className="sub-header-right">
             <Button
-            onClick={goVasselPage}
+            onClick={goEquipmentPage}
               label="Cancel"
               icon="pi pi-times-circle"
               severity="secondary"
@@ -117,7 +117,7 @@ const manufacturers =[
               className="p-button-secondary mr-3"
             />
             <Button
-              onClick={goVasselPage}
+              onClick={goEquipmentPage}
               label="Save"
               icon="pi pi-save"
               className="p-button-primary"
