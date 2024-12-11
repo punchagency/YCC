@@ -1,6 +1,7 @@
 
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/scalable-font' as fs;
 
 .get-started-content{
   max-width: 444px;
@@ -35,7 +36,7 @@
             }
             .text{
                 padding-left: 21px;
-                font-size: 24px;
+                @include fs.fs(18, 24);
                 font-weight: 500;
                 color: vars.$light-black; 
                 @include transition(all, 0.3s, ease-in-out);
