@@ -90,6 +90,8 @@ const Expense = () => {
   const date = [
     ...new Set(expenses.map((expense) => expense.date)),
   ].map((date) => ({ name: date, value: date }));
+
+  const op = useRef(null);
   
 
   const goToAddExpensePage = () => {
@@ -153,14 +155,11 @@ const Expense = () => {
             <h3>Expenses</h3>
             <p>list of all expense </p>
           </div>
-          <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-      <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-      <InputText
-        placeholder="Search" 
-        className="pl-4 mr-3"
-      />
-    </div>
+          <div className="sub-header-right sub-header-big-desktop">
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
+            </div>
             <Dropdown
               value={selectedName}
               options={vesselNames}
@@ -193,6 +192,63 @@ const Expense = () => {
               placeholder="Status"
               className="mr-3"
             />
+            <Button
+              label="Add Expense"
+              icon="pi pi-plus"
+              onClick={goToAddExpensePage}
+              className="p-button-primary"
+            />
+          </div>
+          <div className="sub-header-right sub-header-small-desktop ">
+            <Button
+              label="Filters"
+              className='mr-3'
+              severity="secondary" 
+              outlined
+              icon="pi pi-chevron-down"
+              iconPos="right" // This will place the icon to the right of the text
+              onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+            />
+            <OverlayPanel ref={op}>
+            <div className="p-d-flex p-flex-column">
+            <Dropdown
+              value={selectedName}
+              options={vesselNames}
+              onChange={(e) => setselectedName(e.value)}
+              optionLabel="name"
+              placeholder="Vessel Name"
+              className="mr-3 "
+            />
+            <Dropdown
+              value={selectedCategory}
+              options={category}
+              onChange={(e) => setSelectedCategory(e.value)}
+              optionLabel="name"
+              placeholder="Category"
+              className="mr-3"
+            />
+               <Dropdown
+              value={selectedDate}
+              options={date}
+              onChange={(e) => setSelectedDate(e.value)}
+              optionLabel="name"
+              placeholder="Date"
+              className="mr-3"
+            />
+            <Dropdown
+              value={selectedStatus}
+              options={statuses}
+              onChange={(e) => setSelectedStatus(e.value)}
+              optionLabel="name"
+              placeholder="Status"
+              className="mr-3"
+            />
+            </div>
+            </OverlayPanel>  
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
+            </div>
             <Button
               label="Add Expense"
               icon="pi pi-plus"

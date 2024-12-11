@@ -82,6 +82,7 @@ const Warranty = () => {
   const goToAddEquipmentPage = () => {
     navigate("/maintenance-scheduling/warranty/new");
   };
+  const op = useRef(null);
 
   const actionBodyTemplate = (rowData) => (
     <>
@@ -150,17 +151,18 @@ const Warranty = () => {
             <h3>Warranty</h3>
             <p>list of all Equipment & parts warranty</p>
           </div>
-          <div className="sub-header-right flex align-items-center">
-            <div className="flex align-items-center relative">
+          <div className="sub-header-right sub-header-big-desktop">
+            {/* <div className="flex align-items-center relative">
               <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
               <InputText
                 placeholder="Search"
                 className="pl-4 mr-3"
               />
+            </div> */}
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
             </div>
-
-
-
             <Dropdown
               value={selectedManufacturer}
               options={manufacturer}
@@ -169,7 +171,6 @@ const Warranty = () => {
               placeholder="Manufacturer"
               className="mr-3 "
             />
-
             <Dropdown
               value={selectedDate}
               options={date}
@@ -178,8 +179,6 @@ const Warranty = () => {
               placeholder="Exp Date"
               className="mr-3"
             />
-
-
             <Dropdown
               value={selectedStatus}
               options={statuses}
@@ -188,10 +187,33 @@ const Warranty = () => {
               placeholder="Status"
               className="mr-3"
             />
-
-
-
             <Button
+              label="Add Warranty"
+              icon="pi pi-plus"
+              onClick={goToAddEquipmentPage}
+              className="p-button-primary"
+            />
+          </div>
+          <div className="sub-header-right sub-header-small-desktop ">
+             
+             <Button
+              label="Filters"
+              className='mr-3'
+              severity="secondary" 
+              outlined
+              icon="pi pi-chevron-down"
+              iconPos="right" // This will place the icon to the right of the text
+              onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+            />
+            <OverlayPanel ref={op}>
+                <div className="p-d-flex p-flex-column">
+                </div>
+            </OverlayPanel>  
+            <div className="p-input-icon-left search mr-3">
+                <i className="pi pi-search" />
+                <InputText type="search" placeholder="Search" />
+             </div>     
+             <Button
               label="Add Warranty"
               icon="pi pi-plus"
               onClick={goToAddEquipmentPage}
