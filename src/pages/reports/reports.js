@@ -55,10 +55,7 @@ export default function Reports() {
     navigate(path);
   };
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
+    <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           {/* Left Section: Heading and Subheading */}
           <div className="sub-header-left">
@@ -97,7 +94,6 @@ export default function Reports() {
             ))}
           </div>
         </div>
-      </div>
-    </main>
+    </>
   );
 }

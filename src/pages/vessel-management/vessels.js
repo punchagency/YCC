@@ -130,10 +130,7 @@ const Vessels = () => {
   );
 
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
+    <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
             <h3>Vessels</h3>
@@ -255,8 +252,7 @@ const Vessels = () => {
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
         </div>
-      </div>
-    </main>
+    </>
   );
 };
 

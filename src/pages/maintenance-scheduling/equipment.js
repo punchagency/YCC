@@ -138,10 +138,7 @@ const Equipment = () => {
 
 
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
+    <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
             <h3>Equipment & parts</h3>
@@ -266,8 +263,7 @@ const Equipment = () => {
 
           </DataTable>
         </div>
-      </div>
-    </main>
+    </>
   );
 };
 
