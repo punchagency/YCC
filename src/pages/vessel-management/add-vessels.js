@@ -166,10 +166,7 @@ const AddVassel = () => {
   ];
 
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
+    <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
@@ -1213,8 +1210,7 @@ const AddVassel = () => {
             </TabPanel>
           </TabView>
         </div>
-      </div>
-    </main>
+    </>
   );
 };
 

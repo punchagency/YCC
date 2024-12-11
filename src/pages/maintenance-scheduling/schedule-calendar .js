@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
@@ -7,9 +6,9 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
-import { Skeleton } from 'primereact/skeleton';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { InputText } from 'primereact/inputtext';
+import { Skeleton } from "primereact/skeleton";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { InputText } from "primereact/inputtext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -29,11 +28,46 @@ export default function ScheduleCalendar() {
   useEffect(() => {
     setTimeout(() => {
       const fetchedEquipments = [
-        { id: 1, name: "Alternator", coverage: "Parts", manufacturer: "Caterpillar", expirationDate: "26/09/2024", status: "Warranty" },
-        { id: 2, name: "Lighting Systems", coverage: "Full Warranty", manufacturer: "Viking", expirationDate: "26/09/2024", status: "Out of Warranty" },
-        { id: 3, name: "Radar Systems", coverage: "Labor", manufacturer: "Cummins", expirationDate: "26/09/2024", status: "Warranty" },
-        { id: 4, name: "Alternator", coverage: "Parts", manufacturer: "Cummins", expirationDate: "26/09/2024", status: "Out of Warranty" },
-        { id: 5, name: "Lighting Systems", coverage: "Labor", manufacturer: "Viking", expirationDate: "26/09/2024", status: "Warranty" },
+        {
+          id: 1,
+          name: "Alternator",
+          coverage: "Parts",
+          manufacturer: "Caterpillar",
+          expirationDate: "26/09/2024",
+          status: "Warranty",
+        },
+        {
+          id: 2,
+          name: "Lighting Systems",
+          coverage: "Full Warranty",
+          manufacturer: "Viking",
+          expirationDate: "26/09/2024",
+          status: "Out of Warranty",
+        },
+        {
+          id: 3,
+          name: "Radar Systems",
+          coverage: "Labor",
+          manufacturer: "Cummins",
+          expirationDate: "26/09/2024",
+          status: "Warranty",
+        },
+        {
+          id: 4,
+          name: "Alternator",
+          coverage: "Parts",
+          manufacturer: "Cummins",
+          expirationDate: "26/09/2024",
+          status: "Out of Warranty",
+        },
+        {
+          id: 5,
+          name: "Lighting Systems",
+          coverage: "Labor",
+          manufacturer: "Viking",
+          expirationDate: "26/09/2024",
+          status: "Warranty",
+        },
       ];
       setEquipments(fetchedEquipments);
       setFilteredManufacturer(fetchedEquipments);
@@ -46,13 +80,19 @@ export default function ScheduleCalendar() {
     let filteredData = equipments;
 
     if (selectedManufacturer) {
-      filteredData = filteredData.filter((equipment) => equipment.manufacturer === selectedManufacturer);
+      filteredData = filteredData.filter(
+        (equipment) => equipment.manufacturer === selectedManufacturer
+      );
     }
     if (selectedDate) {
-      filteredData = filteredData.filter((equipment) => equipment.category === selectedDate);
+      filteredData = filteredData.filter(
+        (equipment) => equipment.category === selectedDate
+      );
     }
     if (selectedStatus) {
-      filteredData = filteredData.filter((equipment) => equipment.status === selectedStatus);
+      filteredData = filteredData.filter(
+        (equipment) => equipment.status === selectedStatus
+      );
     }
 
     setFilteredManufacturer(filteredData);
@@ -90,30 +130,34 @@ export default function ScheduleCalendar() {
         className="p-button-rounded p-button-text"
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
-      <Button
+      <OverlayPanel
+        ref={menuRef}
+        dismissable
+        className="datatable-overlaypanel"
+      >
+        <Button
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={() => console.log("Edit", rowData)}
         />
-           <Button
+        <Button
           label="Update"
           icon="pi pi-list-check"
           className="p-button-text w-full"
-          onClick={() => console.log('Update', rowData)}
+          onClick={() => console.log("Update", rowData)}
         />
         <Button
           label="Delete"
           icon="pi pi-trash"
           className="p-button-text w-full"
-          onClick={() => console.log('Delete', rowData)}
+          onClick={() => console.log("Delete", rowData)}
         />
-         <Button
+        <Button
           label="Renew"
           icon="pi pi-refresh"
           className="p-button-text w-full"
-          onClick={() => console.log('Renew', rowData)}
+          onClick={() => console.log("Renew", rowData)}
         />
       </OverlayPanel>
     </>
@@ -124,7 +168,7 @@ export default function ScheduleCalendar() {
         icon="pi pi-paperclip"
         className="p-button-text"
         tooltip={`Download ${rowData.attachment}`}
-        tooltipOptions={{ position: 'top' }}
+        tooltipOptions={{ position: "top" }}
       />
     );
   };
@@ -139,37 +183,27 @@ export default function ScheduleCalendar() {
     </>
   );
 
-
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
-        <div className="flex align-items-center justify-content-between sub-header-panel">
-          <div className="sub-header-left">
-            <h3>Schedule Calendar</h3>
-            <p>Calendar view of all tasks</p>
-          </div>
-          <div className="sub-header-right flex align-items-center">
-            <div className="flex align-items-center relative">
-              <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-              <InputText
-                placeholder="Search"
-                className="pl-4 mr-3"
-              />
-            </div>
-            <Button
-              label="Create New Task"
-              icon="pi pi-plus"
-              onClick={goToAddEquipmentPage}
-              className="p-button-primary"
-            />
-          </div>
+    <>
+      <div className="flex align-items-center justify-content-between sub-header-panel">
+        <div className="sub-header-left">
+          <h3>Schedule Calendar</h3>
+          <p>Calendar view of all tasks</p>
         </div>
-        <div className="card-wrapper-gap">
-          
+        <div className="sub-header-right flex align-items-center">
+          <div className="flex align-items-center relative">
+            <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
+            <InputText placeholder="Search" className="pl-4 mr-3" />
+          </div>
+          <Button
+            label="Create New Task"
+            icon="pi pi-plus"
+            onClick={goToAddEquipmentPage}
+            className="p-button-primary"
+          />
         </div>
       </div>
-    </main>
+      <div className="card-wrapper-gap"></div>
+    </>
   );
-};
+}
