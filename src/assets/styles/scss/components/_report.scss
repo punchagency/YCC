@@ -26,7 +26,7 @@
                 font-weight: vars.$normal;
                 color: #9E9E9E;
             }
-            
+
         }
 
         .p-card-footer {
@@ -43,13 +43,14 @@
         }
     }
 }
-.report-table{
-    .p-datatable-table{
-        .p-datatable-thead{
-            .p-selection-column{
-                .p-column-header-content{
+
+.report-table {
+    .p-datatable-table {
+        .p-datatable-thead {
+            .p-selection-column {
+                .p-column-header-content {
                     .p-checkbox {
-                        &.p-component{
+                        &.p-component {
                             display: none;
                         }
                     }
@@ -58,32 +59,40 @@
         }
     }
 }
-.p-float-label {
-    label{
-        padding-left: .75rem;
-    }
+
+.p-calendar {
     .p-inputtext{
         &:hover{
             border-color: vars.$gray-color-border;
         }
     }
-    .p-calendar {
-        .p-button {
-            background-color: transparent;
-            color: vars.$gray-color-text;
-            border-color: vars.$gray-color-border;
-            border-left: 0;
-        }
+    .p-button {
+        background-color: transparent;
+        color: vars.$gray-color-text;
+        border-color: vars.$gray-color-border;
+        border-left: 0;
     }
 }
 
-.export-menu{
-    .p-menuitem-link{
-        .p-menuitem-text{
+
+.export-menu {
+    .p-menuitem-link {
+        .p-menuitem-text {
             font-size: 0.875rem;
             font-weight: vars.$normal;
             line-height: 1.0588rem;
             margin-left: 0.5rem;
+        }
+    }
+}
+
+.sub-header-right {
+    .p-calendar {
+
+        .p-inputtext,
+        .p-datepicker-trigger {
+            padding-top: 0.6rem;
+            padding-bottom: 0.6rem;
         }
     }
 }
