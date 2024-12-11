@@ -42,6 +42,7 @@ import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
 import DashboardCrew from "./pages/crew/dashboard";
 import ScheduleCalendar from "./pages/maintenance-scheduling/schedule-calendar ";
+import Layout from "./layout/layout";
 
 function App() {
   return (
@@ -51,70 +52,75 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/user-management/role" element={<Role />} />
-        <Route path="/user-management/users" element={<Users />} />
-        <Route path="/user-management/users/new" element={<AddUser />} />
-        <Route path="/vessel-management/vessels" element={<Vessels />} />
-        <Route path="/vessel-management/vessels/new" element={<AddVessel />} />
-        <Route
-          path="/vessel-management/vessels/:id"
-          element={<VesselDetails />}
-        />
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/user-management/role" element={<Role />} />
+          <Route path="/user-management/users" element={<Users />} />
+          <Route path="/user-management/users/new" element={<AddUser />} />
+          <Route path="/vessel-management/vessels" element={<Vessels />} />
+          <Route
+            path="/vessel-management/vessels/new"
+            element={<AddVessel />}
+          />
+          <Route
+            path="/vessel-management/vessels/:id"
+            element={<VesselDetails />}
+          />
 
-        <Route path="/document-management">
-          <Route path="documents" element={<Documents />} />
-          <Route path="documents/new" element={<AddDocument />} />
-          <Route path="documents/:id" element={<DocumentDetails />} />
-          <Route path="documents/edit" element={<EditDocument />} />
+          <Route path="/document-management">
+            <Route path="documents" element={<Documents />} />
+            <Route path="documents/new" element={<AddDocument />} />
+            <Route path="documents/:id" element={<DocumentDetails />} />
+            <Route path="documents/edit" element={<EditDocument />} />
+          </Route>
+
+          <Route path="/warranty-management/warranty" element={<Warranty />} />
+
+          <Route path="/maintenance-scheduling">
+            <Route path="maintenance" element={<Maintenance />} />
+            <Route path="maintenance/:id" element={<MaintenanceDetails />} />
+            <Route path="maintenance/edit" element={<Editmaintenance />} />
+            <Route path="equipment" element={<Equipment />} />
+            <Route path="equipment/:id" element={<EquipmentDetails />} />
+            <Route path="equipment/new" element={<Addequipment />} />
+            <Route path="equipment/edit" element={<EditEquipment />} />
+            <Route path="warranty" element={<Warranty />} />
+            <Route path="warranty/new" element={<AddWarranty />} />
+            <Route path="warranty/:id" element={<WarrantyDetails />} />
+            <Route path="schedule-calendar" element={<ScheduleCalendar />} />
+          </Route>
+
+          <Route path="/finance-management">
+            <Route path="expense" element={<Expense />} />
+            <Route path="expense/new" element={<AddExpense />} />
+            <Route path="expense/:id" element={<ExpenseDetails />} />
+            <Route path="invoice" element={<Invoice />} />
+            <Route path="invoice/new" element={<AddInvoice />} />
+            <Route path="invoice/:id" element={<InvoiceDetails />} />
+          </Route>
+          <Route path="/compliance-management">
+            <Route path="compliance" element={<Compliance />} />
+            <Route path="compliance/new" element={<AddCompliance />} />
+            <Route path="compliance/:id" element={<ComplianceDetails />} />
+          </Route>
+
+          <Route
+            path="/maintenance-scheduling/maintenance/new"
+            element={<AddMaintenance />}
+          />
+          {/* Dynamic Route for User Details */}
+          <Route path="/user-management/users/:id" element={<UserDetails />} />
+          <Route path="/user-management/users/edit/:id" element={<AddUser />} />
+          <Route path="/user-management/role/new" element={<AddRole />} />
+
+          {/* Report Route */}
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/reports/:reportType" element={<ReportDetails />} />
+          {/* Notification Route */}
+          <Route path="/notifications" element={<Notifications />} />
+
+          <Route path="/crew/dashboard" element={<DashboardCrew />} />
         </Route>
-
-        <Route path="/warranty-management/warranty" element={<Warranty />} />
-
-        <Route path="/maintenance-scheduling">
-          <Route path="maintenance" element={<Maintenance />} />
-          <Route path="maintenance/:id" element={<MaintenanceDetails />} />
-          <Route path="maintenance/edit" element={<Editmaintenance />} />
-          <Route path="equipment" element={<Equipment />} />
-          <Route path="equipment/:id" element={<EquipmentDetails />} />
-          <Route path="equipment/new" element={<Addequipment />} />
-          <Route path="equipment/edit" element={<EditEquipment />} />
-          <Route path="warranty" element={<Warranty />} />
-          <Route path="warranty/new" element={<AddWarranty />} />
-          <Route path="warranty/:id" element={<WarrantyDetails />} />
-          <Route path="schedule-calendar" element={<ScheduleCalendar />} />
-        </Route>
-
-        <Route path="/finance-management">
-          <Route path="expense" element={<Expense />} />
-          <Route path="expense/new" element={<AddExpense />} />
-          <Route path="expense/:id" element={<ExpenseDetails />} />
-          <Route path="invoice" element={<Invoice />} />
-          <Route path="invoice/new" element={<AddInvoice />} />
-          <Route path="invoice/:id" element={<InvoiceDetails />} />
-        </Route>
-        <Route path="/compliance-management">
-          <Route path="compliance" element={<Compliance />} />
-          <Route path="compliance/new" element={<AddCompliance />} />
-          <Route path="compliance/:id" element={<ComplianceDetails />} />
-        </Route>
-
-        <Route
-          path="/maintenance-scheduling/maintenance/new"
-          element={<AddMaintenance />}
-        />
-        {/* Dynamic Route for User Details */}
-        <Route path="/user-management/users/:id" element={<UserDetails />} />
-        <Route path="/user-management/users/edit/:id" element={<AddUser />} />
-        <Route path="/user-management/role/new" element={<AddRole />} />
-
-        {/* Report Route */}
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/reports/:reportType" element={<ReportDetails />} />
-        {/* Notification Route */}
-        <Route path="/notifications" element={<Notifications />} />
-
-        <Route path="/crew/dashboard" element={<DashboardCrew />} />
       </Routes>
     </div>
   );

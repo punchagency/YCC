@@ -8,7 +8,7 @@ import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
 import { useNavigate } from "react-router-dom";
 
-const AdminHeader = () => {
+const AdminHeader = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const overlayPanelRef = useRef(null);
   const [notifications, setNotifications] = useState([
@@ -33,12 +33,20 @@ const AdminHeader = () => {
   ]);
 
   const start = (
-    <div className="flex align-items-center profile">
-      <img src={avatar} alt="Profile" className="profile-image" />
-      <span className="profile-name">
-        Welcome, <strong>Christopher</strong>
-      </span>
-    </div>
+    <>
+      <div className="flex align-items-center profile">
+        <img src={avatar} alt="Profile" className="profile-image" />
+        <span className="profile-name">
+          Welcome, <strong>Christopher</strong>
+        </span>
+        <Button 
+          icon="pi pi-bars" 
+          text 
+          className="p-0 collapse-btn ml-4" 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        />
+      </div>
+    </>
   );
   const viewAllNotifications = () => {
     navigate("/notifications");
@@ -55,7 +63,7 @@ const AdminHeader = () => {
             <Badge value={notifications?.length} severity="warning"></Badge>
           </div>
 
-          <Button label="Mark all read" text className="p-0 mark-btn" />
+          {/* <Button label="Mark all read" text className="p-0 mark-btn" /> */}
         </div>
         <ul className="notification-list mb-3">
           {notifications.map((item, index) => (
