@@ -205,7 +205,7 @@ const AddInvoice = () => {
 
                                         <div className="upload-container">
                                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                                            <div className="flex align-content-center gap-4 mt-3">
+                                            <div className="flex align-content-center mt-3">
                                                 <div className="flex flex-wrap gap-1">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isImage =

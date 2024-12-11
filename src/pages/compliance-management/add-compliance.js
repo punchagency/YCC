@@ -566,7 +566,7 @@ const AddCompliance = () => {
 
                           <div className="col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center gap-4 mt-3">
+                            <div className="flex align-content-center mt-3">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
@@ -637,7 +637,7 @@ const AddCompliance = () => {
                           </div>
                           <div className="col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center gap-4 mt-3">
+                            <div className="flex align-content-center mt-3">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));

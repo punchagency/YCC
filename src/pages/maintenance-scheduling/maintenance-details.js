@@ -4,6 +4,7 @@ import { TabView, TabPanel } from 'primereact/tabview';
 import { Button } from 'primereact/button';
 import LeftMenu from '../../components/menu';
 import AdminHeader from '../../components/header';
+import PDFIcon from '../../assets/images/pdf.svg';
 
 
 const MaintenanceDetails = () => {
@@ -56,10 +57,11 @@ const MaintenanceDetails = () => {
           </div>
           <div className="sub-header-right">
          
-       <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary mr-3" onClick={editMaintenancePage}/>
+       <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editMaintenancePage}/>
 
           </div>
         </div>
+
 
         <div className="card-wrapper-gap">
             <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} className="tabview-detaols">
@@ -70,34 +72,34 @@ const MaintenanceDetails = () => {
                   <h5 className='text-base'>General Information</h5>
                   <div style={{ lineHeight: '2' }}>
                     <div className="detail-item flex gap-6">
-                      <span>Task Title</span>Oil Change
+                      <span className='labelName'>Task Title</span><span className='labelValue'>Oil Change</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Vessle Name</span> Sea Dreamer
+                    <span className='labelName'>Vessle Name</span> <span className='labelValue'>Sea Dreamer</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Equipment Name</span> Fuel System
+                    <span className='labelName'>Equipment Name</span> <span className='labelValue'>Fuel System</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span> Assigned Crew </span> Courtney Henry
+                    <span className='labelName'> Assigned Crew </span> <span className='labelValue'>Courtney Henry</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Date</span> 12/10/2024
+                    <span className='labelName'>Date</span> <span className='labelValue'>12/10/2024</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Priority Level</span>High
+                    <span className='labelName'>Priority Level</span><span className='labelValue'>High</span>
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Maintenance Frequency</span> Weekly
+                    <span className='labelName'>Maintenance Frequency</span> <span className='labelValue'>Weekly</span>
                     </div>
                
                 
                     <div className="detail-item flex gap-4">
-                      <span>Status</span> <span style={{color:"#22C55E"}}>In Progress</span>
+                    <span className='labelName'>Status</span> <span className='labelValue' style={{color:"#22C55E"}}>In Progress</span>
                     </div>
 
                     <div className="detail-item flex gap-4">
-                      <span>Note</span> Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components
+                    <span className='labelName'>Note</span> <span className='labelValue'>Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components</span>
                     </div>
 
                 
@@ -112,8 +114,9 @@ const MaintenanceDetails = () => {
                               <div className="p-d-flex p-ai-center flex">
                                 {isPdf ? (
                                   <>
-                                    <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i>
-                                    <span>{file.name}</span>
+                                    {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
+                                    <img src={PDFIcon} className='file-icon p-mr-2' style={{ fontSize: '2rem' }}></img>
+                                    <span className='flex align-items-center'>{file.name}</span>
                                   </>
                                 ) : (
                                   <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />
@@ -127,7 +130,7 @@ const MaintenanceDetails = () => {
                       <Button
                         icon="pi pi-download"
                         label="Download"
-                        className="p-button-outlined p-button-sm p-mt-3 ml-6"
+                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
                         onClick={downloadAllFiles}
                       />
                     </div>

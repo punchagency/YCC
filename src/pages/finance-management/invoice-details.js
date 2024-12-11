@@ -11,7 +11,7 @@ import { Column } from "primereact/column";
 import { Divider } from "primereact/divider";
 import { Icon } from '@iconify/react';
 import wallimage from '../../assets/images/wall-clock.svg';
-
+import PDFIcon from '../../assets/images/pdf.svg';
 
 
 const InvoiceDetails = () => {
@@ -69,7 +69,7 @@ const editInvoicePage = () => {
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary mr-3" onClick={editInvoicePage} />
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editInvoicePage} />
             </div>
           </div>
           <div className="card-wrapper-gap">
@@ -81,36 +81,36 @@ const editInvoicePage = () => {
                   <h5 className='text-base'>General Information</h5>
                   <div style={{ lineHeight: '2' }}>
                     <div className="detail-item flex gap-6">
-                      <span>Invoice Number</span>#YC98564
+                      <span className="labelName">Invoice Number</span><span className="labelValue">#YC98564</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Vendor</span> 12/10/2024
+                      <span className="labelName">Vendor</span><span className="labelValue">12/10/2024</span> 
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Amount</span> $200
+                      <span className="labelName">Amount</span> <span className="labelValue">$200</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span> Invoice Date</span> 12/10/2024
+                      <span className="labelName"> Invoice Date</span><span className="labelValue"> 12/10/2024</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Due Date</span> 22/10/2024
+                      <span className="labelName">Due Date</span><span className="labelValue">22/10/2024</span> 
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Amount Due</span> $200
+                      <span className="labelName">Amount Due</span> <span className="labelValue">$200</span>
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Vendor/Payee</span> Mazagon
+                      <span className="labelName">Vendor/Payee</span><span className="labelValue">Mazagon</span> 
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Payment Status</span> Paid
+                      <span className="labelName">Payment Status</span><span className="labelValue">Paid</span> 
                  </div>
                 
                     <div className="detail-item flex gap-4">
-                      <span>Service/Item Description</span> Nullam eu varius augue. Suspendisse vel mauris et elit maximus egestas.
+                      <span className="labelName">Service/Item Description</span><span className="labelValue">Nullam eu varius augue. Suspendisse vel mauris et elit maximus egestas.</span> 
                     </div>
 
                     <div className="detail-item flex gap-4">
-                      <span>Due Soon Threshold ( Reminder)</span> 2 Days
+                      <span className="labelName">Due Soon Threshold ( Reminder)</span><span className="labelValue">2 Days</span> 
                     </div>
 
 
@@ -124,8 +124,9 @@ const editInvoicePage = () => {
                               <div className="p-d-flex p-ai-center flex">
                                 {isPdf ? (
                                   <>
-                                    <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i>
-                                    <span>{file.name}</span>
+                                    {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
+                                    <img src={PDFIcon} />
+                                    <span className="flex justify-content-center">{file.name}</span>
                                   </>
                                 ) : (
                                   <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />

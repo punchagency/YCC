@@ -201,6 +201,8 @@ const Expense = () => {
             />
           </div>
         </div>
+
+        
         <div className="card-wrapper-gap">
           <DataTable
             value={filteredExpenses}
@@ -212,6 +214,7 @@ const Expense = () => {
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             onRowClick={(e) => navigate(`/finance-management/expense/${e.data.id}`)}
             rowClassName="pointer-row"
+            
           >
             <Column field="name" header="Vessel Name" />
             <Column field="expenseCategory" header="Expense Category" />
@@ -239,6 +242,8 @@ const Expense = () => {
             />
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
+
+          
         </div>
       </div>
     </main>

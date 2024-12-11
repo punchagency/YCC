@@ -11,7 +11,7 @@ import { Column } from "primereact/column";
 import { Divider } from "primereact/divider";
 import { Icon } from '@iconify/react';
 import wallimage from '../../assets/images/wall-clock.svg';
-
+import PDFIcon from '../../assets/images/pdf.svg';
 
 
 const ExpenseDetails = () => {
@@ -101,7 +101,7 @@ const editEquipmentPage = () => {
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary mr-3" onClick={editEquipmentPage} />
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editEquipmentPage} />
             </div>
           </div>
           <div className="card-wrapper-gap">
@@ -113,43 +113,43 @@ const editEquipmentPage = () => {
                   <h5 className='text-base'>General Information</h5>
                   <div style={{ lineHeight: '2' }}>
                     <div className="detail-item flex gap-6">
-                      <span>Vessel Name</span>Sea Dreamer
+                      <span className="labelName">Vessel Name</span><span className="labelValue">Sea Dreamer</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Expense Category</span> 12/10/2024
+                      <span className="labelName">Expense Category</span> <span className="labelValue">12/10/2024</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Amount</span> $200
+                      <span className="labelName">Amount</span> <span className="labelValue">$200</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span> Payment Method</span> Credit Card
+                      <span className="labelName"> Payment Method</span><span className="labelValue">Credit Card</span> 
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Vendor/Payee</span> Mazagon
+                      <span className="labelName">Vendor/Payee</span><span className="labelValue">Mazagon</span> 
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Payment Status</span> Paid
+                      <span className="labelName">Payment Status</span> <span className="labelValue">Paid</span>
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Department</span> Engineering
+                      <span className="labelName">Department</span> <span className="labelValue">Engineering</span>
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Expense Description (Notes)</span> Nullam eu varius augue. Suspendisse vel mauris et elit maximus egestas.
+                      <span className="labelName">Expense Description (Notes)</span><span className="labelValue">Nullam eu varius augue. Suspendisse vel mauris et elit maximus egestas.</span> 
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Warranty expiration Soon Threshold ( Reminder)</span> 10/15/2024	
+                      <span className="labelName">Warranty expiration Soon Threshold ( Reminder)</span><span className="labelValue">10/15/2024	</span> 
                     </div>
                 
                     <div className="detail-item flex gap-4">
-                      <span>Frequency</span> Recurring Expense
+                      <span className="labelName">Frequency</span><span className="labelValue">Recurring Expense</span> 
                     </div>
 
                     <div className="detail-item flex gap-4">
-                      <span>Start Date</span> 12/10/2024
+                      <span className="labelName">Start Date</span><span className="labelValue"> 12/10/2024</span>
                     </div>
 
                     <div className="detail-item flex gap-4">
-                      <span>End Date</span> 13/10/2024
+                      <span className="labelName">End Date</span><span className="labelValue"> 13/10/2024</span>
                     </div>
 
                     <div className="detail-item flex">
@@ -162,8 +162,9 @@ const editEquipmentPage = () => {
                               <div className="p-d-flex p-ai-center flex">
                                 {isPdf ? (
                                   <>
-                                    <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i>
-                                    <span>{file.name}</span>
+                                    {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
+                                    <img src={PDFIcon} />
+                                    <span className="flex align-items-center">{file.name}</span>
                                   </>
                                 ) : (
                                   <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />

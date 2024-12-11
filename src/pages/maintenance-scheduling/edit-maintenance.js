@@ -27,9 +27,8 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
  
   const currentDate = new Date().toLocaleDateString("en-US");
 
-  const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+  const goMaintenancePage = () => {
+    navigate("/maintenance-scheduling/maintenance");
   };
 
   const handleEmailChange = (e) => {
@@ -94,13 +93,13 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
               </Link>
             </div>
             <div className="content">
-              <h3>Add New Task</h3>
-              <p>Enter the user detail and create an user</p>
+              <h3>Oil Change</h3>
+              <p>Edit all details here</p>
             </div>
           </div>
           <div className="sub-header-right">
             <Button
-            onClick={goVasselPage}
+            onClick={goMaintenancePage}
               label="Cancel"
               icon="pi pi-times-circle"
               severity="secondary"
@@ -108,7 +107,7 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
               className="p-button-secondary mr-3"
             />
             <Button
-              onClick={goVasselPage}
+              onClick={goMaintenancePage}
               label="Save"
               icon="pi pi-save"
               className="p-button-primary"
@@ -212,7 +211,7 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
 
                 <div className="col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center gap-4 mt-3">
+                            <div className="flex align-content-center">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));

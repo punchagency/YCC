@@ -15,21 +15,20 @@ import { FileUpload } from "primereact/fileupload";
 const AddMaintenance = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
-const [crew,setCrews] = useState(null);
+  const [crew, setCrews] = useState(null);
   const [email, setEmail] = useState(null);
   const [phone, setPhone] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [priority,setPriority] = useState(null);
-  const [status,setStatus] = useState(null);
-const [additionalNotes,setAdditionalNotes] = useState(null);
-  const [frequency,setFrequency] = useState(null);
+  const [priority, setPriority] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [additionalNotes, setAdditionalNotes] = useState(null);
+  const [frequency, setFrequency] = useState(null);
 
- 
+
   const currentDate = new Date().toLocaleDateString("en-US");
 
-  const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+  const goMaintenancePage = () => {
+    navigate("/maintenance-scheduling/maintenance");
   };
 
   const handleEmailChange = (e) => {
@@ -75,7 +74,7 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
     { name: "Monthly" }
   ];
 
-  
+
   const crews = [
     { name: "Flag State Authority" },
     { name: "Flag State Authority 2" }
@@ -100,7 +99,7 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
           </div>
           <div className="sub-header-right">
             <Button
-            onClick={goVasselPage}
+              onClick={goMaintenancePage}
               label="Cancel"
               icon="pi pi-times-circle"
               severity="secondary"
@@ -108,7 +107,7 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
               className="p-button-secondary mr-3"
             />
             <Button
-              onClick={goVasselPage}
+              onClick={goMaintenancePage}
               label="Save"
               icon="pi pi-save"
               className="p-button-primary"
@@ -122,8 +121,8 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
             <h5>Add New Task</h5>
             <form>
               <div className="grid">
-                
-              <div className="col-12">
+
+                <div className="col-12">
                   <label htmlFor="task">Task Title</label>
                   <InputText
                     id="task"
@@ -211,55 +210,55 @@ const [additionalNotes,setAdditionalNotes] = useState(null);
                 </div>
 
                 <div className="col-6">
-                            <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center gap-4 mt-3">
-                              <div className="flex flex-wrap gap-1">
-                                {uploadedFiles.map((file, index) => {
-                                  const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
+                  <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
+                  <div className="flex align-content-center">
+                    <div className="flex flex-wrap gap-1">
+                      {uploadedFiles.map((file, index) => {
+                        const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
 
-                                  return (
-                                    <div key={index} className="file-item">
-                                      {isImage ? (
-                                        <img
-                                          src={file.url}
-                                          alt={file.name}
-                                          className="file-icon"
-                                        />
-                                      ) : (
-                                        <i className="pi pi-file-pdf file-icon"></i>
-
-                                      )}
-                                      <span className="uploadfiles" onClick={() => removeFile(file.name)}>
-                                        <i className="pi pi-times"></i>
-                                      </span>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                              <label htmlFor="file-upload" className="custom-upload-button">
-                                <i className="pi pi-upload mr-2"></i>Upload
-                              </label>
-                              <input
-                                type="file"
-                                id="file-upload"
-                                multiple
-                                accept=".pdf,.jpg,.jpeg,.png,.gif"
-                                className="file-upload-input"
-                                onChange={handleFileSelect}
+                        return (
+                          <div key={index} className="file-item">
+                            {isImage ? (
+                              <img
+                                src={file.url}
+                                alt={file.name}
+                                className="file-icon"
                               />
-                            </div>
+                            ) : (
+                              <i className="pi pi-file-pdf file-icon"></i>
+
+                            )}
+                            <span className="uploadfiles" onClick={() => removeFile(file.name)}>
+                              <i className="pi pi-times"></i>
+                            </span>
                           </div>
-                          <div className="col-12">
-                            <label htmlFor="additionalNotes" className="font-medium">Additional Notes</label>
-                            <InputTextarea
-                              id="additionalNotes"
-                              value={additionalNotes}
-                              onChange={(e) => setAdditionalNotes(e.target.value)}
-                              rows={5}
-                              cols={10}
-                              className="w-full mt-2"
-                            />
-                          </div>
+                        );
+                      })}
+                    </div>
+                    <label htmlFor="file-upload" className="custom-upload-button">
+                      <i className="pi pi-upload mr-2"></i>Upload
+                    </label>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      multiple
+                      accept=".pdf,.jpg,.jpeg,.png,.gif"
+                      className="file-upload-input"
+                      onChange={handleFileSelect}
+                    />
+                  </div>
+                </div>
+                <div className="col-12">
+                  <label htmlFor="additionalNotes" className="font-medium">Additional Notes</label>
+                  <InputTextarea
+                    id="additionalNotes"
+                    value={additionalNotes}
+                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                    rows={5}
+                    cols={10}
+                    className="w-full mt-2"
+                  />
+                </div>
 
               </div>
             </form>

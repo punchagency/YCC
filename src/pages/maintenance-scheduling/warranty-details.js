@@ -5,6 +5,7 @@ import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from 'primereact/card';
+import PDFIcon from '../../assets/images/pdf.svg';
 
 const WarrantyDetails = () => {
   // Access the userId from the URL
@@ -45,12 +46,12 @@ const WarrantyDetails = () => {
                   </Link>
               </div>
               <div className='content'>
-                <h3>Devon Lane</h3>
-                <p>User’s all type of information</p>
+                <h3>Main Engine</h3>
+                <p>All informations are below</p>
               </div>
             </div>
             <div className="sub-header-right">
-              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary mr-3" onClick={editEquipmentPage} />
+              <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editEquipmentPage} />
             </div>
           </div>
           <div className="card-wrapper-gap">
@@ -62,31 +63,31 @@ const WarrantyDetails = () => {
                   <h5 className='text-base'>General Information</h5>
                   <div style={{ lineHeight: '2' }}>
                     <div className="detail-item flex gap-6">
-                      <span>Equipment</span>Alternator
+                      <span className="labelName">Equipment</span><span className="labelValue">Alternator</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Serial Number</span> 12345-CAT
+                      <span className="labelName">Serial Number</span> <span className="labelValue">12345-CAT</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Manufacturer</span> Viking
+                      <span className="labelName">Manufacturer</span> <span className="labelValue">Viking</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span> Coverage</span> Parts
+                      <span className="labelName"> Coverage</span> <span className="labelValue">Parts</span>
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Supplier name</span> Robert
+                      <span className="labelName">Supplier name</span><span className="labelValue">Robert</span> 
                     </div>
                     <div className="detail-item flex gap-6">
-                      <span>Supplier phone no</span> +01 6789 7890
+                      <span className="labelName">Supplier phone no</span><span className="labelValue">+01 6789 7890</span> 
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Warranty Expiration Date</span> 22/10/2024
+                      <span className="labelName">Warranty Expiration Date</span><span className="labelValue">22/10/2024</span> 
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Warranty Status</span> <span style={{ color: 'green' }}>Warranty</span>
+                      <span className="labelName">Warranty Status</span> <span className="labelValue" style={{ color: 'green' }}>Warranty</span>
                     </div>
                     <div className="detail-item flex gap-4">
-                      <span>Warranty expiration Soon Threshold ( Reminder)</span> 10/15/2024	
+                      <span className="labelName">Warranty expiration Soon Threshold ( Reminder)</span> <span className="labelValue">10/15/2024	</span>
                     </div>
                     <div className="detail-item flex">
                       <div className="p-grid p-dir-col p-mt-3">
@@ -98,8 +99,9 @@ const WarrantyDetails = () => {
                               <div className="p-d-flex p-ai-center flex">
                                 {isPdf ? (
                                   <>
-                                    <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i>
-                                    <span>{file.name}</span>
+                                    {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
+                                    <img src={PDFIcon} className='file-icon p-mr-2' style={{ fontSize: '2rem' }}></img>
+                                    <span className='flex align-items-center'>{file.name}</span>
                                   </>
                                 ) : (
                                   <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />
@@ -113,7 +115,7 @@ const WarrantyDetails = () => {
                       <Button
                         icon="pi pi-download"
                         label="Download"
-                        className="p-button-outlined p-button-sm p-mt-3 ml-6"
+                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
                         onClick={downloadAllFiles}
                       />
                     </div>
