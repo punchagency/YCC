@@ -171,7 +171,7 @@ export default function ReportDetails() {
 
   return (
     <main className="flex h-screen page">
-      <LeftMenu />
+      <LeftMenu role="Captain/Manager" />
       <div className="w-full right-panel-component">
         <AdminHeader />
         <div className="grid grid-nogutter align-items-center justify-content-between sub-header-panel">
@@ -192,31 +192,33 @@ export default function ReportDetails() {
                 placeholder="Search"
               />
             </div>
-            <FloatLabel className="lg:col-3 py-0">
+            <div className="lg:col-3 py-0">
               <Calendar
-                inputId="birth_date"
                 value={date}
                 onChange={(e) => setDate(e.value)}
                 showIcon
+                placeholder="Form Date"
               />
-              <label htmlFor="birth_date">Form Date</label>
-            </FloatLabel>
-            <FloatLabel className="lg:col-3 py-0">
+            </div>
+            <div className="lg:col-3 py-0">
               <Calendar
-                inputId="birth_date"
                 value={date}
                 onChange={(e) => setDate(e.value)}
                 showIcon
+                placeholder="Date To"
               />
-              <label htmlFor="birth_date">Date To</label>
-            </FloatLabel>
+            </div>
             <div className="lg:col-3 py-0">
               <Button
                 className="p-button-primary w-full flex justify-content-between"
                 onClick={(event) => menuRight.current.toggle(event)}
                 aria-controls="popup_menu_right"
                 aria-haspopup
-              ><i className="pi pi-download" /> <span className="mx-3">Export</span> <i className="pi pi-ellipsis-v" /></Button>
+              >
+                <i className="pi pi-download" /> 
+                <span className="mx-3">Export</span> 
+                <i className="pi pi-ellipsis-v" />
+              </Button>
               <Menu
                 className="export-menu"
                 model={items}

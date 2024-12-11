@@ -150,7 +150,7 @@ const Invoice = () => {
 
   return (
     <main className="flex h-screen page">
-      <LeftMenu />
+      <LeftMenu role="Captain/Manager" />
       <div className="w-full right-panel-component">
         <AdminHeader />
         <div className="flex align-items-center justify-content-between sub-header-panel">
