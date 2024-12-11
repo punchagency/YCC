@@ -41,6 +41,7 @@ import Reports from "./pages/reports/reports";
 import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
 import DashboardCrew from "./pages/crew/dashboard";
+import ScheduleCalendar from "./pages/maintenance-scheduling/schedule-calendar ";
 
 function App() {
   return (
@@ -81,6 +82,7 @@ function App() {
           <Route path="warranty" element={<Warranty />} />
           <Route path="warranty/new" element={<AddWarranty />} />
           <Route path="warranty/:id" element={<WarrantyDetails />} />
+          <Route path="schedule-calendar" element={<ScheduleCalendar />} />
         </Route>
 
         <Route path="/finance-management">
