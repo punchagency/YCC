@@ -52,7 +52,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route element={<Layout />}>
+        <Route element={<Layout role="Captain/Manager" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management/role" element={<Role />} />
           <Route path="/user-management/users" element={<Users />} />
@@ -119,7 +119,9 @@ function App() {
           {/* Notification Route */}
           <Route path="/notifications" element={<Notifications />} />
 
-          <Route path="/crew/dashboard" element={<DashboardCrew />} />
+        </Route>
+        <Route element={<Layout role="Crew Member" />}>
+            <Route path="/crew/dashboard" element={<DashboardCrew />} />
         </Route>
       </Routes>
     </div>
