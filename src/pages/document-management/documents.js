@@ -86,6 +86,9 @@ const Documents = () => {
     ...new Set(documents.map((vessel) => vessel.status)),
   ].map((status) => ({ name: status, value: status }));
 
+
+  const op = useRef(null);
+
   const goToAddDocumentPage = () => {
     navigate("/document-management/documents/new");
   };
@@ -171,15 +174,10 @@ const Documents = () => {
             <h3>Documents</h3>
             <p>list of all documents</p>
           </div>
-          <div className="sub-header-right flex align-items-center">
-            <div className="flex align-items-center relative">
-              <i className="pi pi-search absolute left-0 ml-2 text-gray-500" style={{ marginRight: '5px' }}></i>
-              <InputText
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search"
-                className="pl-6 mr-3"
-              />
+          <div className="sub-header-right sub-header-big-desktop">
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
             </div>
 
             <Dropdown
@@ -206,6 +204,57 @@ const Documents = () => {
               placeholder="Status"
               className="mr-3"
             />
+            <Button
+              label="Add Documents"
+              icon="pi pi-plus"
+              onClick={goToAddDocumentPage}
+              className="p-button-primary"
+            />
+          </div>
+
+
+          <div className="sub-header-right sub-header-small-desktop ">
+            <Button
+              label="Filters"
+              className='mr-3'
+              severity="secondary" 
+              outlined
+              icon="pi pi-chevron-down"
+              iconPos="right" // This will place the icon to the right of the text
+              onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+            />
+            <OverlayPanel ref={op}>
+              <div className="p-d-flex p-flex-column">
+                <Dropdown
+                  value={selectedAuthority}
+                  options={issueAuthorities}
+                  onChange={(e) => setSelectedAuthority(e.value)}
+                  optionLabel="name"
+                  placeholder="Issuing Authority"
+                  className="mr-3 "
+                />
+                <Dropdown
+                  value={type}
+                  options={types}
+                  onChange={(e) => setSelectedDocumentType(e.value)}
+                  optionLabel="name"
+                  placeholder="Document type"
+                  className="mr-3"
+                />
+                <Dropdown
+                  value={selectedStatus}
+                  options={statuses}
+                  onChange={(e) => setSelectedStatus(e.value)}
+                  optionLabel="name"
+                  placeholder="Status"
+                  className="mr-3"
+                />
+              </div>
+            </OverlayPanel>
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
+            </div>
             <Button
               label="Add Documents"
               icon="pi pi-plus"

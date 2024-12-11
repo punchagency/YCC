@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import avatar from "../assets/images/avatar.svg";
-import { Menu } from "primereact/menu";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
