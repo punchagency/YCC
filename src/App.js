@@ -41,6 +41,7 @@ import Reports from './pages/reports/reports';
 import ReportDetails from './pages/reports/report-details';
 import Notifications from './pages/notification/notifications';
 import DashboardCrew from './pages/crew/dashboard';
+import MyTask from './pages/crew/maintenanace-task/mytask';
 
 
 
@@ -118,6 +119,7 @@ function App() {
           <Route path="/notifications" element={<Notifications />} />
 
         <Route path="/crew/dashboard" element={<DashboardCrew />} />  
+        <Route path="/abc" element={<MyTask />} />  
       </Routes>
     </div>
   );

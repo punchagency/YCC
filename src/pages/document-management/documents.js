@@ -18,7 +18,6 @@ const Documents = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const menuRef = useRef(null);
-
   // State for filters
   const [selectedAuthority, setSelectedAuthority] = useState(null);
   const [selectedDocumentType, setSelectedDocumentType] = useState(null);
