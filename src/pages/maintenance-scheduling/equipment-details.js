@@ -4,29 +4,12 @@ import LeftMenu from '../../components/menu';
 import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
 import { TabView, TabPanel } from "primereact/tabview";
-import { Card } from 'primereact/card';
-import PDFIcon from '../../assets/images/pdf.svg';
 
 const EquipmentDetails = () => {
   // Access the userId from the URL
   useParams();
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [uploadedFiles] = useState([
-    {
-      name: 'example.pdf',
-      type: 'application/pdf',
-      url: 'path/to/example.pdf',
-    }
-  ]);
-  const downloadAllFiles = () => {
-    uploadedFiles.forEach((file) => {
-      const a = document.createElement('a');
-      a.href = file.url;
-      a.download = file.name;
-      a.click();
-    });
-  };
 
   const editEquipmentPage = () => {
     navigate("/maintenance-scheduling/equipment/edit");
