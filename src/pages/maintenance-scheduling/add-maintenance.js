@@ -99,164 +99,165 @@ const AddMaintenance = () => {
         </div>
       </div>
       <div className="card-wrapper-gap">
-        <div
-          className="form-container border-round-sm"
-          style={{ backgroundColor: "#FFFFFF", padding: "28px" }}
-        >
-          <h5>Add New Task</h5>
-          <form>
-            <div className="grid">
-              <div className="col-12">
-                <label htmlFor="task">Task Title</label>
-                <InputText
-                  id="task"
-                  placeholder="Enter Task Title"
-                  className="w-full mt-2 p-inputtext p-component"
-                />
-              </div>
-              <div className="col-6">
-                <label htmlFor="vesselName">Vessel Name</label>
-                <InputText
-                  id="vesselName"
-                  placeholder="Enter Vessel Name"
-                  className="w-full mt-2 p-inputtext p-component"
-                />
-              </div>
-
-              <div className="col-6">
-                <label htmlFor="equipmentName">Equipment Name</label>
-                <InputText
-                  id="equipmentName"
-                  placeholder="Enter Equipment Name"
-                  className="w-full mt-2 p-inputtext p-component"
-                />
-              </div>
-              <div className="col-6">
-                <label htmlFor="crew">Assigned Crew </label>
-                <Dropdown
-                  id="crew"
-                  value={crew}
-                  onChange={(e) => setCrews(e.value)}
-                  options={crews}
-                  optionLabel="name"
-                  placeholder={crews.length > 0 ? crews[0].name : "Select"}
-                  className="w-full mt-2"
-                />
-              </div>
-              <div className="col-6">
-                <label htmlFor="date">Date</label>
-                <Calendar
-                  id="date"
-                  value={date}
-                  onChange={(e) => setDate(e.value)}
-                  showIcon
-                  placeholder={currentDate}
-                  className="w-full mt-2 p-input-calender"
-                />
-              </div>
-              <div className="col-6">
-                <label htmlFor="priority">Priority Level </label>
-                <Dropdown
-                  id="priority"
-                  value={priority}
-                  onChange={(e) => setPriority(e.value)}
-                  options={priorities}
-                  optionLabel="name"
-                  placeholder="Choose priority"
-                  className="w-full mt-2"
-                />
-              </div>
-
-              <div className="col-6">
-                <label htmlFor="status">Status</label>
-                <Dropdown
-                  id="status"
-                  value={status}
-                  onChange={(e) => setStatus(e.value)}
-                  options={statuses}
-                  optionLabel="name"
-                  placeholder="Enter Status"
-                  className="w-full mt-2"
-                />
-              </div>
-
-              <div className="col-6">
-                <label htmlFor="frequency">Maintenance Frequency</label>
-                <Dropdown
-                  id="frequency"
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.value)}
-                  options={frequencies}
-                  optionLabel="name"
-                  placeholder={
-                    frequencies.length > 0 ? frequencies[0].name : "Select"
-                  }
-                  className="w-full mt-2"
-                />
-              </div>
-
-              <div className="col-6">
-                <label htmlFor="uploadDocuments">
-                  Upload Supporting Documents
-                </label>
-                <div className="flex align-content-center">
-                  <div className="flex flex-wrap gap-1">
-                    {uploadedFiles.map((file, index) => {
-                      const isImage =
-                        file.type.includes("image") ||
-                        file.name
-                          .toLowerCase()
-                          .endsWith((".jpg", ".jpeg", ".png", ".gif"));
-
-                      return (
-                        <div key={index} className="file-item">
-                          {isImage ? (
-                            <img
-                              src={file.url}
-                              alt={file.name}
-                              className="file-icon"
-                            />
-                          ) : (
-                            <i className="pi pi-file-pdf file-icon"></i>
-                          )}
-                          <span
-                            className="uploadfiles"
-                            onClick={() => removeFile(file.name)}
-                          >
-                            <i className="pi pi-times"></i>
-                          </span>
-                        </div>
-                      );
-                    })}
+        <div className="card">
+          <div className="card-wraper">
+            <div className="form-container">
+              <h5>Add New Task</h5>
+              <form>
+                <div className="grid">
+                  <div className="col-12">
+                    <label htmlFor="task">Task Title</label>
+                    <InputText
+                      id="task"
+                      placeholder="Enter Task Title"
+                      className="w-full mt-2 p-inputtext p-component"
+                    />
                   </div>
-                  <label htmlFor="file-upload" className="custom-upload-button">
-                    <i className="pi pi-upload mr-2"></i>Upload
-                  </label>
-                  <input
-                    type="file"
-                    id="file-upload"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png,.gif"
-                    className="file-upload-input"
-                    onChange={handleFileSelect}
-                  />
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="vesselName">Vessel Name</label>
+                    <InputText
+                      id="vesselName"
+                      placeholder="Enter Vessel Name"
+                      className="w-full mt-2 p-inputtext p-component"
+                    />
+                  </div>
+
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="equipmentName">Equipment Name</label>
+                    <InputText
+                      id="equipmentName"
+                      placeholder="Enter Equipment Name"
+                      className="w-full mt-2 p-inputtext p-component"
+                    />
+                  </div>
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="crew">Assigned Crew </label>
+                    <Dropdown
+                      id="crew"
+                      value={crew}
+                      onChange={(e) => setCrews(e.value)}
+                      options={crews}
+                      optionLabel="name"
+                      placeholder={crews.length > 0 ? crews[0].name : "Select"}
+                      className="w-full mt-2"
+                    />
+                  </div>
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="date">Date</label>
+                    <Calendar
+                      id="date"
+                      value={date}
+                      onChange={(e) => setDate(e.value)}
+                      showIcon
+                      placeholder={currentDate}
+                      className="w-full mt-2 p-input-calender"
+                    />
+                  </div>
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="priority">Priority Level </label>
+                    <Dropdown
+                      id="priority"
+                      value={priority}
+                      onChange={(e) => setPriority(e.value)}
+                      options={priorities}
+                      optionLabel="name"
+                      placeholder="Choose priority"
+                      className="w-full mt-2"
+                    />
+                  </div>
+
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="status">Status</label>
+                    <Dropdown
+                      id="status"
+                      value={status}
+                      onChange={(e) => setStatus(e.value)}
+                      options={statuses}
+                      optionLabel="name"
+                      placeholder="Enter Status"
+                      className="w-full mt-2"
+                    />
+                  </div>
+
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="frequency">Maintenance Frequency</label>
+                    <Dropdown
+                      id="frequency"
+                      value={frequency}
+                      onChange={(e) => setFrequency(e.value)}
+                      options={frequencies}
+                      optionLabel="name"
+                      placeholder={
+                        frequencies.length > 0 ? frequencies[0].name : "Select"
+                      }
+                      className="w-full mt-2"
+                    />
+                  </div>
+
+                  <div className="col-12 md:col-6">
+                    <label htmlFor="uploadDocuments">
+                      Upload Supporting Documents
+                    </label>
+                    <div className="flex align-content-center">
+                      <div className="flex flex-wrap gap-1">
+                        {uploadedFiles.map((file, index) => {
+                          const isImage =
+                            file.type.includes("image") ||
+                            file.name
+                              .toLowerCase()
+                              .endsWith((".jpg", ".jpeg", ".png", ".gif"));
+
+                          return (
+                            <div key={index} className="file-item">
+                              {isImage ? (
+                                <img
+                                  src={file.url}
+                                  alt={file.name}
+                                  className="file-icon"
+                                />
+                              ) : (
+                                <i className="pi pi-file-pdf file-icon"></i>
+                              )}
+                              <span
+                                className="uploadfiles"
+                                onClick={() => removeFile(file.name)}
+                              >
+                                <i className="pi pi-times"></i>
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <label htmlFor="file-upload" className="custom-upload-button">
+                        <i className="pi pi-upload mr-2"></i>Upload
+                      </label>
+                      <input
+                        type="file"
+                        id="file-upload"
+                        multiple
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        className="file-upload-input"
+                        onChange={handleFileSelect}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-12 md:col-12">
+                    <label htmlFor="additionalNotes" className="font-medium">
+                      Additional Notes
+                    </label>
+                    <InputTextarea
+                      id="additionalNotes"
+                      value={additionalNotes}
+                      onChange={(e) => setAdditionalNotes(e.target.value)}
+                      rows={5}
+                      cols={10}
+                      className="w-full mt-2"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="col-12">
-                <label htmlFor="additionalNotes" className="font-medium">
-                  Additional Notes
-                </label>
-                <InputTextarea
-                  id="additionalNotes"
-                  value={additionalNotes}
-                  onChange={(e) => setAdditionalNotes(e.target.value)}
-                  rows={5}
-                  cols={10}
-                  className="w-full mt-2"
-                />
-              </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </>

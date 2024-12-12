@@ -1,4 +1,4 @@
-
+@use '../mixins/breakpoints' as bp;
    
     .card-wrapper-gap{
         .item{
@@ -26,6 +26,17 @@
                         .download-btn{
                             border: 1px solid #3B82F6;
                             border-radius: 6px;
+                            .p-button-label {
+                                @include bp.bp(custome-568) {
+                                  display: none;
+                                }
+                              }
+                              .p-button-icon{
+                                @include bp.bp(custome-568) {
+                                  margin-right: 0rem;
+                                  margin-left: 0rem;
+                                }
+                              }
                           
                         }
                        

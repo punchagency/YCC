@@ -1,4 +1,5 @@
 
+@use '../mixins/breakpoints' as bp;
 
 .right-panel-component {
   .card-wrapper-gap {
@@ -14,6 +15,10 @@
           font-size: 14px;
           color: #9E9E9E;
           font-weight: 500;
+          
+          @include bp.bp(custome-568) {
+            max-width: 150px;
+          }
         }
         .labelValue{
           font-size: 14px;
@@ -21,6 +26,17 @@
         }
         .download-btn{
           border: 1px solid #3B82F6;
+          .p-button-label {
+            @include bp.bp(custome-568) {
+              display: none;
+            }
+          }
+          .p-button-icon{
+            @include bp.bp(custome-568) {
+              margin-right: 0rem;
+              margin-left: 0rem;
+            }
+          }
         }
         .p-button-icon{
           color:#3B82F6;
