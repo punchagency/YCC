@@ -1,187 +1,136 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
+import React from "react";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
-import { Skeleton } from "primereact/skeleton";
-import { OverlayPanel } from "primereact/overlaypanel";
 import { InputText } from "primereact/inputtext";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import { TabPanel, TabView } from "primereact/tabview";
+import { Badge } from "primereact/badge";
 
 export default function ScheduleCalendar() {
-  const [equipments, setEquipments] = useState([]);
-  const [filteredManufacturer, setFilteredManufacturer] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const menuRef = useRef(null);
-
-  // State for filters
-  const [selectedManufacturer, setSelectedManufacturer] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setTimeout(() => {
-      const fetchedEquipments = [
-        {
-          id: 1,
-          name: "Alternator",
-          coverage: "Parts",
-          manufacturer: "Caterpillar",
-          expirationDate: "26/09/2024",
-          status: "Warranty",
-        },
-        {
-          id: 2,
-          name: "Lighting Systems",
-          coverage: "Full Warranty",
-          manufacturer: "Viking",
-          expirationDate: "26/09/2024",
-          status: "Out of Warranty",
-        },
-        {
-          id: 3,
-          name: "Radar Systems",
-          coverage: "Labor",
-          manufacturer: "Cummins",
-          expirationDate: "26/09/2024",
-          status: "Warranty",
-        },
-        {
-          id: 4,
-          name: "Alternator",
-          coverage: "Parts",
-          manufacturer: "Cummins",
-          expirationDate: "26/09/2024",
-          status: "Out of Warranty",
-        },
-        {
-          id: 5,
-          name: "Lighting Systems",
-          coverage: "Labor",
-          manufacturer: "Viking",
-          expirationDate: "26/09/2024",
-          status: "Warranty",
-        },
-      ];
-      setEquipments(fetchedEquipments);
-      setFilteredManufacturer(fetchedEquipments);
-      setLoading(false);
-    }, 500);
-  }, []);
-
-  // Handle filter logic
-  const applyFilters = useCallback(() => {
-    let filteredData = equipments;
-
-    if (selectedManufacturer) {
-      filteredData = filteredData.filter(
-        (equipment) => equipment.manufacturer === selectedManufacturer
-      );
-    }
-    if (selectedDate) {
-      filteredData = filteredData.filter(
-        (equipment) => equipment.category === selectedDate
-      );
-    }
-    if (selectedStatus) {
-      filteredData = filteredData.filter(
-        (equipment) => equipment.status === selectedStatus
-      );
-    }
-
-    setFilteredManufacturer(filteredData);
-  }, [equipments, selectedManufacturer, selectedDate, selectedStatus]);
-
-  // Apply filters when dependencies change
-  useEffect(() => {
-    applyFilters();
-  }, [applyFilters]);
-
-  // Dropdown options
-  const manufacturer = [
-    ...new Set(equipments.map((equipment) => equipment.manufacturer)),
-  ].map((manufacturer) => ({ name: manufacturer, value: manufacturer }));
-
-  const date = [
-    ...new Set(equipments.map((equipment) => equipment.expirationDate)),
-  ].map((expirationDate) => ({
-    name: expirationDate,
-    value: expirationDate,
+  const scrollableTabs = Array.from({ length: 50 }, (_, i) => ({
+    title: `Tab ${i + 1}`,
+    content: `Tab ${i + 1} Content`,
   }));
 
-  const statuses = [
-    ...new Set(equipments.map((equipment) => equipment.status)),
-  ].map((status) => ({ name: status, value: status }));
+  const resourcesEventArr = [
+    {
+      resourceId: 1,
+      resourceTitle: "Ashley Brown",
+      resourceDesignation: "Crew",
+      events: [
+        {
+          title: "Meeting with Client",
+          start: "2024-12-14",
+          status: "Complete",
+        },
+        {
+          title: "Project Presentation",
+          start: "2024-12-15",
+          status: "In Progress",
+        },
+        {
+          title: "Team Building Activity",
+          start: "2024-12-20",
+          status: "Pending",
+        },
+        {
+          title: "Company Holiday",
+          start: "2024-12-25",
+          status: "Complete",
+        },
+      ],
+    },
+    {
+      resourceId: 2,
+      resourceTitle: "Javier Holloway",
+      resourceDesignation: "Crew",
+      events: [
+        {
+          title: "Meeting with Client",
+          start: "2024-12-01",
+          status: "Complete",
+        },
+        {
+          title: "Project Presentation",
+          start: "2024-12-10",
+          status: "In Progress",
+        },
+        {
+          title: "Team Building Activity",
+          start: "2024-12-18",
+          status: "Pending",
+        },
+        {
+          title: "Company Holiday",
+          start: "2024-12-30",
+          status: "Complete",
+        },
+      ],
+    },
+    {
+      resourceId: 3,
+      resourceTitle: "Stephen Harris",
+      resourceDesignation: "Crew",
+      events: [],
+    },
+    {
+      resourceId: 4,
+      resourceTitle: "Richard Walters",
+      resourceDesignation: "Crew",
+      events: [],
+    },
+  ];
 
-  const goToAddEquipmentPage = () => {
-    navigate("/maintenance-scheduling/warranty/new");
-  };
-
-  const actionBodyTemplate = (rowData) => (
-    <>
-      <Button
-        icon="pi pi-ellipsis-v"
-        className="p-button-rounded p-button-text"
-        onClick={(e) => menuRef.current.toggle(e)}
-      />
-      <OverlayPanel
-        ref={menuRef}
-        dismissable
-        className="datatable-overlaypanel"
-      >
-        <Button
-          label="Edit"
-          icon="pi pi-pencil"
-          className="p-button-text w-full"
-          onClick={() => console.log("Edit", rowData)}
-        />
-        <Button
-          label="Update"
-          icon="pi pi-list-check"
-          className="p-button-text w-full"
-          onClick={() => console.log("Update", rowData)}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-text w-full"
-          onClick={() => console.log("Delete", rowData)}
-        />
-        <Button
-          label="Renew"
-          icon="pi pi-refresh"
-          className="p-button-text w-full"
-          onClick={() => console.log("Renew", rowData)}
-        />
-      </OverlayPanel>
-    </>
-  );
-  const attachmentTemplate = (rowData) => {
+  // Custom header template for tab with resource title and designation
+  const HeaderTemplate = ({ resource }) => {
     return (
-      <Button
-        icon="pi pi-paperclip"
-        className="p-button-text"
-        tooltip={`Download ${rowData.attachment}`}
-        tooltipOptions={{ position: "top" }}
-      />
+      <div>
+        <h6>{resource.resourceTitle}</h6>
+        <p>{resource.resourceDesignation}</p>
+      </div>
     );
   };
-  const skeletonTemplate = () => (
-    <>
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="10%" />
-    </>
-  );
+
+  // Function to dynamically add a class based on event status
+  const getEventClass = (status) => {
+    switch (status) {
+      case "Complete":
+        return "complete";
+      case "In Progress":
+        return "in-progress";
+      case "Pending":
+        return "pending";
+      default:
+        return "";
+    }
+  };
+
+  const renderTabs = () => {
+    return resourcesEventArr.map((resource) => (
+      <TabPanel
+        key={resource.resourceId}
+        header={<HeaderTemplate resource={resource} />}
+      >
+        <FullCalendar
+          plugins={[dayGridPlugin, interactionPlugin]}
+          initialView="dayGridMonth"
+          events={resource.events.map((event) => ({
+            ...event,
+            classNames: [getEventClass(event.status)], // Assign custom class based on status
+          }))}
+          headerToolbar={{
+            left: "prev,next",
+            center: "title",
+            right: "dayGridMonth",
+          }}
+          selectable={true}
+          height="auto"
+        />
+      </TabPanel>
+    ));
+  };
 
   return (
     <>
@@ -198,12 +147,29 @@ export default function ScheduleCalendar() {
           <Button
             label="Create New Task"
             icon="pi pi-plus"
-            onClick={goToAddEquipmentPage}
             className="p-button-primary"
           />
         </div>
       </div>
-      <div className="card-wrapper-gap"></div>
+      <div className="card-wrapper-gap">
+        <div className="grid align-items-center">
+          <div className="col-6">
+            <h3 className="my-0 schedule-title">
+              Specialist Name <Badge value={resourcesEventArr.length}></Badge>
+            </h3>
+          </div>
+          <div className="col-6">
+            <ul className="flex justify-content-end schedule-calender-mark">
+              <li className="complete">Complete</li>
+              <li className="in-progress">In Progress</li>
+              <li className="pending">Pending</li>
+            </ul>
+          </div>
+          <div className="col-12 schedule-calender">
+            <TabView>{renderTabs()}</TabView>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
