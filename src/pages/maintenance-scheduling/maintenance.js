@@ -322,7 +322,7 @@ const Maintenance = () => {
             className="mr-3"
             severity="secondary"
             outlined
-            icon="pi pi-chevron-down"
+            icon="pi pi-filter"
             iconPos="right" // This will place the icon to the right of the text
             onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
           />

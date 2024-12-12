@@ -121,7 +121,7 @@ const Addequipment = () => {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="category">Category </label>
                 <Dropdown
                   id="category"
@@ -136,7 +136,7 @@ const Addequipment = () => {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="manufacturer">Manufaturer </label>
                 <Dropdown
                   id="manufacturer"
@@ -151,7 +151,7 @@ const Addequipment = () => {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="modelNo">Model Number</label>
                 <InputText
                   id="modelNo"
@@ -160,7 +160,7 @@ const Addequipment = () => {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="serialNo">Serial Number</label>
                 <InputText
                   id="serialNo"
@@ -168,7 +168,7 @@ const Addequipment = () => {
                   className="w-full mt-2 p-inputtext p-component"
                 />
               </div>
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="date">Last Service Date</label>
                 <Calendar
                   id="date"
@@ -180,7 +180,7 @@ const Addequipment = () => {
                 />
               </div>
 
-              <div className="col-6">
+              <div className="col-12 md:col-6">
                 <label htmlFor="status">Status</label>
                 <Dropdown
                   id="status"
