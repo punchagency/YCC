@@ -134,22 +134,22 @@ const MyTask = () => {
             a.click();
         });
     };
-    const editMaintenancePage = () => {
-        navigate("/maintenance-scheduling/maintenance/edit");
+    const editTaskPage = () => {
+        navigate("/crew/maintenance-task/mytask/edit");
     };
 
     return (
         <main className="flex h-screen page">
-            <LeftMenu role="Crew Member" />
+            {/* <LeftMenu role="Crew Member" /> */}
             <div className="w-full right-panel-component">
-                <AdminHeader />
+                {/* <AdminHeader /> */}
                 <div className="flex align-items-center justify-content-between sub-header-panel">
                     <div className="sub-header-left sub-header-left-with-arrow">
-                        <div className="arrow">
+                        {/* <div className="arrow">
                             <Link to="/maintenance-scheduling/maintenance">
                                 <i className="pi pi-angle-left"></i>
                             </Link>
-                        </div>
+                        </div> */}
                         <div className="content">
                             <h3>My Task</h3>
                             <p>All informations are below</p>
@@ -157,7 +157,7 @@ const MyTask = () => {
                     </div>
                     <div className="sub-header-right">
 
-                        <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editMaintenancePage} />
+                        <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editTaskPage} />
 
                     </div>
                 </div>

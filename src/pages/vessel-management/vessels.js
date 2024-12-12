@@ -79,6 +79,8 @@ const Vessels = () => {
     navigate("/vessel-management/vessels/new");
   };
 
+  const op = useRef(null);
+
   const actionBodyTemplate = (rowData) => (
     <>
       <Button
@@ -128,16 +130,13 @@ const Vessels = () => {
   );
 
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
+    <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
             <h3>Vessels</h3>
             <p>List of all Vessels. You can also add new vessels.</p>
           </div>
-          <div className="sub-header-right flex align-items-center">
+          <div className="sub-header-right sub-header-big-desktop">
             <Dropdown
               value={selectedType}
               options={vesselTypes}
@@ -168,6 +167,51 @@ const Vessels = () => {
               onClick={goToAddVesselPage}
               className="p-button-primary"
             />
+          </div>
+          <div className="sub-header-right sub-header-small-desktop ">
+            <Button
+              label="Filters"
+              className='mr-3'
+              severity="secondary" 
+              outlined
+              icon="pi pi-chevron-down"
+              iconPos="right" // This will place the icon to the right of the text
+              onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+            />
+            <OverlayPanel ref={op}>
+                <div className="p-d-flex p-flex-column">
+                  <Dropdown
+                    value={selectedType}
+                    options={vesselTypes}
+                    onChange={(e) => setSelectedType(e.value)}
+                    optionLabel="name"
+                    placeholder="Vessel Type"
+                    className="mr-3 "
+                  />
+                  <Dropdown
+                    value={selectedYear}
+                    options={years}
+                    onChange={(e) => setSelectedYear(e.value)}
+                    optionLabel="name"
+                    placeholder="Year Built"
+                    className="mr-3"
+                  />
+                  <Dropdown
+                    value={selectedStatus}
+                    options={statuses}
+                    onChange={(e) => setSelectedStatus(e.value)}
+                    optionLabel="name"
+                    placeholder="Status"
+                    className="mr-3"
+                  />
+                </div>  
+            </OverlayPanel> 
+            <Button
+              label="Add Vessels"
+              icon="pi pi-plus"
+              onClick={goToAddVesselPage}
+              className="p-button-primary"
+            /> 
           </div>
         </div>
         <div className="card-wrapper-gap">
@@ -208,8 +252,7 @@ const Vessels = () => {
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
         </div>
-      </div>
-    </main>
+    </>
   );
 };
 

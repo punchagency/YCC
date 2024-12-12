@@ -1,33 +1,46 @@
-
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
 
-.login-content{
+.login-content {
   max-width: 444px;
 }
 
-.login-right-component{
+.login-right-component {
   max-width: 550px;
   width: 100%;
-  .logo-wraper{
+
+  .logo-wraper {
     margin-bottom: 48px;
-    .logo{
-       width: 180px;
-       display: block;
+    @include bp.bp(phone-end) {
+      margin-bottom: 30px;
+    }
+
+    .logo {
+      width: 180px;
+      display: block;
+
+      @include bp.bp(phone-end) {
+        width: 100px;
+      }
     }
   }
-  .login-heading{
+
+  .login-heading {
     text-align: left;
     margin-bottom: 38px;
   }
-  .login-form{
+
+  .login-form {
     text-align: left;
   }
-  .p-field-checkbox{
+
+  .p-field-checkbox {
     margin-bottom: 41px;
     display: flex;
     justify-content: space-between;
-    a{
+
+    a {
       font-size: 14px;
     }
   }

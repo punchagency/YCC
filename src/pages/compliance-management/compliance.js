@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
@@ -7,10 +6,10 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
-import { Skeleton } from 'primereact/skeleton';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { type } from '@testing-library/user-event/dist/type';
-import { InputText } from 'primereact/inputtext';
+import { Skeleton } from "primereact/skeleton";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { type } from "@testing-library/user-event/dist/type";
+import { InputText } from "primereact/inputtext";
 
 const Compliance = () => {
   const [documents, setDocuments] = useState([]);
@@ -28,11 +27,46 @@ const Compliance = () => {
   useEffect(() => {
     setTimeout(() => {
       const fetchedDocument = [
-        { id: 1, name: "Sea Dreamer", type: "Flag State",  issuingAuthority: "USCG", outcome:"Passed", date: "20/10/2024", nextDate: "30/10/2024", status: "InCompliance" },
-        { id: 2, name: "Serenity", type: "ISM Code Audit", issuingAuthority: "MCA", outcome:"Passed with Obs..", date: "20/10/2024", nextDate: "30/10/2024", status: "CompliancePending" },
-        { id: 3, name: "Odyssey", type: "PSC", issuingAuthority: "Port State Control Officer", outcome:"Failed", date: "20/10/2024", nextDate: "30/10/2024", status: "InCompliance" },
-        { id: 4, name: "Harmony", type: "Compliance", issuingAuthority: "MCA", outcome:"Passed with Obs..", date: "20/10/2024", nextDate: "30/10/2024", status: "NonCompliance" },
-       
+        {
+          id: 1,
+          name: "Sea Dreamer",
+          type: "Flag State",
+          issuingAuthority: "USCG",
+          outcome: "Passed",
+          date: "20/10/2024",
+          nextDate: "30/10/2024",
+          status: "InCompliance",
+        },
+        {
+          id: 2,
+          name: "Serenity",
+          type: "ISM Code Audit",
+          issuingAuthority: "MCA",
+          outcome: "Passed with Obs..",
+          date: "20/10/2024",
+          nextDate: "30/10/2024",
+          status: "CompliancePending",
+        },
+        {
+          id: 3,
+          name: "Odyssey",
+          type: "PSC",
+          issuingAuthority: "Port State Control Officer",
+          outcome: "Failed",
+          date: "20/10/2024",
+          nextDate: "30/10/2024",
+          status: "InCompliance",
+        },
+        {
+          id: 4,
+          name: "Harmony",
+          type: "Compliance",
+          issuingAuthority: "MCA",
+          outcome: "Passed with Obs..",
+          date: "20/10/2024",
+          nextDate: "30/10/2024",
+          status: "NonCompliance",
+        },
       ];
       setDocuments(fetchedDocument);
       setFilteredDocument(fetchedDocument); // Initially, all vessels are displayed
@@ -45,13 +79,19 @@ const Compliance = () => {
     let filteredData = documents;
 
     if (selectedAuthority) {
-      filteredData = filteredData.filter((vessel) => vessel.type === selectedAuthority);
+      filteredData = filteredData.filter(
+        (vessel) => vessel.type === selectedAuthority
+      );
     }
     if (selectedDocumentType) {
-      filteredData = filteredData.filter((vessel) => vessel.yearbuilt === selectedDocumentType);
+      filteredData = filteredData.filter(
+        (vessel) => vessel.yearbuilt === selectedDocumentType
+      );
     }
     if (selectedStatus) {
-      filteredData = filteredData.filter((vessel) => vessel.status === selectedStatus);
+      filteredData = filteredData.filter(
+        (vessel) => vessel.status === selectedStatus
+      );
     }
 
     setFilteredDocument(filteredData);
@@ -67,13 +107,13 @@ const Compliance = () => {
     ...new Set(documents.map((document) => document.issuingAuthority)),
   ].map((issueAuthority) => ({ name: issueAuthority, value: issueAuthority }));
 
-  const types = [
-    ...new Set(documents.map((vessel) => vessel.type)),
-  ].map((type) => ({ name: type, value: type }));
+  const types = [...new Set(documents.map((vessel) => vessel.type))].map(
+    (type) => ({ name: type, value: type })
+  );
 
-  const statuses = [
-    ...new Set(documents.map((vessel) => vessel.status)),
-  ].map((status) => ({ name: status, value: status }));
+  const statuses = [...new Set(documents.map((vessel) => vessel.status))].map(
+    (status) => ({ name: status, value: status })
+  );
 
   const goToAddCompliancePage = () => {
     navigate("/compliance-management/compliance/new");
@@ -84,7 +124,7 @@ const Compliance = () => {
       backgroundColor: "#94E0ED",
       color: "#047F94",
     },
-    CompliancePending : {
+    CompliancePending: {
       backgroundColor: "#F59E0B",
       color: "#FFFFFF",
     },
@@ -92,7 +132,7 @@ const Compliance = () => {
       backgroundColor: "#3B82F6",
       color: "#FFFFFF",
     },
-   
+
     Default: {
       backgroundColor: "#F0F0F0",
       color: "#000000",
@@ -106,18 +146,22 @@ const Compliance = () => {
         className="p-button-rounded p-button-text"
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
+      <OverlayPanel
+        ref={menuRef}
+        dismissable
+        className="datatable-overlaypanel"
+      >
         <Button
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={() => console.log("Edit", rowData)}
         />
         <Button
           label="Delete"
           icon="pi pi-trash"
           className="p-button-text w-full"
-          onClick={() => console.log('Delete', rowData)}
+          onClick={() => console.log("Delete", rowData)}
         />
       </OverlayPanel>
     </>
@@ -135,98 +179,97 @@ const Compliance = () => {
   );
 
   return (
-    <main className="flex h-screen page">
-      <LeftMenu role="Captain/Manager" />
-      <div className="w-full right-panel-component">
-        <AdminHeader />
-        <div className="flex align-items-center justify-content-between sub-header-panel">
-          <div className="sub-header-left">
-            <h3>Documents</h3>
-            <p>list of all documents</p>
-          </div>
-          <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-      <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-      <InputText 
-        placeholder="Search" 
-        className="pl-4 mr-3"
-      />
-    </div>
-            <Dropdown
-              value={selectedAuthority}
-              options={issueAuthorities}
-              onChange={(e) => setSelectedAuthority(e.value)}
-              optionLabel="name"
-              placeholder="Issuing Authority"
-              className="mr-3 "
-            />
-            <Dropdown
-              value={type}
-              options={types}
-              onChange={(e) => setSelectedDocumentType(e.value)}
-              optionLabel="name"
-              placeholder="Document type"
-              className="mr-3"
-            />
-            <Dropdown
-              value={selectedStatus}
-              options={statuses}
-              onChange={(e) => setSelectedStatus(e.value)}
-              optionLabel="name"
-              placeholder="Status"
-              className="mr-3"
-            />
-            <Button
-              label="Add Compliance"
-              icon="pi pi-plus"
-              onClick={goToAddCompliancePage}
-              className="p-button-primary"
-            />
-          </div>
+    <>
+      <div className="flex align-items-center justify-content-between sub-header-panel">
+        <div className="sub-header-left">
+          <h3>Documents</h3>
+          <p>list of all documents</p>
         </div>
-        <div className="card-wrapper-gap">
-          <DataTable
-            value={filteredDocument}
-            paginator
-            rows={10}
-            rowsPerPageOptions={[10, 25, 50]}
-            tableStyle={{ minWidth: "50rem" }}
-            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            onRowClick={(e) => navigate(`/compliance-management/compliance/${e.data.id}`)}
-            rowClassName="pointer-row"
-          >
-            <Column field="name" header="Vessel Name" />
-            <Column field="type" header="Type" />
-            <Column field="date" header="Date" />
-            <Column field="issuingAuthority" header="Issuing Authority" />
-            <Column field="outcome" header="Outcome" />
-            <Column field="nextDate" header="Next Date" />
-            <Column
-              field="status"
-              header="Status"
-              body={(rowData) => {
-                const styles = statusStyles[rowData.status] || statusStyles.Default; 
-                return (
-                  <span
-                    style={{
-                      ...styles,
-                      fontWeight: "bold",
-                      padding: "5px 10px",
-                      borderRadius: "6px",
-                      display: "inline-block",
-                    }}
-                  >
-                    {rowData.status}
-                  </span>
-                );
-              }}
-            />
-            <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
-          </DataTable>
+        <div className="sub-header-right flex align-items-center">
+          <div className="flex align-items-center relative">
+            <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
+            <InputText placeholder="Search" className="pl-4 mr-3" />
+          </div>
+          <Dropdown
+            value={selectedAuthority}
+            options={issueAuthorities}
+            onChange={(e) => setSelectedAuthority(e.value)}
+            optionLabel="name"
+            placeholder="Issuing Authority"
+            className="mr-3 "
+          />
+          <Dropdown
+            value={type}
+            options={types}
+            onChange={(e) => setSelectedDocumentType(e.value)}
+            optionLabel="name"
+            placeholder="Document type"
+            className="mr-3"
+          />
+          <Dropdown
+            value={selectedStatus}
+            options={statuses}
+            onChange={(e) => setSelectedStatus(e.value)}
+            optionLabel="name"
+            placeholder="Status"
+            className="mr-3"
+          />
+          <Button
+            label="Add Compliance"
+            icon="pi pi-plus"
+            onClick={goToAddCompliancePage}
+            className="p-button-primary"
+          />
         </div>
       </div>
-    </main>
+      <div className="card-wrapper-gap">
+        <DataTable
+          value={filteredDocument}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[10, 25, 50]}
+          tableStyle={{ minWidth: "50rem" }}
+          paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+          onRowClick={(e) =>
+            navigate(`/compliance-management/compliance/${e.data.id}`)
+          }
+          rowClassName="pointer-row"
+        >
+          <Column field="name" header="Vessel Name" />
+          <Column field="type" header="Type" />
+          <Column field="date" header="Date" />
+          <Column field="issuingAuthority" header="Issuing Authority" />
+          <Column field="outcome" header="Outcome" />
+          <Column field="nextDate" header="Next Date" />
+          <Column
+            field="status"
+            header="Status"
+            body={(rowData) => {
+              const styles =
+                statusStyles[rowData.status] || statusStyles.Default;
+              return (
+                <span
+                  style={{
+                    ...styles,
+                    fontWeight: "bold",
+                    padding: "5px 10px",
+                    borderRadius: "6px",
+                    display: "inline-block",
+                  }}
+                >
+                  {rowData.status}
+                </span>
+              );
+            }}
+          />
+          <Column
+            body={loading ? skeletonTemplate : actionBodyTemplate}
+            style={{ width: "10%" }}
+          />
+        </DataTable>
+      </div>
+    </>
   );
 };
 

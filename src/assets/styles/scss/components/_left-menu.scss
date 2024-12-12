@@ -1,5 +1,7 @@
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
+
 
 .left-menu {
   max-width: 296px;
@@ -10,6 +12,12 @@
   padding: 18px;
   box-sizing: border-box;
   min-width: fit-content;
+  transition: 0.5s all ease;
+  @include bp.bp(mid-desktop3) {
+    position: absolute;
+    left: 0;
+    transform: translate(-100%);
+  }
 
   .p-panelmenu {
     width: 100%;
@@ -181,6 +189,25 @@
 
     .logo {
       max-width: 127px;
+    }
+    .collapse-close-btn{
+      position: absolute;
+      right: 0;
+      top: 18px;
+      display: none;
+      &:focus{
+        box-shadow: none;
+      }
+      @include bp.bp(mid-desktop3) {
+        display: block;
+      }
+    }
+  }
+  &.collapsed{
+    @include bp.bp(mid-desktop3) {
+      transform: translate(0%);
+      height: 100%;
+      z-index: 2;
     }
   }
 }

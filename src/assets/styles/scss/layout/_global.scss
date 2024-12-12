@@ -1,6 +1,7 @@
 @use './variables' as vars;
 @use '../mixins/transition' as *;
 @use '../mixins/breakpoints' as bp;
+@use '../mixins/scalable-font' as fs;
 
 body {
   margin: 0;
@@ -18,16 +19,18 @@ h1{
   }
 }
 
-h2{
+h2 {
   font-size: vars.$h2-font-size;
+  @include fs.fs(20, 24);
   line-height: 30px;
   font-weight: vars.$bold;
-  color: vars.$light-black; 
+  color: vars.$light-black;
   margin: 0;
 }
 
 h6{
   font-size: vars.$h6-font-size;
+  @include fs.fs(15, 19);
   line-height: 23px;
   color: vars.$light-black;
   font-weight: vars.$medium;
@@ -51,7 +54,12 @@ ul{
   margin: 0;
   padding: 0;
 }
-
+.wrapper{
+  height: 100vh;
+  @include bp.bp(mid-desktop3) {
+    height: auto;
+  }
+}
 .right-panel{
   padding: 40px 30px;
   box-sizing: border-box;
@@ -291,6 +299,8 @@ ul{
 }
 
 .sub-header-right{
+   display: flex;
+   align-items: center;
    .search{
       .pi-search{
         padding-left: 14px;
@@ -300,12 +310,29 @@ ul{
          padding-left: 40px;
       }
    }
+   &.sub-header-big-desktop{
+    display: flex;
+    @include bp.bp(custome-1600) {
+      display: none;
+    }
+   }
+   &.sub-header-small-desktop{
+    display: none;
+    @include bp.bp(custome-1600) {
+      display: flex;
+    }
+   }
+   
 }
 .p-calendar-w-btn-right{
   .p-inputtext{
     border-right: 0;
   }
 }
+
+
+
+
 
 
 .p-datatable{
@@ -594,4 +621,26 @@ ul{
           }
      }
   }
+}
+
+.search{
+  @include bp.bp(custome-1600) {
+    max-width: 200px;
+  }
+  @include bp.bp(mid-desktop2) {
+    max-width: 150px;
+  }
+  .p-inputtext{
+    @include bp.bp(custome-1600) {
+      width: 100%;
+    }
+  }
+}
+
+.sub-header-right{
+   .p-dropdown{
+      .p-dropdown-label.p-inputtext{
+        padding: 0.67rem 0.75rem;
+      } 
+   }
 }

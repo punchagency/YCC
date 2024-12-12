@@ -1,6 +1,8 @@
 
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/scalable-font' as fs;
+@use '../mixins/breakpoints' as bp;
 
 .get-started-content{
   max-width: 444px;
@@ -8,6 +10,9 @@
 
 .get-started-right-component-content{
   margin-top: 35px;
+  @include bp.bp(phone-end) {
+    margin-top: 10px;
+  }
 }
 
 .get-started-right-component{
@@ -27,15 +32,22 @@
         padding: 39px 0;
         justify-content: space-between;
         cursor: pointer;
+        @include bp.bp(phone-end) {
+          padding: 25px 0;
+        }
         .content{
             display: flex;
             .icons{
               width: 53px;
               height: 53px;
+              @include bp.bp(phone-end) {
+                width: 45px;
+                height: 45px;
+              }
             }
             .text{
                 padding-left: 21px;
-                font-size: 24px;
+                @include fs.fs(16, 24);
                 font-weight: 500;
                 color: vars.$light-black; 
                 @include transition(all, 0.3s, ease-in-out);
@@ -44,6 +56,10 @@
                   font-weight: 500;
                   color: vars.$light-black; 
                   margin-bottom: 5px;
+                  @include fs.fs(12, 14);
+                  @include bp.bp(phone-end) {
+                    margin-bottom: 0;
+                  }
                 }
             }
         }

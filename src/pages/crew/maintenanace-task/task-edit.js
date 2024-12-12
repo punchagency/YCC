@@ -55,8 +55,8 @@ const CrewTaskEdit = () => {
         { name: "Inactive" }
     ]
 
-    const goDocumentPage = () => {
-        navigate("/document-management/documents");
+    const goTaskPage = () => {
+        navigate("/crew/maintenance-task/mytask");
     };
 
 
@@ -64,13 +64,13 @@ const CrewTaskEdit = () => {
 
     return (
         <main className="flex h-screen page">
-            <LeftMenu role="Crew Member" />
+            {/* <LeftMenu role="Crew Member" /> */}
             <div className="w-full right-panel-component">
-                <AdminHeader />
+                {/* <AdminHeader /> */}
                 <div className="flex align-items-center justify-content-between sub-header-panel">
                     <div className="sub-header-left sub-header-left-with-arrow">
                         <div className="arrow">
-                            <Link to="/document-management/documents">
+                            <Link to="/crew/maintenance-task/mytask">
                                 <i className="pi pi-angle-left"></i>
                             </Link>
                         </div>
@@ -81,7 +81,7 @@ const CrewTaskEdit = () => {
                     </div>
                     <div className="sub-header-right">
                         <Button
-                            onClick={goDocumentPage}
+                            onClick={goTaskPage}
                             label="Cancel"
                             icon="pi pi-times-circle"
                             severity="secondary"
@@ -89,7 +89,7 @@ const CrewTaskEdit = () => {
                             className="p-button-secondary mr-3"
                         />
                         <Button
-                            onClick={goDocumentPage}
+                            onClick={goTaskPage}
                             label="Save"
                             icon="pi pi-save"
                             className="p-button-primary"

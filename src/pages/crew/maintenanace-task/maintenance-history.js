@@ -116,9 +116,9 @@ const MaintenanceHistory = () => {
 
   return (
     <main className="flex h-screen page">
-      <LeftMenu role="Crew Member" />
+      {/* <LeftMenu role="Crew Member" /> */}
       <div className="w-full right-panel-component">
-        <AdminHeader />
+        {/* <AdminHeader /> */}
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
             <h3>Maintenance History</h3>

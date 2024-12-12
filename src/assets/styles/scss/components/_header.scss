@@ -1,5 +1,6 @@
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
 
 .p-menubar {
   padding: 0.5rem 25px;
@@ -22,6 +23,12 @@
     font-size: vars.$body-font-size;
     color: vars.$light-black;
     font-weight: 400;
+  }
+  .collapse-btn{
+    display: none;
+    @include bp.bp(mid-desktop3) {
+      display: block;
+    }
   }
 }
 
