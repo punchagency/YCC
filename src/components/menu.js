@@ -225,7 +225,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Documentation Access",
       icon: "pi pi-file",
       command: () => {
-        navigate("/document-management/documents");
+        navigate("/crew/maintenance-task/document");
       },
     },
     {
@@ -257,6 +257,9 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
     {
       label: "Settings",
+      command: () => {
+        navigate('/crew/settings'); 
+    },
       icon: "pi pi-cog",
     },
   ];

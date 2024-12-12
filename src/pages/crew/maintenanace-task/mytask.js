@@ -7,11 +7,15 @@ import AdminHeader from '../../../components/header';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { InputText } from 'primereact/inputtext';
+import { Calendar } from 'primereact/calendar';
 
 
 const MyTask = () => {
     const [myTask, setMyTask] = useState([]);
     const [filteredTask, setFilteredTask] = useState([]);
+    const [date, setDate] = useState(null); // State to store the selected date
+
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
@@ -62,7 +66,7 @@ const MyTask = () => {
 
     const handleRowClick = (event) => {
         const { id } = event.data;
-        console.log("id",id);
+        console.log("id", id);
         navigate(`/crew/maintenance-task/mytask/${id}`); // Corrected path
     };
 
@@ -109,7 +113,7 @@ const MyTask = () => {
                         </span>
                     );
                 }}
-            />        
+            />
         </DataTable>
     );
 
@@ -150,16 +154,25 @@ const MyTask = () => {
                                 <i className="pi pi-angle-left"></i>
                             </Link>
                         </div> */}
+
                         <div className="content">
                             <h3>My Task</h3>
                             <p>All informations are below</p>
                         </div>
                     </div>
                     <div className="sub-header-right">
-
-                        <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editTaskPage} />
-
-                    </div>
+                        <div className="p-input-icon-left search mr-3">
+                            <i className="pi pi-search" />
+                            <InputText type="search" placeholder="Search" />
+                        </div>
+                        <Calendar
+                            value={date}
+                            onChange={(e) => setDate(e.value)}
+                            className="p-calendar"
+                            placeholder="Date"
+                            style={{ maxWidth: '111px' }}
+                            showIcon
+                        />          </div>
                 </div>
 
                 <div className="card-wrapper-gap">

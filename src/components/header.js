@@ -7,7 +7,8 @@ import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
 import { useNavigate } from "react-router-dom";
 
-const AdminHeader = ({ isCollapsed, setIsCollapsed }) => {
+
+const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const navigate = useNavigate();
   const overlayPanelRef = useRef(null);
   const [notifications] = useState([
@@ -45,11 +46,25 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed }) => {
         <span className="profile-name">
           Welcome, <strong>Christopher</strong>
         </span>
+        <Button
+          icon="pi pi-bars"
+          text
+          className="p-0 collapse-btn ml-4"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        />
       </div>
     </>
   );
   const viewAllNotifications = () => {
-    navigate("/notifications");
+    if (role == "Captain/Manager") {
+      navigate("/notifications");
+
+    }
+    else {
+      navigate("/crew/notifications");
+
+    }
+
   };
 
   const end = (

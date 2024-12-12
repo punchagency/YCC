@@ -244,7 +244,7 @@ const DocumentDetails = () => {
               </div>
 
               <div className="item">
-                <div className="activity-log">
+                <div className="activity-log p-d-flex p-flex-column p-gap-2">
                   <Card title="Activity Log">
                     <DataTable
                       value={data}

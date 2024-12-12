@@ -11,12 +11,15 @@ import { Skeleton } from 'primereact/skeleton';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { type } from '@testing-library/user-event/dist/type';
 import { InputText } from 'primereact/inputtext';
+import { Calendar } from 'primereact/calendar';
 
 const MaintenanceHistory = () => {
   const [documents, setDocuments] = useState([]);
   const [filteredDocument, setFilteredDocument] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [date, setDate] = useState(null); // State to store the selected date
+
   const menuRef = useRef(null);
   // State for filters
   const [selectedAuthority, setSelectedAuthority] = useState(null);
@@ -45,7 +48,7 @@ const MaintenanceHistory = () => {
   const applyFilters = useCallback(() => {
     let filteredData = documents;
 
-   
+
 
     if (searchText.trim()) {
       filteredData = filteredData.filter((doc) =>
@@ -56,7 +59,7 @@ const MaintenanceHistory = () => {
       );
     }
     setFilteredDocument(filteredData);
-  }, [documents,  searchText]);
+  }, [documents, searchText]);
 
 
   // Apply filters when dependencies change
@@ -124,19 +127,19 @@ const MaintenanceHistory = () => {
             <h3>Maintenance History</h3>
             <p>list of all Maintenance task history</p>
           </div>
-          <div className="sub-header-right flex align-items-center">
-            <div className="flex align-items-center relative">
-              <i className="pi pi-search absolute left-0 ml-2 text-gray-500" style={{ marginRight: '5px' }}></i>
-              <InputText
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search"
-                className="pl-6 mr-3"
-              />
+          <div className="sub-header-right">
+            <div className="p-input-icon-left search mr-3">
+              <i className="pi pi-search" />
+              <InputText type="search" placeholder="Search" />
             </div>
-
-        
-          </div>
+            <Calendar
+              value={date}
+              onChange={(e) => setDate(e.value)}
+              className="p-calendar"
+              placeholder="Date"
+              style={{ maxWidth: '111px' }}
+              showIcon
+            />          </div>
         </div>
         <div className="card-wrapper-gap">
           <DataTable
@@ -154,8 +157,8 @@ const MaintenanceHistory = () => {
             <Column field="assign" header="Assign By" />
             <Column field="logDate" header="Log Date" />
             <Column field="workingHours" header="Working Hours" />
-            
-           
+
+
             <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
           </DataTable>
         </div>
