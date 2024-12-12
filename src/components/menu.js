@@ -258,7 +258,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Settings",
       command: () => {
-        navigate('/crew/maintenance-task/settings'); 
+        navigate('/crew/settings'); 
     },
       icon: "pi pi-cog",
     },

@@ -51,7 +51,7 @@ import MaintenanceHistory from './pages/crew/maintenanace-task/maintenance-histo
 import MaintenanceHistoryDetails from './pages/crew/maintenanace-task/history-details';
 import Document from "./pages/crew/document-access/document";
 import CrewDocumentDetails from "./pages/crew/document-access/document-details";
-
+import CrewSetting from "./pages/crew/settings/crewsetting";
 import Layout from "./layout/layout";
 
 function App() {
@@ -144,6 +144,7 @@ function App() {
         <Route path="/crew/maintenance-task/document" element={<Document />} /> 
         <Route path="/crew/maintenance-task/document/:id" element={<CrewDocumentDetails />} /> 
         <Route path="/crew/notifications" element={<Notifications />} />
+        <Route path="/crew/settings" element={<CrewSetting />} />
 
         </Route>
       </Routes>
