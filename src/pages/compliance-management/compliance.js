@@ -16,6 +16,7 @@ const Compliance = () => {
   const [filteredDocument, setFilteredDocument] = useState([]);
   const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
+  const op = useRef(null);
 
   // State for filters
   const [selectedAuthority, setSelectedAuthority] = useState(null);
@@ -185,10 +186,10 @@ const Compliance = () => {
           <h3>Documents</h3>
           <p>list of all documents</p>
         </div>
-        <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-            <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-            <InputText placeholder="Search" className="pl-4 mr-3" />
+        <div className="sub-header-right sub-header-big-desktop">
+          <div className="p-input-icon-left search mr-3">
+            <i className="pi pi-search" />
+            <InputText type="search" placeholder="Search" />
           </div>
           <Dropdown
             value={selectedAuthority}
@@ -214,6 +215,55 @@ const Compliance = () => {
             placeholder="Status"
             className="mr-3"
           />
+          <Button
+            label="Add Compliance"
+            icon="pi pi-plus"
+            onClick={goToAddCompliancePage}
+            className="p-button-primary"
+          />
+        </div>
+        <div className="sub-header-right sub-header-small-desktop ">
+          <div className="p-input-icon-left search mr-3">
+            <i className="pi pi-search" />
+            <InputText type="search" placeholder="Search" />
+          </div>
+          <Button
+            label="Filters"
+            className="mr-3"
+            severity="secondary"
+            outlined
+            icon="pi pi-filter"
+            iconPos="right" // This will place the icon to the right of the text
+            onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+          />
+          <OverlayPanel ref={op}>
+            <div className="p-d-flex p-flex-column">
+              <Dropdown
+                value={selectedAuthority}
+                options={issueAuthorities}
+                onChange={(e) => setSelectedAuthority(e.value)}
+                optionLabel="name"
+                placeholder="Issuing Authority"
+                className="mr-3 "
+              />
+              <Dropdown
+                value={type}
+                options={types}
+                onChange={(e) => setSelectedDocumentType(e.value)}
+                optionLabel="name"
+                placeholder="Document type"
+                className="mr-3"
+              />
+              <Dropdown
+                value={selectedStatus}
+                options={statuses}
+                onChange={(e) => setSelectedStatus(e.value)}
+                optionLabel="name"
+                placeholder="Status"
+                className="mr-3"
+              />
+            </div>
+          </OverlayPanel>
           <Button
             label="Add Compliance"
             icon="pi pi-plus"

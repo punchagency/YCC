@@ -34,7 +34,7 @@ const UserDetails = () => {
             icon="pi pi-user-edit"
             severity="secondary"
             outlined
-            className="p-button-secondary"
+            className="p-button-secondary mr-3"
           />
           <Button
             label="Assign task"

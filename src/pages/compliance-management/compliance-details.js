@@ -32,7 +32,7 @@ const ComplianceDetails = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/user-management/users">
+            <Link to="/compliance-management/compliance">
               {" "}
               {/* Replace "/previous-page" with your target route */}
               <i className="pi pi-angle-left"></i>

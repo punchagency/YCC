@@ -11,24 +11,25 @@ import { Column } from "primereact/column";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
-import Pdf from '../../assets/images/pdf.svg';
-import Csv from '../../assets/images/csv.svg';
-import Xlsx from '../../assets/images/xls.svg';
+import Pdf from "../../assets/images/pdf.svg";
+import Csv from "../../assets/images/csv.svg";
+import Xlsx from "../../assets/images/xls.svg";
 
 export default function ReportDetails() {
   const [date, setDate] = useState(null);
   const menuRef = useRef(null);
   const menuRight = useRef(null);
+  const op = useRef(null);
   const navigate = useNavigate();
   const { reportType } = useParams();
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState(null);
-  const [rowClick ] = useState(true);
+  const [rowClick] = useState(true);
   const [loading, setLoading] = useState(true);
   const items = [
     {
       label: ".PDF",
-      icon: <img src={Pdf} alt="PDF icon"/>,
+      icon: <img src={Pdf} alt="PDF icon" />,
     },
     {
       label: ".CSV",
@@ -171,33 +172,79 @@ export default function ReportDetails() {
 
   return (
     <>
-        <div className="grid grid-nogutter align-items-center justify-content-between sub-header-panel">
-          {/* Left Section: Heading and Subheading */}
-          <div className="sub-header-left lg:col-4">
-            <h3 className="mb-0" onClick={backtoPreviousScreen}>
-              <i className="pi pi-angle-left"></i> {report.title}
-            </h3>
+      <div className="flex align-items-center justify-content-between sub-header-panel">
+        {/* Left Section: Heading and Subheading */}
+        <div className="sub-header-left">
+          <h3 className="mb-0" onClick={backtoPreviousScreen}>
+            <i className="pi pi-angle-left"></i> {report.title}
+          </h3>
+        </div>
+
+        {/* Right Section: Action Button */}
+        <div className="sub-header-right sub-header-big-desktop">
+          <div className="p-input-icon-left search mr-3">
+            <i className="pi pi-search" />
+            <InputText type="search" placeholder="Search" />
           </div>
 
-          {/* Right Section: Action Button */}
-          <div className="sub-header-right grid align-items-center justify-content-end lg:col-8">
-            <div className="p-input-icon-left search lg:col-3 py-0">
-              <i className="pi pi-search" />
-              <InputText
-                className="w-full"
-                type="search"
-                placeholder="Search"
-              />
-            </div>
-            <div className="lg:col-3 py-0">
+          <Calendar
+            value={date}
+            onChange={(e) => setDate(e.value)}
+            showIcon
+            placeholder="Form Date"
+              className="mr-3 w-14rem"
+          />
+
+          <Calendar
+            value={date}
+            onChange={(e) => setDate(e.value)}
+            showIcon
+            placeholder="Date To"
+              className="mr-3 w-14rem"
+          />
+
+          <Button
+            className="p-button-primary"
+            onClick={(event) => menuRight.current.toggle(event)}
+            aria-controls="popup_menu_right"
+            aria-haspopup
+          >
+            <i className="pi pi-download" />
+            <span className="mx-3">Export</span>
+            <i className="pi pi-ellipsis-v" />
+          </Button>
+          <Menu
+            className="export-menu"
+            model={items}
+            popup
+            ref={menuRight}
+            id="popup_menu_right"
+            popupAlignment="right"
+          />
+        </div>
+        <div className="sub-header-right sub-header-small-desktop">
+          <div className="p-input-icon-left search mr-3">
+            <i className="pi pi-search" />
+            <InputText type="search" placeholder="Search" />
+          </div>
+          <Button
+            label="Filters"
+            className="mr-3"
+            severity="secondary"
+            outlined
+            icon="pi pi-filter"
+            iconPos="right"
+            onClick={(e) => op.current && op.current.toggle(e)}
+          />
+          <OverlayPanel ref={op}>
+            <div className="p-d-flex p-flex-column">
               <Calendar
                 value={date}
                 onChange={(e) => setDate(e.value)}
                 showIcon
                 placeholder="Form Date"
+                className="mb-3 md:mb-0 md:mr-3"
               />
-            </div>
-            <div className="lg:col-3 py-0">
               <Calendar
                 value={date}
                 onChange={(e) => setDate(e.value)}
@@ -205,60 +252,59 @@ export default function ReportDetails() {
                 placeholder="Date To"
               />
             </div>
-            <div className="lg:col-3 py-0">
-              <Button
-                className="p-button-primary w-full flex justify-content-between"
-                onClick={(event) => menuRight.current.toggle(event)}
-                aria-controls="popup_menu_right"
-                aria-haspopup
-              >
-                <i className="pi pi-download" /> 
-                <span className="mx-3">Export</span> 
-                <i className="pi pi-ellipsis-v" />
-              </Button>
-              <Menu
-                className="export-menu"
-                model={items}
-                popup
-                ref={menuRight}
-                id="popup_menu_right"
-                popupAlignment="right"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="card-wrapper-gap">
-          <DataTable
-            className="report-table"
-            value={products}
-            paginator
-            rows={10}
-            rowsPerPageOptions={[10, 25, 50]}
-            paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            selectionMode={rowClick ? null : "checkbox"}
-            selection={selectedProducts}
-            onSelectionChange={(e) => setSelectedProducts(e.value)}
-            dataKey="id"
-            tableStyle={{ minWidth: "50rem" }}
+          </OverlayPanel>
+          <Button
+            className="p-button-primary"
+            onClick={(event) => menuRight.current.toggle(event)}
+            aria-controls="popup_menu_right"
+            aria-haspopup
           >
-            <Column
-              selectionMode="multiple"
-              headerStyle={{ width: "3rem" }}
-            ></Column>
-            <Column field="uid" header="Document ID"></Column>
-            <Column field="type" header="Document Type"></Column>
-            <Column field="name" header="Vessel name"></Column>
-            <Column field="status" header="Compliance Status"></Column>
-            <Column field="lastDate" header="Last Checked"></Column>
-            <Column field="dueDate" header="Next Due Date"></Column>
-            <Column field="actions" header="Actions Required"></Column>
-            <Column
-              body={loading ? skeletonTemplate : actionBodyTemplate}
-              style={{ width: "5%", textAlign: "end" }}
-            />
-          </DataTable>
+            <i className="pi pi-download" />
+            <span className="mx-3">Export</span>
+            <i className="pi pi-ellipsis-v" />
+          </Button>
+          <Menu
+            className="export-menu"
+            model={items}
+            popup
+            ref={menuRight}
+            id="popup_menu_right"
+            popupAlignment="right"
+          />
         </div>
+      </div>
+      <div className="card-wrapper-gap">
+        <DataTable
+          className="report-table"
+          value={products}
+          paginator
+          rows={10}
+          rowsPerPageOptions={[10, 25, 50]}
+          paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+          currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+          selectionMode={rowClick ? null : "checkbox"}
+          selection={selectedProducts}
+          onSelectionChange={(e) => setSelectedProducts(e.value)}
+          dataKey="id"
+          tableStyle={{ minWidth: "50rem" }}
+        >
+          <Column
+            selectionMode="multiple"
+            headerStyle={{ width: "3rem" }}
+          ></Column>
+          <Column field="uid" header="Document ID"></Column>
+          <Column field="type" header="Document Type"></Column>
+          <Column field="name" header="Vessel name"></Column>
+          <Column field="status" header="Compliance Status"></Column>
+          <Column field="lastDate" header="Last Checked"></Column>
+          <Column field="dueDate" header="Next Due Date"></Column>
+          <Column field="actions" header="Actions Required"></Column>
+          <Column
+            body={loading ? skeletonTemplate : actionBodyTemplate}
+            style={{ width: "5%", textAlign: "end" }}
+          />
+        </DataTable>
+      </div>
     </>
   );
 }
