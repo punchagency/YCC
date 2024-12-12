@@ -44,6 +44,10 @@ import DashboardCrew from './pages/crew/dashboard';
 import MyTask from './pages/crew/maintenanace-task/mytask';
 import Settings from './pages/Settings';
 import RoleDetails from './pages/user-management/role-details';
+import CrewTaskDetails from './pages/crew/maintenanace-task/task-details';
+import CrewTaskEdit from './pages/crew/maintenanace-task/task-edit';
+import MaintenanceHistory from './pages/crew/maintenanace-task/maintenance-history';
+import MaintenanceHistoryDetails from './pages/crew/maintenanace-task/history-details';
 
 
 
@@ -121,7 +125,12 @@ function App() {
 
 
         <Route path="/crew/dashboard" element={<DashboardCrew />} />  
-        <Route path="/crew/maintenance-task/mytask" element={<MyTask />} />  
+        <Route path="/crew/maintenance-task/mytask" element={<MyTask />} /> 
+        <Route path="/crew/maintenance-task/mytask/:id" element={<CrewTaskDetails />} /> 
+        <Route path="/crew/maintenance-task/mytask/edit" element={<CrewTaskEdit />} /> 
+        <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
+        <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} /> 
+
 
       </Routes>
     </div>

@@ -146,7 +146,7 @@ const LeftMenu = ({ role }) => {
                     navigate('/crew/maintenance-task/mytask'); 
                 } },
                 { label: "Maintenance History",command: () => {
-                    navigate('/maintenance-scheduling/maintenance'); 
+                    navigate('/crew/maintenance-task/history'); 
                 }  },
                
             ]
