@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import backgroundImage from '../../assets/images/captain_login_bg.jpg'
 import logo from '../../assets/images/logo-login.png'
 import SignupForm from '../../components/signup'
 
 const Signup = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
+  const location = useLocation();
+  const role = location.state?.role || 'Guest';
+  console.log("role", role)
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login">
         <div className='flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center' style={{ backgroundImage: `url(${backgroundImage})` }}>
