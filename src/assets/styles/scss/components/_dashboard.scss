@@ -1,5 +1,6 @@
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
 
 .dashboard-overview {
   display: flex;
@@ -22,15 +23,29 @@
     &:nth-last-child(2){
       margin-bottom: 0;
     }
+    @include bp.bp(custome-991) {
+      font-size: 20px;
+    }
+    @include bp.bp(phone-end) {
+      height: 80px;
+    }
+    @include bp.bp(custome-375) {
+      width: 100%;
+      height: 70px;
+    }
     p{
       color: #9E9E9E;
       margin-bottom: 0;
       margin-top: 5px;
+      text-align: center;
     }
   }
   &.dashboard-overview-three-row{
      .dashboard-overview-item {
          width: 33.3333%;
+         @include bp.bp(custome-375) {
+          width: 100%;
+        }
      }
   }
 }

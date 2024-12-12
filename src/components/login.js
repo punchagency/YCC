@@ -7,6 +7,8 @@ import { Checkbox } from 'primereact/checkbox';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const LoginForm = () => {
+    // Define the options for the user roles
+    
     const [credentials, setCredentials] = useState({
         email: '',
         password: '',
@@ -19,6 +21,8 @@ const LoginForm = () => {
             rememberMe: e.checked,
         });
     };
+
+    
 
     const [emailError, setEmailError] = useState('');
     const handleChange = (e) => {

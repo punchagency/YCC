@@ -206,6 +206,9 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
     {
       label: "Settings",
+      command: () => {
+        navigate("/settings");
+      },
       icon: "pi pi-cog",
     },
   ];
@@ -243,31 +246,14 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         </svg>
       ),
       items: [
-        {
-          label: "Create task",
-          command: () => {
-            navigate("/maintenance-scheduling/maintenance");
-          },
-        },
-        {
-          label: "Schedule calendar",
-          command: () => {
-            navigate("/maintenance-scheduling/schedule-calendar");
-          },
-        },
-        {
-          label: "Equipment & parts",
-          command: () => {
-            navigate("/maintenance-scheduling/equipment");
-          },
-        },
-        {
-          label: "Warranty",
-          command: () => {
-            navigate("/maintenance-scheduling/warranty");
-          },
-        },
-      ],
+        { label: "My task",  command: () => {
+            navigate('/crew/maintenance-task/mytask'); 
+        } },
+        { label: "Maintenance History",command: () => {
+            navigate('/crew/maintenance-task/history'); 
+        }  },
+       
+    ],
     },
     {
       label: "Settings",

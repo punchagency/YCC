@@ -4,12 +4,34 @@
 @use '../mixins/scalable-font' as fs;
 @use '../mixins/breakpoints' as bp;
 
+.get-started{
+  height: 100vh;
+  @include bp.bp(custome-991) {
+    height: auto;
+  }
+}
+
 .get-started-content{
   max-width: 444px;
+  h2{
+    margin-bottom: 32px;
+    @include bp.bp(custome-1440) {
+      margin-bottom: 22px;
+    }
+    @include bp.bp(custome-568) {
+      margin-bottom: 17px;
+     }
+  }
 }
 
 .get-started-right-component-content{
   margin-top: 35px;
+  @include bp.bp(custome-1440) {
+    margin-top: 20px;
+  }
+  @include bp.bp(mid-desktop3) {
+    margin-top: 15px;
+  }
   @include bp.bp(phone-end) {
     margin-top: 10px;
   }
@@ -18,6 +40,9 @@
 .get-started-right-component{
   max-width: 550px;
   width: 100%;
+  @include bp.bp(mid-desktop3) {
+    max-width: 460px;
+  }
   h6{
     margin-bottom: 5px;
   }
@@ -32,8 +57,14 @@
         padding: 39px 0;
         justify-content: space-between;
         cursor: pointer;
-        @include bp.bp(phone-end) {
+        @include bp.bp(custome-1440) {
+          padding: 30px 0;
+        }
+        @include bp.bp(mid-desktop3) {
           padding: 25px 0;
+        }
+        @include bp.bp(custome-568) {
+          padding: 20px 0;
         }
         .content{
             display: flex;
@@ -50,7 +81,14 @@
                 @include fs.fs(16, 24);
                 font-weight: 500;
                 color: vars.$light-black; 
+                text-align: left;
                 @include transition(all, 0.3s, ease-in-out);
+                @include bp.bp(custome-1440) {
+                  padding-left: 17px;
+                }
+                @include bp.bp(custome-568) {
+                  padding-left: 14px;
+                }
                 p{
                   text-align: left;
                   font-weight: 500;

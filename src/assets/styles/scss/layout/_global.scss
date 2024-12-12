@@ -60,9 +60,32 @@ ul{
     height: auto;
   }
 }
+.left-panel{
+  box-sizing: border-box;
+  @include bp.bp(custome-991) {
+    padding: 100px 30px;
+  }
+  @include bp.bp(custome-568) {
+    padding: 70px 20px;
+  }
+  .logo{
+     width: 181px;
+     height: 181px;
+     @include bp.bp(custome-568) {
+      width: 131px;
+      height: 131px;
+     }
+  }
+}
 .right-panel{
   padding: 40px 30px;
   box-sizing: border-box;
+  @include bp.bp(custome-991) {
+    padding: 60px 30px;
+  }
+  @include bp.bp(custome-568) {
+    padding: 50px 20px;
+  }
 }
 
 .p-button{
@@ -151,12 +174,19 @@ ul{
   box-sizing: border-box;
   background-color: #eff3f8;
   text-align: left;
+  min-height: calc(100vh - 144px);
+  @include bp.bp(custome-375) {
+    padding: 20px 15px;
+  }
 }
 
 .v-grid {
   column-count: 2;
   column-gap: 16px;
   margin-bottom: 20px;
+  @include bp.bp(phone-end) {
+    column-count: 1;
+  }
   &:last-child{
     margin-bottom: 0;
   }
@@ -172,6 +202,9 @@ ul{
     font-size: 18px;
     font-weight: 600;
     color: #212121;
+    @include bp.bp(custome-991) {
+      font-size: 17px;
+    }
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -257,6 +290,12 @@ ul{
                 font-size: 14px;
                 font-weight: 500;
                 word-wrap: break-word;
+                @include bp.bp(custome-991) {
+                  width: 50%;
+                  padding-right: 20px;
+                  box-sizing: border-box;
+                  line-height: 20px;
+                }
               }
               .details-content-text{
                 width: 70%;
@@ -269,12 +308,35 @@ ul{
                 align-items: center;
                 justify-content: space-between;
                 overflow-wrap: anywhere;
+                @include bp.bp(custome-991) {
+                  width: 50%;
+                  padding-left: 20px;
+                  box-sizing: border-box;
+                }
               }
               &:last-child{
                 border-bottom: 0px solid #dfe7ef;
                 margin-bottom: 0px;
               }
           } 
+          .detail-item{
+             .p-d-flex{
+               .download-btn{
+                  .p-button-label {
+                    @include bp.bp(custome-568) {
+                      display: none;
+                    }
+                  }
+                  .p-button-icon{
+                    @include bp.bp(custome-568) {
+                      margin-right: 0rem;
+                      margin-left: 0rem;
+                    }
+                  }
+               }
+             }
+          }
+          
      }
   }
 }
@@ -289,6 +351,22 @@ ul{
   width: 400px;
   height: 400px;
   margin: 0 auto;
+  @include bp.bp(custome-991) {
+    width: 300px;
+    height: 300px;
+  }
+  @include bp.bp(phone-end) {
+    width: 400px;
+    height: 400px;
+  }
+  @include bp.bp(custome-568) {
+    width: 300px;
+    height: 300px;
+  }
+  @include bp.bp(custome-375) {
+    width: 250px;
+    height: 250px;
+  }
 }
 
 .card-wraper{
@@ -322,7 +400,40 @@ ul{
       display: flex;
     }
    }
-   
+   .p-button{
+      &.p-button-primary{
+          @include bp.bp(phone-end) {
+            padding: 0.75rem;
+          }
+         .p-button-label{
+            @include bp.bp(phone-end) {
+              display: none;
+            }
+         }
+         .p-button-icon{
+            @include bp.bp(phone-end) {
+              margin-right: 0rem;
+              margin-left: 0;
+            }
+         }
+      }
+      &.p-button-outlined{
+          @include bp.bp(phone-end) {
+            padding: 0.75rem;
+         }
+        .p-button-label{
+            @include bp.bp(phone-end) {
+              display: none;
+            }
+        }
+        .p-button-icon{
+            @include bp.bp(phone-end) {
+              margin-right: 0rem;
+              margin-left: 0;
+            }
+        }
+      }
+   }
 }
 .p-calendar-w-btn-right{
   .p-inputtext{
@@ -392,13 +503,31 @@ ul{
   .p-paginator-bottom{
     display: flex;
     justify-content: flex-end;
+    @include bp.bp(mid-desktop3) {
+      justify-content: center;
+    }
   }
   
+}
+
+.p-paginator .p-paginator-current{
+   @include bp.bp(phone-end) {
+    display: none;
+   }
+}
+
+.field-checkbox > label, .field-radiobutton > label {
+  @include bp.bp(phone-end) {
+    margin-left: 0.5rem;
+    line-height: 1.2;
+    font-size: 14px;
+  }
 }
 
 .datatable-overlaypanel{
   border: 1px solid #DEE2E6;
   box-shadow: 0 0px 0px rgba(0, 0, 0, 0.3);
+  max-width: 222px;
   &.p-overlaypanel{
      &:before{
        display: none;
@@ -464,15 +593,21 @@ ul{
          }
       }
    }
+   &.v-tab{
+    &>.p-tabview-panels{
+      box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+    }
+   }
 }
 
-.v-tab.p-tabview .p-tabview-nav-container .p-tabview-nav-content .p-tabview-nav{
-
-}
 
 .v-tab {
   display: flex;
   flex-direction: row;
+  @include bp.bp(mid-desktop3) {
+    flex-direction: column;
+  }
+  
   &.p-tabview{
     display: flex;
     &>.p-tabview-nav-container{
@@ -488,6 +623,11 @@ ul{
             background: none;
             border: 0px solid #dfe7ef;
             border-width: 0 0 0px 0;
+            @include bp.bp(mid-desktop3) {
+              flex-direction: row;
+              width: 100%;
+              padding-right: 0;
+            }
             li{
               margin-right: 0;
               .p-tabview-nav-link{
@@ -530,7 +670,7 @@ ul{
                                  display: flex;
                                  flex-direction: row;
                                  width: 100%;
-                                 border-bottom: 2px solid #d1d5db;
+                                //  border-bottom: 2px solid #d1d5db;
                                  .p-unselectable-text{
                                      .p-tabview-nav-link{
                                         font-size: 14px;
@@ -544,6 +684,7 @@ ul{
                        .p-tabview-panels{
                           padding-left: 0;
                           padding-right: 0;
+                          padding-bottom: 0;
                        }
                    }
                }
@@ -558,7 +699,6 @@ ul{
       margin: 0;
     }
 }
-
 
 .form-container {
   margin: 0px;
@@ -644,3 +784,55 @@ ul{
       } 
    }
 }
+
+
+.filter-dropdown {
+  max-width: 100px;
+  @include bp.bp(phone-end) {
+    max-width: unset;
+  }
+  @include bp.bp(custome-568) {
+    max-width: 100px;
+  }
+  .p-dropdown-label{
+    max-width: 50px;
+    @include bp.bp(phone-end) {
+      max-width: unset;
+    }
+    @include bp.bp(custome-568) {
+      max-width: 50px;
+    }
+  }
+}
+
+.tabview-detaols{
+   .p-tabview-nav-container{
+      .p-tabview-nav{
+         .p-unselectable-text{
+            .p-tabview-nav-link{
+              border-top-right-radius: 0px;
+              border-top-left-radius: 0px;
+            }
+         }
+      }
+   }
+}
+
+.p-overlaypanel{
+  .p-overlaypanel-content{
+    @include bp.bp(phone-end) {
+      padding: 1rem;
+      max-width: 250px;
+    }
+    .p-d-flex{
+       .p-dropdown{
+          width: 100%;
+          margin-bottom: 15px;
+          &:last-child{
+            margin-bottom: 0px;
+          }
+       }
+    }
+  }
+}
+

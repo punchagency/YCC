@@ -4,6 +4,7 @@ import { Checkbox } from "primereact/checkbox";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
+import { Link } from "react-router-dom";
 const AddRole = () => {
   const [roleTitle, setRoleTitle] = useState("");
   const [permissions, setPermissions] = useState([]);
@@ -31,9 +32,16 @@ const AddRole = () => {
     <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           {/* Left Section: Heading and Subheading */}
-          <div className="sub-header-left">
-            <h3>Roles</h3>
-            <p>Lists of different roles with accessibility </p>
+          <div className="sub-header-left sub-header-left-with-arrow">
+            <div className="arrow">
+              <Link to="/user-management/role">
+                <i className="pi pi-angle-left"></i>
+              </Link>
+            </div>
+            <div className="content">
+              <h3>Roles</h3>
+              <p>Lists of different roles with accessibility</p>
+            </div>
           </div>
 
           {/* Right Section: Action Button */}

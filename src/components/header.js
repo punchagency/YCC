@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 const AdminHeader = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const overlayPanelRef = useRef(null);
-  const [notifications, setNotifications] = useState([
+  const [notifications] = useState([
     {
       title: "Deficiency Follow-Ups",
       message: "The recent MARPOL Annex I audit ..",
@@ -34,16 +34,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed }) => {
   const start = (
     <>
       <div className="flex align-items-center profile">
+        
+        <Button 
+          icon="pi pi-bars" 
+          text 
+          className="p-0 collapse-btn mr-3" 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        />
         <img src={avatar} alt="Profile" className="profile-image" />
         <span className="profile-name">
           Welcome, <strong>Christopher</strong>
         </span>
-        <Button 
-          icon="pi pi-bars" 
-          text 
-          className="p-0 collapse-btn ml-4" 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        />
       </div>
     </>
   );
