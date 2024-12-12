@@ -60,7 +60,7 @@ const Role = () => {
           className="p-button-text w-full"
           onClick={() => console.log('Edit', rowData)}
         />
-           <Button
+        <Button
           label="Update"
           icon="pi pi-list-check"
           className="p-button-text w-full"

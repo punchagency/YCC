@@ -60,9 +60,32 @@ ul{
     height: auto;
   }
 }
+.left-panel{
+  box-sizing: border-box;
+  @include bp.bp(custome-991) {
+    padding: 100px 30px;
+  }
+  @include bp.bp(custome-568) {
+    padding: 70px 20px;
+  }
+  .logo{
+     width: 181px;
+     height: 181px;
+     @include bp.bp(custome-568) {
+      width: 131px;
+      height: 131px;
+     }
+  }
+}
 .right-panel{
   padding: 40px 30px;
   box-sizing: border-box;
+  @include bp.bp(custome-991) {
+    padding: 60px 30px;
+  }
+  @include bp.bp(custome-568) {
+    padding: 50px 20px;
+  }
 }
 
 .p-button{
@@ -157,6 +180,9 @@ ul{
   column-count: 2;
   column-gap: 16px;
   margin-bottom: 20px;
+  @include bp.bp(phone-end) {
+    column-count: 1;
+  }
   &:last-child{
     margin-bottom: 0;
   }
@@ -172,6 +198,9 @@ ul{
     font-size: 18px;
     font-weight: 600;
     color: #212121;
+    @include bp.bp(custome-991) {
+      font-size: 17px;
+    }
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -289,6 +318,22 @@ ul{
   width: 400px;
   height: 400px;
   margin: 0 auto;
+  @include bp.bp(custome-991) {
+    width: 300px;
+    height: 300px;
+  }
+  @include bp.bp(phone-end) {
+    width: 400px;
+    height: 400px;
+  }
+  @include bp.bp(custome-568) {
+    width: 300px;
+    height: 300px;
+  }
+  @include bp.bp(custome-375) {
+    width: 250px;
+    height: 250px;
+  }
 }
 
 .card-wraper{
@@ -399,6 +444,7 @@ ul{
 .datatable-overlaypanel{
   border: 1px solid #DEE2E6;
   box-shadow: 0 0px 0px rgba(0, 0, 0, 0.3);
+  max-width: 222px;
   &.p-overlaypanel{
      &:before{
        display: none;
@@ -643,4 +689,24 @@ ul{
         padding: 0.67rem 0.75rem;
       } 
    }
+}
+
+
+.filter-dropdown {
+  max-width: 100px;
+  @include bp.bp(phone-end) {
+    max-width: unset;
+  }
+  @include bp.bp(custome-568) {
+    max-width: 100px;
+  }
+  .p-dropdown-label{
+    max-width: 50px;
+    @include bp.bp(phone-end) {
+      max-width: unset;
+    }
+    @include bp.bp(custome-568) {
+      max-width: 50px;
+    }
+  }
 }
