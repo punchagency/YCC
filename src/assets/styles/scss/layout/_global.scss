@@ -600,13 +600,13 @@ ul{
    }
 }
 
-.v-tab.p-tabview .p-tabview-nav-container .p-tabview-nav-content .p-tabview-nav{
-
-}
 
 .v-tab {
   display: flex;
   flex-direction: row;
+  @include bp.bp(mid-desktop3) {
+    flex-direction: column;
+  }
   
   &.p-tabview{
     display: flex;
@@ -623,6 +623,11 @@ ul{
             background: none;
             border: 0px solid #dfe7ef;
             border-width: 0 0 0px 0;
+            @include bp.bp(mid-desktop3) {
+              flex-direction: row;
+              width: 100%;
+              padding-right: 0;
+            }
             li{
               margin-right: 0;
               .p-tabview-nav-link{
@@ -665,7 +670,7 @@ ul{
                                  display: flex;
                                  flex-direction: row;
                                  width: 100%;
-                                 border-bottom: 2px solid #d1d5db;
+                                //  border-bottom: 2px solid #d1d5db;
                                  .p-unselectable-text{
                                      .p-tabview-nav-link{
                                         font-size: 14px;
@@ -679,6 +684,7 @@ ul{
                        .p-tabview-panels{
                           padding-left: 0;
                           padding-right: 0;
+                          padding-bottom: 0;
                        }
                    }
                }

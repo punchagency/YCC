@@ -132,7 +132,7 @@ const AddUser = () => {
                           className="w-full mt-2 p-inputtext p-component"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="dob">Date of Birth</label>
                         <Calendar
                           id="dob"
@@ -143,7 +143,7 @@ const AddUser = () => {
                           className="w-full mt-2 p-input-calender"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="nationality">Nationality</label>
                         <Dropdown
                           id="nationality"
@@ -155,7 +155,7 @@ const AddUser = () => {
                           className="w-full mt-2"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="phone">Phone</label>
                         <InputText
                           id="phone"
@@ -163,7 +163,7 @@ const AddUser = () => {
                           className="w-full mt-2 p-inputtext p-component"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="phone">Email</label>
                         <InputText
                           id="email"
@@ -191,7 +191,7 @@ const AddUser = () => {
                 <h3>Professional Information</h3>
                 <hr className="border-line"></hr>
                 <form className="grid">
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="job-role">Job Role</label>
                     <Dropdown
                       id="job-role"
@@ -203,7 +203,7 @@ const AddUser = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="department">Department</label>
                     <Dropdown
                       id="department"
@@ -215,7 +215,7 @@ const AddUser = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="experience">Years of Experience</label>
                     <Dropdown
                       id="experience"
@@ -227,7 +227,7 @@ const AddUser = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="certifications">Certifications</label>
                     <Dropdown
                       id="certifications"
@@ -250,7 +250,7 @@ const AddUser = () => {
                       placeholder="Address"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="upload-cv">Upload CV (Upload pdf or doc)</label>
                     <div className="flex upload-cv-component">
                         {/* <div className="upload-cv-image">
@@ -333,7 +333,7 @@ const AddUser = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="relationship">Relationship</label>
                     <InputText
                       id="relationship"
@@ -341,7 +341,7 @@ const AddUser = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="contactNumber">Contact Number</label>
                     <InputText
                       id="contactNumber"
@@ -357,7 +357,7 @@ const AddUser = () => {
                 <h3>Account Information</h3>
                 <hr className="border-line"></hr>
                 <form className="grid">
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="name">Username</label>
                     <InputText
                       id="Username"
@@ -365,7 +365,7 @@ const AddUser = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="relationship">Password</label>
                     <Password
                             id="password"
