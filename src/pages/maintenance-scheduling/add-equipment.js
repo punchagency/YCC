@@ -26,9 +26,9 @@ const Addequipment = () => {
   const [manufacturer, setManufacturer] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
 
-  const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+  const goEquipmentPage = () => {
+    
+    navigate("/maintenance-scheduling/equipment");
   };
 
   const handleEmailChange = (e) => {
@@ -88,7 +88,7 @@ const Addequipment = () => {
         </div>
         <div className="sub-header-right">
           <Button
-            onClick={goVasselPage}
+            onClick={goEquipmentPage}
             label="Cancel"
             icon="pi pi-times-circle"
             severity="secondary"
@@ -96,7 +96,7 @@ const Addequipment = () => {
             className="p-button-secondary mr-3"
           />
           <Button
-            onClick={goVasselPage}
+            onClick={goEquipmentPage}
             label="Save"
             icon="pi pi-save"
             className="p-button-primary"

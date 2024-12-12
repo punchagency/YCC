@@ -28,8 +28,8 @@ const WarrantyDetails = () => {
     });
   };
 
-  const editEquipmentPage = () => {
-    navigate("/maintenance-scheduling/equipment/edit");
+  const editWarrantyPage = () => {
+    navigate("/maintenance-scheduling/warranty/new");
   };
 
   // You can now use the userId to fetch or display the specific user details
@@ -54,7 +54,7 @@ const WarrantyDetails = () => {
             severity="secondary"
             outlined
             className="p-button-secondary"
-            onClick={editEquipmentPage}
+            onClick={editWarrantyPage}
           />
         </div>
       </div>

@@ -1,0 +1,50 @@
+.right-panel-component {
+    .card-wrapper-gap {
+        .form-container {
+            .horizontalLine {
+                border: 1px solid #DEE2E6;
+
+            }
+
+            .parts {
+                border-bottom: 1px solid #DEE2E6;
+
+                .p-button-icon {
+                    color: #556376;
+                }
+
+                .p-button-label {
+                    color: #556376;
+                }
+
+            }
+
+            .progressHeading .p-tabview-title {
+                color: #188A42;
+
+            }
+
+            .pendingHeading .p-tabview-title {
+                color: #D9712A;
+            }
+
+            .completeHeading .p-tabview-title {
+                color: #337E89;
+            }
+
+            .p-card {
+                margin-bottom: 20px;
+                border-radius: 10px;
+                background-color: #F4F4F4;
+                box-shadow: none;
+                margin-top: 15px;
+
+
+            }
+
+        }
+
+
+
+    }
+}

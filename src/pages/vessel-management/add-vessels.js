@@ -50,8 +50,8 @@ const AddVassel = () => {
   const currentDate = new Date().toLocaleDateString("en-US");
 
   const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+    // console.log("Navigating to /user-management/users");
+    navigate("/vessel-management/vessels");
   };
 
   const handleEmailChange = (e) => {
@@ -182,6 +182,7 @@ const AddVassel = () => {
           <div className="sub-header-right">
             <Button
               label="Cancel"
+              onClick={goVasselPage}
               icon="pi pi-times-circle"
               severity="secondary"
               outlined
