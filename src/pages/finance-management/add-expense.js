@@ -110,7 +110,7 @@ const AddExpense = () => {
               <h5>Add Expense</h5>
               <form>
                 <div className="grid">
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="vesselName">Vessel Name</label>
                     <InputText
                       id="vesselName"
@@ -119,7 +119,7 @@ const AddExpense = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="category">Expense Category</label>
                     <Dropdown
                       id="category"
@@ -133,7 +133,7 @@ const AddExpense = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="date">Date of Expense</label>
                     <Calendar
                       id="date"
@@ -144,7 +144,7 @@ const AddExpense = () => {
                       className="w-full mt-2 p-input-calender"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="amount">Amount</label>
                     <InputText
                       id="amount"
@@ -152,7 +152,7 @@ const AddExpense = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="paymentMethod">Payment Method</label>
                     <Dropdown
                       id="paymentMethod"
@@ -168,7 +168,7 @@ const AddExpense = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="vendor">Vendor/Payee</label>
                     <InputText
                       id="vendor"
@@ -177,7 +177,7 @@ const AddExpense = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="paymentStatus">Payment Status</label>
                     <Dropdown
                       id="paymentStatus"
@@ -194,7 +194,7 @@ const AddExpense = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="department">Department</label>
                     <Dropdown
                       id="department"
@@ -230,7 +230,7 @@ const AddExpense = () => {
               <h5>Frequency</h5>
               <form>
                 <div className="grid">
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <RadioButton
                       inputId="singleExpense"
                       name="frequency"
@@ -243,7 +243,7 @@ const AddExpense = () => {
                     </label>
                     <p className="ml-4">A single entry that does not repeat</p>
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <RadioButton
                       inputId="recurringExpense"
                       name="frequency"
@@ -257,7 +257,7 @@ const AddExpense = () => {
                     <p className="ml-4">Repeats on a monthly or annual basis</p>
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="date">Start Date</label>
                     <Calendar
                       id="date"
@@ -268,7 +268,7 @@ const AddExpense = () => {
                       className="w-full mt-2 p-input-calender"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="date">End Date</label>
                     <Calendar
                       id="date"
@@ -280,7 +280,7 @@ const AddExpense = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="maintenanceFrequency">
                       Expense Category
                     </label>
@@ -299,7 +299,7 @@ const AddExpense = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="uploadDocuments">
                       Upload Supporting Documents
                     </label>

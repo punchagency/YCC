@@ -105,7 +105,7 @@ const CrewTaskEdit = () => {
                                 <hr className='horizontalLine'></hr>
                                 <form>
                                     <div className="grid">
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="startDate">Start Date</label>
                                             <Calendar
                                                 id="startDate"
@@ -118,7 +118,7 @@ const CrewTaskEdit = () => {
                                         </div>
 
 
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="endDate">End Date</label>
                                             <Calendar
                                                 id="endDate"
@@ -131,7 +131,7 @@ const CrewTaskEdit = () => {
                                         </div>
 
 
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="endDate">Start Time</label>
                                             <Calendar
                                                 id="startTime"
@@ -148,7 +148,7 @@ const CrewTaskEdit = () => {
                                             />
                                         </div>
 
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="endDate">End Time</label>
                                             <Calendar
                                                 id="startTime"
@@ -186,20 +186,20 @@ const CrewTaskEdit = () => {
 
                                         
                                             <div className="p-fluid grid">
-                                                <div className="field col-6">
+                                                <div className="field col-12 md:col-6">
                                                     <label htmlFor="partsName">Parts name</label>
                                                     <InputText id="partsName" placeholder="Enter parts name" />
                                                 </div>
-                                                <div className="field col-6">
+                                                <div className="field col-12 md:col-6">
                                                     <label htmlFor="serialNumber">Serial Number</label>
                                                     <InputText id="serialNumber" placeholder="Enter serial number" />
                                                 </div>
-                                                <div className="field col-6">
+                                                <div className="field col-12 md:col-6">
                                                     <label htmlFor="modelNumber">Manufacturer</label>
                                                     <InputText id="modelNumber" placeholder="Enter Manufacturer" />
                                                 </div>
 
-                                                <div className="field col-6">
+                                                <div className="field col-12 md:col-6">
                                                     <label htmlFor="modelNumber">Model Number</label>
                                                     <InputText id="modelNumber" placeholder="Enter model number" />
                                                 </div>
@@ -232,9 +232,9 @@ const CrewTaskEdit = () => {
                                         </div>
 
 
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                                            <div className="flex align-content-center mt-3">
+                                            <div className="flex align-content-center">
                                                 <div className="flex flex-wrap gap-1">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
@@ -272,7 +272,7 @@ const CrewTaskEdit = () => {
                                             </div>
                                         </div>
 
-                                        <div className="col-6">
+                                        <div className="col-12 md:col-6">
                                             <label htmlFor="status">Status</label>
                                             <Dropdown
                                                 id="status"
