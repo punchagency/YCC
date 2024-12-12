@@ -1,14 +1,26 @@
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
 
 .sub-header-panel{
   padding: 16px 25px;
   background: vars.$color-white;
   border: 0;
   border-radius: 0;
+  box-sizing: border-box;
   border-bottom: 1px solid vars.$light-gray-color;
+  @include bp.bp(custome-375) {
+    padding: 15px 15px;
+  }
   .sub-header-left{
     text-align: left;
+    @include bp.bp(phone-end) {
+      padding-right: 20px;
+      box-sizing: border-box;
+    }
+    @include bp.bp(custome-375) {
+      padding-right: 15px;
+    }
     &.sub-header-left-with-arrow{
       display: flex;
       flex-direction: row;
@@ -28,6 +40,9 @@
     p{
       font-size: 12px;
       margin-bottom: 0px;
+      @include bp.bp(phone-end) {
+        line-height: 18px;
+      }
     }
     .p-badge {
       background: #FBA86F;

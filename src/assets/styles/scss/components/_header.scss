@@ -8,6 +8,9 @@
   border: 0;
   border-radius: 0;
   border-bottom: 1px solid vars.$light-gray-color;
+  @include bp.bp(custome-375) {
+    padding: 0.5rem 15px;
+  }
   .p-menubar-button{
     display: none;
   }

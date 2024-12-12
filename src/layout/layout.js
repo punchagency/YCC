@@ -8,8 +8,8 @@ export default function Layout({role}) {
   return (
     <main className="flex page relative wrapper">
       <LeftMenu role={role} isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-      <div className="w-full right-panel-component">
-        <AdminHeader isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} role={role}/>
+      <div className="w-full right-panel-component overflow-x-hidden">
+        <AdminHeader isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}/>
         <Outlet />
       </div>
     </main>

@@ -207,7 +207,7 @@ const AddVassel = () => {
                       <h5>Basic Details</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="dreamer">Vessel Name</label>
                             <InputText
                               id="dreamer"
@@ -215,7 +215,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="flagState">Flag State</label>
                             <Dropdown
                               id="flagState"
@@ -227,7 +227,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="registration">Registration Number</label>
                             <InputText
                               id="registration"
@@ -235,7 +235,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="vesselType">Vessel Type</label>
                             <Dropdown
                               id="vesselType"
@@ -247,7 +247,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="yearBuilt">Year Built</label>
                             <InputText
                               id="yearBuilt"
@@ -255,7 +255,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="manufacturer">Manufacturer</label>
                             <InputText
                               id="manufacturer"
@@ -263,7 +263,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-12">
                             <label htmlFor="vesselStatus">Vessel Status</label>
                             <Dropdown
                               id="vesselStatus"
@@ -284,7 +284,7 @@ const AddVassel = () => {
                       <h5>Dimensions</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="length">Length</label>
                             <InputText
                               id="length"
@@ -292,7 +292,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="beam">Beam</label>
                             <InputText
                               id="beam"
@@ -300,7 +300,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="draft">Draft</label>
                             <InputText
                               id="draft"
@@ -308,7 +308,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="tonnage">Gross Tonnage</label>
                             <InputText
                               id="tonnage"
@@ -325,7 +325,7 @@ const AddVassel = () => {
                       <h5>Engine Information & Capacity</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="engineType">Engine Type and Power</label>
                             <Dropdown
                               id="engineType"
@@ -337,7 +337,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="engines">Number of Engines</label>
                             <InputText
                               id="engines"
@@ -345,7 +345,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="power">Engine Power</label>
                             <InputText
                               id="power"
@@ -368,7 +368,7 @@ const AddVassel = () => {
                       <h5>Inspection Details</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="inspection">Inspection Details</label>
                             <Dropdown
                               id="inspection"
@@ -380,7 +380,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="flagState">Inspection Date</label>
                             <Calendar
                               id="dob"
@@ -392,7 +392,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="authority">Issuing Authority</label>
                             <Dropdown
                               id="authority"
@@ -405,7 +405,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="inspectorName">Inspector’s Name</label>
                             <InputText
                               id="inspectorName"
@@ -413,7 +413,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="inspectorEmail">Email address</label>
                             <InputText
                               id="inspectorEmail"
@@ -423,7 +423,7 @@ const AddVassel = () => {
                               placeholder="Inspector’s email"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="inspectorPhone">Phone no</label>
                             <InputText
                               id="inspectorPhone"
@@ -433,7 +433,7 @@ const AddVassel = () => {
                               placeholder="Inspector’s Ph no"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="organizationName">Affiliated Organization</label>
                             <InputText
                               id="organizationName"
@@ -448,7 +448,7 @@ const AddVassel = () => {
                       <h5 className="mt-4">Inspection Outcome</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="outcome">Outcome</label>
                             <Dropdown
                               id="outcome"
@@ -460,7 +460,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="outcome">Observation Report <span className="text-xs">( Detailed description of issues identified )</span></label>
                             <InputTextarea
                               id="outcome"
@@ -472,7 +472,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="category">Categories</label>
                             <Dropdown
                               id="category"
@@ -485,7 +485,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="deficiency">Severity of Deficiency</label>
                             <Dropdown
                               id="deficiency"
@@ -497,13 +497,13 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <div className="flex align-content-center mt-2 action-toggle">
                               <p className="mr-5 font-medium action-label">Action Required</p>
                               <InputSwitch checked={action} onChange={(e) => setAction(e.value)} />
                             </div>
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="actionDescription">Action Description <span className="text-xs">( Mention in detail )</span></label>
                             <InputTextarea
                               id="actionDescription"
@@ -537,7 +537,7 @@ const AddVassel = () => {
                           </div>
 
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="department">Responsible Person/Department</label>
                             <Dropdown
                               id="department"
@@ -550,7 +550,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="flagState">Target Completion Date</label>
                             <Calendar
                               id="targetdate"
@@ -561,7 +561,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-input-calender"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="actionStatus">Status</label>
                             <Dropdown
                               id="actionStatus"
@@ -574,7 +574,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="inspectionDate">Follow-Up Inspection Date ( Optional )</label>
                             <Calendar
                               id="inspectionDate"
@@ -586,7 +586,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
                             <div className="flex align-content-center mt-3">
                               <div className="flex flex-wrap gap-1">
@@ -636,7 +636,7 @@ const AddVassel = () => {
                       <h5>Compliance Verification</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="complianceStatus">Return to Compliance</label>
                             <Dropdown
                               id="complianceStatus"
@@ -649,7 +649,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="verificationOfficerName">Verification Officer Name (Optional)</label>
                             <InputText
                               id="verificationOfficerName"
@@ -657,7 +657,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
                             <div className="flex align-content-center mt-3">
                               <div className="flex flex-wrap gap-1">
@@ -707,7 +707,7 @@ const AddVassel = () => {
                       <h5 className="mt-4">Next Scheduled</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                           <label htmlFor="scheduledDate">Date</label>
 
                           <Calendar
@@ -720,7 +720,7 @@ const AddVassel = () => {
                             />
                           </div>
                       
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="scheduledType">Type</label>
                             <Dropdown
                               id="scheduledType"
@@ -784,7 +784,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="taskCategory">Task Category</label>
                             <Dropdown
                               id="taskCategory"
@@ -797,7 +797,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="maintenanceDate">Date of Maintenance</label>
                             <Calendar
                               id="maintenanceDate"
@@ -809,7 +809,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="serviceType">Service Provide Type</label>
                             <Dropdown
                               id="serviceType"
@@ -822,7 +822,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="maintenanceDate">Date of Maintenance</label>
                             <Calendar
                               id="maintenanceDate"
@@ -834,7 +834,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="workDescription" className="font-medium">Description of Work Done</label>
                             <InputTextarea
                               id="workDescription"
@@ -846,7 +846,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
                             <div className="flex align-content-center gap-4">
                               <div className="flex flex-wrap gap-1">
@@ -898,7 +898,7 @@ const AddVassel = () => {
                       <h5>Spare Parts and Inventory</h5>
                       <form>
                         <div className="grid">
-                        <div className="col-6">
+                        <div className="col-12 md:col-6">
                             <label htmlFor="partName">Parts Name</label>
                             <InputText
                               id="partName"
@@ -907,7 +907,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="quantity">Quantity</label>
                             <InputText
                               id="quantity"
@@ -915,7 +915,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="replacementDate">Date of Replacement</label>
                             <Calendar
                               id="replacementDate"
@@ -927,7 +927,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="serviceType">Service Provide Type</label>
                             <Dropdown
                               id="serviceType"
@@ -940,7 +940,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="supplierPhone">Supplier phone</label>
                             <InputText
                               id="supplierPhone"
@@ -948,7 +948,7 @@ const AddVassel = () => {
                               className="w-full mt-2 p-inputtext p-component"
                             />
                           </div>
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
                             <div className="flex align-content-center gap-4">
                               <div className="flex flex-wrap gap-1">
@@ -1008,7 +1008,7 @@ const AddVassel = () => {
                         <div className="grid">
                       
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="financeCategory">Category</label>
                             <Dropdown
                               id="financeCategory"
@@ -1021,7 +1021,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="amount">Amount</label>
                             <InputText
                               id="amount"
@@ -1056,7 +1056,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
                             <div className="flex align-content-center gap-4">
                               <div className="flex flex-wrap gap-1">
@@ -1110,7 +1110,7 @@ const AddVassel = () => {
                         <div className="grid">
                       
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="revenueSource">Revenue Source</label>
                             <Dropdown
                               id="revenueSource"
@@ -1123,7 +1123,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="amount">Amount</label>
                             <InputText
                               id="amount"
@@ -1158,7 +1158,7 @@ const AddVassel = () => {
                             />
                           </div>
 
-                          <div className="col-6">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
                             <div className="flex align-content-center gap-4">
                               <div className="flex flex-wrap gap-1">

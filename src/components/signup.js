@@ -67,7 +67,7 @@ const SignupForm = () => {
     const navigate = useNavigate();  // Add useNavigate hook
     const location = useLocation(); 
     const role = location.state?.role || null; // Default to 'Guest' if no role is passed 
-
+    console.log("role", role)
     const handleSubmit = (e) => {
         e.preventDefault();
         if (emailError || passwordError || confirmPasswordError || !credentials.fullName || !credentials.email || !credentials.password || !credentials.confirmPassword) {

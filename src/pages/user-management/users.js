@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'; 
 import { useNavigate } from 'react-router-dom'; 
-import LeftMenu from '../../components/menu';
-import AdminHeader from '../../components/header';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { DataTable } from 'primereact/datatable';
@@ -92,7 +90,7 @@ const Users = () => {
             <p>List of all users assigned to each role. You can also add new users to a specific role.</p>
           </div>
           <div className="sub-header-right">
-            <div className="p-input-icon-left search mr-3">
+            <div className="p-input-icon-left search mr-3 swarch">
               <i className="pi pi-search" />
               <InputText type="search" placeholder="Search" />
             </div>

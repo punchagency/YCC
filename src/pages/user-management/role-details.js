@@ -13,10 +13,7 @@ const RoleDetails = () => {
         navigate("/user-management/role");
       };
   return (
-    <main className="flex h-screen page">
-    {/* <LeftMenu role="Captain/Manager" /> */}
-    <div className="w-full right-panel-component">
-      {/* <AdminHeader /> */}
+    <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
@@ -44,7 +41,7 @@ const RoleDetails = () => {
     <div className="card-wraper">
     <div className="p-p-4">
 <div>
-  <h5 className='text-base'>Role Information</h5>
+  <h5 className='text-base m-0 mb-2'>Role Information</h5>
   <div style={{ lineHeight: '2' }}>
     <div className="detail-item flex gap-6">
       <span className='labelName'>Role Name</span><span className='labelValue'>Captain/Manager</span>
@@ -69,8 +66,7 @@ const RoleDetails = () => {
 </div>
     </div>
     </div>
-    </div>
-    </main>
+    </>
   )
 }
 
