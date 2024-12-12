@@ -79,7 +79,7 @@ const Settings = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="newPassword">New Password</label>
                       <InputText
                         id="oldPassword"
@@ -88,7 +88,7 @@ const Settings = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="confirmPassword">Confirm Password</label>
                       <InputText
                         id="confirmPassword"
