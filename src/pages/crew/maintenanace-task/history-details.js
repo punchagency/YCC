@@ -15,9 +15,6 @@ import { Column } from "primereact/column";
 const MaintenanceHistoryDetails = () => {
     const navigate = useNavigate();
 
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0);
     const [uploadedFiles] = useState([
         {
             name: 'Crew Certification (STCW)',
@@ -40,8 +37,8 @@ const MaintenanceHistoryDetails = () => {
         { id: 3, partName: 'Stern', serialNumber: 'S45678', modelNumber: 'YS-400', manufacturer: 'Princess Yachts' }
     ];
 
-    const editVesselPage = () => {
-        // navigate("/vessel-management/vessels/new");
+    const goDocumentPage = () => {
+         navigate("/crew/maintenance-task/history");
     };
 
     return (
@@ -63,8 +60,21 @@ const MaintenanceHistoryDetails = () => {
                     </div>
                     <div className="sub-header-right">
 
-                        <Button label="Edit" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editVesselPage} />
-
+                    <Button
+            onClick={goDocumentPage}
+            label="Cancel"
+            icon="pi pi-times-circle"
+            severity="secondary"
+            outlined
+            className="p-button-secondary mr-3"
+          />
+          <Button
+            onClick={goDocumentPage}
+            label="Save Changes"
+            icon="pi pi-save"
+            className="p-button-primary"
+            type="button"
+          />
                     </div>
                 </div>
 
@@ -172,6 +182,42 @@ const MaintenanceHistoryDetails = () => {
 
                                     </div>
 
+                                    <div className="details-content">
+                                        <div className="detail-item flex align-items-center">
+                                            <div className="p-grid p-dir-col p-mt-3">
+                                                {uploadedFiles.map((file, index) => {
+                                                    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+                                                    return (
+                                                        <div key={index} className="p-col-12 p-md-6 p-lg-4 p-d-flex p-ai-center p-jc-between">
+                                                            <div className="p-d-flex p-ai-center flex">
+                                                                {isPdf ? (
+                                                                    <>
+
+
+                                                                        <img src={PDFIcon} className="file-icon mr-2" />
+                                                                        <span className="flex align-items-center">{file.name}</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <img src={file.url} alt={file.name} className="file-icon p-mr-2" style={{ width: '50px', height: '50px' }} />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="p-d-flex p-jc-end">
+                                                <Button
+                                                    icon="pi pi-download"
+                                                    label="Download"
+                                                    className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                    onClick={downloadAllFiles}
+                                                />
+                                            </div>
+                                        </div>
+
+
+                                    </div>
 
                                 </Card>
                             </div>
