@@ -8,6 +8,9 @@
   border: 0;
   border-radius: 0;
   border-bottom: 1px solid vars.$light-gray-color;
+  .p-menubar-button{
+    display: none;
+  }
 }
 
 .profile {
@@ -26,6 +29,7 @@
   }
   .collapse-btn{
     display: none;
+    width: auto;
     @include bp.bp(mid-desktop3) {
       display: block;
     }
