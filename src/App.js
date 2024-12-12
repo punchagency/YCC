@@ -49,6 +49,8 @@ import CrewTaskDetails from './pages/crew/maintenanace-task/task-details';
 import CrewTaskEdit from './pages/crew/maintenanace-task/task-edit';
 import MaintenanceHistory from './pages/crew/maintenanace-task/maintenance-history';
 import MaintenanceHistoryDetails from './pages/crew/maintenanace-task/history-details';
+import Document from "./pages/crew/document-access/document";
+import CrewDocumentDetails from "./pages/crew/document-access/document-details";
 
 import Layout from "./layout/layout";
 
@@ -127,7 +129,7 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:reportType" element={<ReportDetails />} />
           {/* Notification Route */}
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/notifications" element={<Notifications role={"Captain/Manager"}/>} />
           <Route path="/settings" element={<Settings />} />  
 
         </Route>
@@ -138,8 +140,10 @@ function App() {
         <Route path="/crew/maintenance-task/mytask/:id" element={<CrewTaskDetails />} /> 
         <Route path="/crew/maintenance-task/mytask/edit" element={<CrewTaskEdit />} /> 
         <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
-        <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} /> 
-
+        <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} />
+        <Route path="/crew/maintenance-task/document" element={<Document />} /> 
+        <Route path="/crew/maintenance-task/document/:id" element={<CrewDocumentDetails />} /> 
+        <Route path="/crew/notifications" element={<Notifications />} />
 
         </Route>
       </Routes>

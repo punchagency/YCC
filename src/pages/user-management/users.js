@@ -98,6 +98,7 @@ const Users = () => {
             </div>
             <Button label="Add User" icon="pi pi-plus" onClick={goToAddUserPage} className="p-button-primary" />
           </div>
+          
         </div>
         <div className="card-wrapper-gap">
           <DataTable 
