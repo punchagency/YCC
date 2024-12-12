@@ -370,7 +370,7 @@ ul{
 }
 
 .card-wraper{
-   padding: 30px;
+   padding: 1.25rem;
    box-sizing: border-box;
    background-color: vars.$color-white;
    border-radius: 10px;
@@ -433,6 +433,8 @@ ul{
             }
         }
       }
+
+
    }
 }
 .p-calendar-w-btn-right{
@@ -770,6 +772,9 @@ ul{
   @include bp.bp(mid-desktop2) {
     max-width: 150px;
   }
+  @include bp.bp(phone-end) {
+   display: none;
+  } 
   .p-inputtext{
     @include bp.bp(custome-1600) {
       width: 100%;
@@ -826,10 +831,15 @@ ul{
     }
     .p-d-flex{
        .p-dropdown{
-          width: 100%;
-          margin-bottom: 15px;
+          @include bp.bp(phone-end) {
+            width: 100%;
+            margin-bottom: 15px;
+          }
           &:last-child{
-            margin-bottom: 0px;
+            margin-right: 0px !important;
+            @include bp.bp(phone-end) {
+              margin-bottom: 0px;
+            }
           }
        }
     }

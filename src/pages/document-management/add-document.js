@@ -103,7 +103,7 @@ const AddDocument = () => {
               <h5>Document Details</h5>
               <form>
                 <div className="grid">
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="documentName">Document Name</label>
                     <Dropdown
                       id="documentName"
@@ -119,7 +119,7 @@ const AddDocument = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="documentType">Document Type</label>
                     <Dropdown
                       id="documentType"
@@ -136,7 +136,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="documeassociatedVesselntName">
                       Associated vessel
                     </label>
@@ -155,7 +155,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="issueDate">Issue Date</label>
                     <Calendar
                       id="issueDate"
@@ -167,7 +167,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="issuexpiryDateDate">Expiry Date</label>
                     <Calendar
                       id="expiryDate"
@@ -179,7 +179,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-4">
+                  <div className="col-12 md:col-4">
                     <label htmlFor="uploadDate">Issue Date</label>
                     <Calendar
                       id="uploadDate"
@@ -191,7 +191,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="issuingAuthority">Issuing Authority</label>
                     <Dropdown
                       id="issuingAuthority"
@@ -206,7 +206,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="renewalDate">Next Renewal</label>
                     <Calendar
                       id="renewalDate"
@@ -218,66 +218,69 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="upload-container">
-                    <div className="flex align-content-center mt-3 justify-content-center">
+                  <div className="col-12">
+                    <div className="upload-container">
+                      <div className="flex align-content-center mt-3 justify-content-center">
+                        <label
+                          htmlFor="file-upload"
+                          className="custom-upload-button"
+                        >
+                          <i className="pi pi-upload mr-2"></i>Upload
+                        </label>
+                        <input
+                          type="file"
+                          id="file-upload"
+                          multiple
+                          accept=".pdf,.jpg,.jpeg,.png,.gif"
+                          className="file-upload-input"
+                          onChange={handleFileSelect}
+                        />
+                      </div>
                       <label
-                        htmlFor="file-upload"
-                        className="custom-upload-button"
+                        htmlFor="uploadDocuments"
+                        className="mt-2 font-semibold text-lg flex justify-content-center"
                       >
-                        <i className="pi pi-upload mr-2"></i>Upload
+                        Select Files to Upload
                       </label>
-                      <input
-                        type="file"
-                        id="file-upload"
-                        multiple
-                        accept=".pdf,.jpg,.jpeg,.png,.gif"
-                        className="file-upload-input"
-                        onChange={handleFileSelect}
-                      />
-                    </div>
-                    <label
-                      htmlFor="uploadDocuments"
-                      className="mt-2 font-semibold text-lg flex justify-content-center"
-                    >
-                      Select Files to Upload
-                    </label>
-                    <label
-                      htmlFor="uploadDocuments"
-                      className="mt-2 flex justify-content-center"
-                    >
-                      or Drag and Drop, Copy and Paste Files
-                    </label>
-                    <div className="flex flex-wrap gap-1 mt-3">
-                      {uploadedFiles.map((file, index) => {
-                        const isImage =
-                          file.type.includes("image") ||
-                          file.name.toLowerCase().endsWith(".jpg") ||
-                          file.name.toLowerCase().endsWith(".jpeg") ||
-                          file.name.toLowerCase().endsWith(".png") ||
-                          file.name.toLowerCase().endsWith(".gif");
+                      <label
+                        htmlFor="uploadDocuments"
+                        className="mt-2 flex justify-content-center"
+                      >
+                        or Drag and Drop, Copy and Paste Files
+                      </label>
+                      <div className="flex flex-wrap gap-1 mt-3">
+                        {uploadedFiles.map((file, index) => {
+                          const isImage =
+                            file.type.includes("image") ||
+                            file.name.toLowerCase().endsWith(".jpg") ||
+                            file.name.toLowerCase().endsWith(".jpeg") ||
+                            file.name.toLowerCase().endsWith(".png") ||
+                            file.name.toLowerCase().endsWith(".gif");
 
-                        return (
-                          <div key={index} className="file-item">
-                            {isImage ? (
-                              <img
-                                src={file.url}
-                                alt={file.name}
-                                className="file-icon"
-                              />
-                            ) : (
-                              <i className="pi pi-file-pdf file-icon"></i>
-                            )}
-                            <span
-                              className="uploadfiles"
-                              onClick={() => removeFile(file.name)}
-                            >
-                              <i className="pi pi-times"></i>
-                            </span>
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div key={index} className="file-item">
+                              {isImage ? (
+                                <img
+                                  src={file.url}
+                                  alt={file.name}
+                                  className="file-icon"
+                                />
+                              ) : (
+                                <i className="pi pi-file-pdf file-icon"></i>
+                              )}
+                              <span
+                                className="uploadfiles"
+                                onClick={() => removeFile(file.name)}
+                              >
+                                <i className="pi pi-times"></i>
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  </div>    
+                  
                 </div>
               </form>
             </div>
