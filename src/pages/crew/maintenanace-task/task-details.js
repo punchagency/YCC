@@ -90,16 +90,16 @@ const CrewTaskDetails = () => {
                     <div className="detail-item flex gap-6">
                     <span className='labelName'>Priority Level</span><span className='labelValue'>High</span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                     <span className='labelName'>Maintenance Frequency</span> <span className='labelValue'>Weekly</span>
                     </div>
                
                 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                     <span className='labelName'>Status</span> <span className='labelValue' style={{color:"#22C55E"}}>In Progress</span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                     <span className='labelName'>Note</span> <span className='labelValue'>Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components</span>
                     </div>
 
