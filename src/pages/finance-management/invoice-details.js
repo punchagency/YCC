@@ -100,7 +100,7 @@ const InvoiceDetails = () => {
             <div className="card-wraper">
               <div className="p-p-4">
                 <div>
-                  <h5 className="text-base">General Information</h5>
+                  <h5 className="text-base m-0 mb-3">General Information</h5>
                   <div style={{ lineHeight: "2" }}>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Invoice Number</span>
@@ -126,16 +126,16 @@ const InvoiceDetails = () => {
                       <span className="labelName">Amount Due</span>{" "}
                       <span className="labelValue">$200</span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Vendor/Payee</span>
                       <span className="labelValue">Mazagon</span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Payment Status</span>
                       <span className="labelValue">Paid</span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">
                         Service/Item Description
                       </span>
@@ -145,7 +145,7 @@ const InvoiceDetails = () => {
                       </span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">
                         Due Soon Threshold ( Reminder)
                       </span>

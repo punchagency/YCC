@@ -564,7 +564,8 @@ const VesselDetails = () => {
                                                 <div className="details-content">
                                                     <div className="details-content-lable">Date of Maintenance</div>
                                                     <div className="details-content-text">
-                                                        12/02/2024                                                    </div>
+                                                        12/02/2024  
+                                                    </div>
                                                 </div>
                                                 <div className="details-content">
                                                     <div className="details-content-lable">Description of Work Done</div>
