@@ -37,6 +37,9 @@ const Users = () => {
       setLoading(false);
     }, 500);
   }, []);
+  const editUser = () => {
+    navigate ("/user-management/users/edit")
+  }
 
   const actionBodyTemplate = (rowData) => (
     <>
@@ -50,7 +53,7 @@ const Users = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={editUser}
         />
         <Button
           label="Delete"

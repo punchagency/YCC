@@ -203,7 +203,7 @@ const Documents = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log("Edit", rowData)}
+          onClick={(e) => navigate(`/document-management/documents/edit`)}
         />
         <Button
           label="Update"
