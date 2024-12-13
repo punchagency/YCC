@@ -192,8 +192,8 @@ const DocumentDetails = () => {
                         </div>
                       </div>
 
-                      <div className="detail-item flex align-items-center">
-                        <div className="p-grid p-dir-col p-mt-3">
+                      <div className="details-content">
+                        <div className="details-content-lable">
                           {uploadedFiles.map((file, index) => {
                             const isPdf =
                               file.type === "application/pdf" ||
@@ -228,11 +228,11 @@ const DocumentDetails = () => {
                             );
                           })}
                         </div>
-                        <div className="p-d-flex p-jc-end">
+                        <div className="details-content-text">
                           <Button
                             icon="pi pi-download"
                             label="Download"
-                            className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                            className="p-button-outlined p-button-sm download-btn"
                             onClick={downloadAllFiles}
                           />
                         </div>

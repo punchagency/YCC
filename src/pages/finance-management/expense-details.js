@@ -189,8 +189,8 @@ const ExpenseDetails = () => {
                       <span className="labelValue"> 13/10/2024</span>
                     </div>
 
-                    <div className="detail-item flex">
-                      <div className="p-grid p-dir-col p-mt-3">
+                    <div className="detail-item flex gap-6">
+                      <div className="labelName">
                         {uploadedFiles.map((file, index) => {
                           const isPdf =
                             file.type === "application/pdf" ||
@@ -223,11 +223,11 @@ const ExpenseDetails = () => {
                           );
                         })}
                       </div>
-                      <div className="p-d-flex p-jc-end">
+                      <div className="labelValue">
                         <Button
                           icon="pi pi-download"
                           label="Download"
-                          className="p-button-outlined p-button-sm p-mt-3 ml-6"
+                          className="p-button-outlined p-button-sm"
                           onClick={downloadAllFiles}
                         />
                       </div>

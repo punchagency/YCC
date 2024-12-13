@@ -21,11 +21,6 @@ const CrewSetting = () => {
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="arrow">
-            <Link to="/crew/dashboard">
-              <i className="pi pi-angle-left"></i>
-            </Link>
-          </div>
           <div className="content">
             <h3>Settings</h3>
             <p>Overview</p>
@@ -76,7 +71,7 @@ const CrewSetting = () => {
                       />
                     </div>
 
-                    <div className="col-12 md:col-6">
+                    <div className="col-12">
                       <label htmlFor="email">Email</label>
                       <InputText
                         id="email"
@@ -117,7 +112,7 @@ const CrewSetting = () => {
                 <h5>Change Password</h5>
                 <form>
                   <div className="grid">
-                    <div className="col-12 md:col-6">
+                    <div className="col-12">
                       <label htmlFor="oldPassword">Current Password</label>
                       <InputText
                         id="oldPassword"

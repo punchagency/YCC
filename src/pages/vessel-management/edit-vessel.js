@@ -12,7 +12,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { FileUpload } from "primereact/fileupload";
 
 
-const AddVassel = () => {
+const EditVassel = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
   const [selectedFlug, setSelectedFlug] = useState(null);
@@ -433,7 +433,7 @@ const AddVassel = () => {
                               placeholder="Inspector’s Ph no"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="organizationName">Affiliated Organization</label>
                             <InputText
                               id="organizationName"
@@ -448,7 +448,7 @@ const AddVassel = () => {
                       <h5 className="mt-4">Inspection Outcome</h5>
                       <form>
                         <div className="grid">
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="outcome">Outcome</label>
                             <Dropdown
                               id="outcome"
@@ -460,7 +460,7 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="outcome">Observation Report <span className="text-xs">( Detailed description of issues identified )</span></label>
                             <InputTextarea
                               id="outcome"
@@ -497,13 +497,13 @@ const AddVassel = () => {
                               className="w-full mt-2"
                             />
                           </div>
-                          <div className="col-12">
+                          <div className="col-12 md:col-6">
                             <div className="flex align-content-center mt-2 action-toggle">
                               <p className="mr-5 font-medium action-label">Action Required</p>
                               <InputSwitch checked={action} onChange={(e) => setAction(e.value)} />
                             </div>
                           </div>
-                          <div className="col-12 ">
+                          <div className="col-12 md:col-6">
                             <label htmlFor="actionDescription">Action Description <span className="text-xs">( Mention in detail )</span></label>
                             <InputTextarea
                               id="actionDescription"
@@ -950,7 +950,7 @@ const AddVassel = () => {
                           </div>
                           <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Supporting Documents</label>
-                            <div className="flex align-content-center">
+                            <div className="flex align-content-center gap-4">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
@@ -1215,4 +1215,4 @@ const AddVassel = () => {
   );
 };
 
-export default AddVassel;
+export default EditVassel;

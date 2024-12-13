@@ -77,7 +77,39 @@ const MyTask = () => {
       assign: "Floyd Miles",
       date: "03/08/2024",
       priority: "Low",
+      status: "InProgress",
+    },
+    {
+      id: 7,
+      name: "Engine Inspection",
+      assign: "Floyd Miles",
+      date: "03/08/2024",
+      priority: "Low",
       status: "Pending",
+    },
+    {
+      id: 8,
+      name: "Engine Inspection",
+      assign: "Floyd Miles",
+      date: "03/08/2024",
+      priority: "Low",
+      status: "Completed",
+    },
+    {
+      id: 9,
+      name: "Engine Inspection",
+      assign: "Floyd Miles",
+      date: "03/08/2024",
+      priority: "Low",
+      status: "Pending",
+    },
+    {
+      id: 10,
+      name: "Engine Inspection",
+      assign: "Floyd Miles",
+      date: "03/08/2024",
+      priority: "Low",
+      status: "Completed",
     },
   ]);
   const filterTasks = (status) =>
@@ -136,6 +168,9 @@ const MyTask = () => {
     return "";
   };
 
+
+  
+
   const renderTaskTable = (filteredTasks) => (
     <DataTable
       value={filteredTasks}
@@ -172,28 +207,35 @@ const MyTask = () => {
   );
 
   const applyFilters = useCallback(() => {
-    let filteredData = myTask;
+    let filteredData = tasks; // Use tasks as the source for filtering
+  
+    // Apply search text filter
     if (searchText.trim()) {
-      filteredData = filteredData.filter((doc) =>
-        Object.values(doc).some((value) =>
+      filteredData = filteredData.filter((task) =>
+        Object.values(task).some((value) =>
           String(value).toLowerCase().includes(searchText.toLowerCase())
         )
       );
     }
+  
+    // Apply date filter
+    if (date) {
+      const selectedDate = new Date(date).setHours(0, 0, 0, 0); // Normalize selected date
+      filteredData = filteredData.filter((task) => {
+        const taskDate = new Date(task.date.split("/").reverse().join("-")).setHours(0, 0, 0, 0); // Parse and normalize task date
+        return taskDate === selectedDate;
+      });
+    }
+  
     setFilteredTask(filteredData);
-  }, [myTask, searchText]);
+  }, [tasks, searchText, date]);
+  
+  useEffect(() => {
+    applyFilters();
+  }, [searchText, date, applyFilters]); // Call whenever searchText or date changes
+  
 
-  const downloadAllFiles = () => {
-    uploadedFiles.forEach((file) => {
-      const a = document.createElement("a");
-      a.href = file.url;
-      a.download = file.name;
-      a.click();
-    });
-  };
-  const editTaskPage = () => {
-    navigate("/crew/maintenance-task/mytask/edit");
-  };
+
 
   return (
     <main className="flex h-screen page">
@@ -235,13 +277,13 @@ const MyTask = () => {
             className={`tabview-${getActiveTabClass()} tab-with-table`}
           >
             <TabPanel header="InProgress" headerClassName="progressHeading">
-              {renderTaskTable(filterTasks("InProgress"))}
+            {renderTaskTable(filteredTask.filter((task) => task.status === "InProgress"))}
             </TabPanel>
             <TabPanel header="Pending" headerClassName="pendingHeading">
-              {renderTaskTable(filterTasks("Pending"))}
+            {renderTaskTable(filteredTask.filter((task) => task.status === "Pending"))}
             </TabPanel>
             <TabPanel header="Completed" headerClassName="completeHeading">
-              {renderTaskTable(filterTasks("Completed"))}
+            {renderTaskTable(filteredTask.filter((task) => task.status === "Completed"))}
             </TabPanel>
           </TabView>
         </div>
