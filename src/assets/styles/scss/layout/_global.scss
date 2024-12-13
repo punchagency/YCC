@@ -291,7 +291,7 @@ ul{
                 font-weight: 500;
                 word-wrap: break-word;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 40%;
                   padding-right: 20px;
                   box-sizing: border-box;
                   line-height: 20px;
@@ -309,7 +309,7 @@ ul{
                 justify-content: space-between;
                 overflow-wrap: anywhere;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 60%;
                   padding-left: 20px;
                   box-sizing: border-box;
                 }

@@ -52,7 +52,7 @@ const RoleDetails = () => {
  
 
 
-    <div className="detail-item flex gap-4">
+    <div className="detail-item flex gap-6">
     <span className='labelName'>Status</span> <span className='labelValue' style={{color:"#22C55E"}}>Active</span>
     </div>
 
