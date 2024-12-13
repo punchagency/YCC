@@ -291,7 +291,7 @@ ul{
                 font-weight: 500;
                 word-wrap: break-word;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 40%;
                   padding-right: 20px;
                   box-sizing: border-box;
                   line-height: 20px;
@@ -309,7 +309,7 @@ ul{
                 justify-content: space-between;
                 overflow-wrap: anywhere;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 60%;
                   padding-left: 20px;
                   box-sizing: border-box;
                 }
@@ -792,7 +792,9 @@ ul{
 
 
 .filter-dropdown {
-  max-width: 100px;
+  @include bp.bp(mid-desktop2) {
+    max-width: 100px;
+  }
   @include bp.bp(phone-end) {
     max-width: unset;
   }
@@ -800,7 +802,9 @@ ul{
     max-width: 100px;
   }
   .p-dropdown-label{
-    max-width: 50px;
+    @include bp.bp(mid-desktop2) {
+      max-width: 50px;
+    }
     @include bp.bp(phone-end) {
       max-width: unset;
     }
@@ -846,3 +850,21 @@ ul{
   }
 }
 
+.p-paginator{
+  .p-paginator-pages{
+    .p-paginator-page{
+      @include bp.bp(custome-568) {
+        min-width: 1.5rem;
+        height: 1.5rem;
+        font-size: 13px;
+      }
+    }
+  }
+  .p-paginator-first, .p-paginator-prev, .p-paginator-next, .p-paginator-last{
+    @include bp.bp(custome-568) {
+      min-width: 1.5rem;
+      height: 1.5rem;
+      font-size: 13px;
+    }
+  }
+}

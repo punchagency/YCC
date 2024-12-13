@@ -848,7 +848,7 @@ const AddVassel = () => {
 
                           <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
-                            <div className="flex align-content-center gap-4">
+                            <div className="flex align-content-center">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
@@ -1058,7 +1058,7 @@ const AddVassel = () => {
 
                           <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
-                            <div className="flex align-content-center gap-4">
+                            <div className="flex align-content-center">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
@@ -1160,7 +1160,7 @@ const AddVassel = () => {
 
                           <div className="col-12 md:col-6">
                             <label htmlFor="uploadDocuments">Upload Maintenance Report</label>
-                            <div className="flex align-content-center gap-4">
+                            <div className="flex align-content-center">
                               <div className="flex flex-wrap gap-1">
                                 {uploadedFiles.map((file, index) => {
                                   const isImage = file.type.includes('image') || file.name.toLowerCase().endsWith(('.jpg', '.jpeg', '.png', '.gif'));
