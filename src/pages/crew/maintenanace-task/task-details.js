@@ -57,7 +57,7 @@ const CrewTaskDetails = () => {
           </div>
           <div className="sub-header-right">
          
-       <Button label="Log Task" icon="pi pi-user-edit" severity="secondary" outlined className="p-button-secondary" onClick={editMaintenancePage}/>
+       <Button label="Log Task" severity="primary" outlined className="p-button-primary" onClick={editMaintenancePage}/>
 
           </div>
         </div>

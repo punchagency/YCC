@@ -55,6 +55,7 @@ import CrewSetting from "./pages/crew/settings/crewsetting";
 import Layout from "./layout/layout";
 import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
+import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
 
 function App() {
   return (
@@ -144,6 +145,7 @@ function App() {
         <Route path="/crew/maintenance-task/mytask/:id" element={<CrewTaskDetails />} /> 
         <Route path="/crew/maintenance-task/mytask/edit" element={<CrewTaskEdit />} /> 
         <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
+        <Route path="/crew/maintenance-task/history/edit" element={<CrewHistoryEdit />} /> 
         <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} />
         <Route path="/crew/maintenance-task/document" element={<Document />} /> 
         <Route path="/crew/maintenance-task/document/:id" element={<CrewDocumentDetails />} /> 
