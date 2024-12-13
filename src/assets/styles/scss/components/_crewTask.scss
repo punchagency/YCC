@@ -1,5 +1,21 @@
 .right-panel-component {
     .card-wrapper-gap {
+        .p-tabview-nav-container{
+            .p-tabview-nav{
+                .pendingHeading a{
+                    color: #D9712A;
+                }
+                .progressHeading a{
+                    color: #188A42;
+                }
+                .completeHeading a {
+                    color: #337E89;
+                }
+                
+                
+            }
+            
+        }
         .form-container {
             .horizontalLine {
                 border: 1px solid #DEE2E6;
@@ -19,18 +35,7 @@
 
             }
 
-            .progressHeading .p-tabview-title {
-                color: #188A42;
-
-            }
-
-            .pendingHeading .p-tabview-title {
-                color: #D9712A;
-            }
-
-            .completeHeading .p-tabview-title {
-                color: #337E89;
-            }
+           
 
             .p-card {
                 margin-bottom: 20px;
@@ -58,4 +63,32 @@
 
 
     }
+    .tabview-in-progress .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        border-color: #188A42;
+    }
+    
+    .tabview-pending .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        border-color: #D9712A;
+    }
+    
+    .tabview-completed .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+        border-color: #337E89;
+    }
+    .p-tabview-panels{
+        margin-top: 0px;
+        background: #eff3f8;
+        padding: 0;
+    }
+  
+    .p-tabview-nav{
+        border-top-left-radius:10px;
+        border-top-right-radius:10px
+    }
+
 }
+
+
+
+
+
+
