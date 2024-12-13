@@ -192,7 +192,7 @@ const DocumentDetails = () => {
                         </div>
                       </div>
 
-                      <div className="detail-item flex">
+                      <div className="detail-item flex align-items-center">
                         <div className="p-grid p-dir-col p-mt-3">
                           {uploadedFiles.map((file, index) => {
                             const isPdf =
