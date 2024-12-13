@@ -51,7 +51,7 @@ const EquipmentDetails = () => {
             <div className="card-wraper">
               <div className="p-p-4">
                 <div>
-                  <h5 className="text-base">General Information</h5>
+                  <h5 className="text-base m-0 mb-3">General Information</h5>
                   <div style={{ lineHeight: "2" }}>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Equipment</span>

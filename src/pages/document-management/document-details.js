@@ -74,7 +74,6 @@ const DocumentDetails = () => {
   const headerStyle = {
     fontSize: "16px",
     fontWeight: "bold",
-    marginBottom: "0.5rem",
   };
 
   const renewalStyle = {
