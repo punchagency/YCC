@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
@@ -60,9 +60,8 @@ const AddCompliance = () => {
   const [revenueSource, setRevenueSource] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
 
-  const goVasselPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+  const goCompliancePage = () => {
+    navigate("/compliance-management/compliance");
   };
 
   const handleEmailChange = (e) => {
@@ -305,10 +304,17 @@ const AddCompliance = () => {
   return (
     <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
-          <div className="sub-header-left">
-            <h3>Documents</h3>
-            <p>list of all documents</p>
+        <div className="sub-header-left sub-header-left-with-arrow">
+          <div className="arrow">
+            <Link to="/compliance-management/compliance">
+              <i className="pi pi-angle-left"></i>
+            </Link>
           </div>
+          <div className="content">
+            <h3>Add New Compliance </h3>
+            <p>All all details here</p>
+          </div>
+        </div>
           {/* <div className="sub-header-right flex align-items-center">
             <div className="flex align-items-center relative">
               <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
@@ -349,14 +355,14 @@ const AddCompliance = () => {
            <div className="sub-header-right">
                       <Button
                         label="Cancel"
-                        onClick={goVasselPage}
+                        onClick={goCompliancePage}
                         icon="pi pi-times-circle"
                         severity="secondary"
                         outlined
                         className="p-button-secondary mr-3"
                       />
                       <Button
-                        onClick={goVasselPage}
+                        onClick={goCompliancePage}
                         label="Save"
                         icon="pi pi-save"
                         className="p-button-primary"

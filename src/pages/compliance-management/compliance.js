@@ -19,8 +19,8 @@ const Compliance = () => {
   const op = useRef(null);
 
   // State for filters
-  const [selectedAuthority, setSelectedAuthority] = useState(null);
-  const [selectedDocumentType, setSelectedDocumentType] = useState(null);
+  const [selectedOutcome, setSelectedOutcome] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
   const navigate = useNavigate();
@@ -79,14 +79,14 @@ const Compliance = () => {
   const applyFilters = useCallback(() => {
     let filteredData = documents;
 
-    if (selectedAuthority) {
+    if (selectedOutcome) {
       filteredData = filteredData.filter(
-        (vessel) => vessel.type === selectedAuthority
+        (vessel) => vessel.type === selectedOutcome
       );
     }
-    if (selectedDocumentType) {
+    if (selectedDate) {
       filteredData = filteredData.filter(
-        (vessel) => vessel.yearbuilt === selectedDocumentType
+        (vessel) => vessel.yearbuilt === selectedDate
       );
     }
     if (selectedStatus) {
@@ -96,7 +96,7 @@ const Compliance = () => {
     }
 
     setFilteredDocument(filteredData);
-  }, [documents, selectedAuthority, selectedDocumentType, selectedStatus]);
+  }, [documents, selectedOutcome, selectedDate, selectedStatus]);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -104,15 +104,15 @@ const Compliance = () => {
   }, [applyFilters]);
 
   // Dropdown options
-  const issueAuthorities = [
-    ...new Set(documents.map((document) => document.issuingAuthority)),
-  ].map((issueAuthority) => ({ name: issueAuthority, value: issueAuthority }));
+  const outcomes = [
+    ...new Set(documents.map((document) => document.outcome)),
+  ].map((outcome) => ({ name: outcome, value: outcome }));
 
-  const types = [...new Set(documents.map((vessel) => vessel.type))].map(
-    (type) => ({ name: type, value: type })
+  const dates = [...new Set(documents.map((document) => document.date))].map(
+    (date) => ({ name: date, value: date })
   );
 
-  const statuses = [...new Set(documents.map((vessel) => vessel.status))].map(
+  const statuses = [...new Set(documents.map((document) => document.status))].map(
     (status) => ({ name: status, value: status })
   );
 
@@ -183,8 +183,8 @@ const Compliance = () => {
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left">
-          <h3>Documents</h3>
-          <p>list of all documents</p>
+          <h3>Compliance</h3>
+          <p>list of all Compliance</p>
         </div>
         <div className="sub-header-right sub-header-big-desktop">
           <div className="p-input-icon-left search mr-3">
@@ -192,19 +192,19 @@ const Compliance = () => {
             <InputText type="search" placeholder="Search" />
           </div>
           <Dropdown
-            value={selectedAuthority}
-            options={issueAuthorities}
-            onChange={(e) => setSelectedAuthority(e.value)}
+            value={selectedOutcome}
+            options={outcomes}
+            onChange={(e) => setSelectedOutcome(e.value)}
             optionLabel="name"
-            placeholder="Issuing Authority"
+            placeholder="Outcome"
             className="mr-3 "
           />
           <Dropdown
-            value={type}
-            options={types}
-            onChange={(e) => setSelectedDocumentType(e.value)}
+            value={selectedDate}
+            options={dates}
+            onChange={(e) => setSelectedDate(e.value)}
             optionLabel="name"
-            placeholder="Document type"
+            placeholder="Date"
             className="mr-3"
           />
           <Dropdown
@@ -239,19 +239,19 @@ const Compliance = () => {
           <OverlayPanel ref={op}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
-                value={selectedAuthority}
-                options={issueAuthorities}
-                onChange={(e) => setSelectedAuthority(e.value)}
+                value={selectedOutcome}
+                options={outcomes}
+                onChange={(e) => setSelectedOutcome(e.value)}
                 optionLabel="name"
-                placeholder="Issuing Authority"
+                placeholder="Outcome"
                 className="mr-3 "
               />
               <Dropdown
-                value={type}
-                options={types}
-                onChange={(e) => setSelectedDocumentType(e.value)}
+                value={selectedDate}
+                options={dates}
+                onChange={(e) => setSelectedDate(e.value)}
                 optionLabel="name"
-                placeholder="Document type"
+                placeholder="Date"
                 className="mr-3"
               />
               <Dropdown
