@@ -792,7 +792,9 @@ ul{
 
 
 .filter-dropdown {
-  max-width: 100px;
+  @include bp.bp(mid-desktop2) {
+    max-width: 100px;
+  }
   @include bp.bp(phone-end) {
     max-width: unset;
   }
@@ -800,7 +802,9 @@ ul{
     max-width: 100px;
   }
   .p-dropdown-label{
-    max-width: 50px;
+    @include bp.bp(mid-desktop2) {
+      max-width: 50px;
+    }
     @include bp.bp(phone-end) {
       max-width: unset;
     }
@@ -846,3 +850,21 @@ ul{
   }
 }
 
+.p-paginator{
+  .p-paginator-pages{
+    .p-paginator-page{
+      @include bp.bp(custome-568) {
+        min-width: 1.5rem;
+        height: 1.5rem;
+        font-size: 13px;
+      }
+    }
+  }
+  .p-paginator-first, .p-paginator-prev, .p-paginator-next, .p-paginator-last{
+    @include bp.bp(custome-568) {
+      min-width: 1.5rem;
+      height: 1.5rem;
+      font-size: 13px;
+    }
+  }
+}
