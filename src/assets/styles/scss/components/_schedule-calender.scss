@@ -1,5 +1,7 @@
 @use '../layout/variables' as vars;
 @use '../mixins/transition' as *;
+@use '../mixins/breakpoints' as bp;
+@use '../mixins/scalable-font' as fs;
 
 
 .schedule-title {
@@ -64,33 +66,57 @@
         &.p-component {
             display: flex;
             justify-content: space-between;
+            @include bp.bp(custome-850) {
+                display: block;
+            }
 
             .p-tabview-nav-container {
                 width: 29%;
                 background-color: vars.$color-white;
                 height: auto;
                 overflow: auto;
+                @include bp.bp(custome-850) {
+                    width: 100%;
+                    border-bottom: 1px solid vars.$gray-color-border;
+                }
 
                 .p-tabview-nav {
                     display: flex;
                     flex-direction: column;
                     border: 0;
+                    @include bp.bp(custome-850) {
+                       flex-direction: row;
+                    }
 
                     li {
                         border-bottom: 1px solid vars.$gray-color-border;
-
+                        @include bp.bp(custome-850) {
+                            border-bottom: 0;
+                        }
+                        &:not(:last-child){
+                            @include bp.bp(custome-850) {
+                                border-right: 1px solid vars.$gray-color-border;
+                            }
+                        }
                         .p-tabview-nav-link {
                             border-radius: 0;
                             margin: 0;
                             border: 0;
                             padding: .85rem 1.35rem;
+                            @include bp.bp(custome-850) {
+                                padding: .65rem 1rem;
+                            }
 
                             h6 {
                                 font-size: 14px;
+                                @include fs.fs(12,14);
                                 font-weight: vars.$normal;
                                 line-height: 20px;
                                 color: vars.$light-black;
                                 margin-bottom: .15rem;
+                                @include bp.bp(custome-850) {
+                                    margin-bottom: 0;
+                                }
                             }
 
                             p {
@@ -106,6 +132,9 @@
 
             .p-tabview-panels {
                 width: 69%;
+                @include bp.bp(custome-850) {
+                    width: 100%;
+                }
 
                 .fc {
                     .fc-toolbar {
@@ -128,18 +157,23 @@
                         font-size: 18px;
                         font-weight: 500;
                         line-height: 21.78px;
+                        @include fs.fs(15,18)
                     }
 
                     .fc-dayGridMonth-button {
-                        padding: 10.5px;
+                        padding: 10.5px 12px;
                         border-radius: 6px;
                         border: 1px solid vars.$gray-color-border;
                         font-size: 14px;
+                        @include fs.fs(12,14);
                         font-weight: 400;
                         line-height: 16.94px;
                         background-color: vars.$color-white;
                         color: #6C757D;
                         text-transform: capitalize;
+                        @include bp.bp(custome-850) {
+                            padding: 6px 8px;
+                        }
                     }
 
                     .fc-button-group {
@@ -149,6 +183,12 @@
                             color: #111;
                             padding: 0;
                             margin-right: 8px;
+                            &:focus{
+                                box-shadow: none;
+                            }
+                            @include bp.bp(custome-850) {
+                                font-size: 12px;
+                            }
                         }
                     }
 
@@ -158,6 +198,7 @@
                         line-height: 28px;
                         padding: 8px 12px;
                         color: #121D22;
+                        @include fs.fs(14,15)
                     }
 
                     .fc-daygrid-day-frame {
@@ -171,7 +212,7 @@
                         }
                     }
 
-                    .fc-daygrid-day-events {
+                    .fc-daygrid-day-events, .fc-listMonth-view {
                         .fc-event {
                             border: 0;
                             border-radius: 10px;
@@ -179,10 +220,11 @@
                             margin-bottom: 5px;
                             white-space: normal;
 
-                            .fc-event-title {
+                            .fc-event-title, .fc-list-event-title {
                                 font-size: 10px;
                                 font-weight: 700;
                                 line-height: 14px;
+                                word-break: break-word;
                             }
 
                             &.complete {
