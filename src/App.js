@@ -56,6 +56,7 @@ import Layout from "./layout/layout";
 import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
+import EditCompliance from "./pages/compliance-management/edit-compliance";
 
 function App() {
   return (
@@ -117,6 +118,7 @@ function App() {
             <Route path="compliance" element={<Compliance />} />
             <Route path="compliance/new" element={<AddCompliance />} />
             <Route path="compliance/:id" element={<ComplianceDetails />} />
+            <Route path="compliance/edit" element={<EditCompliance />} />
           </Route>
 
           <Route

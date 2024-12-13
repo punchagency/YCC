@@ -64,6 +64,7 @@ const AddInvoice = () => {
         <div className="sub-header-right">
           <Button
             label="Cancel"
+            onClick={goInvoicePage}
             icon="pi pi-times-circle"
             severity="secondary"
             outlined
