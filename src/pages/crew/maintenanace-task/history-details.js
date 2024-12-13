@@ -38,7 +38,7 @@ const MaintenanceHistoryDetails = () => {
     ];
 
     const goDocumentPage = () => {
-         navigate("/crew/maintenance-task/history");
+        navigate("/crew/maintenance-task/history/edit");
     };
 
     return (
@@ -59,22 +59,14 @@ const MaintenanceHistoryDetails = () => {
                         </div>
                     </div>
                     <div className="sub-header-right">
-
-                    <Button
-            onClick={goDocumentPage}
-            label="Cancel"
-            icon="pi pi-times-circle"
-            severity="secondary"
-            outlined
-            className="p-button-secondary mr-3"
-          />
-          <Button
-            onClick={goDocumentPage}
-            label="Save Changes"
-            icon="pi pi-save"
-            className="p-button-primary"
-            type="button"
-          />
+                        <Button
+                            label="Edit"
+                            icon="pi pi-user-edit"
+                            severity="secondary"
+                            outlined
+                            className="p-button-secondary"
+                            onClick={goDocumentPage}
+                        />
                     </div>
                 </div>
 
