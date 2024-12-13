@@ -58,7 +58,7 @@ const CrewSetting = () => {
                 <h5>User Profile</h5>
                 <form>
                   <div className="grid">
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="fname">First Name</label>
                       <InputText
                         id="fname"
@@ -67,7 +67,7 @@ const CrewSetting = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="lname">Last Name</label>
                       <InputText
                         id="lname"
@@ -76,7 +76,7 @@ const CrewSetting = () => {
                       />
                     </div>
 
-                    <div className="col-12">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="email">Email</label>
                       <InputText
                         id="email"
@@ -117,7 +117,7 @@ const CrewSetting = () => {
                 <h5>Change Password</h5>
                 <form>
                   <div className="grid">
-                    <div className="col-12">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="oldPassword">Current Password</label>
                       <InputText
                         id="oldPassword"
@@ -126,7 +126,7 @@ const CrewSetting = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="newPassword">New Password<span>*</span></label>
                       <InputText
                         id="oldPassword"
@@ -135,7 +135,7 @@ const CrewSetting = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="confirmPassword">Confirm Password<span>*</span></label>
                       <InputText
                         id="confirmPassword"
