@@ -93,7 +93,7 @@ const AddInvoice = () => {
               <h5>Add Warranty</h5>
               <form>
                 <div className="grid">
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="invoiceNo">Invoice number</label>
                     <InputText
                       id="invoiceNo"
@@ -101,7 +101,7 @@ const AddInvoice = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="vendorName">Vendor/Contractor Name</label>
                     <InputText
                       id="vendorName"
@@ -110,7 +110,7 @@ const AddInvoice = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="date">Invoice Date</label>
                     <Calendar
                       id="date"
@@ -121,7 +121,7 @@ const AddInvoice = () => {
                       className="w-full mt-2 p-input-calender"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="date">Due Date</label>
                     <Calendar
                       id="date"
@@ -133,7 +133,7 @@ const AddInvoice = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="amountDue">Amount Due</label>
                     <InputText
                       id="amountDue"
@@ -141,7 +141,7 @@ const AddInvoice = () => {
                       className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="paymentStatus">Payment Status</label>
                     <Dropdown
                       id="paymentStatus"
@@ -154,7 +154,7 @@ const AddInvoice = () => {
                     />
                   </div>
 
-                  <div className="col-6">
+                  <div className="col-12 md:col-6">
                     <label htmlFor="due">Due Soon Threshold ( Reminder)</label>
                     <InputText
                       id="due"
@@ -163,7 +163,7 @@ const AddInvoice = () => {
                     />
                   </div>
 
-                  <div className="col-6 mt-3">
+                  <div className="col-12 md:col-6 mt-3">
                     <Dropdown
                       id="day"
                       value={day}
