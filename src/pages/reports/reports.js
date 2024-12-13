@@ -74,7 +74,7 @@ export default function Reports() {
         <div className="card-wrapper-gap">
           <div className="grid">
             {cardData.map((card, index) => (
-              <div className="col-4" key={index}>
+              <div className="col-12 sm:col-6 lg:col-4" key={index}>
                 <Card
                   className="report-card"
                   footer={
