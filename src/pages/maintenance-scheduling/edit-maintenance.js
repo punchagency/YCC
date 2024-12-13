@@ -103,7 +103,7 @@ const EditMaintenance = () => {
           className="form-container border-round-sm"
           style={{ backgroundColor: "#FFFFFF", padding: "28px" }}
         >
-          <h5>Add New Task</h5>
+          <h5>Edit Task</h5>
           <form>
             <div className="grid">
               <div className="col-12">

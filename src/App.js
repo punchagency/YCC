@@ -57,7 +57,9 @@ import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
 import EditCompliance from "./pages/compliance-management/edit-compliance";
-import EditVassel from "./pages/vessel-management/edit-vessel";
+import ComingSoon from "./pages/coming-soon";
+import EditUser from "./pages/user-management/edit-user";
+import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 
 function App() {
@@ -68,12 +70,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
+        <Route path="/coming-soon" element={<ComingSoon />} />  
         <Route element={<Layout role="Captain/Manager" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management/role" element={<Role />} />
           <Route path="/user-management/users" element={<Users />} />
           <Route path="/user-management/users/new" element={<AddUser />} />
+          <Route path="/user-management/users/edit" element={<EditUser />} />
           <Route path="/vessel-management/vessels" element={<Vessels />} />
           <Route
             path="/vessel-management/vessels/new"
@@ -83,9 +86,9 @@ function App() {
             path="/vessel-management/vessels/:id"
             element={<VesselDetails />}
           />
-           <Route
+          <Route
             path="/vessel-management/vessels/edit"
-            element={<EditVassel />}
+            element={<EditVessel />}
           />
 
           <Route path="/document-management">

@@ -96,7 +96,7 @@ const Warranty = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={(e) => navigate(`/maintenance-scheduling/warranty/edit`)}
         />
            <Button
           label="Update"
