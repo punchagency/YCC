@@ -9,7 +9,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 
 export default function ScheduleCalendar() {
-  const isMobile = window.innerWidth <= 479;
+  const isMobile = window.innerWidth <= 767;
 
   const resourcesEventArr = [
     {
