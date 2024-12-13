@@ -70,7 +70,7 @@ const InvoiceDetails = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/user-management/users">
+            <Link to="/finance-management/invoice">
               <i className="pi pi-angle-left"></i>
             </Link>
           </div>
