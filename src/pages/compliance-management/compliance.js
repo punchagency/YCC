@@ -81,12 +81,12 @@ const Compliance = () => {
 
     if (selectedOutcome) {
       filteredData = filteredData.filter(
-        (vessel) => vessel.type === selectedOutcome
+        (vessel) => vessel.outcome === selectedOutcome
       );
     }
     if (selectedDate) {
       filteredData = filteredData.filter(
-        (vessel) => vessel.yearbuilt === selectedDate
+        (vessel) => vessel.date === selectedDate
       );
     }
     if (selectedStatus) {
