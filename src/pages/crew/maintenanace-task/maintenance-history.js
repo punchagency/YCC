@@ -81,7 +81,7 @@ const MaintenanceHistory = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={(e) => navigate(`/crew/maintenance-task/history/edit`)}
         />
         <Button
           label="Update"

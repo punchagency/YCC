@@ -92,7 +92,7 @@ const Equipment = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log('Edit', rowData)}
+          onClick={(e) => navigate(`/maintenance-scheduling/equipment/edit`)}
         />
            <Button
           label="Update"
