@@ -98,7 +98,7 @@ const EditExpense = () => {
           <Button
             onClick={goExpensePage}
             label="Save & Add Another"
-            icon="pi pi-save"
+            icon="pi pi-file-export"
             className="p-button-primary mr-3"
             type="button"
           />
