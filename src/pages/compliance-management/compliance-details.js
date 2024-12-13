@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
@@ -25,6 +25,10 @@ const ComplianceDetails = () => {
       a.click();
     });
   };
+  const navigate = useNavigate();
+  const goComplinacePage = () => {
+    navigate("/compliance-management/compliance/edit");
+  };
 
   // You can now use the userId to fetch or display the specific user details
   return (
@@ -45,17 +49,14 @@ const ComplianceDetails = () => {
         </div>
         <div className="sub-header-right">
           <Button
+          onClick={goComplinacePage}
             label="Edit"
             icon="pi pi-user-edit"
             severity="secondary"
             outlined
             className="p-button-secondary mr-3"
           />
-          <Button
-            label="Assign task"
-            icon="pi pi-clipboard"
-            className="p-button-primary"
-          />
+       
         </div>
       </div>
       <div className="card-wrapper-gap">

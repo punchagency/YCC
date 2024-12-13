@@ -64,6 +64,7 @@ const AddWarranty = () => {
           <div className="sub-header-right">
             <Button
               label="Cancel"
+              onClick={goEquipmentPage}
               icon="pi pi-times-circle"
               severity="secondary"
               outlined
