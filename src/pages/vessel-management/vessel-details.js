@@ -36,7 +36,7 @@ const VesselDetails = () => {
         });
     };
     const editVesselPage = () => {
-        navigate("/vessel-management/vessels/new");
+        navigate("/vessel-management/vessels/edit");
     };
 
     return (

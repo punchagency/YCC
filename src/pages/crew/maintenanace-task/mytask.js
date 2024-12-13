@@ -183,17 +183,7 @@ const MyTask = () => {
     setFilteredTask(filteredData);
   }, [myTask, searchText]);
 
-  const downloadAllFiles = () => {
-    uploadedFiles.forEach((file) => {
-      const a = document.createElement("a");
-      a.href = file.url;
-      a.download = file.name;
-      a.click();
-    });
-  };
-  const editTaskPage = () => {
-    navigate("/crew/maintenance-task/mytask/edit");
-  };
+
 
   return (
     <main className="flex h-screen page">
