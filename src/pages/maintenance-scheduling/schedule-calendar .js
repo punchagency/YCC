@@ -4,15 +4,12 @@ import { InputText } from "primereact/inputtext";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Badge } from "primereact/badge";
 
 export default function ScheduleCalendar() {
-  const scrollableTabs = Array.from({ length: 50 }, (_, i) => ({
-    title: `Tab ${i + 1}`,
-    content: `Tab ${i + 1} Content`,
-  }));
+  const isMobile = window.innerWidth <= 768;
 
   const resourcesEventArr = [
     {
@@ -81,6 +78,30 @@ export default function ScheduleCalendar() {
       resourceDesignation: "Crew",
       events: [],
     },
+    {
+      resourceId: 5,
+      resourceTitle: "Stephen Harris",
+      resourceDesignation: "Crew",
+      events: [],
+    },
+    {
+      resourceId: 6,
+      resourceTitle: "Richard Walters",
+      resourceDesignation: "Crew",
+      events: [],
+    },
+    {
+      resourceId: 7,
+      resourceTitle: "Stephen Harris",
+      resourceDesignation: "Crew",
+      events: [],
+    },
+    {
+      resourceId: 8,
+      resourceTitle: "Richard Walters",
+      resourceDesignation: "Crew",
+      events: [],
+    },
   ];
 
   // Custom header template for tab with resource title and designation
@@ -114,8 +135,13 @@ export default function ScheduleCalendar() {
         header={<HeaderTemplate resource={resource} />}
       >
         <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin]}
-          initialView="dayGridMonth"
+          //plugins={[dayGridPlugin, interactionPlugin]}
+          plugins={
+            isMobile
+              ? [listPlugin, interactionPlugin]
+              : [dayGridPlugin, interactionPlugin]
+          }
+          initialView={isMobile ? "listMonth" : "dayGridMonth"}
           events={resource.events.map((event) => ({
             ...event,
             classNames: [getEventClass(event.status)], // Assign custom class based on status
@@ -123,7 +149,7 @@ export default function ScheduleCalendar() {
           headerToolbar={{
             left: "prev,next",
             center: "title",
-            right: "dayGridMonth",
+            right: isMobile ? "listMonth" : "dayGridMonth",
           }}
           selectable={true}
           height="auto"
@@ -139,11 +165,7 @@ export default function ScheduleCalendar() {
           <h3>Schedule Calendar</h3>
           <p>Calendar view of all tasks</p>
         </div>
-        <div className="sub-header-right flex align-items-center">
-          <div className="flex align-items-center relative">
-            <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
-            <InputText placeholder="Search" className="pl-4 mr-3" />
-          </div>
+        <div className="sub-header-right">
           <Button
             label="Create New Task"
             icon="pi pi-plus"
@@ -152,22 +174,22 @@ export default function ScheduleCalendar() {
         </div>
       </div>
       <div className="card-wrapper-gap">
-        <div className="grid align-items-center">
-          <div className="col-6">
-            <h3 className="my-0 schedule-title">
+        <div className="grid md:align-items-center flex-column-reverse md:flex-row">
+          <div className="col-12 md:col-4">
+            <h3 className="mt-0 mb-2 md:mb-0 schedule-title">
               Specialist Name <Badge value={resourcesEventArr.length}></Badge>
             </h3>
           </div>
-          <div className="col-6">
-            <ul className="flex justify-content-end schedule-calender-mark">
+          <div className="col-12 md:col-8">
+            <ul className="flex md:justify-content-end schedule-calender-mark">
               <li className="complete">Complete</li>
               <li className="in-progress">In Progress</li>
               <li className="pending">Pending</li>
             </ul>
           </div>
-          <div className="col-12 schedule-calender">
-            <TabView>{renderTabs()}</TabView>
-          </div>
+        </div>
+        <div className="schedule-calender">
+          <TabView>{renderTabs()}</TabView>
         </div>
       </div>
     </>

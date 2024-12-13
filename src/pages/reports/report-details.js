@@ -260,8 +260,6 @@ export default function ReportDetails() {
             aria-haspopup
           >
             <i className="pi pi-download" />
-            <span className="mx-3">Export</span>
-            <i className="pi pi-ellipsis-v" />
           </Button>
           <Menu
             className="export-menu"
