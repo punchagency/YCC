@@ -4,7 +4,7 @@ import { Checkbox } from "primereact/checkbox";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const AddRole = () => {
   const [roleTitle, setRoleTitle] = useState("");
   const [permissions, setPermissions] = useState([]);
@@ -27,6 +27,10 @@ const AddRole = () => {
       setPermissions([...permissions, permission]);
     }
   };
+const navigate = useNavigate();
+  const goRolePage = ()=>{
+    navigate('/user-management/role');
+  }
 
   return (
     <>
@@ -47,6 +51,7 @@ const AddRole = () => {
           {/* Right Section: Action Button */}
           <div className="sub-header-right">
             <Button
+            onClick={goRolePage}
               label="Save"
               icon="pi pi-save"
               className="p-button-primary"

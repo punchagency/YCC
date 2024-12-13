@@ -57,6 +57,8 @@ import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
 import EditCompliance from "./pages/compliance-management/edit-compliance";
+import EditVassel from "./pages/vessel-management/edit-vessel";
+import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 
 function App() {
   return (
@@ -80,6 +82,10 @@ function App() {
             path="/vessel-management/vessels/:id"
             element={<VesselDetails />}
           />
+           <Route
+            path="/vessel-management/vessels/edit"
+            element={<EditVassel />}
+          />
 
           <Route path="/document-management">
             <Route path="documents" element={<Documents />} />
@@ -101,6 +107,7 @@ function App() {
             <Route path="warranty" element={<Warranty />} />
             <Route path="warranty/new" element={<AddWarranty />} />
             <Route path="warranty/:id" element={<WarrantyDetails />} />
+            <Route path="warranty/edit" element={<EditWarranty />} />
             <Route path="schedule-calendar" element={<ScheduleCalendar />} />
           </Route>
 

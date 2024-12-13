@@ -29,7 +29,7 @@ const WarrantyDetails = () => {
   };
 
   const editWarrantyPage = () => {
-    navigate("/maintenance-scheduling/warranty/new");
+    navigate("/maintenance-scheduling/warranty/edit");
   };
 
   // You can now use the userId to fetch or display the specific user details
