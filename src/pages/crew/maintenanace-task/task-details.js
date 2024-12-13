@@ -105,7 +105,7 @@ const CrewTaskDetails = () => {
 
                 
 
-                    <div className="detail-item flex">
+                    <div className="detail-item flex gap-5">
                       <div className="p-grid p-dir-col p-mt-3">
                         {uploadedFiles.map((file, index) => {
                           const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');

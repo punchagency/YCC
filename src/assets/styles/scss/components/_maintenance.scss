@@ -107,3 +107,14 @@
 
   }
 }
+.tab-with-table{
+  .p-tabview-nav-container{
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    overflow: hidden;
+  }
+  .p-tabview-panels{
+    padding: 0;
+    background-color: transparent;
+  }
+}
