@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import LeftMenu from "../../components/menu";
 import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
@@ -7,9 +7,16 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
 
 const UserDetails = () => {
+  const navigate = useNavigate();
   // Access the userId from the URL
   useParams();
   const [activeIndex, setActiveIndex] = useState(0);
+  const editUser = () => {
+    navigate ("/user-management/users/edit")
+  }
+  const assignTask = () => {
+    navigate ("/coming-soon")
+  }
 
   // You can now use the userId to fetch or display the specific user details
   return (
@@ -35,11 +42,13 @@ const UserDetails = () => {
             severity="secondary"
             outlined
             className="p-button-secondary mr-3"
+            onClick={editUser}
           />
           <Button
             label="Assign task"
             icon="pi pi-clipboard"
             className="p-button-primary"
+            onClick={assignTask}
           />
         </div>
       </div>

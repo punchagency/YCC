@@ -57,6 +57,10 @@ import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
 import EditCompliance from "./pages/compliance-management/edit-compliance";
+import ComingSoon from "./pages/coming-soon";
+import EditUser from "./pages/user-management/edit-user";
+import EditVessel from "./pages/vessel-management/edit-vessels";
+import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 
 function App() {
   return (
@@ -66,11 +70,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/coming-soon" element={<ComingSoon />} />  
         <Route element={<Layout role="Captain/Manager" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management/role" element={<Role />} />
           <Route path="/user-management/users" element={<Users />} />
           <Route path="/user-management/users/new" element={<AddUser />} />
+          <Route path="/user-management/users/edit" element={<EditUser />} />
           <Route path="/vessel-management/vessels" element={<Vessels />} />
           <Route
             path="/vessel-management/vessels/new"
@@ -79,6 +85,10 @@ function App() {
           <Route
             path="/vessel-management/vessels/:id"
             element={<VesselDetails />}
+          />
+          <Route
+            path="/vessel-management/vessels/edit"
+            element={<EditVessel />}
           />
 
           <Route path="/document-management">
@@ -101,6 +111,7 @@ function App() {
             <Route path="warranty" element={<Warranty />} />
             <Route path="warranty/new" element={<AddWarranty />} />
             <Route path="warranty/:id" element={<WarrantyDetails />} />
+            <Route path="warranty/edit" element={<EditWarranty />} />
             <Route path="schedule-calendar" element={<ScheduleCalendar />} />
           </Route>
 

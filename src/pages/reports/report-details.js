@@ -93,14 +93,20 @@ export default function ReportDetails() {
         className="datatable-overlaypanel"
       >
         <Button
-          label="Edit"
-          icon="pi pi-pencil"
+          label="PDF"
+          icon={<img src={Pdf} alt="PDF icon" className="mr-3" />}
           className="p-button-text w-full"
           onClick={() => console.log("Edit", rowData)}
         />
         <Button
-          label="Delete"
-          icon="pi pi-trash"
+          label="CSV"
+          icon={<img src={Csv} alt="CSV icon" className="mr-3" />}
+          className="p-button-text w-full"
+          onClick={() => console.log("Delete", rowData)}
+        />
+        <Button
+          label="XLSX"
+          icon={<img src={Xlsx} alt="XLSX icon" className="mr-3" />}
           className="p-button-text w-full"
           onClick={() => console.log("Delete", rowData)}
         />

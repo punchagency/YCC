@@ -156,7 +156,7 @@ const Compliance = () => {
           label="Edit"
           icon="pi pi-pencil"
           className="p-button-text w-full"
-          onClick={() => console.log("Edit", rowData)}
+          onClick={(e) => navigate(`/compliance-management/compliance/edit`)}
         />
         <Button
           label="Delete"
