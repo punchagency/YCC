@@ -888,3 +888,10 @@ ul{
     }
   }
 }
+
+
+.p-datatable .p-datatable-table .p-datatable-tbody td {
+  @include bp.bp(custome-568) {
+     min-width: 200px;
+  }
+}
