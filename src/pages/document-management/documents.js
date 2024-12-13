@@ -77,6 +77,26 @@ const Documents = () => {
           expiryDate: "25/10/2025",
           status: "Valid",
         },
+        {
+          id: 6,
+          name: "ISM Code Audit Report",
+          type: "Administrator",
+          associatedVessel: "Sea Dreamer",
+          issuingAuthority: "MCA",
+          issueDate: "26/9/2024",
+          expiryDate: "25/10/2025",
+          status: "Active",
+        },
+        {
+          id: 7,
+          name: "Engine Maintenance Report",
+          type: "Maintenance",
+          associatedVessel: "Serenity",
+          issuingAuthority: "Internal",
+          issueDate: "18/10/2024",
+          expiryDate: "30/10/2026",
+          status: "Valid",
+        },
       ];
       setDocuments(fetchedDocument);
       setFilteredDocument(fetchedDocument); // Initially, all vessels are displayed
