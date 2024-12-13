@@ -218,7 +218,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Dashboard",
       icon: "pi pi-home",
       command: () => {
-        navigate("/dashboard"); // Navigate to the dashboard
+        navigate("/crew/dashboard"); // Navigate to the dashboard
       },
     },
     {

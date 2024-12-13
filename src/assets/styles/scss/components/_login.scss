@@ -62,9 +62,30 @@
     margin-bottom: 41px;
     display: flex;
     justify-content: space-between;
-
+    @include bp.bp(custome-568) {
+      flex-direction: column;
+      margin-bottom: 30px;
+    }
+    .p-d-flex{
+      @include bp.bp(custome-568) {
+        margin-bottom: 15px;
+      }
+    }
     a {
       font-size: 14px;
     }
   }
 }
+
+.login-right-component {
+  .p-field-checkbox{
+     &.signup-checkbox{
+      .p-d-flex{
+        @include bp.bp(custome-568) {
+          margin-bottom: 0;
+        }
+      }
+     }
+  }
+}
+

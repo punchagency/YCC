@@ -71,50 +71,50 @@ const DashboardCrew = () => {
   ];
 
   const filterOptions2 = [
-    { label: "Last 30 days", value: "Last 30 days" },
-    { label: "Last 7 days", value: "Last 7 days" },
-    { label: "Last 6 months", value: "Last 6 months" },
+    { label: "Year 2024", value: "2024" },
+    { label: "Year 2023", value: "2023" },
+    { label: "Year 2022", value: "2022" },
   ];
 
   useEffect(() => {
-    setTimeout(() => {
-      const fetchedTasks = [
-        { id: 1, name: "Oil change", priority: "High", date: "23/01/2025" },
-        {
-          id: 2,
-          name: "Filter Replacement",
-          priority: "High",
-          date: "22/01/2025",
-        },
-        {
-          id: 3,
-          name: "Engine Inspection",
-          priority: "High",
-          date: "21/01/2025",
-        },
-        { id: 4, name: "Oil change", priority: "Medium", date: "20/01/2025" },
-        { id: 5, name: "Oil change", priority: "Medium", date: "19/01/2025" },
-      ];
-      setTasks(fetchedTasks.slice(0, 20));
-      setLoading(false);
-    }, 500);
+    // setTimeout(() => {
+    const fetchedTasks = [
+      { id: 1, name: "Oil change", priority: "High", date: "23/01/2025" },
+      {
+        id: 2,
+        name: "Filter Replacement",
+        priority: "High",
+        date: "22/01/2025",
+      },
+      {
+        id: 3,
+        name: "Engine Inspection",
+        priority: "High",
+        date: "21/01/2025",
+      },
+      { id: 4, name: "Oil change", priority: "Medium", date: "20/01/2025" },
+      { id: 5, name: "Oil change", priority: "Medium", date: "19/01/2025" },
+    ];
+    setTasks(fetchedTasks.slice(0, 20));
+    setLoading(false);
+    // }, 500);
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      const fetchedDocument = [
-        {
-          id: 1,
-          name: "Engine Maintenance Guide",
-          date: "26/10/2024",
-          imageUrl: Doc,
-        },
-        { id: 2, name: "Safety Protocol", date: "26/10/2024", imageUrl: Pdf },
-        { id: 3, name: "Engine Manual", date: "26/10/2024", imageUrl: Xls },
-      ];
-      setDocument(fetchedDocument.slice(0, 20));
-      setLoading(false);
-    }, 500);
+    // setTimeout(() => {
+    const fetchedDocument = [
+      {
+        id: 1,
+        name: "Engine Maintenance Guide",
+        date: "26/10/2024",
+        imageUrl: Doc,
+      },
+      { id: 2, name: "Safety Protocol", date: "26/10/2024", imageUrl: Pdf },
+      { id: 3, name: "Engine Manual", date: "26/10/2024", imageUrl: Xls },
+    ];
+    setDocument(fetchedDocument.slice(0, 20));
+    setLoading(false);
+    // }, 500);
   }, []);
 
   const skeletonTemplate = () => (
@@ -347,6 +347,53 @@ const DashboardCrew = () => {
               <Card
                 title={
                   <div className="card-header">
+                    <span>Recent Document</span>
+                    <div className="filter-dropdown">
+                      <Dropdown
+                        value={selectedFilter1}
+                        options={filterOptions1}
+                        onChange={onFilterChange1}
+                        placeholder="Select a filter"
+                        className="p-dropdown-sm"
+                      />
+                    </div>
+                  </div>
+                }
+              >
+                <div className="dashboard-overview">
+                  <DataTable
+                    value={document}
+                    rows={10}
+                    tableStyle={{ minWidth: "20rem" }}
+                    rowClassName="pointer-row"
+                  >
+                    <Column
+                      field="name"
+                      header="Document Name"
+                      style={{ width: "33%" }}
+                    />
+                    <Column
+                      field="date"
+                      header="Date Added"
+                      style={{ width: "33%" }}
+                    />
+                    <Column
+                      field="imageUrl"
+                      header="File Type"
+                      style={{ width: "33%" }}
+                      body={priorityTemplateImage}
+                    />
+                  </DataTable>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          <div className="item">
+            <div className="card flex justify-content-center">
+              <Card
+                title={
+                  <div className="card-header">
                     <span>Total No of Document</span>
                     <div className="three-dot-menu">
                       <Menu
@@ -378,56 +425,6 @@ const DashboardCrew = () => {
                     16
                     <p>Safety Docs</p>
                   </div>
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Monthly Maintenance Trend</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter2}
-                        options={filterOptions2}
-                        onChange={onFilterChange2}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
-                    </div>
-                  </div>
-                }
-              >
-                <div className="bar-chart-wrapper">
-                  <Chart type="line" data={lineData} options={lineOptions} />
-                </div>
-              </Card>
-            </div>
-          </div>
-
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Document Access Frequency</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter1}
-                        options={filterOptions1}
-                        onChange={onFilterChange1}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
-                    </div>
-                  </div>
-                }
-              >
-                <div className="bar-chart-wrapper">
-                  <Chart type="bar" data={barData} options={barOptions} />
                 </div>
               </Card>
             </div>
@@ -487,7 +484,32 @@ const DashboardCrew = () => {
               <Card
                 title={
                   <div className="card-header">
-                    <span>Recent Document</span>
+                    <span>Monthly Maintenance Trend</span>
+                    <div className="filter-dropdown">
+                      <Dropdown
+                        value={selectedFilter2}
+                        options={filterOptions2}
+                        onChange={onFilterChange2}
+                        placeholder="Select a filter"
+                        className="p-dropdown-sm"
+                      />
+                    </div>
+                  </div>
+                }
+              >
+                <div className="bar-chart-wrapper">
+                  <Chart type="line" data={lineData} options={lineOptions} />
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          <div className="item">
+            <div className="card flex justify-content-center">
+              <Card
+                title={
+                  <div className="card-header">
+                    <span>Document Access Frequency</span>
                     <div className="filter-dropdown">
                       <Dropdown
                         value={selectedFilter1}
@@ -500,30 +522,8 @@ const DashboardCrew = () => {
                   </div>
                 }
               >
-                <div className="dashboard-overview">
-                  <DataTable
-                    value={document}
-                    rows={10}
-                    tableStyle={{ minWidth: "20rem" }}
-                    rowClassName="pointer-row"
-                  >
-                    <Column
-                      field="name"
-                      header="Document Name"
-                      style={{ width: "33%" }}
-                    />
-                    <Column
-                      field="date"
-                      header="Date Added"
-                      style={{ width: "33%" }}
-                    />
-                    <Column
-                      field="imageUrl"
-                      header="File Type"
-                      style={{ width: "33%" }}
-                      body={priorityTemplateImage}
-                    />
-                  </DataTable>
+                <div className="bar-chart-wrapper">
+                  <Chart type="bar" data={barData} options={barOptions} />
                 </div>
               </Card>
             </div>
