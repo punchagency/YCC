@@ -1,7 +1,12 @@
 @use '../layout/variables' as vars;
+@use '../mixins/breakpoints' as bp;
+@use '../mixins/scalable-font' as fs;
 
 .report-card {
     height: 230px;
+    @include bp.bp(phone-end) {
+        height: 180px;
+    }
 
     .p-card-body {
         display: flex;
@@ -14,7 +19,7 @@
             padding-top: 0;
 
             h3 {
-                font-size: 18px;
+                @include fs.fs(15, 18);
                 line-height: 21.78px;
                 font-weight: vars.$medium;
                 color: #37404C;
