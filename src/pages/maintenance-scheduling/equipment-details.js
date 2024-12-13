@@ -77,7 +77,7 @@ const EquipmentDetails = () => {
                       <span className="labelName">Last Service Date</span>
                       <span className="labelValue">10/15/2024 </span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Status</span>{" "}
                       <span className="labelValue" style={{ color: "#22C55E" }}>
                         In Use
