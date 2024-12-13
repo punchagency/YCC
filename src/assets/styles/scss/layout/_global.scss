@@ -311,8 +311,10 @@ ul{
                 font-weight: 500;
                 word-wrap: break-word;
                 padding-right: 20px;
-                @include bp.bp(custome-991) {
+                @include bp.bp(custome-1440) {
                   width: 40%;
+                }
+                @include bp.bp(custome-991) {
                   box-sizing: border-box;
                   line-height: 20px;
                 }
@@ -328,8 +330,10 @@ ul{
                 align-items: center;
                 justify-content: space-between;
                 overflow-wrap: anywhere;
-                @include bp.bp(custome-991) {
+                @include bp.bp(custome-1440) {
                   width: 60%;
+                }
+                @include bp.bp(custome-991) {
                   padding-left: 20px;
                   box-sizing: border-box;
                 }
