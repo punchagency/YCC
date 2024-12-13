@@ -61,7 +61,7 @@ const AddExpense = () => {
 
   const maintenanceFrequencies = [{ name: "Monthly" }, { name: "Yearly" }];
 
-  const goEquipmentPage = () => {
+  const goExpensePage = () => {
     navigate("/finance-management/expense");
   };
 
@@ -81,6 +81,7 @@ const AddExpense = () => {
         </div>
         <div className="sub-header-right">
           <Button
+          onClick={goExpensePage}
             label="Cancel"
             icon="pi pi-times-circle"
             severity="secondary"
@@ -88,14 +89,14 @@ const AddExpense = () => {
             className="p-button-secondary mr-3"
           />
           <Button
-            onClick={goEquipmentPage}
+            onClick={goExpensePage}
             label="Save"
             icon="pi pi-save"
             className="p-button-primary mr-3"
             type="button"
           />
           <Button
-            onClick={goEquipmentPage}
+            onClick={goExpensePage}
             label="Save & Add Another"
             icon="pi pi-save"
             className="p-button-primary mr-3"
