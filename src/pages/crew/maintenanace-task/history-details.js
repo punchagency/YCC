@@ -49,7 +49,7 @@ const MaintenanceHistoryDetails = () => {
                 <div className="flex align-items-center justify-content-between sub-header-panel">
                     <div className="sub-header-left sub-header-left-with-arrow">
                         <div className="arrow">
-                            <Link to="/vessel-management/vessels">
+                            <Link to="/crew/maintenance-task/history">
                                 <i className="pi pi-angle-left"></i>
                             </Link>
                         </div>
@@ -138,8 +138,7 @@ const MaintenanceHistoryDetails = () => {
                                 }
                                 >
                                     <div className="details-content">
-                                        <div className="detail-item flex align-items-center">
-                                            <div className="p-grid p-dir-col p-mt-3">
+                                        <div className="details-content-lable">
                                                 {uploadedFiles.map((file, index) => {
                                                     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -160,23 +159,24 @@ const MaintenanceHistoryDetails = () => {
                                                         </div>
                                                     );
                                                 })}
+
                                             </div>
-                                            <div className="p-d-flex p-jc-end">
+                                            <div className="details-content-text">
                                                 <Button
                                                     icon="pi pi-download"
                                                     label="Download"
-                                                    className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                    className="p-button-outlined p-button-sm download-btn"
                                                     onClick={downloadAllFiles}
                                                 />
                                             </div>
-                                        </div>
+                                        
 
 
                                     </div>
 
                                     <div className="details-content">
-                                        <div className="detail-item flex align-items-center">
-                                            <div className="p-grid p-dir-col p-mt-3">
+                                        <div className="details-content-lable">
+      
                                                 {uploadedFiles.map((file, index) => {
                                                     const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -197,17 +197,17 @@ const MaintenanceHistoryDetails = () => {
                                                         </div>
                                                     );
                                                 })}
-                                            </div>
-                                            <div className="p-d-flex p-jc-end">
+                                          
+                                            
+                                        </div>
+                                        <div className="details-content-text">
                                                 <Button
                                                     icon="pi pi-download"
                                                     label="Download"
-                                                    className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                    className="p-button-outlined p-button-sm download-btn"
                                                     onClick={downloadAllFiles}
                                                 />
-                                            </div>
-                                        </div>
-
+                                            </div>        
 
                                     </div>
 

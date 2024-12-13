@@ -16,6 +16,7 @@
           color: #9E9E9E;
           font-weight: 500;
           width: 150px;
+          line-height: 20px;
           @include bp.bp(custome-568) {
             max-width: 80px;
           }
@@ -23,6 +24,13 @@
         .labelValue{
           font-size: 14px;
           color: #212121;
+          @include bp.bp(phone-end) {
+            max-width: 400px;
+          }
+          @include bp.bp(custome-568) {
+            max-width: 200px;
+          }
+
         }
         .download-btn{
           border: 1px solid #3B82F6;
