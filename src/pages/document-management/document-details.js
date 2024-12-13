@@ -74,7 +74,6 @@ const DocumentDetails = () => {
   const headerStyle = {
     fontSize: "16px",
     fontWeight: "bold",
-    marginBottom: "0.5rem",
   };
 
   const renewalStyle = {
@@ -249,7 +248,6 @@ const DocumentDetails = () => {
                     <DataTable
                       value={data}
                       autoLayout
-                      className="p-datatable-sm"
                     >
                       <Column field="userName" header="User Name" />
                       <Column field="date" header="Date" />

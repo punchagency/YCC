@@ -128,7 +128,7 @@ const ExpenseDetails = () => {
             <div className="card-wraper">
               <div className="p-p-4">
                 <div>
-                  <h5 className="text-base">General Information</h5>
+                  <h5 className="text-base m-0 mb-3">General Information</h5>
                   <div style={{ lineHeight: "2" }}>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Vessel Name</span>
@@ -154,11 +154,11 @@ const ExpenseDetails = () => {
                       <span className="labelName">Payment Status</span>{" "}
                       <span className="labelValue">Paid</span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Department</span>{" "}
                       <span className="labelValue">Engineering</span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">
                         Expense Description (Notes)
                       </span>
@@ -167,24 +167,24 @@ const ExpenseDetails = () => {
                         maximus egestas.
                       </span>
                     </div>
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">
                         Warranty expiration Soon Threshold ( Reminder)
                       </span>
                       <span className="labelValue">10/15/2024 </span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Frequency</span>
                       <span className="labelValue">Recurring Expense</span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">Start Date</span>
                       <span className="labelValue"> 12/10/2024</span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
+                    <div className="detail-item flex gap-6">
                       <span className="labelName">End Date</span>
                       <span className="labelValue"> 13/10/2024</span>
                     </div>

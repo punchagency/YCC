@@ -148,7 +148,7 @@ const SignupForm = () => {
                     />
                     {confirmPasswordError && <small className="p-error">{confirmPasswordError}</small>}
                 </div>
-                <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between">
+                <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between signup-checkbox">
                     <div className="p-d-flex p-ai-center">
                         <Checkbox
                             inputId="rememberMe"

@@ -26,9 +26,9 @@ const Role = () => {
   useEffect(() => {
     setTimeout(() => {
       const fetchedRoles = [
-        { id: 1, name: "Captain/Manager",permission:"demo permission", status: "Active" },
-        { id: 2, name: "Crew Manager",permission:"demo permission", status: "Inactive" },
-        { id: 3, name: "HOD",permission:"demo permission", status: "Active" },
+        { id: 1, name: "Captain/Manager",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Active" },
+        { id: 2, name: "Crew Manager",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Inactive" },
+        { id: 3, name: "HOD",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Active" },
 
        ];
        
