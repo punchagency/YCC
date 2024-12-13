@@ -309,7 +309,7 @@ const AddCompliance = () => {
             <h3>Documents</h3>
             <p>list of all documents</p>
           </div>
-          <div className="sub-header-right flex align-items-center">
+          {/* <div className="sub-header-right flex align-items-center">
             <div className="flex align-items-center relative">
               <i className="pi pi-search absolute left-0 ml-2 text-gray-500"></i>
               <InputText placeholder="Search" className="pl-4 mr-3" />
@@ -344,7 +344,25 @@ const AddCompliance = () => {
               onClick={goToAddCompliancePage}
               className="p-button-primary"
             />
-          </div>
+          </div> */}
+
+           <div className="sub-header-right">
+                      <Button
+                        label="Cancel"
+                        onClick={goVasselPage}
+                        icon="pi pi-times-circle"
+                        severity="secondary"
+                        outlined
+                        className="p-button-secondary mr-3"
+                      />
+                      <Button
+                        onClick={goVasselPage}
+                        label="Save"
+                        icon="pi pi-save"
+                        className="p-button-primary"
+                        type="button"
+                      />
+            </div>
         </div>
         <div className="card-wrapper-gap">
           <div className="form-container">

@@ -178,6 +178,26 @@ ul{
   @include bp.bp(custome-375) {
     padding: 20px 15px;
   }
+  .form-container{
+    .p-tabview{
+        .p-tabview-nav-container{
+            .p-tabview-nav-content{
+               .p-tabview-nav{
+                  display: flex;
+                  flex-direction: row;
+                  width: 100%;
+                 //  border-bottom: 2px solid #d1d5db;
+                  .p-unselectable-text{
+                      .p-tabview-nav-link{
+                         font-size: 14px;
+                         color: #212121;
+                      }
+                  }
+               }
+            }
+        }
+    }
+  }
 }
 
 .v-grid {
