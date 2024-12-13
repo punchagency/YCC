@@ -160,7 +160,7 @@
                         @include fs.fs(15,18)
                     }
 
-                    .fc-dayGridMonth-button {
+                    .fc-dayGridMonth-button, .fc-listMonth-button {
                         padding: 10.5px 12px;
                         border-radius: 6px;
                         border: 1px solid vars.$gray-color-border;
@@ -193,12 +193,17 @@
                     }
 
                     .fc-col-header-cell-cushion {
-                        font-size: 16px;
                         font-weight: 500;
                         line-height: 28px;
                         padding: 8px 12px;
                         color: #121D22;
                         @include fs.fs(14,15)
+                    }
+                    .fc-list-day-text, .fc-list-day-side-text {
+                        font-weight: 500;
+                        line-height: 28px;
+                        color: #121D22;
+                        @include fs.fs(12,14)
                     }
 
                     .fc-daygrid-day-frame {
@@ -219,35 +224,59 @@
                             padding: 8px;
                             margin-bottom: 5px;
                             white-space: normal;
+                            .fc-list-event-graphic{
+                                .fc-list-event-dot{
+                                    border: 3px solid;
+                                }
+                            }
 
-                            .fc-event-title, .fc-list-event-title {
+                            .fc-event-title, .fc-list-event-title, .fc-list-event-time {
                                 font-size: 10px;
                                 font-weight: 700;
                                 line-height: 14px;
                                 word-break: break-word;
+                                vertical-align: middle;
                             }
 
                             &.complete {
                                 background-color: #CAF1D8;
 
-                                .fc-event-title {
+                                .fc-event-title, .fc-list-event-title, .fc-list-event-time {
                                     color: #337E89;
+                                }
+
+                                .fc-list-event-graphic{
+                                    .fc-list-event-dot{
+                                        border-color: #337E89;
+                                    }
                                 }
                             }
 
                             &.in-progress {
                                 background-color: #94E0ED;
 
-                                .fc-event-title {
+                                .fc-event-title, .fc-list-event-title, .fc-list-event-time {
                                     color: #168B9F;
+                                }
+
+                                .fc-list-event-graphic{
+                                    .fc-list-event-dot{
+                                        border-color: #168B9F;
+                                    }
                                 }
                             }
 
                             &.pending {
                                 background-color: #FEDDC7;
 
-                                .fc-event-title {
+                                .fc-event-title, .fc-list-event-title, .fc-list-event-time {
                                     color: #D9712A;
+                                }
+
+                                .fc-list-event-graphic{
+                                    .fc-list-event-dot{
+                                        border-color: #D9712A;
+                                    }
                                 }
                             }
                         }
