@@ -361,8 +361,8 @@ const VesselDetails = () => {
                                                     demo officer
                                                 </div>
                                             </div>
-                                            <div className="detail-item flex">
-                                                <div className="p-grid p-dir-col p-mt-3">
+                                            <div className="details-content">
+                                                <div className="details-content-lable">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -384,11 +384,11 @@ const VesselDetails = () => {
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="p-d-flex p-jc-end">
+                                                <div className="details-content-text">
                                                     <Button
                                                         icon="pi pi-download"
                                                         label="Download"
-                                                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                        className="p-button-outlined p-button-sm download-btn"
                                                         onClick={downloadAllFiles}
                                                     />
                                                 </div>
@@ -446,8 +446,8 @@ const VesselDetails = () => {
                                                     12/11/2024
                                                 </div>
                                             </div>
-                                            <div className="detail-item flex">
-                                                <div className="p-grid p-dir-col p-mt-3">
+                                            <div className="details-content">
+                                                <div className="details-content-lable">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -469,11 +469,11 @@ const VesselDetails = () => {
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="p-d-flex p-jc-end">
+                                                <div className="details-content-text">
                                                     <Button
                                                         icon="pi pi-download"
                                                         label="Download"
-                                                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                        className="p-button-outlined p-button-sm download-btn"
                                                         onClick={downloadAllFiles}
                                                     />
                                                 </div>
@@ -573,8 +573,8 @@ const VesselDetails = () => {
                                                         description work
                                                     </div>
                                                 </div>
-                                                <div className="detail-item flex">
-                                                    <div className="p-grid p-dir-col p-mt-3">
+                                                <div className="details-content">
+                                                    <div className="details-content-lable">
                                                         {uploadedFiles.map((file, index) => {
                                                             const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -596,11 +596,11 @@ const VesselDetails = () => {
                                                             );
                                                         })}
                                                     </div>
-                                                    <div className="p-d-flex p-jc-end">
+                                                    <div className="details-content-text">
                                                         <Button
                                                             icon="pi pi-download"
                                                             label="Download"
-                                                            className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                            className="p-button-outlined p-button-sm download-btn"
                                                             onClick={downloadAllFiles}
                                                         />
                                                     </div>
@@ -655,8 +655,8 @@ const VesselDetails = () => {
                                                     8587568756756
                                                 </div>
                                             </div>
-                                            <div className="detail-item flex">
-                                                <div className="p-grid p-dir-col p-mt-3">
+                                            <div className="details-content">
+                                                <div className="details-content-lable">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -678,11 +678,11 @@ const VesselDetails = () => {
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="p-d-flex p-jc-end">
+                                                <div className="details-content-text">
                                                     <Button
                                                         icon="pi pi-download"
                                                         label="Download"
-                                                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                        className="p-button-outlined p-button-sm download-btn"
                                                         onClick={downloadAllFiles}
                                                     />
                                                 </div>
@@ -734,8 +734,8 @@ const VesselDetails = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="detail-item flex">
-                                                    <div className="p-grid p-dir-col p-mt-3">
+                                                <div className="details-content">
+                                                    <div className="details-content-lable">
                                                         {uploadedFiles.map((file, index) => {
                                                             const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -757,11 +757,11 @@ const VesselDetails = () => {
                                                             );
                                                         })}
                                                     </div>
-                                                    <div className="p-d-flex p-jc-end">
+                                                    <div className="details-content-text">
                                                         <Button
                                                             icon="pi pi-download"
                                                             label="Download"
-                                                            className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                            className="p-button-outlined p-button-sm download-btn"
                                                             onClick={downloadAllFiles}
                                                         />
                                                     </div>
@@ -817,8 +817,8 @@ const VesselDetails = () => {
                                                     demo description
                                                 </div>
                                             </div>
-                                            <div className="detail-item flex">
-                                                <div className="p-grid p-dir-col p-mt-3">
+                                            <div className="details-content">
+                                                <div className="details-content-lable">
                                                     {uploadedFiles.map((file, index) => {
                                                         const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -840,11 +840,11 @@ const VesselDetails = () => {
                                                         );
                                                     })}
                                                 </div>
-                                                <div className="p-d-flex p-jc-end">
+                                                <div className="details-content-text">
                                                     <Button
                                                         icon="pi pi-download"
                                                         label="Download"
-                                                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                                                        className="p-button-outlined p-button-sm download-btn"
                                                         onClick={downloadAllFiles}
                                                     />
                                                 </div>

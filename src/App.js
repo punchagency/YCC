@@ -68,6 +68,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        
         <Route element={<Layout role="Captain/Manager" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user-management/role" element={<Role />} />
@@ -149,8 +150,8 @@ function App() {
         </Route>
 
         <Route element={<Layout role="Crew Member" />}>
-            <Route path="/crew/dashboard" element={<DashboardCrew />} />
-            <Route path="/crew/maintenance-task/mytask" element={<MyTask />} /> 
+        <Route path="/crew/dashboard" element={<DashboardCrew />} />
+        <Route path="/crew/maintenance-task/mytask" element={<MyTask />} /> 
         <Route path="/crew/maintenance-task/mytask/:id" element={<CrewTaskDetails />} /> 
         <Route path="/crew/maintenance-task/mytask/edit" element={<CrewTaskEdit />} /> 
         <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
@@ -160,6 +161,7 @@ function App() {
         <Route path="/crew/maintenance-task/document/:id" element={<CrewDocumentDetails />} /> 
         <Route path="/crew/notifications" element={<Notifications />} />
         <Route path="/crew/settings" element={<CrewSetting />} />
+        
 
         </Route>
       </Routes>

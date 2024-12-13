@@ -52,7 +52,7 @@ const CrewDocumentDetails = () => {
             <div className="card-wraper">
               <div className="p-p-4">
                 <div>
-                  <h5 className="text-base">General Information</h5>
+                  <h5 className="text-base m-0 mb-3">General Information</h5>
                   <div style={{ lineHeight: "2" }}>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Document Name</span>
@@ -73,8 +73,8 @@ const CrewDocumentDetails = () => {
                     </div>
                  
 
-                    <div className="detail-item flex">
-                      <div className="p-grid p-dir-col p-mt-3">
+                    <div className="detail-item flex gap-6">
+                      <div className="labelName">
                         {uploadedFiles.map((file, index) => {
                           const isPdf =
                             file.type === "application/pdf" ||
@@ -111,11 +111,11 @@ const CrewDocumentDetails = () => {
                           );
                         })}
                       </div>
-                      <div className="p-d-flex p-jc-end">
+                      <div className="labelValue">
                         <Button
                           icon="pi pi-download"
                           label="Download"
-                          className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                          className="p-button-outlined p-button-sm download-btn"
                           onClick={downloadAllFiles}
                         />
                       </div>

@@ -310,9 +310,9 @@ ul{
                 font-size: 14px;
                 font-weight: 500;
                 word-wrap: break-word;
+                padding-right: 20px;
                 @include bp.bp(custome-991) {
                   width: 40%;
-                  padding-right: 20px;
                   box-sizing: border-box;
                   line-height: 20px;
                 }
@@ -911,3 +911,14 @@ ul{
      }
   }
 }
+
+
+.download-label{
+  width: 150px;
+  @include bp.bp(custome-568) {
+    max-width: 80px;
+  }
+}
+
+
+

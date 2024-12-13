@@ -57,7 +57,7 @@ const CrewTaskDetails = () => {
           </div>
           <div className="sub-header-right">
          
-       <Button label="Log Task" severity="primary" outlined className="p-button-primary" onClick={editMaintenancePage}/>
+            <Button label="Log Task" severity="primary" outlined className="p-button-primary" onClick={editMaintenancePage}/>
 
           </div>
         </div>
@@ -69,7 +69,7 @@ const CrewTaskDetails = () => {
                     <div className="card-wraper">
                     <div className="p-p-4">
                 <div>
-                  <h5 className='text-base'>Task Information</h5>
+                  <h5 className='text-base m-0 mb-3'>Task Information</h5>
                   <div style={{ lineHeight: '2' }}>
                     <div className="detail-item flex gap-6">
                       <span className='labelName'>Vessle Name</span><span className='labelValue'>Sea Dreamer</span>
@@ -100,13 +100,13 @@ const CrewTaskDetails = () => {
                     </div>
 
                     <div className="detail-item flex gap-6">
-                    <span className='labelName'>Note</span> <span className='labelValue'>Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components</span>
+                        <span className='labelName'>Note</span> <span className='labelValue'>Regular oil changes are essential to keep engines running smoothly and prevent wear on internal components</span>
                     </div>
 
                 
 
-                    <div className="detail-item flex gap-5">
-                      <div className="p-grid p-dir-col p-mt-3">
+                    <div className="detail-item flex gap-6">
+                      <div className="labelName">
                         {uploadedFiles.map((file, index) => {
                           const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
@@ -127,11 +127,11 @@ const CrewTaskDetails = () => {
                           );
                         })}
                       </div>
-                      <div className="p-d-flex p-jc-end">
+                      <div className="labelValue">
                       <Button
                         icon="pi pi-download"
                         label="Download"
-                        className="p-button-outlined p-button-sm p-mt-3 ml-6 download-btn"
+                        className="p-button-outlined p-button-sm p-mt-3 download-btn"
                         onClick={downloadAllFiles}
                       />
                     </div>
