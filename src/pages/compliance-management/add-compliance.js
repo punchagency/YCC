@@ -378,7 +378,7 @@ const AddCompliance = () => {
                   <h5>Inspection Details</h5>
                   <form>
                     <div className="grid">
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="inspection">Inspection Details</label>
                         <Dropdown
                           id="inspection"
@@ -390,7 +390,7 @@ const AddCompliance = () => {
                           className="w-full mt-2"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="flagState">Inspection Date</label>
                         <Calendar
                           id="dob"
@@ -402,7 +402,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="authority">Issuing Authority</label>
                         <Dropdown
                           id="authority"
@@ -415,7 +415,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="inspectorName">Inspector’s Name</label>
                         <InputText
                           id="inspectorName"
@@ -423,7 +423,7 @@ const AddCompliance = () => {
                           className="w-full mt-2 p-inputtext p-component"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="inspectorEmail">Email address</label>
                         <InputText
                           id="inspectorEmail"
@@ -433,7 +433,7 @@ const AddCompliance = () => {
                           placeholder="Inspector’s email"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="inspectorPhone">Phone no</label>
                         <InputText
                           id="inspectorPhone"
@@ -489,7 +489,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="category">Categories</label>
                         <Dropdown
                           id="category"
@@ -506,7 +506,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="deficiency">
                           Severity of Deficiency
                         </label>
@@ -570,7 +570,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="department">
                           Responsible Person/Department
                         </label>
@@ -589,7 +589,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="flagState">
                           Target Completion Date
                         </label>
@@ -602,7 +602,7 @@ const AddCompliance = () => {
                           className="w-full mt-2 p-input-calender"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="actionStatus">Status</label>
                         <Dropdown
                           id="actionStatus"
@@ -619,7 +619,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="inspectionDate">
                           Follow-Up Inspection Date ( Optional )
                         </label>
@@ -633,7 +633,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="uploadDocuments">
                           Upload Supporting Documents
                         </label>
@@ -692,7 +692,7 @@ const AddCompliance = () => {
                   <h5>Compliance Verification</h5>
                   <form>
                     <div className="grid">
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="complianceStatus">
                           Return to Compliance
                         </label>
@@ -711,7 +711,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="verificationOfficerName">
                           Verification Officer Name (Optional)
                         </label>
@@ -721,7 +721,7 @@ const AddCompliance = () => {
                           className="w-full mt-2 p-inputtext p-component"
                         />
                       </div>
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="uploadDocuments">
                           Upload Supporting Documents
                         </label>
@@ -780,7 +780,7 @@ const AddCompliance = () => {
                   <h5 className="mt-4">Next Scheduled</h5>
                   <form>
                     <div className="grid">
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="scheduledDate">Date</label>
 
                         <Calendar
@@ -793,7 +793,7 @@ const AddCompliance = () => {
                         />
                       </div>
 
-                      <div className="col-6">
+                      <div className="col-12 md:col-6">
                         <label htmlFor="scheduledType">Type</label>
                         <Dropdown
                           id="scheduledType"
