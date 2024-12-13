@@ -31,11 +31,11 @@ const MaintenanceHistory = () => {
   useEffect(() => {
     setTimeout(() => {
       const fetchedDocument = [
-        { id: 1, name: "ISM Code Audit Report", assign: "Administrator", logDate: "Sea Dreamer", workingHours: "MCA" },
-        { id: 2, name: "ISM Code Audit Report", assign: "Administrator", logDate: "Sea Dreamer", workingHours: "MCA" },
-        { id: 3, name: "ISM Code Audit Report", assign: "Administrator", logDate: "Sea Dreamer", workingHours: "MCA" },
-        { id: 4, name: "ISM Code Audit Report", assign: "Administrator", logDate: "Sea Dreamer", workingHours: "MCA" },
-        { id: 5, name: "ISM Code Audit Report", assign: "Administrator", logDate: "Sea Dreamer", workingHours: "MCA" },
+        { id: 1, name: "Oil Change", assign: "Robert Fox", logDate: "12/10/2024", workingHours: "8 hours" },
+        { id: 2, name: "Check Fuel and Oil Levels", assign: "Brooklyn Simmons", logDate: "13/10/2024", workingHours: "5 hours" },
+        { id: 3, name: "Visual Inspection of Engine Room", assign: "Jacob Jones", logDate: "14/10/2024", workingHours: "12 hours" },
+        { id: 4, name: "Check Bilge", assign: "Arlene McCoy", logDate: "15/10/2024", workingHours: "4 hours" },
+        { id: 5, name: "Safety Gear", assign: "Ronald Richards", logDate: "17/10/2024", workingHours: "2 hours" },
 
       ];
       setDocuments(fetchedDocument);
@@ -69,42 +69,7 @@ const MaintenanceHistory = () => {
 
 
 
-  const actionBodyTemplate = (rowData) => (
-    <>
-      <Button
-        icon="pi pi-ellipsis-v"
-        className="p-button-rounded p-button-text"
-        onClick={(e) => menuRef.current.toggle(e)}
-      />
-      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
-        <Button
-          label="Edit"
-          icon="pi pi-pencil"
-          className="p-button-text w-full"
-          onClick={(e) => navigate(`/crew/maintenance-task/history/edit`)}
-        />
-        <Button
-          label="Update"
-          icon="pi pi-list-check"
-          className="p-button-text w-full"
-          onClick={() => console.log('Update', rowData)}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-text w-full"
-          onClick={() => console.log('Delete', rowData)}
-        />
-        <Button
-          label="Renew"
-          icon="pi pi-refresh"
-          className="p-button-text w-full"
-          onClick={() => console.log('Renew', rowData)}
-        />
 
-      </OverlayPanel>
-    </>
-  );
 
   const skeletonTemplate = () => (
     <>
@@ -159,7 +124,7 @@ const MaintenanceHistory = () => {
             <Column field="workingHours" header="Working Hours" />
 
 
-            <Column body={loading ? skeletonTemplate : actionBodyTemplate} style={{ width: '10%' }} />
+            
           </DataTable>
         </div>
       </div>
