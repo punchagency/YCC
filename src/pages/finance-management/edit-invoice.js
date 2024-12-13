@@ -10,7 +10,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { InputTextarea } from "primereact/inputtextarea";
 
-const AddInvoice = () => {
+const EditInvoice = () => {
   const [date, setDate] = useState(null);
   const [day, setDay] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -57,12 +57,13 @@ const AddInvoice = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Add New Invoice</h3>
+            <h3>Edit Invoice</h3>
             <p>All all details here</p>
           </div>
         </div>
         <div className="sub-header-right">
           <Button
+          onClick={goInvoicePage}
             label="Cancel"
             icon="pi pi-times-circle"
             severity="secondary"
@@ -90,7 +91,7 @@ const AddInvoice = () => {
         <div className="card">
           <div className="card-wraper">
             <div className="form-container">
-              <h5>Add Warranty</h5>
+              <h5>Edit Warranty</h5>
               <form>
                 <div className="grid">
                   <div className="col-12 md:col-6">
@@ -250,4 +251,4 @@ const AddInvoice = () => {
   );
 };
 
-export default AddInvoice;
+export default EditInvoice;

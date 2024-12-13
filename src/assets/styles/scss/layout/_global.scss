@@ -178,6 +178,26 @@ ul{
   @include bp.bp(custome-375) {
     padding: 20px 15px;
   }
+  .form-container{
+    .p-tabview{
+        .p-tabview-nav-container{
+            .p-tabview-nav-content{
+               .p-tabview-nav{
+                  display: flex;
+                  flex-direction: row;
+                  width: 100%;
+                 //  border-bottom: 2px solid #d1d5db;
+                  .p-unselectable-text{
+                      .p-tabview-nav-link{
+                         font-size: 14px;
+                         color: #212121;
+                      }
+                  }
+               }
+            }
+        }
+    }
+  }
 }
 
 .v-grid {
@@ -291,7 +311,7 @@ ul{
                 font-weight: 500;
                 word-wrap: break-word;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 40%;
                   padding-right: 20px;
                   box-sizing: border-box;
                   line-height: 20px;
@@ -309,7 +329,7 @@ ul{
                 justify-content: space-between;
                 overflow-wrap: anywhere;
                 @include bp.bp(custome-991) {
-                  width: 50%;
+                  width: 60%;
                   padding-left: 20px;
                   box-sizing: border-box;
                 }
@@ -792,7 +812,9 @@ ul{
 
 
 .filter-dropdown {
-  max-width: 100px;
+  @include bp.bp(mid-desktop2) {
+    max-width: 100px;
+  }
   @include bp.bp(phone-end) {
     max-width: unset;
   }
@@ -800,7 +822,9 @@ ul{
     max-width: 100px;
   }
   .p-dropdown-label{
-    max-width: 50px;
+    @include bp.bp(mid-desktop2) {
+      max-width: 50px;
+    }
     @include bp.bp(phone-end) {
       max-width: unset;
     }
@@ -846,3 +870,44 @@ ul{
   }
 }
 
+.p-paginator{
+  .p-paginator-pages{
+    .p-paginator-page{
+      @include bp.bp(custome-568) {
+        min-width: 1.5rem;
+        height: 1.5rem;
+        font-size: 13px;
+      }
+    }
+  }
+  .p-paginator-first, .p-paginator-prev, .p-paginator-next, .p-paginator-last{
+    @include bp.bp(custome-568) {
+      min-width: 1.5rem;
+      height: 1.5rem;
+      font-size: 13px;
+    }
+  }
+}
+
+.p-datatable {
+  .p-datatable-table{
+    .p-datatable-tbody{
+      td{
+        @include bp.bp(custome-568) {
+          min-width: 200px;
+        }
+      }
+    }
+  }
+}
+
+.p-tabview {
+  .p-tabview-nav{
+     li{
+      .p-tabview-nav-link{
+        border-top-right-radius: 0px;
+        border-top-left-radius: 0px;
+      }
+     }
+  }
+}

@@ -12,7 +12,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 import { RadioButton } from "primereact/radiobutton";
 
-const AddExpense = () => {
+const EditExpense = () => {
   const [vesselName, setVesselName] = useState(null);
   const [category, setCategory] = useState(null);
   const [warranty, setWarranty] = useState(null);
@@ -61,7 +61,7 @@ const AddExpense = () => {
 
   const maintenanceFrequencies = [{ name: "Monthly" }, { name: "Yearly" }];
 
-  const goEquipmentPage = () => {
+  const goExpensePage = () => {
     navigate("/finance-management/expense");
   };
 
@@ -75,12 +75,13 @@ const AddExpense = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Add New Expense</h3>
+            <h3>Edit Expense</h3>
             <p>All all details here</p>
           </div>
         </div>
         <div className="sub-header-right">
           <Button
+           onClick={goExpensePage}
             label="Cancel"
             icon="pi pi-times-circle"
             severity="secondary"
@@ -88,14 +89,14 @@ const AddExpense = () => {
             className="p-button-secondary mr-3"
           />
           <Button
-            onClick={goEquipmentPage}
+            onClick={goExpensePage}
             label="Save"
             icon="pi pi-save"
             className="p-button-primary mr-3"
             type="button"
           />
           <Button
-            onClick={goEquipmentPage}
+            onClick={goExpensePage}
             label="Save & Add Another"
             icon="pi pi-save"
             className="p-button-primary mr-3"
@@ -107,7 +108,7 @@ const AddExpense = () => {
         <div className="card">
           <div className="card-wraper">
             <div className="form-container">
-              <h5>Add Expense</h5>
+              <h5>Edit Expense</h5>
               <form>
                 <div className="grid">
                   <div className="col-12 md:col-6">
@@ -359,4 +360,4 @@ const AddExpense = () => {
   );
 };
 
-export default AddExpense;
+export default EditExpense;

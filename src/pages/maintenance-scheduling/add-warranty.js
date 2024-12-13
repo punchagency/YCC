@@ -71,16 +71,16 @@ const AddWarranty = () => {
             />
             <Button
               onClick={goEquipmentPage}
-              label="Save"
-              icon="pi pi-save"
+              label="Save & Add Another"
+              icon="pi pi-file-export"
               className="p-button-primary mr-3"
               type="button"
             />
             <Button
               onClick={goEquipmentPage}
-              label="Save & Add Another"
+              label="Save"
               icon="pi pi-save"
-              className="p-button-primary mr-3"
+              className="p-button-primary"
               type="button"
             />
           </div>
@@ -92,7 +92,7 @@ const AddWarranty = () => {
                 <h5>Add Warranty</h5>
                 <form>
                   <div className="grid">
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="equipmentName">Equipment/Part Name</label>
                       <InputText
                         id="equipmentName"
@@ -100,7 +100,7 @@ const AddWarranty = () => {
                         className="w-full mt-2 p-inputtext p-component"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="serialNo">Serial Number</label>
                       <InputText
                         id="serialNo"
@@ -109,7 +109,7 @@ const AddWarranty = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="warranty">Warranty Status</label>
                       <Dropdown
                         id="warranty"
@@ -123,7 +123,7 @@ const AddWarranty = () => {
                         className="w-full mt-2"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="date">Warranty Expiration Date</label>
                       <Calendar
                         id="date"
@@ -134,7 +134,7 @@ const AddWarranty = () => {
                         className="w-full mt-2 p-input-calender"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="warrantyCoverage">
                         Warranty Coverage
                       </label>
@@ -144,7 +144,7 @@ const AddWarranty = () => {
                         className="w-full mt-2 p-inputtext p-component"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="manufacturer">Manufacturer</label>
                       <InputText
                         id="manufacturer"
@@ -152,7 +152,7 @@ const AddWarranty = () => {
                         className="w-full mt-2 p-inputtext p-component"
                       />
                     </div>
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="supplierName">Supplier name</label>
                       <InputText
                         id="supplierName"
@@ -161,7 +161,7 @@ const AddWarranty = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="supplierNo">Supplier phone no</label>
                       <InputText
                         id="supplierNo"
@@ -170,7 +170,7 @@ const AddWarranty = () => {
                       />
                     </div>
 
-                    <div className="col-6">
+                    <div className="col-12 md:col-6">
                       <label htmlFor="warrantyTime">
                         Warranty expiration Soon Threshold ( Reminder)
                       </label>
@@ -181,7 +181,7 @@ const AddWarranty = () => {
                       />
                     </div>
 
-                    <div className="col-6 mt-3">
+                    <div className="col-12 md:col-6 mt-3">
                       <Dropdown
                         id="day"
                         value={day}

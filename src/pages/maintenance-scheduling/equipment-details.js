@@ -84,13 +84,7 @@ const EquipmentDetails = () => {
                       </span>
                     </div>
 
-                    <div className="detail-item flex gap-4">
-                      <span className="labelName">Note</span>{" "}
-                      <span className="labelValue">
-                        Regular oil changes are essential to keep engines
-                        running smoothly and prevent wear on internal components
-                      </span>
-                    </div>
+                 
                   </div>
                 </div>
               </div>

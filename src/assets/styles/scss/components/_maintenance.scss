@@ -15,9 +15,9 @@
           font-size: 14px;
           color: #9E9E9E;
           font-weight: 500;
-          
+          width: 150px;
           @include bp.bp(custome-568) {
-            max-width: 150px;
+            max-width: 80px;
           }
         }
         .labelValue{

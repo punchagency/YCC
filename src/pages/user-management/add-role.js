@@ -56,9 +56,9 @@ const AddRole = () => {
         <div className="card-wrapper-gap">
           <div className="card">
             <div className="card-wraper">
-              <h4 className="mb-3">Role Information</h4>
+              <h4 className="m-0 mb-3">Role Information</h4>
               <div className="field mb-3">
-                <label htmlFor="roleTitle" className="block font-medium mb-1">
+                <label htmlFor="roleTitle">
                   Role Title
                 </label>
                 <InputText
@@ -70,7 +70,7 @@ const AddRole = () => {
                 />
               </div>
               <div className="field">
-                <label className="block font-medium mb-2">Permissions</label>
+                <label>Permissions</label>
                 {permissionList.map((permission, index) => (
                   <div key={index} className="field-checkbox">
                     <Checkbox

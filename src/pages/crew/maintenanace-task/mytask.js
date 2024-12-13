@@ -88,6 +88,16 @@ const MyTask = () => {
             color: "#000000",
         },
     };
+
+
+    const getActiveTabClass = () => {
+        if (activeIndex === 0) return 'in-progress';
+        if (activeIndex === 1) return 'pending';
+        if (activeIndex === 2) return 'completed';
+        return '';
+    };
+    
+
     const renderTaskTable = (filteredTasks) => (
         <DataTable value={filteredTasks} paginator rows={5} onRowClick={handleRowClick} rowClassName="pointer-row">
             <Column field="name" header="Task Name" />
@@ -98,7 +108,7 @@ const MyTask = () => {
                 field="status"
                 header="Status"
                 body={(rowData) => {
-                    const styles = statusStyles[rowData.status] || statusStyles.Default; // Fallback to Default if no match
+                    const styles = statusStyles[rowData.status] || statusStyles.Default; 
                     return (
                         <span
                             style={{
@@ -176,7 +186,7 @@ const MyTask = () => {
                 </div>
 
                 <div className="card-wrapper-gap">
-                    <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
+                    <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} className={`tabview-${getActiveTabClass()}`}>
                         <TabPanel header="InProgress" headerClassName='progressHeading'>
                             {renderTaskTable(filterTasks('InProgress'))}
                         </TabPanel>
