@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
-import PDFIcon from "../../assets/images/pdf.svg";
+import PDFIcon from "../../../assets/images/pdf.svg";
 
 const EditDocument = () => {
   const [documentName, setDocumentName] = useState(null);

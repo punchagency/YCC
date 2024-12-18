@@ -89,7 +89,7 @@ const Role = () => {
     <>
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left">
-            <h3>Roles</h3>
+            <h3>Head of Department</h3>
             <p>List of all Roles</p>
           </div>
           <div className="sub-header-right flex align-items-center">

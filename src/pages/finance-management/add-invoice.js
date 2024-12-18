@@ -36,7 +36,7 @@ const AddInvoice = () => {
     );
   };
 
-  const statuses = [{ name: "Online" }, { name: "Offline" }];
+  const statuses = [{ name: "Paid" }, { name: "Unpaid" }];
 
   const days = [{ name: "Days" }, { name: "Months" }];
   const goInvoicePage = () => {

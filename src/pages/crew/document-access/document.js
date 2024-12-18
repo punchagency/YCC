@@ -29,15 +29,15 @@ const Document = () => {
           category: "Manuals",
           associatedVessel: "Sea Dreamer",
           date: "25/10/2025",
-          fileType: "pdf"
+          fileType: "pdf",
         },
         {
           id: 2,
           name: "Crew Certification (STCW)",
           category: "Schematics",
           associatedVessel: "The Black Pearl",
-           date: "25/10/2025",
-          fileType: "xls"
+          date: "25/10/2025",
+          fileType: "xls",
         },
         {
           id: 3,
@@ -45,7 +45,7 @@ const Document = () => {
           category: "Safety Docs",
           associatedVessel: "Andiamo",
           date: "25/10/2025",
-          fileType: "doc"
+          fileType: "doc",
         },
         {
           id: 4,
@@ -53,7 +53,7 @@ const Document = () => {
           category: "Safety Docs",
           associatedVessel: "Andiamo",
           date: "25/10/2025",
-          fileType: "pdf"
+          fileType: "pdf",
         },
         {
           id: 5,
@@ -61,7 +61,7 @@ const Document = () => {
           category: "Safety Docs",
           associatedVessel: "Andiamo",
           date: "25/10/2025",
-          fileType: "doc"
+          fileType: "doc",
         },
       ];
       setDocuments(fetchedDocument);
@@ -84,7 +84,6 @@ const Document = () => {
         (document) => document.category === selectedCategory
       );
     }
-   
 
     if (searchText.trim()) {
       filteredData = filteredData.filter((doc) =>
@@ -94,12 +93,7 @@ const Document = () => {
       );
     }
     setFilteredDocument(filteredData);
-  }, [
-    documents,
-    selectedVessel,
-    selectedCategory,
-    searchText,
-  ]);
+  }, [documents, selectedVessel, selectedCategory, searchText]);
 
   // Apply filters when dependencies change
   useEffect(() => {
@@ -111,15 +105,14 @@ const Document = () => {
     ...new Set(documents.map((document) => document.category)),
   ].map((category) => ({ name: category, value: category }));
 
-  const associatedVessels = [...new Set(documents.map((document) => document.associatedVessel))].map(
-    (associatedVessel) => ({ name: associatedVessel, value: associatedVessel })
-  );
-
+  const associatedVessels = [
+    ...new Set(documents.map((document) => document.associatedVessel)),
+  ].map((associatedVessel) => ({
+    name: associatedVessel,
+    value: associatedVessel,
+  }));
 
   const op = useRef(null);
-
-
-  
 
   const fileTypeBodyTemplate = (rowData) => {
     const fileIcons = {
@@ -140,7 +133,9 @@ const Document = () => {
       />
     );
   };
- 
+  const goToAddDocumentPage = () => {
+    navigate("/crew/task-schedule/document/new");
+  };
 
   return (
     <>
@@ -171,8 +166,12 @@ const Document = () => {
             placeholder="Category"
             className="mr-3"
           />
-       
-      
+          <Button
+            label="Add Documents"
+            icon="pi pi-plus"
+            onClick={goToAddDocumentPage}
+            className="p-button-primary"
+          />
         </div>
 
         <div className="sub-header-right sub-header-small-desktop ">
@@ -203,22 +202,26 @@ const Document = () => {
                 placeholder="Category"
                 className="mr-3"
               />
-          
             </div>
           </OverlayPanel>
           <div className="p-input-icon-left search mr-3">
-              <i className="pi pi-search" />
-              <InputText type="search" placeholder="Search" />
-            </div>
-            <Calendar
-              value={date}
-              onChange={(e) => setDate(e.value)}
-              className="p-calendar"
-              placeholder="Date"
-              style={{ maxWidth: '111px' }}
-              showIcon
-            />  
-          
+            <i className="pi pi-search" />
+            <InputText type="search" placeholder="Search" />
+          </div>
+          <Calendar
+            value={date}
+            onChange={(e) => setDate(e.value)}
+            className="p-calendar mr-3"
+            placeholder="Date"
+            style={{ maxWidth: "111px" }}
+            showIcon
+          />
+          <Button
+            label="Add Documents"
+            icon="pi pi-plus"
+            onClick={goToAddDocumentPage}
+            className="p-button-primary"
+          />
         </div>
       </div>
       <div className="card-wrapper-gap">
@@ -231,7 +234,7 @@ const Document = () => {
           paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
           onRowClick={(e) =>
-            navigate(`/crew/maintenance-task/document/${e.data.id}`)
+            navigate(`/crew/task-schedule/document/${e.data.id}`)
           }
           rowClassName="pointer-row"
         >
@@ -241,7 +244,6 @@ const Document = () => {
           <Column field="date" header="Date Added" />
           <Column body={fileTypeBodyTemplate} header="File Type" />
           <Column body={downloadButtonTemplate} />
-      
         </DataTable>
       </div>
     </>

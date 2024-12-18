@@ -27,7 +27,7 @@ const CrewDocumentDetails = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/crew/maintenance-task/document">
+            <Link to="/crew/task-schedule/document">
               <i className="pi pi-angle-left"></i>
             </Link>
           </div>

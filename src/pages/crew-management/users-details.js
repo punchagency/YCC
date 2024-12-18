@@ -10,11 +10,11 @@ const UserDetails = () => {
   useParams();
   const [activeIndex, setActiveIndex] = useState(0);
   const editUser = () => {
-    navigate ("/crew-management/users/edit")
-  }
+    navigate("/crew-management/crews/edit");
+  };
   const assignTask = () => {
-    navigate ("/coming-soon")
-  }
+    navigate("/coming-soon");
+  };
 
   // You can now use the userId to fetch or display the specific user details
   return (
@@ -22,7 +22,7 @@ const UserDetails = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/crew-management/users">
+            <Link to="/crew-management/crews">
               {" "}
               {/* Replace "/previous-page" with your target route */}
               <i className="pi pi-angle-left"></i>
@@ -34,6 +34,14 @@ const UserDetails = () => {
           </div>
         </div>
         <div className="sub-header-right">
+        <Button
+            label="Join Vessel"
+            icon="pi pi-user-edit"
+            severity="secondary"
+            outlined
+            className="p-button-secondary mr-3"
+            //onClick={editUser}
+          />
           <Button
             label="Edit"
             icon="pi pi-user-edit"
@@ -151,6 +159,33 @@ const UserDetails = () => {
                     className="details-card"
                     title={
                       <div className="card-header">
+                        <span>Medical Information</span>
+                        <div className="three-dot-menu"></div>
+                      </div>
+                    }
+                  >
+                    <div className="details-overview">
+                      <div className="details-content">
+                        <div className="details-content-lable">
+                          Medical Restrictions
+                        </div>
+                        <div className="details-content-text">
+                          Peanuts, tree nuts, dairy, gluten, or eggs. Yacht
+                          kitchens often need to accommodate dietary
+                          restrictions for safety.
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+
+              <div className="item">
+                <div className="card flex justify-content-center">
+                  <Card
+                    className="details-card"
+                    title={
+                      <div className="card-header">
                         <span>Professional Information</span>
                         <div className="three-dot-menu"></div>
                       </div>
@@ -192,33 +227,6 @@ const UserDetails = () => {
                     className="details-card"
                     title={
                       <div className="card-header">
-                        <span>Medical Information</span>
-                        <div className="three-dot-menu"></div>
-                      </div>
-                    }
-                  >
-                    <div className="details-overview">
-                      <div className="details-content">
-                        <div className="details-content-lable">
-                          Medical Restrictions
-                        </div>
-                        <div className="details-content-text">
-                          Peanuts, tree nuts, dairy, gluten, or eggs. Yacht
-                          kitchens often need to accommodate dietary
-                          restrictions for safety.
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-              </div>
-
-              <div className="item">
-                <div className="card flex justify-content-center">
-                  <Card
-                    className="details-card"
-                    title={
-                      <div className="card-header">
                         <span>Account Information</span>
                         <div className="three-dot-menu"></div>
                       </div>
@@ -238,6 +246,60 @@ const UserDetails = () => {
                           Account Type
                         </div>
                         <div className="details-content-text">Admin</div>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
+
+              <div className="item">
+                <div className="card flex justify-content-center">
+                  <Card
+                    className="details-card"
+                    title={
+                      <div className="card-header">
+                        <span>Vessel Details</span>
+                        <div className="three-dot-menu"></div>
+                      </div>
+                    }
+                  >
+                    <div className="details-overview">
+                      <div className="details-content">
+                        <div className="details-content-lable">Vessel Name</div>
+                        <div className="details-content-text">
+                          United States of America (USA)
+                        </div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">
+                          Registration No
+                        </div>
+                        <div className="details-content-text">USA6789</div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">Vessel Type</div>
+                        <div className="details-content-text">Motor Yacht</div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">Year Built</div>
+                        <div className="details-content-text">2023</div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">
+                          Manufacturer
+                        </div>
+                        <div className="details-content-text">Feadship </div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">
+                          Vessel Status
+                        </div>
+                        <div
+                          className="details-content-text"
+                          style={{ color: "#22C55E" }}
+                        >
+                          Active
+                        </div>
                       </div>
                     </div>
                   </Card>

@@ -42,13 +42,16 @@ const AddExpense = () => {
     );
   };
 
-  const categories = [{ name: "Fuel" }, { name: "Crew" }];
-
   const paymentMethods = [{ name: "Credit Card" }, { name: "Cash" }];
 
   const paymentStatuses = [{ name: "Paid" }, { name: "Unpaid" }];
 
-  const departments = [{ name: "Engineering" }, { name: "IT Engineer" }];
+  const departments = [
+    { name: "Engineering" }, 
+    { name: "Interior" }, 
+    { name: "Exterior" }, 
+    { name: "Chef" }
+  ];
 
   const maintenanceFrequencies = [{ name: "Monthly" }, { name: "Yearly" }];
 
@@ -113,16 +116,10 @@ const AddExpense = () => {
 
                   <div className="col-12 md:col-6">
                     <label htmlFor="category">Expense Category</label>
-                    <Dropdown
-                      id="category"
-                      value={category}
-                      onChange={(e) => setCategory(e.value)}
-                      options={categories}
-                      optionLabel="name"
-                      placeholder={
-                        categories.length > 0 ? categories[0].name : "Select"
-                      }
-                      className="w-full mt-2"
+                    <InputText
+                      id="expenseCat"
+                      placeholder="Enter expense category"
+                      className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
                   <div className="col-12 md:col-6">

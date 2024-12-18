@@ -6,8 +6,8 @@ import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Divider } from "primereact/divider";
-import wallimage from "../../assets/images/wall-clock.svg";
-import PDFIcon from "../../assets/images/pdf.svg";
+import wallimage from "../../../assets/images/wall-clock.svg";
+import PDFIcon from "../../../assets/images/pdf.svg";
 
 const DocumentDetails = () => {
   // Access the userId from the URL

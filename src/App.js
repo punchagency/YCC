@@ -11,7 +11,8 @@ import UserDetails from "./pages/crew-management/users-details";
 import AddUser from "./pages/crew-management/add-users";
 import Vessels from "./pages/vessel-management/vessels";
 import AddVessel from "./pages/vessel-management/add-vessels";
-import Documents from "./pages/document-management/documents";
+import VesselScheduleCalendar from "./pages/vessel-management/schedule-calendar ";
+import Documents from "./pages/compliance-management/document-management/documents";
 import Maintenance from "./pages/maintenance-scheduling/maintenance";
 import AddMaintenance from "./pages/maintenance-scheduling/add-maintenance";
 import MaintenanceDetails from "./pages/maintenance-scheduling/maintenance-details";
@@ -20,9 +21,9 @@ import Equipment from "./pages/maintenance-scheduling/equipment";
 import EquipmentDetails from "./pages/maintenance-scheduling/equipment-details";
 import Addequipment from "./pages/maintenance-scheduling/add-equipment";
 import EditEquipment from "./pages/maintenance-scheduling/edit-equipment";
-import AddDocument from "./pages/document-management/add-document";
-import DocumentDetails from "./pages/document-management/document-details";
-import EditDocument from "./pages/document-management/edit-document";
+import AddDocument from "./pages/compliance-management/document-management/add-document";
+import DocumentDetails from "./pages/compliance-management/document-management/document-details";
+import EditDocument from "./pages/compliance-management/document-management/edit-document";
 import Warranty from "./pages/maintenance-scheduling/warranty";
 import AddWarranty from "./pages/maintenance-scheduling/add-warranty";
 import WarrantyDetails from "./pages/maintenance-scheduling/warranty-details";
@@ -61,6 +62,7 @@ import ComingSoon from "./pages/coming-soon";
 import EditUser from "./pages/crew-management/edit-user";
 import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
+import CrewAddDocument from "./pages/crew/document-access/add-document";
 
 function App() {
   return (
@@ -74,9 +76,9 @@ function App() {
         <Route element={<Layout role="Captain" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crew-management/role" element={<Role />} />
-          <Route path="/crew-management/users" element={<Users />} />
-          <Route path="/crew-management/users/new" element={<AddUser />} />
-          <Route path="/crew-management/users/edit" element={<EditUser />} />
+          <Route path="/crew-management/crews" element={<Users />} />
+          <Route path="/crew-management/crews/new" element={<AddUser />} />
+          <Route path="/crew-management/crews/edit" element={<EditUser />} />
           <Route path="/vessel-management/vessels" element={<Vessels />} />
           <Route
             path="/vessel-management/vessels/new"
@@ -89,6 +91,10 @@ function App() {
           <Route
             path="/vessel-management/vessels/edit"
             element={<EditVessel />}
+          />
+          <Route
+            path="/vessel-management/schedule-calendar"
+            element={<VesselScheduleCalendar />}
           />
 
           <Route path="/document-management">
@@ -137,8 +143,8 @@ function App() {
             element={<AddMaintenance />}
           />
           {/* Dynamic Route for User Details */}
-          <Route path="/crew-management/users/:id" element={<UserDetails />} />
-          <Route path="/crew-management/users/edit/:id" element={<AddUser />} />
+          <Route path="/crew-management/crews/:id" element={<UserDetails />} />
+          <Route path="/crew-management/crews/edit/:id" element={<AddUser />} />
           <Route path="/crew-management/role/new" element={<AddRole />} />
           <Route path="/crew-management/role/:id" element={<RoleDetails />} />
 
@@ -160,8 +166,9 @@ function App() {
         <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
         <Route path="/crew/maintenance-task/history/edit" element={<CrewHistoryEdit />} /> 
         <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} />
-        <Route path="/crew/maintenance-task/document" element={<Document />} /> 
-        <Route path="/crew/maintenance-task/document/:id" element={<CrewDocumentDetails />} /> 
+        <Route path="/crew/task-schedule/document" element={<Document />} /> 
+        <Route path="/crew/task-schedule/document/:id" element={<CrewDocumentDetails />} /> 
+        <Route path="/crew/task-schedule/document/new" element={<CrewAddDocument />} />
         <Route path="/crew/notifications" element={<Notifications />} />
         <Route path="/crew/settings" element={<CrewSetting />} />
         
