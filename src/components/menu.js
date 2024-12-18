@@ -7,7 +7,7 @@ import { Button } from "primereact/button";
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   // Define menu items for each role
-  const menuItemsCaptainManager = [
+  const menuItemsCaptain = [
     {
       label: "Dashboard",
       icon: "pi pi-home",
@@ -16,19 +16,19 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "User Management",
+      label: "Crew Management",
       icon: "pi pi-users",
       items: [
         {
-          label: "Role",
+          label: "Head of Department",
           command: () => {
-            navigate("/user-management/role"); // Navigate to the dashboard
+            navigate("/crew-management/role"); // Navigate to the dashboard
           },
         },
         {
-          label: "User",
+          label: "Crew",
           command: () => {
-            navigate("/user-management/users"); // Navigate to the dashboard
+            navigate("/crew-management/users"); // Navigate to the dashboard
           },
         },
       ],
@@ -129,7 +129,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Maintenance scheduling",
+      label: "Maintenance",
       icon: (
         <svg
           width="21"
@@ -282,8 +282,8 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       {/* <PanelMenu model={menuItems} />
             <PanelMenu model={menuItemsCrew} /> */}
       <div>
-        {role === "Captain/Manager" ? (
-          <PanelMenu model={menuItemsCaptainManager} />
+        {role === "Captain" ? (
+          <PanelMenu model={menuItemsCaptain} />
         ) : role === "Crew Member" ? (
           <PanelMenu model={menuItemsCrew} />
         ) : (

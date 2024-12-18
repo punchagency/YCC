@@ -1,8 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
-import LeftMenu from "../components/menu";
-import AdminHeader from "../components/header";
 import { Card } from "primereact/card";
 import { Chart } from "primereact/chart";
 import { Dropdown } from "primereact/dropdown";
@@ -70,17 +68,14 @@ const Dashboard = () => {
   const onFilterChange = (e) => {
     setSelectedFilter(e.value);
     // Add any logic to fetch or update data based on the selected filter here
-    console.log("Selected filter:", e.value);
   };
 
   const onFilterChange1 = (e) => {
     setSelectedFilter1(e.value);
-    console.log("Selected filter 2:", e.value);
   };
 
   const onFilterChange2 = (e) => {
     setSelectedFilter2(e.value);
-    console.log("Selected filter 2:", e.value);
   };
 
   const barData = {

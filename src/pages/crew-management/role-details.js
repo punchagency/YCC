@@ -1,28 +1,24 @@
 import React from 'react'
-import LeftMenu from '../../components/menu'
-import AdminHeader from '../../components/header'
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
-
-
 
 const RoleDetails = () => {
     const navigate = useNavigate();
 
     const goRolePage = () => {
-        navigate("/user-management/role");
+        navigate("/crew-management/role");
       };
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/user-management/role">
+            <Link to="/crew-management/role">
               <i className="pi pi-angle-left"></i>
             </Link>
           </div>
           <div className="content">
-            <h3>Captain/Manager</h3>
+            <h3>Captain</h3>
             <p>All informations are below</p>
           </div>
         </div>
@@ -44,7 +40,7 @@ const RoleDetails = () => {
   <h5 className='text-base m-0 mb-2'>Role Information</h5>
   <div style={{ lineHeight: '2' }}>
     <div className="detail-item flex gap-6">
-      <span className='labelName'>Role Name</span><span className='labelValue'>Captain/Manager</span>
+      <span className='labelName'>Role Name</span><span className='labelValue'>Captain</span>
     </div>
     <div className="detail-item flex gap-6">
     <span className='labelName'>Permission</span> <span className='labelValue'>demo permission</span>

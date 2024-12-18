@@ -34,8 +34,6 @@ const ForgotPasswordForm = () => {
             alert('Please correct the errors before submitting.');
             return;
         }
-
-        console.log('Forgot Password Request:', email);
         // Add your forgot password logic here
 
         // Assuming the email is valid and the request is successful

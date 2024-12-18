@@ -1,12 +1,9 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react'; 
 import { useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
 import { Skeleton } from 'primereact/skeleton';
 import { OverlayPanel } from 'primereact/overlaypanel';
 
@@ -15,18 +12,12 @@ const Role = () => {
   const [filteredVessels, setFilteredVessels] = useState([]);
   const [loading, setLoading] = useState(true);
   const menuRef = useRef(null); 
-
-  // State for filters
-  const [selectedType, setSelectedType] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-
   const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
       const fetchedRoles = [
-        { id: 1, name: "Captain/Manager",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Active" },
+        { id: 1, name: "Captain",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Active" },
         { id: 2, name: "Crew Manager",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Inactive" },
         { id: 3, name: "HOD",permission:"Oversees compliance,manage maintenance schedules,log and reports,Financial Management,Assign tasks", status: "Active" },
 
@@ -43,7 +34,7 @@ const Role = () => {
 
 
   const goToRolePage = () => {
-    navigate("/user-management/role/new");
+    navigate("/crew-management/role/new");
   };
 
   const actionBodyTemplate = (rowData) => (
@@ -120,7 +111,7 @@ const Role = () => {
             tableStyle={{ minWidth: "50rem" }}
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            onRowClick={(e) => navigate(`/user-management/role/${e.data.id}`)}
+            onRowClick={(e) => navigate(`/crew-management/role/${e.data.id}`)}
             rowClassName="pointer-row"
           >
             <Column field="name" header="Role Name" />

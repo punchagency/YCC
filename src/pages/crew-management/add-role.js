@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { Link, useNavigate } from "react-router-dom";
 const AddRole = () => {
@@ -29,7 +27,7 @@ const AddRole = () => {
   };
 const navigate = useNavigate();
   const goRolePage = ()=>{
-    navigate('/user-management/role');
+    navigate('/crew-management/role');
   }
 
   return (
@@ -38,7 +36,7 @@ const navigate = useNavigate();
           {/* Left Section: Heading and Subheading */}
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/user-management/role">
+              <Link to="/crew-management/role">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>

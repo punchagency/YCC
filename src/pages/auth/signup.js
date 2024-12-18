@@ -8,7 +8,6 @@ const Signup = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
   const location = useLocation();
   const role = location.state?.role || 'Guest';
-  console.log("role", role)
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login">
         <div className='flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center' style={{ backgroundImage: `url(${backgroundImage})` }}>

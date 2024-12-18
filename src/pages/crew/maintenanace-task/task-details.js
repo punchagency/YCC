@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Button } from 'primereact/button';
-import LeftMenu from '../../../components/menu';
-import AdminHeader from '../../../components/header';
 import PDFIcon from '../../../assets/images/pdf.svg';
 
 
@@ -16,15 +14,8 @@ const CrewTaskDetails = () => {
       url: 'path/to/example.pdf',
     }
   ]); 
-
-  const [isEditing, setIsEditing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-
-  const handleEdit = () => {
-      setIsEditing(!isEditing);
-      console.log(isEditing ? 'Editing disabled' : 'Editing enabled');
-  };
 
   const downloadAllFiles = () => {
     uploadedFiles.forEach((file) => {
@@ -40,7 +31,7 @@ const CrewTaskDetails = () => {
 
   return (
     <main className="flex h-screen page">
-      {/* <LeftMenu role="Captain/Manager" /> */}
+      {/* <LeftMenu role="Captain" /> */}
       <div className="w-full right-panel-component">
         {/* <AdminHeader /> */}
         <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -116,7 +107,7 @@ const CrewTaskDetails = () => {
                                 {isPdf ? (
                                   <>
                                     {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
-                                    <img src={PDFIcon} className='file-icon p-mr-2' style={{ fontSize: '2rem' }}></img>
+                                    <img src={PDFIcon} className='file-icon p-mr-2' style={{ fontSize: '2rem' }} alt=''></img>
                                     <span className='flex align-items-center'>{file.name}</span>
                                   </>
                                 ) : (

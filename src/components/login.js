@@ -47,7 +47,6 @@ const LoginForm = () => {
   const navigate = useNavigate(); // Add useNavigate hook
   const location = useLocation();
   const role = location.state?.role || "Guest"; // Default to 'Guest' if no role is passed
-  console.log("role", role);
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -61,15 +60,13 @@ const LoginForm = () => {
       alert("Please correct the errors before submitting.");
       return;
     }
-
-    console.log("Login Credentials:", credentials);
     // Add your login logic here
 
     // Assuming login is successful, navigate to Dashboard
     navigate("/dashboard");
 
     // Navigate to different dashboards based on the role
-    if (role === "Captain/Manager") {
+    if (role === "Captain") {
       navigate("/dashboard");
     } else if (role === "Crew Member") {
       navigate("/crew/dashboard");

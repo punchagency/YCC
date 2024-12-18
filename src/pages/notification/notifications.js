@@ -1,6 +1,4 @@
 import { InputText } from "primereact/inputtext";
-import AdminHeader from "../../components/header";
-import LeftMenu from "../../components/menu";
 import { Badge } from "primereact/badge";
 import { useRef, useState } from "react";
 import { Card } from "primereact/card";
@@ -9,7 +7,6 @@ import { Menu } from "primereact/menu";
 
 export default function Notifications({ role }) {
 
-  console.log("roleeee",role);
   const menuRight = useRef(null);
   const items = [
     {
@@ -125,7 +122,7 @@ export default function Notifications({ role }) {
                 </li>
               ))}
             </ul>
-            {role === "Captain/Manager" ? (
+            {role === "Captain" ? (
               <>
 
                 <div className="grid align-items-center justify-content-between mb-3 mt-4 notification-title">

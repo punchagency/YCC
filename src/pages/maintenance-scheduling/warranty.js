@@ -1,8 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -10,7 +8,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Skeleton } from 'primereact/skeleton';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputText } from 'primereact/inputtext';
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Warranty = () => {

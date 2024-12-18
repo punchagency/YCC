@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Menu } from "primereact/menu";
 import { Button } from "primereact/button";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Card } from "primereact/card";
 import { Chart } from "primereact/chart";
 import { Dropdown } from "primereact/dropdown";

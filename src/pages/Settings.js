@@ -1,36 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { TabView, TabPanel } from 'primereact/tabview';
 import { Button } from 'primereact/button';
-import LeftMenu from '../components/menu';
-import AdminHeader from '../components/header';
 import { InputText } from 'primereact/inputtext';
-import { Card } from 'primereact/card';
-import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
-import { InputTextarea } from 'primereact/inputtextarea';
 
 
 const Settings = () => {
 
-  const [oldPassword, setOldPassword] = useState(null);
-  const [newPassword, setNewPassword] = useState(null);
-
-  const [confirmPassword, setConfirmPassword] = useState(null);
-
   const navigate = useNavigate()
-
-
   const goDashboard = () => {
     navigate("/dashboard");
   };
 
-
-
-
   return (
     <main className="flex h-screen page">
-      {/* <LeftMenu role="Captain/Manager" /> */}
+      {/* <LeftMenu role="Captain" /> */}
       <div className="w-full right-panel-component">
         {/* <AdminHeader /> */}
         <div className="flex align-items-center justify-content-between sub-header-panel">

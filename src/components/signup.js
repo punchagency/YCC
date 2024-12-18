@@ -67,21 +67,19 @@ const SignupForm = () => {
     const navigate = useNavigate();  // Add useNavigate hook
     const location = useLocation(); 
     const role = location.state?.role || null; // Default to 'Guest' if no role is passed 
-    console.log("role", role)
     const handleSubmit = (e) => {
         e.preventDefault();
         if (emailError || passwordError || confirmPasswordError || !credentials.fullName || !credentials.email || !credentials.password || !credentials.confirmPassword) {
             alert('Please fix the errors before submitting.');
             return;
         }
-        console.log('Signup Credentials:', credentials);
         // Add your signup logic here
 
         // Assuming login is successful, navigate to Dashboard
         navigate('/dashboard');
 
         // Navigate to different dashboards based on the role
-        if (role === 'Captain/Manager') {
+        if (role === 'Captain') {
             navigate('/dashboard');
         } else if (role === 'Crew Member') {
             navigate('/crew/dashboard');

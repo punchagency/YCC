@@ -5,10 +5,10 @@ import Login from "./pages/auth/login";
 import Signup from "./pages/auth/signup";
 import ForgotPassword from "./pages/auth/forgot-password";
 import Dashboard from "./pages/dashboard";
-import Role from "./pages/user-management/role";
-import Users from "./pages/user-management/users";
-import UserDetails from "./pages/user-management/users-details";
-import AddUser from "./pages/user-management/add-users";
+import Role from "./pages/crew-management/role";
+import Users from "./pages/crew-management/users";
+import UserDetails from "./pages/crew-management/users-details";
+import AddUser from "./pages/crew-management/add-users";
 import Vessels from "./pages/vessel-management/vessels";
 import AddVessel from "./pages/vessel-management/add-vessels";
 import Documents from "./pages/document-management/documents";
@@ -35,14 +35,14 @@ import InvoiceDetails from "./pages/finance-management/invoice-details";
 import Compliance from "./pages/compliance-management/compliance";
 import AddCompliance from "./pages/compliance-management/add-compliance";
 import ComplianceDetails from "./pages/compliance-management/compliance-details";
-import AddRole from "./pages/user-management/add-role";
+import AddRole from "./pages/crew-management/add-role";
 import VesselDetails from "./pages/vessel-management/vessel-details";
 import Reports from "./pages/reports/reports";
 import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
 import DashboardCrew from "./pages/crew/dashboard";
 import ScheduleCalendar from "./pages/maintenance-scheduling/schedule-calendar ";
-import RoleDetails from './pages/user-management/role-details';
+import RoleDetails from './pages/crew-management/role-details';
 import Settings from './pages/Settings';
 import MyTask from './pages/crew/maintenanace-task/mytask';
 import CrewTaskDetails from './pages/crew/maintenanace-task/task-details';
@@ -58,7 +58,7 @@ import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
 import EditCompliance from "./pages/compliance-management/edit-compliance";
 import ComingSoon from "./pages/coming-soon";
-import EditUser from "./pages/user-management/edit-user";
+import EditUser from "./pages/crew-management/edit-user";
 import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 
@@ -71,12 +71,12 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/coming-soon" element={<ComingSoon />} />  
-        <Route element={<Layout role="Captain/Manager" />}>
+        <Route element={<Layout role="Captain" />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/user-management/role" element={<Role />} />
-          <Route path="/user-management/users" element={<Users />} />
-          <Route path="/user-management/users/new" element={<AddUser />} />
-          <Route path="/user-management/users/edit" element={<EditUser />} />
+          <Route path="/crew-management/role" element={<Role />} />
+          <Route path="/crew-management/users" element={<Users />} />
+          <Route path="/crew-management/users/new" element={<AddUser />} />
+          <Route path="/crew-management/users/edit" element={<EditUser />} />
           <Route path="/vessel-management/vessels" element={<Vessels />} />
           <Route
             path="/vessel-management/vessels/new"
@@ -137,17 +137,17 @@ function App() {
             element={<AddMaintenance />}
           />
           {/* Dynamic Route for User Details */}
-          <Route path="/user-management/users/:id" element={<UserDetails />} />
-          <Route path="/user-management/users/edit/:id" element={<AddUser />} />
-          <Route path="/user-management/role/new" element={<AddRole />} />
-          <Route path="/user-management/role/:id" element={<RoleDetails />} />
+          <Route path="/crew-management/users/:id" element={<UserDetails />} />
+          <Route path="/crew-management/users/edit/:id" element={<AddUser />} />
+          <Route path="/crew-management/role/new" element={<AddRole />} />
+          <Route path="/crew-management/role/:id" element={<RoleDetails />} />
 
 
           {/* Report Route */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:reportType" element={<ReportDetails />} />
           {/* Notification Route */}
-          <Route path="/notifications" element={<Notifications role={"Captain/Manager"}/>} />
+          <Route path="/notifications" element={<Notifications role={"Captain"}/>} />
           <Route path="/settings" element={<Settings />} />  
 
         </Route>

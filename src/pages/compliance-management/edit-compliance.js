@@ -1,14 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { type } from "@testing-library/user-event/dist/type";
 import { InputText } from "primereact/inputtext";
 import { TabPanel, TabView } from "primereact/tabview";
 import { Calendar } from "primereact/calendar";
@@ -27,10 +22,6 @@ const EditCompliance = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
 
   const [date, setDate] = useState(null);
-  const [selectedFlug, setSelectedFlug] = useState(null);
-  const [selectedVesselType, setVesselType] = useState(null);
-  const [selectedVesselStatus, setVesselStatus] = useState(null);
-  const [selectedEngineType, setSelectedEngineType] = useState(null);
   const [selectedInspection, setSelectedInspection] = useState(null);
   const [email, setEmail] = useState(null);
   const [phone, setPhone] = useState(null);
@@ -50,14 +41,6 @@ const EditCompliance = () => {
   const [scheduledDate, setScheduledDate] = useState(null);
   const [scheduledType, setScheduledType] = useState(null);
   const [reminder, setReminder] = useState(null);
-  const [taskDescription, setTaskDescription] = useState(null);
-  const [taskCategory, setTaskCategory] = useState(null);
-  const [maintenanceDate, setMaintenanceDate] = useState(null);
-  const [serviceType, setServiceType] = useState(null);
-  const [workDescription, setWorkDescription] = useState(null);
-  const [replacementDate, setReplacementDate] = useState(null);
-  const [financeCategory, setFinanceCategory] = useState(null);
-  const [revenueSource, setRevenueSource] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
 
   const goCompliancePage = () => {
