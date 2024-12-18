@@ -1,15 +1,8 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
-import LeftMenu from "../../../components/menu";
-import AdminHeader from "../../../components/header";
-import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
-import { Skeleton } from 'primereact/skeleton';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { type } from '@testing-library/user-event/dist/type';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 
@@ -19,12 +12,6 @@ const MaintenanceHistory = () => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [date, setDate] = useState(null); // State to store the selected date
-
-  const menuRef = useRef(null);
-  // State for filters
-  const [selectedAuthority, setSelectedAuthority] = useState(null);
-  const [selectedDocumentType, setSelectedDocumentType] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
 
   const navigate = useNavigate();
 
@@ -66,21 +53,6 @@ const MaintenanceHistory = () => {
   useEffect(() => {
     applyFilters();
   }, [applyFilters]);
-
-
-
-
-
-  const skeletonTemplate = () => (
-    <>
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="10%" />
-    </>
-  );
 
   return (
     <main className="flex h-screen page">

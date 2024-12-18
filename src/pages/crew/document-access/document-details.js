@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
+import { Link } from "react-router-dom";
 import { Button } from "primereact/button";
 
 import PDFIcon from "../../../assets/images/pdf.svg";
 
 const CrewDocumentDetails = () => {
-  const navigate = useNavigate();
   const [uploadedFiles] = useState([
     {
       name: "example.pdf",
@@ -14,10 +12,6 @@ const CrewDocumentDetails = () => {
       url: "path/to/example.pdf",
     },
   ]);
-
-  const [activeIndex, setActiveIndex] = useState(0);
-
- 
 
   const downloadAllFiles = () => {
     uploadedFiles.forEach((file) => {
@@ -93,6 +87,7 @@ const CrewDocumentDetails = () => {
                                       src={PDFIcon}
                                       className="file-icon p-mr-2"
                                       style={{ fontSize: "2rem" }}
+                                      alt=""
                                     ></img>
                                     <span className="flex align-items-center">
                                       {file.name}

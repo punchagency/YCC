@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
-import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { type } from "@testing-library/user-event/dist/type";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 
@@ -16,7 +13,6 @@ const Document = () => {
   const [filteredDocument, setFilteredDocument] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
-  const menuRef = useRef(null);
   // State for filters
   const [selectedVessel, setSelectedVessel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { TabView, TabPanel } from 'primereact/tabview';
 import { Button } from 'primereact/button';
-import LeftMenu from '../../../components/menu';
-import AdminHeader from '../../../components/header';
 import { InputText } from 'primereact/inputtext';
 import { Card } from 'primereact/card';
 import { Dropdown } from 'primereact/dropdown';
@@ -13,14 +10,8 @@ import { InputTextarea } from 'primereact/inputtextarea';
 
 const CrewTaskEdit = () => {
 
-    const [documentName, setDocumentName] = useState(null);
-    const [documentType, setDocumentType] = useState(null);
-    const [associatedVessel, setAssociatedVessel] = useState(null);
     const [startDate, setstartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
-    const [startTime, setStartTime] = useState(null);
-    const [endTime, setEndTime] = useState(null)
-    const [uploadDate, setUploadDate] = useState(null);
     const [report, setReport] = useState(null);
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [time, setTime] = useState(null);

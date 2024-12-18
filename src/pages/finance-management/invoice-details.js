@@ -1,49 +1,13 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { TabView, TabPanel } from "primereact/tabview";
-import { Card } from "primereact/card";
-import { color } from "chart.js/helpers";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Divider } from "primereact/divider";
-import { Icon } from "@iconify/react";
-import wallimage from "../../assets/images/wall-clock.svg";
 import PDFIcon from "../../assets/images/pdf.svg";
 
 const InvoiceDetails = () => {
   const navigate = useNavigate();
   useParams();
   const [activeIndex, setActiveIndex] = useState(0);
-
-  const data = [
-    {
-      userName: "Floyd Miles",
-      date: "2/10/2026",
-      time: "4:10 PM",
-      activity: "View",
-    },
-    {
-      userName: "Ralph Edwards",
-      date: "5/10/2026",
-      time: "12:10 PM",
-      activity: "Edit",
-    },
-    {
-      userName: "Arlene McCoy",
-      date: "7/10/2026",
-      time: "8:10 AM",
-      activity: "Edit",
-    },
-    {
-      userName: "Devon Lane",
-      date: "9/10/2026",
-      time: "9:10 PM",
-      activity: "View",
-    },
-  ];
   const [uploadedFiles] = useState([
     {
       name: "example.pdf",
@@ -168,7 +132,7 @@ const InvoiceDetails = () => {
                                 {isPdf ? (
                                   <>
                                     {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
-                                    <img src={PDFIcon} />
+                                    <img src={PDFIcon} alt=""/>
                                     <span className="flex justify-content-center">
                                       {file.name}
                                     </span>

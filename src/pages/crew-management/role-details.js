@@ -1,13 +1,13 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from 'primereact/button';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "primereact/button";
 
 const RoleDetails = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const goRolePage = () => {
-        navigate("/crew-management/role");
-      };
+  const goRolePage = () => {
+    navigate("/crew-management/role");
+  };
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -23,47 +23,43 @@ const RoleDetails = () => {
           </div>
         </div>
         <div className="sub-header-right">
-       
-        <Button
-              onClick={goRolePage}
-              label="Save"
-              icon="pi pi-save"
-              className="p-button-primary"
-              type="button"
-            />
+          <Button
+            onClick={goRolePage}
+            label="Save"
+            icon="pi pi-save"
+            className="p-button-primary"
+            type="button"
+          />
         </div>
       </div>
       <div className="card-wrapper-gap">
-    <div className="card-wraper">
-    <div className="p-p-4">
-<div>
-  <h5 className='text-base m-0 mb-2'>Role Information</h5>
-  <div style={{ lineHeight: '2' }}>
-    <div className="detail-item flex gap-6">
-      <span className='labelName'>Role Name</span><span className='labelValue'>Captain</span>
-    </div>
-    <div className="detail-item flex gap-6">
-    <span className='labelName'>Permission</span> <span className='labelValue'>demo permission</span>
-    </div>
- 
+        <div className="card-wraper">
+          <div className="p-p-4">
+            <div>
+              <h5 className="text-base m-0 mb-2">Role Information</h5>
+              <div style={{ lineHeight: "2" }}>
+                <div className="detail-item flex gap-6">
+                  <span className="labelName">Role Name</span>
+                  <span className="labelValue">Captain</span>
+                </div>
+                <div className="detail-item flex gap-6">
+                  <span className="labelName">Permission</span>{" "}
+                  <span className="labelValue">demo permission</span>
+                </div>
 
-
-    <div className="detail-item flex gap-6">
-    <span className='labelName'>Status</span> <span className='labelValue' style={{color:"#22C55E"}}>Active</span>
-    </div>
-
-
-
-
-  
- 
-  </div>
-</div>
-</div>
-    </div>
-    </div>
+                <div className="detail-item flex gap-6">
+                  <span className="labelName">Status</span>{" "}
+                  <span className="labelValue" style={{ color: "#22C55E" }}>
+                    Active
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default RoleDetails
+export default RoleDetails;

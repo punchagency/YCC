@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { Link, useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
@@ -9,7 +7,6 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputSwitch } from "primereact/inputswitch";
-import { FileUpload } from "primereact/fileupload";
 
 
 const EditVassel = () => {
