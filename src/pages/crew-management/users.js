@@ -38,7 +38,7 @@ const Users = () => {
     }, 500);
   }, []);
   const editUser = () => {
-    navigate ("/user-management/users/edit")
+    navigate ("/crew-management/users/edit")
   }
 
   const actionBodyTemplate = (rowData) => (
@@ -78,11 +78,11 @@ const Users = () => {
 
   // Function to handle row click and navigate to user details page
   const handleRowClick = (rowData) => {
-    navigate(`/user-management/users/${rowData.id}`); // Navigate to the user details page with the user ID
+    navigate(`/crew-management/users/${rowData.id}`); // Navigate to the user details page with the user ID
   };
 
   const goToAddUserPage = () => {
-    navigate("/user-management/users/new");
+    navigate("/crew-management/users/new");
   };
 
   return (

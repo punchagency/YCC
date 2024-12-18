@@ -50,7 +50,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     </>
   );
   const viewAllNotifications = () => {
-    if (role == "Captain/Manager") {
+    if (role == "Captain") {
       navigate("/notifications");
 
     }

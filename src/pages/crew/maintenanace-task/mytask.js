@@ -138,7 +138,6 @@ const MyTask = () => {
 
   const handleRowClick = (event) => {
     const { id } = event.data;
-    console.log("id", id);
     navigate(`/crew/maintenance-task/mytask/${id}`); // Corrected path
   };
 

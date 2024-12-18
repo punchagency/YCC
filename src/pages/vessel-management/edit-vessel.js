@@ -50,7 +50,6 @@ const EditVassel = () => {
   const currentDate = new Date().toLocaleDateString("en-US");
 
   const goVasselPage = () => {
-    // console.log("Navigating to /user-management/users");
     navigate("/vessel-management/vessels");
   };
 

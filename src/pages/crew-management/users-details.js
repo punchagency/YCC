@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
@@ -12,7 +10,7 @@ const UserDetails = () => {
   useParams();
   const [activeIndex, setActiveIndex] = useState(0);
   const editUser = () => {
-    navigate ("/user-management/users/edit")
+    navigate ("/crew-management/users/edit")
   }
   const assignTask = () => {
     navigate ("/coming-soon")
@@ -24,7 +22,7 @@ const UserDetails = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="arrow">
-            <Link to="/user-management/users">
+            <Link to="/crew-management/users">
               {" "}
               {/* Replace "/previous-page" with your target route */}
               <i className="pi pi-angle-left"></i>

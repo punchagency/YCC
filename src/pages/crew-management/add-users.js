@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { Link, useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
@@ -11,7 +9,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Password } from 'primereact/password';
 import { FileUpload } from 'primereact/fileupload';
 
-export default function EditUser () {
+const AddUser = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState(null);
   const [selectedNationality, setSelectedNationality] = useState(null);
@@ -60,12 +58,11 @@ export default function EditUser () {
   ];
 
   const goUserPage = () => {
-    console.log("Navigating to /user-management/users");
-    navigate("/user-management/users");
+    navigate("/crew-management/users");
   };
 
   const handleCancel = () => {
-    navigate("/user-management/users"); // Navigate to the desired page
+    navigate("/crew-management/users"); // Navigate to the desired page
   };
 
 //   const handleFileChange = (event) => {
@@ -89,12 +86,12 @@ export default function EditUser () {
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/user-management/users">
+              <Link to="/crew-management/users">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>
             <div className="content">
-              <h3>Edit User</h3>
+              <h3>Create a New User</h3>
               <p>Enter the user detail and create an user</p>
             </div>
           </div>
@@ -400,3 +397,5 @@ export default function EditUser () {
     </>
   );
 };
+
+export default AddUser;

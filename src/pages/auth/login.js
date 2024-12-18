@@ -13,7 +13,7 @@ const Login = () => {
 
   const getBackgroundImage = (role) => {
     switch (role) {
-      case "Captain/Manager":
+      case "Captain":
         return backgroundImageCaptain;
       case "Crew Member":
         return backgroundImageCrew;
