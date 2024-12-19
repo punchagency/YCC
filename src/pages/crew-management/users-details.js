@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
+import PDFIcon from "../../assets/images/pdf.svg";
 
 const UserDetails = () => {
   const navigate = useNavigate();
@@ -14,6 +15,21 @@ const UserDetails = () => {
   };
   const assignTask = () => {
     navigate("/coming-soon");
+  };
+  const [uploadedFiles] = useState([
+    {
+      name: "Certification",
+      type: "application/pdf",
+      url: "path/to/example.pdf",
+    },
+  ]);
+  const downloadAllFiles = () => {
+    uploadedFiles.forEach((file) => {
+      const a = document.createElement("a");
+      a.href = file.url;
+      a.download = file.name;
+      a.click();
+    });
   };
 
   // You can now use the userId to fetch or display the specific user details
@@ -34,13 +50,13 @@ const UserDetails = () => {
           </div>
         </div>
         <div className="sub-header-right">
-        <Button
+          <Button
             label="Join Vessel"
             icon="pi pi-user-edit"
             severity="secondary"
             outlined
             className="p-button-secondary mr-3"
-            //onClick={editUser}
+          //onClick={editUser}
           />
           <Button
             label="Edit"
@@ -208,13 +224,101 @@ const UserDetails = () => {
                         </div>
                         <div className="details-content-text">12</div>
                       </div>
-                      <div className="details-content">
+                      {/* <div className="details-content">
                         <div className="details-content-lable">
                           Certifications
                         </div>
                         <div className="details-content-text">
-                          devon@yachtcrewcenter.com
+                          sdf
                         </div>
+                      </div> */}
+
+                      {/* <div className="details-content">
+                        <div className="details-content-lable">
+                          {uploadedFiles.map((file, index) => {
+                            const isPdf =
+                              file.type === "application/pdf" ||
+                              file.name.toLowerCase().endsWith(".pdf");
+
+                            return (
+                              <div
+                                key={index}
+                                className="p-col-12 p-md-6 p-lg-4 p-d-flex p-ai-center p-jc-between"
+                              >
+                                <div className="p-d-flex p-ai-center flex">
+                                  {file.name}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="details-content-text">
+                          ISM Code Audit Report
+                          <Button
+                            icon="pi pi-download"
+                            label="Download"
+                            className="p-button-outlined p-button-sm download-btn"
+                            onClick={downloadAllFiles}
+                          />
+                        </div>
+                      </div> */}
+
+                    </div>
+                  </Card>
+                </div>
+              </div>
+
+              <div className="item">
+                <div className="card flex justify-content-center">
+                  <Card
+                    className="details-card"
+                    title={
+                      <div className="card-header">
+                        <span>Certification</span>
+                        <div className="three-dot-menu"></div>
+                      </div>
+                    }
+                  >
+                    <div className="details-overview">
+                      <div className="details-content">
+                        <div className="details-content-lable">ISM Code Audit Report</div>
+                        <div className="details-content-text">
+                          <Button
+                            icon="pi pi-download"
+                            label="Download"
+                            className="p-button-outlined p-button-sm download-btn"
+                            onClick={downloadAllFiles}
+                          /></div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">Crew Certification (STCW)</div>
+                        <div className="details-content-text">
+                          <Button
+                            icon="pi pi-download"
+                            label="Download"
+                            className="p-button-outlined p-button-sm download-btn"
+                            onClick={downloadAllFiles}
+                          /></div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">MARPOL Compliance</div>
+                        <div className="details-content-text">
+                          <Button
+                            icon="pi pi-download"
+                            label="Download"
+                            className="p-button-outlined p-button-sm download-btn"
+                            onClick={downloadAllFiles}
+                          /></div>
+                      </div>
+                      <div className="details-content">
+                        <div className="details-content-lable">Annual Financial Report</div>
+                        <div className="details-content-text">
+                          <Button
+                            icon="pi pi-download"
+                            label="Download"
+                            className="p-button-outlined p-button-sm download-btn"
+                            onClick={downloadAllFiles}
+                          /></div>
                       </div>
                     </div>
                   </Card>
@@ -251,6 +355,8 @@ const UserDetails = () => {
                   </Card>
                 </div>
               </div>
+
+              
 
               <div className="item">
                 <div className="card flex justify-content-center">
