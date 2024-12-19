@@ -12,6 +12,7 @@ import AddUser from "./pages/crew-management/add-users";
 import Vessels from "./pages/vessel-management/vessels";
 import AddVessel from "./pages/vessel-management/add-vessels";
 import VesselScheduleCalendar from "./pages/vessel-management/schedule-calendar ";
+import CrewScheduleCalendar from "./pages/crew/maintenanace-task/schedule-calendar ";
 import Documents from "./pages/compliance-management/document-management/documents";
 import Maintenance from "./pages/maintenance-scheduling/maintenance";
 import AddMaintenance from "./pages/maintenance-scheduling/add-maintenance";
@@ -166,6 +167,7 @@ function App() {
         <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
         <Route path="/crew/maintenance-task/history/edit" element={<CrewHistoryEdit />} /> 
         <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} />
+        <Route path="/crew/maintenance-task/schedule-calendar" element={<CrewScheduleCalendar />} /> 
         <Route path="/crew/task-schedule/document" element={<Document />} /> 
         <Route path="/crew/task-schedule/document/:id" element={<CrewDocumentDetails />} /> 
         <Route path="/crew/task-schedule/document/new" element={<CrewAddDocument />} />

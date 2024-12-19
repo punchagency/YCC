@@ -32,7 +32,7 @@ const CrewDocumentDetails = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Engine Maintenance Guide</h3>
+            <h3>ISM Code Audit Report</h3>
             <p>All informations are below</p>
           </div>
         </div>
@@ -50,7 +50,7 @@ const CrewDocumentDetails = () => {
                   <div style={{ lineHeight: "2" }}>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Document Name</span>
-                      <span className="labelValue">Engine Maintenance Guide</span>
+                      <span className="labelValue">ISM Code Audit Report</span>
                     </div>
                     <div className="detail-item flex gap-6">
                       <span className="labelName">Category</span>{" "}

@@ -27,7 +27,7 @@ const Documents = () => {
       const fetchedDocument = [
         {
           id: 1,
-          name: "ISM Code Audit Report",
+          name: "Crew Certification (STCW)",
           type: "Administrator",
           associatedVessel: "Sea Dreamer",
           issuingAuthority: "MCA",
@@ -37,7 +37,7 @@ const Documents = () => {
         },
         {
           id: 2,
-          name: "Crew Certification (STCW)",
+          name: "ISM Code Audit Report",
           type: "Crew Certification",
           associatedVessel: "The Black Pearl",
           issuingAuthority: "USCG",

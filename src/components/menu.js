@@ -262,6 +262,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         { label: "Maintenance History",command: () => {
             navigate('/crew/maintenance-task/history'); 
         }  },
+        {
+          label: "Schedule calendar",
+          command: () => {
+            navigate("/crew/maintenance-task/schedule-calendar");
+          },
+        },
        
     ],
     },

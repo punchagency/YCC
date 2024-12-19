@@ -29,7 +29,7 @@ const UserDetails = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Devon Lane</h3>
+            <h3>John Doe</h3>
             <p>User’s all type of information</p>
           </div>
         </div>
@@ -80,7 +80,7 @@ const UserDetails = () => {
                     <div className="details-overview">
                       <div className="details-content">
                         <div className="details-content-lable">Full Name</div>
-                        <div className="details-content-text">Devon Lane</div>
+                        <div className="details-content-text">John Doe</div>
                       </div>
                       <div className="details-content">
                         <div className="details-content-lable">

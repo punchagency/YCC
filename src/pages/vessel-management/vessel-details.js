@@ -38,7 +38,7 @@ const VesselDetails = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Oil Change</h3>
+            <h3>Sea Dreamer</h3>
             <p>All informations are below</p>
           </div>
         </div>
@@ -77,7 +77,7 @@ const VesselDetails = () => {
                       <div className="details-content">
                         <div className="details-content-lable">Vessel Name</div>
                         <div className="details-content-text">
-                          United States of America (USA)
+                          Sea Dreamer
                         </div>
                       </div>
                       <div className="details-content">
