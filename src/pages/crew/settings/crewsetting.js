@@ -1,22 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { Button } from "primereact/button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
 
 
 const CrewSetting = () => {
   const navigate = useNavigate();
-
-
   const goCrewDashboardPage = () => {
     navigate("/crew/dashboard");
   };
-
-
- 
-
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">

@@ -1,6 +1,4 @@
 import React from "react";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";

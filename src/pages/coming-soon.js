@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import React from "react";
 import comingSoon from "../assets/images/coming-soon.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 export default function ComingSoon () {

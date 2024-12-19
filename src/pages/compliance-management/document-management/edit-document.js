@@ -1,16 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
-import { InputText } from "primereact/inputtext";
-import { Card } from "primereact/card";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
-import { InputTextarea } from "primereact/inputtextarea";
+import PDFIcon from "../../../assets/images/pdf.svg";
 
-const AddDocument = () => {
+const EditDocument = () => {
   const [documentName, setDocumentName] = useState(null);
   const [documentType, setDocumentType] = useState(null);
   const [associatedVessel, setAssociatedVessel] = useState(null);
@@ -41,6 +36,21 @@ const AddDocument = () => {
     setUploadedFiles((prevFiles) =>
       prevFiles.filter((file) => file.name !== fileName)
     );
+  };
+  const [uploadedFile] = useState([
+    {
+      name: "Crew Certification (STCW)",
+      type: "application/pdf",
+      url: "path/to/example.pdf",
+    },
+  ]);
+  const downloadAllFiles = () => {
+    uploadedFile.forEach((file) => {
+      const a = document.createElement("a");
+      a.href = file.url;
+      a.download = file.name;
+      a.click();
+    });
   };
 
   const documentNames = [
@@ -74,8 +84,8 @@ const AddDocument = () => {
             </Link>
           </div>
           <div className="content">
-            <h3>Add New Documents</h3>
-            <p>list of all documents</p>
+            <h3>Crew Certification (STCW)</h3>
+            <p>All informations are below</p>
           </div>
         </div>
         <div className="sub-header-right">
@@ -89,7 +99,7 @@ const AddDocument = () => {
           />
           <Button
             onClick={goDocumentPage}
-            label="Save"
+            label="Save Changes"
             icon="pi pi-save"
             className="p-button-primary"
             type="button"
@@ -103,7 +113,7 @@ const AddDocument = () => {
               <h5>Document Details</h5>
               <form>
                 <div className="grid">
-                  <div className="col-12 md:col-4">
+                  <div className="col-4">
                     <label htmlFor="documentName">Document Name</label>
                     <Dropdown
                       id="documentName"
@@ -119,7 +129,7 @@ const AddDocument = () => {
                       className="w-full mt-2"
                     />
                   </div>
-                  <div className="col-12 md:col-4">
+                  <div className="col-4">
                     <label htmlFor="documentType">Document Type</label>
                     <Dropdown
                       id="documentType"
@@ -136,7 +146,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-4">
+                  <div className="col-4">
                     <label htmlFor="documeassociatedVesselntName">
                       Associated vessel
                     </label>
@@ -155,7 +165,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-4">
+                  <div className="col-4">
                     <label htmlFor="issueDate">Issue Date</label>
                     <Calendar
                       id="issueDate"
@@ -167,7 +177,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-4">
+                  <div className="col-4">
                     <label htmlFor="issuexpiryDateDate">Expiry Date</label>
                     <Calendar
                       id="expiryDate"
@@ -179,8 +189,8 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-4">
-                    <label htmlFor="uploadDate">Issue Date</label>
+                  <div className="col-4">
+                    <label htmlFor="uploadDate">Upload Date</label>
                     <Calendar
                       id="uploadDate"
                       value={uploadDate}
@@ -191,8 +201,8 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-6">
-                    <label htmlFor="issuingAuthority">Issuing Authority</label>
+                  <div className="col-6">
+                    <label htmlFor="issuingAuthority">Associated vessel</label>
                     <Dropdown
                       id="issuingAuthority"
                       value={issuingAuthority}
@@ -206,7 +216,7 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12 md:col-6">
+                  <div className="col-6">
                     <label htmlFor="renewalDate">Next Renewal</label>
                     <Calendar
                       id="renewalDate"
@@ -218,69 +228,114 @@ const AddDocument = () => {
                     />
                   </div>
 
-                  <div className="col-12">
-                    <div className="upload-container">
-                      <div className="flex align-content-center mt-3 justify-content-center">
-                        <label
-                          htmlFor="file-upload"
-                          className="custom-upload-button"
-                        >
-                          <i className="pi pi-upload mr-2"></i>Upload
-                        </label>
-                        <input
-                          type="file"
-                          id="file-upload"
-                          multiple
-                          accept=".pdf,.jpg,.jpeg,.png,.gif"
-                          className="file-upload-input"
-                          onChange={handleFileSelect}
-                        />
-                      </div>
-                      <label
-                        htmlFor="uploadDocuments"
-                        className="mt-2 font-semibold text-lg flex justify-content-center"
-                      >
-                        Select Files to Upload
-                      </label>
-                      <label
-                        htmlFor="uploadDocuments"
-                        className="mt-2 flex justify-content-center"
-                      >
-                        or Drag and Drop, Copy and Paste Files
-                      </label>
-                      <div className="flex flex-wrap gap-1 mt-3">
-                        {uploadedFiles.map((file, index) => {
-                          const isImage =
-                            file.type.includes("image") ||
-                            file.name.toLowerCase().endsWith(".jpg") ||
-                            file.name.toLowerCase().endsWith(".jpeg") ||
-                            file.name.toLowerCase().endsWith(".png") ||
-                            file.name.toLowerCase().endsWith(".gif");
+                  <div className="col-6 flex">
+                    <div className="p-grid p-dir-col p-mt-3">
+                      {uploadedFile.map((file, index) => {
+                        const isPdf =
+                          file.type === "application/pdf" ||
+                          file.name.toLowerCase().endsWith(".pdf");
 
-                          return (
-                            <div key={index} className="file-item">
-                              {isImage ? (
+                        return (
+                          <div
+                            key={index}
+                            className="p-col-12 p-md-6 p-lg-4 p-d-flex p-ai-center p-jc-between"
+                          >
+                            <div className="p-d-flex p-ai-center flex">
+                              {isPdf ? (
+                                <>
+                                  <img
+                                    src={PDFIcon}
+                                    className="file-icon mr-2"
+                                    alt=""
+                                  />
+                                  <span className="flex align-items-center">
+                                    {file.name}
+                                  </span>
+                                </>
+                              ) : (
                                 <img
                                   src={file.url}
                                   alt={file.name}
-                                  className="file-icon"
+                                  className="file-icon p-mr-2"
+                                  style={{ width: "50px", height: "50px" }}
                                 />
-                              ) : (
-                                <i className="pi pi-file-pdf file-icon"></i>
                               )}
-                              <span
-                                className="uploadfiles"
-                                onClick={() => removeFile(file.name)}
-                              >
-                                <i className="pi pi-times"></i>
-                              </span>
                             </div>
-                          );
-                        })}
-                      </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  </div>    
-                  
+                    <div className="p-d-flex p-jc-end">
+                      <Button
+                        icon="pi pi-download"
+                        label="Download"
+                        className="p-button-outlined p-button-sm p-mt-3 ml-6 border-blue-300"
+                        onClick={downloadAllFiles}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="upload-container">
+                    <div className="flex align-content-center mt-3 justify-content-center">
+                      <label
+                        htmlFor="file-upload"
+                        className="custom-upload-button"
+                      >
+                        <i className="pi pi-upload mr-2"></i>Upload Updated
+                        Document
+                      </label>
+                      <input
+                        type="file"
+                        id="file-upload"
+                        multiple
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        className="file-upload-input"
+                        onChange={handleFileSelect}
+                      />
+                    </div>
+                    <label
+                      htmlFor="uploadDocuments"
+                      className="mt-2 font-semibold text-lg flex justify-content-center"
+                    >
+                      Select Files to Upload
+                    </label>
+                    <label
+                      htmlFor="uploadDocuments"
+                      className="mt-2 flex justify-content-center"
+                    >
+                      or Drag and Drop, Copy and Paste Files
+                    </label>
+                    <div className="flex flex-wrap gap-1 mt-3">
+                      {uploadedFiles.map((file, index) => {
+                        const isImage =
+                          file.type.includes("image") ||
+                          file.name.toLowerCase().endsWith(".jpg") ||
+                          file.name.toLowerCase().endsWith(".jpeg") ||
+                          file.name.toLowerCase().endsWith(".png") ||
+                          file.name.toLowerCase().endsWith(".gif");
+
+                        return (
+                          <div key={index} className="file-item">
+                            {isImage ? (
+                              <img
+                                src={file.url}
+                                alt={file.name}
+                                className="file-icon"
+                              />
+                            ) : (
+                              <i className="pi pi-file-pdf file-icon"></i>
+                            )}
+                            <span
+                              className="uploadfiles"
+                              onClick={() => removeFile(file.name)}
+                            >
+                              <i className="pi pi-times"></i>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>
@@ -291,4 +346,4 @@ const AddDocument = () => {
   );
 };
 
-export default AddDocument;
+export default EditDocument;

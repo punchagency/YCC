@@ -28,7 +28,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         {
           label: "Crew",
           command: () => {
-            navigate("/crew-management/users"); // Navigate to the dashboard
+            navigate("/crew-management/crews"); // Navigate to the dashboard
           },
         },
       ],
@@ -119,14 +119,13 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
             navigate("/vessel-management/vessels");
           },
         },
+        {
+          label: "Schedule calendar",
+          command: () => {
+            navigate("/vessel-management/schedule-calendar");
+          },
+        },
       ],
-    },
-    {
-      label: "Document Management",
-      icon: "pi pi-file",
-      command: () => {
-        navigate("/document-management/documents");
-      },
     },
     {
       label: "Maintenance",
@@ -164,12 +163,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
             navigate("/maintenance-scheduling/equipment");
           },
         },
-        {
-          label: "Warranty",
-          command: () => {
-            navigate("/maintenance-scheduling/warranty");
-          },
-        },
+        // {
+        //   label: "Warranty",
+        //   command: () => {
+        //     navigate("/maintenance-scheduling/warranty");
+        //   },
+        // },
       ],
     },
     {
@@ -193,9 +192,20 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Compliance tracking",
       icon: "pi pi-folder-open",
-      command: () => {
-        navigate("/compliance-management/compliance");
-      },
+      items: [
+        {
+          label: "Compliance",
+          command: () => {
+            navigate("/compliance-management/compliance");
+          },
+        },
+        {
+          label: "Document Management",
+          command: () => {
+            navigate("/document-management/documents");
+          },
+        },
+      ],
     },
     {
       label: "Reports",
@@ -225,11 +235,11 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Documentation Access",
       icon: "pi pi-file",
       command: () => {
-        navigate("/crew/maintenance-task/document");
+        navigate("/crew/task-schedule/document");
       },
     },
     {
-      label: "Maintenance Task",
+      label: "Task Schedule",
       icon: (
         <svg
           width="21"

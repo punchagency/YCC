@@ -30,17 +30,18 @@ const AddUser = () => {
   ];
 
   const jobRoles = [
-    { name: "Software Engineer", code: "SE" },
-    { name: "Product Manager", code: "PM" },
-    { name: "HR Manager", code: "HR" },
-    { name: "Designer", code: "DS" },
+    { name: "Engineer", code: "SE" },
+    { name: "Administrator", code: "PM" },
+    { name: "Head of Department", code: "HR" },
+    { name: "Captain", code: "DS" },
+    { name: "Crew Manager", code: "DS" },
   ];
 
   const departments = [
     { name: "Engineering", code: "ENG" },
-    { name: "Human Resources", code: "HR" },
-    { name: "Design", code: "DSN" },
-    { name: "Marketing", code: "MKT" },
+    { name: "Exterior", code: "EXt" },
+    { name: "Interior", code: "Int" },
+    { name: "Chef", code: "CHEF" },
   ];
 
   const experiences = [
@@ -58,11 +59,11 @@ const AddUser = () => {
   ];
 
   const goUserPage = () => {
-    navigate("/crew-management/users");
+    navigate("/crew-management/crews");
   };
 
   const handleCancel = () => {
-    navigate("/crew-management/users"); // Navigate to the desired page
+    navigate("/crew-management/crews"); // Navigate to the desired page
   };
 
 //   const handleFileChange = (event) => {
@@ -86,7 +87,7 @@ const AddUser = () => {
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/crew-management/users">
+              <Link to="/crew-management/crews">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>
@@ -247,8 +248,8 @@ const AddUser = () => {
                       placeholder="Address"
                     />
                   </div>
-                  <div className="col-12 md:col-6">
-                    <label htmlFor="upload-cv">Upload CV (Upload pdf or doc)</label>
+                  <div className="col-12">
+                    <label htmlFor="upload-cv">Upload Documents’ (with the integration of an AI Agent these certificates would be selected and added to the profile)</label>
                     <div className="flex upload-cv-component">
                         {/* <div className="upload-cv-image">
                             {filePreview && (

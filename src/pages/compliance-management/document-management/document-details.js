@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
-import { color } from "chart.js/helpers";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Divider } from "primereact/divider";
-import { Icon } from "@iconify/react";
-import wallimage from "../../assets/images/wall-clock.svg";
-import PDFIcon from "../../assets/images/pdf.svg";
+import wallimage from "../../../assets/images/wall-clock.svg";
+import PDFIcon from "../../../assets/images/pdf.svg";
 
 const DocumentDetails = () => {
   // Access the userId from the URL
@@ -210,6 +206,7 @@ const DocumentDetails = () => {
                                       <img
                                         src={PDFIcon}
                                         className="file-icon mr-2"
+                                        alt=""
                                       />
                                       <span className="flex align-items-center">
                                         {file.name}

@@ -1,11 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { InputText } from "primereact/inputtext";
-import { Card } from "primereact/card";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -13,14 +9,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { RadioButton } from "primereact/radiobutton";
 
 const AddExpense = () => {
-  const [vesselName, setVesselName] = useState(null);
   const [category, setCategory] = useState(null);
-  const [warranty, setWarranty] = useState(null);
   const [date, setDate] = useState(null);
-  const [day, setDay] = useState(null);
-  const [amount, setAmount] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(null);
-  const [vendor, setVendor] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [paymentStatus, setPaymentStatus] = useState();
   const [expenseReport, setExpenseReport] = useState(null);
@@ -51,13 +42,16 @@ const AddExpense = () => {
     );
   };
 
-  const categories = [{ name: "Fuel" }, { name: "Crew" }];
-
   const paymentMethods = [{ name: "Credit Card" }, { name: "Cash" }];
 
   const paymentStatuses = [{ name: "Paid" }, { name: "Unpaid" }];
 
-  const departments = [{ name: "Engineering" }, { name: "IT Engineer" }];
+  const departments = [
+    { name: "Engineering" }, 
+    { name: "Interior" }, 
+    { name: "Exterior" }, 
+    { name: "Chef" }
+  ];
 
   const maintenanceFrequencies = [{ name: "Monthly" }, { name: "Yearly" }];
 
@@ -122,16 +116,10 @@ const AddExpense = () => {
 
                   <div className="col-12 md:col-6">
                     <label htmlFor="category">Expense Category</label>
-                    <Dropdown
-                      id="category"
-                      value={category}
-                      onChange={(e) => setCategory(e.value)}
-                      options={categories}
-                      optionLabel="name"
-                      placeholder={
-                        categories.length > 0 ? categories[0].name : "Select"
-                      }
-                      className="w-full mt-2"
+                    <InputText
+                      id="expenseCat"
+                      placeholder="Enter expense category"
+                      className="w-full mt-2 p-inputtext p-component"
                     />
                   </div>
                   <div className="col-12 md:col-6">

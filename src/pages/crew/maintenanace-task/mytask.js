@@ -1,33 +1,17 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
-import { Button } from "primereact/button";
-import LeftMenu from "../../../components/menu";
-import AdminHeader from "../../../components/header";
-import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 
 const MyTask = () => {
-  const [myTask, setMyTask] = useState([]);
   const [filteredTask, setFilteredTask] = useState([]);
   const [date, setDate] = useState(null); // State to store the selected date
 
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
-  const menuRef = useRef(null);
-  const [uploadedFiles] = useState([
-    {
-      name: "example.pdf",
-      type: "application/pdf",
-      url: "path/to/example.pdf",
-    },
-  ]);
-
-  const [isEditing, setIsEditing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [tasks] = useState([
@@ -112,8 +96,6 @@ const MyTask = () => {
       status: "Completed",
     },
   ]);
-  const filterTasks = (status) =>
-    tasks.filter((task) => task.status === status);
 
   const priorityTemplate = (rowData) => {
     let color = "";

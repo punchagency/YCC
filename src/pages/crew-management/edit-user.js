@@ -58,11 +58,11 @@ export default function EditUser () {
   ];
 
   const goUserPage = () => {
-    navigate("/crew-management/users");
+    navigate("/crew-management/crews");
   };
 
   const handleCancel = () => {
-    navigate("/crew-management/users"); // Navigate to the desired page
+    navigate("/crew-management/crews"); // Navigate to the desired page
   };
 
 //   const handleFileChange = (event) => {
@@ -86,7 +86,7 @@ export default function EditUser () {
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="arrow">
-              <Link to="/crew-management/users">
+              <Link to="/crew-management/crews">
                 <i className="pi pi-angle-left"></i>
               </Link>
             </div>

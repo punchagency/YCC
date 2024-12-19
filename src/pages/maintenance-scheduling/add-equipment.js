@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import { Button } from "primereact/button";
 import { Link, useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputSwitch } from "primereact/inputswitch";
-import { FileUpload } from "primereact/fileupload";
 
 const Addequipment = () => {
   const navigate = useNavigate();
@@ -18,16 +12,14 @@ const Addequipment = () => {
   const [email, setEmail] = useState(null);
   const [phone, setPhone] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [priority, setPriority] = useState(null);
   const [status, setStatus] = useState(null);
-  const [additionalNotes, setAdditionalNotes] = useState(null);
-  const [frequency, setFrequency] = useState(null);
   const [category, setCategory] = useState(null);
   const [manufacturer, setManufacturer] = useState(null);
   const currentDate = new Date().toLocaleDateString("en-US");
+  const [warranty, setWarranty] = useState(null);
+  const [day, setDay] = useState(null);
 
   const goEquipmentPage = () => {
-    
     navigate("/maintenance-scheduling/equipment");
   };
 
@@ -61,16 +53,11 @@ const Addequipment = () => {
 
   const manufacturers = [{ name: "Caterpillar" }, { name: "Caterpillar 1" }];
 
-  const priorities = [{ name: "High" }, { name: "Low" }];
-
   const statuses = [{ name: "In Use" }, { name: "Not Use" }];
 
-  const frequencies = [{ name: "Weekly" }, { name: "Monthly" }];
+  const days = [{ name: "Days" }, { name: "Months" }];
 
-  const crews = [
-    { name: "Flag State Authority" },
-    { name: "Flag State Authority 2" },
-  ];
+  const warranties = [{ name: "Warranty" }, { name: "Warranty 2" }];
 
   return (
     <>
@@ -193,6 +180,134 @@ const Addequipment = () => {
                   }
                   className="w-full mt-2"
                 />
+              </div>
+              <div className="col-12 md:col-6">
+                <label htmlFor="warranty">Warranty Status</label>
+                <Dropdown
+                  id="warranty"
+                  value={warranty}
+                  onChange={(e) => setWarranty(e.value)}
+                  options={warranties}
+                  optionLabel="name"
+                  placeholder={
+                    warranties.length > 0 ? warranties[0].name : "Select"
+                  }
+                  className="w-full mt-2"
+                />
+              </div>
+              <div className="col-12 md:col-6">
+                <label htmlFor="date">Warranty Expiration Date</label>
+                <Calendar
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.value)}
+                  showIcon
+                  placeholder={currentDate}
+                  className="w-full mt-2 p-input-calender"
+                />
+              </div>
+              <div className="col-12 md:col-6">
+                <label htmlFor="warrantyCoverage">Warranty Coverage</label>
+                <InputText
+                  id="warrantyCoverage"
+                  placeholder="Parts"
+                  className="w-full mt-2 p-inputtext p-component"
+                />
+              </div>
+              <div className="col-12 md:col-6">
+                <label htmlFor="supplierName">Supplier name</label>
+                <InputText
+                  id="supplierName"
+                  placeholder="Robert"
+                  className="w-full mt-2 p-inputtext p-component"
+                />
+              </div>
+
+              <div className="col-12 md:col-6">
+                <label htmlFor="supplierNo">Supplier phone no</label>
+                <InputText
+                  id="supplierNo"
+                  placeholder="+01 6789 7890"
+                  className="w-full mt-2 p-inputtext p-component"
+                />
+              </div>
+
+              <div className="col-12 md:col-6">
+                <label htmlFor="warrantyTime">
+                  Warranty expiration Soon Threshold ( Reminder)
+                </label>
+                <div className="grid">
+                  <div className="col-6">
+                    <InputText
+                      id="warrantyTime"
+                      placeholder="2"
+                      className="w-full mt-2 p-inputtext p-component"
+                    />
+                  </div>
+                  <div className="col-6">
+                    <Dropdown
+                      id="day"
+                      value={day}
+                      onChange={(e) => setDay(e.value)}
+                      options={days}
+                      optionLabel="name"
+                      placeholder={days.length > 0 ? days[0].name : "Select"}
+                      className="w-full mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="upload-container">
+                <div className="flex align-items-center justify-content-center mt-3">
+                  <label htmlFor="file-upload" className="custom-upload-button">
+                    <i className="pi pi-upload mr-2"></i> Upload Warranty
+                    Document
+                  </label>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.gif"
+                    className="file-upload-input"
+                    onChange={handleFileSelect}
+                  />
+                </div>
+                <p className="mt-4 font-semibold text-lg text-center">
+                  Select Files to Upload
+                </p>
+                <p className="text-sm text-gray-500 text-center">
+                  or Drag and Drop, Copy and Paste Files
+                </p>
+                <div className="flex flex-wrap gap-3 mt-4 justify-content-center">
+                  {uploadedFiles.map((file, index) => {
+                    const isImage =
+                      file.type.includes("image") ||
+                      file.name.toLowerCase().endsWith(".jpg") ||
+                      file.name.toLowerCase().endsWith(".jpeg") ||
+                      file.name.toLowerCase().endsWith(".png") ||
+                      file.name.toLowerCase().endsWith(".gif");
+
+                    return (
+                      <div key={index} className="file-item">
+                        {isImage ? (
+                          <img
+                            src={file.url}
+                            alt={file.name}
+                            className="file-icon"
+                          />
+                        ) : (
+                          <i className="pi pi-file-pdf file-icon"></i>
+                        )}
+                        <span
+                          className="uploadfiles"
+                          onClick={() => removeFile(file.name)}
+                        >
+                          <i className="pi pi-times"></i>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </form>
