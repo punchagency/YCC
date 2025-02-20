@@ -1,102 +1,158 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
+import { Message } from 'primereact/message';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { signup } from "../services/authService";
+import { useUser } from "../context/userContext"; // Import UserContext
 
 const SignupForm = () => {
-    const [credentials, setCredentials] = useState({
+
+    const navigate = useNavigate();  // Add useNavigate hook
+    const location = useLocation();
+    const role = location.state?.role || ""; // Default to 'Guest' if no role is passed 
+    console.log('Received role:', role);
+
+    const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         password: '',
         confirmPassword: '',
         rememberMe: false,
+        role: role
     });
 
+   
+
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    const { signupUser } = useUser();
 
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 10000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
+    if (!formData.role) {
+        console.error("User role is missing! Cannot navigate.");
+        return;
+    }
+
+    
+    
     const handleCheckboxChange = (e) => {
-        setCredentials({
-            ...credentials,
+        setFormData({
+            ...formData,
             rememberMe: e.checked,
         });
     };
 
+    console.log('Role before submission okk:', formData.role);
+    // Handle form field changes
     const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === 'email') {
-            validateEmail(value);
-        }
-        if (name === 'password' || name === 'confirmPassword') {
-            validatePassword(credentials.password, value);
-        }
-
-        setCredentials({
-            ...credentials,
-            [name]: value,
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const validateEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setEmailError('Invalid email address');
-        } else {
-            setEmailError('');
+    const validateForm = () => {
+        let isValid = true;
+        setEmailError('');
+        setPasswordError('');
+        setConfirmPasswordError('');
+
+        if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
+            setError('All fields are required.');
+            isValid = false;
         }
+
+        if (!/^[\w.-]+@([\w-]+\.)+[a-zA-Z]{2,}$/.test(formData.email)) {
+            setEmailError('Invalid email format.');
+            isValid = false;
+        }
+        
+
+        if (formData.password.length < 6) {
+            setPasswordError('Password must be at least 6 characters long.');
+            isValid = false;
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setConfirmPasswordError('Passwords do not match.');
+            isValid = false;
+        }
+
+        return isValid;
     };
 
-    const validatePassword = (password, confirmPassword) => {
-        if (confirmPassword && password !== confirmPassword) {
-            setConfirmPasswordError('Passwords do not match');
-        } else {
-            setConfirmPasswordError('');
-        }
 
-        if (password && password.length < 6) {
-            setPasswordError('Password must be at least 6 characters');
-        } else {
-            setPasswordError('');
-        }
-    };
-
-    const navigate = useNavigate();  // Add useNavigate hook
-    const location = useLocation(); 
-    const role = location.state?.role || null; // Default to 'Guest' if no role is passed 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (emailError || passwordError || confirmPasswordError || !credentials.fullName || !credentials.email || !credentials.password || !credentials.confirmPassword) {
-            alert('Please fix the errors before submitting.');
-            return;
-        }
-        // Add your signup logic here
+        console.log('Role before submission:', formData.role);
+        if(!validateForm()) return;
 
-        // Assuming login is successful, navigate to Dashboard
-        navigate('/dashboard');
+        setLoading(true);
 
-        // Navigate to different dashboards based on the role
-        if (role === 'Captain') {
-            navigate('/dashboard');
-        } else if (role === 'Crew Member') {
-            navigate('/crew/dashboard');
-        } else {
-            alert('Unknown role. Please try again.');
+        try {
+
+            console.log("submitting form Data", formData)
+            const response = await signup(formData);
+            console.log('Signup API response:', response);
+
+            if (!response || typeof response !== 'object') {
+                console.error("Invalid API response:", response);
+                setError("Unexpected API response format.");
+                return;
+            }
+
+            if (response.status === "success") {
+                // Debug: Confirm the role value before navigating
+                
+                console.log('Redirecting user with role:', formData.role);
+
+                signupUser(response.user); // Store user data after signup
+
+                if (formData.role === "captain") {
+                    navigate("/dashboard")
+                } else if (formData.role === "service_provider") {
+                    navigate("/service_provider/dashboard")
+                } else if (formData.role === "supplier") {
+                    navigate("/supplier/dashboard")
+                } else if (formData.role === "crew_member") {
+                    navigate("/crew/dashboard")
+                }
+            } else {
+
+                setError(response.message || 'Signup failed. Please try again.');
+
+            }
+
+
+        } catch (error) {
+            console.log("error during signup")
+            setError(error.message || 'An error occurred. Please try again.');
+        } finally {
+            setLoading(false)
         }
+
+
     };
 
     return (
         <div className="p-d-flex p-jc-center p-ai-center">
             <form onSubmit={handleSubmit}>
+            {error && <Message severity="error" text={error} className="p-mb-3 "/>}
                 <div className="flex flex-column p-field p-mb-3">
                     <label htmlFor="fullName">Full Name</label>
                     <InputText
                         id="fullName"
                         name="fullName"
-                        value={credentials.fullName}
+                        value={formData.fullName}
                         onChange={handleChange}
                         placeholder="Full name"
                         className="p-d-block"
@@ -108,7 +164,7 @@ const SignupForm = () => {
                     <InputText
                         id="email"
                         name="email"
-                        value={credentials.email}
+                        value={formData.email}
                         onChange={handleChange}
                         placeholder="Email address"
                         className="p-d-block"
@@ -121,7 +177,7 @@ const SignupForm = () => {
                     <Password
                         id="password"
                         name="password"
-                        value={credentials.password}
+                        value={formData.password}
                         onChange={handleChange}
                         feedback={false}
                         toggleMask
@@ -136,7 +192,7 @@ const SignupForm = () => {
                     <Password
                         id="confirmPassword"
                         name="confirmPassword"
-                        value={credentials.confirmPassword}
+                        value={formData.confirmPassword}
                         onChange={handleChange}
                         feedback={false}
                         toggleMask
@@ -144,13 +200,13 @@ const SignupForm = () => {
                         required
                         className="w-full"
                     />
-                    {confirmPasswordError && <small className="p-error">{confirmPasswordError}</small>}
+                   {confirmPasswordError && <small className="p-error">{confirmPasswordError}</small>}
                 </div>
                 <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between signup-checkbox">
                     <div className="p-d-flex p-ai-center">
                         <Checkbox
                             inputId="rememberMe"
-                            checked={credentials.rememberMe}
+                            checked={formData.rememberMe}
                             onChange={handleCheckboxChange}
                         />
                         <label htmlFor="rememberMe" className="p-ml-2">

@@ -6,11 +6,14 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "./../context/userContext"; // Import User Context
 
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const navigate = useNavigate();
   const overlayPanelRef = useRef(null);
+  const { user, logoutUser } = useUser(); // Get user data from context
+
   const [notifications] = useState([
     {
       title: "Deficiency Follow-Ups",
@@ -32,19 +35,24 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     },
   ]);
 
+  const handleLogout = () => {
+    logoutUser(); // Clears user data
+    navigate("/login"); // Redirect to login page
+  };
+
   const start = (
     <>
       <div className="flex align-items-center profile">
-        
-        <Button 
-          icon="pi pi-bars" 
-          text 
-          className="p-0 collapse-btn mr-3" 
+
+        <Button
+          icon="pi pi-bars"
+          text
+          className="p-0 collapse-btn mr-3"
           onClick={() => setIsCollapsed(!isCollapsed)}
         />
         <img src={avatar} alt="Profile" className="profile-image" />
         <span className="profile-name">
-          Welcome, <strong>Christopher</strong>
+        Welcome, <strong>{user?.fullName || "User"}</strong>
         </span>
       </div>
     </>

@@ -1,89 +1,137 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
+import { Message } from "primereact/message";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { login } from "../services/authService";
+import { useUser } from "../context/userContext"; // Import UserContext
+
 
 const LoginForm = () => {
   // Define the options for the user roles
+  const navigate = useNavigate(); // Add useNavigate hook
+  const location = useLocation();
 
-  const [credentials, setCredentials] = useState({
+
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
     rememberMe: false,
   });
 
   const handleCheckboxChange = (e) => {
-    setCredentials({
-      ...credentials,
+    setFormData({
+      ...formData,
       rememberMe: e.checked,
     });
   };
 
-  const [emailError, setEmailError] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const { loginUser } = useUser(); // Get loginUser function from context
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+
+
+
+
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "email") {
-      validateEmail(value);
-    }
-
-    setCredentials({
-      ...credentials,
-      [name]: value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Invalid email address");
-    } else {
-      setEmailError("");
+
+  const validateForm = (email) => {
+    let isValid = true;
+    setEmailError('');
+    setPasswordError('');
+    if (!formData.email || !formData.password) {
+      setError('All fields are required.');
+      isValid = false;
     }
+
+    return isValid;
+
   };
 
-  const navigate = useNavigate(); // Add useNavigate hook
-  const location = useLocation();
-  const role = location.state?.role || "Guest"; // Default to 'Guest' if no role is passed
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Role before submission:', formData.role);
+    if (!validateForm()) return;
 
-    // Validate if email and password are provided and the email is valid
-    if (!credentials.email || !credentials.password) {
-      alert("Please fill in both email and password.");
-      return;
+    setLoading(true);
+
+    try {
+      console.log("submitting login form Data", formData)
+      const response = await login(formData);
+      console.log('Login API response:', response);
+
+      if (!response || typeof response !== 'object') {
+        console.error("Invalid API response:", response);
+        setError("Unexpected API response format.");
+        return;
+      }
+
+      if (response.status === "success") {
+        // Debug: Confirm the role value before navigating
+        console.log('Redirecting user with role:', formData.fullName);
+        loginUser(response.user); // Store user in context
+        // Extract role from response
+        const userRole = response.user?.role;
+        console.log('Redirecting user with role:', userRole); // Debugging
+
+        if (userRole === "captain") {
+          navigate("/dashboard");
+        } 
+        else if (userRole === "service_provider") {
+          navigate("/service_provider/dashboard");
+        } 
+        else if (userRole === "supplier") {
+          navigate("/supplier/dashboard");
+        } 
+        else if (userRole === "crew_member") {
+          navigate("/crew/dashboard");
+        } 
+        else {
+          console.error("Unknown role:", userRole);
+          setError("Invalid role. Please contact support.");
+        }
+      } else {
+
+        setError(response.message || 'Login failed. Please try again...');
+
+      }
+
+    } catch (error) {
+      console.log("Error during signup")
+      setError(error.message || 'An error occurred. Please try again.');
+    } finally {
+      setLoading(false)
     }
 
-    if (emailError) {
-      alert("Please correct the errors before submitting.");
-      return;
-    }
-    // Add your login logic here
-
-    // Assuming login is successful, navigate to Dashboard
-    navigate("/dashboard");
-
-    // Navigate to different dashboards based on the role
-    if (role === "Captain") {
-      navigate("/dashboard");
-    } else if (role === "Crew Member") {
-      navigate("/crew/dashboard");
-    } else {
-      alert("Unknown role. Please try again.");
-    }
   };
 
   return (
     <div className="p-d-flex p-jc-center p-ai-center">
       <form onSubmit={handleSubmit}>
+        {error && <Message severity="error" text={error} className="p-mb-3 " />}
         <div className="flex flex-column p-field p-mb-3">
           <label htmlFor="username">Email Address</label>
           <InputText
             id="email"
             name="email"
-            value={credentials.email}
+            value={formData.email}
             onChange={handleChange}
             placeholder="Email address"
             className="p-d-block"
@@ -96,7 +144,7 @@ const LoginForm = () => {
           <Password
             id="password"
             name="password"
-            value={credentials.password}
+            value={formData.password}
             onChange={handleChange}
             feedback={false}
             toggleMask
@@ -104,12 +152,14 @@ const LoginForm = () => {
             required
             className="w-full" // Apply the full-width class
           />
+          {passwordError && <small className="p-error">{passwordError}</small>}
+
         </div>
         <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between">
           <div className="p-d-flex p-ai-center">
             <Checkbox
               inputId="rememberMe"
-              checked={credentials.rememberMe}
+              checked={formData.rememberMe}
               onChange={handleCheckboxChange}
             />
             <label htmlFor="rememberMe" className="p-ml-2">
