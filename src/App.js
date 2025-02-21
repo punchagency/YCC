@@ -64,6 +64,8 @@ import EditUser from "./pages/crew-management/edit-user";
 import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 import CrewAddDocument from "./pages/crew/document-access/add-document";
+import CaptainLandingPage from "./pages/landing-pages/captain";
+import LandingPageLayout from "./layout/landing-page-layout";
 
 function App() {
   return (
@@ -74,6 +76,14 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/coming-soon" element={<ComingSoon />} />  
+
+        {/* Landing Page Routes */}
+        <Route element={<LandingPageLayout />}>
+        <Route path="/home" element={<CaptainLandingPage />} />
+        </Route>
+
+
+
         <Route element={<Layout role="Captain" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crew-management/role" element={<Role />} />
