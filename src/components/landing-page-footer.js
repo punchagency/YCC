@@ -1,16 +1,16 @@
 import React from 'react'
-import { Box, Container, Typography, Grid, List, ListItem } from '@mui/material'
+import { Box, Container, Typography, Grid, List, ListItem, Icon } from '@mui/material'
 import { GradientButton } from './landing-page-header'
-import { ButtonTypography } from './landing-page-header'
 import { styled } from '@mui/material/styles'
-import logo from '../assets/images/logo.png'
+import logo from '../assets/images/icons/plain-white-icon.png'
+import anchor from '../assets/images/icons/anchor.png'
 import { Link } from 'react-router-dom'
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 
 const LandingPageFooter = () => {
-    const footerLinks = [
+    const footerData = [
         {
             title: "Quick Links",
             links: ["Home", "Departments", "Vendors & Services", "About Us", "Resource Center"],
@@ -35,8 +35,26 @@ const LandingPageFooter = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center", // Center content
+            flexDirection: "column",
         }}
     >
+
+        <Box
+            sx={{
+                p: 0,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                gap: "31px",
+                width: "100%",
+                backgroundColor: "white",
+
+            }}>
+            <FooterGradientHeadingTypography>
+                CREW CENTER</FooterGradientHeadingTypography>
+
+        </Box>
+
         <Container
             maxWidth="lg"
             disableGutters
@@ -65,7 +83,11 @@ const LandingPageFooter = () => {
                                 <ButtonTypography
                                     sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
                                 >
-                                    Contact Yacht Crew Center, LLC
+                                    Contact Yacht Crew Center, LLC &nbsp; <img
+                                src={anchor}
+                                alt="logo"
+                            
+                            />
                                 </ButtonTypography>
                             </GradientButton>
                         </Box>
@@ -73,13 +95,13 @@ const LandingPageFooter = () => {
                 </Grid>
 
                 {/* Remaining 3 columns (equal width, responsive) */}
-                {footerLinks.map((link, index) => (
+                {footerData.map((link, index) => (
                     <Grid item xs={12} sm={3} md={link.size} key={index}>
                         <Box sx={{ textAlign: "left" }}>
                             <FooterHeadingTypography>{link.title}</FooterHeadingTypography>
                             <List>
                                 {link.links.map((linkItem, idx) => (
-                                    <ListItem key={idx} sx={{ paddingLeft: "0px" , paddingBlock: "5px"}}>
+                                    <ListItem key={idx} sx={{ paddingLeft: "0px", paddingBlock: "5px" }}>
                                         <FooterTypography
 
                                         >
@@ -97,18 +119,20 @@ const LandingPageFooter = () => {
                 <Grid item xs={12} sm={12} md={9}>
                     <Box sx={{ textAlign: "left" }}>
                         <FooterTypography>
-                            Copyright © 2025 Yacht Crew Center, LLC. All rights reserved.  | <Link href="/terms-and-conditions">Terms and Conditions</Link> |  <Link href="/privacy-policy">Privacy Policy</Link>
+                            © 2025 SC Yacht Crew Center  LLC . All Rights Reserved.&nbsp;&nbsp;|&nbsp;&nbsp;
+                            <FooterLink href="/terms-and-conditions">Terms and Conditions</FooterLink>&nbsp;&nbsp;|&nbsp;&nbsp;
+                            <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
                         </FooterTypography>
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={12} md={3}>
                     <Box sx={{ textAlign: "right", display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-                        
-                            <FacebookIcon />
-                            <InstagramIcon />
-                            <YouTubeIcon />
+
+                        <FacebookIcon sx={{ color: "white" }} />
+                        <InstagramIcon sx={{ color: "white" }} />
+                        <YouTubeIcon sx={{ color: "white" }} />
                     </Box>
-                </Grid> 
+                </Grid>
             </Grid>
         </Container>
     </Box>
@@ -116,6 +140,45 @@ const LandingPageFooter = () => {
     )
 }
 
+const ButtonTypography = styled(Typography)({
+    fontSize: "16px",
+    fontFamily: "Inter, sans-serif",
+    lineHeight: "19px",
+    fontWeight: 600,
+    display: 'flex',
+    justifyContent: 'center'
+  });
+
+const FooterGradientHeadingTypography = styled(Typography)(({ theme }) => ({
+    fontFamily: "Plus Jakarta Sans",
+    fontWeight: 600,
+    fontSize: "13.5vw",
+    lineHeight: "1",
+    letterSpacing: "-2%",
+    background: "linear-gradient(1.04deg, rgba(19, 19, 19, 0.1) 0.89%, rgba(255, 255, 255, 0.1) 73.3%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    whiteSpace: "nowrap",
+    display: "inline-block",
+    textAlign: "center",
+    padding: 0,
+    width: "100%",
+    margin: 0,
+    padding: 0,
+
+
+    // 🔹 Responsive Adjustments for Smaller Screens
+    [theme.breakpoints.down("md")]: {
+        fontSize: "12vw",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "14vw",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "16vw",
+    },
+
+}))
 
 const FooterHeadingTypography = styled(Typography)({
     fontFamily: "Plus Jakarta Sans",
@@ -133,8 +196,14 @@ const FooterTypography = styled(Typography)({
     fontSize: "16px",
     lineHeight: "21px",
     letterSpacing: "0%",
-    color: "#FFFFFF",
+    color: "#E0E0E0",
     whiteSpace: "nowrap",
 })
+
+const FooterLink = styled(Link)({
+    color: "#E0E0E0",
+    textDecoration: "none",
+})
+
 
 export default LandingPageFooter

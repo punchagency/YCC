@@ -1,22 +1,19 @@
 import React from 'react'
-import banner from '../../assets/images/captain/YCC-captain-banner.png'
+import banner from '../../assets/images/crew/YCC-crew-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import { styled,Typography, Box } from '@mui/material'
-import Section1Captain from '../../components/captain/section1-captain'
-import Section2Captain from '../../components/captain/section2-captain'
-import LandingPageExitCard from '../../components/landing-page-exit-card'
-import Section3Captain from '../../components/captain/section3-captain'
-const CaptainLandingPage = () => {
 
-const backgroundImage = banner
+const CrewLandingPage = () => {
+
+    const backgroundImage = banner
   const header = (
     <>
      Supporting <GradientText>yatch</GradientText>{" "}
-      <GradientText>captains</GradientText> in leadership and excellence
+      <GradientText>crew</GradientText> at every step of their journey
     </>
   );
-  const subtext2 = 'From compliance to guest experiences, access the resources you need to master every aspect of yacht operations.'
+  const subtext2 = 'From recruitment to mental health and off-duty resources, access everything you need to thrive in your yachting career.'
   const button1 = {
     text: 'Join Our Crew Network'
   }
@@ -33,15 +30,12 @@ const backgroundImage = banner
         subtext2={subtext2}
         button1={button1}
         />
-        <Section1Captain />
-        <Section2Captain />
-        <Section3Captain />
+
 
         <LandingPageFooter />
       </Box>
   )
 }
-
 const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
@@ -53,4 +47,4 @@ const GradientText = styled(Typography)({
     display: "inline-block",
   });
 
-export default CaptainLandingPage
+export default CrewLandingPage

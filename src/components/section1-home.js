@@ -30,7 +30,6 @@ const Section1Home = () => {
                         flexDirection: "column",
                         gap: "28px",
                         textAlign: { xs: "center", md: "left" },
-                        justifyContent: "center",
                     }}>
 
                         <Box sx={{

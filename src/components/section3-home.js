@@ -74,7 +74,7 @@ export const CustomButton = styled(Button)({
     fontFamily: "Inter, sans-serif",
     textTransform: "none",
     color: "black",
-    padding: "13px 17px",
+    padding: "13px 40px",
     borderRadius: "8px",
   });
   

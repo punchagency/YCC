@@ -6,7 +6,7 @@ import engineeringIcon from '../assets/images/icons/home-page-engineering.png'
 import chefGalleryIcon from '../assets/images/icons/home-page-chef.png'
 import interiorIcon from '../assets/images/icons/home-page-interior.png'
 import { GradientText } from './section1-home'
-import { GradientButton, ButtonTypography, linearGradient } from './landing-page-header'
+import { ButtonTypography, linearGradient } from './landing-page-header'
 
 const Section2Home = () => {
     const gridData = [
@@ -68,7 +68,7 @@ const Section2Home = () => {
                     <Box sx={{
                         display: "flex",
                         flexDirection: "row",
-                        gap: "28px",
+                        gap: "10px",
                         justifyContent: "center",
                         alignItems: "center",
                     }}>
@@ -85,7 +85,7 @@ const Section2Home = () => {
                     </Box>
 
                     <HeadingText>
-                        Explore Resources for Every Department
+                        Explore Resources For Every Department
                     </HeadingText>
                 </Box>
 
@@ -102,8 +102,10 @@ const Section2Home = () => {
                                 textAlign: "left",
                             }}
                         >
-                            <Box sx={{ px: 4, py: 7, display: "flex",background: "#E6EFF28A", flexDirection: "column", gap: "28px" }}>
-                                <Box>
+                            <Box sx={{ px: 4, py: 7, display: "flex",background: "#E6EFF28A",borderRadius: '13px', flexDirection: "column", gap: "28px",justifyContent:"space-between" }}>
+                               
+                               <Box sx={{ display: "flex", flexDirection: "column", gap: "28px"}}>
+                             <Box>
                                     <img src={item.image} alt="yacht" />
                                 </Box>
                                 <Box>
@@ -113,6 +115,8 @@ const Section2Home = () => {
                                     <SecondarySubTextBlack>
                                         {item.description}
                                     </SecondarySubTextBlack>
+                                </Box>
+
                                 </Box>
                                 <Box>
                                     <GradientButton>
@@ -131,6 +135,7 @@ const Section2Home = () => {
         </Box>
     )
 }
+const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 const SecondarySubTextBlack = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 400,
@@ -159,6 +164,15 @@ const SecondaryHeadingText = styled(Typography)({
 
 })
 
-
+const GradientButton = styled(Button)({
+  background: linearGradient,
+  fontSize: "16px",
+  fontFamily: "Inter, sans-serif",
+  textTransform: "none",
+  "&:hover": {
+    background: linearGradient2,
+  },
+  padding: "15px 41px",
+});
 
 export default Section2Home

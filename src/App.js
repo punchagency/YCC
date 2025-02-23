@@ -64,8 +64,10 @@ import EditUser from "./pages/crew-management/edit-user";
 import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 import CrewAddDocument from "./pages/crew/document-access/add-document";
-import CaptainLandingPage from "./pages/landing-pages/captain";
+import HomeLandingPage from "./pages/landing-pages/home";
 import LandingPageLayout from "./layout/landing-page-layout";
+import CaptainLandingPage from "./pages/landing-pages/captain";
+import CrewLandingPage from "./pages/landing-pages/crew";
 
 function App() {
   return (
@@ -79,7 +81,9 @@ function App() {
 
         {/* Landing Page Routes */}
         <Route element={<LandingPageLayout />}>
-        <Route path="/home" element={<CaptainLandingPage />} />
+        <Route path="/home" element={<HomeLandingPage />} />
+        <Route path="/captain" element= {<CaptainLandingPage />} />
+        <Route path="/crew" element={<CrewLandingPage />}/>
         </Route>
 
 
