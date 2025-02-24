@@ -1,8 +1,8 @@
 import React from 'react'
-import { Box, Typography, Container, Button, styled, Grid, Badge } from '@mui/material'
+import { Box, Typography, Container, Button, styled, Grid } from '@mui/material'
 import { ButtonTypography, linearGradient } from './landing-page-header'
 import yatch from '../assets/images/YCC-yatch.png'
-import banner from '../assets/images/YCC-home-banner.png'
+import banner from '../assets/images/water.png'
 const LandingPageExitCard = ({sectionData}) => {
 
     return (

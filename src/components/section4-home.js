@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Typography, Container, Button, styled, Grid, Badge } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from './landing-page-header'
 import yatch from '../assets/images/YCC-yatch.png'
-import banner from '../assets/images/YCC-home-banner.png'
+import banner from '../assets/images/water-wide.png'
 import playIcon from '../assets/images/icons/play-button.png'
 const Section4Home = () => {
     return (

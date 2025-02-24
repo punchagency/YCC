@@ -72,6 +72,9 @@ import ExteriorLandingPage from "./pages/landing-pages/exterior";
 import InteriorLandingPage from "./pages/landing-pages/interior";
 import ChefGalleryLandingPage from "./pages/landing-pages/chef-gallery";
 import EngineeringLandingPage from "./pages/landing-pages/engineering";
+import VendorAndServices from "./pages/landing-pages/vendor-services";
+
+
 function App() {
   return (
     <div className="App">
@@ -91,6 +94,7 @@ function App() {
         <Route path="/interior" element={<InteriorLandingPage />}/>
         <Route path="/chef-gallery" element={<ChefGalleryLandingPage />}/>
         <Route path="/engineering" element={<EngineeringLandingPage />}/>
+        <Route path="/vendor-services" element={<VendorAndServices />}/>
         </Route>
 
 

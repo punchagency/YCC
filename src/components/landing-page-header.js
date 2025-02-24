@@ -24,7 +24,7 @@ const LandingPageHeader = () => {
         { title: 'Interior', route: '/interior' }
       ]
     },
-    { title: "Vendor & Services", link: "/vendors-services" },
+    { title: "Vendor & Services", link: "/vendor-services" },
     { title: "About Us", link: "/about" },
     { title: "Resource Center", link: "/resources" },
     { title: "Contact", link: "/contact" }

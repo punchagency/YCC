@@ -1,4 +1,3 @@
-import React from 'react'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
