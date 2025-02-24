@@ -1,20 +1,21 @@
+
 import { Box, Typography, styled } from '@mui/material'
-import banner from '../../assets/images/chef-gallery/YCC-chef-gallery-banner.png'
+import banner from '../../assets/images/engineering/YCC-engineering-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1ChefGallery from '../../components/chef-gallery/section1-chef-gallery'
-import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gallery'
-import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
+import Section1Engineering from '../../components/engineering/section1-engineering'
+import Section2Engineering from '../../components/engineering/section2-engineering'
+import Section3Engineering from '../../components/engineering/section3-engineering'
 
-const ChefGalleryLandingPage = () => {
+const EngineeringLandingPage = () => {
     const backgroundImage = banner
     const header = (
         <>
-            Empowering <GradientText>Yacht</GradientText>{" "}
-            <GradientText>Chefs</GradientText> to Create Culinary Excellence
-        </>  
+            Empowering <GradientText>Exterior</GradientText>{" "}
+            <GradientText>Yatch</GradientText> crew with the Right Resources
+        </>    
     );
-    const subtext2 = 'From gourmet provisioning to top-tier galley equipment, discover everything you need to elevate onboard dining.'
+    const subtext2 = 'Master the art of yacht maintenance, safety, and watersports with expert advice and trusted tools designed for exterior crew'
     const button1 = {
         text: 'Join Our Crew Network'
     }
@@ -31,14 +32,15 @@ const ChefGalleryLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1ChefGallery />
-            <Section2ChefGallery />
-            <Section3ChefGallery />
+            <Section1Engineering /> 
+            <Section2Engineering />
+            <Section3Engineering />
             <LandingPageFooter />
         </Box>
     )
 
 }
+
 
 const GradientText = styled(Typography)({
     fontWeight: 600,
@@ -46,8 +48,9 @@ const GradientText = styled(Typography)({
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontSize: "55.96px",
     lineHeight: "60px",
-    letterSpacing: "-0.02em",
+    letterSpacing: "-2%",
     textTransform: "uppercase",
     display: "inline-block",
-});
-export default ChefGalleryLandingPage       
+})
+
+export default EngineeringLandingPage      
