@@ -69,6 +69,8 @@ import LandingPageLayout from "./layout/landing-page-layout";
 import CaptainLandingPage from "./pages/landing-pages/captain";
 import CrewLandingPage from "./pages/landing-pages/crew";
 import ExteriorLandingPage from "./pages/landing-pages/exterior";
+import InteriorLandingPage from "./pages/landing-pages/interior";
+import ChefGalleryLandingPage from "./pages/landing-pages/chef-gallery";
 function App() {
   return (
     <div className="App">
@@ -85,6 +87,8 @@ function App() {
         <Route path="/captain" element= {<CaptainLandingPage />} />
         <Route path="/crew" element={<CrewLandingPage />}/>
         <Route path="/exterior" element={<ExteriorLandingPage />}/>
+        <Route path="/interior" element={<InteriorLandingPage />}/>
+        <Route path="/chef-gallery" element={<ChefGalleryLandingPage />}/>
         </Route>
 
 

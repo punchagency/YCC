@@ -1,24 +1,21 @@
 import { Box, Typography, styled } from '@mui/material'
-import banner from '../../assets/images/interior/YCC-interior-banner.png'
+import banner from '../../assets/images/exterior/YCC-exterior-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1Interior from '../../components/interior/section1-interior'
-import Section2Interior from '../../components/interior/section2-interior'
-import Section3Interior from '../../components/interior/section3-interior'
 
-const InteriorLandingPage = () => {
-
+const ChefGalleryLandingPage = () => {
     const backgroundImage = banner
     const header = (
         <>
-            Empowering <GradientText>Interior</GradientText>{" "}
-            <GradientText>Yatch</GradientText> Crew for Excellence
-        </>   
+            Empowering <GradientText>Yacht</GradientText>{" "}
+            <GradientText>Chefs</GradientText> to Create Culinary Excellence
+        </>  
     );
-    const subtext2 = 'From décor to hospitality, discover resources designed to help stewards and stewardesses create luxurious onboard experiences.'
+    const subtext2 = 'From gourmet provisioning to top-tier galley equipment, discover everything you need to elevate onboard dining.'
     const button1 = {
         text: 'Join Our Crew Network'
     }
+
     return (
         <Box sx={{
             display: "flex",
@@ -31,12 +28,10 @@ const InteriorLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1Interior />
-            <Section2Interior />
-            <Section3Interior />
             <LandingPageFooter />
         </Box>
     )
+
 }
 
 const GradientText = styled(Typography)({
@@ -45,9 +40,8 @@ const GradientText = styled(Typography)({
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontSize: "55.96px",
     lineHeight: "60px",
-    letterSpacing: "-2%",
+    letterSpacing: "-0.02em",
     textTransform: "uppercase",
     display: "inline-block",
 });
-
-export default InteriorLandingPage  
+export default ChefGalleryLandingPage       
