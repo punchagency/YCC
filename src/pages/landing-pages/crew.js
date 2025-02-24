@@ -3,6 +3,10 @@ import banner from '../../assets/images/crew/YCC-crew-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import { styled,Typography, Box } from '@mui/material'
+import Section1Crew from '../../components/crew/section1-crew'
+import Section2Crew from '../../components/crew/section2-crew'
+import Section3Crew from '../../components/crew/section3-crew'
+
 
 const CrewLandingPage = () => {
 
@@ -31,7 +35,9 @@ const CrewLandingPage = () => {
         button1={button1}
         />
 
-
+        <Section1Crew />
+        <Section2Crew />
+        <Section3Crew />
         <LandingPageFooter />
       </Box>
   )

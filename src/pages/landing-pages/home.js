@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
 import banner from '../../assets/images/YCC-home-banner2.png'
-import { GradientButton, ButtonTypography, linearGradient, linearGradient2 } from '../../components/landing-page-header'
 import Section1Home from '../../components/section1-home'
 import Section2Home from '../../components/section2-home'
 import Section3Home from '../../components/section3-home'
