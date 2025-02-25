@@ -8,7 +8,6 @@ const LandingPageExitCard = ({sectionData}) => {
     return (
         <Box sx={{
             paddingBottom: '288px',// must be exactly 60% of the overflowing box at the end
-            //backgroundColor: 'pink',
         }}>
             <Box
                 sx={{

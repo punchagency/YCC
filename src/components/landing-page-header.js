@@ -37,7 +37,7 @@ const LandingPageHeader = () => {
       ]
     },
     { title: "Vendor & Services", link: "/vendor-services" },
-    { title: "About Us", link: "/about" },
+    { title: "About Us", link: "/about-us" },
     { title: "Resource Center", link: "/resources" },
     { title: "Contact", link: "/contact" }
   ]

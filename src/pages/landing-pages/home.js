@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, styled } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import banner from '../../assets/images/YCC-home-banner2.png'
 import Section1Home from '../../components/section1-home'
 import Section2Home from '../../components/section2-home'

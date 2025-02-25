@@ -1,44 +1,34 @@
 import React from 'react'
 import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
-import shipIcon from '../assets/images/icons/home-page-ship.png'
-import crewIcon from '../assets/images/icons/home-page-crew.png'
-import engineeringIcon from '../assets/images/icons/home-page-engineering.png'
-import chefGalleryIcon from '../assets/images/icons/home-page-chef.png'
-import interiorIcon from '../assets/images/icons/home-page-interior.png'
-import { GradientText } from './section1-home'
-import { ButtonTypography, linearGradient } from './landing-page-header'
+import shipIcon from '../../assets/images/icons/home-page-ship.png'
+import crewIcon from '../../assets/images/icons/home-page-crew.png'
+import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
+import chefGalleryIcon from '../../assets/images/icons/home-page-chef.png'
+import interiorIcon from '../../assets/images/icons/home-page-interior.png'
+import { GradientText } from '../section1-home'
+import { ButtonTypography, linearGradient } from '../landing-page-header'
 
-const Section2Home = () => {
+const Section2AboutUs = () => {
+
     const gridData = [
         {
-            title: "Captains",
-            description: "Better manage your vessel and departments through AI. Explore the future of modern yacht management.",
+            title: "Vendor & Service Connections",
+            description: "A growing network of trusted vendors and service providers to meet your unique needs.",
             image: shipIcon,
         },
         {
-            title: "Crew",
-            description: "Access resources for career training, local accommodation's, mental health and more. Feel supported in your life on and off the water.",
-            image: crewIcon,
-        },
-        {
-            title: "Engineering",
-            description: "Equipment troubleshooting, schedule services, order parts and develop additional skills.  Be able to simplify and focus on what is important in your department.",
+            title: "Crew Support",
+            description: "Resources for career advancement, certifications, and professional growth.",
             image: engineeringIcon,
         },
         {
-            title: "Exterior",
-            description: "Elevate your exterior skill set and per. Source your department needs, look for creative ideas to enhance guests experiences, and inquire about specific information wherever you are. ",
+            title: "Community Engagement",
+            description: "Opportunities to network, learn, and collaborate within a vibrant global yachting community.",
             image: shipIcon,
-        },
-        {
-            title: "Chef/Gallery",
-            description: "Search suggestions for recipes based on diet restrictions and what you have on hand.  Assistance with sourcing for local provisions. Focus on your art and leave the suggestions and sourcing to us.",
-            image: chefGalleryIcon,
-        },
-        {
-            title: "Interior",
-            description: "Source your departments needs, look for creative ideas to enhance guests experiences,  and inquiry about specific information wherever you are. ",
-            image: interiorIcon,
+        },   {
+            title: "Expert Guidance",
+            description: "Insights and advice to help you make the most of your yachting journey.",
+            image: crewIcon,
         },
 
     ]
@@ -107,7 +97,10 @@ const Section2Home = () => {
                                 textAlign: "left",
                             }}
                         >
-                            <Box sx={{ px: 4, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px", justifyContent: "space-between" }}>
+                            <Box sx={{
+                                px: 4, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px",
+                                alignItems: "center", textAlign: "center", justifyContent: "space-between"
+                            }}>
 
                                 <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                                     <Box>
@@ -123,15 +116,17 @@ const Section2Home = () => {
                                     </Box>
 
                                 </Box>
-                                <Box>
-                                    <GradientButton>
-                                        <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
-                                    </GradientButton>
-                                </Box>
+
                             </Box>
                         </Grid>
                     ))}
                 </Grid>
+
+                <Box>
+                    <GradientButton>
+                        <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
+                    </GradientButton>
+                </Box>
 
 
 
@@ -140,6 +135,7 @@ const Section2Home = () => {
         </Box>
     )
 }
+
 const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 const SecondarySubTextBlack = styled(Typography)({
     fontFamily: "Inter",
@@ -186,4 +182,4 @@ const GradientButton = styled(Button)({
     padding: "15px 41px",
 });
 
-export default Section2Home
+export default Section2AboutUs      

@@ -1,7 +1,6 @@
-import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, styled, Container, Grid, Badge } from '@mui/material'
 import yatch from '../assets/images/yatch-home.png'
-import { GradientButton, ButtonTypography, linearGradient, linearGradient2 } from './landing-page-header'
+import { linearGradient } from './landing-page-header'
 
 const Section1Home = () => {
     return (
