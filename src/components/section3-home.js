@@ -5,58 +5,67 @@ import SectionImage from '../assets/images/home-section3-image.png'
 import { styled } from '@mui/material/styles'
 
 const Section3Home = () => {
-  return (
-    <Container disableGutters component="section" maxWidth="md" sx={{
-        display: "flex",  
-        padding: 0,
-    }}>
-        <Box
-        sx={{
-            background: linearGradient,
-            width: "100%",
-            height: "100%",
+    return (
+        <Container disableGutters component="section" maxWidth="md" sx={{
             display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: "20px",
-            marginBottom: "200px",
-        }}
-        >
-
+            padding: 0,
+        }}>
             <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                padding: "40px",
-                gap: "20px",
-                textAlign: "left",
-            }}
+                sx={{
+                    background: linearGradient,
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: { xs: "column", md: "row" },
+                    justifyContent: { xs: "center", md: "space-between" },
+                    alignItems: "center",
+                    borderRadius: "20px",
+                    marginBottom: { xs: "80px", md: "200px" },
+                    padding: { xs: 0, md: 0 }, // Add padding for spacing on mobile
+                }}
             >
-            <Box>
-            <HeadingText>Book the Best Vendors & Suppliers Instantly with Our AI Agent!</HeadingText>
+
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        padding: "40px",
+                        gap: "20px",
+                        textAlign: "left",
+                    }}
+                >
+                    <Box>
+                        <HeadingText>Book the Best Vendors & Suppliers Instantly with Our AI Agent!</HeadingText>
+                    </Box>
+
+                    <Box>
+                        <CustomButton variant="contained" color="white">Learn More</CustomButton>
+
+                    </Box>
+
+                </Box>
+
+                <Box
+                    component="img"
+                    src={SectionImage}
+                    alt="Section Image"
+                    sx={{
+                        width: { xs: "100%", md: "236px" },
+                        height: { xs: "100%", md: "235px" },
+                        maxWidth: { xs: "100%", md: "236px" },
+                        maxHeight: { xs: "100%", md: "235px" },
+                        borderBottomRightRadius: 20, 
+                        borderBottomLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
+                        borderTopLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
+                        display: "block", 
+                    }}
+                />
+
+
+
             </Box>
-
-            <Box>
-            <CustomButton variant="contained" color="white">Learn More</CustomButton>
-
-            </Box>
-
-            </Box>
-
-            <Box>
-            <img src={SectionImage} alt="Section Image" style={{width: "236",
-            height: "235px",
-            borderTopRightRadius: "20px",
-            borderBottomRightRadius: "20px",
-            }} />
-            </Box>
-           
-
-            
-        </Box>
-    </Container>
-  )
+        </Container>
+    )
 }
 
 const HeadingText = styled(Typography)({
@@ -76,7 +85,7 @@ export const CustomButton = styled(Button)({
     color: "black",
     padding: "13px 40px",
     borderRadius: "8px",
-  });
-  
+});
+
 
 export default Section3Home

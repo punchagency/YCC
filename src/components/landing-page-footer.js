@@ -190,15 +190,22 @@ const FooterHeadingTypography = styled(Typography)({
     whiteSpace: "nowrap",
 })
 
-const FooterTypography = styled(Typography)({
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: 400,
-    fontSize: "16px",
-    lineHeight: "21px",
-    letterSpacing: "0%",
-    color: "#E0E0E0",
+const FooterTypography = styled(Typography)(({ theme }) => ({
+  fontFamily: "Plus Jakarta Sans",
+  fontWeight: 400,
+  fontSize: "16px",
+  lineHeight: "21px",
+  letterSpacing: "0%",
+  color: "#E0E0E0",
+
+  [theme.breakpoints.up("md")]: { // No wrap on larger screens (md+)
     whiteSpace: "nowrap",
-})
+  },
+
+  [theme.breakpoints.down("sm")]: { // Wrap on small screens
+    whiteSpace: "normal",
+  },
+}))
 
 const FooterLink = styled(Link)({
     color: "#E0E0E0",

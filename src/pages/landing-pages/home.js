@@ -32,9 +32,17 @@ const HomeLandingPage = () => {
     <Box sx={{
       display: "flex",
       flexDirection: "column",
-      gap: "120px",
+      gap: {
+        xs: "47px",  // Smaller gap on mobile
+        sm: "60px",  // Medium gap on small screens
+        md: "90px",  // Larger gap on tablets
+        lg: "120px", // Default gap for large screens
+      },    
+      maxWidth: '100vw'
     }}>
-      <LandingPageBanner
+    
+ 
+         <LandingPageBanner
       backgroundImage={backgroundImage}
       header={header}
       subtext1={subtext1}
@@ -43,31 +51,56 @@ const HomeLandingPage = () => {
       button2={button2}
       page = {page}
       />
+         <Section1Home />
+         <Section2Home />
+         <Section3Home />
+         <Section4Home />
+         <LandingPageFooter />
+      {/*
 
-      <Section1Home />
-      <Section2Home />
-      <Section3Home />
-      <Section4Home />
-      <LandingPageFooter />
+   
+
+            
+    
+       */}
+      {/* <Section4Home />*/}
+      {/*  <LandingPageFooter />*/}
+
     </Box>
 
   );
 };
 
 const linearGradientLight =  `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
-const GradientText = styled(Typography)({
-  background: linearGradientLight,
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-  fontWeight: 600,
-  color: "white",
-  fontFamily: "Plus Jakarta Sans, sans-serif",
-  fontSize: "55.96px",
-  lineHeight: "60px",
-  letterSpacing: "-2%",
-  textTransform: "uppercase",
-  display: "inline-block",
-});
+const GradientText = (props) => (
+  <Typography
+    component="span"
+    sx={{
+      background: linearGradientLight,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      fontWeight: 600,
+      fontFamily: "Plus Jakarta Sans, sans-serif",
+      fontSize: {
+        xs: "32px", // Smaller font for mobile
+        sm: "40px",
+        md: "48px",
+        lg: "55.96px",
+      },
+      lineHeight: {
+        xs: "38px", // Smaller line height for mobile
+        sm: "45px", // Medium screens
+        md: "52px", // Larger screens
+        lg: "60px", // Default for large screens
+      },
+      letterSpacing: "-2%",
+      textTransform: "uppercase",
+      display: "inline-block",
+    }}
+  >
+    {props.children}
+  </Typography>
+);
 
 
 export default HomeLandingPage

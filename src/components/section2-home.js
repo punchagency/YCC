@@ -40,7 +40,7 @@ const Section2Home = () => {
             description: "Source your departments needs, look for creative ideas to enhance guests experiences,  and inquiry about specific information wherever you are. ",
             image: interiorIcon,
         },
-        
+
     ]
 
     return (
@@ -63,7 +63,12 @@ const Section2Home = () => {
                     display: "flex",
                     flexDirection: "column",
                     gap: "13px",
-                    maxWidth: "50%",
+                    maxWidth: {
+                        xs: "90%",  // Mobile - almost full width
+                        sm: "75%",  // Small screens - slightly smaller
+                        md: "60%",  // Medium screens - more controlled
+                        lg: "50%",  // Large screens - original width
+                    },
                 }}>
                     <Box sx={{
                         display: "flex",
@@ -89,7 +94,7 @@ const Section2Home = () => {
                     </HeadingText>
                 </Box>
 
-                <Grid container rowSpacing={{ xs: 3, sm: 4, md: 5}} columnSpacing={{ xs: 3, sm: 4, md: 5 }} sx={{ width: "100%" }}>
+                <Grid container rowSpacing={{ xs: 3, sm: 4, md: 5 }} columnSpacing={{ xs: 3, sm: 4, md: 5 }} sx={{ width: "100%" }}>
                     {gridData.map((item, index) => (
                         <Grid
                             item
@@ -102,20 +107,20 @@ const Section2Home = () => {
                                 textAlign: "left",
                             }}
                         >
-                            <Box sx={{ px: 4, py: 7, display: "flex",background: "#E6EFF28A",borderRadius: '13px', flexDirection: "column", gap: "28px",justifyContent:"space-between" }}>
-                               
-                               <Box sx={{ display: "flex", flexDirection: "column", gap: "28px"}}>
-                             <Box>
-                                    <img src={item.image} alt="yacht" />
-                                </Box>
-                                <Box>
-                                    <SecondaryHeadingText>
-                                        {item.title}
-                                    </SecondaryHeadingText>
-                                    <SecondarySubTextBlack>
-                                        {item.description}
-                                    </SecondarySubTextBlack>
-                                </Box>
+                            <Box sx={{ px: 4, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px", justifyContent: "space-between" }}>
+
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+                                    <Box>
+                                        <img src={item.image} alt="yacht" />
+                                    </Box>
+                                    <Box>
+                                        <SecondaryHeadingText>
+                                            {item.title}
+                                        </SecondaryHeadingText>
+                                        <SecondarySubTextBlack>
+                                            {item.description}
+                                        </SecondarySubTextBlack>
+                                    </Box>
 
                                 </Box>
                                 <Box>
@@ -145,14 +150,20 @@ const SecondarySubTextBlack = styled(Typography)({
     color: "#373737",
 })
 
-const HeadingText = styled(Typography)({
+const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px",
-    lineHeight: "51px",
+    fontSize: theme.breakpoints.values.xs ? "36px" :
+        theme.breakpoints.values.sm ? "40px" :
+            theme.breakpoints.values.md ? "42px" :
+                "46px", // Default for large screens
+    lineHeight: theme.breakpoints.values.xs ? "36px" :
+        theme.breakpoints.values.sm ? "40px" :
+            theme.breakpoints.values.md ? "46px" :
+                "51px", // Default for large screens
     letterSpacing: "-2%",
-})
+}));
 
 const SecondaryHeadingText = styled(Typography)({
     color: "#131313",
@@ -165,14 +176,14 @@ const SecondaryHeadingText = styled(Typography)({
 })
 
 const GradientButton = styled(Button)({
-  background: linearGradient,
-  fontSize: "16px",
-  fontFamily: "Inter, sans-serif",
-  textTransform: "none",
-  "&:hover": {
-    background: linearGradient2,
-  },
-  padding: "15px 41px",
+    background: linearGradient,
+    fontSize: "16px",
+    fontFamily: "Inter, sans-serif",
+    textTransform: "none",
+    "&:hover": {
+        background: linearGradient2,
+    },
+    padding: "15px 41px",
 });
 
 export default Section2Home

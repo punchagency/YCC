@@ -3,12 +3,24 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { AppBar, Toolbar, Button, Menu, MenuItem } from "@mui/material";
+import {
+  AppBar, Toolbar, Button, Menu, MenuItem, Drawer,  Collapse,
+  IconButton
+} from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MenuIcon from "@mui/icons-material/Menu";
+
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLocation } from "react-router-dom";
+
+
+
+
 const LandingPageHeader = () => {
+
   const location = useLocation();
   const navItems = [
     { title: "Home", link: "/home" },
@@ -30,9 +42,11 @@ const LandingPageHeader = () => {
     { title: "Contact", link: "/contact" }
   ]
 
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
   // Detect scroll position
   useEffect(() => {
@@ -58,22 +72,44 @@ const LandingPageHeader = () => {
     setOpenDropdown(null);
   };
 
+  const toggleDrawer = () => setMobileOpen(!mobileOpen);
+
 
   return (
-    <TransparentAppBar position="fixed" sx={{
-      zIndex: 1300,
-      transition: "0.3s ease-in-out",
-      backgroundColor: scrolled ? "rgba(0, 0, 0, 0.8)" : "transparent", // Change color on scroll
-      boxShadow: scrolled ? "0px 4px 10px rgba(0, 0, 0, 0.3)" : "none",
-    }}>
+    <TransparentAppBar
+      position="fixed"
+      sx={{
+        zIndex: 1300,
+        transition: "0.3s ease-in-out",
+        backgroundColor: {
+          xs: 'white',
+          md:  scrolled ? "rgba(0, 0, 0, 0.8)" : "transparent", // Change color on scroll
+        },
+        boxShadow: scrolled ? "0px 4px 10px rgba(0, 0, 0, 0.3)" : "none",
+        maxWidth: '100%'
+      }}>
 
-      <Toolbar sx={{ width: "100%", display: "flex", justifyContent: "center", gap: "30px" }}>
 
+      <Toolbar sx={{ width: "100%", display: "flex", justifyContent: { xs: 'space-between', md: 'center' }, gap: "30px" }}>
+
+        {/* Hamburger Menu - Always on the Left */}
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          onClick={toggleDrawer}
+          sx={{ display: { xs: "block", md: "none"},  background: "linear-gradient(90deg, #034D92, #0487D9)", color: 'white',   borderRadius: '8px', }}
+        >
+          <MenuIcon />
+        </IconButton>
+
+        {/* Logo */}
         <Box display="flex" alignItems="center">
           <img src={logo} alt="Logo" style={{ width: 50, height: 50, marginRight: 10 }} />
         </Box>
 
-        <Box sx={{ display: "flex", gap: "40px", alignItems: "center" }}>
+        {/* Desktop Navigation */}
+        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: "40px", alignItems: "center" }}>
 
           {navItems.map((item) => (
             item.options ? (
@@ -97,7 +133,7 @@ const LandingPageHeader = () => {
                   disablePortal
                   disableScrollLock
                   sx={{
-                    "& .MuiPaper-root": { padding: 0, boxShadow: "none", minWidth: "200px", borderRadius: '13px',}, // Remove padding from Paper
+                    "& .MuiPaper-root": { padding: 0, boxShadow: "none", minWidth: "200px", borderRadius: '13px', }, // Remove padding from Paper
                     "& .MuiList-root": { padding: 0, },
                   }}
                 >
@@ -152,8 +188,8 @@ const LandingPageHeader = () => {
         </Box>
 
 
-        {/* Buttons */}
-        <Box sx={{ display: "flex", gap: 2 }}>
+        {/* Desktop Buttons */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
           <GradientButton variant="contained">
             <ButtonTypography sx={{ color: "white" }}>Join Now</ButtonTypography></GradientButton>
           <Button variant="contained" sx={{ backgroundColor: "white", textTransform: "none" }}>
@@ -166,6 +202,118 @@ const LandingPageHeader = () => {
         </Box>
 
       </Toolbar>
+
+
+      {/* Mobile Drawer */}
+      <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer} sx={{
+        zIndex: 1301,
+      }}>
+
+
+
+
+
+
+
+
+
+        <Box sx={{ width: 250, display: "flex", flexDirection: "column", height: "100%",background: "linear-gradient(90deg, #034D92, #0487D9)", paddingBlock: '40px' }}>
+
+
+          <Box sx={{ flex: 1, padding: "20px" }}>
+            {/* Nav Item with dropdown */}
+            {navItems.map((item) =>
+              item.options ? (
+
+                <Box key={item.title}>
+                {/* Parent Item (Clickable) */}
+                <Button
+                  onClick={() => setOpen(!open)}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    textAlign: "left",
+                    width: "100%",
+                    padding: "10px",
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    color: "white",
+                    textTransform: 'none'
+                  }}
+                >
+                    <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                    {item.title} {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </Typography>
+                  
+                </Button>
+          
+                {/* Child Dropdown Menu */}
+                <Collapse in={open} timeout="auto" unmountOnExit>
+                  <Box sx={{ paddingLeft: "20px" }}>
+                    {item.options.map((option) => (
+                      <Button
+                        key={option.title}
+                        component={Link}
+                        to={option.route}
+                        onClick={toggleDrawer}
+                        sx={{
+                          display: "block",
+                          textAlign: "left",
+                          width: "100%",
+                          padding: "8px 0",
+                          fontSize: "14px",
+                          color: "white",
+                          textTransform: 'none'
+                        }}
+                      >
+                           <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                    {option.title}
+                  </Typography>
+                      </Button>
+                    ))}
+                  </Box>
+                </Collapse>
+              </Box>  
+
+              ) : (
+                <Button key={item.title} component={Link} to={item.link} onClick={toggleDrawer} sx={{ display: "block", textAlign: "left", width: "100%", padding: "10px", textTransform: 'none' }}>
+                  <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                    {item.title}
+                  </Typography>
+                </Button>
+              )
+            )}
+          </Box>
+
+          {/* Mobile Buttons at Bottom */}
+          <Box sx={{ padding: "20px", borderTop: "1px solid #ddd", textAlign: "center" }}>
+            <Button fullWidth variant="contained" sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", textTransform: 'none', color: "white", marginBottom: "10px" }}>
+            <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                   Join Now
+                  </Typography>
+            </Button>
+            <Button fullWidth variant="contained" sx={{ backgroundColor: "white", textTransform: 'none' }}>
+              <Typography sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",fontSize: "15px", cursor: "pointer",alignText: "center", letterSpacing: "-2%" }}>
+                Sign In
+              </Typography>
+            </Button>
+          </Box>
+
+
+
+
+        </Box>
+
+
+
+
+
+
+
+
+      </Drawer>
+
     </TransparentAppBar>
   )
 }
@@ -175,19 +323,39 @@ export const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 const TransparentAppBar = styled(AppBar)({
   backgroundColor: "transparent",
   boxShadow: "none",
-  padding: "20px 110px",
+  padding: {
+    xs: "20px 20px",  // Small screens (mobile)
+    sm: "20px 40px",  // Small tablets
+    md: "20px 80px",  // Medium screens (larger tablets, small laptops)
+    lg: "20px 110px", // Large screens (desktops)
+  },
   color: "white",
   fontSize: "16px",
   fontFamily: "Manrope, sans-serif",
   fontWeight: 400,
 });
 
-export const ButtonTypography = styled(Typography)({
-  fontSize: "16px",
+export const ButtonTypography = styled(Typography)(({ theme }) => ({
   fontFamily: "Inter, sans-serif",
-  lineHeight: "19px",
   fontWeight: 600,
-});
+  lineHeight: "19px",
+  fontSize: "16px", // Default for large screens
+
+  [theme.breakpoints.down("sm")]: { // Mobile (xs)
+    fontSize: "14px",
+    lineHeight: "17px",
+  },
+
+  [theme.breakpoints.between("sm", "md")]: { // Tablets (sm - md)
+    fontSize: "15px",
+    lineHeight: "18px",
+  },
+
+  [theme.breakpoints.up("md")]: { // Medium+ screens
+    fontSize: "16px",
+    lineHeight: "19px",
+  }
+}));
 
 export const GradientButton = styled(Button)({
   background: linearGradient,

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Box, Typography, Button, styled, Container, Grid } from '@mui/material'
 import logo from '../assets/images/captain/logo.png'
 const LandingPageInfoSection = ({ data }) => {
@@ -62,12 +61,6 @@ const LandingPageInfoSection = ({ data }) => {
                         <SecondarySubTextBlack variant='body1'>
                             {data.subText2}
                         </SecondarySubTextBlack>
-
-                        {data.button && (
-                            <GradientButton>
-                                <ButtonTypography sx={{ color: "white" }}>{data.button.text}</ButtonTypography>
-                            </GradientButton>
-                        )}
                     </Grid>
                 </Grid>
 

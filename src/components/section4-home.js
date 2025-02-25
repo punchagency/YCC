@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, Container, Button, styled, Grid, Badge } from '@mui/material'
+import { Box, Typography, Container, Button, styled, Grid } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from './landing-page-header'
 import yatch from '../assets/images/YCC-yatch.png'
 import banner from '../assets/images/water-wide.png'
@@ -7,26 +7,29 @@ import playIcon from '../assets/images/icons/play-button.png'
 const Section4Home = () => {
     return (
         <Box sx={{
-            paddingBottom: '288px',// must be exactly 60% of the overflowing box at the end
+            paddingBottom: { xs: "710px", md: "288px" },// must be exactly 60% of the overflowing box at the end
             //backgroundColor: 'pink',
         }}>
             <Box
                 sx={{
                     backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
+                    backgroundPosition: "center", 
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: '1032px',
+                    height: { xs: "500px", sm: "700px", md: "900px", lg: "1032px" },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',
+                    padding: { xs: "20px", md: "0" },
                 }}
             >
                 <Container maxWidth="lg" sx={{
                     justifyContent: 'center',
-                    display: 'flex'
+                    display: 'flex',
+                    
                 }}>
                     <Box sx={{
                         display: 'flex',
@@ -34,8 +37,8 @@ const Section4Home = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: '100%',
-                        width: '944px',
-                        gap: '30px'
+                        width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" }, 
+                        gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
                         <Box>
                             <img src={playIcon} alt="play" width='91px' height='91px' />
@@ -64,21 +67,35 @@ const Section4Home = () => {
                         position: 'absolute', // Position it relative to the red box
                         bottom: '0', // Aligns to the bottom
                         left: '50%', // Center it horizontally
-                        transform: 'translate(-50%, 60%)', // Shift left by 50% of width and down by 50% of height
+                        transform: {
+                            xs: "translate(-50%, 100%)", // Directly below for small screens
+                            sm: "translate(-50%, 30%)", // Slight offset for tablets
+                            md: "translate(-50%, 45%)", // Adjusted for medium screens
+                            lg: "translate(-50%, 60%)", // Default large screen behavior
+                          },
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '1180px', // Adjust width as needed
-                        height: '480px', // Adjust height as needed
+                        justifyContent: 'center', 
+                        width: {
+                            xs: "90%", // Mobile: take almost full width
+                            sm: "80%", // Tablets: slightly smaller
+                            md: "70%", // Medium screens
+                            lg: "1180px", // Large screens: fixed width
+                          },
+                        height: {
+                            xs: "300px", // Smaller height on mobile
+                            sm: "400px",
+                            md: "480px", // Original height on larger screens
+                          },
+                        flexWrap: { xs: "wrap", md: "nowrap" }, 
                     }}>
 
 
-                        <Grid container rowSpacing={0} columnSpacing={4} sx={{
+                        <Grid container  rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }}  sx={{
                             flexWrap: "wrap",
                             backgroundColor: "white",
                             borderRadius: '9px',
-
                             boxShadow: "0px 4px 10.2px 0px #0000001A"
                         }}>
 
@@ -88,6 +105,7 @@ const Section4Home = () => {
                                 flexDirection: "column",
                                 gap: "28px",
                                 textAlign: { xs: "center", md: "left" },
+                                alignItems: { xs: "center", md: "flex-start" }, 
 
                             }}>
                                 <Box sx={{
@@ -101,8 +119,7 @@ const Section4Home = () => {
                                     alignItems: "center",
                                     gap: "8px",
                                     flexDirection: "row",
-                                    paddingTop: "40px",
-
+                                    padding: { xs: "20px 20px 0 20px", md: "40px 0 0 0" },
                                 }}>
                                         <Box
                                             sx={{
@@ -110,13 +127,15 @@ const Section4Home = () => {
                                                 height: 8,
                                                 display: "inline-block",
                                                 backgroundColor: "#295FD1", // Keeps it invisible but structured
-                                                borderRadius: '20px'
+                                                borderRadius: '20px',
                                             }}
                                         />
                                     <BadgeText>
                                         Resources
                                     </BadgeText>
                                 </Box>
+
+
                                 <HeadingTextBlack>
                                     Expert Advice, Tips, And Trends for Yachting Professionals
                                 </HeadingTextBlack>
@@ -125,7 +144,7 @@ const Section4Home = () => {
                                     Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you’re managing operations or advancing your career, our blog is your resource for success.
                                 </SecondarySubTextBlack>
 
-                                <Box sx={{ display: "flex", gap: "15px" }}>
+                                <Box sx={{ display: "flex", gap: "15px" , padding: { xs: "0 20px 0 20px", md: "0 0 0 0" }}}>
                                     <GradientButton>
                                         <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography></GradientButton>
                                     <Button variant='outlined'
@@ -157,7 +176,7 @@ const Section4Home = () => {
                             </Grid>
 
                             <Grid item xs={12} md={6}>
-                                <Box>
+                                <Box >
                                     <img src={yatch} alt="Yacht Crew Center"
                                         style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
                                 </Box>
@@ -181,35 +200,74 @@ const SecondarySubText = styled(Typography)({
     color: "white",
 })
 
-const SecondarySubTextBlack = styled(Typography)({
+
+export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px",
+    fontSize: "15.26px", // Default for large screens
     lineHeight: "22.51px",
     letterSpacing: "0%",
     color: "#373737",
-    display: 'inline-block',
-    width: '500px'
-})
+    display: "inline-block",
+    width: "100%", // Makes it flexible
+  
+    [theme.breakpoints.down("md")]: {
+      fontSize: "14px",
+      lineHeight: "20px",
+      width: "500px", // Reduce width on tablets
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "13px",
+      lineHeight: "18px",
+      width: "100%", // Full width on mobile
+      padding: "0 20px 0 20px"
+    },
+  }));
 
 
-export const HeadingText = styled(Typography)({
+  export const HeadingText = styled(Typography)(({ theme }) => ({
     color: "white",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px",
+    fontSize: "46px", // Default size
+  
     lineHeight: "51px",
     letterSpacing: "-2%",
-})
-
-export const HeadingTextBlack = styled(Typography)({
+  
+    [theme.breakpoints.down("lg")]: {
+      fontSize: "42px",
+      lineHeight: "48px",
+    },
+    [theme.breakpoints.down("md")]: {
+      fontSize: "36px",
+      lineHeight: "44px",
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "28px",
+      lineHeight: "36px",
+    },
+  }));
+  export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px",
+    fontSize: "46px", // Default for large screens
     lineHeight: "51px",
     letterSpacing: "-2%",
-})
+  
+    [theme.breakpoints.down("lg")]: {
+      fontSize: "42px",
+      lineHeight: "48px",
+    },
+    [theme.breakpoints.down("md")]: {
+      fontSize: "36px",
+      lineHeight: "44px",
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "28px",
+      lineHeight: "36px",
+    },
+  }));
 
 
 const BadgeText = styled(Typography)({

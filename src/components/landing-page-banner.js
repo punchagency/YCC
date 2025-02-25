@@ -1,8 +1,7 @@
 
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
-import banner from '../assets/images/YCC-home-banner2.png'
-import { GradientButton, ButtonTypography, linearGradient, linearGradient2 } from '../components/landing-page-header'
+import { Box, Typography, Button, styled } from '@mui/material'
+import { GradientButton, ButtonTypography, linearGradient } from '../components/landing-page-header'
 
 const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, button1, button2 }) => {
 
@@ -14,8 +13,21 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                 position: "relative",
                 backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: "cover",
-                height: "100vh",
+                backgroundPosition: "center",
+                height: {
+                    xs: "100vh", // Reduce height on smaller screens
+                    sm: "100vh",
+                    md: "100vh",
+                  },
                 width: "100%",
+                padding: {
+                    xs: "0", // Add padding for mobile
+                    md: "0", // Remove padding for desktop
+                  },
+                marginTop: {
+                    xs: '0',
+                    md: '0'
+                },
             }}
         >
 {
@@ -74,27 +86,58 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                 flexDirection: "column",
                 gap: "28px",
                 position: "absolute",
-                top: "60%",
-                left: "30%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "left",
-                maxWidth: "690px",
+                top: {
+                    xs: "50%", // Adjust for better centering on small screens
+                    md: "60%",
+                  },
+                  left: {
+                    xs: "50%", // Center on mobile
+                    md: "30%", // Keep original positioning for larger screens
+                  },
+                  transform: {
+                    xs: "translate(-50%, -50%)", // Full centering on mobile
+                    md: "translate(-50%, -50%)",
+                  },
+                  textAlign: {
+                    xs: "center", // Center text on mobile
+                    md: "left",
+                  },
+                  width: '90%',
+                  maxWidth: {
+                    xs: "100%", // Reduce width on small screens
+                    sm: "80%",
+                    md: "690px", // Keep original for larger screens
+                  },
+                  padding: {
+                    xs: "10px", // Add padding on small screens
+                    md: "0",
+                  },
 
             }}>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <Box sx={{ display: "flex",width: '100%', flexDirection: "column", gap: "14px"}}>
                     <Typography sx={{
                         color: "white",
                         fontFamily: "Plus Jakarta Sans, sans-serif",
                         fontWeight: 600,
-                        fontSize: "55.96px",
-                        lineHeight: "60px",
+                        fontSize: {
+                            xs: "32px",  // Smaller font for mobile
+                            sm: "40px",  // Slightly bigger for small tablets
+                            md: "48px",  // Medium screens
+                            lg: "55.96px",  // Default for large screens
+                          },
+                          lineHeight: {
+                            xs: "38px", // Smaller line height for mobile
+                            sm: "45px", // Medium screens
+                            md: "52px", // Larger screens
+                            lg: "60px", // Default for large screens
+                          },
                         letterSpacing: "-2%",
                         textTransform: "uppercase",
                     }}>
                         { header }
                     </Typography>
 
-                    <PrimarySubText>
+                    <PrimarySubText sx={{ display: {xs: 'none', md: 'flex'} }} >
                         { subtext1 }
                     </PrimarySubText>
                 </Box>

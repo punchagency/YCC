@@ -87,16 +87,16 @@ const HeadingText = styled(Typography)({
     letterSpacing: "-2%",
 })
 
-export const GradientText = styled(Typography)({
-    background: linearGradient,
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    fontFamily: "Inter",
-    fontWeight: 600,
-    fontSize: "14px",
-    lineHeight: "16.94px",
-    letterSpacing: "-2%",
-    textTransform: "uppercase",
-    display: "inline-block",
-});
+export const GradientText = styled(Typography)(({ theme }) => ({
+  background: linearGradient,
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  fontFamily: "Inter",
+  fontWeight: 600,
+  fontSize:"14px",  // Smaller font on mobile
+  lineHeight: theme.breakpoints.down("sm") ? "14px" : "16.94px",  // Adjusted line height
+  letterSpacing: "-2%",
+  textTransform: "uppercase",
+  display: "inline-block",
+}));
 export default Section1Home
