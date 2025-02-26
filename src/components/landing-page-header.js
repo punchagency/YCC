@@ -38,7 +38,7 @@ const LandingPageHeader = () => {
     },
     { title: "Vendor & Services", link: "/vendor-services" },
     { title: "About Us", link: "/about-us" },
-    { title: "Resource Center", link: "/resources" },
+    { title: "Resource Center", link: "/resource-center" },
     { title: "Contact", link: "/contact" }
   ]
 
@@ -98,9 +98,22 @@ const LandingPageHeader = () => {
           color="inherit"
           aria-label="menu"
           onClick={toggleDrawer}
-          sx={{ display: { xs: "block", md: "none"},  background: "linear-gradient(90deg, #034D92, #0487D9)", color: 'white',   borderRadius: '8px', }}
+          sx={{ 
+            display: { xs: "flex", md: "none"},
+            background: "linear-gradient(90deg, #034D92, #0487D9)",
+            width: 50,
+            height: 50,
+            minWidth: 50,   // Ensures the button does not shrink
+            minHeight: 50,  // Ensures the button does not shrink
+            padding: 0,
+            color: 'white',
+            borderRadius: '8px', 
+            alignContent: "center",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          <MenuIcon />
+          <MenuIcon/>
         </IconButton>
 
         {/* Logo */}
@@ -242,7 +255,17 @@ const LandingPageHeader = () => {
                     textTransform: 'none'
                   }}
                 >
-                    <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                    <Typography sx={{
+                        fontSize: "14px",
+                        cursor: "pointer",
+                        color: location.pathname === item.link ? "white" : "rgba(255, 255, 255, 0.8)",
+                        textAlign: "center", // Correct property for text alignment
+                        letterSpacing: "-2%",
+                        display: "flex", // Enables flexbox
+                        alignItems: "center", // Vertically centers text & icon
+                        justifyContent: "center", // Horizontally centers content
+                        gap: "4px",
+                    }}>
                     {item.title} {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   </Typography>
                   
@@ -267,7 +290,7 @@ const LandingPageHeader = () => {
                           textTransform: 'none'
                         }}
                       >
-                           <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                           <Typography sx={{fontWeight: location.pathname === option.route ? "bold" : "normal", fontSize: "14px", cursor: "pointer", color: location.pathname === option.route ? "white" : "rgba(255, 255, 255, 0.8)", alignText: "center", letterSpacing: "-2%" }}>
                     {option.title}
                   </Typography>
                       </Button>
@@ -278,7 +301,7 @@ const LandingPageHeader = () => {
 
               ) : (
                 <Button key={item.title} component={Link} to={item.link} onClick={toggleDrawer} sx={{ display: "block", textAlign: "left", width: "100%", padding: "10px", textTransform: 'none' }}>
-                  <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                  <Typography sx={{fontWeight: location.pathname === item.link ? "bold" : "normal", fontSize: "14px", cursor: "pointer", color: location.pathname === item.link ? "white" : "rgba(255, 255, 255, 0.8)", alignText: "center", letterSpacing: "-2%" }}>
                     {item.title}
                   </Typography>
                 </Button>
