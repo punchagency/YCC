@@ -75,7 +75,7 @@ import EngineeringLandingPage from "./pages/landing-pages/engineering";
 import VendorAndServices from "./pages/landing-pages/vendor-services";
 import AboutUs from "./pages/landing-pages/about-us";
 import ResourceCenter from "./pages/landing-pages/resource-center";
-import Contact from "./pages/landing-pages/contact";
+import ContactUs from "./pages/landing-pages/contact-us";
 
 function App() {
   return (
@@ -99,7 +99,7 @@ function App() {
         <Route path="/vendor-services" element={<VendorAndServices />}/>
         <Route path="/about-us" element={<AboutUs />}/>
         <Route path="/resource-center" element={<ResourceCenter />}/>
-        <Route path="/contact" element={<Contact />}/>
+        <Route path="/contact-us" element={<ContactUs />}/>
         </Route>
 
 

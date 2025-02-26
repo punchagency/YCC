@@ -39,7 +39,7 @@ const LandingPageHeader = () => {
     { title: "Vendor & Services", link: "/vendor-services" },
     { title: "About Us", link: "/about-us" },
     { title: "Resource Center", link: "/resource-center" },
-    { title: "Contact", link: "/contact" }
+    { title: "Contact", link: "/contact-us" }
   ]
 
   const [mobileOpen, setMobileOpen] = useState(false);
