@@ -9,7 +9,8 @@ export default function LandingPageLayout() {
   return (
     <Box component="main" sx={{ minHeight: "100vh"}}>
      {/*<LandingPageHeader/>  */}
-     <LandingPageHeader />
+
+     <LandingPageHeader/>
    
 
    {/*  <SimpleBar style={{ maxHeight: "100vh", width: "100vw", overflowX: "hidden" }}> */}

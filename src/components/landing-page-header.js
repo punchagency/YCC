@@ -122,7 +122,7 @@ const LandingPageHeader = () => {
         </Box>
 
         {/* Desktop Navigation */}
-        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: "40px", alignItems: "center" }}>
+        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: {sm: '5px', lg: '40px'}, alignItems: "center" }}>
 
           {navItems.map((item) => (
             item.options ? (
@@ -203,9 +203,11 @@ const LandingPageHeader = () => {
 
         {/* Desktop Buttons */}
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+          <Link to='/get-started' >
           <GradientButton variant="contained">
             <ButtonTypography sx={{ color: "white" }}>Join Now</ButtonTypography></GradientButton>
-          <Button variant="contained" sx={{ backgroundColor: "white", textTransform: "none" }}>
+            </Link>
+          <Button variant="contained" component={Link} to='/login' sx={{ backgroundColor: "white", textTransform: "none" }}>
             <ButtonTypography sx={{
               background: "linear-gradient(90deg, #034D92, #0487D9)",
               WebkitBackgroundClip: "text",
@@ -311,12 +313,12 @@ const LandingPageHeader = () => {
 
           {/* Mobile Buttons at Bottom */}
           <Box sx={{ padding: "20px", borderTop: "1px solid #ddd", textAlign: "center" }}>
-            <Button fullWidth variant="contained" sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", textTransform: 'none', color: "white", marginBottom: "10px" }}>
+            <Button component={Link} to='/get-started' fullWidth variant="contained" sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", textTransform: 'none', color: "white", marginBottom: "10px" }}>
             <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
                    Join Now
                   </Typography>
             </Button>
-            <Button fullWidth variant="contained" sx={{ backgroundColor: "white", textTransform: 'none' }}>
+            <Button component={Link} to='/login' fullWidth variant="contained" sx={{ backgroundColor: "white", textTransform: 'none' }}>
               <Typography sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",fontSize: "15px", cursor: "pointer",alignText: "center", letterSpacing: "-2%" }}>
                 Sign In
               </Typography>

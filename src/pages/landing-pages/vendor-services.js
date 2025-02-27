@@ -16,7 +16,8 @@ const VendorAndServices = () => {
     );
     const subtext2 = "Find and connect directly with Yacht Crew. Simplify your order & booking management with Yacht Crew Center’s platform .Onboard your Yacht Services and Supplies to simplify Business Management.";
     const button1 = {
-        text: 'Join A Comprehensive Global Marketplace'
+        text: 'Join A Comprehensive Global Marketplace',
+        path: '/get-started'
     }
     return (
         <Box sx={{

@@ -16,7 +16,8 @@ const ExteriorLandingPage = () => {
     );
     const subtext2 = 'Master the art of yacht maintenance, safety, and watersports with expert advice and trusted tools designed for exterior crew'
     const button1 = {
-        text: 'Join Our Crew Network'
+        text: 'Join Our Crew Network',
+        path: '/get-started'
     }
 
     return (

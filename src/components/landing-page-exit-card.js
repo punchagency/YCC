@@ -3,7 +3,8 @@ import { Box, Typography, Container, Button, styled, Grid } from '@mui/material'
 import { ButtonTypography, linearGradient } from './landing-page-header'
 import yatch from '../assets/images/YCC-yatch.png'
 import banner from '../assets/images/water.png'
-const LandingPageExitCard = ({sectionData}) => {
+import { Link } from 'react-router-dom'
+const LandingPageExitCard = ({ sectionData }) => {
 
     return (
         <Box sx={{
@@ -17,7 +18,7 @@ const LandingPageExitCard = ({sectionData}) => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: '50vh',
+                    height: { xs: '40vh', md: '30vh', lg: '50vh' },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',
@@ -31,8 +32,13 @@ const LandingPageExitCard = ({sectionData}) => {
                     <Box sx={{
                         position: 'absolute', // Position it relative to the red box
                         bottom: '0', // Aligns to the bottom
-                        left: '50%', // Center it horizontally
-                        transform: 'translate(-50%, 60%)', // Shift left by 50% of width and down by 50% of height
+                        left: '50%', // Center it horizontally     
+                        transform: {
+                            xs: "translate(-50%, 50%)", // Directly below for small screens
+                            sm: "translate(-50%, 50%)", // Slight offset for tablets
+                            md: "translate(-50%, 30%)", // Adjusted for medium screens
+                            lg: "translate(-50%, 60%)", // Default large screen behavior
+                        },
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
@@ -45,7 +51,7 @@ const LandingPageExitCard = ({sectionData}) => {
                     }}>
 
 
-                        <Grid container rowSpacing={0} columnSpacing={4} sx={{
+                        <Grid container rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }} sx={{
                             flexWrap: "wrap",
                             borderRadius: '9px',
                             backgroundColor: 'white',
@@ -70,23 +76,43 @@ const LandingPageExitCard = ({sectionData}) => {
                                 }}>
 
                                     <HeadingTextBlack>
-                                       {sectionData.title}
+                                        {sectionData.title}
                                     </HeadingTextBlack>
                                 </Box>
                                 <SecondarySubTextBlack >
-                                  {sectionData.subText}
-                                   </SecondarySubTextBlack>
+                                    {sectionData.subText}
+                                </SecondarySubTextBlack>
 
-                                <Box sx={{ display: "flex", gap: "15px" }}>
-                                    <GradientButton>
-                                        <ButtonTypography sx={{ color: "white" }}>{sectionData.button.text}</ButtonTypography></GradientButton>
+                                <Box sx={{ display: "flex", gap: "15px", justifyContent: 'center' }}>
+                                    <Link to={sectionData.button.path}>
+                                        <GradientButton>
+                                            <ButtonTypography sx={{ color: "white" }}>{sectionData.button.text}</ButtonTypography>
+                                        </GradientButton>
+                                    </Link>
                                 </Box>
                             </Grid>
 
                             <Grid item xs={12} md={6}>
-                                <Box>
+                                <Box sx={{
+                                    position: 'relative',
+                                    height: '100%'
+                                }}>
                                     <img src={yatch} alt="Yacht Crew Center"
                                         style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
+
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0, // Ensure it starts from the left
+                                            background: "linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
+                                            height: "100%",
+                                            width: "35%",
+                                            zIndex: 1, // Ensure it appears above the image
+                                        }}
+                                    />
+
+
                                 </Box>
 
                             </Grid>
@@ -102,46 +128,86 @@ const LandingPageExitCard = ({sectionData}) => {
 
 export const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 
-const SecondarySubTextBlack = styled(Typography)({
+
+export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px",
+    fontSize: "15.26px", // Default for large screens
     lineHeight: "22.51px",
     letterSpacing: "0%",
     color: "#373737",
-    display: 'inline-block',
-    width: '500px'
-})
+    display: "inline-block",
+    width: "100%", // Makes it flexible
 
+    [theme.breakpoints.down("md")]: {
+        fontSize: "14px",
+        lineHeight: "20px",
+        width: "500px", // Reduce width on tablets
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "13px",
+        lineHeight: "18px",
+        width: "100%", // Full width on mobile
+        padding: "0 20px 0 20px"
+    },
+}));
 
-export const HeadingText = styled(Typography)({
+export const HeadingText = styled(Typography)(({ theme }) => ({
     color: "white",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px",
+    fontSize: "46px", // Default size
+
     lineHeight: "51px",
     letterSpacing: "-2%",
-})
 
-export const HeadingTextBlack = styled(Typography)({
+    [theme.breakpoints.down("lg")]: {
+        fontSize: "42px",
+        lineHeight: "48px",
+    },
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "44px",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "36px",
+    },
+}));
+export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px",
+    fontSize: "46px", // Default for large screens
     lineHeight: "51px",
     letterSpacing: "-2%",
-})
+
+    [theme.breakpoints.down("lg")]: {
+        fontSize: "30px",
+        lineHeight: "40px",
+    },
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "44px",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "36px",
+    },
+}));
 
 
- const GradientButton = styled(Button)({
-  background: linearGradient,
-  fontSize: "16px",
-  fontFamily: "Inter, sans-serif",
-  textTransform: "none",
-  "&:hover": {
-    background: linearGradient2,
-  },
-  padding: "17.5px 89px",
+
+
+const GradientButton = styled(Button)({
+    background: linearGradient,
+    fontSize: "16px",
+    fontFamily: "Inter, sans-serif",
+    textTransform: "none",
+    "&:hover": {
+        background: linearGradient2,
+    },
+    padding: "17.5px 89px",
 });
 
 

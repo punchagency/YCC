@@ -7,6 +7,7 @@ import chefGalleryIcon from '../assets/images/icons/home-page-chef.png'
 import interiorIcon from '../assets/images/icons/home-page-interior.png'
 import { GradientText } from './section1-home'
 import { ButtonTypography, linearGradient } from './landing-page-header'
+import { Link } from 'react-router-dom'
 
 const Section2Home = () => {
     const gridData = [
@@ -14,31 +15,37 @@ const Section2Home = () => {
             title: "Captains",
             description: "Better manage your vessel and departments through AI. Explore the future of modern yacht management.",
             image: shipIcon,
+            path: '/captain'
         },
         {
             title: "Crew",
             description: "Access resources for career training, local accommodation's, mental health and more. Feel supported in your life on and off the water.",
             image: crewIcon,
+            path: '/crew'
         },
         {
             title: "Engineering",
             description: "Equipment troubleshooting, schedule services, order parts and develop additional skills.  Be able to simplify and focus on what is important in your department.",
             image: engineeringIcon,
+            path: '/engineering'
         },
         {
             title: "Exterior",
             description: "Elevate your exterior skill set and per. Source your department needs, look for creative ideas to enhance guests experiences, and inquire about specific information wherever you are. ",
             image: shipIcon,
+            path: '/exterior'
         },
         {
             title: "Chef/Gallery",
             description: "Search suggestions for recipes based on diet restrictions and what you have on hand.  Assistance with sourcing for local provisions. Focus on your art and leave the suggestions and sourcing to us.",
             image: chefGalleryIcon,
+            path: '/chef-gallery'
         },
         {
             title: "Interior",
             description: "Source your departments needs, look for creative ideas to enhance guests experiences,  and inquiry about specific information wherever you are. ",
             image: interiorIcon,
+            path: '/interior'
         },
 
     ]
@@ -124,9 +131,11 @@ const Section2Home = () => {
 
                                 </Box>
                                 <Box>
+                                    <Link to={item.path}>
                                     <GradientButton>
                                         <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
                                     </GradientButton>
+                                    </Link>
                                 </Box>
                             </Box>
                         </Grid>

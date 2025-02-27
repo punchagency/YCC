@@ -19,7 +19,8 @@ const CrewLandingPage = () => {
   );
   const subtext2 = 'From recruitment to mental health and off-duty resources, access everything you need to thrive in your yachting career.'
   const button1 = {
-    text: 'Join Our Crew Network'
+    text: 'Join Our Crew Network',
+    path: '/get-started'
   }
 
   return (

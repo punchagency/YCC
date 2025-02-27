@@ -13,18 +13,33 @@ const LandingPageFooter = () => {
     const footerData = [
         {
             title: "Quick Links",
-            links: ["Home", "Departments", "Vendors & Services", "About Us", "Resource Center"],
+            links: [
+                { name: "Home", path: "/home" },
+                { name: "Vendor & Services", path: "/vendor-services" },
+                { name: "About Us", path: "/about-us" },
+                { name: "Resource Center", path: "/resource-center" },
+            ],
             size: 2,
         },
         {
             title: "Departments",
-            links: ["Captains", "Chef Gallery", "Engineering", "Crew", "Interior", "Exterior"],
+            links: [
+                { name: "Captain", path: "/captain" },
+                { name: "Chef Gallery", path: "/chef-gallery" },
+                { name: "Engineering", path: "/engineering" },
+                { name: "Crew", path: "/crew" },
+                { name: "Interior", path: "/interior" },
+                { name: "Exterior", path: "/exterior" },
+            ],
             size: 2,
         },
         {
             title: "Contacts",
-            links: ["contact@yachtcrewcenter.com", "+1 954 532 0550t"],
-            size: 2.3,
+            links: [
+                { name: "contact@yachtcrewcenter.com", path: "mailto:contact@yachtcrewcenter.com" },
+                { name: "+1 954 532 0550", path: "tel:+19545320550" },
+            ],
+            size: 3,
         },
     ]
     return (<Box
@@ -36,6 +51,7 @@ const LandingPageFooter = () => {
             justifyContent: "center",
             alignItems: "center", // Center content
             flexDirection: "column",
+            maxWidth: '100vw'
         }}
     >
 
@@ -43,9 +59,6 @@ const LandingPageFooter = () => {
             sx={{
                 p: 0,
                 display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                gap: "31px",
                 width: "100%",
                 backgroundColor: "white",
 
@@ -69,7 +82,7 @@ const LandingPageFooter = () => {
         >
             <Grid container spacing={2}>
                 {/* First column (2x wider, but responsive) */}
-                <Grid item xs={12} sm={6} md={5.7}>
+                <Grid item xs={12} sm={6} md={5}>
                     <Box sx={{ textAlign: "left" }}>
                         <Box>
                             <img
@@ -79,17 +92,16 @@ const LandingPageFooter = () => {
                             />
                         </Box>
                         <Box>
-                            <GradientButton>
-                                <ButtonTypography
-                                    sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
-                                >
-                                    Contact Yacht Crew Center, LLC &nbsp; <img
-                                src={anchor}
-                                alt="logo"
-                            
-                            />
-                                </ButtonTypography>
-                            </GradientButton>
+                            <Link to="/contact-us" style={{ textDecoration: "none" }}>
+                                <GradientButton>
+                                    <ButtonTypography
+                                        sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
+                                    >
+                                        Contact Yacht Crew Center, LLC &nbsp;
+                                        <img src={anchor} alt="logo" />
+                                    </ButtonTypography>
+                                </GradientButton>
+                            </Link>
                         </Box>
                     </Box>
                 </Grid>
@@ -101,11 +113,9 @@ const LandingPageFooter = () => {
                             <FooterHeadingTypography>{link.title}</FooterHeadingTypography>
                             <List>
                                 {link.links.map((linkItem, idx) => (
-                                    <ListItem key={idx} sx={{ paddingLeft: "0px", paddingBlock: "5px" }}>
-                                        <FooterTypography
-
-                                        >
-                                            {linkItem}
+                                    <ListItem key={idx} component={Link} to={linkItem.path} sx={{ paddingLeft: "0px", paddingBlock: "5px" }}>
+                                        <FooterTypography>
+                                            {linkItem.name}
                                         </FooterTypography>
                                     </ListItem>
                                 ))}
@@ -147,7 +157,7 @@ const ButtonTypography = styled(Typography)({
     fontWeight: 600,
     display: 'flex',
     justifyContent: 'center'
-  });
+});
 
 const FooterGradientHeadingTypography = styled(Typography)(({ theme }) => ({
     fontFamily: "Plus Jakarta Sans",
@@ -172,7 +182,7 @@ const FooterGradientHeadingTypography = styled(Typography)(({ theme }) => ({
         fontSize: "12vw",
     },
     [theme.breakpoints.down("sm")]: {
-        fontSize: "14vw",
+        fontSize: "13.5vw",
     },
     [theme.breakpoints.down("xs")]: {
         fontSize: "16vw",
@@ -191,20 +201,20 @@ const FooterHeadingTypography = styled(Typography)({
 })
 
 const FooterTypography = styled(Typography)(({ theme }) => ({
-  fontFamily: "Plus Jakarta Sans",
-  fontWeight: 400,
-  fontSize: "16px",
-  lineHeight: "21px",
-  letterSpacing: "0%",
-  color: "#E0E0E0",
+    fontFamily: "Plus Jakarta Sans",
+    fontWeight: 400,
+    fontSize: "16px",
+    lineHeight: "21px",
+    letterSpacing: "0%",
+    color: "#E0E0E0",
 
-  [theme.breakpoints.up("md")]: { // No wrap on larger screens (md+)
-    whiteSpace: "nowrap",
-  },
+    [theme.breakpoints.up("md")]: { // No wrap on larger screens (md+)
+        whiteSpace: "nowrap",
+    },
 
-  [theme.breakpoints.down("sm")]: { // Wrap on small screens
-    whiteSpace: "normal",
-  },
+    [theme.breakpoints.down("sm")]: { // Wrap on small screens
+        whiteSpace: "normal",
+    },
 }))
 
 const FooterLink = styled(Link)({

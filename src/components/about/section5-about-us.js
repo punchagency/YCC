@@ -1,9 +1,10 @@
 import React from 'react'
-import { Box, Typography, Container, Button, styled, Grid } from '@mui/material'
+import { Box, Typography, Container,styled, Grid } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
 import yatch from '../../assets/images/YCC-yatch.png'
 import banner from '../../assets/images/water-wide.png'
 import playIcon from '../../assets/images/icons/play-button.png'
+import { Link } from 'react-router-dom'
 const Section5AboutUs = () => {
 
     return (
@@ -117,8 +118,11 @@ const Section5AboutUs = () => {
                                 </SecondarySubTextBlack>
 
                                 <Box sx={{ display: "flex", gap: "15px" }}>
-                                    <GradientButton>
-                                        <ButtonTypography sx={{ color: "white" }}>Join Our Crew Network</ButtonTypography></GradientButton>
+                                    <Link to="/get-started">
+                                        <GradientButton>
+                                            <ButtonTypography sx={{ color: "white" }}>Join Our Crew Network</ButtonTypography>
+                                        </GradientButton>
+                                    </Link>
                                 </Box>
                             </Grid>
 
@@ -215,18 +219,6 @@ export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
         lineHeight: "36px",
     },
 }));
-
-
-const BadgeText = styled(Typography)({
-    color: '#295FD1',
-    fontFamily: "Inter",
-    fontWeight: 600,
-    fontSize: "14px",
-    lineHeight: "16.94px",
-    letterSpacing: "-2%",
-    textTransform: "uppercase",
-    display: "inline-block",
-});
 
 export const GradientText = styled(Typography)({
     background: linearGradient,

@@ -3,6 +3,7 @@ import { Container, Box, Typography, Button } from '@mui/material'
 import { linearGradient } from './landing-page-header'
 import SectionImage from '../assets/images/home-section3-image.png'
 import { styled } from '@mui/material/styles'
+import { Link } from 'react-router-dom'
 
 const Section3Home = () => {
     return (
@@ -39,7 +40,9 @@ const Section3Home = () => {
                     </Box>
 
                     <Box>
+                        <Link to='/vendor-services'>
                         <CustomButton variant="contained" color="white">Learn More</CustomButton>
+                        </Link>
 
                     </Box>
 

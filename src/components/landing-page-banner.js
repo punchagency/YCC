@@ -2,6 +2,7 @@
 import React from 'react'
 import { Box, Typography, Button, styled } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from '../components/landing-page-header'
+import { Link } from 'react-router-dom'
 
 const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, button1, button2 }) => {
 
@@ -19,6 +20,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     sm: "100vh",
                     md: "100vh",
                   },
+                maxHeight: '100vh',
                 width: "100%",
                 padding: {
                     xs: "0", // Add padding for mobile
@@ -92,7 +94,8 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                   },
                   left: {
                     xs: "50%", // Center on mobile
-                    md: "30%", // Keep original positioning for larger screens
+                    md: "40%", // Keep original positioning for larger screens
+                    lg: "30%",
                   },
                   transform: {
                     xs: "translate(-50%, -50%)", // Full centering on mobile
@@ -145,10 +148,12 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     {subtext2}
                 </SecondarySubText>}
 
-                <Box sx={{ display: "flex", gap: "15px" }}>
+                <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
+                    <Link to={button1.path}>
                     <GradientButton>
                         <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography></GradientButton>
-                  {button2 &&   <Button variant='outlined'
+                        </Link>
+                  {button2 &&   <Button variant='outlined' component={Link} to={button2.path}
 
                         sx={{
                             position: "relative",
@@ -172,7 +177,8 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         }}
 
                     >
-                        <ButtonTypography sx={{ color: "white" }}>{button2.text}</ButtonTypography></Button>
+                        <ButtonTypography sx={{ color: "white" }}>{button2.text}</ButtonTypography>
+                        </Button>
                         }
                 </Box>
             </Box>

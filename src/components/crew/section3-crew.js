@@ -7,7 +7,8 @@ const Section3Crew = () => {
         title: 'Join Our Crew Network Today',
         subText: 'Elevate your career as a Yacht crew member. Become a member of our verified Crew Network and gain access to exclusive resources, job opportunities, and a supportive community dedicated to your success.',
         button: {
-            text: 'Join Now'
+            text: 'Join Now',
+            path: '/get-started'
         }
     } 
   return (

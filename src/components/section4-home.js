@@ -4,6 +4,7 @@ import { GradientButton, ButtonTypography, linearGradient } from './landing-page
 import yatch from '../assets/images/YCC-yatch.png'
 import banner from '../assets/images/water-wide.png'
 import playIcon from '../assets/images/icons/play-button.png'
+import { Link } from 'react-router-dom'
 const Section4Home = () => {
     return (
         <Box sx={{
@@ -14,7 +15,7 @@ const Section4Home = () => {
                 sx={{
                     backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
-                    backgroundPosition: "center", 
+                    backgroundPosition: "center",
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -29,7 +30,7 @@ const Section4Home = () => {
                 <Container maxWidth="lg" sx={{
                     justifyContent: 'center',
                     display: 'flex',
-                    
+
                 }}>
                     <Box sx={{
                         display: 'flex',
@@ -37,7 +38,7 @@ const Section4Home = () => {
                         alignItems: 'center',
                         justifyContent: 'center',
                         height: '100%',
-                        width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" }, 
+                        width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
                         <Box>
@@ -53,13 +54,15 @@ const Section4Home = () => {
                         </Box>
 
                         <Box>
-                            <GradientButton>
-                                <ButtonTypography
-                                    sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
-                                >
-                                    Join Our Network Now
-                                </ButtonTypography>
-                            </GradientButton>
+                            <Link to='/get-started'>
+                                <GradientButton>
+                                    <ButtonTypography
+                                        sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
+                                    >
+                                        Join Our Network Now
+                                    </ButtonTypography>
+                                </GradientButton>
+                            </Link>
                         </Box>
                     </Box>
 
@@ -72,27 +75,27 @@ const Section4Home = () => {
                             sm: "translate(-50%, 30%)", // Slight offset for tablets
                             md: "translate(-50%, 45%)", // Adjusted for medium screens
                             lg: "translate(-50%, 60%)", // Default large screen behavior
-                          },
+                        },
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
-                        justifyContent: 'center', 
+                        justifyContent: 'center',
                         width: {
                             xs: "90%", // Mobile: take almost full width
                             sm: "80%", // Tablets: slightly smaller
                             md: "70%", // Medium screens
                             lg: "1180px", // Large screens: fixed width
-                          },
+                        },
                         height: {
                             xs: "300px", // Smaller height on mobile
                             sm: "400px",
                             md: "480px", // Original height on larger screens
-                          },
-                        flexWrap: { xs: "wrap", md: "nowrap" }, 
+                        },
+                        flexWrap: { xs: "wrap", md: "nowrap" },
                     }}>
 
 
-                        <Grid container  rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }}  sx={{
+                        <Grid container rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }} sx={{
                             flexWrap: "wrap",
                             backgroundColor: "white",
                             borderRadius: '9px',
@@ -105,22 +108,22 @@ const Section4Home = () => {
                                 flexDirection: "column",
                                 gap: "28px",
                                 textAlign: { xs: "center", md: "left" },
-                                alignItems: { xs: "center", md: "flex-start" }, 
-
-                            }}>
-                                <Box sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "12px",
+                                alignItems: { xs: "center", md: "flex-start" },
 
                             }}>
                                 <Box sx={{
                                     display: "flex",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    flexDirection: "row",
-                                    padding: { xs: "20px 20px 0 20px", md: "40px 0 0 0" },
+                                    flexDirection: "column",
+                                    gap: "12px",
+
                                 }}>
+                                    <Box sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        flexDirection: "row",
+                                        padding: { xs: "20px 20px 0 20px", md: "40px 0 0 0" },
+                                    }}>
                                         <Box
                                             sx={{
                                                 width: 8, // Controls the size of the badge anchor
@@ -130,23 +133,26 @@ const Section4Home = () => {
                                                 borderRadius: '20px',
                                             }}
                                         />
-                                    <BadgeText>
-                                        Resources
-                                    </BadgeText>
-                                </Box>
+                                        <BadgeText>
+                                            Resources
+                                        </BadgeText>
+                                    </Box>
 
 
-                                <HeadingTextBlack>
-                                    Expert Advice, Tips, And Trends for Yachting Professionals
-                                </HeadingTextBlack>
+                                    <HeadingTextBlack>
+                                        Expert Advice, Tips, And Trends for Yachting Professionals
+                                    </HeadingTextBlack>
                                 </Box>
                                 <SecondarySubTextBlack >
                                     Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you’re managing operations or advancing your career, our blog is your resource for success.
                                 </SecondarySubTextBlack>
 
-                                <Box sx={{ display: "flex", gap: "15px" , padding: { xs: "0 20px 0 20px", md: "0 0 0 0" }}}>
-                                    <GradientButton>
-                                        <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography></GradientButton>
+                                <Box sx={{ display: "flex", gap: "15px", padding: { xs: "0 20px 0 20px", md: "0 0 0 0" } }}>
+                                    <Link to='/resource-center' >
+                                        <GradientButton>
+                                            <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
+                                        </GradientButton>
+                                    </Link>
                                     <Button variant='outlined'
 
                                         sx={{
@@ -176,10 +182,27 @@ const Section4Home = () => {
                             </Grid>
 
                             <Grid item xs={12} md={6}>
-                                <Box >
+                                <Box
+                                    sx={{
+                                        position: 'relative',
+                                        height: '100%'
+                                    }} >
                                     <img src={yatch} alt="Yacht Crew Center"
                                         style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
+                                    <Box
+                                        sx={{
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0, // Ensure it starts from the left
+                                            background: "linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
+                                            height: "100%",
+                                            width: "35%",
+                                            zIndex: 1, // Ensure it appears above the image
+                                        }}
+                                    />
                                 </Box>
+
+
 
                             </Grid>
                         </Grid>
@@ -210,64 +233,64 @@ export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     color: "#373737",
     display: "inline-block",
     width: "100%", // Makes it flexible
-  
+
     [theme.breakpoints.down("md")]: {
-      fontSize: "14px",
-      lineHeight: "20px",
-      width: "500px", // Reduce width on tablets
+        fontSize: "14px",
+        lineHeight: "20px",
+        width: "500px", // Reduce width on tablets
     },
     [theme.breakpoints.down("sm")]: {
-      fontSize: "13px",
-      lineHeight: "18px",
-      width: "100%", // Full width on mobile
-      padding: "0 20px 0 20px"
+        fontSize: "13px",
+        lineHeight: "18px",
+        width: "100%", // Full width on mobile
+        padding: "0 20px 0 20px"
     },
-  }));
+}));
 
 
-  export const HeadingText = styled(Typography)(({ theme }) => ({
+export const HeadingText = styled(Typography)(({ theme }) => ({
     color: "white",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
     fontSize: "46px", // Default size
-  
+
     lineHeight: "51px",
     letterSpacing: "-2%",
-  
+
     [theme.breakpoints.down("lg")]: {
-      fontSize: "42px",
-      lineHeight: "48px",
+        fontSize: "42px",
+        lineHeight: "48px",
     },
     [theme.breakpoints.down("md")]: {
-      fontSize: "36px",
-      lineHeight: "44px",
+        fontSize: "36px",
+        lineHeight: "44px",
     },
     [theme.breakpoints.down("sm")]: {
-      fontSize: "28px",
-      lineHeight: "36px",
+        fontSize: "28px",
+        lineHeight: "36px",
     },
-  }));
-  export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
+}));
+export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
     fontSize: "46px", // Default for large screens
     lineHeight: "51px",
     letterSpacing: "-2%",
-  
+
     [theme.breakpoints.down("lg")]: {
-      fontSize: "42px",
-      lineHeight: "48px",
+        fontSize: "30px",
+        lineHeight: "40px",
     },
     [theme.breakpoints.down("md")]: {
-      fontSize: "36px",
-      lineHeight: "44px",
+        fontSize: "36px",
+        lineHeight: "44px",
     },
     [theme.breakpoints.down("sm")]: {
-      fontSize: "28px",
-      lineHeight: "36px",
+        fontSize: "28px",
+        lineHeight: "36px",
     },
-  }));
+}));
 
 
 const BadgeText = styled(Typography)({

@@ -17,7 +17,8 @@ const ResourceCenter = () => {
     );
     const subtext2 = "Explore the Yacht Crew Center Resource Hub for expert yachting tips, tools and insights. To help Crew, Captains and Department Heads streamline operations and enhance guest experiences."
     const button1 = {
-        text: 'Join A Comprehensive Global Marketplace'
+        text: 'Join A Comprehensive Global Marketplace',
+        path: '/get-started'
     }
     return (
         <Box sx={{

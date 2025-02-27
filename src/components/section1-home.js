@@ -77,14 +77,26 @@ export const SecondarySubTextBlack = styled(Typography)({
     color: "#373737",
 })
 
-const HeadingText = styled(Typography)({
+const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
     fontSize: "46px",
     lineHeight: "51px",
     letterSpacing: "-2%",
-})
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "42px",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "34px",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "22px",
+        lineHeight: "28px",
+    },
+}));
 
 export const GradientText = styled(Typography)(({ theme }) => ({
   background: linearGradient,
