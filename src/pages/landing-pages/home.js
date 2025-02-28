@@ -7,7 +7,7 @@ import Section3Home from '../../components/section3-home'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section4Home from '../../components/section4-home'
 import LandingPageBanner from '../../components/landing-page-banner'
-
+import Chatbot from '../../components/chatbot/chatbot'
 
 const HomeLandingPage = () => {
   
@@ -54,6 +54,7 @@ const HomeLandingPage = () => {
       page = {page}
       />
          <Section1Home />
+         <Chatbot />
          <Section2Home />
          <Section3Home />
          <Section4Home />
