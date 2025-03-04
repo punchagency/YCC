@@ -3,6 +3,13 @@ import { Route, Routes } from "react-router-dom";
 import GetStarted from "./pages/auth/get-started"; // Adjust the import according to your file structure
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/signup";
+
+// new import
+import CrewSignup from "./pages/auth/crew.signup";
+import VendorSignup from "./pages/auth/vendor.signup";
+// end of new import 
+
+
 import ForgotPassword from "./pages/auth/forgot-password";
 import Dashboard from "./pages/dashboard";
 import Role from "./pages/crew-management/role";
@@ -84,6 +91,14 @@ function App() {
         <Route path="/" element={<GetStarted />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+
+        {/* new route start */}
+
+        <Route path="/crew/signup" element={<CrewSignup />} />
+        <Route path="/vendor/signup" element={<VendorSignup />} />
+
+        {/* end of route */}
+
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/coming-soon" element={<ComingSoon />} />  
 
@@ -179,32 +194,55 @@ function App() {
           <Route path="/crew-management/role/new" element={<AddRole />} />
           <Route path="/crew-management/role/:id" element={<RoleDetails />} />
 
-
           {/* Report Route */}
           <Route path="/reports" element={<Reports />} />
           <Route path="/reports/:reportType" element={<ReportDetails />} />
           {/* Notification Route */}
-          <Route path="/notifications" element={<Notifications role={"Captain"}/>} />
-          <Route path="/settings" element={<Settings />} />  
-
+          <Route
+            path="/notifications"
+            element={<Notifications role={"Captain"} />}
+          />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         <Route element={<Layout role="Crew Member" />}>
-        <Route path="/crew/dashboard" element={<DashboardCrew />} />
-        <Route path="/crew/maintenance-task/mytask" element={<MyTask />} /> 
-        <Route path="/crew/maintenance-task/mytask/:id" element={<CrewTaskDetails />} /> 
-        <Route path="/crew/maintenance-task/mytask/edit" element={<CrewTaskEdit />} /> 
-        <Route path="/crew/maintenance-task/history" element={<MaintenanceHistory />} /> 
-        <Route path="/crew/maintenance-task/history/edit" element={<CrewHistoryEdit />} /> 
-        <Route path="/crew/maintenance-task/history/:id" element={<MaintenanceHistoryDetails />} />
-        <Route path="/crew/maintenance-task/schedule-calendar" element={<CrewScheduleCalendar />} /> 
-        <Route path="/crew/task-schedule/document" element={<Document />} /> 
-        <Route path="/crew/task-schedule/document/:id" element={<CrewDocumentDetails />} /> 
-        <Route path="/crew/task-schedule/document/new" element={<CrewAddDocument />} />
-        <Route path="/crew/notifications" element={<Notifications />} />
-        <Route path="/crew/settings" element={<CrewSetting />} />
-        
-
+          <Route path="/crew/dashboard" element={<DashboardCrew />} />
+          <Route path="/crew/maintenance-task/mytask" element={<MyTask />} />
+          <Route
+            path="/crew/maintenance-task/mytask/:id"
+            element={<CrewTaskDetails />}
+          />
+          <Route
+            path="/crew/maintenance-task/mytask/edit"
+            element={<CrewTaskEdit />}
+          />
+          <Route
+            path="/crew/maintenance-task/history"
+            element={<MaintenanceHistory />}
+          />
+          <Route
+            path="/crew/maintenance-task/history/edit"
+            element={<CrewHistoryEdit />}
+          />
+          <Route
+            path="/crew/maintenance-task/history/:id"
+            element={<MaintenanceHistoryDetails />}
+          />
+          <Route
+            path="/crew/maintenance-task/schedule-calendar"
+            element={<CrewScheduleCalendar />}
+          />
+          <Route path="/crew/task-schedule/document" element={<Document />} />
+          <Route
+            path="/crew/task-schedule/document/:id"
+            element={<CrewDocumentDetails />}
+          />
+          <Route
+            path="/crew/task-schedule/document/new"
+            element={<CrewAddDocument />}
+          />
+          <Route path="/crew/notifications" element={<Notifications />} />
+          <Route path="/crew/settings" element={<CrewSetting />} />
         </Route>
       </Routes>
     </div>

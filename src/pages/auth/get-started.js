@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useNavigate } from 'react-router-dom'
 import backgroundImage from '../../assets/images/get_started_bg.jpg'
 import logo from '../../assets/images/start-logo.svg'
@@ -16,9 +16,9 @@ const GetStarted = ({ name }) => {
   // Define the options for the user roles
   const roles = [
     { image: captain, alt: 'captain', text: 'captain', path: '/signup' },
-    { image: hod, alt: 'service providers', text: 'service_providers', path: '/signup' },
+    { image: hod, alt: 'service providers', text: 'service_providers', path: '/vendor/signup' },
     { image: crew, alt: 'suppliers', text: 'supplier', path: '/signup' },
-    { image: crew, alt: 'crew', text: 'crew_member', path: '/signup' }
+    { image: crew, alt: 'crew', text: 'crew_member', path: '/crew/signup' }
   ]
 
 
@@ -27,8 +27,19 @@ const GetStarted = ({ name }) => {
   // Function to handle navigation
   const handleRoleSelect = (path, role) => {
     console.log("navigating to:", path, "with role ", role)
+     localStorage.setItem("selectedRole", role);
     navigate(path, { state: { role } }); // Pass the role as state
   };
+
+  //  useEffect(() => {
+  //    const storedRole = localStorage.getItem("selectedRole");
+  //    if (storedRole) {
+  //      const selectedRoleObj = roles.find((role) => role.text === storedRole);
+  //      if (selectedRoleObj) {
+  //        navigate(selectedRoleObj.path, { state: { role: storedRole } });
+  //      }
+  //    }
+  //  }, [navigate]);
 
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">

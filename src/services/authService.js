@@ -1,10 +1,19 @@
 import axios from "axios";
-const API_URL = "http://localhost:3001/api/auth";
+
+const API_URL = process.env.REACT_APP_API_URL;
+console.log("API_URL:", process.env.REACT_APP_API_URL);
 
 export const signup = async (userData) => {
   try {
     console.log("Sending signup request:", userData);
-    const response = await axios.post(`${API_URL}/signup`, userData);
+    const response = await axios.post(`${API_URL}/signup`, userData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Add this for file uploads
+      },
+    });
+    if(response.data.token){
+      localStorage.setItem("token", response.data.token)
+    }
     console.log("Signup response:", response.data);
     return response.data;
   } catch (error) {
