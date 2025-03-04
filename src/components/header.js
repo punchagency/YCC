@@ -52,19 +52,18 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
         />
         <img src={avatar} alt="Profile" className="profile-image" />
         <span className="profile-name">
-        Welcome, <strong>{user?.fullName || "User"}</strong>
+        Welcome, <strong>{user?.firstName || "User"}</strong>
         </span>
       </div>
     </>
   );
   const viewAllNotifications = () => {
-    if (role == "Captain") {
+    if (role === "Captain") {
       navigate("/notifications");
 
     }
     else {
       navigate("/crew/notifications");
-
     }
 
   };
