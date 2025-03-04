@@ -71,6 +71,18 @@ import EditUser from "./pages/crew-management/edit-user";
 import EditVessel from "./pages/vessel-management/edit-vessels";
 import EditWarranty from "./pages/maintenance-scheduling/edit-warranty";
 import CrewAddDocument from "./pages/crew/document-access/add-document";
+import HomeLandingPage from "./pages/landing-pages/home";
+import LandingPageLayout from "./layout/landing-page-layout";
+import CaptainLandingPage from "./pages/landing-pages/captain";
+import CrewLandingPage from "./pages/landing-pages/crew";
+import ExteriorLandingPage from "./pages/landing-pages/exterior";
+import InteriorLandingPage from "./pages/landing-pages/interior";
+import ChefGalleryLandingPage from "./pages/landing-pages/chef-gallery";
+import EngineeringLandingPage from "./pages/landing-pages/engineering";
+import VendorAndServices from "./pages/landing-pages/vendor-services";
+import AboutUs from "./pages/landing-pages/about-us";
+import ResourceCenter from "./pages/landing-pages/resource-center";
+import ContactUs from "./pages/landing-pages/contact-us";
 
 function App() {
   return (
@@ -88,7 +100,25 @@ function App() {
         {/* end of route */}
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/coming-soon" element={<ComingSoon />} />
+        <Route path="/coming-soon" element={<ComingSoon />} />  
+
+        {/* Landing Page Routes */}
+        <Route element={<LandingPageLayout />}>
+        <Route path="/home" element={<HomeLandingPage />} />
+        <Route path="/captain" element= {<CaptainLandingPage />} />
+        <Route path="/crew" element={<CrewLandingPage />}/>
+        <Route path="/exterior" element={<ExteriorLandingPage />}/>
+        <Route path="/interior" element={<InteriorLandingPage />}/>
+        <Route path="/chef-gallery" element={<ChefGalleryLandingPage />}/>
+        <Route path="/engineering" element={<EngineeringLandingPage />}/>
+        <Route path="/vendor-services" element={<VendorAndServices />}/>
+        <Route path="/about-us" element={<AboutUs />}/>
+        <Route path="/resource-center" element={<ResourceCenter />}/>
+        <Route path="/contact-us" element={<ContactUs />}/>
+        </Route>
+
+
+
         <Route element={<Layout role="Captain" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crew-management/role" element={<Role />} />
