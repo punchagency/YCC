@@ -3,10 +3,12 @@ import banner from '../../assets/images/contact-us/YCC-contact-us-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section1ContactUs from '../../components/contact-us/section1-contact-us'
-
+import { useEffect } from 'react'
 
 const ContactUs = () => {
-    
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>

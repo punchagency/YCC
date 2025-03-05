@@ -4,9 +4,12 @@ import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
 import Section2VendorServices from '../../components/vendor-services/section2-vendor-services'
-
+import { useEffect } from 'react'
 
 const VendorAndServices = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>

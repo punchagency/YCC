@@ -148,7 +148,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     {subtext2}
                 </SecondarySubText>}
 
-                <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
+              { button1 && <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
                     <Link to={button1.path}>
                     <GradientButton>
                         <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography></GradientButton>
@@ -180,7 +180,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         <ButtonTypography sx={{ color: "white" }}>{button2.text}</ButtonTypography>
                         </Button>
                         }
-                </Box>
+                </Box>   }   
             </Box>
 
         </Box >

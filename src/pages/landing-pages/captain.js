@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import banner from '../../assets/images/captain/YCC-captain-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
@@ -6,8 +6,11 @@ import { Typography, Box } from '@mui/material'
 import Section1Captain from '../../components/captain/section1-captain'
 import Section2Captain from '../../components/captain/section2-captain'
 import Section3Captain from '../../components/captain/section3-captain'
-const CaptainLandingPage = () => {
 
+const CaptainLandingPage = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 const backgroundImage = banner
   const header = (
     <>

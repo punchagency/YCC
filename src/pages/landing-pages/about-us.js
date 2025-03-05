@@ -7,9 +7,11 @@ import Section2AboutUs from '../../components/about/section2-about-us'
 import Section3AboutUs from '../../components/about/section3-about-us'
 import Section4AboutUs from '../../components/about/section4-about-us'
 import Section5AboutUs from '../../components/about/section5-about-us'
-
+import { useEffect } from 'react'
 const AboutUs = () => {
-    
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
     const backgroundImage = banner
     const header = (
         <>

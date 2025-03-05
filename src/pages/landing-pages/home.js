@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Typography } from '@mui/material'
-import banner from '../../assets/images/YCC-home-banner2.png'
+import banner from '../../assets/images/YCC-home-banner-new.png'
 import Section1Home from '../../components/section1-home'
 import Section2Home from '../../components/section2-home'
 import Section3Home from '../../components/section3-home'
@@ -10,7 +10,9 @@ import LandingPageBanner from '../../components/landing-page-banner'
 import Chatbot from '../../components/chatbot/chatbot'
 
 const HomeLandingPage = () => {
-  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const backgroundImage = banner
   const header = (
     <>

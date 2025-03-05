@@ -5,8 +5,11 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1Exterior from '../../components/exterior/section1-exterior'
 import Section2Exterior from '../../components/exterior/section2-exterior'
 import Section3Exterior from '../../components/exterior/section3-exterior'
-
+import { useEffect } from 'react'
 const ExteriorLandingPage = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>

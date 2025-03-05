@@ -6,10 +6,12 @@ import { styled,Typography, Box } from '@mui/material'
 import Section1Crew from '../../components/crew/section1-crew'
 import Section2Crew from '../../components/crew/section2-crew'
 import Section3Crew from '../../components/crew/section3-crew'
-
+import { useEffect } from 'react'
 
 const CrewLandingPage = () => {
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
   const header = (
     <>

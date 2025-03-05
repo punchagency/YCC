@@ -6,8 +6,11 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1Engineering from '../../components/engineering/section1-engineering'
 import Section2Engineering from '../../components/engineering/section2-engineering'
 import Section3Engineering from '../../components/engineering/section3-engineering'
-
+import { useEffect } from 'react'
 const EngineeringLandingPage = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>

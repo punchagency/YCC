@@ -5,8 +5,11 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1ChefGallery from '../../components/chef-gallery/section1-chef-gallery'
 import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gallery'
 import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
-
+import { useEffect } from 'react'
 const ChefGalleryLandingPage = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>

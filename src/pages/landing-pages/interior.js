@@ -5,9 +5,11 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1Interior from '../../components/interior/section1-interior'
 import Section2Interior from '../../components/interior/section2-interior'
 import Section3Interior from '../../components/interior/section3-interior'
-
+import { useEffect } from 'react'
 const InteriorLandingPage = () => {
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>
