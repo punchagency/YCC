@@ -6,7 +6,7 @@ import { Typography, Box } from '@mui/material'
 import Section1Captain from '../../components/captain/section1-captain'
 import Section2Captain from '../../components/captain/section2-captain'
 import Section3Captain from '../../components/captain/section3-captain'
-
+import Chatbot from '../../components/chatbot/chatbot'
 const CaptainLandingPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -38,6 +38,8 @@ const backgroundImage = banner
         button1={button1}
         />
         <Section1Captain />
+        
+        <Chatbot />
         <Section2Captain />
         <Section3Captain />
 

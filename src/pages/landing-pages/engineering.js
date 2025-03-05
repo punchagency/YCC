@@ -7,6 +7,7 @@ import Section1Engineering from '../../components/engineering/section1-engineeri
 import Section2Engineering from '../../components/engineering/section2-engineering'
 import Section3Engineering from '../../components/engineering/section3-engineering'
 import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const EngineeringLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -37,6 +38,7 @@ const EngineeringLandingPage = () => {
                 button1={button1}
             />
             <Section1Engineering /> 
+            <Chatbot />
             <Section2Engineering />
             <Section3Engineering />
             <LandingPageFooter />

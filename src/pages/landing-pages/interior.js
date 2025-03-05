@@ -6,6 +6,7 @@ import Section1Interior from '../../components/interior/section1-interior'
 import Section2Interior from '../../components/interior/section2-interior'
 import Section3Interior from '../../components/interior/section3-interior'
 import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const InteriorLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -35,6 +36,7 @@ const InteriorLandingPage = () => {
                 button1={button1}
             />
             <Section1Interior />
+            <Chatbot />
             <Section2Interior />
             <Section3Interior />
             <LandingPageFooter />

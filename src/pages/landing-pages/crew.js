@@ -7,7 +7,7 @@ import Section1Crew from '../../components/crew/section1-crew'
 import Section2Crew from '../../components/crew/section2-crew'
 import Section3Crew from '../../components/crew/section3-crew'
 import { useEffect } from 'react'
-
+import Chatbot from '../../components/chatbot/chatbot'
 const CrewLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -39,6 +39,7 @@ const CrewLandingPage = () => {
         />
 
         <Section1Crew />
+        <Chatbot />
         <Section2Crew />
         <Section3Crew />
         <LandingPageFooter />

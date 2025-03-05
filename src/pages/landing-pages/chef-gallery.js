@@ -6,6 +6,7 @@ import Section1ChefGallery from '../../components/chef-gallery/section1-chef-gal
 import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gallery'
 import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
 import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const ChefGalleryLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -36,6 +37,7 @@ const ChefGalleryLandingPage = () => {
                 button1={button1}
             />
             <Section1ChefGallery />
+            <Chatbot />
             <Section2ChefGallery />
             <Section3ChefGallery />
             <LandingPageFooter />
