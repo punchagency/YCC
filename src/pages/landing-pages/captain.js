@@ -54,10 +54,10 @@ const GradientText = (props) => (
       fontWeight: 600,
       fontFamily: "Plus Jakarta Sans, sans-serif",
       fontSize: {
-        xs: "32px", // Smaller font for mobile
-        sm: "40px",
-        md: "48px",
-        lg: "55.96px",
+        xs: "30px",  // Smaller font for mobile
+        sm: "35px",  // Slightly bigger for small tablets
+        md: "40px",  // Medium screens
+        lg: "50px",  // Default for large screens
       },
       lineHeight: {
         xs: "38px", // Smaller line height for mobile

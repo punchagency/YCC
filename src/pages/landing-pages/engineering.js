@@ -47,7 +47,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",

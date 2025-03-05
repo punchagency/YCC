@@ -12,7 +12,7 @@ const ResourceCenter = () => {
     const header = (
         <>
            <GradientText>Resource</GradientText>{" "}
-            <GradientText>Center</GradientText> Yacht Crew Center
+            <GradientText>Center</GradientText> <br /> Yacht Crew Center
         </> 
     );
     const subtext2 = "Explore the Yacht Crew Center Resource Hub for expert yachting tips, tools and insights. To help Crew, Captains and Department Heads streamline operations and enhance guest experiences."
@@ -46,7 +46,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",

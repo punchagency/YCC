@@ -55,18 +55,6 @@ const LandingPageFooter = () => {
         }}
     >
 
-        <Box
-            sx={{
-                p: 0,
-                display: "flex",
-                width: "100%",
-                backgroundColor: "white",
-
-            }}>
-            <FooterGradientHeadingTypography>
-                CREW CENTER</FooterGradientHeadingTypography>
-
-        </Box>
 
         <Container
             maxWidth="lg"
