@@ -49,6 +49,7 @@ const Section4AboutUs = () => {
                             display: "flex",
                             flexDirection: "column",
                             textAlign: "left",
+                            height: { xs: "200px", md: "300px", lg: "200px" },
                             width: "100%",
                             gap: '17.8px',
                             padding: "20px",

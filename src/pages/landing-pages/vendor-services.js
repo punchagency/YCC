@@ -4,9 +4,12 @@ import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
 import Section2VendorServices from '../../components/vendor-services/section2-vendor-services'
-
+import { useEffect } from 'react'
 
 const VendorAndServices = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>
@@ -43,7 +46,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",

@@ -5,9 +5,12 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1Interior from '../../components/interior/section1-interior'
 import Section2Interior from '../../components/interior/section2-interior'
 import Section3Interior from '../../components/interior/section3-interior'
-
+import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const InteriorLandingPage = () => {
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>
@@ -33,6 +36,7 @@ const InteriorLandingPage = () => {
                 button1={button1}
             />
             <Section1Interior />
+            <Chatbot />
             <Section2Interior />
             <Section3Interior />
             <LandingPageFooter />
@@ -44,7 +48,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",

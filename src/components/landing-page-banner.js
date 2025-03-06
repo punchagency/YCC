@@ -123,10 +123,10 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         fontFamily: "Plus Jakarta Sans, sans-serif",
                         fontWeight: 600,
                         fontSize: {
-                            xs: "32px",  // Smaller font for mobile
-                            sm: "40px",  // Slightly bigger for small tablets
-                            md: "48px",  // Medium screens
-                            lg: "55.96px",  // Default for large screens
+                            xs: "30px",  // Smaller font for mobile
+                            sm: "35px",  // Slightly bigger for small tablets
+                            md: "40px",  // Medium screens
+                            lg: "50px",  // Default for large screens
                           },
                           lineHeight: {
                             xs: "38px", // Smaller line height for mobile
@@ -148,7 +148,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     {subtext2}
                 </SecondarySubText>}
 
-                <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
+              { button1 && <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
                     <Link to={button1.path}>
                     <GradientButton>
                         <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography></GradientButton>
@@ -180,7 +180,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         <ButtonTypography sx={{ color: "white" }}>{button2.text}</ButtonTypography>
                         </Button>
                         }
-                </Box>
+                </Box>   }   
             </Box>
 
         </Box >
@@ -193,7 +193,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
 const PrimarySubText = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: "18.65px",
+    fontSize: "15.65px",
     lineHeight: "27.52px",
     letterSpacing: "0%",
     color: "white",
@@ -201,7 +201,7 @@ const PrimarySubText = styled(Typography)({
 
 const SecondarySubText = styled(Typography)({
     fontFamily: "Inter",
-    fontWeight: 400,
+    fontWeight: 300,
     fontSize: "15.26px",
     lineHeight: "22.51px",
     letterSpacing: "0%",

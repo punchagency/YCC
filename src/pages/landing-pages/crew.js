@@ -6,10 +6,12 @@ import { styled,Typography, Box } from '@mui/material'
 import Section1Crew from '../../components/crew/section1-crew'
 import Section2Crew from '../../components/crew/section2-crew'
 import Section3Crew from '../../components/crew/section3-crew'
-
-
+import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const CrewLandingPage = () => {
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
   const header = (
     <>
@@ -37,6 +39,7 @@ const CrewLandingPage = () => {
         />
 
         <Section1Crew />
+        <Chatbot />
         <Section2Crew />
         <Section3Crew />
         <LandingPageFooter />
@@ -47,7 +50,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",
