@@ -15,11 +15,11 @@ const EngineeringLandingPage = () => {
     const backgroundImage = banner
     const header = (
         <>
-            Empowering <GradientText>Exterior</GradientText>{" "}
-            <GradientText>Yatch</GradientText> crew with the Right Resources
+            Supporting <GradientText>Yatch</GradientText>{" "}
+            <GradientText>Engineers</GradientText> with Tools for Success
         </>    
     );
-    const subtext2 = 'Master the art of yacht maintenance, safety, and watersports with expert advice and trusted tools designed for exterior crew'
+    const subtext2 = 'From maintenance resources to technical training, find everything you need to keep yachts running at peak performance.'
     const button1 = {
         text: 'Join Our Crew Network',
         path: '/get-started'

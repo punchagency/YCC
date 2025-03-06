@@ -19,7 +19,7 @@ const LandingPageFooter = () => {
                 { name: "About Us", path: "/about-us" },
                 { name: "Resource Center", path: "/resource-center" },
             ],
-            size: 2,
+            size: 2.5,
         },
         {
             title: "Departments",
@@ -31,7 +31,7 @@ const LandingPageFooter = () => {
                 { name: "Interior", path: "/interior" },
                 { name: "Exterior", path: "/exterior" },
             ],
-            size: 2,
+            size: 2.5,
         },
         {
             title: "Contacts",
@@ -68,15 +68,15 @@ const LandingPageFooter = () => {
                 gap: "31px",
             }}
         >
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
                 {/* First column (2x wider, but responsive) */}
-                <Grid item xs={12} sm={6} md={5}>
-                    <Box sx={{ textAlign: "left" }}>
+                <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ textAlign: "left", display: "flex", flexDirection: "column", gap: "20px" }}>
                         <Box>
                             <img
                                 src={logo}
                                 alt="logo"
-                                style={{ width: "53px", height: "45px" }}
+                                style={{ width: "70px", height: "65px" }}
                             />
                         </Box>
                         <Box>
@@ -85,8 +85,7 @@ const LandingPageFooter = () => {
                                     <ButtonTypography
                                         sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
                                     >
-                                        Contact Yacht Crew Center, LLC &nbsp;
-                                        <img src={anchor} alt="logo" />
+                                        Contact Yacht Crew Center, LLC
                                     </ButtonTypography>
                                 </GradientButton>
                             </Link>
