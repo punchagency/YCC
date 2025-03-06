@@ -101,7 +101,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
       const response = await signup(formDataObj);
 
-      if (response.token) {
+      if (response.status === "success") {
         setSuccess(true);
         setIsSubmitting(false);
         // Move to step 6 after successful signup
@@ -168,15 +168,17 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   });
 
   const [fileErrors, setFileErrors] = useState({
-    licenseFile: '',
-    taxIdFile: '',
-    insuranceFile: '',
-    pricingFile: '',
+    licenseFile: "",
+    taxIdFile: "",
+    insuranceFile: "",
+    pricingFile: "",
   });
 
   // File upload handlers
   const handleFileUpload = async (file, type) => {
     if (!file) return;
+
+    setFileErrors((prev) => ({ ...prev, [type]: "" }));
 
     // Validate file size (e.g., max 10MB)
     const maxSize = 10 * 1024 * 1024;
@@ -193,6 +195,9 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
 
     setError("");
+
+    // Start loading for this file type
+    setFileUploading((prev) => ({ ...prev, [type]: true }));
 
     setIsUploading(true);
     try {

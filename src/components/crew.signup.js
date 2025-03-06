@@ -174,7 +174,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       const response = await signup(formDataObj);
 
       // Handle successful signup
-      if (response.token) {
+      if (response.status === "success") {
         // Redirect to success page or dashboard
         navigate("/dashboard");
       }
@@ -554,7 +554,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              <div className="form-group3">
+              <div className="form-group1">
                 <div className="input-field">
                   <div>
                     <label htmlFor="phone">Phone Number</label>
@@ -562,6 +562,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   <div className="inputBorder">
                     <PhoneInput
                       country={"us"}
+                      className="phone-input"
                       value={phone}
                       onChange={(value) => setPhone(value)}
                       inputStyle={{
@@ -589,7 +590,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     />
                   </div>
                 </div>
-
                 <div className="input-field">
                   <div>
                     <label htmlFor="country">Country/Region</label>
@@ -1207,9 +1207,30 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 <div
                   className="upload-box"
                   onClick={triggerFileInput}
-                  style={{ width: "550px" }}
+                  style={{
+                    cursor: "pointer",
+                    lineHeight: "60px",
+                    width: "100%",
+                    height: "180px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                  }}
                 >
-                  <div className="upload-content">
+                  <div
+                    className="upload-content"
+                    style={{
+                      borderRadius: "8px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "100%",
+                      width: "100%",
+                      padding: "0px",
+                    }}
+                  >
                     <div className="upload-icon">
                       {isProfileUploading ? (
                         <div className="loading-spinner">
@@ -1220,30 +1241,34 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           src={URL.createObjectURL(selectedFiles[0])}
                           className="profileLogo"
                           alt="Selected profile"
+                          style={{ width: "35px", height: "35px" }}
                         />
                       ) : (
                         <img
                           src={profileLogo}
                           className="profileLogo"
-                          style={{ width: "40px", height: "40px" }}
+                          style={{ width: "35px", height: "35px" }}
                         />
                       )}
                       <p
                         className="optional"
-                        style={{ fontSize: "12px", fontWeight: "bold" }}
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          color: "grey",
+                        }}
                       >
                         Upload photo{" "}
                         <span
                           style={{ color: "lightgrey", fontWeight: "normal" }}
-                        >
-                          (Optional)
-                        </span>
+                        ></span>
                       </p>
                     </div>
                     <button
                       className="browse-button"
                       onClick={triggerFileInput}
                       type="button"
+                      style={{ marginTop: "50px" }}
                     >
                       {selectedFiles.length > 0
                         ? "Change Photo"
@@ -1260,7 +1285,16 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   onDragOver={handleDragOver}
                   onDrop={handleCVDrop}
                   onClick={triggerCVInput} // Add onClick to the entire box
-                  style={{ cursor: "pointer", lineHeight: "-30px" }}
+                  style={{
+                    cursor: "pointer",
+                    lineHeight: "-30px",
+                    width: "100%",
+                    height: "180px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                  }}
                 >
                   {isCVUploading ? (
                     <div className="loading-spinner">
@@ -1302,7 +1336,10 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         <span className="file-size">
                           ({(selectedCV.size / 1024 / 1024).toFixed(2)} MB)
                         </span>
-                        <div className="cv-actions">
+                        <div
+                          className="cv-actions"
+                          style={{ marginTop: "100px" }}
+                        >
                           <button
                             className="change-cv"
                             onClick={triggerCVInput}
@@ -1321,6 +1358,10 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           className="browse-button"
                           onClick={triggerCVInput}
                           type="button"
+                          style={{
+                            background:
+                              "linear-gradient(to right, #034d92, #0487d9)",
+                          }}
                         >
                           Browse Files
                         </button>
@@ -1334,7 +1375,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 <button
                   className="prev-button"
                   onClick={() => setStep(3)}
-                  style={{ width: "250px", background: "#f0f0f0" }}
+                  style={{ width: "100%", background: "#f0f0f0" }}
                 >
                   Previous
                 </button>
@@ -1343,7 +1384,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   onClick={() => setStep(5)}
                   disabled={false}
                   style={{
-                    width: "250px",
+                    width: "100%",
+                    marginLeft: "20px",
                     background: "linear-gradient(to right, #034d92, #0487d9)",
                   }}
                 >
@@ -1441,7 +1483,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 <button
                   className="prev-button"
                   onClick={() => setStep(4)}
-                  style={{ width: "250px", background: "#f0f0f0" }}
+                  style={{ width: "100%", marginLeft: "20px" }}
                   disabled={isSubmitting}
                 >
                   Previous
@@ -1451,7 +1493,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   onClick={handleSignup}
                   disabled={isSubmitting}
                   style={{
-                    width: "250px",
+                    width: "100%",
+                    marginLeft: "20px",
                     background: isSubmitting
                       ? "#ccc"
                       : "linear-gradient(to right, #034d92, #0487d9)",
