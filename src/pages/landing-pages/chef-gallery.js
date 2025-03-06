@@ -5,8 +5,12 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section1ChefGallery from '../../components/chef-gallery/section1-chef-gallery'
 import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gallery'
 import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
-
+import { useEffect } from 'react'
+import Chatbot from '../../components/chatbot/chatbot'
 const ChefGalleryLandingPage = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>
@@ -33,6 +37,7 @@ const ChefGalleryLandingPage = () => {
                 button1={button1}
             />
             <Section1ChefGallery />
+            <Chatbot />
             <Section2ChefGallery />
             <Section3ChefGallery />
             <LandingPageFooter />
@@ -45,7 +50,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-0.02em",
     textTransform: "uppercase",

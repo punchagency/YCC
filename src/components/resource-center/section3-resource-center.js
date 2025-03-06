@@ -43,16 +43,16 @@ const Section3ResourceCenter = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
-                                padding: { xs: "20px", md: "40px" },
-                                gap: "20px",
+                                padding: { xs: "20px 20px 15px 20px", md: "40px 40px 30px 40px" },
                                 textAlign: "left",
+                                gap: {xs: '20px', md: '0'},
                                 justifyContent: "space-between",
                                 height: { xs: "auto", md: "100%" },
                                 border: "1px solid #E0E0E0",
                                 borderBottomLeftRadius: "20px", borderBottomRightRadius: "20px"
                             }}
                         >
-                            <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: "20px"}}>
                             <Box sx={{ display: "flex", gap: "10px", justifyContent: "space-between" }}>
                                 <FeaturedText>
                                     FEATURED

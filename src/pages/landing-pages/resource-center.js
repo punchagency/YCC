@@ -6,20 +6,20 @@ import Section1ResourceCenter from '../../components/resource-center/section1-re
 import Section2ResourceCenter from '../../components/resource-center/section2-resource-center'
 import Section3ResourceCenter from '../../components/resource-center/section3-resource-center'
 import ResourceCenterSection4 from '../../components/resource-center/section4-resource-center'
-
+import { useEffect } from 'react'
 const ResourceCenter = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     const backgroundImage = banner
     const header = (
         <>
            <GradientText>Resource</GradientText>{" "}
-            <GradientText>Center</GradientText> Yacht Crew Center
+            <GradientText>Center</GradientText> <br /> Yacht Crew Center
         </> 
     );
     const subtext2 = "Explore the Yacht Crew Center Resource Hub for expert yachting tips, tools and insights. To help Crew, Captains and Department Heads streamline operations and enhance guest experiences."
-    const button1 = {
-        text: 'Join A Comprehensive Global Marketplace',
-        path: '/get-started'
-    }
+
     return (
         <Box sx={{
             display: "flex",
@@ -30,7 +30,6 @@ const ResourceCenter = () => {
                 backgroundImage={backgroundImage}
                 header={header}
                 subtext2={subtext2}
-                button1={button1}
             />
             <Section1ResourceCenter />
             <Section2ResourceCenter />
@@ -46,7 +45,7 @@ const GradientText = styled(Typography)({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontSize: "55.96px",
+    fontSize: "50px",
     lineHeight: "60px",
     letterSpacing: "-2%",
     textTransform: "uppercase",

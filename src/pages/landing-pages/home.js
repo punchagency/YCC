@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Typography } from '@mui/material'
-import banner from '../../assets/images/YCC-home-banner2.png'
+import banner from '../../assets/images/YCC-home-banner-new.png'
 import Section1Home from '../../components/section1-home'
 import Section2Home from '../../components/section2-home'
 import Section3Home from '../../components/section3-home'
@@ -10,7 +10,9 @@ import LandingPageBanner from '../../components/landing-page-banner'
 import Chatbot from '../../components/chatbot/chatbot'
 
 const HomeLandingPage = () => {
-  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const backgroundImage = banner
   const header = (
     <>
@@ -85,10 +87,10 @@ const GradientText = (props) => (
       fontWeight: 600,
       fontFamily: "Plus Jakarta Sans, sans-serif",
       fontSize: {
-        xs: "32px", // Smaller font for mobile
-        sm: "40px",
-        md: "48px",
-        lg: "55.96px",
+        xs: "30px",  // Smaller font for mobile
+        sm: "35px",  // Slightly bigger for small tablets
+        md: "40px",  // Medium screens
+        lg: "50px",  // Default for large screens
       },
       lineHeight: {
         xs: "38px", // Smaller line height for mobile
