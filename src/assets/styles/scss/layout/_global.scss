@@ -1019,7 +1019,7 @@ ul {
   justify-content: space-between;
   width: 100%;
   margin-bottom: 20px;
-  
+
   padding-left: 8px;
   .input-field {
     flex: 1;
@@ -1110,7 +1110,6 @@ ul {
 
 .check-bg {
   background: #d8dee7;
-
   height: 100vh;
 }
 .bg-inner {
@@ -1159,7 +1158,7 @@ ul {
     }
 
     &.nextbtn {
-       background: linear-gradient(to right, #034d92, #0487d9);
+      background: linear-gradient(to right, #034d92, #0487d9);
       color: white;
 
       &:hover {
@@ -1461,7 +1460,6 @@ ul {
     margin-top: 5px;
     margin-bottom: 15px;
   }
-  
 }
 
 .phone-input-container .country-list::-webkit-scrollbar {
@@ -1472,7 +1470,6 @@ ul {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-
 
 .loading-spinner {
   display: flex;
@@ -1492,10 +1489,13 @@ ul {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
-
 
 .form-group1,
 .form-group2,
@@ -1520,7 +1520,6 @@ ul {
   width: 100% !important;
 }
 
-
 .form-group-department {
   width: 100%; /* Matches Business Address */
   margin-bottom: 20px;
@@ -1538,10 +1537,10 @@ ul {
 }
 
 .inputBorder .select__control {
-  background-color: #F8F8F8 !important;
+  background-color: #f8f8f8 !important;
   border-radius: 5px;
   padding: 5px;
-  border: 1px solid #DEDCDC;
+  border: 1px solid #dedcdc;
 }
 .inputBorder .select__control {
   width: 100% !important;
@@ -1557,7 +1556,7 @@ ul {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #F8F8F8; /* Match Business Address */
+  background-color: #f8f8f8; /* Match Business Address */
   padding: 10px;
   border-radius: 5px;
 }
@@ -1579,7 +1578,7 @@ ul {
   width: 100%;
   display: flex;
   align-items: center;
-  background-color: #F8F8F8;
+  background-color: #f8f8f8;
   padding: 10px;
   border-radius: 5px;
   position: relative;
@@ -1587,7 +1586,7 @@ ul {
 
 .upload-input input {
   width: 100%;
-  background: #F8F8F8;
+  background: #f8f8f8;
   border: none;
   outline: none;
   padding: 5px;
@@ -1600,7 +1599,7 @@ ul {
   cursor: pointer;
 }
 
-.fees{
+.fees {
   border: 1px solid lightgrey;
   background: #f9f9f9;
   padding: 15px 40px;
@@ -1619,11 +1618,11 @@ ul {
   background: white;
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .success-icon {
-  color: #4CAF50;
+  color: #4caf50;
   font-size: 60px;
   margin-bottom: 20px;
 }
@@ -1645,3 +1644,77 @@ ul {
   line-height: 1.6;
 }
 
+@media screen and (min-width: 360px) {
+}
+
+// Form group responsive styles
+.form-group {
+  width: 100%;
+  margin-bottom: 20px;
+
+  .input-row {
+    display: flex;
+    gap: 20px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .input-field {
+      flex: 1;
+      width: 100%;
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        
+        @media (max-width: 576px) {
+          font-size: 12px;
+        }
+      }
+
+      .inputBorder {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: #fff;
+        width: 100%;
+        
+        @media (max-width: 576px) {
+          padding: 6px 10px;
+        }
+
+        input {
+          border: none;
+          outline: none;
+          width: 100%;
+          font-size: 14px;
+
+          @media (max-width: 576px) {
+            font-size: 12px;
+          }
+
+          &::placeholder {
+            color: #999;
+          }
+        }
+
+        img {
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+          
+          @media (max-width: 576px) {
+            width: 14px;
+            height: 14px;
+          }
+        }
+      }
+    }
+  }
+}

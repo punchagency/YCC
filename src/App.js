@@ -7,6 +7,7 @@ import Signup from "./pages/auth/signup";
 // new import
 import CrewSignup from "./pages/auth/crew.signup";
 import VendorSignup from "./pages/auth/vendor.signup";
+import SupplierSignup from "./pages/auth/supplier.signup";
 // end of new import 
 
 
@@ -88,7 +89,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<GetStarted />} />
+        <Route path="/get-started" element={<GetStarted />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -96,6 +97,7 @@ function App() {
 
         <Route path="/crew/signup" element={<CrewSignup />} />
         <Route path="/vendor/signup" element={<VendorSignup />} />
+        <Route path="/supplier/signup" element={<SupplierSignup />} />
 
         {/* end of route */}
 

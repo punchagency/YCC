@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/water.jpg";
 import check from "../../assets/images/check1.png";
 import yachtCrew from "../../assets/images/yacht.png"; // Add appropriate vendor image
-import VendorSignUpForm from "../../components/vendor.signup";
+import SupplierSignUpForm from "../../components/supplier.signup";
 
 const StepInfo = ({ currentStep }) => {
   const stepData = {
@@ -17,22 +17,20 @@ const StepInfo = ({ currentStep }) => {
     },
     3: {
       step: "Step 3",
-      info: "Service & Pricing Information",
+      info: "Inventory & Order Processing Setup",
     },
     4: {
       step: "Step 4",
-      info: "Company Representative Information",
+      info: "Contact Person",
     },
     5: {
       step: "Step 5",
-      info: "Platform Fees",
+      info: "Fee Transparency & Confirmation Before Submission",
     },
     6: {
       step: "Success",
-      info: "Application Submitted",
-
+      info: "Submission",
     },
-   
   };
 
   return (
@@ -48,29 +46,23 @@ const StepInfo = ({ currentStep }) => {
   );
 };
 
-const VendorSignup = () => {
+const SupplierSignup = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     // Business Information
     businessName: "",
-    businessAddress: "",
-    department: null,
-    phone: "",
-    businessWebsite: "",
+    businessType: "",
     email: "",
-    taxId: "",
-
-    // Service Details
-    services: null,
-    pricingStructure: "",
-    availability: "",
-    bookingMethod: null,
-    serviceArea: null,
-
-    // Documents
-    licenseFile: null,
-    liabilityInsurance: null,
-    role:"",
+    phone: "",
+    address: "",
+    website: "",
+    inventorySource: "",
+    serviceAreas: [],
+    licenseSupplierFile: null,
+    supplierVatTaxId: "",
+    supplierLiabilityInsurance: null,
+    spreadsheetFile: null,
+    acceptFees: false,
 
     // Contact Person
     contactPerson: {
@@ -114,7 +106,7 @@ const VendorSignup = () => {
               <StepInfo currentStep={step} />
             </div>
             <div className="login-form vendor-login-form">
-              <VendorSignUpForm
+              <SupplierSignUpForm
                 setStep={setStep}
                 currentStep={step}
                 formData={formData}
@@ -128,4 +120,4 @@ const VendorSignup = () => {
   );
 };
 
-export default VendorSignup;
+export default SupplierSignup;

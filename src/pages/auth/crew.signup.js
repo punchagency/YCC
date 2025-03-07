@@ -16,22 +16,20 @@ const StepInfo = ({ currentStep }) => {
     2: {
       step: "Step 2",
       info: "Work and Experience",
-      
     },
     3: {
       step: "Step 3",
       info: "Certifications and training",
     },
-    4:{
+    4: {
       step: "step 4",
-      info: "Upload CV & Profile Picture"
+      info: "Upload CV & Profile Picture",
     },
-    5:{
-      step:"step 5",
-      info:"Create Password"
-    }
+    5: {
+      step: "step 5",
+      info: "Create Password",
+    },
   };
-  
 
   return (
     <div className="logo_crew">
@@ -74,21 +72,19 @@ const Signup = () => {
     // Add any step 3 fields here
   });
 
-  
-
-const handleFormDataChange = (newData) => {
-  setFormData((prev) => {
-    const updated = { ...prev, ...newData };
-    console.log("Updated Form Data:", updated); // Debug log
-    return updated;
-  });
-};
+  const handleFormDataChange = (newData) => {
+    setFormData((prev) => {
+      const updated = { ...prev, ...newData };
+      console.log("Updated Form Data:", updated); // Debug log
+      return updated;
+    });
+  };
 
   return (
     <div className="check-bg">
-      <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login bg-inner">
+      <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login bg-inner testing">
         <div
-          className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
+          className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center bgImage"
           style={{
             backgroundImage: `url(${backgroundImage})`,
             height: "100vh", // Sets the height of the background to 12vh
@@ -97,6 +93,7 @@ const handleFormDataChange = (newData) => {
             backgroundPosition: "center",
             backgroundSize: "center",
             objectFit: "center",
+            overflow: "hidden",
           }}
         >
           <div className="login-content">
@@ -105,11 +102,11 @@ const handleFormDataChange = (newData) => {
         </div>
 
         <div className="flex-1 flex align-items-center justify-content-center right-panel">
-          <div className="login-right-component">
-            <div
-              className="logo-wraper"
-              style={{ marginBottom: "5px", paddingTop: "30px" }}
-            >
+          <div
+            className="login-right-component"
+            style={{ width: "100%", paddingTop: "0px" }}
+          >
+            <div className="logo-wraper">
               {" "}
               {/* Added negative margin to reduce space */}
               {/* <div className="logo_crew">
@@ -130,7 +127,14 @@ const handleFormDataChange = (newData) => {
                 Have an account? <Link to="/login">Sign in!</Link>
               </p>
             </div> */}
-            <div className="login-form captain-login-form">
+            <div
+              className="login-form captain-login-form"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <CrewSignUpForm
                 setStep={setStep}
                 currentStep={step}
