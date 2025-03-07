@@ -53,15 +53,16 @@ const SupplierSignup = () => {
     businessName: "",
     businessType: "",
     email: "",
+    phone: "",
+    address: "",
+    website: "",
     inventorySource: "",
     serviceAreas: [],
-    licenseFile: null,
-    vatTaxId: "",
-    liabilityInsurance: null,
-    phone: "",
-    Address: "",
-    Website: "",
- 
+    licenseSupplierFile: null,
+    supplierVatTaxId: "",
+    supplierLiabilityInsurance: null,
+    spreadsheetFile: null,
+    acceptFees: false,
 
     // Contact Person
     contactPerson: {

@@ -3,22 +3,39 @@ import axios from "axios";
 const API_URL = "http://localhost:3000/api/auth";
 console.log("API_URL:", API_URL);
 
-export const signup = async (userData) => {
+export const signup = async (formData) => {
   try {
-    console.log("Sending signup request:", userData);
-    const response = await axios.post(`${API_URL}/signup`, userData, {
+    console.log("AuthService: Starting signup request");
+    console.log("FormData contents:");
+    for (let pair of formData.entries()) {
+      console.log(
+        pair[0],
+        ":",
+        pair[1] instanceof File
+          ? { name: pair[1].name, type: pair[1].type, size: pair[1].size }
+          : pair[1]
+      );
+    }
+
+    const response = await axios.post(`${API_URL}/signup`, formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // Add this for file uploads
+        "Content-Type": "multipart/form-data",
       },
     });
+
+    console.log("AuthService: Received response:", response.data);
+
     if (response.data.token) {
+      console.log("AuthService: Storing token in localStorage");
       localStorage.setItem("token", response.data.token);
     }
-    console.log("Signup response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Signup failed:", error.response?.data || error.message);
-    throw error.response?.data || { message: "Signup failed" };
+    console.error("AuthService: Signup error:", {
+      response: error.response?.data,
+      error: error.message,
+    });
+    throw error.response?.data || error;
   }
 };
 
