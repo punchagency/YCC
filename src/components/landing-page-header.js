@@ -23,7 +23,7 @@ const LandingPageHeader = () => {
 
   const location = useLocation();
   const navItems = [
-    { title: "Home", link: "/home" },
+    { title: "Home", link: "/" },
     {
       title: "Departments",
       link: "/departments",

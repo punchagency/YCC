@@ -14,7 +14,7 @@ const LandingPageFooter = () => {
         {
             title: "Quick Links",
             links: [
-                { name: "Home", path: "/home" },
+                { name: "Home", path: "/" },
                 { name: "Vendor & Services", path: "/vendor-services" },
                 { name: "About Us", path: "/about-us" },
                 { name: "Resource Center", path: "/resource-center" },
