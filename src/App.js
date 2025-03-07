@@ -106,7 +106,7 @@ function App() {
 
         {/* Landing Page Routes */}
         <Route element={<LandingPageLayout />}>
-        <Route path="/home" element={<HomeLandingPage />} />
+        <Route path="/" element={<HomeLandingPage />} />
         <Route path="/captain" element= {<CaptainLandingPage />} />
         <Route path="/crew" element={<CrewLandingPage />}/>
         <Route path="/exterior" element={<ExteriorLandingPage />}/>
