@@ -32,7 +32,7 @@ const LandingPageHeader = () => {
         { title: 'Crew', route: '/crew' },
         { title: 'Engineering', route: '/engineering' },
         { title: 'Exterior', route: '/exterior' },
-        { title: 'Chef/Gallery', route: '/chef-gallery' },
+        { title: 'Chef/Galley', route: '/chef-galley' },
         { title: 'Interior', route: '/interior' }
       ]
     },

@@ -36,10 +36,10 @@ const Section2Home = () => {
             path: '/exterior'
         },
         {
-            title: "Chef/Gallery",
+            title: "Chef/Galley",
             description: "Search suggestions for recipes based on diet restrictions and what you have on hand.  Assistance with sourcing for local provisions. Focus on your art and leave the suggestions and sourcing to us.",
             image: chefGalleryIcon,
-            path: '/chef-gallery'
+            path: '/chef-galley'
         },
         {
             title: "Interior",

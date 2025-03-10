@@ -1,11 +1,17 @@
 import React from 'react'
-import { Box, Typography, Container, Button, styled, Grid } from '@mui/material'
+import { Box, Typography, Container, Button, styled, Grid, TextField } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from './landing-page-header'
 import yatch from '../assets/images/YCC-yatch.png'
 import banner from '../assets/images/water-wide.png'
 import playIcon from '../assets/images/icons/play-button.png'
 import { Link } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react';
+
 const Section4Home = () => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [email, setEmail] = useState("");
+    const inputRef = useRef(null);
+
     return (
         <Box sx={{
             paddingBottom: { xs: "710px", md: "288px" },// must be exactly 60% of the overflowing box at the end
@@ -41,9 +47,6 @@ const Section4Home = () => {
                         width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
-                        <Box>
-                            <img src={playIcon} alt="play" width='91px' height='91px' />
-                        </Box>
 
                         <Box>
                             <HeadingText>Join Our Crew Network</HeadingText>
@@ -151,14 +154,36 @@ const Section4Home = () => {
                                     <Link to='/resource-center' >
                                         <GradientButton>
                                             <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
-                                        </GradientButton>
-                                    </Link>
-                                    <Button variant='outlined'
 
+                                            
+                                        </GradientButton>
+                                    </Link> 
+                                
+                                {isEditing ? (
+                                    <TextField
+                                        inputRef={inputRef}
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        onBlur={() => setIsEditing(false)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                setIsEditing(false);
+                                            }
+                                        }}
+                                        variant="outlined"
+                                        size="small"
+                                        placeholder="Enter your email"
+                                        sx={{ borderRadius: "8px", width: "250px" }}
+                                    />
+                                    ) : (
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setIsEditing(true)}
                                         sx={{
                                             position: "relative",
                                             overflow: "hidden",
-                                            border: "none", // Remove the border since we use background trick
+                                            border: "none",
                                             borderRadius: "8px",
                                             padding: "10px 20px",
                                             background: "transparent",
@@ -167,17 +192,19 @@ const Section4Home = () => {
                                                 content: '""',
                                                 position: "absolute",
                                                 inset: 0,
-                                                padding: "2px", // Controls the border thickness
+                                                padding: "2px",
                                                 borderRadius: "inherit",
-                                                background: linearGradient, // Use your gradient here
+                                                background: linearGradient,
                                                 WebkitMask:
                                                     "linear-gradient(white, white) content-box, linear-gradient(white, white)",
                                                 WebkitMaskComposite: "destination-out",
-                                            }
+                                            },
                                         }}
-
                                     >
-                                        <ButtonTypography sx={{ color: "#000005C" }}>Enter Your Email  For Weekly Article</ButtonTypography></Button>
+                                        Enter Your Email For Weekly Article
+                                    </Button>
+                                    )
+                                }
                                 </Box>
                             </Grid>
 
@@ -201,9 +228,6 @@ const Section4Home = () => {
                                         }}
                                     />
                                 </Box>
-
-
-
                             </Grid>
                         </Grid>
 

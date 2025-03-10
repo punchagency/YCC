@@ -25,7 +25,7 @@ const LandingPageFooter = () => {
             title: "Departments",
             links: [
                 { name: "Captain", path: "/captain" },
-                { name: "Chef Gallery", path: "/chef-gallery" },
+                { name: "Chef/Galley", path: "/chef-galley" },
                 { name: "Engineering", path: "/engineering" },
                 { name: "Crew", path: "/crew" },
                 { name: "Interior", path: "/interior" },
