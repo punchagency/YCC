@@ -1,0 +1,39 @@
+ [
+    {
+        "labels": "Jan",
+        "revenue": 0,
+        "cost": 100 
+    },
+    {
+        "labels": "Feb",
+        "revenue": 20,
+        "cost": 200
+    },
+    {
+        "labels": "Mar",
+        "revenue": 40,
+        "cost": 400
+    },
+    {
+        "labels": "Apr",
+        "revenue": 60,
+        "cost": 600
+    },
+    {
+        "labels": "May",
+        "revenue": 80,
+        "cost": 800
+    },
+    {
+        "labels": "Jun",
+        "revenue": 100,
+        "cost": 1000
+    },
+    {
+        "labels": "Jul",
+        "revenue": 120,
+        "cost": 1200
+    }
+   
+]
+

@@ -67,30 +67,20 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Role before submission:', formData.role);
     if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      console.log("submitting login form Data", formData)
       const response = await login(formData);
-      console.log('Login API response:', response);
-
-      if (!response || typeof response !== 'object') {
-        console.error("Invalid API response:", response);
-        setError("Unexpected API response format.");
-        return;
-      }
 
       if (response.status === "success") {
-        // Debug: Confirm the role value before navigating
-        console.log('Redirecting user with role:', formData.fullName);
-        loginUser(response.user); // Store user in context
-        // Extract role from response
-        const userRole = response.user?.role;
-        console.log('Redirecting user with role:', userRole); // Debugging
-
+        loginUser(response.data.user);
+        const userRole = response.data.user?.role;
+        
+        // Get the intended destination or use default based on role
+        const from = location.state?.from || getRoleDefaultPath(userRole);
+        
         if (userRole === "captain") {
           navigate("/dashboard");
         } 
@@ -101,25 +91,37 @@ const LoginForm = () => {
           navigate("/supplier/dashboard");
         } 
         else if (userRole === "crew_member") {
-          navigate("/crew/dashboard");
+          navigate("/crew/inventory/dashboard");
         } 
         else {
           console.error("Unknown role:", userRole);
           setError("Invalid role. Please contact support.");
         }
       } else {
-
-        setError(response.message || 'Login failed. Please try again...');
-
+        setError(response.message || 'Login failed. Please try again.');
       }
-
     } catch (error) {
-      console.log("Error during signup")
+      console.log("Error during login:", error);
       setError(error.message || 'An error occurred. Please try again.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  };
 
+  // Helper function to get default path based on role
+  const getRoleDefaultPath = (role) => {
+    switch (role) {
+      case "captain":
+        return "/dashboard";
+      case "crew_member":
+        return "/crew/inventory/dashboard";
+      case "service_provider":
+        return "/service_provider/dashboard";
+      case "supplier":
+        return "/supplier/dashboard";
+      default:
+        return "/";
+    }
   };
 
   return (

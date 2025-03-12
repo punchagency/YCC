@@ -262,7 +262,6 @@ const DashboardCrew = () => {
         {/* Left Section: Heading and Subheading */}
         <div className="sub-header-left">
           <h3>Dashboard</h3>
-          <p>Overview of all important data</p>
         </div>
 
         {/* Right Section: Action Button */}
