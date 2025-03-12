@@ -16,7 +16,7 @@ const CrewSetting = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Settings</h3>
+            <h3>Set</h3>
             <p>Overview</p>
           </div>
         </div>

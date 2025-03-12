@@ -1,10 +1,11 @@
+import React from 'react';
 import { Outlet } from "react-router-dom";
 import AdminHeader from "../components/header";
 import LeftMenu from "../components/menu";
 import { useState } from "react";
 import ChatbotDashboard from "../components/chatbot/chatbot-dashboard";
 
-export default function Layout({role}) {
+const Layout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <main className="flex page relative wrapper">
@@ -17,4 +18,6 @@ export default function Layout({role}) {
       </div>
     </main>
   );
-}
+};
+
+export default Layout;

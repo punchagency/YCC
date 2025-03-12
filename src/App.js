@@ -8,6 +8,9 @@ import Signup from "./pages/auth/signup";
 import CrewSignup from "./pages/auth/crew.signup";
 import VendorSignup from "./pages/auth/vendor.signup";
 import SupplierSignup from "./pages/auth/supplier.signup";
+import Invent from "./pages/invent/invent"
+import Order from "./pages/order/order";
+import Reports from "./pages/report/report";
 // end of new import 
 
 
@@ -47,8 +50,8 @@ import AddCompliance from "./pages/compliance-management/add-compliance";
 import ComplianceDetails from "./pages/compliance-management/compliance-details";
 import AddRole from "./pages/crew-management/add-role";
 import VesselDetails from "./pages/vessel-management/vessel-details";
-import Reports from "./pages/reports/reports";
-import ReportDetails from "./pages/reports/report-details";
+// import Reports from "./pages/reports/reports";
+// import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
 import DashboardCrew from "./pages/crew/dashboard";
 import ScheduleCalendar from "./pages/maintenance-scheduling/schedule-calendar ";
@@ -62,6 +65,7 @@ import MaintenanceHistoryDetails from './pages/crew/maintenanace-task/history-de
 import Document from "./pages/crew/document-access/document";
 import CrewDocumentDetails from "./pages/crew/document-access/document-details";
 import CrewSetting from "./pages/crew/settings/crewsetting";
+import Inventory from "./pages/inventory/inventory";
 import Layout from "./layout/layout";
 import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
@@ -84,6 +88,8 @@ import VendorAndServices from "./pages/landing-pages/vendor-services";
 import AboutUs from "./pages/landing-pages/about-us";
 import ResourceCenter from "./pages/landing-pages/resource-center";
 import ContactUs from "./pages/landing-pages/contact-us";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 
 
 //context imports
@@ -92,7 +98,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/" element={<GetStarted />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -101,6 +107,7 @@ function App() {
         <Route path="/crew/signup" element={<CrewSignup />} />
         <Route path="/vendor/signup" element={<VendorSignup />} />
         <Route path="/supplier/signup" element={<SupplierSignup />} />
+      
 
         {/* end of route */}
 
@@ -115,7 +122,9 @@ function App() {
           <Route path="/crew" element={<CrewLandingPage />} />
           <Route path="/exterior" element={<ExteriorLandingPage />} />
           <Route path="/interior" element={<InteriorLandingPage />} />
-          <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
+
+          <Route path="/chef-gallery" element={<ChefGalleryLandingPage />} />
+
           <Route path="/engineering" element={<EngineeringLandingPage />} />
           <Route path="/vendor-services" element={<VendorAndServices />} />
           <Route path="/about-us" element={<AboutUs />} />
@@ -123,9 +132,11 @@ function App() {
           <Route path="/contact-us" element={<ContactUs />} />
         </Route>
 
-
-
-        <Route element={<Layout role="Captain" />}>
+        <Route element={
+          <ProtectedRoute>
+            <Layout role="Captain" />
+          </ProtectedRoute>
+        }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/crew-management/role" element={<Role />} />
           <Route path="/crew-management/crews" element={<Users />} />
@@ -201,8 +212,8 @@ function App() {
           <Route path="/crew-management/role/:id" element={<RoleDetails />} />
 
           {/* Report Route */}
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/reports/:reportType" element={<ReportDetails />} />
+          {/* <Route path="/crew/reports" element={<Reports />} /> */}
+          {/* <Route path="/reports/:reportType" element={<ReportDetails />} /> */}
           {/* Notification Route */}
           <Route
             path="/notifications"
@@ -211,7 +222,11 @@ function App() {
           <Route path="/settings" element={<Settings />} />
         </Route>
 
-        <Route element={<Layout role="Crew Member" />}>
+        <Route element={
+          <ProtectedRoute>
+            <Layout role="Crew Member" />
+          </ProtectedRoute>
+        }>
           <Route path="/crew/dashboard" element={<DashboardCrew />} />
           <Route path="/crew/maintenance-task/mytask" element={<MyTask />} />
           <Route
@@ -249,6 +264,11 @@ function App() {
           />
           <Route path="/crew/notifications" element={<Notifications />} />
           <Route path="/crew/settings" element={<CrewSetting />} />
+          <Route path="/crew/inventory/dashboard" element={<Inventory />} />
+          <Route path="/crew/orders" element={<Order />} />
+          <Route path="/crew/inventory/inventory" element={<Invent />} />
+          <Route path="/crew/reports" element={<Reports />} />
+         
         </Route>
       </Routes>
     </div>

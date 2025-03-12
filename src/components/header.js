@@ -6,6 +6,8 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
 import { useNavigate } from "react-router-dom";
+import hamburger from "../assets/images/crew/hamburger.png";
+import searchLogo from "../assets/images/crew/searchLogo.png";
 import { useUser } from "./../context/userContext"; // Import User Context
 
 
@@ -42,7 +44,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
 
   const start = (
     <>
-      <div className="flex align-items-center profile">
+      {/* <div className="flex align-items-center profile">
 
         <Button
           icon="pi pi-bars"
@@ -53,7 +55,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
         <img src={avatar} alt="Profile" className="profile-image" />
         <span className="profile-name">
         Welcome, <strong>{user?.firstName || "User"}</strong>
+        
         </span>
+      </div> */}
+      <div className="header-container">
+          <div className="hamburger">
+            <img src={hamburger} alt="Profile" className="profile-image" />
+          </div>
+          <div className="search-container">
+            <img src={searchLogo} alt="search" className="profile-image" />
+            <input type="text" placeholder="Search" />
+          </div>
       </div>
     </>
   );
@@ -68,6 +80,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
 
   };
 
+
+
   const end = (
     <>
       {/* Notification Overlay Panel */}
@@ -81,6 +95,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
 
           {/* <Button label="Mark all read" text className="p-0 mark-btn" /> */}
         </div>
+
         <ul className="notification-list mb-3">
           {notifications.map((item, index) => (
             <li key={index}>
@@ -110,13 +125,19 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
-      <Button
-        icon="pi pi-bell"
-        className="notifications"
-        onClick={(event) => overlayPanelRef.current.toggle(event)}
-        aria-haspopup
-        rounded
-      />
+      <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+        <Button
+          icon="pi pi-bell"
+          className="notifications"
+          onClick={(event) => overlayPanelRef.current.toggle(event)}
+          aria-haspopup
+          rounded
+        />
+        <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+          <img src={avatar} alt="Profile" className="profile-image" />
+          <p>Alex Seiger</p>
+        </div>
+      </div>
     </>
   );
   return <Menubar start={start} end={end} />;
