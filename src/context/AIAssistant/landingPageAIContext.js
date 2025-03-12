@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { getResponseFromAI } from "../../services/AIAssistant/landingPageAIService";
 
 const LandingPageAIContext = createContext();
 
@@ -8,29 +9,33 @@ export const useLandingPageAI = () => {
 
 export const LandingPageAIProvider = ({ children }) => {
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-    const [chatData, setChatData] = useState([
-        { id: 1, message: "Hello, how can I help you today?", sender: "bot" },
-      ]);
-      const [typingState, setTypingState] = useState(false)
-      const [message, setMessage] = useState('')
+    const [chatData, setChatData] = useState({
+      messages: []
+    });
+    const [typingState, setTypingState] = useState(false)
+    const [message, setMessage] = useState('')
     
-  const function1 = () => {
+  const sendMessage = () => {
     if (!(message.trim())) return;
     if (!isAIAssistantOpen) {
       setIsAIAssistantOpen(true)
     }
     setTypingState(true)
-    setChatData((prevChatData) => [
-      ...prevChatData,
-      { id: prevChatData.length + 1, message, sender: "user" },
-    ]);
-    setMessage(""); // Clear input after sending
-    response()
+    console.log(' message being sent', message)
+    let previousChatData = chatData
+    console.log('previousChatData', previousChatData)
+    previousChatData.messages.push({role: 'user', content: message})
+    setChatData(previousChatData)
+    console.log('chatData on sending message', previousChatData)
+    getResponse(previousChatData)
+    setMessage("");
   }
 
 
-  const response = () => {
-    setTimeout(() => {
+  const getResponse = async (previousChatData) => {
+  /*  setTimeout(() => {
+
+
       setChatData((prevChatData) => [
         ...prevChatData,
         {
@@ -41,32 +46,48 @@ export const LandingPageAIProvider = ({ children }) => {
       ]);
       setTypingState(false);
     }, 2000);
+    */
+    console.log('chatData on getting response', previousChatData)
+    const response = await getResponseFromAI(previousChatData)
+    console.log('response from AI', response)
+    setChatData(response)
+    setTypingState(false);
   }
 
   
-  const preDefinedMessages = (message) => {
-    setMessage(message)
-
-
-
-    setTimeout(() => {
-      console.log('message sent', message)
-      if (!(message.trim())) return;
+  const preDefinedMessages = (predefinedMessage) => {
+      console.log('message sent', predefinedMessage)
+      if (!(predefinedMessage.trim())) return;
       if (!isAIAssistantOpen) {
         setIsAIAssistantOpen(true)
       }
       setTypingState(true)
-      setChatData((prevChatData) => [
-        ...prevChatData,
-        { id: prevChatData.length + 1, message, sender: "user" },
-      ]);
-      setMessage(""); // Clear input after sending
-      response()
-    }, 0);
+      let previousChatData = chatData
+      previousChatData.messages.push({role: 'user', content: predefinedMessage})
+      setChatData(previousChatData)
+      getResponse(previousChatData)
+
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return (
-        <LandingPageAIContext.Provider value={{ isAIAssistantOpen, setIsAIAssistantOpen, chatData, setChatData, typingState, setTypingState, message, setMessage, function1, response, preDefinedMessages }}>
+        <LandingPageAIContext.Provider value={{ isAIAssistantOpen, setIsAIAssistantOpen, chatData, setChatData, typingState, setTypingState, message, setMessage, sendMessage, getResponse, preDefinedMessages }}>
             {children}
         </LandingPageAIContext.Provider>
     );

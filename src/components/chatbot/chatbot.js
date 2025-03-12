@@ -19,8 +19,8 @@ const Chatbot = () => {
     setTypingState,
     message,
     setMessage,
-    function1,
-    response,
+    sendMessage,
+    getResponse,
     preDefinedMessages
    } = useLandingPageAI();
 
@@ -94,11 +94,11 @@ const Chatbot = () => {
                 backgroundColor: '#F3F3F3',
               }}>
 
-                {chatData.map((item) => (
+                {chatData.messages.map((item) => (
                   <Box key={item.id} sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignSelf: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                    alignSelf: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                     width: '70%',
                     paddingX: '15px',
                   }}>
@@ -107,16 +107,16 @@ const Chatbot = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       width: '100%',
-                      justifyContent: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                      justifyContent: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                     }}>
-                      {item.sender === 'bot' && <>
+                      {item.role === 'assistant' && <>
                         <Box>
                           <img src={BotIcon} alt="user" />
                         </Box>
                         <ChatbotTime>Chatbot 02:12pm</ChatbotTime>
                       </>}
 
-                      {item.sender === 'user' && <>
+                      {item.role === 'user' && <>
                         <ChatbotTime>visitor 02:12pm</ChatbotTime>
                       </>}
                     </Box>
@@ -124,15 +124,15 @@ const Chatbot = () => {
                     <Box sx={{
                       width: '100%',
                     }}>
-                      {item.sender === 'bot' ? (
+                      {item.role === 'assistant' ? (
                         <BotChatMessage>
-                          <Typography>{item.message}</Typography>
+                          <Typography>{parseAIMessage(item.content)}</Typography>
                         </BotChatMessage>
                       ) : (
                         <UserChatMessage>
                           <Typography sx={{
                             color: 'white',
-                          }}>{item.message}</Typography>
+                          }}>{item.content}</Typography>
                         </UserChatMessage>
                       )}
                     </Box>
@@ -142,11 +142,11 @@ const Chatbot = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       width: '100%',
-                      justifyContent: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                      justifyContent: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                       gap: '5px',
                     }}>
                       {
-                        item.sender === 'bot' && <>
+                        item.role === 'assistant' && <>
                           <Box>
                             <img
                               src={SendIcon}
@@ -161,7 +161,7 @@ const Chatbot = () => {
                         </>
                       }
 
-                      {item.sender === 'user' && <>
+                      {item.role === 'user' && <>
                         <ChatbotTime><DoneAll sx={{ height: '13px', width: '13px' }} />Read</ChatbotTime>
                       </>}
                     </Box>
@@ -243,7 +243,7 @@ const Chatbot = () => {
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton disabled={!(message.trim())} onClick={function1}>
+                    <IconButton disabled={!(message.trim())} onClick={sendMessage}>
                       <img
                         src={SendIcon}
                         alt="Send"
@@ -357,6 +357,40 @@ const ChatInput = styled(TextField)(({ isAIAssistantOpen }) => ({
   },
 }));
 
+const parseAIMessage = (message) => {
+  const lines = message.split("\n").map((line, index) => {
+    // Detect numbered headers (e.g., "1. Rank Raven")
+    if (/^\d+\.\s/.test(line)) {
+      return (
+        <Typography key={index} variant="subtitle1" fontWeight="bold" sx={{ mt: 2, color: "#333" }}>
+          {line.replace(/\*\*/g, "").trim()} {/* Remove `**` bold markers */}
+        </Typography>
+      );
+    }
+
+    // Detect key-value pairs (e.g., ": **Contact Person:** Osikoya Jason")
+    if (/^:\s*\*\*(.*?)\*\*\s*(.*)/.test(line)) {
+      const match = line.match(/^:\s*\*\*(.*?)\*\*\s*(.*)/);
+      return (
+        <Typography key={index} sx={{ ml: 2, color: "#555" }}>
+          <strong style={{ fontWeight: 600 }}>{match[1]}</strong> - {match[2]}
+        </Typography>
+      );
+    }
+
+    // Default text (fallback)
+    return (
+      <Typography key={index} sx={{ ml: 2, color: "#666" }}>
+        {line.trim()}
+      </Typography>
+    );
+  });
+
+  return <>{lines}</>;
+};
+
+
+
 const CustomOptionButton = styled(Button)({
   height: '50px',
   gap: '10px',
@@ -389,6 +423,7 @@ const BotChatMessage = styled(Box)({
   flexDirection: 'row',
   alignItems: 'flex-start',
   backgroundColor: 'white',
+  textAlign: 'left',
   width: '100%',
   padding: "16px 10px",
   borderRadius: '14px',
