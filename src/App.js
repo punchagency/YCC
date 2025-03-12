@@ -91,6 +91,9 @@ import ContactUs from "./pages/landing-pages/contact-us";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 
+
+//context imports
+
 function App() {
   return (
     <div className="App">
@@ -112,13 +115,16 @@ function App() {
         <Route path="/coming-soon" element={<ComingSoon />} />
 
         {/* Landing Page Routes */}
+
         <Route element={<LandingPageLayout />}>
           <Route path="/" element={<HomeLandingPage />} />
           <Route path="/captain" element={<CaptainLandingPage />} />
           <Route path="/crew" element={<CrewLandingPage />} />
           <Route path="/exterior" element={<ExteriorLandingPage />} />
           <Route path="/interior" element={<InteriorLandingPage />} />
+
           <Route path="/chef-gallery" element={<ChefGalleryLandingPage />} />
+
           <Route path="/engineering" element={<EngineeringLandingPage />} />
           <Route path="/vendor-services" element={<VendorAndServices />} />
           <Route path="/about-us" element={<AboutUs />} />
