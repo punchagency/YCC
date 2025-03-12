@@ -8,12 +8,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
 
-
 const LoginForm = () => {
   // Define the options for the user roles
   const navigate = useNavigate(); // Add useNavigate hook
   const location = useLocation();
-
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,8 +28,8 @@ const LoginForm = () => {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const { loginUser } = useUser(); // Get loginUser function from context
 
   useEffect(() => {
@@ -41,32 +39,25 @@ const LoginForm = () => {
     }
   }, [error]);
 
-
-
-
-
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
   const validateForm = (email) => {
     let isValid = true;
-    setEmailError('');
-    setPasswordError('');
+    setEmailError("");
+    setPasswordError("");
     if (!formData.email || !formData.password) {
-      setError('All fields are required.');
+      setError("All fields are required.");
       isValid = false;
     }
 
     return isValid;
-
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Role before submission:", formData.role);
     if (!validateForm()) return;
 
     setLoading(true);
@@ -77,32 +68,28 @@ const LoginForm = () => {
       if (response.status === "success") {
         loginUser(response.data.user);
         const userRole = response.data.user?.role;
-        
+
         // Get the intended destination or use default based on role
         const from = location.state?.from || getRoleDefaultPath(userRole);
-        
+
         if (userRole === "captain") {
           navigate("/dashboard");
-        } 
-        else if (userRole === "service_provider") {
+        } else if (userRole === "service_provider") {
           navigate("/service_provider/dashboard");
-        } 
-        else if (userRole === "supplier") {
+        } else if (userRole === "supplier") {
           navigate("/supplier/dashboard");
-        } 
-        else if (userRole === "crew_member") {
+        } else if (userRole === "crew_member") {
           navigate("/crew/inventory/dashboard");
-        } 
-        else {
+        } else {
           console.error("Unknown role:", userRole);
           setError("Invalid role. Please contact support.");
         }
       } else {
-        setError(response.message || 'Login failed. Please try again.');
+        setError(response.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.log("Error during login:", error);
-      setError(error.message || 'An error occurred. Please try again.');
+      setError(error.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -155,7 +142,6 @@ const LoginForm = () => {
             className="w-full" // Apply the full-width class
           />
           {passwordError && <small className="p-error">{passwordError}</small>}
-
         </div>
         <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between">
           <div className="p-d-flex p-ai-center">
