@@ -85,6 +85,9 @@ import AboutUs from "./pages/landing-pages/about-us";
 import ResourceCenter from "./pages/landing-pages/resource-center";
 import ContactUs from "./pages/landing-pages/contact-us";
 
+
+//context imports
+
 function App() {
   return (
     <div className="App">
@@ -102,21 +105,22 @@ function App() {
         {/* end of route */}
 
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/coming-soon" element={<ComingSoon />} />  
+        <Route path="/coming-soon" element={<ComingSoon />} />
 
         {/* Landing Page Routes */}
+
         <Route element={<LandingPageLayout />}>
-        <Route path="/" element={<HomeLandingPage />} />
-        <Route path="/captain" element= {<CaptainLandingPage />} />
-        <Route path="/crew" element={<CrewLandingPage />}/>
-        <Route path="/exterior" element={<ExteriorLandingPage />}/>
-        <Route path="/interior" element={<InteriorLandingPage />}/>
-        <Route path="/chef-gallery" element={<ChefGalleryLandingPage />}/>
-        <Route path="/engineering" element={<EngineeringLandingPage />}/>
-        <Route path="/vendor-services" element={<VendorAndServices />}/>
-        <Route path="/about-us" element={<AboutUs />}/>
-        <Route path="/resource-center" element={<ResourceCenter />}/>
-        <Route path="/contact-us" element={<ContactUs />}/>
+          <Route path="/" element={<HomeLandingPage />} />
+          <Route path="/captain" element={<CaptainLandingPage />} />
+          <Route path="/crew" element={<CrewLandingPage />} />
+          <Route path="/exterior" element={<ExteriorLandingPage />} />
+          <Route path="/interior" element={<InteriorLandingPage />} />
+          <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
+          <Route path="/engineering" element={<EngineeringLandingPage />} />
+          <Route path="/vendor-services" element={<VendorAndServices />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/resource-center" element={<ResourceCenter />} />
+          <Route path="/contact-us" element={<ContactUs />} />
         </Route>
 
 
