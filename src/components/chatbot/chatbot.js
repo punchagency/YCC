@@ -7,6 +7,11 @@ import "simplebar-react/dist/simplebar.min.css";
 import { useState, useRef, useEffect } from "react";
 import { DoneAll } from "@mui/icons-material";
 import { useLandingPageAI } from "../../context/AIAssistant/landingPageAIContext";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css"; // Ensure you import KaTeX CSS for proper styling
 
 
 const Chatbot = () => {
@@ -358,35 +363,12 @@ const ChatInput = styled(TextField)(({ isAIAssistantOpen }) => ({
 }));
 
 const parseAIMessage = (message) => {
-  const lines = message.split("\n").map((line, index) => {
-    // Detect numbered headers (e.g., "1. Rank Raven")
-    if (/^\d+\.\s/.test(line)) {
-      return (
-        <Typography key={index} variant="subtitle1" fontWeight="bold" sx={{ mt: 2, color: "#333" }}>
-          {line.replace(/\*\*/g, "").trim()} {/* Remove `**` bold markers */}
-        </Typography>
-      );
-    }
-
-    // Detect key-value pairs (e.g., ": **Contact Person:** Osikoya Jason")
-    if (/^:\s*\*\*(.*?)\*\*\s*(.*)/.test(line)) {
-      const match = line.match(/^:\s*\*\*(.*?)\*\*\s*(.*)/);
-      return (
-        <Typography key={index} sx={{ ml: 2, color: "#555" }}>
-          <strong style={{ fontWeight: 600 }}>{match[1]}</strong> - {match[2]}
-        </Typography>
-      );
-    }
-
-    // Default text (fallback)
-    return (
-      <Typography key={index} sx={{ ml: 2, color: "#666" }}>
-        {line.trim()}
-      </Typography>
-    );
-  });
-
-  return <>{lines}</>;
+  
+  return  <ReactMarkdown
+  children={message}
+  remarkPlugins={[remarkGfm, remarkMath]}
+  rehypePlugins={[rehypeKatex]}
+/>
 };
 
 

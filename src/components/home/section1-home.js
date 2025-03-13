@@ -1,6 +1,6 @@
 import { Box, Typography, styled, Container, Grid, Badge } from '@mui/material'
-import yatch from '../assets/images/yatch-home.png'
-import { linearGradient } from './landing-page-header'
+import yatch from '../../assets/images/yatch-home.png'
+import { linearGradient } from '../landing-page-header'
 
 const Section1Home = () => {
     return (
