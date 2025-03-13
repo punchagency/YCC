@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://ycc-ee4d189a3af8.herokuapp.com";
+const API_URL = process.env.REACT_APP_API_URL;
 console.log("API_URL:", API_URL);
 
 export const signup = async (formData) => {
