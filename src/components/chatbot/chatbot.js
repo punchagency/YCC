@@ -41,6 +41,22 @@ const Chatbot = () => {
     }
   }, [chatData]);
 
+  function formatUtcTo12Hour(utcTimestamp) {
+    const date = new Date(utcTimestamp);
+
+    // Extract hours, minutes, and determine AM/PM
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const amPm = hours >= 12 ? "PM" : "AM";
+
+    // Convert to 12-hour format
+    hours = hours % 12 || 12; 
+
+    // Format minutes to always be two digits
+    const formattedMinutes = minutes.toString().padStart(2, "0");
+
+    return `${hours}:${formattedMinutes} ${amPm}`;
+}
 
   return (
     <Container maxWidth="md">
@@ -118,11 +134,11 @@ const Chatbot = () => {
                         <Box>
                           <img src={BotIcon} alt="user" />
                         </Box>
-                        <ChatbotTime>Chatbot 02:12pm</ChatbotTime>
+                        <ChatbotTime>Chatbot {formatUtcTo12Hour(item.createdAt? item.createdAt : new Date().toISOString())}</ChatbotTime>
                       </>}
 
                       {item.role === 'user' && <>
-                        <ChatbotTime>visitor 02:12pm</ChatbotTime>
+                        <ChatbotTime>visitor {formatUtcTo12Hour(item.createdAt? item.createdAt : new Date().toISOString())}</ChatbotTime>
                       </>}
                     </Box>
 
@@ -368,9 +384,11 @@ const parseAIMessage = (message) => {
   children={message}
   remarkPlugins={[remarkGfm, remarkMath]}
   rehypePlugins={[rehypeKatex]}
+  components={{
+    p: ({ node, ...props }) => <Typography {...props} />,
+  }}
 />
 };
-
 
 
 const CustomOptionButton = styled(Button)({
@@ -417,6 +435,7 @@ const UserChatMessage = styled(Box)({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-end',
+  textAlign: 'left',
   background: 'linear-gradient(80.24deg, #034D92 12.46%, #0487D9 84.7%)',
   width: '100%',
   padding: "16px 10px",
