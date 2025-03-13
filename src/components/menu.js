@@ -241,7 +241,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Inventory",
+      label: "Inventory Management",
       icon: "pi pi-file",
       command: () => {
         navigate("/crew/inventory/inventory");

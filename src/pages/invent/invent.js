@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog } from 'primereact/dialog';
+import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
@@ -19,15 +19,15 @@ import deleteLogo from "../../assets/images/crew/deleteLogo.png";
 const Invent = () => {
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
-  
+
   // Sample inventory data
   const [inventoryItems, setInventoryItems] = useState([
     {
       id: 1,
-      productName: "Safety Vest #1",
-      category: "Safety Equipment",
-      serviceArea: "Deck",
-      stockQuantity: 20,
+      productName: "Diesel Fuel",
+      category: "Fuel",
+      serviceArea: "Caribean",
+      stockQuantity: 500,
       price: 150.0,
     },
     {
@@ -83,11 +83,11 @@ const Invent = () => {
 
   const [editItem, setEditItem] = useState({
     id: null,
-    productName: '',
-    category: '',
-    serviceArea: '',
-    stockQuantity: '',
-    price: ''
+    productName: "",
+    category: "",
+    serviceArea: "",
+    stockQuantity: "",
+    price: "",
   });
 
   const goCrewDashboardPage = () => {
@@ -105,7 +105,7 @@ const Invent = () => {
       category: item.category,
       serviceArea: item.serviceArea,
       stockQuantity: item.stockQuantity.toString(),
-      price: item.price.toFixed(2)
+      price: item.price.toFixed(2),
     });
     setShowEditModal(true);
   };
@@ -118,9 +118,9 @@ const Invent = () => {
       category: editItem.category,
       serviceArea: editItem.serviceArea,
       stockQuantity: parseInt(editItem.stockQuantity),
-      price: parseFloat(editItem.price)
+      price: parseFloat(editItem.price),
     };
-    
+
     setInventoryItems(updatedItems);
     setShowEditModal(false);
   };
@@ -137,74 +137,293 @@ const Invent = () => {
 
       <div className="inventory-container">
         <div className="inventory-summary">
-          
-          <div className="sort">
-            <div>
-              <p>Checkbox</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Product Name</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Category</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Service Area</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Stock Quantity</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Price</p>
-              <img src={sort} alt="sort" />
-            </div>
-            <div>
-              <p>Manage</p>
-              <img src={sort} alt="sort" />
-            </div>
-          </div>
-          <div>
-            <table className="inventory-table">
-              <tbody>
-                {inventoryItems.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <input type="checkbox" />
-                    </td>
-                    <td>{item.productName}</td>
-                    <td>{item.category}</td>
-                    <td>{item.serviceArea}</td>
-                    <td>{item.stockQuantity} units</td>
-                    <td>${item.price.toFixed(2)}</td>
-                    <td className="action-buttons">
-                      <img 
-                        src={editLogo} 
-                        alt="edit" 
+          <table
+            className="inventory-header-table"
+            style={{
+              width: "100%",
+              tableLayout: "fixed",
+              borderCollapse: "collapse",
+              marginBottom: "0",
+            }}
+          >
+            <thead>
+              <tr>
+                <th
+                  style={{
+                    width: "20%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Product Name
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "15%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Category
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "15%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Service Area
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "15%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Stock Quantity
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "15%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Price
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "15%",
+                    textAlign: "left",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src={sort}
+                      alt="sort"
+                      style={{
+                        width: "15px",
+                        height: "15px",
+                        marginRight: "5px",
+                      }}
+                    />
+                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      Manage
+                    </p>
+                  </div>
+                </th>
+                <th
+                  style={{
+                    width: "5%",
+                    textAlign: "center",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    style={{
+                      margin: 0,
+                      width: "14px",
+                      height: "14px",
+                    }}
+                  />
+                </th>
+              </tr>
+            </thead>
+          </table>
+
+          <table
+            className="inventory-table"
+            style={{
+              width: "100%",
+              tableLayout: "fixed",
+              borderCollapse: "collapse",
+              marginTop: "0",
+            }}
+          >
+            <tbody>
+              {inventoryItems.map((item, index) => (
+                <tr key={index}>
+                  <td
+                    style={{
+                      width: "20%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    {item.productName}
+                  </td>
+                  <td
+                    style={{
+                      width: "15%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    {item.category}
+                  </td>
+                  <td
+                    style={{
+                      width: "15%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    {item.serviceArea}
+                  </td>
+                  <td
+                    style={{
+                      width: "15%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    {item.stockQuantity} units
+                  </td>
+                  <td
+                    style={{
+                      width: "15%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    ${item.price.toFixed(2)}
+                  </td>
+                  <td
+                    style={{
+                      width: "15%",
+                      padding: "10px",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <img
+                        src={editLogo}
+                        alt="edit"
                         onClick={() => handleEdit(index)}
+                        style={{
+                          cursor: "pointer",
+                          width: "18px",
+                          height: "18px",
+                        }}
                       />
-                      <img src={deleteLogo} alt="delete" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      <img
+                        src={deleteLogo}
+                        alt="delete"
+                        style={{
+                          cursor: "pointer",
+                          width: "18px",
+                          height: "18px",
+                        }}
+                      />
+                    </div>
+                  </td>
+                  <td
+                    style={{
+                      width: "5%",
+                      padding: "10px",
+                      textAlign: "center",
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                      }}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <Dialog 
-        visible={showEditModal} 
+      <Dialog
+        visible={showEditModal}
         onHide={() => setShowEditModal(false)}
         header="Edit Inventory Item"
         className="edit-inventory-modal"
         modal
-        breakpoints={{'960px': '75vw', '641px': '90vw'}}
-        style={{ width: '50vw' }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        style={{ width: "50vw" }}
       >
         <div className="edit-form">
           <div className="form-row">
@@ -213,7 +432,9 @@ const Invent = () => {
               <InputText
                 id="productName"
                 value={editItem.productName}
-                onChange={(e) => setEditItem({...editItem, productName: e.target.value})}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, productName: e.target.value })
+                }
               />
             </div>
             <div className="form-group">
@@ -221,7 +442,9 @@ const Invent = () => {
               <InputText
                 id="category"
                 value={editItem.category}
-                onChange={(e) => setEditItem({...editItem, category: e.target.value})}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, category: e.target.value })
+                }
               />
             </div>
           </div>
@@ -232,7 +455,9 @@ const Invent = () => {
               <InputText
                 id="serviceArea"
                 value={editItem.serviceArea}
-                onChange={(e) => setEditItem({...editItem, serviceArea: e.target.value})}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, serviceArea: e.target.value })
+                }
               />
             </div>
             <div className="form-group">
@@ -241,7 +466,9 @@ const Invent = () => {
                 id="stockQuantity"
                 type="number"
                 value={editItem.stockQuantity}
-                onChange={(e) => setEditItem({...editItem, stockQuantity: e.target.value})}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, stockQuantity: e.target.value })
+                }
               />
             </div>
           </div>
@@ -254,23 +481,25 @@ const Invent = () => {
                 type="number"
                 step="0.01"
                 value={editItem.price}
-                onChange={(e) => setEditItem({...editItem, price: e.target.value})}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, price: e.target.value })
+                }
               />
             </div>
           </div>
 
           <div className="button-row">
-            <Button 
-              label="Cancel" 
-              icon="pi pi-times" 
-              onClick={() => setShowEditModal(false)} 
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              onClick={() => setShowEditModal(false)}
               className="p-button-text"
             />
-            <Button 
-              label="Update" 
-              icon="pi pi-check" 
-              onClick={handleUpdate} 
-              autoFocus 
+            <Button
+              label="Update"
+              icon="pi pi-check"
+              onClick={handleUpdate}
+              autoFocus
             />
           </div>
         </div>

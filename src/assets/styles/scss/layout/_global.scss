@@ -1880,6 +1880,13 @@ ul {
     width: 100%;
 
     .current-order-summary,
+    h2 {
+      font-size: 18px;
+    }
+    p {
+      text-align: center;
+      font-size: 12px;
+    }
     .progressionBar {
       background: #fff;
       padding: 20px;
@@ -2059,8 +2066,8 @@ ul {
       border-bottom: 1px solid #eee;
       font-size: 10px;
     }
-    .total-orders{
-      background: #FFFFFF;
+    .total-orders {
+      background: #ffffff;
     }
 
     .status {
@@ -2093,6 +2100,15 @@ ul {
 .progressionBar {
   .progress {
     display: flex;
+    justify-content: space-between;
+
+    h2 {
+      font-size: 18px;
+      text-align: left;
+    }
+    p {
+      text-align: left;
+    }
   }
 }
 
@@ -2219,7 +2235,7 @@ ul {
       justify-content: space-between;
       align-items: center;
       background: #f9f9fa;
-      padding: 10px 20px;
+      padding: 10px;
       margin-bottom: 7px;
       border-radius: 5px;
 
@@ -2238,12 +2254,14 @@ ul {
 
     .inventory-table {
       width: 100%;
+
       border-collapse: collapse;
 
       td {
         padding: 12px;
         border-bottom: 1px solid #eee;
-        font-size: 14px;
+        font-size: 12px;
+        text-align: left;
 
         &.action-buttons {
           display: flex;
@@ -2260,17 +2278,17 @@ ul {
             }
           }
         }
-
-        input[type="checkbox"] {
-          width: 16px;
-          height: 16px;
-          cursor: pointer;
-        }
       }
 
-      tr:hover {
-        background-color: #f9f9f9;
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
       }
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
     }
   }
 }
@@ -2580,7 +2598,7 @@ ul {
     background: #fff;
     padding: 15px 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 8px #0000001A;
+    box-shadow: 0 4px 8px #0000001a;
     transition: all 0.3s ease;
 
     h3 {
@@ -2597,7 +2615,131 @@ ul {
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 12px #0000001A;
+      box-shadow: 0 6px 12px #0000001a;
     }
+  }
+}
+
+.calendar-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 15px;
+  max-width: 280px;
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h3 {
+      font-size: 14px;
+      margin: 0;
+      color: #344054;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: none;
+      color: #667085;
+      font-size: 14px;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 5px;
+
+    div {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 500;
+      color: #667085;
+      padding: 3px 0;
+    }
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+
+    div {
+      height: 24px;
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #344054;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f2f4f7;
+      }
+
+      &.prev-month,
+      &.next-month {
+        color: #d0d5dd;
+      }
+
+      &.current-day {
+        background-color: #0487d9;
+        color: white;
+        font-weight: 500;
+      }
+
+      &.has-event {
+        position: relative;
+
+        &:after {
+          content: "";
+          position: absolute;
+          bottom: 2px;
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background-color: #0487d9;
+        }
+      }
+    }
+  }
+}
+
+.calendar-container {
+  .calendar-container-smalls {
+    display: flex;
+    p {
+      text-align: left;
+      font-size: 8px;
+    }
+  }
+  .smalls-h3 {
+    font-size: 10px;
+    text-align: left;
+    margin-right: 10px;
+  }
+  button{
+    background: #0387D9;
+    color: #fff;
+    font-weight: 500;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
   }
 }
