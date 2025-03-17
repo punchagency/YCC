@@ -123,7 +123,7 @@ function App() {
           <Route path="/exterior" element={<ExteriorLandingPage />} />
           <Route path="/interior" element={<InteriorLandingPage />} />
 
-          <Route path="/chef-gallery" element={<ChefGalleryLandingPage />} />
+          <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
 
           <Route path="/engineering" element={<EngineeringLandingPage />} />
           <Route path="/vendor-services" element={<VendorAndServices />} />
@@ -219,7 +219,7 @@ function App() {
             path="/notifications"
             element={<Notifications role={"Captain"} />}
           />
-          <Route path="/settings" element={<Settings />} />
+        {/* <Route path="/settings" element={<Settings />} /> */}
         </Route>
 
         <Route element={
