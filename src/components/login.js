@@ -8,12 +8,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
 
-
 const LoginForm = () => {
   // Define the options for the user roles
   const navigate = useNavigate(); // Add useNavigate hook
   const location = useLocation();
-
 
   const [formData, setFormData] = useState({
     email: "",
@@ -30,8 +28,8 @@ const LoginForm = () => {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const { loginUser } = useUser(); // Get loginUser function from context
 
   useEffect(() => {
@@ -41,85 +39,76 @@ const LoginForm = () => {
     }
   }, [error]);
 
-
-
-
-
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
   const validateForm = (email) => {
     let isValid = true;
-    setEmailError('');
-    setPasswordError('');
+    setEmailError("");
+    setPasswordError("");
     if (!formData.email || !formData.password) {
-      setError('All fields are required.');
+      setError("All fields are required.");
       isValid = false;
     }
 
     return isValid;
-
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Role before submission:', formData.role);
+    console.log("Role before submission:", formData.role);
     if (!validateForm()) return;
 
     setLoading(true);
 
     try {
-      console.log("submitting login form Data", formData)
       const response = await login(formData);
-      console.log('Login API response:', response);
-
-      if (!response || typeof response !== 'object') {
-        console.error("Invalid API response:", response);
-        setError("Unexpected API response format.");
-        return;
-      }
 
       if (response.status === "success") {
-        // Debug: Confirm the role value before navigating
-        console.log('Redirecting user with role:', formData.fullName);
-        loginUser(response.user); // Store user in context
-        // Extract role from response
-        const userRole = response.user?.role;
-        console.log('Redirecting user with role:', userRole); // Debugging
+        loginUser(response.data.user);
+        const userRole = response.data.user?.role;
+
+        // Get the intended destination or use default based on role
+        const from = location.state?.from || getRoleDefaultPath(userRole);
 
         if (userRole === "captain") {
           navigate("/dashboard");
-        } 
-        else if (userRole === "service_provider") {
+        } else if (userRole === "service_provider") {
           navigate("/service_provider/dashboard");
-        } 
-        else if (userRole === "supplier") {
+        } else if (userRole === "supplier") {
           navigate("/supplier/dashboard");
-        } 
-        else if (userRole === "crew_member") {
-          navigate("/crew/dashboard");
-        } 
-        else {
+        } else if (userRole === "crew_member") {
+          navigate("/crew/inventory/dashboard");
+        } else {
           console.error("Unknown role:", userRole);
           setError("Invalid role. Please contact support.");
         }
       } else {
-
-        setError(response.message || 'Login failed. Please try again...');
-
+        setError(response.message || "Login failed. Please try again.");
       }
-
     } catch (error) {
-      console.log("Error during signup")
-      setError(error.message || 'An error occurred. Please try again.');
+      console.log("Error during login:", error);
+      setError(error.message || "An error occurred. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  };
 
+  // Helper function to get default path based on role
+  const getRoleDefaultPath = (role) => {
+    switch (role) {
+      case "captain":
+        return "/dashboard";
+      case "crew_member":
+        return "/crew/inventory/dashboard";
+      case "service_provider":
+        return "/service_provider/dashboard";
+      case "supplier":
+        return "/supplier/dashboard";
+      default:
+        return "/";
+    }
   };
 
   return (
@@ -153,7 +142,6 @@ const LoginForm = () => {
             className="w-full" // Apply the full-width class
           />
           {passwordError && <small className="p-error">{passwordError}</small>}
-
         </div>
         <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between">
           <div className="p-d-flex p-ai-center">

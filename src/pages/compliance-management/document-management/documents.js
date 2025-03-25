@@ -241,7 +241,7 @@ const Documents = () => {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left">
           <h3>Documents</h3>
-          <p>list of all documents</p>
+          <p></p>
         </div>
         <div className="sub-header-right sub-header-big-desktop">
           <div className="p-input-icon-left search mr-3">
@@ -372,10 +372,7 @@ const Documents = () => {
               );
             }}
           />
-          <Column
-            body={loading ? skeletonTemplate : actionBodyTemplate}
-            style={{ width: "10%" }}
-          />
+         
         </DataTable>
       </div>
     </>

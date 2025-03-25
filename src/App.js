@@ -8,8 +8,11 @@ import Signup from "./pages/auth/signup";
 import CrewSignup from "./pages/auth/crew.signup";
 import VendorSignup from "./pages/auth/vendor.signup";
 import SupplierSignup from "./pages/auth/supplier.signup";
-// end of new import 
-
+import Invent from "./pages/invent/invent";
+import Order from "./pages/order/order";
+import Reports from "./pages/report/report";
+import Bookings from "./pages/bookings/bookings";
+// end of new import
 
 import ForgotPassword from "./pages/auth/forgot-password";
 import Dashboard from "./pages/dashboard";
@@ -47,21 +50,22 @@ import AddCompliance from "./pages/compliance-management/add-compliance";
 import ComplianceDetails from "./pages/compliance-management/compliance-details";
 import AddRole from "./pages/crew-management/add-role";
 import VesselDetails from "./pages/vessel-management/vessel-details";
-import Reports from "./pages/reports/reports";
-import ReportDetails from "./pages/reports/report-details";
+// import Reports from "./pages/reports/reports";
+// import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
 import DashboardCrew from "./pages/crew/dashboard";
 import ScheduleCalendar from "./pages/maintenance-scheduling/schedule-calendar ";
-import RoleDetails from './pages/crew-management/role-details';
-import Settings from './pages/Settings';
-import MyTask from './pages/crew/maintenanace-task/mytask';
-import CrewTaskDetails from './pages/crew/maintenanace-task/task-details';
-import CrewTaskEdit from './pages/crew/maintenanace-task/task-edit';
-import MaintenanceHistory from './pages/crew/maintenanace-task/maintenance-history';
-import MaintenanceHistoryDetails from './pages/crew/maintenanace-task/history-details';
+import RoleDetails from "./pages/crew-management/role-details";
+import Settings from "./pages/Settings";
+import MyTask from "./pages/crew/maintenanace-task/mytask";
+import CrewTaskDetails from "./pages/crew/maintenanace-task/task-details";
+import CrewTaskEdit from "./pages/crew/maintenanace-task/task-edit";
+import MaintenanceHistory from "./pages/crew/maintenanace-task/maintenance-history";
+import MaintenanceHistoryDetails from "./pages/crew/maintenanace-task/history-details";
 import Document from "./pages/crew/document-access/document";
 import CrewDocumentDetails from "./pages/crew/document-access/document-details";
 import CrewSetting from "./pages/crew/settings/crewsetting";
+import Inventory from "./pages/inventory/inventory";
 import Layout from "./layout/layout";
 import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
@@ -84,169 +88,223 @@ import VendorAndServices from "./pages/landing-pages/vendor-services";
 import AboutUs from "./pages/landing-pages/about-us";
 import ResourceCenter from "./pages/landing-pages/resource-center";
 import ContactUs from "./pages/landing-pages/contact-us";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Calendar from "./pages/calendar/calendar";
+import { NotificationsProvider } from "./context/notificationsContext";
+
 
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path="/get-started" element={<GetStarted />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+      
+        <NotificationsProvider>
+          <Routes>
+            <Route path="/get-started" element={<GetStarted />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-        {/* new route start */}
+            {/* new route start */}
 
-        <Route path="/crew/signup" element={<CrewSignup />} />
-        <Route path="/vendor/signup" element={<VendorSignup />} />
-        <Route path="/supplier/signup" element={<SupplierSignup />} />
+            <Route path="/crew/signup" element={<CrewSignup />} />
+            <Route path="/vendor/signup" element={<VendorSignup />} />
+            <Route path="/supplier/signup" element={<SupplierSignup />} />
 
-        {/* end of route */}
+            {/* end of route */}
 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/coming-soon" element={<ComingSoon />} />  
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/coming-soon" element={<ComingSoon />} />
 
-        {/* Landing Page Routes */}
-        <Route element={<LandingPageLayout />}>
-        <Route path="/" element={<HomeLandingPage />} />
-        <Route path="/captain" element= {<CaptainLandingPage />} />
-        <Route path="/crew" element={<CrewLandingPage />}/>
-        <Route path="/exterior" element={<ExteriorLandingPage />}/>
-        <Route path="/interior" element={<InteriorLandingPage />}/>
-        <Route path="/chef-gallery" element={<ChefGalleryLandingPage />}/>
-        <Route path="/engineering" element={<EngineeringLandingPage />}/>
-        <Route path="/vendor-services" element={<VendorAndServices />}/>
-        <Route path="/about-us" element={<AboutUs />}/>
-        <Route path="/resource-center" element={<ResourceCenter />}/>
-        <Route path="/contact-us" element={<ContactUs />}/>
-        </Route>
+            {/* Landing Page Routes */}
+            <Route element={<LandingPageLayout />}>
+              <Route path="/" element={<HomeLandingPage />} />
+              <Route path="/captain" element={<CaptainLandingPage />} />
+              <Route path="/crew" element={<CrewLandingPage />} />
+              <Route path="/exterior" element={<ExteriorLandingPage />} />
+              <Route path="/interior" element={<InteriorLandingPage />} />
+              <Route
+                path="/chef-gallery"
+                element={<ChefGalleryLandingPage />}
+              />
+              <Route path="/engineering" element={<EngineeringLandingPage />} />
+              <Route path="/vendor-services" element={<VendorAndServices />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/resource-center" element={<ResourceCenter />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+            </Route>
 
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout role="Captain" />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/crew-management/role" element={<Role />} />
+              <Route path="/crew-management/crews" element={<Users />} />
+              <Route path="/crew-management/crews/new" element={<AddUser />} />
+              <Route
+                path="/crew-management/crews/edit"
+                element={<EditUser />}
+              />
+              <Route path="/vessel-management/vessels" element={<Vessels />} />
+              <Route
+                path="/vessel-management/vessels/new"
+                element={<AddVessel />}
+              />
+              <Route
+                path="/vessel-management/vessels/:id"
+                element={<VesselDetails />}
+              />
+              <Route
+                path="/vessel-management/vessels/edit"
+                element={<EditVessel />}
+              />
+              <Route
+                path="/vessel-management/schedule-calendar"
+                element={<VesselScheduleCalendar />}
+              />
 
+              <Route path="/document-management">
+                <Route path="documents" element={<Documents />} />
+                <Route path="documents/new" element={<AddDocument />} />
+                <Route path="documents/:id" element={<DocumentDetails />} />
+                <Route path="documents/edit" element={<EditDocument />} />
+              </Route>
 
-        <Route element={<Layout role="Captain" />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/crew-management/role" element={<Role />} />
-          <Route path="/crew-management/crews" element={<Users />} />
-          <Route path="/crew-management/crews/new" element={<AddUser />} />
-          <Route path="/crew-management/crews/edit" element={<EditUser />} />
-          <Route path="/vessel-management/vessels" element={<Vessels />} />
-          <Route
-            path="/vessel-management/vessels/new"
-            element={<AddVessel />}
-          />
-          <Route
-            path="/vessel-management/vessels/:id"
-            element={<VesselDetails />}
-          />
-          <Route
-            path="/vessel-management/vessels/edit"
-            element={<EditVessel />}
-          />
-          <Route
-            path="/vessel-management/schedule-calendar"
-            element={<VesselScheduleCalendar />}
-          />
+              <Route
+                path="/warranty-management/warranty"
+                element={<Warranty />}
+              />
 
-          <Route path="/document-management">
-            <Route path="documents" element={<Documents />} />
-            <Route path="documents/new" element={<AddDocument />} />
-            <Route path="documents/:id" element={<DocumentDetails />} />
-            <Route path="documents/edit" element={<EditDocument />} />
-          </Route>
+              <Route path="/maintenance-scheduling">
+                <Route path="maintenance" element={<Maintenance />} />
+                <Route
+                  path="maintenance/:id"
+                  element={<MaintenanceDetails />}
+                />
+                <Route path="maintenance/edit" element={<Editmaintenance />} />
+                <Route path="equipment" element={<Equipment />} />
+                <Route path="equipment/:id" element={<EquipmentDetails />} />
+                <Route path="equipment/new" element={<Addequipment />} />
+                <Route path="equipment/edit" element={<EditEquipment />} />
+                <Route path="warranty" element={<Warranty />} />
+                <Route path="warranty/new" element={<AddWarranty />} />
+                <Route path="warranty/:id" element={<WarrantyDetails />} />
+                <Route path="warranty/edit" element={<EditWarranty />} />
+                <Route
+                  path="schedule-calendar"
+                  element={<ScheduleCalendar />}
+                />
+              </Route>
 
-          <Route path="/warranty-management/warranty" element={<Warranty />} />
+              <Route path="/finance-management">
+                <Route path="expense" element={<Expense />} />
+                <Route path="expense/new" element={<AddExpense />} />
+                <Route path="expense/:id" element={<ExpenseDetails />} />
+                <Route path="expense/edit" element={<EditExpense />} />
+                <Route path="invoice" element={<Invoice />} />
+                <Route path="invoice/new" element={<AddInvoice />} />
+                <Route path="invoice/:id" element={<InvoiceDetails />} />
+                <Route path="invoice/edit" element={<EditInvoice />} />
+              </Route>
+              <Route path="/compliance-management">
+                <Route path="compliance" element={<Compliance />} />
+                <Route path="compliance/new" element={<AddCompliance />} />
+                <Route path="compliance/:id" element={<ComplianceDetails />} />
+                <Route path="compliance/edit" element={<EditCompliance />} />
+              </Route>
 
-          <Route path="/maintenance-scheduling">
-            <Route path="maintenance" element={<Maintenance />} />
-            <Route path="maintenance/:id" element={<MaintenanceDetails />} />
-            <Route path="maintenance/edit" element={<Editmaintenance />} />
-            <Route path="equipment" element={<Equipment />} />
-            <Route path="equipment/:id" element={<EquipmentDetails />} />
-            <Route path="equipment/new" element={<Addequipment />} />
-            <Route path="equipment/edit" element={<EditEquipment />} />
-            <Route path="warranty" element={<Warranty />} />
-            <Route path="warranty/new" element={<AddWarranty />} />
-            <Route path="warranty/:id" element={<WarrantyDetails />} />
-            <Route path="warranty/edit" element={<EditWarranty />} />
-            <Route path="schedule-calendar" element={<ScheduleCalendar />} />
-          </Route>
+              <Route
+                path="/maintenance-scheduling/maintenance/new"
+                element={<AddMaintenance />}
+              />
+              {/* Dynamic Route for User Details */}
+              <Route
+                path="/crew-management/crews/:id"
+                element={<UserDetails />}
+              />
+              <Route
+                path="/crew-management/crews/edit/:id"
+                element={<AddUser />}
+              />
+              <Route path="/crew-management/role/new" element={<AddRole />} />
+              <Route
+                path="/crew-management/role/:id"
+                element={<RoleDetails />}
+              />
 
-          <Route path="/finance-management">
-            <Route path="expense" element={<Expense />} />
-            <Route path="expense/new" element={<AddExpense />} />
-            <Route path="expense/:id" element={<ExpenseDetails />} />
-            <Route path="expense/edit" element={<EditExpense />} />
-            <Route path="invoice" element={<Invoice />} />
-            <Route path="invoice/new" element={<AddInvoice />} />
-            <Route path="invoice/:id" element={<InvoiceDetails />} />
-            <Route path="invoice/edit" element={<EditInvoice />} />
-          </Route>
-          <Route path="/compliance-management">
-            <Route path="compliance" element={<Compliance />} />
-            <Route path="compliance/new" element={<AddCompliance />} />
-            <Route path="compliance/:id" element={<ComplianceDetails />} />
-            <Route path="compliance/edit" element={<EditCompliance />} />
-          </Route>
+              {/* Report Route */}
+              {/* <Route path="/crew/reports" element={<Reports />} /> */}
+              {/* <Route path="/reports/:reportType" element={<ReportDetails />} /> */}
+              {/* Notification Route */}
+              <Route
+                path="/notifications"
+                element={<Notifications role={"Captain"} />}
+              />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
-          <Route
-            path="/maintenance-scheduling/maintenance/new"
-            element={<AddMaintenance />}
-          />
-          {/* Dynamic Route for User Details */}
-          <Route path="/crew-management/crews/:id" element={<UserDetails />} />
-          <Route path="/crew-management/crews/edit/:id" element={<AddUser />} />
-          <Route path="/crew-management/role/new" element={<AddRole />} />
-          <Route path="/crew-management/role/:id" element={<RoleDetails />} />
-
-          {/* Report Route */}
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/reports/:reportType" element={<ReportDetails />} />
-          {/* Notification Route */}
-          <Route
-            path="/notifications"
-            element={<Notifications role={"Captain"} />}
-          />
-          <Route path="/settings" element={<Settings />} />
-        </Route>
-
-        <Route element={<Layout role="Crew Member" />}>
-          <Route path="/crew/dashboard" element={<DashboardCrew />} />
-          <Route path="/crew/maintenance-task/mytask" element={<MyTask />} />
-          <Route
-            path="/crew/maintenance-task/mytask/:id"
-            element={<CrewTaskDetails />}
-          />
-          <Route
-            path="/crew/maintenance-task/mytask/edit"
-            element={<CrewTaskEdit />}
-          />
-          <Route
-            path="/crew/maintenance-task/history"
-            element={<MaintenanceHistory />}
-          />
-          <Route
-            path="/crew/maintenance-task/history/edit"
-            element={<CrewHistoryEdit />}
-          />
-          <Route
-            path="/crew/maintenance-task/history/:id"
-            element={<MaintenanceHistoryDetails />}
-          />
-          <Route
-            path="/crew/maintenance-task/schedule-calendar"
-            element={<CrewScheduleCalendar />}
-          />
-          <Route path="/crew/task-schedule/document" element={<Document />} />
-          <Route
-            path="/crew/task-schedule/document/:id"
-            element={<CrewDocumentDetails />}
-          />
-          <Route
-            path="/crew/task-schedule/document/new"
-            element={<CrewAddDocument />}
-          />
-          <Route path="/crew/notifications" element={<Notifications />} />
-          <Route path="/crew/settings" element={<CrewSetting />} />
-        </Route>
-      </Routes>
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout role="Crew Member" />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/crew/dashboard" element={<DashboardCrew />} />
+              <Route
+                path="/crew/maintenance-task/mytask"
+                element={<MyTask />}
+              />
+              <Route
+                path="/crew/maintenance-task/mytask/:id"
+                element={<CrewTaskDetails />}
+              />
+              <Route
+                path="/crew/maintenance-task/mytask/edit"
+                element={<CrewTaskEdit />}
+              />
+              <Route
+                path="/crew/maintenance-task/history"
+                element={<MaintenanceHistory />}
+              />
+              <Route
+                path="/crew/maintenance-task/history/edit"
+                element={<CrewHistoryEdit />}
+              />
+              <Route
+                path="/crew/maintenance-task/history/:id"
+                element={<MaintenanceHistoryDetails />}
+              />
+              <Route
+                path="/crew/maintenance-task/schedule-calendar"
+                element={<CrewScheduleCalendar />}
+              />
+              <Route
+                path="/crew/task-schedule/document"
+                element={<Document />}
+              />
+              <Route
+                path="/crew/task-schedule/document/:id"
+                element={<CrewDocumentDetails />}
+              />
+              <Route
+                path="/crew/task-schedule/document/new"
+                element={<CrewAddDocument />}
+              />
+              <Route path="/crew/notifications" element={<Notifications />} />
+              <Route path="/crew/settings" element={<CrewSetting />} />
+              <Route path="/crew/inventory/dashboard" element={<Inventory />} />
+              <Route path="/crew/orders" element={<Order />} />
+              <Route path="/crew/inventory/inventory" element={<Invent />} />
+              <Route path="/crew/reports" element={<Reports />} />
+              <Route path="/crew/calendar" element={<Calendar />} />
+              <Route path="/crew/bookings" element={<Bookings />} />
+            </Route>
+          </Routes>
+        </NotificationsProvider>
+      
     </div>
   );
 }

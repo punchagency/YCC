@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 // Create the context
-const UserContext = createContext();
+export const UserContext = createContext();
 
 // Custom hook to use the user context
 export const useUser = () => useContext(UserContext);
@@ -9,13 +9,28 @@ export const useUser = () => useContext(UserContext);
 
 // Provider component to wrap the application
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        // Initialize user state from localStorage
+        const savedUser = localStorage.getItem('user');
+        try {
+            return savedUser ? JSON.parse(savedUser) : null;
+        } catch {
+            return null;
+        }
+    });
 
     // Load user from localStorage (useful for page refreshes)
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        // Get user data from localStorage
+        const userData = localStorage.getItem('user');
+        if (userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                setUser(parsedUser);
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+                localStorage.removeItem('user'); // Clear invalid data
+            }
         }
     }, []);
 
@@ -40,7 +55,7 @@ export const UserProvider = ({ children }) => {
 
 
     return (
-        <UserContext.Provider value={{ user, loginUser, logoutUser, signupUser  }}>
+        <UserContext.Provider value={{ user, loginUser, logoutUser, signupUser, setUser }}>
             {children}
         </UserContext.Provider>
     );
