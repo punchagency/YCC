@@ -10,7 +10,8 @@ export const useLandingPageAI = () => {
 export const LandingPageAIProvider = ({ children }) => {
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
     const [chatData, setChatData] = useState({
-      messages: []
+      messages: [],
+      chatSuggestions: ["how chatbot works?", "vendors services", "supplier profile", "contractors"]  
     });
     const [typingState, setTypingState] = useState(false)
     const [message, setMessage] = useState('')

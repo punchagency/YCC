@@ -4,10 +4,11 @@ import AdminHeader from "../components/header";
 import LeftMenu from "../components/menu";
 import { useState } from "react";
 import ChatbotDashboard from "../components/chatbot/chatbot-dashboard";
-
+import { DashboardAIProvider } from "../context/AIAssistant/dashboardAIContext";
 const Layout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
+    <DashboardAIProvider>
     <main className="flex page relative wrapper">
       <LeftMenu
         role={role}
@@ -25,6 +26,7 @@ const Layout = ({ role }) => {
         <ChatbotDashboard />
       </div>
     </main>
+    </DashboardAIProvider>
   );
 };
 
