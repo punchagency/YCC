@@ -1,0 +1,184 @@
+/* Slide transition effects from right to left */
+.fade-enter {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 400ms ease-out,
+    transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 400ms ease-in,
+    transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a smooth scale effect */
+.fade-enter .booking-edit-container,
+.fade-enter .inventory-summary {
+  transform: scale(0.98);
+}
+
+.fade-enter-active .booking-edit-container,
+.fade-enter-active .inventory-summary {
+  transform: scale(1);
+  transition: transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a subtle shadow animation */
+.fade-enter .booking-edit-container {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.fade-enter-active .booking-edit-container {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 400ms ease-out;
+}
+
+/* Remove scrollbar from dropdowns */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-items-wrapper {
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-dropdown-scrollbar
+  .p-dropdown-panel
+  .p-dropdown-items-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Make sure dropdown items have enough padding */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-item {
+  padding: 0.75rem 1rem;
+}
+
+/* Remove scrollbar from the upload modal */
+.upload-invoice-modal .p-dialog-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.upload-invoice-modal .p-dialog-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Make the modal content have some padding */
+.upload-invoice-modal .p-dialog-content {
+  padding: 1.5rem;
+}
+
+/* Add smooth transition to the upload modal */
+.upload-invoice-modal .p-dialog {
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+}
+
+.upload-invoice-modal.p-dialog-enter {
+  transform: translateY(20px);
+}
+
+/* Make all inputs in the upload modal block-level */
+.upload-invoice-modal .p-inputtext,
+.upload-invoice-modal .p-calendar,
+.upload-invoice-modal .p-dropdown {
+  display: block;
+  width: 100%;
+}
+
+/* Improve the file upload styling */
+.upload-invoice-modal .p-button-outlined.p-button-rounded {
+  border-color: #6366F1;
+  color: #6366F1;
+}
+
+.upload-invoice-modal .p-button-outlined.p-button-rounded:hover {
+  background: rgba(99, 102, 241, 0.04);
+  border-color: #4F46E5;
+  color: #4F46E5;
+}
+
+/* Add some spacing between form elements */
+.upload-invoice-modal .form-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Make the modal header more prominent */
+.upload-invoice-modal .p-dialog-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1.25rem 1.5rem;
+}
+
+.upload-invoice-modal .p-dialog-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* Fix calendar icon alignment */
+.p-calendar-inline-icon .p-datepicker-trigger {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.p-calendar-inline-icon .p-inputtext {
+  width: 100%;
+  padding-right: 2.5rem;
+}
+
+/* Remove default border from calendar component */
+.upload-invoice-modal .p-calendar {
+  border: none !important;
+  width: 100%;
+}
+
+/* Apply consistent border to calendar input */
+.upload-invoice-modal .p-calendar .p-inputtext {
+  border: 1px solid #ced4da !important;
+  width: 100%;
+}
+
+/* Consistent styling for action buttons and icons */
+.action-buttons img,
+.action-buttons .pi {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.action-buttons .p-button {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 6px !important;
+  margin: 0 4px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.action-buttons .p-button:hover {
+  background-color: #e9ecef;
+}
+
+/* Add a container class for the action buttons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}

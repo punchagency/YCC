@@ -5,16 +5,65 @@ import avatar from "../assets/images/avatar.svg";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Card } from "primereact/card";
 import { Badge } from "primereact/badge";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import hamburger from "../assets/images/crew/hamburger.png";
 import searchLogo from "../assets/images/crew/searchLogo.png";
 import { useUser } from "./../context/userContext"; // Import User Context
-
+import { Dropdown } from "primereact/dropdown";
+import { Menu } from "primereact/menu";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isBookingsPage = location.pathname.includes("/bookings");
   const overlayPanelRef = useRef(null);
   const { user, logoutUser } = useUser(); // Get user data from context
+  const [searchValue, setSearchValue] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedSort, setSelectedSort] = useState(null);
+  const shareMenuRef = useRef(null);
+
+  // Filter options
+  const filterOptions = [
+    { label: "Vendor", value: "vendor" },
+    { label: "Yacht", value: "yacht" },
+    { label: "Order Status", value: "orderStatus" },
+    { label: "Priority", value: "priority" },
+    { label: "Delivery Date", value: "deliveryDate" },
+  ];
+
+  // Sort options
+  const sortOptions = [
+    { label: "Date Placed", value: "datePlaced" },
+    { label: "Order Value", value: "orderValue" },
+    { label: "Urgency", value: "urgency" },
+    { label: "Fulfillment Status", value: "fulfillmentStatus" },
+  ];
+
+  // Share menu items
+  const shareItems = [
+    {
+      label: "Email",
+      icon: "pi pi-envelope",
+      command: () => {
+        console.log("Share via email");
+      },
+    },
+    {
+      label: "Export as PDF",
+      icon: "pi pi-file-pdf",
+      command: () => {
+        console.log("Export as PDF");
+      },
+    },
+    {
+      label: "Export as Excel",
+      icon: "pi pi-file-excel",
+      command: () => {
+        console.log("Export as Excel");
+      },
+    },
+  ];
 
   const [notifications] = useState([
     {
@@ -37,6 +86,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     },
   ]);
 
+  // Get user's name from the profile data
+  const userName =
+    user?.profile?.firstName && user?.profile?.lastName
+      ? `${user.profile.firstName} ${user.profile.lastName}`
+      : user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : "User";
+
+  // Get profile picture if available
+  const profilePicture = user?.profile?.profilePicture || avatar;
+
   const handleLogout = () => {
     logoutUser(); // Clears user data
     navigate("/login"); // Redirect to login page
@@ -44,43 +104,161 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
 
   const start = (
     <>
-      {/* <div className="flex align-items-center profile">
+      <div
+        className="header-container"
+        style={{ display: "flex", alignItems: "center", width: "100%" }}
+      >
+        <div className="hamburger">
+          <img src={hamburger} alt="Profile" className="profile-image" />
+        </div>
 
-        <Button
-          icon="pi pi-bars"
-          text
-          className="p-0 collapse-btn mr-3"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        />
-        <img src={avatar} alt="Profile" className="profile-image" />
-        <span className="profile-name">
-        Welcome, <strong>{user?.firstName || "User"}</strong>
-        
-        </span>
-      </div> */}
-      <div className="header-container">
-          <div className="hamburger">
-            <img src={hamburger} alt="Profile" className="profile-image" />
+        {/* Search container as a separate div */}
+        <div
+          className="search-container"
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            flex: "1",
+            marginRight: "15px",
+          }}
+        >
+          <img
+            src={searchLogo}
+            alt="search"
+            className="profile-image"
+            style={{ position: "absolute", left: "10px" }}
+          />
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            style={{ paddingLeft: "35px", width: "100%" }}
+          />
+        </div>
+
+        {/* Only show these controls on the Bookings page - outside the search container */}
+        {isBookingsPage && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            {/* Filter Dropdown */}
+            <Dropdown
+              value={selectedFilter}
+              options={filterOptions}
+              onChange={(e) => setSelectedFilter(e.value)}
+              placeholder="Filter By"
+              style={{
+                width: "120px",
+                height: "36px",
+                textAlign: "center",
+                alignItems: "center",
+              }}
+              panelStyle={{ fontSize: "0.7rem" }}
+            />
+
+            {/* Sort Dropdown */}
+            <Dropdown
+              value={selectedSort}
+              options={sortOptions}
+              onChange={(e) => setSelectedSort(e.value)}
+              placeholder="Sort By"
+              style={{
+                width: "120px",
+                height: "36px",
+                textAlign: "center",
+                alignItems: "center",
+              }}
+              panelStyle={{ fontSize: "0.7rem" }}
+            />
+
+            {/* Share Button */}
+            <Button
+              icon="pi pi-share-alt"
+              className="p-button-outlined p-button-sm"
+              onClick={(e) => shareMenuRef.current.toggle(e)}
+              aria-controls="share-menu"
+              aria-haspopup
+              style={{ height: "36px", width: "36px" }}
+            />
+            <Menu model={shareItems} popup ref={shareMenuRef} id="share-menu" />
           </div>
-          <div className="search-container">
-            <img src={searchLogo} alt="search" className="profile-image" />
-            <input type="text" placeholder="Search" />
-          </div>
+        )}
       </div>
+
+      {/* Display selected filters if any - only on Bookings page */}
+      {isBookingsPage && (selectedFilter || selectedSort) && (
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginTop: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          {selectedFilter && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#f0f7ff",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                border: "1px solid #d0e1fd",
+              }}
+            >
+              <span>
+                Filter:{" "}
+                {filterOptions.find((f) => f.value === selectedFilter)?.label}
+              </span>
+              <Button
+                icon="pi pi-times"
+                className="p-button-text p-button-rounded p-button-sm"
+                onClick={() => setSelectedFilter(null)}
+                style={{ padding: "2px", margin: "0 0 0 5px" }}
+              />
+            </div>
+          )}
+
+          {selectedSort && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: "#f0f7ff",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                border: "1px solid #d0e1fd",
+              }}
+            >
+              <span>
+                Sort: {sortOptions.find((s) => s.value === selectedSort)?.label}
+              </span>
+              <Button
+                icon="pi pi-times"
+                className="p-button-text p-button-rounded p-button-sm"
+                onClick={() => setSelectedSort(null)}
+                style={{ padding: "2px", margin: "0 0 0 5px" }}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
+
   const viewAllNotifications = () => {
     if (role === "Captain") {
       navigate("/notifications");
-
-    }
-    else {
+    } else {
       navigate("/crew/notifications");
     }
-
   };
-
-
 
   const end = (
     <>
@@ -92,8 +270,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
             <h4 className="mx-2">Notifications</h4>
             <Badge value={notifications?.length} severity="warning"></Badge>
           </div>
-
-          {/* <Button label="Mark all read" text className="p-0 mark-btn" /> */}
         </div>
 
         <ul className="notification-list mb-3">
@@ -125,7 +301,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
-      <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <Button
           icon="pi pi-bell"
           className="notifications"
@@ -133,9 +309,19 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
           aria-haspopup
           rounded
         />
-        <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
-          <img src={avatar} alt="Profile" className="profile-image" />
-          <p>Alex Seiger</p>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <img
+            src={avatar}
+            alt="Profile"
+            className="profile-image"
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
+          <p>{userName}</p>
         </div>
       </div>
     </>

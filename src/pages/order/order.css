@@ -1,0 +1,58 @@
+/* Slide transition effects from right to left */
+.fade-enter {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 400ms ease-out, transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 400ms ease-in, transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a smooth scale effect */
+.fade-enter .order-form-container,
+.fade-enter .no-order-container {
+  transform: scale(0.98);
+}
+
+.fade-enter-active .order-form-container,
+.fade-enter-active .no-order-container {
+  transform: scale(1);
+  transition: transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a subtle shadow animation */
+.fade-enter .order-form-container {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.fade-enter-active .order-form-container {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 400ms ease-out;
+}
+
+/* Remove scrollbar from dropdowns */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-items-wrapper {
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-items-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Make sure dropdown items have enough padding */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-item {
+  padding: 0.75rem 1rem;
+} 
