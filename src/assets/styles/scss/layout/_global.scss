@@ -1744,6 +1744,7 @@ ul {
   }
 }
 
+
 .crew-sidebar {
   width: 250px;
   height: 100vh;
@@ -2876,3 +2877,235 @@ ul {
     transform: translateY(1px);
   }
 }
+.calendar-container {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-bottom: 15px;
+  max-width: 280px;
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h3 {
+      font-size: 14px;
+      margin: 0;
+      color: #344054;
+    }
+
+    .calendar-nav-btn {
+      background: none;
+      border: none;
+      color: #667085;
+      font-size: 14px;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 5px;
+
+    div {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 500;
+      color: #667085;
+      padding: 3px 0;
+    }
+  }
+
+  .calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+
+    div {
+      height: 24px;
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #344054;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f2f4f7;
+      }
+
+      &.prev-month,
+      &.next-month {
+        color: #d0d5dd;
+      }
+
+      &.current-day {
+        background-color: #0487d9;
+        color: white;
+        font-weight: 500;
+      }
+
+      &.has-event {
+        position: relative;
+
+        &:after {
+          content: "";
+          position: absolute;
+          bottom: 2px;
+          width: 3px;
+          height: 3px;
+          border-radius: 50%;
+          background-color: #0487d9;
+        }
+      }
+    }
+  }
+}
+
+.calendar-container {
+  .calendar-container-smalls {
+    display: flex;
+    p {
+      text-align: left;
+      font-size: 8px;
+    }
+  }
+  .smalls-h3 {
+    font-size: 10px;
+    text-align: left;
+    margin-right: 10px;
+  }
+  button {
+    background: #0387d9;
+    color: #fff;
+    font-weight: 500;
+    font-size: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+.widget-container {
+  display: flex;
+  margin-top: 20px;
+  margin-left: 20px;
+  .event-container-display {
+    background: #ffffff;
+    box-shadow: 1px 1px 1px #0000001a;
+    display: flex;
+    padding: 20px 10px;
+    border-radius: 10px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    .profile_display {
+      display: flex;
+      padding-top: 10px;
+      div {
+        border: 1px solid #4880ff;
+      }
+      img {
+        height: 30px;
+        width: 30px;
+        border-radius: 50%;
+      }
+    }
+    .profiles {
+      display: flex;
+      justify-content: center;
+
+      p {
+        text-align: left;
+        font-size: 12px;
+      }
+      .header {
+        font-size: 14px;
+      }
+      img {
+        margin-right: 10px;
+      }
+    }
+    .new_event {
+      border-bottom: 1px solid #e0e0e0;
+      margin-bottom: 15px;
+    }
+    h3 {
+      text-align: left;
+      font-size: 13px;
+      color: #202224;
+    }
+  button {
+      background-color: #0387d9;
+      color: #ffff;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 10px 0px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      width: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      img {
+        width: 15px;
+        height: 15px;
+      }
+    }
+  }
+}
+
+.event-divider {
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 15px 0;
+}
+
+.see-more-container {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  text-align: center;
+}
+
+.see-more-button {
+  background: transparent;
+  border: 1px solid #0387d9;
+  color: #0387d9;
+  padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+  transition: background-color 0.3s, color 0.3s;
+
+  &:hover {
+    background-color: rgba(3, 135, 217, 0.1);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+

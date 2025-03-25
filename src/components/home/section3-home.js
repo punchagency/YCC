@@ -1,7 +1,7 @@
 import React from 'react'
 import { Container, Box, Typography, Button } from '@mui/material'
-import { linearGradient } from './landing-page-header'
-import SectionImage from '../assets/images/home-section3-image.png'
+import { linearGradient } from '../landing-page-header'
+import SectionImage from '../../assets/images/home-section3-image.png'
 import { styled } from '@mui/material/styles'
 import { Link } from 'react-router-dom'
 

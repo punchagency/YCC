@@ -235,7 +235,7 @@ const SupplierSignUpForm = ({
       setIsSubmitting(false);
     }
   };
-  
+
   const renderStep1 = () => (
     <motion.div
       key="step1"
@@ -331,6 +331,7 @@ const SupplierSignUpForm = ({
                   height: "100%",
                   background: "transparent",
                   border: "none",
+
                   outline: "none",
                 }}
               />
@@ -1347,6 +1348,7 @@ const SupplierSignUpForm = ({
       </div>
     </motion.div>
   );
+
   return (
     <div className="form-container">
       <AnimatePresence mode="wait" initial={false}>

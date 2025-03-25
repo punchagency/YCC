@@ -90,8 +90,9 @@ import ResourceCenter from "./pages/landing-pages/resource-center";
 import ContactUs from "./pages/landing-pages/contact-us";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Calendar from "./pages/calendar/calendar";
-import { NotificationsProvider } from "./context/notificationsContext";
+import { NotificationsProvider } from "./context/notificationsContext"
 
+//context imports
 
 function App() {
   return (
@@ -114,23 +115,23 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/coming-soon" element={<ComingSoon />} />
 
-            {/* Landing Page Routes */}
-            <Route element={<LandingPageLayout />}>
-              <Route path="/" element={<HomeLandingPage />} />
-              <Route path="/captain" element={<CaptainLandingPage />} />
-              <Route path="/crew" element={<CrewLandingPage />} />
-              <Route path="/exterior" element={<ExteriorLandingPage />} />
-              <Route path="/interior" element={<InteriorLandingPage />} />
-              <Route
-                path="/chef-gallery"
-                element={<ChefGalleryLandingPage />}
-              />
-              <Route path="/engineering" element={<EngineeringLandingPage />} />
-              <Route path="/vendor-services" element={<VendorAndServices />} />
-              <Route path="/about-us" element={<AboutUs />} />
-              <Route path="/resource-center" element={<ResourceCenter />} />
-              <Route path="/contact-us" element={<ContactUs />} />
-            </Route>
+        {/* Landing Page Routes */}
+
+        <Route element={<LandingPageLayout />}>
+          <Route path="/" element={<HomeLandingPage />} />
+          <Route path="/captain" element={<CaptainLandingPage />} />
+          <Route path="/crew" element={<CrewLandingPage />} />
+          <Route path="/exterior" element={<ExteriorLandingPage />} />
+          <Route path="/interior" element={<InteriorLandingPage />} />
+
+          <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
+
+          <Route path="/engineering" element={<EngineeringLandingPage />} />
+          <Route path="/vendor-services" element={<VendorAndServices />} />
+          <Route path="/about-us" element={<AboutUs />} />
+          <Route path="/resource-center" element={<ResourceCenter />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+        </Route>
 
             <Route
               element={
@@ -234,16 +235,16 @@ function App() {
                 element={<RoleDetails />}
               />
 
-              {/* Report Route */}
-              {/* <Route path="/crew/reports" element={<Reports />} /> */}
-              {/* <Route path="/reports/:reportType" element={<ReportDetails />} /> */}
-              {/* Notification Route */}
-              <Route
-                path="/notifications"
-                element={<Notifications role={"Captain"} />}
-              />
-              <Route path="/settings" element={<Settings />} />
-            </Route>
+          {/* Report Route */}
+          {/* <Route path="/crew/reports" element={<Reports />} /> */}
+          {/* <Route path="/reports/:reportType" element={<ReportDetails />} /> */}
+          {/* Notification Route */}
+          <Route
+            path="/notifications"
+            element={<Notifications role={"Captain"} />}
+          />
+        {/* <Route path="/settings" element={<Settings />} /> */}
+        </Route>
 
             <Route
               element={
