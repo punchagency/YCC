@@ -96,14 +96,14 @@
 
 /* Improve the file upload styling */
 .upload-invoice-modal .p-button-outlined.p-button-rounded {
-  border-color: #6366f1;
-  color: #6366f1;
+  border-color: #6366F1;
+  color: #6366F1;
 }
 
 .upload-invoice-modal .p-button-outlined.p-button-rounded:hover {
   background: rgba(99, 102, 241, 0.04);
-  border-color: #4f46e5;
-  color: #4f46e5;
+  border-color: #4F46E5;
+  color: #4F46E5;
 }
 
 /* Add some spacing between form elements */
@@ -120,4 +120,65 @@
 .upload-invoice-modal .p-dialog-title {
   font-weight: 600;
   font-size: 1.25rem;
+}
+
+/* Fix calendar icon alignment */
+.p-calendar-inline-icon .p-datepicker-trigger {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.p-calendar-inline-icon .p-inputtext {
+  width: 100%;
+  padding-right: 2.5rem;
+}
+
+/* Remove default border from calendar component */
+.upload-invoice-modal .p-calendar {
+  border: none !important;
+  width: 100%;
+}
+
+/* Apply consistent border to calendar input */
+.upload-invoice-modal .p-calendar .p-inputtext {
+  border: 1px solid #ced4da !important;
+  width: 100%;
+}
+
+/* Consistent styling for action buttons and icons */
+.action-buttons img,
+.action-buttons .pi {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.action-buttons .p-button {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 6px !important;
+  margin: 0 4px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.action-buttons .p-button:hover {
+  background-color: #e9ecef;
+}
+
+/* Add a container class for the action buttons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
 }

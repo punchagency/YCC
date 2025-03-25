@@ -235,7 +235,7 @@ const SupplierSignUpForm = ({
       setIsSubmitting(false);
     }
   };
-  
+
   const renderStep1 = () => (
     <motion.div
       key="step1"
@@ -331,6 +331,7 @@ const SupplierSignUpForm = ({
                   height: "100%",
                   background: "transparent",
                   border: "none",
+
                   outline: "none",
                 }}
               />
@@ -570,9 +571,7 @@ const SupplierSignUpForm = ({
               type="url"
               placeholder="www.example.com"
               value={formData.website || ""}
-              onChange={(e) =>
-                handleInputChange("website", e.target.value)
-              }
+              onChange={(e) => handleInputChange("website", e.target.value)}
               style={{
                 width: "100%",
                 background: "transparent",
@@ -1349,6 +1348,7 @@ const SupplierSignUpForm = ({
       </div>
     </motion.div>
   );
+
   return (
     <div className="form-container">
       <AnimatePresence mode="wait" initial={false}>

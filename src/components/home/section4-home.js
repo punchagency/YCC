@@ -1,9 +1,9 @@
 import React from 'react'
 import { Box, Typography, Container, Button, styled, Grid, TextField } from '@mui/material'
-import { GradientButton, ButtonTypography, linearGradient } from './landing-page-header'
-import yatch from '../assets/images/YCC-yatch.png'
-import banner from '../assets/images/water-wide.png'
-import playIcon from '../assets/images/icons/play-button.png'
+import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
+import yatch from '../../assets/images/YCC-yatch.png'
+import banner from '../../assets/images/water-wide.png'
+import playIcon from '../../assets/images/icons/play-button.png'
 import { Link } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react';
 

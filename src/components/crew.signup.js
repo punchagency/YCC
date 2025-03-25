@@ -176,7 +176,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       // Handle successful signup
       if (response.status === "success") {
         // Redirect to success page or dashboard
-        navigate("/dashboard");
+        navigate("/crew/inventory/dashboard");
       }
     } catch (err) {
       setError(err.message || "Failed to sign up. Please try again.");
