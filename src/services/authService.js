@@ -27,6 +27,7 @@ export const signup = async (formData) => {
 
     if (response.data.token) {
       console.log("AuthService: Storing token in localStorage");
+
       localStorage.setItem("token", response.data.token);
     }
     return response.data;
