@@ -279,6 +279,11 @@ const Chatbot = () => {
                 placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value || '')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey || message.trim() === '') {
+                    sendMessage()
+                  }
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -305,7 +310,7 @@ const Chatbot = () => {
             <Box sx={{
               display: 'flex',
               flexDirection: 'row',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               alignItems: 'center',
               width: '100%',
               backgroundColor: '#F3F3F3',
@@ -317,23 +322,23 @@ const Chatbot = () => {
               borderBottom: '1px solid #A6C2D4',
               gap: '10px',
               flexWrap: 'nowrap',
-              //overflowX: 'auto',
+              overflowX: 'auto',
               scrollbarWidth: 'none',
               '&::-webkit-scrollbar': {
                 display: 'none',
               },
             }}>
-              <CustomOptionButton onClick={() => preDefinedMessages('how chatbot works?')}  >
-                <CustomOPtionText>how chatbot works?</CustomOPtionText>
+              <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[0] || 'how chatbot works?')}  >
+                <CustomOPtionText> {chatData.chatSuggestions[0] || 'how chatbot works?'}</CustomOPtionText>
               </CustomOptionButton>
-              <CustomOptionButton onClick={() => preDefinedMessages('vendors services')}>
-                <CustomOPtionText>vendors services</CustomOPtionText>
+              <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || 'vendors services')}>
+                <CustomOPtionText> {chatData.chatSuggestions[1] || 'vendors services'}</CustomOPtionText>
               </CustomOptionButton>
-              <CustomOptionButton onClick={() => preDefinedMessages('supplier profile')}>
-                <CustomOPtionText>supplier profile</CustomOPtionText>
+              <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || 'supplier profile')}>
+                <CustomOPtionText> {chatData.chatSuggestions[2] || 'supplier profile'}</CustomOPtionText>
               </CustomOptionButton>
-              <CustomOptionButton onClick={() => preDefinedMessages('contractors')}>
-                <CustomOPtionText>contractors</CustomOPtionText>
+              <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || 'contractors')}>
+                <CustomOPtionText> {chatData.chatSuggestions[3] || 'contractors'}</CustomOPtionText>
               </CustomOptionButton>
             </Box>
 
@@ -519,17 +524,17 @@ const Chatbot = () => {
                   display: 'none',
                 },
               }}>
-                <CustomOptionButton onClick={() => preDefinedMessages('how chatbot works?')}  >
-                  <CustomOPtionText>how chatbot works?</CustomOPtionText>
+                <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[0] || 'how chatbot works?')}  >
+                  <CustomOPtionText> {chatData.chatSuggestions[0] || 'how chatbot works?'}</CustomOPtionText>
                 </CustomOptionButton>
-                <CustomOptionButton onClick={() => preDefinedMessages('vendors services')}>
-                  <CustomOPtionText>vendors services</CustomOPtionText>
+                <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || 'vendors services')}>
+                  <CustomOPtionText> {chatData.chatSuggestions[1] || 'vendors services'}</CustomOPtionText>
                 </CustomOptionButton>
-                <CustomOptionButton onClick={() => preDefinedMessages('supplier profile')}>
-                  <CustomOPtionText>supplier profile</CustomOPtionText>
+                <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || 'supplier profile')}>
+                  <CustomOPtionText> {chatData.chatSuggestions[2] || 'supplier profile'}</CustomOPtionText>
                 </CustomOptionButton>
-                <CustomOptionButton onClick={() => preDefinedMessages('contractors')}>
-                  <CustomOPtionText>contractors</CustomOPtionText>
+                <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || 'contractors')}>
+                  <CustomOPtionText> {chatData.chatSuggestions[3] || 'contractors'}</CustomOPtionText>
                 </CustomOptionButton>
               </Box>
 
@@ -770,17 +775,21 @@ const ChatInput = styled(TextField)(({ isAIAssistantOpen }) => ({
     border: 'none',
   },
 }));
-
 const parseAIMessage = (message) => {
-
-  return <ReactMarkdown
-    children={message}
-    remarkPlugins={[remarkGfm, remarkMath]}
-    rehypePlugins={[rehypeKatex]}
-    components={{
-      p: ({ node, ...props }) => <Typography {...props} />,
-    }}
-  />
+  return (
+      <ReactMarkdown
+          children={message} 
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
+          components={{
+              p: ({ node, ...props }) => <Typography variant="body1" {...props} />,
+              ul: ({ node, ...props }) => <ul style={{ paddingLeft: "20px" }} {...props} />, 
+              ol: ({ node, ...props }) => <ol style={{ paddingLeft: "20px" }} {...props} />,
+              li: ({ node, ...props }) => <li {...props} />, 
+              a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
+          }}
+      />
+  );
 };
 
 
@@ -794,7 +803,10 @@ const CustomOptionButton = styled(Button)({
   backgroundColor: '#FFFFFF',
   textTransform: 'none',
   minWidth: '200px',
-  maxWidth: '200px',
+  flex: '0 0 auto',
+  '&:hover': {
+    backgroundColor: '#f0f0f0',
+  },
 })
 
 const CustomOPtionText = styled(Typography)({

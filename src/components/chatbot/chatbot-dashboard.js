@@ -214,23 +214,23 @@ const ChatbotDashboard = () => {
                             padding: '15px 20px 10px 20px',
                             gap: '10px',
                             flexWrap: 'nowrap',
-                            //overflowX: 'auto',
+                            overflowX: 'auto',
                             scrollbarWidth: 'none',
                             '&::-webkit-scrollbar': {
                                 display: 'none',
                             },
                         }}>
-                            <CustomOptionButton onClick={() => preDefinedMessages('my bookings for this month')}  >
-                                <CustomOPtionText>my bookings for this month</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[0] || 'my bookings for this month')}  >
+                                <CustomOPtionText>{chatData.chatSuggestions[0] || 'my bookings for this month'}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages('my account')}>
-                                <CustomOPtionText>my account</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || 'my account')}>
+                                <CustomOPtionText>{chatData.chatSuggestions[1] || 'my account'}</CustomOPtionText>
                             </CustomOptionButton>   
-                            <CustomOptionButton onClick={() => preDefinedMessages('supplier profile')}>
-                                <CustomOPtionText>supplier profile</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || 'supplier profile')}>
+                                <CustomOPtionText> {chatData.chatSuggestions[2] || 'supplier profile'}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages('contractors')}>
-                                <CustomOPtionText>contractors</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || 'contractors')}>
+                                <CustomOPtionText> {chatData.chatSuggestions[3] || 'contractors'}</CustomOPtionText>
                             </CustomOptionButton>
                         </Box>
 
@@ -368,6 +368,11 @@ const ChatbotDashboard = () => {
                                 placeholder="Type a message..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value || '')}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey || message.trim() === '') {
+                                        sendMessage()
+                                    }
+                                }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
@@ -493,6 +498,10 @@ const CustomOptionButton = styled(Button)({
     backgroundColor: '#FFFFFF',
     textTransform: 'none',
     minWidth: '200px',
+    flex: '0 0 auto',
+    '&:hover': {
+        backgroundColor: '#f0f0f0',
+    },
 })
 
 const CustomOPtionText = styled(Typography)({
@@ -561,14 +570,21 @@ const ChatbotFooterText = styled(Typography)({
 })
 
 const parseAIMessage = (message) => {
+    return (
+        <ReactMarkdown
+            children={message} 
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+                p: ({ node, ...props }) => <Typography variant="body1" {...props} />,
+                ul: ({ node, ...props }) => <ul style={{ paddingLeft: "20px" }} {...props} />, 
+                ol: ({ node, ...props }) => <ol style={{ paddingLeft: "20px" }} {...props} />,
+                li: ({ node, ...props }) => <li {...props} />, 
+                a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
+            }}
+        />
+    );
+};
 
-    return <ReactMarkdown
-      children={message}
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={{
-        p: ({ node, ...props }) => <Typography {...props} />,
-      }}
-    />
-  };
+
 export default ChatbotDashboard;

@@ -11,12 +11,13 @@ export const useDashboardAI = () => {
 
 export const DashboardAIProvider = ({ children }) => {
     //const { user } =useUser();
-    const userId = '67ced33a4b1b4e1b3802f2ae'
+    const userId = '67dad4d27fff4d864bf44dca'
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
     const [chatData, setChatData] = useState({
         _id: '',
         userId: userId,
-        messages: []
+        messages: [],   
+        chatSuggestions: ["my bookings for this month", "my account", "supplier profile", "contractors"]
     });
     const [typingState, setTypingState] = useState(false)
     const [message, setMessage] = useState('')
