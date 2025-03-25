@@ -10,8 +10,8 @@ export const useDashboardAI = () => {
 }
 
 export const DashboardAIProvider = ({ children }) => {
-    //const { user } =useUser();
-    const userId = '67dad4d27fff4d864bf44dca'
+    const { user } = useUser();
+    const userId = user.id
     const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
     const [chatData, setChatData] = useState({
         _id: '',

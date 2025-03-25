@@ -17,10 +17,15 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; 
+import { useUser } from "../../context/userContext";
 
 
 
 const ChatbotDashboard = () => {
+
+    const { user } = useUser();
+    const role = user.role.split('_')[0]
+
     const {
         isAIAssistantOpen,
         setIsAIAssistantOpen,
@@ -97,13 +102,14 @@ const ChatbotDashboard = () => {
                     border: 'none',
                 }}
             >
+                <>
 
                 <Box sx={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    display: 'flex',
+                     display: role !== 'service' ? 'none' : 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '900px',
@@ -142,7 +148,7 @@ const ChatbotDashboard = () => {
                                 paddingLeft: '20px',
                             }}
                         >
-                            <ChatHeadingText>Supplier Profile</ChatHeadingText>
+                            <ChatHeadingText>Vendor Profile</ChatHeadingText>
                             <Box sx={{
                                 display: 'flex',
                                 flexDirection: 'row',
@@ -431,7 +437,34 @@ const ChatbotDashboard = () => {
 
                 </Box>
 
+                <Box
+                sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                     display: role !== 'service' ? 'flex' : 'none',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '900px',
+                    maxHeight: '40vh',
+                    backgroundColor: 'white',
+                    borderRadius: '24px',
+                    border: '1px solid #E3E3E3',
+                    padding: '20px',
+                }}
+                >
+                    <Typography sx={{
+                        fontFamily: 'Inter',
+                        fontWeight: '500',
+                        fontSize: '20px',
+                        lineHeight: '30px',
+                        letterSpacing: '0%',
+                        color: 'red',
+                    }}>Only Available to Vendors</Typography>
+                </Box>
 
+                </>
 
 
 

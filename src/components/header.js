@@ -92,7 +92,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
       ? `${user.profile.firstName} ${user.profile.lastName}`
       : user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
-      : "User";
+      : user?.profile?.businessName
 
   // Get profile picture if available
   const profilePicture = user?.profile?.profilePicture || avatar;
