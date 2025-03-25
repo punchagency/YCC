@@ -1,0 +1,123 @@
+/* Slide transition effects from right to left */
+.fade-enter {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 400ms ease-out,
+    transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 400ms ease-in,
+    transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a smooth scale effect */
+.fade-enter .booking-edit-container,
+.fade-enter .inventory-summary {
+  transform: scale(0.98);
+}
+
+.fade-enter-active .booking-edit-container,
+.fade-enter-active .inventory-summary {
+  transform: scale(1);
+  transition: transform 400ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Add a subtle shadow animation */
+.fade-enter .booking-edit-container {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+}
+
+.fade-enter-active .booking-edit-container {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 400ms ease-out;
+}
+
+/* Remove scrollbar from dropdowns */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-items-wrapper {
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-dropdown-scrollbar
+  .p-dropdown-panel
+  .p-dropdown-items-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Make sure dropdown items have enough padding */
+.no-dropdown-scrollbar .p-dropdown-panel .p-dropdown-item {
+  padding: 0.75rem 1rem;
+}
+
+/* Remove scrollbar from the upload modal */
+.upload-invoice-modal .p-dialog-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.upload-invoice-modal .p-dialog-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Make the modal content have some padding */
+.upload-invoice-modal .p-dialog-content {
+  padding: 1.5rem;
+}
+
+/* Add smooth transition to the upload modal */
+.upload-invoice-modal .p-dialog {
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+}
+
+.upload-invoice-modal.p-dialog-enter {
+  transform: translateY(20px);
+}
+
+/* Make all inputs in the upload modal block-level */
+.upload-invoice-modal .p-inputtext,
+.upload-invoice-modal .p-calendar,
+.upload-invoice-modal .p-dropdown {
+  display: block;
+  width: 100%;
+}
+
+/* Improve the file upload styling */
+.upload-invoice-modal .p-button-outlined.p-button-rounded {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.upload-invoice-modal .p-button-outlined.p-button-rounded:hover {
+  background: rgba(99, 102, 241, 0.04);
+  border-color: #4f46e5;
+  color: #4f46e5;
+}
+
+/* Add some spacing between form elements */
+.upload-invoice-modal .form-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Make the modal header more prominent */
+.upload-invoice-modal .p-dialog-header {
+  border-bottom: 1px solid #e9ecef;
+  padding: 1.25rem 1.5rem;
+}
+
+.upload-invoice-modal .p-dialog-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
