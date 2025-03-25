@@ -6,15 +6,24 @@ import SimpleBar from 'simplebar-react'
 import "simplebar-react/dist/simplebar.min.css";
 import { useState, useRef, useEffect } from "react";
 import { DoneAll } from "@mui/icons-material";
+import { useLandingPageAI } from "../../context/AIAssistant/landingPageAIContext";
+
 
 const Chatbot = () => {
 
-  const [chatMode, setChatMode] = useState('inactive')
-  const [typingState, setTypingState] = useState(false)
-  const [message, setMessage] = useState('')
-  const [chatData, setChatData] = useState([
-    { id: 1, message: "Hello, how can I help you today?", sender: "bot" },
-  ]);
+  const { isAIAssistantOpen,
+    setIsAIAssistantOpen,
+    chatData,
+    setChatData,
+    typingState,
+    setTypingState,
+    message,
+    setMessage,
+    sendMessage,
+    getResponse,
+    preDefinedMessages
+   } = useLandingPageAI();
+
 
   const chatContainerRef = useRef(null);
 
@@ -26,65 +35,6 @@ const Chatbot = () => {
       });
     }
   }, [chatData]);
-
-  const function1 = () => {
-    console.log('message sent', message)
-    if (!(message.trim())) return;
-    if (chatMode !== 'active') {
-      setChatMode('active')
-    }
-    setTypingState(true)
-    setChatData((prevChatData) => [
-      ...prevChatData,
-      { id: prevChatData.length + 1, message, sender: "user" },
-    ]);
-    setMessage(""); // Clear input after sending
-    response()
-  }
-
-
-  const response = () => {
-    setTimeout(() => {
-      setChatData((prevChatData) => [
-        ...prevChatData,
-        {
-          id: prevChatData.length + 1, // Use prevChatData.length to keep IDs correct
-          message: "Acknowledged... here is your response",
-          sender: "bot",
-        },
-      ]);
-      setTypingState(false);
-    }, 2000);
-  }
-
-  const preDefinedMessages = (message) => {
-    setMessage(message)
-
-
-    
-    setTimeout(() => {
-      console.log('message sent', message)
-      if (!(message.trim())) return;
-      if (chatMode !== 'active') {
-        setChatMode('active')
-      }
-      setTypingState(true)
-      setChatData((prevChatData) => [
-        ...prevChatData,
-        { id: prevChatData.length + 1, message, sender: "user" },
-      ]);
-      setMessage(""); // Clear input after sending
-      response()
-    }, 0);
-  }
-
-
-
-
-
-
-
-
 
 
   return (
@@ -122,7 +72,7 @@ const Chatbot = () => {
 
           {/* Main chat section */}
 
-          {chatMode === 'active' && <Box sx={{
+          {isAIAssistantOpen && <Box sx={{
             display: 'flex',
             height: '250px',
             width: '100%',
@@ -144,11 +94,11 @@ const Chatbot = () => {
                 backgroundColor: '#F3F3F3',
               }}>
 
-                {chatData.map((item) => (
+                {chatData.messages.map((item) => (
                   <Box key={item.id} sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignSelf: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                    alignSelf: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                     width: '70%',
                     paddingX: '15px',
                   }}>
@@ -157,16 +107,16 @@ const Chatbot = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       width: '100%',
-                      justifyContent: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                      justifyContent: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                     }}>
-                      {item.sender === 'bot' && <>
+                      {item.role === 'assistant' && <>
                         <Box>
                           <img src={BotIcon} alt="user" />
                         </Box>
                         <ChatbotTime>Chatbot 02:12pm</ChatbotTime>
                       </>}
 
-                      {item.sender === 'user' && <>
+                      {item.role === 'user' && <>
                         <ChatbotTime>visitor 02:12pm</ChatbotTime>
                       </>}
                     </Box>
@@ -174,15 +124,15 @@ const Chatbot = () => {
                     <Box sx={{
                       width: '100%',
                     }}>
-                      {item.sender === 'bot' ? (
+                      {item.role === 'assistant' ? (
                         <BotChatMessage>
-                          <Typography>{item.message}</Typography>
+                          <Typography>{parseAIMessage(item.content)}</Typography>
                         </BotChatMessage>
                       ) : (
                         <UserChatMessage>
                           <Typography sx={{
                             color: 'white',
-                          }}>{item.message}</Typography>
+                          }}>{item.content}</Typography>
                         </UserChatMessage>
                       )}
                     </Box>
@@ -192,28 +142,28 @@ const Chatbot = () => {
                       flexDirection: 'row',
                       alignItems: 'center',
                       width: '100%',
-                      justifyContent: item.sender === 'bot' ? 'flex-start' : 'flex-end',
+                      justifyContent: item.role === 'assistant' ? 'flex-start' : 'flex-end',
                       gap: '5px',
                     }}>
                       {
-                        item.sender === 'bot' && <>
-                      <Box>
-                        <img
-                          src={SendIcon}
-                          alt="Send"
-                          style={{
-                            width: "10px",
-                            height: "10px",
-                          }}
-                        />
-                      </Box>
-                      <ChatbotTime>sent</ChatbotTime>
-                      </>
-                        }
+                        item.role === 'assistant' && <>
+                          <Box>
+                            <img
+                              src={SendIcon}
+                              alt="Send"
+                              style={{
+                                width: "10px",
+                                height: "10px",
+                              }}
+                            />
+                          </Box>
+                          <ChatbotTime>sent</ChatbotTime>
+                        </>
+                      }
 
-                        {item.sender === 'user' && <>
-                          <ChatbotTime><DoneAll sx={{height: '13px', width: '13px' }} />Read</ChatbotTime>
-                        </>}
+                      {item.role === 'user' && <>
+                        <ChatbotTime><DoneAll sx={{ height: '13px', width: '13px' }} />Read</ChatbotTime>
+                      </>}
                     </Box>
 
 
@@ -286,14 +236,14 @@ const Chatbot = () => {
             backgroundColor: 'transparent',
           }}>
             <ChatInput
-              chatMode={chatMode}
+              isAIAssistantOpen={isAIAssistantOpen}
               placeholder="Type a message..."
               value={message}
               onChange={(e) => setMessage(e.target.value || '')}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton disabled={!(message.trim())} onClick={function1}>
+                    <IconButton disabled={!(message.trim())} onClick={sendMessage}>
                       <img
                         src={SendIcon}
                         alt="Send"
@@ -368,13 +318,13 @@ const Chatbot = () => {
   )
 };
 
-const ChatInput = styled(TextField)(({ chatMode }) => ({
+const ChatInput = styled(TextField)(({ isAIAssistantOpen }) => ({
   width: '100%',
   backgroundColor: 'white',
-  borderTopLeftRadius: chatMode === 'active' ? '0px' : '24px',
-  borderTopRightRadius: chatMode === 'active' ? '0px' : '24px',
+  borderTopLeftRadius: isAIAssistantOpen ? '0px' : '24px',
+  borderTopRightRadius: isAIAssistantOpen ? '0px' : '24px',
   padding: '10px',
-  borderTop: chatMode === 'active' ? 'none' : '1px solid #A6C2D4',
+  borderTop: isAIAssistantOpen ? 'none' : '1px solid #A6C2D4',
   borderLeft: '1px solid #A6C2D4',
   borderRight: '1px solid #A6C2D4',
   borderBottom: 'none',
@@ -406,6 +356,40 @@ const ChatInput = styled(TextField)(({ chatMode }) => ({
     border: 'none',
   },
 }));
+
+const parseAIMessage = (message) => {
+  const lines = message.split("\n").map((line, index) => {
+    // Detect numbered headers (e.g., "1. Rank Raven")
+    if (/^\d+\.\s/.test(line)) {
+      return (
+        <Typography key={index} variant="subtitle1" fontWeight="bold" sx={{ mt: 2, color: "#333" }}>
+          {line.replace(/\*\*/g, "").trim()} {/* Remove `**` bold markers */}
+        </Typography>
+      );
+    }
+
+    // Detect key-value pairs (e.g., ": **Contact Person:** Osikoya Jason")
+    if (/^:\s*\*\*(.*?)\*\*\s*(.*)/.test(line)) {
+      const match = line.match(/^:\s*\*\*(.*?)\*\*\s*(.*)/);
+      return (
+        <Typography key={index} sx={{ ml: 2, color: "#555" }}>
+          <strong style={{ fontWeight: 600 }}>{match[1]}</strong> - {match[2]}
+        </Typography>
+      );
+    }
+
+    // Default text (fallback)
+    return (
+      <Typography key={index} sx={{ ml: 2, color: "#666" }}>
+        {line.trim()}
+      </Typography>
+    );
+  });
+
+  return <>{lines}</>;
+};
+
+
 
 const CustomOptionButton = styled(Button)({
   height: '50px',
@@ -439,6 +423,7 @@ const BotChatMessage = styled(Box)({
   flexDirection: 'row',
   alignItems: 'flex-start',
   backgroundColor: 'white',
+  textAlign: 'left',
   width: '100%',
   padding: "16px 10px",
   borderRadius: '14px',
