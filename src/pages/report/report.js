@@ -21,6 +21,8 @@ import neworder from "../../assets/images/crew/neworder.png";
 import doctor from "../../assets/images/crew/doctor.png";
 import wavyline from "../../assets/images/crew/wavyline.png";
 import wavyback from "../../assets/images/crew/wavyback.png";
+import profileReport from "../../assets/images/crew/profile-report.png";
+import profileReport2 from "../../assets/images/crew/profile-report2.png";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -244,7 +246,7 @@ const Reports = () => {
 
               {/* Second Progress Bar */}
               <div className="progress-container" style={{ marginTop: "20px" }}>
-                <img src={iconcontainer} alt="container" />
+                <img src={profileReport} alt="container" />
                 <div className="progress-container-1">
                   <div
                     className="progress-container-1-1"
@@ -259,7 +261,7 @@ const Reports = () => {
 
               {/* Third Progress Bar */}
               <div className="progress-container" style={{ marginTop: "20px" }}>
-                <img src={neworder} alt="neworder" />
+                <img src={profileReport2} alt="neworder" />
                 <div className="progress-container-1">
                   <div
                     className="progress-container-1-1"

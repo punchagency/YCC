@@ -241,7 +241,14 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Inventory",
+      label: "Calendar",
+      icon: "pi pi-calendar",
+      command: () => {
+        navigate("/crew/calendar");
+      },
+    },
+    {
+      label: "Inventory Management",
       icon: "pi pi-file",
       command: () => {
         navigate("/crew/inventory/inventory");
@@ -255,10 +262,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Maintenance",
-      icon: <img src={orderLogo} alt="Maintenance" width={15} height={15} />,
+      label: "Bookings",
+      icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
       command: () => {
-        navigate("/crew/maintenance");
+        navigate("/crew/bookings");
       },
     },
     {
@@ -276,7 +283,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Compliance Tracking",
+      label: "Notifications",
       icon: (
         <img
           src={complianceLogo}
@@ -286,7 +293,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         />
       ),
       command: () => {
-        navigate("/crew/compliance-tracking");
+        navigate("/crew/notifications");
       },
     },
     {

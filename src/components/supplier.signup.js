@@ -571,9 +571,7 @@ const SupplierSignUpForm = ({
               type="url"
               placeholder="www.example.com"
               value={formData.website || ""}
-              onChange={(e) =>
-                handleInputChange("website", e.target.value)
-              }
+              onChange={(e) => handleInputChange("website", e.target.value)}
               style={{
                 width: "100%",
                 background: "transparent",

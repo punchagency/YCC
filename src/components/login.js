@@ -73,11 +73,11 @@ const LoginForm = () => {
         const from = location.state?.from || getRoleDefaultPath(userRole);
 
         if (userRole === "captain") {
-          navigate("/dashboard");
+          navigate("/crew/inventory/dashboard");// navigate("/dashboard");
         } else if (userRole === "service_provider") {
-          navigate("/service_provider/dashboard");
+          navigate("/crew/inventory/dashboard");//navigate("/service_provider/dashboard");
         } else if (userRole === "supplier") {
-          navigate("/supplier/dashboard");
+          navigate("/crew/inventory/dashboard");//navigate("/supplier/dashboard");
         } else if (userRole === "crew_member") {
           navigate("/crew/inventory/dashboard");
         } else {
