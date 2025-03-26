@@ -11,6 +11,7 @@ import searchLogo from "../assets/images/crew/searchLogo.png";
 import { useUser } from "./../context/userContext"; // Import User Context
 import { Dropdown } from "primereact/dropdown";
 import { Menu } from "primereact/menu";
+import MobileSidebar from './MobileSidebar'; // Re-import MobileSidebar
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [selectedSort, setSelectedSort] = useState(null);
   const shareMenuRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Re-add mobile menu state
 
   // Filter options
   const filterOptions = [
@@ -102,14 +104,25 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     navigate("/login"); // Redirect to login page
   };
 
+  const viewAllNotifications = () => {
+    if (role === "Captain") {
+      navigate("/notifications");
+    } else {
+      navigate("/crew/notifications");
+    }
+  };
+
   const start = (
     <>
       <div
         className="header-container"
         style={{ display: "flex", alignItems: "center", width: "100%" }}
       >
-        <div className="hamburger">
-          <img src={hamburger} alt="Profile" className="profile-image" />
+        <div 
+          className="hamburger" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)} // Re-add click handler
+        >
+          <img src={hamburger} alt="Menu" className="profile-image" />
         </div>
 
         {/* Search container as a separate div */}
@@ -252,14 +265,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     </>
   );
 
-  const viewAllNotifications = () => {
-    if (role === "Captain") {
-      navigate("/notifications");
-    } else {
-      navigate("/crew/notifications");
-    }
-  };
-
   const end = (
     <>
       {/* Notification Overlay Panel */}
@@ -326,7 +331,18 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
       </div>
     </>
   );
-  return <Menubar start={start} end={end} />;
+  
+  // Return both the Menubar and the MobileSidebar
+  return (
+    <>
+      <Menubar start={start} end={end} />
+      <MobileSidebar 
+        isOpen={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)}
+        role={role}
+      />
+    </>
+  );
 };
 
 export default AdminHeader;

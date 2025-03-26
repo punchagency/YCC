@@ -626,7 +626,13 @@ const CrewSetting = () => {
                       marginTop: "7px",
                     }}
                   >
-                    <p style={{ fontSize: "8px", color: "#78ABCA", marginRight: "5px" }}>
+                    <p
+                      style={{
+                        fontSize: "8px",
+                        color: "#78ABCA",
+                        marginRight: "5px",
+                      }}
+                    >
                       22% Decrease from last year
                     </p>
                     <img src={barup} alt="barup" width="10px" height="10px" />
