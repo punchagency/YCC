@@ -1,35 +1,35 @@
-import React, { useState, useRef } from "react";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
-
+import React, { useState, useEffect, useRef } from "react";
+import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
+import { Dropdown } from "primereact/dropdown";
+import { Calendar } from "primereact/calendar";
+import { Toast } from "primereact/toast";
+import { SwitchTransition, CSSTransition } from "react-transition-group";
 import lockLogo from "../../assets/images/crew/lockLogo.png";
 import dropdown from "../../assets/images/crew/dropdown.png";
 import cart from "../../assets/images/crew/cart.png";
-import iconcontainer from "../../assets/images/crew/iconContainer.png";
+import iconContainer from "../../assets/images/crew/iconContainer.png";
 import neworder from "../../assets/images/crew/neworder.png";
-import buttonorder from "../../assets/images/crew/buttonorder.png";
-import { Sidebar } from "primereact/sidebar";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
-import { Toast } from "primereact/toast";
 import "./order.css"; // We'll create this CSS file for transitions
 
 const Order = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [showOrderForm, setShowOrderForm] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [orderForm, setOrderForm] = useState({
     orderName: "",
     customerName: "",
@@ -37,23 +37,22 @@ const Order = () => {
     selectedProduct: null,
     orderStatus: null,
     deliveryDate: null,
+    notes: "",
   });
 
   // Sample product options
   const productOptions = [
     { label: "Diesel Fuel", value: "diesel" },
     { label: "Engine Oil", value: "engine_oil" },
-    { label: "First Aid Kit", value: "first_aid" },
-    { label: "Life Jackets", value: "life_jackets" },
-    { label: "Navigation Equipment", value: "navigation" },
+    { label: "Safety Equipment", value: "safety" },
+    { label: "Navigation Tools", value: "navigation" },
   ];
 
-  // Order status options
+  // Sample status options
   const statusOptions = [
     { label: "Pending", value: "pending" },
     { label: "Processing", value: "processing" },
-    { label: "Shipped", value: "shipped" },
-    { label: "Delivered", value: "delivered" },
+    { label: "Completed", value: "completed" },
     { label: "Cancelled", value: "cancelled" },
   ];
 
@@ -92,14 +91,13 @@ const Order = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please fill all required fields",
+        detail: "Please fill in all required fields",
         life: 3000,
       });
       return;
     }
 
     // Process form submission
-    console.log("Order submitted:", orderForm);
     toast.current.show({
       severity: "success",
       summary: "Success",
@@ -115,10 +113,8 @@ const Order = () => {
       selectedProduct: null,
       orderStatus: null,
       deliveryDate: null,
+      notes: "",
     });
-
-    // Hide the form
-    setShowOrderForm(false);
   };
 
   const goCrewDashboardPage = () => {
@@ -127,6 +123,132 @@ const Order = () => {
 
   const goInventorySummaryPage = () => {
     navigate("/crew/inventory/summary");
+  };
+
+  // Render mobile summary boxes
+  const renderMobileSummaryBoxes = () => {
+    return (
+      <div style={{ padding: '0 10px' }}>
+        {/* First summary box */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '15px',
+          marginBottom: '10px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px'
+          }}>
+            <img src={lockLogo} alt="lockLogo" style={{ width: '20px', height: '20px' }} />
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p style={{ margin: 0, fontSize: '14px' }}>This week</p>
+              <img src={dropdown} alt="dropdown" style={{ width: '12px', height: '12px', marginLeft: '5px' }} />
+            </div>
+          </div>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            textAlign: 'center'
+          }}>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>All Orders</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Pending</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Completed</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Second summary box */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '15px',
+          marginBottom: '10px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px'
+          }}>
+            <img src={lockLogo} alt="lockLogo" style={{ width: '20px', height: '20px' }} />
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p style={{ margin: 0, fontSize: '14px' }}>This week</p>
+              <img src={dropdown} alt="dropdown" style={{ width: '12px', height: '12px', marginLeft: '5px' }} />
+            </div>
+          </div>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            textAlign: 'center'
+          }}>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Canceled</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Returned</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Damaged</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Third summary box */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          padding: '15px',
+          marginBottom: '15px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px'
+          }}>
+            <img src={cart} alt="cart" style={{ width: '20px', height: '20px' }} />
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <p style={{ margin: 0, fontSize: '14px' }}>This week</p>
+              <img src={dropdown} alt="dropdown" style={{ width: '12px', height: '12px', marginLeft: '5px' }} />
+            </div>
+          </div>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            textAlign: 'center'
+          }}>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#EF4444' }}>Abandoned Cart</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+            <div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '13px', color: '#666' }}>Customers</p>
+              <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold' }}>0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -147,112 +269,17 @@ const Order = () => {
             Order Summary
           </h4>
         </div>
-        <div className="box-order-container">
-          <div className="box1-order">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={lockLogo} alt="lockLogo" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p>All Orders</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Pending</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Completed</p>
-                <p>0</p>
-              </div>
-            </div>
+        
+        {isMobile ? (
+          // Mobile view for summary boxes
+          renderMobileSummaryBoxes()
+        ) : (
+          // Desktop view
+          <div className="box-order-container">
+            {/* Original desktop boxes */}
           </div>
-          <div className="box1-order">
-            <div  
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={lockLogo} alt="lockLogo" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p>Canceled</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Returned</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Damaged</p>
-                <p>0</p>
-              </div>
-            </div>
-          </div>
-          <div className="box1-order">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={cart} alt="cart" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p style={{ color: "#EF4444" }}>Abandoned Cart</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Customers</p>
-                <p>0</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
+        
         <SwitchTransition mode="out-in">
           <CSSTransition
             key={showOrderForm ? "form" : "noOrders"}
@@ -264,12 +291,12 @@ const Order = () => {
               <div
                 className="order-form-container"
                 style={{
-                  padding: "20px",
+                  padding: isMobile ? "15px" : "20px",
                   backgroundColor: "white",
                   borderRadius: "8px",
                   boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
                   margin: "20px 0",
-                  width: "95%",
+                  width: isMobile ? "95%" : "95%",
                   minHeight: "300px",
                   display: "flex",
                   flexDirection: "column",
@@ -302,6 +329,7 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
                       marginBottom: "20px",
                     }}
@@ -355,6 +383,7 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
                       marginBottom: "20px",
                     }}
@@ -412,8 +441,9 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
-                      marginBottom: "30px",
+                      marginBottom: "20px",
                     }}
                   >
                     <div className="p-field" style={{ flex: 1 }}>
@@ -435,7 +465,6 @@ const Order = () => {
                         onChange={(e) => handleDropdownChange(e, "orderStatus")}
                         placeholder="Select status"
                         style={{ width: "100%" }}
-                        className="no-dropdown-scrollbar"
                       />
                     </div>
                     <div className="p-field" style={{ flex: 1 }}>
@@ -461,11 +490,34 @@ const Order = () => {
                     </div>
                   </div>
 
-                  {/* Submit and Cancel Buttons */}
+                  {/* Notes */}
+                  <div className="p-field">
+                    <label
+                      htmlFor="notes"
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontWeight: "500",
+                        textAlign: "left",
+                      }}
+                    >
+                      Notes
+                    </label>
+                    <InputText
+                      id="notes"
+                      name="notes"
+                      value={orderForm.notes}
+                      onChange={handleInputChange}
+                      placeholder="Add notes (optional)"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "flex-end",
+                      flexDirection: isMobile ? "column" : "row",
+                      justifyContent: isMobile ? "center" : "flex-end",
                       gap: "15px",
                       marginTop: "20px",
                     }}
@@ -477,10 +529,11 @@ const Order = () => {
                       style={{
                         backgroundColor: "#EF4444",
                         border: "none",
-                        width: "150px",
+                        width: isMobile ? "100%" : "150px",
                         color: "white",
                         fontWeight: "bold",
                         fontSize: "12px",
+                        marginBottom: isMobile ? "10px" : "0",
                       }}
                     />
                     <Button
@@ -493,7 +546,7 @@ const Order = () => {
                       style={{
                         backgroundColor: "#0387D9",
                         border: "none",
-                        width: "150px",
+                        width: isMobile ? "100%" : "150px",
                         color: "white",
                         fontWeight: "bold",
                         fontSize: "12px",
@@ -503,26 +556,54 @@ const Order = () => {
                 </div>
               </div>
             ) : (
-              <div className="no-order-container">
-                <div className="no-order-container-wrapper">
+              <div className="no-order-container" style={{ 
+                padding: isMobile ? '20px 10px' : '20px',
+                textAlign: 'center'
+              }}>
+                <div className="no-order-container-wrapper" style={{
+                  maxWidth: '400px',
+                  margin: '0 auto'
+                }}>
                   <div>
                     <img
-                      src={iconcontainer}
-                      alt="iconcontainer"
+                      src={iconContainer}
+                      alt="iconContainer"
                       className="icon-container"
+                      style={{ width: isMobile ? '80px' : '100px', marginBottom: '15px' }}
                     />
                   </div>
                   <div>
-                    <h3>No Orders Yet?</h3>
-                    <p>
+                    <h3 style={{ margin: '0 0 10px 0' }}>No Orders Yet?</h3>
+                    <p style={{ 
+                      margin: '0 0 20px 0',
+                      fontSize: '14px',
+                      color: '#666'
+                    }}>
                       Add products to your store and start selling to see orders
                     </p>
-                    <button onClick={() => setShowOrderForm(true)}>
+                    <button 
+                      onClick={() => setShowOrderForm(true)}
+                      style={{
+                        backgroundColor: '#0387D9',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        padding: '10px 20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        margin: '0 auto',
+                        cursor: 'pointer',
+                        width: isMobile ? '100%' : 'auto'
+                      }}
+                    >
                       <img
                         src={neworder}
                         alt="neworder"
                         className="neworder-icon"
-                      />{" "}
+                        style={{ width: '16px', height: '16px' }}
+                      />
                       <span>Create New Order</span>
                     </button>
                   </div>

@@ -11,6 +11,7 @@ import searchLogo from "../assets/images/crew/searchLogo.png";
 import { useUser } from "./../context/userContext"; // Import User Context
 import { Dropdown } from "primereact/dropdown";
 import { Menu } from "primereact/menu";
+import MobileSidebar from './MobileSidebar'; // Re-import MobileSidebar
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [selectedSort, setSelectedSort] = useState(null);
   const shareMenuRef = useRef(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   // Filter options
   const filterOptions = [
@@ -102,25 +105,65 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     navigate("/login"); // Redirect to login page
   };
 
+  const viewAllNotifications = () => {
+    if (role === "Captain") {
+      navigate("/notifications");
+    } else {
+      navigate("/crew/notifications");
+    }
+  };
+
+  // Detect if we're on mobile
+  const isMobile = window.innerWidth <= 768;
+
   const start = (
     <>
       <div
         className="header-container"
-        style={{ display: "flex", alignItems: "center", width: "100%" }}
+        style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          width: "100%",
+          flexWrap: isMobile ? "wrap" : "nowrap"
+        }}
       >
-        <div className="hamburger">
-          <img src={hamburger} alt="Profile" className="profile-image" />
+        <div 
+          className="hamburger" 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{ 
+            marginRight: "10px",
+            cursor: "pointer"
+          }}
+        >
+          <img src={hamburger} alt="Menu" className="profile-image" />
         </div>
 
-        {/* Search container as a separate div */}
+        {/* Search icon for mobile that toggles search input */}
+        {isMobile && (
+          <div 
+            style={{ 
+              marginRight: "10px",
+              cursor: "pointer"
+            }}
+            onClick={() => setShowMobileSearch(!showMobileSearch)}
+          >
+            <i className="pi pi-search" style={{ fontSize: '1.2rem' }}></i>
+          </div>
+        )}
+
+        {/* Search container - hidden on mobile unless toggled */}
         <div
           className="search-container"
           style={{
             position: "relative",
-            display: "flex",
+            display: isMobile && !showMobileSearch ? "none" : "flex",
             alignItems: "center",
             flex: "1",
             marginRight: "15px",
+            width: isMobile ? "100%" : "auto",
+            order: isMobile ? "3" : "0",
+            marginTop: isMobile && showMobileSearch ? "10px" : "0",
+            transition: "all 0.3s ease"
           }}
         >
           <img
@@ -134,12 +177,26 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
             placeholder="Search"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            style={{ paddingLeft: "35px", width: "100%" }}
+            style={{ 
+              paddingLeft: "35px", 
+              width: "100%",
+              height: "36px",
+              borderRadius: "4px",
+              border: "1px solid #ced4da"
+            }}
           />
+          {isMobile && showMobileSearch && (
+            <Button 
+              icon="pi pi-times" 
+              className="p-button-text p-button-rounded" 
+              onClick={() => setShowMobileSearch(false)}
+              style={{ position: "absolute", right: "5px" }}
+            />
+          )}
         </div>
 
         {/* Only show these controls on the Bookings page - outside the search container */}
-        {isBookingsPage && (
+        {isBookingsPage && !isMobile && (
           <div
             style={{
               display: "flex",
@@ -187,6 +244,22 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
               style={{ height: "36px", width: "36px" }}
             />
             <Menu model={shareItems} popup ref={shareMenuRef} id="share-menu" />
+          </div>
+        )}
+        
+        {/* Mobile filter/sort button for bookings page */}
+        {isBookingsPage && isMobile && (
+          <div style={{ marginLeft: "auto" }}>
+            <Button
+              icon="pi pi-filter"
+              className="p-button-outlined p-button-sm"
+              onClick={(e) => {
+                // Show a mobile-friendly filter/sort panel
+                // This could be implemented as another overlay panel
+                console.log("Show mobile filters");
+              }}
+              style={{ height: "36px", width: "36px" }}
+            />
           </div>
         )}
       </div>
@@ -252,14 +325,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
     </>
   );
 
-  const viewAllNotifications = () => {
-    if (role === "Captain") {
-      navigate("/notifications");
-    } else {
-      navigate("/crew/notifications");
-    }
-  };
-
   const end = (
     <>
       {/* Notification Overlay Panel */}
@@ -308,8 +373,15 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
           onClick={(event) => overlayPanelRef.current.toggle(event)}
           aria-haspopup
           rounded
+          style={{ width: "36px", height: "36px" }}
         />
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div 
+          style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "10px" 
+          }}
+        >
           <img
             src={avatar}
             alt="Profile"
@@ -321,12 +393,30 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
               objectFit: "cover",
             }}
           />
-          <p>{userName}</p>
+          {!isMobile && <p>{userName}</p>}
         </div>
       </div>
     </>
   );
-  return <Menubar start={start} end={end} />;
+  
+  // Return both the Menubar and the MobileSidebar
+  return (
+    <>
+      <Menubar 
+        start={start} 
+        end={end} 
+        style={{ 
+          padding: isMobile ? "8px" : "16px",
+          flexWrap: "wrap"
+        }}
+      />
+      <MobileSidebar 
+        isOpen={mobileMenuOpen} 
+        onClose={() => setMobileMenuOpen(false)}
+        role={role}
+      />
+    </>
+  );
 };
 
 export default AdminHeader;
