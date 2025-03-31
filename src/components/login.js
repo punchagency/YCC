@@ -64,8 +64,16 @@ const LoginForm = () => {
 
     try {
       const response = await login(formData);
+      console.log("Login response:", response);
 
       if (response.status === "success") {
+        // Store the token from the nested data object
+        if (response.data && response.data.token) {
+          console.log("Saving token to localStorage:", response.data.token);
+          localStorage.setItem("token", response.data.token);
+        }
+
+        // Store user data
         loginUser(response.data.user);
         const userRole = response.data.user?.role;
 
@@ -75,9 +83,9 @@ const LoginForm = () => {
         if (userRole === "captain") {
           navigate("/dashboard");
         } else if (userRole === "service_provider") {
-          navigate("/service_provider/dashboard");
+          navigate("/crew/inventory/dashboard");
         } else if (userRole === "supplier") {
-          navigate("/supplier/dashboard");
+          navigate("/crew/inventory/dashboard");
         } else if (userRole === "crew_member") {
           navigate("/crew/inventory/dashboard");
         } else {

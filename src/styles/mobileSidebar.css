@@ -1,0 +1,124 @@
+/* Mobile Sidebar Overlay */
+.mobile-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+}
+
+.mobile-sidebar-overlay.active {
+  display: block;
+}
+
+/* Mobile Sidebar Container */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  max-width: 280px;
+  height: 100vh;
+  background-color: red;
+  z-index: 1001;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-sidebar.active {
+  left: 0;
+}
+
+/* Mobile Sidebar Header */
+.mobile-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-logo img {
+  height: 40px;
+}
+
+.mobile-close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+}
+
+/* Mobile Menu */
+.mobile-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mobile-menu li {
+  margin: 0;
+}
+
+.mobile-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+}
+
+.mobile-menu li.active a {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-menu li a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-icon {
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  width: 20px;
+  justify-content: center;
+}
+
+.mobile-icon img,
+.mobile-icon i {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* Make icons white */
+}
+
+.mobile-menu-text {
+  flex: 1;
+  text-align: left;
+}
+
+/* Logout Item */
+.mobile-logout {
+  margin-top: auto;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-height: 600px) {
+  .mobile-menu {
+    height: calc(100vh - 70px);
+    overflow-y: scroll;
+  }
+}

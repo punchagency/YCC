@@ -16,8 +16,14 @@ import sort from "../../assets/images/crew/sort.png";
 import plus from "../../assets/images/crew/plus.png";
 import arrowup from "../../assets/images/crew/arrowup.png";
 import barup from "../../assets/images/crew/barup.png";
+import { useUser } from "../../context/userContext";
+// import { getUserProfie } from "../../services/authService";
 
 const Calendar = () => {
+  const { userProfile, setUserProfile, user } = useUser();
+
+  // getUserProfie(user.id);
+
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const months = [
