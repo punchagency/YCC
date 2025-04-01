@@ -182,3 +182,237 @@
   justify-content: flex-start;
   gap: 8px;
 }
+
+.bookings-container {
+  padding: 1rem;
+}
+
+.table-header {
+  margin-bottom: 1rem;
+}
+
+.booking-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.status-confirmed {
+  background-color: #c8e6c9;
+  color: #256029;
+}
+
+.status-pending {
+  background-color: #feedaf;
+  color: #8a5340;
+}
+
+.status-cancelled {
+  background-color: #ffcdd2;
+  color: #c63737;
+}
+
+.status-completed {
+  background-color: #b3e5fc;
+  color: #23547b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* Mobile Booking Cards */
+.mobile-view {
+  display: none;
+}
+
+.mobile-booking-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.mobile-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.booking-id {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.mobile-booking-details {
+  padding: 12px 16px;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.detail-label {
+  font-weight: 600;
+  width: 80px;
+  color: #6c757d;
+}
+
+.detail-value {
+  flex: 1;
+}
+
+.detail-row.notes {
+  flex-direction: column;
+}
+
+.detail-row.notes .detail-label {
+  margin-bottom: 4px;
+}
+
+.mobile-booking-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .bookings-container {
+    padding: 12px;
+  }
+  
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .table-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .hide-on-mobile {
+    display: none;
+  }
+  
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+  }
+  
+  .responsive-datatable .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+  
+  /* Stack layout for mobile */
+  .p-datatable.p-datatable-responsive-stack .p-datatable-tbody > tr {
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+  }
+  
+  .p-datatable.p-datatable-responsive-stack .p-datatable-tbody > tr > td {
+    text-align: left;
+    display: flex;
+    align-items: center;
+    border: none;
+    width: 100% !important;
+    float: left;
+    clear: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .p-datatable.p-datatable-responsive-stack .p-datatable-tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+  
+  .p-datatable.p-datatable-responsive-stack .p-datatable-tbody > tr > td .p-column-title {
+    padding-right: 1rem;
+    font-weight: bold;
+  }
+  
+  /* Make dialogs take up more space on mobile */
+  .p-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+  }
+  
+  /* Adjust form fields for mobile */
+  .p-field {
+    margin-bottom: 16px;
+  }
+  
+  .p-grid.p-formgrid {
+    flex-direction: column !important;
+  }
+  
+  .p-grid.p-formgrid .p-field {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Make buttons more tappable on mobile */
+  .p-button {
+    min-height: 44px;
+  }
+  
+  /* Adjust status menu for mobile */
+  .p-menu.p-menu-overlay {
+    width: 200px !important;
+  }
+  
+  /* Make the view booking modal scrollable on mobile */
+  .view-booking-modal .p-dialog-content {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  /* Adjust form layout in edit/add dialogs */
+  .p-grid.p-formgrid {
+    display: block !important;
+  }
+  
+  .p-grid.p-formgrid > div {
+    margin-bottom: 16px;
+  }
+}
+
+/* Tablet styles */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .bookings-container {
+    padding: 0.75rem;
+  }
+  
+  .inventory-header-table {
+    font-size: 12px;
+  }
+  
+  .inventory-header-table th,
+  .inventory-header-table td {
+    padding: 6px !important;
+  }
+  
+  .action-buttons .p-button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 4px !important;
+  }
+}
