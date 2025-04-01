@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import backgroundImage from "../../assets/images/get_started_bg.jpg";
+import backgroundImage from "../../assets/images/crew/back.png";
 import logo from "../../assets/images/start-logo.svg";
 import captain from "../../assets/images/captain1.svg";
 import hod from "../../assets/images/HOD.svg";
@@ -21,20 +21,20 @@ const GetStarted = ({ name }) => {
       text: "captain",
       path: "/crew/signup",
     },
-    {
-      image: hod,
-      alt: "service providers",
-      newText: "Service Provider",
-      text: "service_provider",
-      path: "/vendor/signup",
-    },
-    {
-      image: crew,
-      alt: "suppliers",
-      newText: "Supplier",
-      text: "supplier",
-      path: "/supplier/signup",
-    },
+    // {
+    //   image: hod,
+    //   alt: "service providers",
+    //   newText: "Service Provider",
+    //   text: "service_provider",
+    //   path: "/vendor/signup",
+    // },
+    // {
+    //   image: crew,
+    //   alt: "suppliers",
+    //   newText: "Supplier",
+    //   text: "supplier",
+    //   path: "/supplier/signup",
+    // },
     {
       image: crew,
       alt: "crew",
@@ -60,20 +60,20 @@ const GetStarted = ({ name }) => {
   //      }
   //    }
   //  }, [navigate]);
-
+ 
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">
       <div
         className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       >
-        <div className="border-circle mb-3 bg-white font-bold flex align-items-center justify-content-center logo">
+        {/* <div className="border-circle mb-3 bg-white font-bold flex align-items-center justify-content-center logo">
           <img src={logo} alt="Company logo" className="image-full" />
-        </div>
-        <div className="get-started-content">
+        </div> */}
+        {/* <div className="get-started-content">
           <h2 className="font-semibold text-white">{title}</h2>
           <p className="text-white m-0 line-height-3">{description}</p>
-        </div>
+        </div> */}
       </div>
       <div className="flex-1 flex align-items-center justify-content-center right-panel">
         <div className="get-started-right-component">

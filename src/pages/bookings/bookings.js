@@ -157,6 +157,7 @@ const Bookings = () => {
     setShowEditForm(true);
   };
 
+  
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     setEditingBooking({
@@ -909,7 +910,7 @@ const Bookings = () => {
                                 }}
                                 tooltip="Edit"
                                 tooltipOptions={{ position: "top" }}
-                                onClick={() => handleEditBooking(booking)}
+                                // onClick={() => handleEditBooking(booking)}
                               >
                                 <img
                                   src={times}
