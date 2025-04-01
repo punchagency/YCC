@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getBookings, updateBooking, deleteBooking } from "../../services/bookings/bookingService";
+import { getBookingService, updateBookingService, deleteBookingService } from "../../services/bookings/bookingService";
 import { useUser } from "../userContext";
 const BookingContext = createContext();
 
@@ -16,10 +16,8 @@ export const BookingProvider = ({ children }) => {
     
     const fetchBookings = async () => {
         try {
-            const response = await getBookings(user.profile._id);
-            console.log('response', response)
+            const response = await getBookingService(user.profile._id);
             const bookings = response.data.result;
-            console.log('bookings', bookings)
             setBookings(bookings);
             setTotalPages(response.data.totalPages);
             setLimit(response.data.limit);
@@ -30,8 +28,8 @@ export const BookingProvider = ({ children }) => {
 
     const updateBooking = async (bookingId, booking) => {
         try {
-            const response = await updateBooking(bookingId, booking);
-            console.log('response', response)
+            const response = await updateBookingService(bookingId, booking);
+            fetchBookings();
         } catch (error) {
             console.error('Error updating booking:', error);
         }
@@ -40,8 +38,7 @@ export const BookingProvider = ({ children }) => {
 
     const deleteBooking = async (bookingId) => {
         try {
-            const response = await deleteBooking(bookingId);
-            console.log('response', response)
+            const response = await deleteBookingService(bookingId);
         } catch (error) {
             console.error('Error deleting booking:', error);
         }
@@ -52,7 +49,7 @@ export const BookingProvider = ({ children }) => {
     }, []);
 
     return (
-        <BookingContext.Provider value={{ bookings, setBookings, deleteBooking, updateBooking }}>
+        <BookingContext.Provider value={{ bookings, setBookings, deleteBooking, updateBooking, fetchBookings }}>
             {children}
         </BookingContext.Provider>
     );
