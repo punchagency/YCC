@@ -64,8 +64,16 @@ const LoginForm = () => {
 
     try {
       const response = await login(formData);
+      console.log("Login response:", response);
 
       if (response.status === "success") {
+        // Store the token from the nested data object
+        if (response.data && response.data.token) {
+          console.log("Saving token to localStorage:", response.data.token);
+          localStorage.setItem("token", response.data.token);
+        }
+
+        // Store user data
         loginUser(response.data.user);
         const userRole = response.data.user?.role;
 

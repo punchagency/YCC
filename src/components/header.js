@@ -13,7 +13,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Menu } from "primereact/menu";
 import MobileSidebar from './MobileSidebar'; // Re-import MobileSidebar
 
-const AdminHeader = ({ isCollapsed, setIsCollapsed, role }) => {
+const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const isBookingsPage = location.pathname.includes("/bookings");

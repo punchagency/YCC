@@ -1,5 +1,5 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useUser } from '../context/userContext';
+import { Navigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/userContext";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useUser();
@@ -13,4 +13,4 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import {
+  createInventoryData,
+  getInventoryData,
+  updateInventoryItem,
+  deleteInventoryItem,
+} from "../../services/inventory/inventoryService";
 import lone from "../../assets/images/crew/lone.png";
 import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
 import iconexpire from "../../assets/images/crew/iconexpire.png";
@@ -17,9 +24,13 @@ import editLogo from "../../assets/images/crew/editLogo.png";
 import deleteLogo from "../../assets/images/crew/deleteLogo.png";
 import plus from "../../assets/images/crew/plus.png";
 import eyesIn from "../../assets/images/crew/eyes-in.png";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const Invent = () => {
   const navigate = useNavigate();
+  const toast = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -35,69 +46,12 @@ const Invent = () => {
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-  // Sample inventory data
-  const [inventoryItems, setInventoryItems] = useState([
-    {
-      id: 1,
-      productName: "Diesel Fuel",
-      category: "Fuel",
-      serviceArea: "Caribean",
-      stockQuantity: 500,
-      price: 150.0,
-    },
-    {
-      id: 2,
-      productName: "First Aid Kit Pro",
-      category: "Medical",
-      serviceArea: "All Areas",
-      stockQuantity: 15,
-      price: 275.5,
-    },
-    {
-      id: 3,
-      productName: "Engine Oil Filter",
-      category: "Engine Parts",
-      serviceArea: "Engine Room",
-      stockQuantity: 45,
-      price: 89.99,
-    },
-    {
-      id: 4,
-      productName: "Navigation Compass",
-      category: "Navigation",
-      serviceArea: "Bridge",
-      stockQuantity: 8,
-      price: 450.0,
-    },
-    {
-      id: 5,
-      productName: "Life Jacket Type III",
-      category: "Safety Equipment",
-      serviceArea: "Deck",
-      stockQuantity: 50,
-      price: 125.0,
-    },
-    {
-      id: 6,
-      productName: "Hydraulic Fluid",
-      category: "Maintenance",
-      serviceArea: "Engine Room",
-      stockQuantity: 30,
-      price: 65.75,
-    },
-    {
-      id: 7,
-      productName: "LED Floodlight",
-      category: "Electrical",
-      serviceArea: "Exterior",
-      stockQuantity: 12,
-      price: 189.99,
-    },
-    // Add more items as needed
-  ]);
+  // Initialize with empty array
+  const [inventoryItems, setInventoryItems] = useState([]);
 
   const [editItem, setEditItem] = useState({
     id: null,
+    index: null,
     productName: "",
     category: "",
     serviceArea: "",
@@ -113,6 +67,65 @@ const Invent = () => {
     price: "",
   });
 
+  // Fetch inventory data when component mounts
+  useEffect(() => {
+    fetchInventoryData();
+  }, []);
+
+  // Function to fetch inventory data from API
+  const fetchInventoryData = async () => {
+    setIsDataLoading(true);
+    try {
+      const result = await getInventoryData();
+      console.log("API Response:", result);
+      console.log("Data structure:", result.data);
+
+      if (result.success) {
+        // The inventory array is in result.data.data.result
+        const inventoryData = result.data.data.result || [];
+        if (!Array.isArray(inventoryData)) {
+          console.error("Inventory data is not an array:", inventoryData);
+          return;
+        }
+
+        // Transform API data to match the format expected by the component
+        const formattedItems = inventoryData.map((item) => ({
+          id: item._id,
+          productName: item.product?.name || "Unknown Product",
+          category: item.product?.category || "Uncategorized",
+          serviceArea: item.product?.serviceArea || "Not specified",
+          stockQuantity: item.quantity || 0,
+          price: item.price || 0,
+        }));
+
+        setInventoryItems(formattedItems);
+        console.log("Inventory data loaded:", formattedItems);
+      } else {
+        console.error("Failed to load inventory data:", result.error);
+        if (toast.current) {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: result.error || "Failed to load inventory data",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching inventory data:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An unexpected error occurred while loading data",
+          life: 3000,
+        });
+      }
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
   const goCrewDashboardPage = () => {
     navigate("/crew/dashboard");
   };
@@ -125,15 +138,16 @@ const Invent = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleEdit = (index) => {
     const item = inventoryItems[index];
     setEditItem({
-      id: index,
+      id: item.id,
+      index: index,
       productName: item.productName,
       category: item.category,
       serviceArea: item.serviceArea,
@@ -143,61 +157,239 @@ const Invent = () => {
     setShowEditModal(true);
   };
 
-  const handleUpdate = () => {
-    const updatedItems = [...inventoryItems];
-    updatedItems[editItem.id] = {
-      ...updatedItems[editItem.id],
-      productName: editItem.productName,
-      category: editItem.category,
-      serviceArea: editItem.serviceArea,
-      stockQuantity: parseInt(editItem.stockQuantity),
-      price: parseFloat(editItem.price),
-    };
+  const handleUpdate = async () => {
+    setIsLoading(true);
 
-    setInventoryItems(updatedItems);
-    setShowEditModal(false);
+    try {
+      // Format the data for the API - make sure this matches your API's expected structure
+      const updateData = {
+        productName: editItem.productName,
+        category: editItem.category,
+        serviceArea: editItem.serviceArea,
+        quantity: parseInt(editItem.stockQuantity),
+        price: parseFloat(editItem.price),
+      };
+
+      console.log("Sending update with data:", updateData);
+
+      // Call the API to update the item
+      const result = await updateInventoryItem(editItem.id, updateData);
+
+      if (result.success) {
+        // Update the local state with the updated item
+        const updatedItems = [...inventoryItems];
+        const updatedItem = {
+          id: editItem.id,
+          productName: editItem.productName,
+          category: editItem.category,
+          serviceArea: editItem.serviceArea,
+          stockQuantity: parseInt(editItem.stockQuantity),
+          price: parseFloat(editItem.price),
+        };
+
+        updatedItems[editItem.index] = updatedItem;
+        setInventoryItems(updatedItems);
+
+        // Show success message
+        if (toast.current) {
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product updated successfully",
+            life: 3000,
+          });
+        }
+
+        setShowEditModal(false);
+      } else {
+        // Show error message
+        if (toast.current) {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: result.error || "Failed to update product",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An unexpected error occurred while updating the product",
+          life: 3000,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDelete = (index) => {
-    setItemToDelete(index);
+    const item = inventoryItems[index];
+    setItemToDelete({
+      id: item.id,
+      index: index,
+    });
     setShowDeleteConfirmation(true);
   };
 
-  const confirmDelete = () => {
-    const updatedItems = inventoryItems.filter(
-      (_, index) => index !== itemToDelete
-    );
-    setInventoryItems(updatedItems);
-    setShowDeleteConfirmation(false);
+  const confirmDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      // Call the API to delete the item
+      const result = await deleteInventoryItem(itemToDelete.id);
+
+      if (result.success) {
+        // Update the local state by removing the deleted item
+        const updatedItems = inventoryItems.filter(
+          (_, index) => index !== itemToDelete.index
+        );
+        setInventoryItems(updatedItems);
+
+        // Show success message
+        if (toast.current) {
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product deleted successfully",
+            life: 3000,
+          });
+        }
+      } else {
+        // Show error message
+        if (toast.current) {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: result.error || "Failed to delete product",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An unexpected error occurred while deleting the product",
+          life: 3000,
+        });
+      }
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   const handleAddProduct = () => {
     setShowAddModal(true);
   };
 
-  const handleSaveProduct = () => {
-    // Create a new product with the form data
-    const product = {
-      id: inventoryItems.length + 1,
-      productName: newItem.productName,
-      category: newItem.category,
-      serviceArea: newItem.serviceArea,
-      stockQuantity: parseInt(newItem.stockQuantity),
-      price: parseFloat(newItem.price),
-    };
+  const handleSaveProduct = async () => {
+    // Validate form
+    if (
+      !newItem.productName ||
+      !newItem.category ||
+      !newItem.serviceArea ||
+      !newItem.stockQuantity ||
+      !newItem.price
+    ) {
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Please fill in all required fields",
+          life: 3000,
+        });
+      } else {
+        alert("Please fill in all required fields");
+      }
+      return;
+    }
 
-    // Add the new product to the inventory
-    setInventoryItems([...inventoryItems, product]);
+    setIsLoading(true);
 
-    // Reset the form and close the modal
-    setNewItem({
-      productName: "",
-      category: "",
-      serviceArea: "",
-      stockQuantity: "",
-      price: "",
-    });
-    setShowAddModal(false);
+    try {
+      // Call the API to create a new product
+      const result = await createInventoryData({
+        productName: newItem.productName,
+        category: newItem.category,
+        serviceArea: newItem.serviceArea,
+        quantity: parseInt(newItem.stockQuantity),
+        price: parseFloat(newItem.price),
+      });
+
+      if (result.success) {
+        if (toast.current) {
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product added successfully",
+            life: 3000,
+          });
+        } else {
+          alert("Product added successfully");
+        }
+
+        // Add the new product to the local state with data from API response
+        const responseData = result.data.data;
+        const product = {
+          id: responseData._id,
+          productName: responseData.product.name,
+          category: responseData.product.category,
+          serviceArea: responseData.product.serviceArea,
+          stockQuantity: responseData.quantity,
+          price: responseData.price,
+        };
+
+        setInventoryItems([...inventoryItems, product]);
+
+        // Reset the form
+        setNewItem({
+          productName: "",
+          category: "",
+          serviceArea: "",
+          stockQuantity: "",
+          price: "",
+        });
+
+        setShowAddModal(false);
+      } else {
+        if (toast.current) {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: result.error || "Failed to add product",
+            life: 3000,
+          });
+        } else {
+          alert(result.error || "Failed to add product");
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail:
+            "An unexpected error occurred: " +
+            (error.message || "Unknown error"),
+          life: 3000,
+        });
+      } else {
+        alert(
+          "An unexpected error occurred: " + (error.message || "Unknown error")
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleView = (index) => {
@@ -216,13 +408,15 @@ const Invent = () => {
   // Render mobile card view for inventory items
   const renderMobileInventoryCards = () => {
     return (
-      <div style={{ padding: '0 10px' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          marginBottom: '15px',
-          marginTop: '10px'
-        }}>
+      <div style={{ padding: "0 10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "15px",
+            marginTop: "10px",
+          }}
+        >
           <Button
             label="Add New Product"
             icon="pi pi-plus"
@@ -233,38 +427,44 @@ const Invent = () => {
               borderRadius: "5px",
               color: "#fff",
               width: "100%",
-              maxWidth: "250px"
+              maxWidth: "250px",
             }}
           />
         </div>
-        
+
         {inventoryItems.map((item, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             style={{
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '10px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+              backgroundColor: "white",
+              borderRadius: "8px",
+              padding: "12px",
+              marginBottom: "10px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
             }}
           >
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              marginBottom: '8px'
-            }}>
-              <h3 style={{ 
-                margin: 0, 
-                fontSize: '16px', 
-                fontWeight: 'bold' 
-              }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
                 {item.productName}
               </h3>
-              <div style={{ 
-                display: 'flex', 
-                gap: '10px' 
-              }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                }}
+              >
                 <img
                   src={eyesIn}
                   alt="view"
@@ -297,27 +497,29 @@ const Invent = () => {
                 />
               </div>
             </div>
-            
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr 1fr',
-              gap: '8px',
-              fontSize: '14px'
-            }}>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "8px",
+                fontSize: "14px",
+              }}
+            >
               <div>
-                <span style={{ color: '#666' }}>Category: </span>
+                <span style={{ color: "#666" }}>Category: </span>
                 <span>{item.category}</span>
               </div>
               <div>
-                <span style={{ color: '#666' }}>Area: </span>
+                <span style={{ color: "#666" }}>Area: </span>
                 <span>{item.serviceArea}</span>
               </div>
               <div>
-                <span style={{ color: '#666' }}>Stock: </span>
+                <span style={{ color: "#666" }}>Stock: </span>
                 <span>{item.stockQuantity} units</span>
               </div>
               <div>
-                <span style={{ color: '#666' }}>Price: </span>
+                <span style={{ color: "#666" }}>Price: </span>
                 <span>${item.price.toFixed(2)}</span>
               </div>
             </div>
@@ -325,6 +527,47 @@ const Invent = () => {
         ))}
       </div>
     );
+  };
+
+  // Render inventory items with loading state
+  const renderInventoryItems = () => {
+    if (isDataLoading) {
+      return (
+        <div
+          className="loading-container"
+          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
+        >
+          <ProgressSpinner
+            style={{ width: "50px", height: "50px" }}
+            strokeWidth="4"
+            fill="var(--surface-ground)"
+            animationDuration=".5s"
+          />
+        </div>
+      );
+    }
+
+    if (inventoryItems.length === 0) {
+      return (
+        <div
+          className="empty-state"
+          style={{ textAlign: "center", padding: "2rem" }}
+        >
+          <p>No inventory items found. Add your first product!</p>
+          <Button
+            label="Add New Product"
+            icon="pi pi-plus"
+            onClick={handleAddProduct}
+            style={{
+              backgroundColor: "#0387D9",
+              border: "none",
+              borderRadius: "5px",
+              marginTop: "1rem",
+            }}
+          />
+        </div>
+      );
+    }
   };
 
   return (
@@ -659,6 +902,10 @@ const Invent = () => {
         )}
       </div>
 
+      {renderInventoryItems()}
+
+      <Toast ref={toast} />
+
       <Dialog
         visible={showEditModal}
         onHide={() => setShowEditModal(false)}
@@ -735,12 +982,21 @@ const Invent = () => {
             </div>
           </div>
 
-          <div className="button-row">
+          <div
+            className="button-row"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "10px",
+              marginTop: "20px",
+            }}
+          >
             <Button
               label="Cancel"
               icon="pi pi-times"
               onClick={() => setShowEditModal(false)}
               className="p-button-text"
+              disabled={isLoading}
               style={{
                 backgroundColor: "#EF4444",
                 color: "#fff",
@@ -748,10 +1004,10 @@ const Invent = () => {
               }}
             />
             <Button
-              label="Update"
+              label={isLoading ? "Updating..." : "Update Product"}
               icon="pi pi-check"
               onClick={handleUpdate}
-              autoFocus
+              disabled={isLoading}
               style={{
                 backgroundColor: "#0387D9",
                 color: "#fff",
@@ -880,10 +1136,10 @@ const Invent = () => {
               }}
             />
             <Button
-              label="Save Product"
+              label={isLoading ? "Saving..." : "Save Product"}
               icon="pi pi-check"
               onClick={handleSaveProduct}
-              autoFocus
+              disabled={isLoading}
               style={{
                 backgroundColor: "#0387D9",
                 color: "#fff",
@@ -910,13 +1166,15 @@ const Invent = () => {
               icon="pi pi-times"
               onClick={() => setShowDeleteConfirmation(false)}
               className="p-button-text"
+              disabled={isLoading}
             />
             <Button
-              label="Yes"
+              label={isLoading ? "Deleting..." : "Yes"}
               icon="pi pi-check"
               onClick={confirmDelete}
               autoFocus
               className="p-button-danger"
+              disabled={isLoading}
             />
           </div>
         }
