@@ -110,6 +110,7 @@ const Bookings = () => {
   };
 
   const handleEditBooking = (booking) => {
+    console.log('booking', booking)
     setEditingBooking({ ...booking });
     setShowEditForm(true);
   };

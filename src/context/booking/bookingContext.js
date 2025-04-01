@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getBookings } from "../../services/bookings/bookingService";
+import { getBookings, updateBooking, deleteBooking } from "../../services/bookings/bookingService";
 import { useUser } from "../userContext";
 const BookingContext = createContext();
 
@@ -28,6 +28,16 @@ export const BookingProvider = ({ children }) => {
         }
     }
 
+    const updateBooking = async (bookingId, booking) => {
+        try {
+            const response = await updateBooking(bookingId, booking);
+            console.log('response', response)
+        } catch (error) {
+            console.error('Error updating booking:', error);
+        }
+    }
+
+
     const deleteBooking = async (bookingId) => {
         try {
             const response = await deleteBooking(bookingId);
@@ -42,7 +52,7 @@ export const BookingProvider = ({ children }) => {
     }, []);
 
     return (
-        <BookingContext.Provider value={{ bookings, setBookings, deleteBooking }}>
+        <BookingContext.Provider value={{ bookings, setBookings, deleteBooking, updateBooking }}>
             {children}
         </BookingContext.Provider>
     );

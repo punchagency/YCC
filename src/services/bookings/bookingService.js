@@ -7,6 +7,11 @@ export const getBookings = async (vendorId) => {
     return response.data;
 }
 
+export const updateBooking = async (bookingId, booking) => {
+    const response = await axios.patch(`${API_URL}/${bookingId}`, booking);
+    return response;
+}
+
 export const deleteBooking = async (bookingId) => {
     const response = await axios.delete(`${API_URL}/${bookingId}`);
     return response;
