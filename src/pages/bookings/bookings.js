@@ -29,8 +29,26 @@ import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
 import "./bookings.css";
 
+// Context
+import { useBooking } from "../../context/booking/bookingContext";
+
 const Bookings = () => {
+  
   const navigate = useNavigate();
+
+
+  // Context
+  const { bookings, deleteBooking } = useBooking();
+
+
+
+
+
+
+
+
+
+
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedReview, setSelectedReview] = useState("");
   const statusMenuRef = useRef(null);
@@ -61,78 +79,6 @@ const Bookings = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Sample bookings data
-  const [bookings, setBookings] = useState([
-    {
-      id: "BK-001",
-      serviceType: "Maintenance",
-      vendorAssigned: "Marine Services Inc.",
-      serviceArea: "Engine Room",
-      date: "2023-11-15",
-      status: "Confirmed",
-      reviews:
-        "The service was excellent. The technician was very knowledgeable and fixed the issue quickly.",
-    },
-    {
-      id: "BK-002",
-      serviceType: "Cleaning",
-      vendorAssigned: "Yacht Cleaners Pro",
-      serviceArea: "Exterior",
-      date: "2023-11-18",
-      status: "Pending",
-      reviews:
-        "Scheduled for next week. Previous services from this vendor have been satisfactory.",
-    },
-    {
-      id: "BK-003",
-      serviceType: "Repair",
-      vendorAssigned: "Tech Solutions",
-      serviceArea: "Navigation",
-      date: "2023-11-20",
-      status: "Completed",
-      reviews:
-        "The navigation system is working perfectly now. Great job by the technician.",
-    },
-    {
-      id: "BK-004",
-      serviceType: "Inspection",
-      vendorAssigned: "Safety First",
-      serviceArea: "Safety Equipment",
-      date: "2023-11-22",
-      status: "Confirmed",
-      reviews:
-        "Looking forward to the annual inspection. Last year's inspection was thorough and helpful.",
-    },
-    {
-      id: "BK-005",
-      serviceType: "Provisioning",
-      vendorAssigned: "Gourmet Supplies",
-      serviceArea: "Galley",
-      date: "2023-11-25",
-      status: "Pending",
-      reviews: "Need to confirm specific items before the delivery date.",
-    },
-    {
-      id: "BK-006",
-      serviceType: "Maintenance",
-      vendorAssigned: "HVAC Specialists",
-      serviceArea: "Air Conditioning",
-      date: "2023-11-28",
-      status: "Cancelled",
-      reviews:
-        "Cancelled due to scheduling conflict. Will reschedule for next month.",
-    },
-    {
-      id: "BK-007",
-      serviceType: "Repair",
-      vendorAssigned: "Electrical Experts",
-      serviceArea: "Electrical Systems",
-      date: "2023-12-01",
-      status: "Confirmed",
-      reviews:
-        "Recurring electrical issues need to be addressed. Previous attempts were not successful.",
-    },
-  ]);
 
   const goCrewDashboardPage = () => {
     navigate("/crew/dashboard");
@@ -155,7 +101,7 @@ const Bookings = () => {
       }
       return b;
     });
-    setBookings(updatedBookings);
+    //setBookings(updatedBookings);
   };
 
   const handleViewBooking = (booking) => {
@@ -198,7 +144,7 @@ const Bookings = () => {
       return b;
     });
 
-    setBookings(updatedBookings);
+    //setBookings(updatedBookings);
     setShowEditForm(false);
   };
 
@@ -296,7 +242,7 @@ const Bookings = () => {
                   fontSize: '15px', 
                   fontWeight: 'bold' 
                 }}>
-                  {booking.id}
+                  {booking.bookingId}
                 </p>
                 <p style={{ 
                   margin: '0', 
@@ -340,7 +286,7 @@ const Bookings = () => {
               </div>
               <div>
                 <span style={{ color: '#666', fontWeight: '500' }}>Date: </span>
-                <span>{formatDate(booking.date)}</span>
+                <span>{formatDate(booking.bookingDate)}</span>
               </div>
             </div>
             
@@ -464,7 +410,7 @@ const Bookings = () => {
                         }}
                       />
                       <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                        Service Type
+                        Customer
                       </p>
                     </div>
                   </th>
@@ -487,7 +433,7 @@ const Bookings = () => {
                         }}
                       />
                       <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                        Vendor Assigned
+                      Service Name
                       </p>
                     </div>
                   </th>
@@ -510,7 +456,7 @@ const Bookings = () => {
                         }}
                       />
                       <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                        Service Area
+                        Price
                       </p>
                     </div>
                   </th>
@@ -605,19 +551,19 @@ const Bookings = () => {
                     }}
                   >
                     <td style={{ padding: "8px", fontSize: "11px" }}>
-                      {booking.id}
+                      {booking.bookingId}
                     </td>
                     <td style={{ padding: "8px", fontSize: "11px" }}>
-                      {booking.serviceType}
+                      {booking.email}
                     </td>
                     <td style={{ padding: "8px", fontSize: "11px" }}>
-                      {booking.vendorAssigned}
+                    {booking.services.map((service) => service.service.name).join(', ')}
                     </td>
                     <td style={{ padding: "8px", fontSize: "11px" }}>
-                      {booking.serviceArea}
+                    ${booking.totalPrice}
                     </td>
                     <td style={{ padding: "8px", fontSize: "11px" }}>
-                      {new Date(booking.date).toLocaleDateString("en-US", {
+                      {new Date(booking.bookingDate).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
@@ -910,7 +856,7 @@ const Bookings = () => {
                 >
                   Booking ID
                 </label>
-                <div className="view-field">{viewBooking.id}</div>
+                <div className="view-field">{viewBooking.bookingId}</div>
               </div>
               <div
                 className="form-group"
@@ -922,12 +868,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="serviceType"
+                  htmlFor="email"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Service Type
+                  Customer
                 </label>
-                <div className="view-field">{viewBooking.serviceType}</div>
+                <div className="view-field">{viewBooking.email}</div>
               </div>
             </div>
 
@@ -942,12 +888,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="vendorAssigned"
+                  htmlFor="services"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Vendor Assigned
+                  Service Name
                 </label>
-                <div className="view-field">{viewBooking.vendorAssigned}</div>
+                <div className="view-field">{viewBooking.services.map((service) => service.service.name).join(', ')}</div>
               </div>
               <div
                 className="form-group"
@@ -959,12 +905,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="serviceArea"
+                  htmlFor="totalPrice"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Service Area
+                  Price
                 </label>
-                <div className="view-field">{viewBooking.serviceArea}</div>
+                <div className="view-field">${viewBooking.totalPrice}</div>
               </div>
             </div>
 
@@ -985,7 +931,7 @@ const Bookings = () => {
                   Date
                 </label>
                 <div className="view-field">
-                  {new Date(viewBooking.date).toLocaleDateString("en-US", {
+                  {new Date(viewBooking.bookingDate).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -1076,7 +1022,7 @@ const Bookings = () => {
                     lineHeight: "1.5",
                   }}
                 >
-                  {viewBooking.reviews}
+                  {viewBooking.reviews?.map((review) => review.review).join(', ') || 'No reviews'}
                 </div>
               </div>
             </div>
