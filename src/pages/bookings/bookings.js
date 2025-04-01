@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
@@ -29,8 +29,22 @@ import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
 import "./bookings.css";
 
+// Context
+import { useBooking } from "../../context/booking/bookingContext";
+import { useService } from "../../context/service/serviceContext";
 const Bookings = () => {
+  
   const navigate = useNavigate();
+
+
+  // Context
+  const { bookings, deleteBooking, fetchBookings, updateBooking, updateBookingStatus } = useBooking();
+  const { services, fetchServices } = useService();
+
+
+
+
+
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedReview, setSelectedReview] = useState("");
   const statusMenuRef = useRef(null);
@@ -49,87 +63,17 @@ const Bookings = () => {
     amount: "",
     file: null,
   });
-
-  // Sample bookings data
-  const [bookings, setBookings] = useState([
-    {
-      id: "BK-001",
-      serviceType: "Maintenance",
-      vendorAssigned: "Marine Services Inc.",
-      serviceArea: "Engine Room",
-      date: "2023-11-15",
-      status: "Confirmed",
-      reviews:
-        "The service was excellent. The technician was very knowledgeable and fixed the issue quickly.",
-    },
-    {
-      id: "BK-002",
-      serviceType: "Cleaning",
-      vendorAssigned: "Yacht Cleaners Pro",
-      serviceArea: "Exterior",
-      date: "2023-11-18",
-      status: "Pending",
-      reviews:
-        "Scheduled for next week. Previous services from this vendor have been satisfactory.",
-    },
-    {
-      id: "BK-003",
-      serviceType: "Repair",
-      vendorAssigned: "Tech Solutions",
-      serviceArea: "Navigation",
-      date: "2023-11-20",
-      status: "Completed",
-      reviews:
-        "The navigation system is working perfectly now. Great job by the technician.",
-    },
-    {
-      id: "BK-004",
-      serviceType: "Inspection",
-      vendorAssigned: "Safety First",
-      serviceArea: "Safety Equipment",
-      date: "2023-11-22",
-      status: "Confirmed",
-      reviews:
-        "Looking forward to the annual inspection. Last year's inspection was thorough and helpful.",
-    },
-    {
-      id: "BK-005",
-      serviceType: "Provisioning",
-      vendorAssigned: "Gourmet Supplies",
-      serviceArea: "Galley",
-      date: "2023-11-25",
-      status: "Pending",
-      reviews: "Need to confirm specific items before the delivery date.",
-    },
-    {
-      id: "BK-006",
-      serviceType: "Maintenance",
-      vendorAssigned: "HVAC Specialists",
-      serviceArea: "Air Conditioning",
-      date: "2023-11-28",
-      status: "Cancelled",
-      reviews:
-        "Cancelled due to scheduling conflict. Will reschedule for next month.",
-    },
-    {
-      id: "BK-007",
-      serviceType: "Repair",
-      vendorAssigned: "Electrical Experts",
-      serviceArea: "Electrical Systems",
-      date: "2023-12-01",
-      status: "Confirmed",
-      reviews:
-        "Recurring electrical issues need to be addressed. Previous attempts were not successful.",
-    },
-  ]);
-
-  const goCrewDashboardPage = () => {
-    navigate("/crew/dashboard");
-  };
-
-  const goInventorySummaryPage = () => {
-    navigate("/crew/inventory/summary");
-  };
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  // Add this useEffect to handle window resizing
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    fetchBookings();
+    fetchServices();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleViewReview = (review) => {
     setSelectedReview(review);
@@ -138,13 +82,7 @@ const Bookings = () => {
 
   // Add this function to handle status changes
   const handleStatusChange = (booking, newStatus) => {
-    const updatedBookings = bookings.map((b) => {
-      if (b.id === booking.id) {
-        return { ...b, status: newStatus };
-      }
-      return b;
-    });
-    setBookings(updatedBookings);
+    updateBookingStatus(booking._id, newStatus);
   };
 
   const handleViewBooking = (booking) => {
@@ -160,16 +98,26 @@ const Bookings = () => {
   
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(name, value);
     setEditingBooking({
       ...editingBooking,
       [name]: value,
     });
   };
 
+  const handleEditServiceChange = (e) => {
+    const { name, value } = e.target;
+    const service = services.find((service) => service._id === value);
+    setEditingBooking({
+      ...editingBooking,
+      services: [{service: service}],
+    });
+  };
+
   const handleEditDateChange = (e) => {
     setEditingBooking({
       ...editingBooking,
-      date: e.value,
+      bookingDate: e.value,
     });
   };
 
@@ -181,15 +129,12 @@ const Bookings = () => {
   };
 
   const handleSaveBooking = () => {
-    const updatedBookings = bookings.map((b) => {
-      if (b.id === editingBooking.id) {
-        return editingBooking;
-      }
-      return b;
-    });
-
-    setBookings(updatedBookings);
-    setShowEditForm(false);
+    updateBooking(editingBooking._id, editingBooking)
+      .then((success) => {
+        if (success) {
+          setShowEditForm(false);
+        }
+      });
   };
 
   const handleUploadBooking = (booking) => {
@@ -353,7 +298,7 @@ const Bookings = () => {
                     marginBottom: "20px",
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>Manage Settings</h3>
+                  <h3 style={{ margin: 0 }}>Manage Booking {editingBooking?.bookingId}</h3>
                   <Button
                     icon="pi pi-times"
                     className="p-button-rounded p-button-text"
@@ -363,7 +308,7 @@ const Bookings = () => {
                 </div>
 
                 <div className="p-fluid">
-                  {/* Service Type and Vendor Assigned */}
+                  {/* Customer and Service Name */}
                   <div
                     className="p-grid p-formgrid"
                     style={{
@@ -374,7 +319,7 @@ const Bookings = () => {
                   >
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
-                        htmlFor="serviceType"
+                        htmlFor="email"
                         style={{
                           display: "block",
                           marginBottom: "8px",
@@ -382,20 +327,20 @@ const Bookings = () => {
                           textAlign: "left",
                         }}
                       >
-                        Service Type*
+                        Customer Email*
                       </label>
                       <InputText
-                        id="serviceType"
-                        name="serviceType"
-                        value={editingBooking?.serviceType || ""}
+                        id="email"
+                        name="email"
+                        value={editingBooking?.email || ""}
                         onChange={handleEditInputChange}
-                        placeholder="Enter service type"
+                        placeholder="Enter customer email"
                         style={{ width: "100%" }}
                       />
                     </div>
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
-                        htmlFor="vendorAssigned"
+                        htmlFor="serviceName"
                         style={{
                           display: "block",
                           marginBottom: "8px",
@@ -403,20 +348,21 @@ const Bookings = () => {
                           textAlign: "left",
                         }}
                       >
-                        Vendor Assigned*
+                        Service Name*
                       </label>
-                      <InputText
-                        id="vendorAssigned"
-                        name="vendorAssigned"
-                        value={editingBooking?.vendorAssigned || ""}
-                        onChange={handleEditInputChange}
-                        placeholder="Enter vendor name"
+                      <Dropdown
+                        id="serviceName"
+                        name="serviceName"
+                        value={editingBooking?.services.map((service) => service.service._id).join(', ') || ""}
+                        options={services.map((service) => ({ label: service.name, value: service._id }))}
+                        onChange={handleEditServiceChange}
+                        placeholder="Select service name"
                         style={{ width: "100%" }}
                       />
                     </div>
                   </div>
 
-                  {/* Vessel Location and Date & Time */}
+                  {/* Price and Date & Time */}
                   <div
                     className="p-grid p-formgrid"
                     style={{
@@ -427,7 +373,7 @@ const Bookings = () => {
                   >
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
-                        htmlFor="serviceArea"
+                        htmlFor="totalPrice"
                         style={{
                           display: "block",
                           marginBottom: "8px",
@@ -435,20 +381,21 @@ const Bookings = () => {
                           textAlign: "left",
                         }}
                       >
-                        Vessel Location*
+                        Price*
                       </label>
                       <InputText
-                        id="serviceArea"
-                        name="serviceArea"
-                        value={editingBooking?.serviceArea || ""}
+                        id="totalPrice"
+                        name="totalPrice"
+                        value={editingBooking?.totalPrice || ""}
                         onChange={handleEditInputChange}
-                        placeholder="Enter vessel location"
+                        placeholder="Enter price"
                         style={{ width: "100%" }}
                       />
                     </div>
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
-                        htmlFor="date"
+                        htmlFor="bookingDate"
+                        name="bookingDate"
                         style={{
                           display: "block",
                           marginBottom: "8px",
@@ -459,10 +406,11 @@ const Bookings = () => {
                         Date & Time*
                       </label>
                       <Calendar
-                        id="date"
+                        id="bookingDate"
+                        name="bookingDate"
                         value={
-                          editingBooking?.date
-                            ? new Date(editingBooking.date)
+                          editingBooking?.bookingDate
+                            ? new Date(editingBooking.bookingDate)
                             : null
                         }
                         onChange={handleEditDateChange}
@@ -499,10 +447,13 @@ const Bookings = () => {
                         id="status"
                         value={editingBooking?.status || ""}
                         options={[
-                          { label: "Completed", value: "Completed" },
-                          { label: "Pending", value: "Pending" },
-                          { label: "Cancelled", value: "Cancelled" },
-                          { label: "Rescheduled", value: "Rescheduled" },
+                          { label: "completed", value: "completed" },
+                          { label: "pending", value: "pending" },
+                          { label: "cancelled", value: "cancelled" },
+                          { label: "in progress", value: "in progress" },
+                          { label: "flagged", value: "flagged" },
+                          { label: "confirmed", value: "confirmed" },
+                          { label: "rescheduled", value: "rescheduled" },
                         ]}
                         onChange={handleEditStatusChange}
                         placeholder="Select status"
@@ -634,7 +585,7 @@ const Bookings = () => {
                               }}
                             />
                             <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                              Service Type
+                              Email
                             </p>
                           </div>
                         </th>
@@ -659,7 +610,7 @@ const Bookings = () => {
                               }}
                             />
                             <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                              Vendor Assigned
+                              Service Name
                             </p>
                           </div>
                         </th>
@@ -684,7 +635,7 @@ const Bookings = () => {
                               }}
                             />
                             <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
-                              Service Area
+                              Price
                             </p>
                           </div>
                         </th>
@@ -786,19 +737,19 @@ const Bookings = () => {
                           }}
                         >
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.id}
+                            {booking.bookingId}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.serviceType}
+                            {booking.email}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.vendorAssigned}
+                            {booking.services?.map((service) => service.service?.name).join(', ')}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.serviceArea}
+                            ${booking.totalPrice}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {new Date(booking.date).toLocaleDateString(
+                            {new Date(booking.bookingDate).toLocaleDateString(
                               "en-US",
                               {
                                 year: "numeric",
@@ -811,27 +762,27 @@ const Bookings = () => {
                             <span
                               style={{
                                 backgroundColor:
-                                  booking.status === "Confirmed"
+                                  booking.status === "confirmed"
                                     ? "#e6f7ee"
-                                    : booking.status === "Pending"
+                                    : booking.status === "pending"
                                     ? "#fff8e6"
-                                    : booking.status === "Completed"
+                                    : booking.status === "completed"
                                     ? "#e6f0ff"
-                                    : booking.status === "In Progress"
+                                    : booking.status === "in progress"
                                     ? "#e6f7ff"
-                                    : booking.status === "Flagged"
+                                    : booking.status === "flagged"
                                     ? "#ffe6e6"
                                     : "#ffebeb",
                                 color:
-                                  booking.status === "Confirmed"
+                                  booking.status === "confirmed"
                                     ? "#1d9d74"
-                                    : booking.status === "Pending"
+                                    : booking.status === "pending"
                                     ? "#ff9800"
-                                    : booking.status === "Completed"
+                                    : booking.status === "completed"
                                     ? "#3366ff"
-                                    : booking.status === "In Progress"
+                                    : booking.status === "in progress"
                                     ? "#0099cc"
-                                    : booking.status === "Flagged"
+                                    : booking.status === "flagged"
                                     ? "#ff4d4f"
                                     : "#ff4d4f",
                                 padding: "2px 6px",
@@ -1036,29 +987,29 @@ const Bookings = () => {
       <Menu
         model={[
           {
-            label: "Confirmed",
+            label: "confirmed",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "Confirmed"),
+              handleStatusChange(selectedBookingForStatus, "confirmed"),
           },
           {
-            label: "Completed",
+            label: "completed",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "Completed"),
+              handleStatusChange(selectedBookingForStatus, "completed"),
           },
           {
-            label: "Pending",
+            label: "pending",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "Pending"),
+              handleStatusChange(selectedBookingForStatus, "pending"),
           },
           {
-            label: "In Progress",
+            label: "in progress",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "In Progress"),
+              handleStatusChange(selectedBookingForStatus, "in progress"),
           },
           {
-            label: "Flagged",
+            label: "flagged",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "Flagged"),
+              handleStatusChange(selectedBookingForStatus, "flagged"),
           },
         ]}
         popup
@@ -1106,7 +1057,7 @@ const Bookings = () => {
                 >
                   Booking ID
                 </label>
-                <div className="view-field">{viewBooking.id}</div>
+                <div className="view-field">{viewBooking.bookingId}</div>
               </div>
               <div
                 className="form-group"
@@ -1118,12 +1069,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="serviceType"
+                  htmlFor="email"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Service Type
+                  Email
                 </label>
-                <div className="view-field">{viewBooking.serviceType}</div>
+                <div className="view-field">{viewBooking.email}</div>
               </div>
             </div>
 
@@ -1138,12 +1089,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="vendorAssigned"
+                  htmlFor="services"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Vendor Assigned
+                  Service Name
                 </label>
-                <div className="view-field">{viewBooking.vendorAssigned}</div>
+                <div className="view-field">{viewBooking.services.map((service) => service.service.name).join(', ')}</div>
               </div>
               <div
                 className="form-group"
@@ -1155,12 +1106,12 @@ const Bookings = () => {
                 }}
               >
                 <label
-                  htmlFor="serviceArea"
+                  htmlFor="totalPrice"
                   style={{ fontWeight: "600", fontSize: "0.9rem" }}
                 >
-                  Service Area
+                  Price
                 </label>
-                <div className="view-field">{viewBooking.serviceArea}</div>
+                <div className="view-field">${viewBooking.totalPrice}</div>
               </div>
             </div>
 
@@ -1181,7 +1132,7 @@ const Bookings = () => {
                   Date
                 </label>
                 <div className="view-field">
-                  {new Date(viewBooking.date).toLocaleDateString("en-US", {
+                  {new Date(viewBooking.bookingDate).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
@@ -1207,27 +1158,27 @@ const Bookings = () => {
                   <span
                     style={{
                       backgroundColor:
-                        viewBooking.status === "Confirmed"
+                        viewBooking.status === "confirmed"
                           ? "#e6f7ee"
-                          : viewBooking.status === "Pending"
+                          : viewBooking.status === "pending"
                           ? "#fff8e6"
-                          : viewBooking.status === "Completed"
+                          : viewBooking.status === "completed"
                           ? "#e6f0ff"
-                          : viewBooking.status === "In Progress"
+                          : viewBooking.status === "in progress"
                           ? "#e6f7ff"
-                          : viewBooking.status === "Flagged"
+                          : viewBooking.status === "flagged"
                           ? "#ffe6e6"
                           : "#ffebeb",
                       color:
-                        viewBooking.status === "Confirmed"
+                        viewBooking.status === "confirmed"
                           ? "#1d9d74"
-                          : viewBooking.status === "Pending"
+                          : viewBooking.status === "pending"
                           ? "#ff9800"
-                          : viewBooking.status === "Completed"
+                          : viewBooking.status === "completed"
                           ? "#3366ff"
-                          : viewBooking.status === "In Progress"
+                          : viewBooking.status === "in progress"
                           ? "#0099cc"
-                          : viewBooking.status === "Flagged"
+                          : viewBooking.status === "flagged"
                           ? "#ff4d4f"
                           : "#ff4d4f",
                       padding: "4px 8px",
@@ -1272,7 +1223,7 @@ const Bookings = () => {
                     lineHeight: "1.5",
                   }}
                 >
-                  {viewBooking.reviews}
+                  {viewBooking.reviews?.map((review) => review.review).join(', ') || 'No reviews'}
                 </div>
               </div>
             </div>

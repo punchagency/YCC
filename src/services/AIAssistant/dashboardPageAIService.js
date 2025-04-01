@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_DASHBOARD_VENDOR_ASSISTANT_API_URL;
+const API_URL = process.env.REACT_APP_DASHBOARD_VENDOR_ASSISTANT_API_URL || 'https://ycc-ee4d189a3af8.herokuapp.com/api/ai/vendor';
 
 export const getResponseFromAI = async (chat) => {
     console.log('chat being sent to AI', chat)
