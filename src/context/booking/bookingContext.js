@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
-import { Toast } from 'primereact/toast';
 import { getBookingService, updateBookingService, deleteBookingService, updateBookingStatusService } from "../../services/bookings/bookingService";
 import { useUser } from "../userContext";
-
+import { useToast } from "../toast/toastContext";
 const BookingContext = createContext();
 
 export const useBooking = () => {
@@ -14,12 +13,13 @@ export const useBooking = () => {
 }
 
 export const BookingProvider = ({ children }) => {
+    const { toast } = useToast();
     const { user } = useUser();
+
     const [bookings, setBookings] = useState([]);
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
-    const toast = useRef(null);
     
     const fetchBookings = async () => {
         try {
@@ -115,8 +115,7 @@ export const BookingProvider = ({ children }) => {
             updateBooking,
             fetchBookings,
             updateBookingStatus
-        }}>
-            <Toast ref={toast} />
+            }}>
             {children}
         </BookingContext.Provider>
     );

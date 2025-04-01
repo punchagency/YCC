@@ -31,7 +31,7 @@ import "./bookings.css";
 
 // Context
 import { useBooking } from "../../context/booking/bookingContext";
-
+import { useService } from "../../context/service/serviceContext";
 const Bookings = () => {
   
   const navigate = useNavigate();
@@ -39,6 +39,7 @@ const Bookings = () => {
 
   // Context
   const { bookings, deleteBooking, fetchBookings, updateBooking, updateBookingStatus } = useBooking();
+  const { services, fetchServices } = useService();
 
 
 
@@ -69,7 +70,7 @@ const Bookings = () => {
       setIsMobile(window.innerWidth <= 768);
     };
     fetchBookings();
-    
+    fetchServices();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -97,9 +98,19 @@ const Bookings = () => {
   
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
+    console.log(name, value);
     setEditingBooking({
       ...editingBooking,
       [name]: value,
+    });
+  };
+
+  const handleEditServiceChange = (e) => {
+    const { name, value } = e.target;
+    const service = services.find((service) => service._id === value);
+    setEditingBooking({
+      ...editingBooking,
+      services: [{service: service}],
     });
   };
 
@@ -339,11 +350,12 @@ const Bookings = () => {
                       >
                         Service Name*
                       </label>
-                      <InputText
+                      <Dropdown
                         id="serviceName"
                         name="serviceName"
-                        value={editingBooking?.services.map((service) => service.service.name).join(', ') || ""}
-                        onChange={handleEditInputChange}
+                        value={editingBooking?.services.map((service) => service.service._id).join(', ') || ""}
+                        options={services.map((service) => ({ label: service.name, value: service._id }))}
+                        onChange={handleEditServiceChange}
                         placeholder="Select service name"
                         style={{ width: "100%" }}
                       />
