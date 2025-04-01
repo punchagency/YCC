@@ -38,7 +38,7 @@ const Bookings = () => {
 
 
   // Context
-  const { bookings, deleteBooking, fetchBookings, updateBooking } = useBooking();
+  const { bookings, deleteBooking, fetchBookings, updateBooking, updateBookingStatus } = useBooking();
 
 
 
@@ -68,18 +68,11 @@ const Bookings = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+    fetchBookings();
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  const goCrewDashboardPage = () => {
-    navigate("/crew/dashboard");
-  };
-
-  const goInventorySummaryPage = () => {
-    navigate("/crew/inventory/summary");
-  };
 
   const handleViewReview = (review) => {
     setSelectedReview(review);
@@ -88,13 +81,7 @@ const Bookings = () => {
 
   // Add this function to handle status changes
   const handleStatusChange = (booking, newStatus) => {
-    const updatedBookings = bookings.map((b) => {
-      if (b.id === booking.id) {
-        return { ...b, status: newStatus };
-      }
-      return b;
-    });
-    //setBookings(updatedBookings);
+    updateBookingStatus(booking._id, newStatus);
   };
 
   const handleViewBooking = (booking) => {
@@ -119,7 +106,7 @@ const Bookings = () => {
   const handleEditDateChange = (e) => {
     setEditingBooking({
       ...editingBooking,
-      date: e.value,
+      bookingDate: e.value,
     });
   };
 
@@ -131,11 +118,12 @@ const Bookings = () => {
   };
 
   const handleSaveBooking = () => {
-    console.log('editingBooking', editingBooking)
-    
-
-    updateBooking(editingBooking._id, editingBooking);
-    setShowEditForm(false);
+    updateBooking(editingBooking._id, editingBooking)
+      .then((success) => {
+        if (success) {
+          setShowEditForm(false);
+        }
+      });
   };
 
   const handleUploadBooking = (booking) => {
@@ -743,7 +731,7 @@ const Bookings = () => {
                             {booking.email}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.services.map((service) => service.service.name).join(', ')}
+                            {booking.services?.map((service) => service.service?.name).join(', ')}
                           </td>
                           <td style={{ padding: "8px", fontSize: "11px" }}>
                             ${booking.totalPrice}
