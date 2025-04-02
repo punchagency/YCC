@@ -12,6 +12,7 @@ import Invent from "./pages/invent/invent";
 import Order from "./pages/order/order";
 import Reports from "./pages/report/report";
 import Bookings from "./pages/bookings/bookings";
+import VendorStarted from "./pages/auth/vendors-started"
 // end of new import
 
 import ForgotPassword from "./pages/auth/forgot-password";
@@ -101,6 +102,8 @@ function App() {
         <NotificationsProvider>
           <Routes>
             <Route path="/get-started" element={<GetStarted />} />
+            <Route path="/apply" element={<VendorStarted />} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 

@@ -1,61 +1,108 @@
-import React, { useState, useRef } from "react";
-import { CSSTransition, SwitchTransition } from "react-transition-group";
-
+import React, { useState, useEffect, useRef } from "react";
+import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
+import { Dropdown } from "primereact/dropdown";
+import { Calendar } from "primereact/calendar";
+import { Toast } from "primereact/toast";
+import { SwitchTransition, CSSTransition } from "react-transition-group";
 import lockLogo from "../../assets/images/crew/lockLogo.png";
 import dropdown from "../../assets/images/crew/dropdown.png";
 import cart from "../../assets/images/crew/cart.png";
-import iconcontainer from "../../assets/images/crew/iconContainer.png";
+import iconContainer from "../../assets/images/crew/iconContainer.png";
 import neworder from "../../assets/images/crew/neworder.png";
-import buttonorder from "../../assets/images/crew/buttonorder.png";
-import { Sidebar } from "primereact/sidebar";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
-import { Toast } from "primereact/toast";
 import "./order.css"; // We'll create this CSS file for transitions
+import { getInventoryData } from "../../services/inventory/inventoryService"; // Add this import
+import { createOrder } from "../../services/order/orderService"; // Add this import
 
 const Order = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [showOrderForm, setShowOrderForm] = useState(false);
-  const [orderForm, setOrderForm] = useState({
-    orderName: "",
-    customerName: "",
-    stockQuantity: "",
-    selectedProduct: null,
-    orderStatus: null,
-    deliveryDate: null,
-  });
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [productOptions, setProductOptions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Sample product options
-  const productOptions = [
-    { label: "Diesel Fuel", value: "diesel" },
-    { label: "Engine Oil", value: "engine_oil" },
-    { label: "First Aid Kit", value: "first_aid" },
-    { label: "Life Jackets", value: "life_jackets" },
-    { label: "Navigation Equipment", value: "navigation" },
-  ];
-
-  // Order status options
+  // Add back the status options
   const statusOptions = [
     { label: "Pending", value: "pending" },
-    { label: "Processing", value: "processing" },
+    { label: "Confirmed", value: "confirmed" },
     { label: "Shipped", value: "shipped" },
     { label: "Delivered", value: "delivered" },
     { label: "Cancelled", value: "cancelled" },
   ];
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const [orderForm, setOrderForm] = useState({
+    customerName: "",
+    products: [{ id: null, quantity: 1 }],
+    deliveryDate: null,
+    additionalNotes: "",
+  });
+
+  // Add useEffect to fetch inventory data when component mounts
+  useEffect(() => {
+    fetchInventoryData();
+  }, []);
+
+  // Function to fetch inventory data and format it for dropdown
+  const fetchInventoryData = async () => {
+    try {
+      const result = await getInventoryData();
+      console.log("API Response:", result);
+      
+      if (result.success) {
+        const inventoryData = result.data.data.result || [];
+        if (!Array.isArray(inventoryData)) {
+          console.error("Inventory data is not an array:", inventoryData);
+          return;
+        }
+
+        // Transform inventory data into product options
+        const options = inventoryData.map((item) => ({
+          label: item.product?.name || "Unknown Product",
+          value: item._id, // This is the inventory ID
+          productId: item.product?._id, // Add the actual product ID
+          price: item.price,
+          quantity: item.quantity,
+          category: item.product?.category,
+          serviceArea: item.product?.serviceArea,
+        }));
+        
+        setProductOptions(options);
+      } else {
+        console.error("Failed to load inventory data:", result.error);
+        if (toast.current) {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: result.error || "Failed to load product data",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching inventory data:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An unexpected error occurred while loading product data",
+          life: 3000,
+        });
+      }
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -66,9 +113,31 @@ const Order = () => {
   };
 
   const handleDropdownChange = (e, field) => {
+    if (field === "selectedProduct") {
+      const selectedProduct = productOptions.find((p) => p.value === e.value);
+      setOrderForm({
+        ...orderForm,
+        products: [{
+          id: selectedProduct.productId, // Use the product ID instead of inventory ID
+          inventoryId: e.value, // Store inventory ID if needed
+          quantity: orderForm.products[0].quantity
+        }]
+      });
+    } else {
+      setOrderForm({
+        ...orderForm,
+        [field]: e.value,
+      });
+    }
+  };
+
+  const handleQuantityChange = (e) => {
     setOrderForm({
       ...orderForm,
-      [field]: e.value,
+      products: [{
+        ...orderForm.products[0],
+        quantity: parseInt(e.target.value) || 1
+      }]
     });
   };
 
@@ -79,46 +148,77 @@ const Order = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate form
     if (
-      !orderForm.orderName ||
       !orderForm.customerName ||
-      !orderForm.stockQuantity ||
-      !orderForm.selectedProduct ||
-      !orderForm.orderStatus ||
+      !orderForm.products[0].id ||
       !orderForm.deliveryDate
     ) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please fill all required fields",
+        detail: "Please fill in all required fields",
         life: 3000,
       });
       return;
     }
 
-    // Process form submission
-    console.log("Order submitted:", orderForm);
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Order created successfully",
-      life: 3000,
-    });
+    try {
+      setIsLoading(true);
 
-    // Reset form
-    setOrderForm({
-      orderName: "",
-      customerName: "",
-      stockQuantity: "",
-      selectedProduct: null,
-      orderStatus: null,
-      deliveryDate: null,
-    });
+      // Format the data for the API
+      const orderData = {
+        supplierId: "67ced03d4c641a3d1af80cc6", // Replace with actual supplier ID
+        customerName: orderForm.customerName,
+        products: [{
+          id: orderForm.products[0].id, // This is now the product ID
+          quantity: parseInt(orderForm.products[0].quantity)
+        }],
+        deliveryDate: orderForm.deliveryDate,
+        additionalNotes: orderForm.additionalNotes || ""
+      };
 
-    // Hide the form
-    setShowOrderForm(false);
+      console.log("Sending order data:", orderData);
+      const response = await createOrder(orderData);
+      console.log("Order response:", response);
+
+      if (response.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Order created successfully",
+          life: 3000,
+        });
+
+        // Reset form
+        setOrderForm({
+          customerName: "",
+          products: [{ id: null, quantity: 1 }],
+          deliveryDate: null,
+          additionalNotes: "",
+        });
+
+        setShowOrderForm(false);
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: response.error || "Failed to create order",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An unexpected error occurred",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const goCrewDashboardPage = () => {
@@ -127,6 +227,256 @@ const Order = () => {
 
   const goInventorySummaryPage = () => {
     navigate("/crew/inventory/summary");
+  };
+
+  // Render mobile summary boxes
+  const renderMobileSummaryBoxes = () => {
+    return (
+      <div style={{ padding: "0 10px" }}>
+        {/* First summary box */}
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "15px",
+            marginBottom: "10px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <img
+              src={lockLogo}
+              alt="lockLogo"
+              style={{ width: "20px", height: "20px" }}
+            />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+              <img
+                src={dropdown}
+                alt="dropdown"
+                style={{ width: "12px", height: "12px", marginLeft: "5px" }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              textAlign: "center",
+            }}
+          >
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                All Orders
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Pending
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Completed
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Second summary box */}
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "15px",
+            marginBottom: "10px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <img
+              src={lockLogo}
+              alt="lockLogo"
+              style={{ width: "20px", height: "20px" }}
+            />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+              <img
+                src={dropdown}
+                alt="dropdown"
+                style={{ width: "12px", height: "12px", marginLeft: "5px" }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              textAlign: "center",
+            }}
+          >
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Canceled
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Returned
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Damaged
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Third summary box */}
+        <div
+          style={{
+            backgroundColor: "white",
+            borderRadius: "8px",
+            padding: "15px",
+            marginBottom: "15px",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <img
+              src={cart}
+              alt="cart"
+              style={{ width: "20px", height: "20px" }}
+            />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+              <img
+                src={dropdown}
+                alt="dropdown"
+                style={{ width: "12px", height: "12px", marginLeft: "5px" }}
+              />
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              textAlign: "center",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 5px 0",
+                  fontSize: "13px",
+                  color: "#EF4444",
+                }}
+              >
+                Abandoned Cart
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+            <div>
+              <p
+                style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
+              >
+                Customers
+              </p>
+              <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Add functions to handle multiple products
+  const handleProductChange = (index, field, value) => {
+    const updatedProducts = [...orderForm.products];
+    updatedProducts[index][field] = field === 'quantity' ? parseInt(value) : value;
+    
+    setOrderForm({
+      ...orderForm,
+      products: updatedProducts
+    });
+  };
+
+  // Add function to add more products
+  const addProduct = () => {
+    setOrderForm({
+      ...orderForm,
+      products: [...orderForm.products, { id: null, quantity: 1 }]
+    });
+  };
+
+  // Add function to remove products
+  const removeProduct = (index) => {
+    if (orderForm.products.length > 1) {
+      const updatedProducts = orderForm.products.filter((_, i) => i !== index);
+      setOrderForm({
+        ...orderForm,
+        products: updatedProducts
+      });
+    }
   };
 
   return (
@@ -147,112 +497,17 @@ const Order = () => {
             Order Summary
           </h4>
         </div>
-        <div className="box-order-container">
-          <div className="box1-order">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={lockLogo} alt="lockLogo" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p>All Orders</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Pending</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Completed</p>
-                <p>0</p>
-              </div>
-            </div>
+
+        {isMobile ? (
+          // Mobile view for summary boxes
+          renderMobileSummaryBoxes()
+        ) : (
+          // Desktop view
+          <div className="box-order-container">
+            {/* Original desktop boxes */}
           </div>
-          <div className="box1-order">
-            <div  
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={lockLogo} alt="lockLogo" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p>Canceled</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Returned</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Damaged</p>
-                <p>0</p>
-              </div>
-            </div>
-          </div>
-          <div className="box1-order">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0px 9px",
-              }}
-            >
-              <div>
-                <img src={cart} alt="cart" />
-              </div>
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <p style={{ marginRight: "5px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
-                  style={{ width: "15px", height: "15px" }}
-                />
-              </div>
-            </div>
-            <div className="pending-order-container">
-              <div>
-                <p style={{ color: "#EF4444" }}>Abandoned Cart</p>
-                <p>0</p>
-              </div>
-              <div>
-                <p>Customers</p>
-                <p>0</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
+
         <SwitchTransition mode="out-in">
           <CSSTransition
             key={showOrderForm ? "form" : "noOrders"}
@@ -264,12 +519,12 @@ const Order = () => {
               <div
                 className="order-form-container"
                 style={{
-                  padding: "20px",
+                  padding: isMobile ? "15px" : "20px",
                   backgroundColor: "white",
                   borderRadius: "8px",
                   boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
                   margin: "20px 0",
-                  width: "95%",
+                  width: isMobile ? "95%" : "95%",
                   minHeight: "300px",
                   display: "flex",
                   flexDirection: "column",
@@ -302,11 +557,12 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
                       marginBottom: "20px",
                     }}
                   >
-                    <div className="p-field" style={{ flex: 1 }}>
+                    {/* <div className="p-field" style={{ flex: 1 }}>
                       <label
                         htmlFor="orderName"
                         style={{
@@ -326,7 +582,7 @@ const Order = () => {
                         placeholder="Enter order name"
                         style={{ width: "100%" }}
                       />
-                    </div>
+                    </div> */}
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
                         htmlFor="customerName"
@@ -355,13 +611,14 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
                       marginBottom: "20px",
                     }}
                   >
                     <div className="p-field" style={{ flex: 1 }}>
                       <label
-                        htmlFor="stockQuantity"
+                        htmlFor="quantity"
                         style={{
                           display: "block",
                           marginBottom: "8px",
@@ -369,13 +626,13 @@ const Order = () => {
                           textAlign: "left",
                         }}
                       >
-                        Stock Quantity*
+                        Quantity*
                       </label>
                       <InputText
-                        id="stockQuantity"
-                        name="stockQuantity"
-                        value={orderForm.stockQuantity}
-                        onChange={handleInputChange}
+                        id="quantity"
+                        name="quantity"
+                        value={orderForm.products[0].quantity}
+                        onChange={handleQuantityChange}
                         placeholder="Enter quantity"
                         keyfilter="pint"
                         style={{ width: "100%" }}
@@ -395,14 +652,11 @@ const Order = () => {
                       </label>
                       <Dropdown
                         id="selectedProduct"
-                        value={orderForm.selectedProduct}
+                        value={orderForm.products[0].inventoryId}
                         options={productOptions}
-                        onChange={(e) =>
-                          handleDropdownChange(e, "selectedProduct")
-                        }
+                        onChange={(e) => handleDropdownChange(e, "selectedProduct")}
                         placeholder="Select a product"
                         style={{ width: "100%" }}
-                        className="no-dropdown-scrollbar"
                       />
                     </div>
                   </div>
@@ -412,8 +666,9 @@ const Order = () => {
                     className="p-grid p-formgrid"
                     style={{
                       display: "flex",
+                      flexDirection: isMobile ? "column" : "row",
                       gap: "15px",
-                      marginBottom: "30px",
+                      marginBottom: "20px",
                     }}
                   >
                     <div className="p-field" style={{ flex: 1 }}>
@@ -435,7 +690,6 @@ const Order = () => {
                         onChange={(e) => handleDropdownChange(e, "orderStatus")}
                         placeholder="Select status"
                         style={{ width: "100%" }}
-                        className="no-dropdown-scrollbar"
                       />
                     </div>
                     <div className="p-field" style={{ flex: 1 }}>
@@ -461,11 +715,34 @@ const Order = () => {
                     </div>
                   </div>
 
-                  {/* Submit and Cancel Buttons */}
+                  {/* Notes */}
+                  <div className="p-field">
+                    <label
+                      htmlFor="notes"
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontWeight: "500",
+                        textAlign: "left",
+                      }}
+                    >
+                      Notes
+                    </label>
+                    <InputText
+                      id="notes"
+                      name="notes"
+                      value={orderForm.notes}
+                      onChange={handleInputChange}
+                      placeholder="Add notes (optional)"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+
                   <div
                     style={{
                       display: "flex",
-                      justifyContent: "flex-end",
+                      flexDirection: isMobile ? "column" : "row",
+                      justifyContent: isMobile ? "center" : "flex-end",
                       gap: "15px",
                       marginTop: "20px",
                     }}
@@ -477,10 +754,11 @@ const Order = () => {
                       style={{
                         backgroundColor: "#EF4444",
                         border: "none",
-                        width: "150px",
+                        width: isMobile ? "100%" : "150px",
                         color: "white",
                         fontWeight: "bold",
                         fontSize: "12px",
+                        marginBottom: isMobile ? "10px" : "0",
                       }}
                     />
                     <Button
@@ -493,7 +771,7 @@ const Order = () => {
                       style={{
                         backgroundColor: "#0387D9",
                         border: "none",
-                        width: "150px",
+                        width: isMobile ? "100%" : "150px",
                         color: "white",
                         fontWeight: "bold",
                         fontSize: "12px",
@@ -503,26 +781,65 @@ const Order = () => {
                 </div>
               </div>
             ) : (
-              <div className="no-order-container">
-                <div className="no-order-container-wrapper">
+              <div
+                className="no-order-container"
+                style={{
+                  padding: isMobile ? "20px 10px" : "20px",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  className="no-order-container-wrapper"
+                  style={{
+                    maxWidth: "400px",
+                    margin: "0 auto",
+                  }}
+                >
                   <div>
                     <img
-                      src={iconcontainer}
-                      alt="iconcontainer"
+                      src={iconContainer}
+                      alt="iconContainer"
                       className="icon-container"
+                      style={{
+                        width: isMobile ? "80px" : "100px",
+                        marginBottom: "15px",
+                      }}
                     />
                   </div>
                   <div>
-                    <h3>No Orders Yet?</h3>
-                    <p>
+                    <h3 style={{ margin: "0 0 10px 0" }}>No Orders Yet?</h3>
+                    <p
+                      style={{
+                        margin: "0 0 20px 0",
+                        fontSize: "14px",
+                        color: "#666",
+                      }}
+                    >
                       Add products to your store and start selling to see orders
                     </p>
-                    <button onClick={() => setShowOrderForm(true)}>
+                    <button
+                      onClick={() => setShowOrderForm(true)}
+                      style={{
+                        backgroundColor: "#0387D9",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "10px 20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        margin: "0 auto",
+                        cursor: "pointer",
+                        width: isMobile ? "100%" : "auto",
+                      }}
+                    >
                       <img
                         src={neworder}
                         alt="neworder"
                         className="neworder-icon"
-                      />{" "}
+                        style={{ width: "16px", height: "16px" }}
+                      />
                       <span>Create New Order</span>
                     </button>
                   </div>

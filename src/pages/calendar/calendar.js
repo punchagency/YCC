@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
@@ -21,34 +21,36 @@ import man1 from "../../assets/images/crew/Man1.png";
 
 const EventCard = ({ title, time, location, organizer }) => {
   return (
-    <div className="profiles">
-      <div>
-        <img src={profilenoti} alt="profile" />
+    <div className="profiles" style={{ display: 'flex', alignItems: 'flex-start', padding: '10px 0' }}>
+      <div style={{ marginRight: '12px' }}>
+        <img src={profilenoti} alt="profile" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
       </div>
-      <div>
-        <p style={{ fontWeight: "bold" }} className="header">
+      <div style={{ flex: 1 }}>
+        <p style={{ fontWeight: "bold", margin: '0 0 5px 0', fontSize: '16px' }} className="header">
           {title}
         </p>
-        <p>{time}</p>
-        <p>{location}</p>
-        <p>{organizer}</p>
-        <div className="profile_display">
-          <img src={man1} alt="edit" />
-          <img src={man1} alt="delete" />
-          <img src={man1} alt="lone" />
+        <p style={{ margin: '0 0 3px 0', fontSize: '14px', color: '#666' }}>{time}</p>
+        <p style={{ margin: '0 0 3px 0', fontSize: '14px', color: '#666' }}>{location}</p>
+        <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>{organizer}</p>
+        <div className="profile_display" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={man1} alt="attendee" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+          <img src={man1} alt="attendee" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+          <img src={man1} alt="attendee" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
           <div
             style={{
               border: "1px solid #4880FF",
-              padding: "15px",
-              height: "20px",
-              width: "20px",
+              padding: "0",
+              height: "24px",
+              width: "24px",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               borderRadius: "50%",
+              fontSize: '10px',
+              color: '#4880FF'
             }}
           >
-            <p>15+</p>
+            <p style={{ margin: 0 }}>15+</p>
           </div>
         </div>
       </div>
@@ -57,6 +59,19 @@ const EventCard = ({ title, time, location, organizer }) => {
 };
 
 const Calendar = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [activeView, setActiveView] = useState('events'); // 'events' or 'calendar'
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const events = [
     {
       id: 1,
@@ -183,6 +198,51 @@ const Calendar = () => {
     );
   };
 
+  // Mobile view toggle buttons
+  const renderMobileViewToggle = () => {
+    if (!isMobile) return null;
+    
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        margin: '15px 0',
+        borderRadius: '8px',
+        overflow: 'hidden',
+        border: '1px solid #E4E7EC'
+      }}>
+        <button 
+          onClick={() => setActiveView('events')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            background: activeView === 'events' ? '#0387D9' : '#F9FAFB',
+            color: activeView === 'events' ? 'white' : '#344054',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 500
+          }}
+        >
+          Events
+        </button>
+        <button 
+          onClick={() => setActiveView('calendar')}
+          style={{
+            flex: 1,
+            padding: '10px',
+            background: activeView === 'calendar' ? '#0387D9' : '#F9FAFB',
+            color: activeView === 'calendar' ? 'white' : '#344054',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 500
+          }}
+        >
+          Calendar
+        </button>
+      </div>
+    );
+  };
+
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -193,19 +253,49 @@ const Calendar = () => {
         </div>
       </div>
 
-      <div className="widget-container">
-        <div className="event-container-display">
-          <div className="new_event">
-            <button>
-              <img src={plus} alt="plus" />
+      {renderMobileViewToggle()}
+
+      <div className="widget-container" style={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: '20px'
+      }}>
+        <div 
+          className="event-container-display" 
+          style={{ 
+            flex: isMobile ? 'auto' : '0 0 350px',
+            display: isMobile && activeView !== 'events' ? 'none' : 'block',
+            background: '#FFFFFF',
+            borderRadius: '10px',
+            padding: '20px',
+            boxShadow: '1px 1px 1px #0000001A',
+            marginBottom: '20px'
+          }}
+        >
+          <div className="new_event" style={{ marginBottom: '20px' }}>
+            <button style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              padding: '12px',
+              background: '#0387D9',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 500,
+              marginBottom: '20px'
+            }}>
+              <img src={plus} alt="plus" style={{ marginRight: '8px', width: '16px', height: '16px' }} />
               Add New Event
             </button>
-            <h3>You Are Going To</h3>
+            <h3 style={{ fontSize: '18px', margin: '0 0 15px 0' }}>You Are Going To</h3>
           </div>
 
           {events.map((event, index) => (
             <React.Fragment key={event.id}>
-              {index > 0 && <div className="event-divider"></div>}
+              {index > 0 && <div className="event-divider" style={{ height: '1px', background: '#E4E7EC', margin: '10px 0' }}></div>}
               <EventCard
                 title={event.title}
                 time={event.time}
@@ -215,12 +305,26 @@ const Calendar = () => {
             </React.Fragment>
           ))}
 
-          <div className="see-more-container">
-            <button className="see-more-button" onClick={handleSeeMore}>
+          <div className="see-more-container" style={{ marginTop: '20px', textAlign: 'center' }}>
+            <button 
+              className="see-more-button" 
+              onClick={handleSeeMore}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'transparent',
+                color: '#0387D9',
+                border: '1px solid #0387D9',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 500
+              }}
+            >
               See More Events
             </button>
           </div>
         </div>
+        
         <div
           style={{
             flex: 1,
@@ -228,18 +332,16 @@ const Calendar = () => {
             borderRadius: "10px",
             padding: "20px",
             boxShadow: "1px 1px 1px #0000001A",
-            marginLeft: "20px",
-            marginBottom: "20px",
-            marginRight: "20px",
+            display: isMobile && activeView !== 'calendar' ? 'none' : 'block'
           }}
         >
-          <h3>Calendar</h3>
+          <h3 style={{ fontSize: '18px', margin: '0 0 15px 0' }}>Calendar</h3>
 
           {/* Large Calendar Component */}
           <div
             style={{
               width: "100%",
-              height: "600px",
+              height: isMobile ? '450px' : '600px',
               display: "flex",
               flexDirection: "column",
             }}
@@ -251,24 +353,32 @@ const Calendar = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginBottom: "20px",
+                flexWrap: isMobile ? 'wrap' : 'nowrap',
+                gap: isMobile ? '10px' : '0'
               }}
             >
               <div>
-                <h2 style={{ fontSize: "20px", margin: 0, color: "#344054" }}>
+                <h2 style={{ fontSize: isMobile ? '16px' : '20px', margin: 0, color: "#344054" }}>
                   {months[currentDate.getMonth()]} {currentDate.getFullYear()}
                 </h2>
               </div>
-              <div style={{ display: "flex", gap: "10px" }}>
+              <div style={{ 
+                display: "flex", 
+                gap: "10px",
+                width: isMobile ? '100%' : 'auto',
+                justifyContent: isMobile ? 'space-between' : 'flex-end',
+                marginTop: isMobile ? '10px' : '0'
+              }}>
                 <button
                   onClick={goToPreviousMonth}
                   style={{
                     background: "#F9FAFB",
                     border: "1px solid #E4E7EC",
                     color: "#344054",
-                    padding: "8px 16px",
+                    padding: isMobile ? '6px 12px' : '8px 16px',
                     borderRadius: "4px",
                     cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: isMobile ? '12px' : '14px',
                   }}
                 >
                   <i className="pi pi-chevron-left"></i>
@@ -279,10 +389,11 @@ const Calendar = () => {
                     background: "#0387D9",
                     color: "white",
                     border: "1px solid #0387D9",
-                    padding: "8px 16px",
+                    padding: isMobile ? '6px 12px' : '8px 16px',
                     borderRadius: "4px",
                     cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: isMobile ? '12px' : '14px',
+                    flex: isMobile ? '1' : 'none'
                   }}
                 >
                   Today
@@ -293,10 +404,10 @@ const Calendar = () => {
                     background: "#F9FAFB",
                     border: "1px solid #E4E7EC",
                     color: "#344054",
-                    padding: "8px 16px",
+                    padding: isMobile ? '6px 12px' : '8px 16px',
                     borderRadius: "4px",
                     cursor: "pointer",
-                    fontSize: "14px",
+                    fontSize: isMobile ? '12px' : '14px',
                   }}
                 >
                   <i className="pi pi-chevron-right"></i>
@@ -313,6 +424,7 @@ const Calendar = () => {
                 backgroundColor: "#E4E7EC",
                 border: "1px solid #E4E7EC",
                 flex: 1,
+                fontSize: isMobile ? '12px' : '14px'
               }}
             >
               {/* Weekday Headers */}
@@ -321,14 +433,14 @@ const Calendar = () => {
                   key={index}
                   style={{
                     backgroundColor: "#F9FAFB",
-                    padding: "10px",
+                    padding: isMobile ? '5px 2px' : '10px',
                     textAlign: "center",
                     fontWeight: 500,
                     color: "#667085",
                     borderBottom: "1px solid #E4E7EC",
                   }}
                 >
-                  {day}
+                  {isMobile ? day.charAt(0) : day}
                 </div>
               ))}
 
@@ -338,9 +450,10 @@ const Calendar = () => {
                   key={`prev-${index}`}
                   style={{
                     backgroundColor: "#F2F4F7",
-                    padding: "8px",
+                    padding: isMobile ? '4px 2px' : '8px',
                     position: "relative",
                     cursor: "pointer",
+                    fontSize: isMobile ? '11px' : 'inherit'
                   }}
                 >
                   <span
@@ -349,8 +462,8 @@ const Calendar = () => {
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
+                      width: isMobile ? '20px' : '28px',
+                      height: isMobile ? '20px' : '28px',
                       borderRadius: "50%",
                       fontWeight: 500,
                     }}
@@ -366,12 +479,14 @@ const Calendar = () => {
                   key={`current-${day}`}
                   style={{
                     backgroundColor: "white",
-                    padding: "8px",
+                    padding: isMobile ? '4px 2px' : '8px',
                     position: "relative",
                     cursor: "pointer",
                     border: day === selectedDay ? "1px solid #0387D9" : "none",
                     backgroundColor:
                       day === selectedDay ? "rgba(3, 135, 217, 0.1)" : "white",
+                    fontSize: isMobile ? '11px' : 'inherit',
+                    overflow: 'hidden'
                   }}
                   onClick={() => setSelectedDay(day)}
                 >
@@ -380,8 +495,8 @@ const Calendar = () => {
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
+                      width: isMobile ? '20px' : '28px',
+                      height: isMobile ? '20px' : '28px',
                       borderRadius: "50%",
                       fontWeight: 500,
                       backgroundColor: isToday(day) ? "#0387D9" : "transparent",
@@ -392,7 +507,7 @@ const Calendar = () => {
                   </span>
 
                   {/* Sample Event Dots - you can make these dynamic */}
-                  {day % 5 === 0 && (
+                  {day % 5 === 0 && !isMobile && (
                     <div style={{ marginTop: "5px" }}>
                       <div
                         style={{
@@ -412,7 +527,18 @@ const Calendar = () => {
                     </div>
                   )}
 
-                  {day % 7 === 0 && (
+                  {/* For mobile, just show a colored dot instead of text */}
+                  {day % 5 === 0 && isMobile && (
+                    <div style={{ 
+                      width: '4px', 
+                      height: '4px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#0387D9',
+                      margin: '2px auto 0'
+                    }}></div>
+                  )}
+
+                  {day % 7 === 0 && !isMobile && (
                     <div style={{ marginTop: "5px" }}>
                       <div
                         style={{
@@ -431,6 +557,17 @@ const Calendar = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* For mobile, just show a colored dot instead of text */}
+                  {day % 7 === 0 && isMobile && (
+                    <div style={{ 
+                      width: '4px', 
+                      height: '4px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#F79009',
+                      margin: '2px auto 0'
+                    }}></div>
+                  )}
                 </div>
               ))}
 
@@ -440,9 +577,10 @@ const Calendar = () => {
                   key={`next-${index}`}
                   style={{
                     backgroundColor: "#F2F4F7",
-                    padding: "8px",
+                    padding: isMobile ? '4px 2px' : '8px',
                     position: "relative",
                     cursor: "pointer",
+                    fontSize: isMobile ? '11px' : 'inherit'
                   }}
                 >
                   <span
@@ -451,8 +589,8 @@ const Calendar = () => {
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
+                      width: isMobile ? '20px' : '28px',
+                      height: isMobile ? '20px' : '28px',
                       borderRadius: "50%",
                       fontWeight: 500,
                     }}
@@ -465,19 +603,24 @@ const Calendar = () => {
 
             {/* Calendar Footer with Legend */}
             <div style={{ marginTop: "15px" }}>
-              <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
+              <div style={{ 
+                display: "flex", 
+                gap: isMobile ? "10px" : "15px", 
+                flexWrap: "wrap",
+                justifyContent: isMobile ? 'center' : 'flex-start'
+              }}>
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "12px",
+                    fontSize: isMobile ? "10px" : "12px",
                     color: "#667085",
                   }}
                 >
                   <span
                     style={{
-                      width: "12px",
-                      height: "12px",
+                      width: isMobile ? "10px" : "12px",
+                      height: isMobile ? "10px" : "12px",
                       borderRadius: "50%",
                       marginRight: "5px",
                       backgroundColor: "#0387D9",
@@ -489,14 +632,14 @@ const Calendar = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "12px",
+                    fontSize: isMobile ? "10px" : "12px",
                     color: "#667085",
                   }}
                 >
                   <span
                     style={{
-                      width: "12px",
-                      height: "12px",
+                      width: isMobile ? "10px" : "12px",
+                      height: isMobile ? "10px" : "12px",
                       borderRadius: "50%",
                       marginRight: "5px",
                       backgroundColor: "#7F56D9",
@@ -508,14 +651,14 @@ const Calendar = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "12px",
+                    fontSize: isMobile ? "10px" : "12px",
                     color: "#667085",
                   }}
                 >
                   <span
                     style={{
-                      width: "12px",
-                      height: "12px",
+                      width: isMobile ? "10px" : "12px",
+                      height: isMobile ? "10px" : "12px",
                       borderRadius: "50%",
                       marginRight: "5px",
                       backgroundColor: "#F79009",
@@ -527,14 +670,14 @@ const Calendar = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "12px",
+                    fontSize: isMobile ? "10px" : "12px",
                     color: "#667085",
                   }}
                 >
                   <span
                     style={{
-                      width: "12px",
-                      height: "12px",
+                      width: isMobile ? "10px" : "12px",
+                      height: isMobile ? "10px" : "12px",
                       borderRadius: "50%",
                       marginRight: "5px",
                       backgroundColor: "#F04438",

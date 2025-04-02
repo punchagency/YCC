@@ -6,7 +6,7 @@ import captain from "../../assets/images/captain1.svg";
 import hod from "../../assets/images/HOD.svg";
 import crew from "../../assets/images/mechanic1.svg";
 
-const GetStarted = ({ name }) => {
+const VendorStarted = ({ name }) => {
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
   const title = "Explore the story behind Yacht Crew Center's journey.";
   const description =
@@ -14,34 +14,34 @@ const GetStarted = ({ name }) => {
 
   // Define the options for the user roles
   const roles = [
+    // {
+    //   image: captain,
+    //   alt: "captain",
+    //   newText: "Captain",
+    //   text: "captain",
+    //   path: "/crew/signup",
+    // },
     {
-      image: captain,
-      alt: "captain",
-      newText: "Captain",
-      text: "captain",
-      path: "/crew/signup",
+      image: hod,
+      alt: "service providers",
+      newText: "Service Provider",
+      text: "service_provider",
+      path: "/vendor/signup",
     },
-    // {
-    //   image: hod,
-    //   alt: "service providers",
-    //   newText: "Service Provider",
-    //   text: "service_provider",
-    //   path: "/vendor/signup",
-    // },
-    // {
-    //   image: crew,
-    //   alt: "suppliers",
-    //   newText: "Supplier",
-    //   text: "supplier",
-    //   path: "/supplier/signup",
-    // },
     {
       image: crew,
-      alt: "crew",
-      newText: "Crew Member",
-      text: "crew_member",
-      path: "/crew/signup",
+      alt: "suppliers",
+      newText: "Supplier",
+      text: "supplier",
+      path: "/supplier/signup",
     },
+    // {
+    //   image: crew,
+    //   alt: "crew",
+    //   newText: "Crew Member",
+    //   text: "crew_member",
+    //   path: "/crew/signup",
+    // },
   ];
 
   // Function to handle navigation
@@ -60,7 +60,7 @@ const GetStarted = ({ name }) => {
   //      }
   //    }
   //  }, [navigate]);
- 
+
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">
       <div
@@ -118,4 +118,4 @@ const GetStarted = ({ name }) => {
   );
 };
 
-export default GetStarted;
+export default VendorStarted;

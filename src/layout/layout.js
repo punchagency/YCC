@@ -5,13 +5,20 @@ import LeftMenu from "../components/menu";
 import { useState } from "react";
 import ChatbotDashboard from "../components/chatbot/chatbot-dashboard";
 import { DashboardAIProvider } from "../context/AIAssistant/dashboardAIContext";
+import { BookingProvider } from "../context/booking/bookingContext";
+import { ServiceProvider } from "../context/service/serviceContext";
+import { ToastProvider } from "../context/toast/toastContext";
+
 const Layout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
+    <ToastProvider>
     <DashboardAIProvider>
-    <main className="flex page relative wrapper">
-      <LeftMenu
-        role={role}
+      <BookingProvider>
+          <ServiceProvider>
+        <main className="flex page relative wrapper">
+          <LeftMenu
+            role={role}
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
       />
@@ -26,7 +33,10 @@ const Layout = ({ role }) => {
         <ChatbotDashboard />
       </div>
     </main>
+    </ServiceProvider>
+    </BookingProvider>
     </DashboardAIProvider>
+    </ToastProvider>
   );
 };
 
