@@ -1,0 +1,60 @@
+/* Skeleton styles */
+.skeleton-wrapper {
+  padding: 20px;
+}
+
+.table-skeleton {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 16px;
+}
+
+.skeleton-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.skeleton-row:last-child {
+  border-bottom: none;
+}
+
+/* Mobile skeleton adjustments */
+@media screen and (max-width: 768px) {
+  .skeleton-wrapper {
+    padding: 12px;
+  }
+
+  .skeleton-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .skeleton-row .p-skeleton {
+    width: 100% !important;
+  }
+
+  .skeleton-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+} 
