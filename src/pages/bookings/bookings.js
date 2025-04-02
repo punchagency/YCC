@@ -548,7 +548,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -559,7 +559,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Booking ID
                             </p>
                           </div>
@@ -573,7 +573,12 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{  display: "flex",
+                              alignItems: "center", 
+                              justifyContent: "center", 
+                              gap: "5px",
+                              padding: "5px"
+                            }}
                           >
                             <img
                               src={sort}
@@ -584,7 +589,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Email
                             </p>
                           </div>
@@ -598,7 +603,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -609,7 +614,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Service Name
                             </p>
                           </div>
@@ -623,7 +628,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -634,7 +639,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Price
                             </p>
                           </div>
@@ -648,7 +653,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -659,7 +664,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Date
                             </p>
                           </div>
@@ -673,7 +678,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -684,7 +689,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Status
                             </p>
                           </div>
@@ -698,7 +703,7 @@ const Bookings = () => {
                           }}
                         >
                           <div
-                            style={{ display: "flex", alignItems: "center" }}
+                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
                           >
                             <img
                               src={sort}
@@ -709,7 +714,7 @@ const Bookings = () => {
                                 marginRight: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, flex: 1, fontSize: "10px" }}>
+                            <p style={{ margin: 0, fontSize: "10px" }}>
                               Notes & Comments
                             </p>
                           </div>
