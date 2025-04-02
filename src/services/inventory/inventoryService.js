@@ -91,14 +91,14 @@ export const getInventoryData = async () => {
     const response = await axios.get(`${API_URL}/inventory`, {
       headers: getAuthHeader(),
     });
-    
+
     // Log the response structure
     console.log("Raw API response:", response);
-    
+
     // Make sure we're returning the correct structure
     return {
       success: true,
-      data: response.data // Should contain { data: [...] }
+      data: response.data, // Should contain { data: [...] }
     };
   } catch (error) {
     console.error("Error fetching inventory data:", error);
