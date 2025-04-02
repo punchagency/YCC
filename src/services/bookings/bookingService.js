@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `${process.env.REACT_APP_API_URL}/bookings`;
+const API_URL = 'https://ycc-ee4d189a3af8.herokuapp.com/api/bookings';
 
 export const getBookingService = async (vendorId) => {
   try {
