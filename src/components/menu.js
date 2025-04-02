@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
-import logo from "../assets/images/logo-login.png";
 import { Button } from "primereact/button";
+import { useUser } from "../context/userContext";
+import logo from "../assets/images/logo-login.png";
 import orderLogo from "../assets/images/crew/order1.png";
 import financeLogo from "../assets/images/crew/financeLogo.png";
 import complianceLogo from "../assets/images/crew/complianceLogo.png";
@@ -15,6 +16,7 @@ import logoutLogo from "../assets/images/crew/logout.png";
 
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
+  const { user } = useUser();
   // Define menu items for each role
   const menuItemsCaptain = [
     {
@@ -237,7 +239,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Dashboard",
       icon: <img src={homeLogo} alt="Dashboard" width={15} height={15} />,
       command: () => {
-        navigate("/crew/inventory/dashboard"); // Navigate to the dashboard
+        navigate("/crew/inventory/dashboard");
       },
     },
     {
@@ -247,27 +249,41 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         navigate("/crew/calendar");
       },
     },
-    {
-      label: "Inventory Management",
-      icon: "pi pi-file",
-      command: () => {
-        navigate("/crew/inventory/inventory");
-      },
-    },
-    {
-      label: "Orders",
-      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
-      command: () => {
-        navigate("/crew/orders");
-      },
-    },
-    {
-      label: "Bookings",
-      icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
-      command: () => {
-        navigate("/crew/bookings");
-      },
-    },
+    // Only show these items if user is a supplier
+    ...(user?.role === "supplier"
+      ? [
+          {
+            label: "Inventory Management",
+            icon: "pi pi-file",
+            command: () => {
+              navigate("/crew/inventory/inventory");
+            },
+          },
+          {
+            label: "Orders",
+            icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+            command: () => {
+              navigate("/crew/orders");
+            },
+          },
+        ]
+      : []),
+      ...(user?.role === "service_provider" ? [
+        {
+          label: "Bookings",
+          icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
+          command: () => {
+            navigate("/crew/bookings");
+          },
+        },
+      ] : []),
+    // {
+    //   label: "Bookings",
+    //   icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
+    //   command: () => {
+    //     navigate("/crew/bookings");
+    //   },
+    // },
     {
       label: "Financial Management",
       icon: (

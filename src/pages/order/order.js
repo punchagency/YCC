@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
-import { Toast } from "primereact/toast";
+// import { Toast } from "primereact/toast";
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 import lockLogo from "../../assets/images/crew/lockLogo.png";
 import dropdown from "../../assets/images/crew/dropdown.png";
@@ -14,15 +14,31 @@ import iconContainer from "../../assets/images/crew/iconContainer.png";
 import neworder from "../../assets/images/crew/neworder.png";
 import "./order.css"; // We'll create this CSS file for transitions
 import { getInventoryData } from "../../services/inventory/inventoryService"; // Add this import
-import { createOrder } from "../../services/order/orderService"; // Add this import
+import { createOrder, getOrders } from "../../services/order/orderService"; // Add this import
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { formatCurrency, formatDate } from "../../utils/formatters";
+import { useToast } from "../../components/Toast";
+import { TableSkeleton } from "../../components/TableSkeleton"; // Add this import
 
 const Order = () => {
   const navigate = useNavigate();
-  const toast = useRef(null);
+  const { showSuccess, showError } = useToast();
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [productOptions, setProductOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [summaryData, setSummaryData] = useState({
+    allOrders: 0,
+    pending: 0,
+    completed: 0,
+    cancelled: 0,
+    returned: 0,
+    damaged: 0,
+  });
+  const [selectedOrders, setSelectedOrders] = useState([]);
 
   // Add back the status options
   const statusOptions = [
@@ -60,7 +76,7 @@ const Order = () => {
     try {
       const result = await getInventoryData();
       console.log("API Response:", result);
-      
+
       if (result.success) {
         const inventoryData = result.data.data.result || [];
         if (!Array.isArray(inventoryData)) {
@@ -78,28 +94,18 @@ const Order = () => {
           category: item.product?.category,
           serviceArea: item.product?.serviceArea,
         }));
-        
+
         setProductOptions(options);
       } else {
         console.error("Failed to load inventory data:", result.error);
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to load product data",
-            life: 3000,
-          });
+        {
+          showError("Failed to load product data");
         }
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while loading product data",
-          life: 3000,
-        });
+      {
+        showError("An unexpected error occurred while loading product data");
       }
     }
   };
@@ -117,11 +123,13 @@ const Order = () => {
       const selectedProduct = productOptions.find((p) => p.value === e.value);
       setOrderForm({
         ...orderForm,
-        products: [{
-          id: selectedProduct.productId, // Use the product ID instead of inventory ID
-          inventoryId: e.value, // Store inventory ID if needed
-          quantity: orderForm.products[0].quantity
-        }]
+        products: [
+          {
+            id: selectedProduct.productId, // Use the product ID instead of inventory ID
+            inventoryId: e.value, // Store inventory ID if needed
+            quantity: orderForm.products[0].quantity,
+          },
+        ],
       });
     } else {
       setOrderForm({
@@ -134,10 +142,12 @@ const Order = () => {
   const handleQuantityChange = (e) => {
     setOrderForm({
       ...orderForm,
-      products: [{
-        ...orderForm.products[0],
-        quantity: parseInt(e.target.value) || 1
-      }]
+      products: [
+        {
+          ...orderForm.products[0],
+          quantity: parseInt(e.target.value) || 1,
+        },
+      ],
     });
   };
 
@@ -149,18 +159,12 @@ const Order = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate form
     if (
       !orderForm.customerName ||
       !orderForm.products[0].id ||
       !orderForm.deliveryDate
     ) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Please fill in all required fields",
-        life: 3000,
-      });
+      showError("Please fill in all required fields");
       return;
     }
 
@@ -171,12 +175,14 @@ const Order = () => {
       const orderData = {
         supplierId: "67ced03d4c641a3d1af80cc6", // Replace with actual supplier ID
         customerName: orderForm.customerName,
-        products: [{
-          id: orderForm.products[0].id, // This is now the product ID
-          quantity: parseInt(orderForm.products[0].quantity)
-        }],
+        products: [
+          {
+            id: orderForm.products[0].id, // This is now the product ID
+            quantity: parseInt(orderForm.products[0].quantity),
+          },
+        ],
         deliveryDate: orderForm.deliveryDate,
-        additionalNotes: orderForm.additionalNotes || ""
+        additionalNotes: orderForm.additionalNotes || "",
       };
 
       console.log("Sending order data:", orderData);
@@ -184,12 +190,7 @@ const Order = () => {
       console.log("Order response:", response);
 
       if (response.success) {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Order created successfully",
-          life: 3000,
-        });
+        showSuccess("Order created successfully");
 
         // Reset form
         setOrderForm({
@@ -201,21 +202,11 @@ const Order = () => {
 
         setShowOrderForm(false);
       } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: response.error || "Failed to create order",
-          life: 3000,
-        });
+        showError(response.error || "Failed to create order");
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An unexpected error occurred",
-        life: 3000,
-      });
+      showError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -280,7 +271,7 @@ const Order = () => {
                 All Orders
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.allOrders}
               </p>
             </div>
             <div>
@@ -290,7 +281,7 @@ const Order = () => {
                 Pending
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.pending}
               </p>
             </div>
             <div>
@@ -300,7 +291,7 @@ const Order = () => {
                 Completed
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.completed}
               </p>
             </div>
           </div>
@@ -350,10 +341,10 @@ const Order = () => {
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
-                Canceled
+                Cancelled
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.cancelled}
               </p>
             </div>
             <div>
@@ -363,7 +354,7 @@ const Order = () => {
                 Returned
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.returned}
               </p>
             </div>
             <div>
@@ -373,7 +364,7 @@ const Order = () => {
                 Damaged
               </p>
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
-                0
+                {summaryData.damaged}
               </p>
             </div>
           </div>
@@ -445,6 +436,71 @@ const Order = () => {
             </div>
           </div>
         </div>
+        <div className="table-container">
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Customer Name</th>
+                <th>Order Date</th>
+                <th>Order Type</th>
+                <th>Tracking ID</th>
+                <th>Order Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td data-label="Select">
+                    <input
+                      type="checkbox"
+                      checked={selectedOrders.includes(order)}
+                      onChange={(e) => {
+                        const selected = e.target.checked;
+                        setSelectedOrders(
+                          selected
+                            ? [...selectedOrders, order]
+                            : selectedOrders.filter((o) => o.id !== order.id)
+                        );
+                      }}
+                    />
+                  </td>
+                  <td data-label="Customer Name">{order.customerName}</td>
+                  <td data-label="Order Date">{formatDate(order.orderDate)}</td>
+                  <td data-label="Order Type">{order.orderType}</td>
+                  <td data-label="Tracking ID">
+                    <div className="tracking-id">
+                      <span>{order.orderId}</span>
+                      <i className="pi pi-copy" />
+                    </div>
+                  </td>
+                  <td data-label="Order Total">
+                    {formatCurrency(order.totalPrice)}
+                  </td>
+                  <td data-label="Status">
+                    <span
+                      className={`status-badge status-${order.status.toLowerCase()}`}
+                    >
+                      {order.status}
+                    </span>
+                  </td>
+                  <td data-label="Actions">
+                    <div className="action-buttons">
+                      <button className="action-btn" title="View Details">
+                        <i className="pi pi-eye" />
+                      </button>
+                      <button className="action-btn" title="Edit Order">
+                        <i className="pi pi-pencil" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   };
@@ -452,11 +508,12 @@ const Order = () => {
   // Add functions to handle multiple products
   const handleProductChange = (index, field, value) => {
     const updatedProducts = [...orderForm.products];
-    updatedProducts[index][field] = field === 'quantity' ? parseInt(value) : value;
-    
+    updatedProducts[index][field] =
+      field === "quantity" ? parseInt(value) : value;
+
     setOrderForm({
       ...orderForm,
-      products: updatedProducts
+      products: updatedProducts,
     });
   };
 
@@ -464,7 +521,7 @@ const Order = () => {
   const addProduct = () => {
     setOrderForm({
       ...orderForm,
-      products: [...orderForm.products, { id: null, quantity: 1 }]
+      products: [...orderForm.products, { id: null, quantity: 1 }],
     });
   };
 
@@ -474,15 +531,70 @@ const Order = () => {
       const updatedProducts = orderForm.products.filter((_, i) => i !== index);
       setOrderForm({
         ...orderForm,
-        products: updatedProducts
+        products: updatedProducts,
       });
     }
   };
 
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await getOrders();
+      if (response.success) {
+        setOrders(response.data.data.result);
+        calculateSummary(response.data.data.result);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateSummary = (orders) => {
+    const summary = orders.reduce(
+      (acc, order) => {
+        acc.allOrders++;
+        acc[order.status.toLowerCase()]++;
+        return acc;
+      },
+      {
+        allOrders: 0,
+        pending: 0,
+        completed: 0,
+        cancelled: 0,
+        returned: 0,
+        damaged: 0,
+      }
+    );
+    setSummaryData(summary);
+  };
+
+  const statusBodyTemplate = (rowData) => {
+    return (
+      <span className={`status-badge status-${rowData.status.toLowerCase()}`}>
+        {rowData.status}
+      </span>
+    );
+  };
+
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <div className="action-buttons">
+        <Button icon="pi pi-eye" className="p-button-rounded p-button-text" />
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-rounded p-button-text"
+        />
+      </div>
+    );
+  };
+
   return (
     <>
-      <Toast ref={toast} />
-
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
@@ -503,349 +615,745 @@ const Order = () => {
           renderMobileSummaryBoxes()
         ) : (
           // Desktop view
-          <div className="box-order-container">
-            {/* Original desktop boxes */}
+
+          <div className="orders-summary">
+            <div style={{ padding: "0 10px" }}>
+              {/* First summary box */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    padding: "15px",
+                    marginBottom: "10px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    width: "100%",
+                    marginRight: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <img
+                      src={lockLogo}
+                      alt="lockLogo"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+                      <img
+                        src={dropdown}
+                        alt="dropdown"
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          marginLeft: "5px",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        All Orders
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.allOrders}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Pending
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.pending}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Completed
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.completed}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Second summary box */}
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    padding: "15px",
+                    marginBottom: "10px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    width: "100%",
+                    marginLeft: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <img
+                      src={lockLogo}
+                      alt="lockLogo"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+                      <img
+                        src={dropdown}
+                        alt="dropdown"
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          marginLeft: "5px",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Cancelled
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.cancelled}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Returned
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.returned}
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Damaged
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {summaryData.damaged}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Third summary box */}
+                <div
+                  style={{
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    padding: "15px",
+                    marginBottom: "15px",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    width: "100%",
+                    marginLeft: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <img
+                      src={cart}
+                      alt="cart"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
+                      <img
+                        src={dropdown}
+                        alt="dropdown"
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          marginLeft: "5px",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#EF4444",
+                        }}
+                      >
+                        Abandoned Cart
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        0
+                      </p>
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          margin: "0 0 5px 0",
+                          fontSize: "13px",
+                          color: "#666",
+                        }}
+                      >
+                        Customers
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        0
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="table-container">
+              <table className="orders-table">
+                
+                <thead>
+                  <tr>
+                    {/* <th>Select</th> */}
+                    <th>Customer Name</th>
+                    <th>Order Date</th>
+                    {/* <th>Order Type</th> */}
+                    <th>Tracking ID</th>
+                    <th>Order Total</th>
+                    <th>Status</th>
+                    {/* <th>Actions</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order.id}>
+                      {/* <td data-label="Select">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.includes(order)}
+                          onChange={(e) => {
+                            const selected = e.target.checked;
+                            setSelectedOrders(
+                              selected
+                                ? [...selectedOrders, order]
+                                : selectedOrders.filter(
+                                    (o) => o.id !== order.id
+                                  )
+                            );
+                          }}
+                        />
+                      </td> */}
+                      <td data-label="Customer Name">{order.customerName}</td>
+                      <td data-label="Order Date">
+                        {formatDate(order.orderDate)}
+                      </td>
+                      {/* <td data-label="Order Type">{order.orderType}</td> */}
+                      <td data-label="Tracking ID">
+                        <div className="tracking-id">
+                          <span>{order.orderId}</span>
+                          <i className="pi pi-copy" />
+                        </div>
+                      </td>
+                      <td data-label="Order Total">
+                        {formatCurrency(order.totalPrice)}
+                      </td>
+                      <td data-label="Status">
+                        <span
+                          className={`status-badge status-${order.status.toLowerCase()}`}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                      {/* <td data-label="Actions">
+                        <div className="action-buttons">
+                          <button className="action-btn" title="View Details">
+                            <i className="pi pi-eye" />
+                          </button>
+                          <button className="action-btn" title="Edit Order">
+                            <i className="pi pi-pencil" />
+                          </button>
+                        </div>
+                      </td> */}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         <SwitchTransition mode="out-in">
           <CSSTransition
-            key={showOrderForm ? "form" : "noOrders"}
-            timeout={300}
+            key={showOrderForm}
+            timeout={400}
             classNames="fade"
             unmountOnExit
           >
-            {showOrderForm ? (
-              <div
-                className="order-form-container"
-                style={{
-                  padding: isMobile ? "15px" : "20px",
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                  margin: "20px 0",
-                  width: isMobile ? "95%" : "95%",
-                  minHeight: "300px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignContent: "center",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                }}
-              >
+            <div>
+              {loading ? (
+                <TableSkeleton showSummary={true} />
+              ) : showOrderForm ? (
                 <div
+                  className="order-form-container"
                   style={{
+                    padding: isMobile ? "15px" : "20px",
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                    margin: "20px 0",
+                    width: isMobile ? "95%" : "95%",
+                    minHeight: "300px",
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "20px",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    marginLeft: "auto",
+                    marginRight: "auto",
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>New Order</h3>
-                  <Button
-                    icon="pi pi-times"
-                    className="p-button-rounded p-button-text"
-                    onClick={() => setShowOrderForm(false)}
-                    aria-label="Close"
-                  />
-                </div>
-
-                <div className="p-fluid">
-                  {/* Order Name and Customer Name */}
                   <div
-                    className="p-grid p-formgrid"
                     style={{
                       display: "flex",
-                      flexDirection: isMobile ? "column" : "row",
-                      gap: "15px",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       marginBottom: "20px",
                     }}
                   >
-                    {/* <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="orderName"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Product Name*
-                      </label>
-                      <InputText
-                        id="orderName"
-                        name="orderName"
-                        value={orderForm.orderName}
-                        onChange={handleInputChange}
-                        placeholder="Enter order name"
-                        style={{ width: "100%" }}
-                      />
-                    </div> */}
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="customerName"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Customer Name*
-                      </label>
-                      <InputText
-                        id="customerName"
-                        name="customerName"
-                        value={orderForm.customerName}
-                        onChange={handleInputChange}
-                        placeholder="Enter customer name"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Stock Quantity and Select Product */}
-                  <div
-                    className="p-grid p-formgrid"
-                    style={{
-                      display: "flex",
-                      flexDirection: isMobile ? "column" : "row",
-                      gap: "15px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="quantity"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Quantity*
-                      </label>
-                      <InputText
-                        id="quantity"
-                        name="quantity"
-                        value={orderForm.products[0].quantity}
-                        onChange={handleQuantityChange}
-                        placeholder="Enter quantity"
-                        keyfilter="pint"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="selectedProduct"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Select Product*
-                      </label>
-                      <Dropdown
-                        id="selectedProduct"
-                        value={orderForm.products[0].inventoryId}
-                        options={productOptions}
-                        onChange={(e) => handleDropdownChange(e, "selectedProduct")}
-                        placeholder="Select a product"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Order Status and Delivery Date */}
-                  <div
-                    className="p-grid p-formgrid"
-                    style={{
-                      display: "flex",
-                      flexDirection: isMobile ? "column" : "row",
-                      gap: "15px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="orderStatus"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Order Status*
-                      </label>
-                      <Dropdown
-                        id="orderStatus"
-                        value={orderForm.orderStatus}
-                        options={statusOptions}
-                        onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                        placeholder="Select status"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="deliveryDate"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Delivery Date*
-                      </label>
-                      <Calendar
-                        id="deliveryDate"
-                        value={orderForm.deliveryDate}
-                        onChange={handleDateChange}
-                        showIcon
-                        placeholder="Select date"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Notes */}
-                  <div className="p-field">
-                    <label
-                      htmlFor="notes"
-                      style={{
-                        display: "block",
-                        marginBottom: "8px",
-                        fontWeight: "500",
-                        textAlign: "left",
-                      }}
-                    >
-                      Notes
-                    </label>
-                    <InputText
-                      id="notes"
-                      name="notes"
-                      value={orderForm.notes}
-                      onChange={handleInputChange}
-                      placeholder="Add notes (optional)"
-                      style={{ width: "100%" }}
-                    />
-                  </div>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: isMobile ? "column" : "row",
-                      justifyContent: isMobile ? "center" : "flex-end",
-                      gap: "15px",
-                      marginTop: "20px",
-                    }}
-                  >
+                    <h3 style={{ margin: 0 }}>New Order</h3>
                     <Button
-                      label="Cancel"
                       icon="pi pi-times"
+                      className="p-button-rounded p-button-text"
                       onClick={() => setShowOrderForm(false)}
-                      style={{
-                        backgroundColor: "#EF4444",
-                        border: "none",
-                        width: isMobile ? "100%" : "150px",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "12px",
-                        marginBottom: isMobile ? "10px" : "0",
-                      }}
-                    />
-                    <Button
-                      label="Create Order"
-                      icon="pi pi-check"
-                      onClick={() => {
-                        handleSubmit();
-                        setShowOrderForm(false);
-                      }}
-                      style={{
-                        backgroundColor: "#0387D9",
-                        border: "none",
-                        width: isMobile ? "100%" : "150px",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "12px",
-                      }}
+                      aria-label="Close"
                     />
                   </div>
+
+                  <div className="p-fluid">
+                    {/* Order Name and Customer Name */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        flexDirection: isMobile ? "column" : "row",
+                        gap: "15px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      {/* <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="orderName"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Product Name*
+                        </label>
+                        <InputText
+                          id="orderName"
+                          name="orderName"
+                          value={orderForm.orderName}
+                          onChange={handleInputChange}
+                          placeholder="Enter order name"
+                          style={{ width: "100%" }}
+                        />
+                      </div> */}
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="customerName"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Customer Name*
+                        </label>
+                        <InputText
+                          id="customerName"
+                          name="customerName"
+                          value={orderForm.customerName}
+                          onChange={handleInputChange}
+                          placeholder="Enter customer name"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Stock Quantity and Select Product */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        flexDirection: isMobile ? "column" : "row",
+                        gap: "15px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="quantity"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Quantity*
+                        </label>
+                        <InputText
+                          id="quantity"
+                          name="quantity"
+                          value={orderForm.products[0].quantity}
+                          onChange={handleQuantityChange}
+                          placeholder="Enter quantity"
+                          keyfilter="pint"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="selectedProduct"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Select Product*
+                        </label>
+                        <Dropdown
+                          id="selectedProduct"
+                          value={orderForm.products[0].inventoryId}
+                          options={productOptions}
+                          onChange={(e) =>
+                            handleDropdownChange(e, "selectedProduct")
+                          }
+                          placeholder="Select a product"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Order Status and Delivery Date */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        flexDirection: isMobile ? "column" : "row",
+                        gap: "15px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="orderStatus"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Order Status*
+                        </label>
+                        <Dropdown
+                          id="orderStatus"
+                          value={orderForm.orderStatus}
+                          options={statusOptions}
+                          onChange={(e) =>
+                            handleDropdownChange(e, "orderStatus")
+                          }
+                          placeholder="Select status"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="deliveryDate"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Delivery Date*
+                        </label>
+                        <Calendar
+                          id="deliveryDate"
+                          value={orderForm.deliveryDate}
+                          onChange={handleDateChange}
+                          showIcon
+                          placeholder="Select date"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Notes */}
+                    <div className="p-field">
+                      <label
+                        htmlFor="notes"
+                        style={{
+                          display: "block",
+                          marginBottom: "8px",
+                          fontWeight: "500",
+                          textAlign: "left",
+                        }}
+                      >
+                        Notes
+                      </label>
+                      <InputText
+                        id="notes"
+                        name="notes"
+                        value={orderForm.notes}
+                        onChange={handleInputChange}
+                        placeholder="Add notes (optional)"
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: isMobile ? "column" : "row",
+                        justifyContent: isMobile ? "center" : "flex-end",
+                        gap: "15px",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        onClick={() => setShowOrderForm(false)}
+                        style={{
+                          backgroundColor: "#EF4444",
+                          border: "none",
+                          width: isMobile ? "100%" : "150px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                          marginBottom: isMobile ? "10px" : "0",
+                        }}
+                      />
+                      <Button
+                        label="Create Order"
+                        icon="pi pi-check"
+                        onClick={() => {
+                          handleSubmit();
+                          setShowOrderForm(false);
+                        }}
+                        style={{
+                          backgroundColor: "#0387D9",
+                          border: "none",
+                          width: isMobile ? "100%" : "150px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div
-                className="no-order-container"
-                style={{
-                  padding: isMobile ? "20px 10px" : "20px",
-                  textAlign: "center",
-                }}
-              >
+              ) : !loading && orders.length === 0 ? (
                 <div
-                  className="no-order-container-wrapper"
+                  className="no-order-container"
                   style={{
-                    maxWidth: "400px",
-                    margin: "0 auto",
+                    padding: isMobile ? "20px 10px" : "20px",
+                    textAlign: "center",
                   }}
                 >
-                  <div>
-                    <img
-                      src={iconContainer}
-                      alt="iconContainer"
-                      className="icon-container"
-                      style={{
-                        width: isMobile ? "80px" : "100px",
-                        marginBottom: "15px",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <h3 style={{ margin: "0 0 10px 0" }}>No Orders Yet?</h3>
-                    <p
-                      style={{
-                        margin: "0 0 20px 0",
-                        fontSize: "14px",
-                        color: "#666",
-                      }}
-                    >
-                      Add products to your store and start selling to see orders
-                    </p>
-                    <button
-                      onClick={() => setShowOrderForm(true)}
-                      style={{
-                        backgroundColor: "#0387D9",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "10px 20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        margin: "0 auto",
-                        cursor: "pointer",
-                        width: isMobile ? "100%" : "auto",
-                      }}
-                    >
+                  <div
+                    className="no-order-container-wrapper"
+                    style={{
+                      maxWidth: "100%",
+                      margin: "0 auto",
+                    }}
+                  >
+                    <div>
                       <img
-                        src={neworder}
-                        alt="neworder"
-                        className="neworder-icon"
-                        style={{ width: "16px", height: "16px" }}
+                        src={iconContainer}
+                        alt="iconContainer"
+                        className="icon-container"
+                        style={{
+                          width: isMobile ? "80px" : "100px",
+                          marginBottom: "15px",
+                        }}
                       />
-                      <span>Create New Order</span>
-                    </button>
+                    </div>
+                    <div className="orders">
+                      <h3 style={{ margin: "0 0 10px 0" }}>No Orders Yet?</h3>
+                      <p
+                        style={{
+                          margin: "0 0 20px 0",
+                          fontSize: "14px",
+                          color: "#666",
+                        }}
+                      >
+                        Add products to your store and start selling to see
+                        orders
+                      </p>
+                      <button
+                        onClick={() => setShowOrderForm(true)}
+                        style={{
+                          backgroundColor: "#0387D9",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          padding: "10px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          margin: "0 auto",
+                          cursor: "pointer",
+                          width: isMobile ? "100%" : "auto",
+                        }}
+                      >
+                        <img
+                          src={neworder}
+                          alt="neworder"
+                          className="neworder-icon"
+                          style={{ width: "16px", height: "16px" }}
+                        />
+                        <span>Create New Order</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ) : null}
+            </div>
           </CSSTransition>
         </SwitchTransition>
       </div>
