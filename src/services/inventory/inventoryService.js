@@ -2,7 +2,7 @@ import axios from "axios";
 import { useUser } from "../../context/userContext"; // Import at the top level
 
 // Use the base API URL, not the auth URL
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = 'https://ycc-ee4d189a3af8.herokuapp.com/api';
 
 // Add authentication token to requests
 const getAuthHeader = () => {
@@ -91,14 +91,14 @@ export const getInventoryData = async () => {
     const response = await axios.get(`${API_URL}/inventory`, {
       headers: getAuthHeader(),
     });
-    
+
     // Log the response structure
     console.log("Raw API response:", response);
-    
+
     // Make sure we're returning the correct structure
     return {
       success: true,
-      data: response.data // Should contain { data: [...] }
+      data: response.data, // Should contain { data: [...] }
     };
   } catch (error) {
     console.error("Error fetching inventory data:", error);
