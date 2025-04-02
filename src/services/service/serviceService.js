@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = `https://ycc-ee4d189a3af8.herokuapp.com/api/services`;
+const API_URL = 'https://ycc-ee4d189a3af8.herokuapp.com/api/services';
 const token = localStorage.getItem("token");
 
 export const getAllVendorServices = async () => {
