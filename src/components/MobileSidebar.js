@@ -86,18 +86,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             overflowY: "auto",
           }}
         >
-          <li className={isActive("/dashboard") ? "active" : ""}>
+          <li className={isActive("/admin/dashboard") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/inventory/dashboard")}
+              onClick={() => handleNavigation("/admin/dashboard")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/dashboard") ? "#0387D9" : "#333",
+                color: isActive("/admin/dashboard") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/dashboard")
+                backgroundColor: isActive("/admin/dashboard")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -114,18 +114,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/calendar") ? "active" : ""}>
+          <li className={isActive("/admin/calendar") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/calendar")}
+              onClick={() => handleNavigation("/admin/calendar")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/calendar") ? "#0387D9" : "#333",
+                color: isActive("/admin/calendar") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/calendar")
+                backgroundColor: isActive("/admin/calendar")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -141,18 +141,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/inventory") ? "active" : ""}>
+          <li className={isActive("/admin/inventory") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/inventory/inventory")}
+              onClick={() => handleNavigation("/admin/inventory")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/inventory") ? "#0387D9" : "#333",
+                color: isActive("/admin/inventory") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/inventory")
+                backgroundColor: isActive("/admin/inventory")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -165,18 +165,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/orders") ? "active" : ""}>
+          <li className={isActive("/admin/orders") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/orders")}
+              onClick={() => handleNavigation("/admin/orders")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/orders") ? "#0387D9" : "#333",
+                color: isActive("/admin/orders") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/orders")
+                backgroundColor: isActive("/admin/orders")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -193,18 +193,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/bookings") ? "active" : ""}>
+          <li className={isActive("/admin/bookings") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/bookings")}
+              onClick={() => handleNavigation("/admin/bookings")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/bookings") ? "#0387D9" : "#333",
+                color: isActive("/admin/bookings") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/bookings")
+                backgroundColor: isActive("/admin/bookings")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -221,18 +221,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/financial") ? "active" : ""}>
+          <li className={isActive("/admin/financial-management") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/financial-management")}
+              onClick={() => handleNavigation("/admin/financial-management")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/financial") ? "#0387D9" : "#333",
+                color: isActive("/admin/financial-management") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/financial")
+                backgroundColor: isActive("/admin/financial-management")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -249,18 +249,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/notifications") ? "active" : ""}>
+          <li className={isActive("/admin/notifications") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/notifications")}
+              onClick={() => handleNavigation("/admin/notifications")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/notifications") ? "#0387D9" : "#333",
+                color: isActive("/admin/notifications") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/notifications")
+                backgroundColor: isActive("/admin/notifications")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -277,18 +277,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/reports") ? "active" : ""}>
+          <li className={isActive("/admin/reports") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/reports")}
+              onClick={() => handleNavigation("/admin/reports")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/reports") ? "#0387D9" : "#333",
+                color: isActive("/admin/reports") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/reports")
+                backgroundColor: isActive("/admin/reports")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -305,18 +305,18 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
             </a>
           </li>
 
-          <li className={isActive("/settings") ? "active" : ""}>
+          <li className={isActive("/admin/settings") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/settings")}
+              onClick={() => handleNavigation("/admin/settings")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/settings") ? "#0387D9" : "#333",
+                color: isActive("/admin/settings") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/settings")
+                backgroundColor: isActive("/admin/settings")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -336,15 +336,15 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
           <li className={isActive("/help") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/help")}
+              onClick={() => handleNavigation("/admin/help")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/help") ? "#0387D9" : "#333",
+                color: isActive("/admin/help") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/help")
+                backgroundColor: isActive("/admin/help")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",
@@ -364,15 +364,15 @@ const MobileSidebar = ({ isOpen, onClose, role }) => {
           <li className={isActive("/contact") ? "active" : ""}>
             <a
               href="#"
-              onClick={() => handleNavigation("/crew/contact")}
+              onClick={() => handleNavigation("/admin/contact")}
               style={{
                 display: "flex",
                 alignItems: "center",
                 padding: "15px 20px",
                 textDecoration: "none",
-                color: isActive("/contact") ? "#0387D9" : "#333",
+                color: isActive("/admin/contact") ? "#0387D9" : "#333",
                 borderBottom: "1px solid #f5f5f5",
-                backgroundColor: isActive("/contact")
+                backgroundColor: isActive("/admin/contact")
                   ? "#f0f7ff"
                   : "transparent",
                 textAlign: "left",

@@ -145,12 +145,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   ]);
 
   // Get user's name from the profile data
-  const userName =
-    user?.profile?.firstName && user?.profile?.lastName
-      ? `${user.profile.firstName} ${user.profile.lastName}`
-      : user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.profile?.businessName;
+  const userName = "Admin";
 
   // Get profile picture if available
   const profilePicture = user?.profile?.profilePicture || avatar;

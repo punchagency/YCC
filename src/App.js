@@ -67,7 +67,7 @@ import Document from "./pages/crew/document-access/document";
 import CrewDocumentDetails from "./pages/crew/document-access/document-details";
 import CrewSetting from "./pages/crew/settings/crewsetting";
 import Inventory from "./pages/inventory/inventory";
-import Layout from "./layout/layout";
+import AdminLayout from "./layout/layout";
 import EditInvoice from "./pages/finance-management/edit-invoice";
 import EditExpense from "./pages/finance-management/edit-expense";
 import CrewHistoryEdit from "./pages/crew/maintenanace-task/history-edit";
@@ -93,7 +93,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Calendar from "./pages/calendar/calendar";
 import { NotificationsProvider } from "./context/notificationsContext";
 import { ToastProvider } from "./components/Toast";
-
+import AdminFinancialManagement from "./pages/dashboard/admin/financial-management/admin-financial-management";
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 //context imports
 
@@ -137,8 +137,21 @@ function App() {
             <Route path="/contact-us" element={<ContactUs />} />
           </Route>
 
-          <Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard1 />} />
+            <Route path="/admin/bookings-management" element={<Bookings />} />
+            <Route path="/admin/orders-management" element={<Order />} />
+            <Route path="/admin/inventory-management" element={<Invent />} />
+            <Route path="/admin/financial-management" element={<AdminFinancialManagement />} />
+            <Route path="/admin/calendar-management" element={<Calendar />} />
+            <Route path="/admin/notifications" element={<Notifications />} />
+            <Route path="/admin/reports" element={<Reports />} />
+            <Route path="/admin/settings" element={<Settings />} />
+            {/* Add other admin routes here look at the setup of the above admin dashboard route */}
+
+
           </Route>
         </Routes>
       </NotificationsProvider>
