@@ -28,6 +28,231 @@
   --header-bg: #051825;
 }
 
+// Notification styles starts here
+.notification-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  padding: 10px 5px;
+  width: 600px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-left: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  .all-notification {
+    background: #0387d9;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+  }
+  div {
+    margin-left: 20px;
+  }
+}
+
+.notification-table-container {
+  background: #ffffff;
+  width: 98%;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+}
+
+.notification-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; // Add this for better column control
+
+  // Define column widths
+  th, td {
+    &:nth-child(1) { // Priority column
+      width: 10%;
+    }
+    &:nth-child(2) { // Type column
+      width: 10%;
+    }
+    &:nth-child(3) { // Description column
+      width: 20%; // Increased width for description
+    }
+    &:nth-child(4) { // Status column
+      width: 10%;
+    }
+    &:nth-child(5) { // Details column
+      width: 10%;
+    }
+  }
+
+  // Header styles
+  .header-cell {
+    padding: 15px;
+    text-align: left;
+    white-space: nowrap; // Prevent header text wrapping
+  }
+
+  // Body styles
+  .body-cell {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+
+    .body-content {
+      white-space: nowrap; // Prevent content wrapping
+      overflow: hidden;
+      text-overflow: ellipsis; // Add ellipsis for long text
+    }
+
+    // Description column specific styling
+    &:nth-child(3) .body-content {
+      white-space: normal; // Allow description text to wrap
+      line-height: 1.4;
+    }
+  }
+
+  // ... rest of your existing styles ...
+}
+// Priority styles
+.priority-high {
+  background-color: #E2F9F0;
+  width: 100px;
+  text-align: center;
+  font-weight: bold;
+  color: #1A9E6D;
+  border-radius: 5px;
+  padding: 10px 0px;
+}
+
+.priority-medium {
+  background-color: #FFFEDB;
+  width: 100px;
+  text-align: center;
+  font-weight: bold;
+  color: #827F29;
+  border-radius: 5px;
+  padding: 10px 0px;
+}
+
+.priority-low {
+  background-color: #E414171A;
+  width: 100px;
+  text-align: center;
+  font-weight: bold;
+  color: #DB5F61;
+  border-radius: 5px;
+  padding: 10px 0px;
+}
+
+// Status styles
+
+.status-assign-to-manager {
+  background-color: #F2E3FF;
+  width: 140px;
+  text-align: center;
+  font-weight: bold;
+  color: #906FAD;
+  border-radius: 5px;
+  padding: 10px 5px;
+}
+
+.status-acknowledged {
+  background-color: #DBF4FF;
+  width: 140px;
+  text-align: center;
+  font-weight: bold;
+  color: #668796;
+  border-radius: 5px;
+  padding: 10px 5px;
+}
+
+.status-resolve-archive {
+  background-color: #E3FFDB;
+  width: 140px;
+  text-align: center;
+  font-weight: bold;
+  color: #768F6F;
+  border-radius: 5px;
+  padding: 10px 5px;
+}
+.view-details-btn {
+  border: 1px solid #E5E7EB !important;
+  color: #495057 !important;
+  background: transparent !important;
+  padding: 8px 16px !important;
+  border-radius: 5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    background: #f0f9ff !important;
+  }
+}
+
+.notification-details-modal {
+  .p-dialog-header {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    
+    .p-dialog-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
+
+  .notification-details-content {
+    padding: 1rem;
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        color: #666;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        color: #333;
+        font-weight: 400;
+      }
+
+      .priority-tag {
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: 500;
+
+        &.priority-high {
+          background-color: #E2F9F0;
+          color: #1A9E6D;
+        }
+
+        &.priority-medium {
+          background-color: #FFFEDB;
+          color: #827F29;
+        }
+
+        &.priority-low {
+          background-color: #E414171A;
+          color: #DB5F61;
+        }
+      }
+    }
+  }
+}
+
+// end of Notification styles
+
 body {
   margin: 0;
   padding: 0;
@@ -1676,12 +1901,11 @@ ul {
   .profile-image {
     margin-left: 10px;
   }
-  .inventory-dashboard-container{
-    .inventory-dashboard-container-wrapper{
+  .inventory-dashboard-container {
+    .inventory-dashboard-container-wrapper {
       background-color: orange;
     }
   }
- 
 }
 
 // Form group responsive styles
@@ -1726,7 +1950,7 @@ ul {
           padding: 6px 10px;
         }
 
-  input {
+        input {
           border: none;
           outline: none;
           width: 100%;
@@ -1961,7 +2185,7 @@ ul {
     padding-top: 45px;
     div:nth-child(1) {
       display: flex;
-    flex-direction: column;
+      flex-direction: column;
       background: #eff1ff;
       width: 150px;
       height: 130px;
@@ -1982,7 +2206,7 @@ ul {
     }
     div:nth-child(2) {
       display: flex;
-    flex-direction: column;
+      flex-direction: column;
       background: #ffffe3;
       width: 150px;
       height: 130px;
@@ -1998,8 +2222,8 @@ ul {
       img {
         width: 20px;
         height: 20px;
-      margin-bottom: 20px;
-    }
+        margin-bottom: 20px;
+      }
     }
     div:nth-child(3) {
       display: flex;
@@ -2052,8 +2276,8 @@ ul {
     justify-content: space-between;
     align-items: center;
     .orders {
-    display: flex;
-    justify-content: center;
+      display: flex;
+      justify-content: center;
       align-items: center;
       gap: 20px;
       margin-left: 30px;
@@ -2095,7 +2319,7 @@ ul {
   }
 
   .order-table {
-      width: 100%;
+    width: 100%;
     border-collapse: collapse;
 
     td {
@@ -2448,7 +2672,7 @@ ul {
 .report-container {
   display: flex;
   justify-content: space-between;
-    width: 100%;
+  width: 100%;
   .reportdiv {
     display: flex;
     .fbox {
@@ -2486,7 +2710,7 @@ ul {
     background: #2fea9b;
     width: 250px;
     height: 5px;
-      border-radius: 5px;
+    border-radius: 5px;
     margin-top: 23px;
     margin-left: 5px;
 
@@ -2594,7 +2818,7 @@ ul {
     th {
       font-weight: 500;
       color: #344054;
-    font-size: 14px;
+      font-size: 14px;
       background-color: #f9fafb;
     }
 
@@ -2639,10 +2863,10 @@ ul {
     transition: all 0.3s ease;
 
     h3 {
-    font-size: 14px;
+      font-size: 14px;
       color: #344054;
       margin-bottom: 5px;
-  }
+    }
 
     p {
       font-size: 12px;
@@ -2716,8 +2940,8 @@ ul {
     div {
       height: 24px;
       width: 24px;
-        display: flex;
-        align-items: center;
+      display: flex;
+      align-items: center;
       justify-content: center;
       font-size: 10px;
       color: #344054;
@@ -2758,7 +2982,7 @@ ul {
 
 .calendar-container {
   .calendar-container-smalls {
-          display: flex;
+    display: flex;
     p {
       text-align: left;
       font-size: 8px;
@@ -2782,7 +3006,7 @@ ul {
 }
 
 .widget-container {
-            display: flex;
+  display: flex;
   margin-top: 20px;
   margin-left: 20px;
   .event-container-display {
@@ -2791,9 +3015,9 @@ ul {
     display: flex;
     padding: 20px 10px;
     border-radius: 10px;
-            justify-content: center;
+    justify-content: center;
     flex-direction: column;
-            align-items: center;
+    align-items: center;
     margin-bottom: 20px;
     .profile_display {
       display: flex;
@@ -2877,7 +3101,7 @@ ul {
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-    width: 100%;
+  width: 100%;
   transition: background-color 0.3s, color 0.3s;
 
   &:hover {
@@ -3062,7 +3286,7 @@ ul {
       font-size: 13px;
       color: #202224;
     }
-  button {
+    button {
       background-color: #0387d9;
       color: #ffff;
       font-weight: 500;
@@ -3104,8 +3328,8 @@ ul {
   border: 1px solid #0387d9;
   color: #0387d9;
   padding: 8px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+  border-radius: 5px;
+  cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   width: 100%;
@@ -3136,11 +3360,11 @@ ul {
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
     overflow-y: auto !important;
     padding: 0 !important;
-    
+
     &.active {
       transform: translateX(0) !important;
     }
-    
+
     /* Header with logo and close button */
     .sidebar-header {
       display: flex !important;
@@ -3148,11 +3372,11 @@ ul {
       justify-content: space-between !important;
       padding: 15px !important;
       border-bottom: 1px solid #eaeaea !important;
-      
+
       .logo img {
         height: 40px !important;
       }
-      
+
       .close-btn {
         background: none !important;
         border: none !important;
@@ -3161,41 +3385,41 @@ ul {
         color: #666 !important;
       }
     }
-    
+
     /* Menu items */
     .sidebar-menu {
       list-style: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      
+
       li {
         border-bottom: 1px solid #f0f0f0 !important;
-        
+
         a {
           display: flex !important;
           align-items: center !important;
           padding: 15px !important;
           color: #333 !important;
           text-decoration: none !important;
-          
+
           &:hover {
             background-color: #f5f5f5 !important;
           }
-          
+
           .icon {
             margin-right: 10px !important;
             width: 20px !important;
             text-align: center !important;
           }
         }
-        
+
         &.logout a {
-          color: #FF4B4B !important;
+          color: #ff4b4b !important;
         }
       }
     }
   }
-  
+
   /* Overlay background */
   .sidebar-overlay {
     position: fixed !important;
@@ -3206,12 +3430,12 @@ ul {
     background-color: rgba(0, 0, 0, 0.5) !important;
     z-index: 999 !important;
     display: none !important;
-    
+
     &.active {
       display: block !important;
     }
   }
-  
+
   /* Hamburger button styling */
   .hamburger {
     cursor: pointer !important;
@@ -3222,34 +3446,34 @@ ul {
 @media screen and (max-width: 767px) {
   .inventory-dashboard-container {
     padding: 10px !important;
-    
+
     .inventory-dashboard-container-wrapper {
       flex-direction: column !important;
-      
+
       .summary-container {
         width: 100% !important;
         margin-bottom: 15px !important;
         padding: 15px !important;
-        
+
         h3 {
           font-size: 18px !important;
           margin-bottom: 10px !important;
         }
-        
+
         p {
           font-size: 14px !important;
         }
       }
-      
+
       .boxes-container {
         width: 100% !important;
         flex-direction: column !important;
-        
+
         > div {
           width: 100% !important;
           margin-bottom: 10px !important;
           padding: 15px !important;
-          
+
           span:first-of-type {
             font-size: 20px !important;
             margin-bottom: 5px !important;
@@ -3257,14 +3481,14 @@ ul {
         }
       }
     }
-    
+
     .orders-analytics-container {
       margin-top: 15px !important;
-      
+
       > div:first-child {
         flex-direction: column !important;
         align-items: flex-start !important;
-        
+
         .orders {
           margin-top: 10px !important;
           width: 100% !important;
@@ -3272,31 +3496,31 @@ ul {
         }
       }
     }
-    
+
     .current-order-summary {
       margin-top: 15px !important;
-      
+
       h3 {
         font-size: 18px !important;
       }
-      
+
       p {
         font-size: 14px !important;
       }
-      
+
       .order-stats {
         flex-direction: column !important;
-        
+
         > div {
           width: 100% !important;
           margin-bottom: 10px !important;
           padding: 15px !important;
         }
       }
-      
+
       .order-table {
         overflow-x: auto !important;
-        
+
         table {
           min-width: 500px !important;
         }
@@ -3309,20 +3533,20 @@ ul {
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   .inventory-dashboard-container {
     padding: 15px !important;
-    
+
     .inventory-dashboard-container-wrapper {
       background: red !important;
       .summary-container {
         padding: 20px !important;
       }
-      
+
       .boxes-container {
         > div {
           padding: 15px !important;
         }
       }
     }
-    
+
     .orders-analytics-container {
       .chart-container {
         height: 300px !important;
@@ -3337,61 +3561,62 @@ ul {
     .orders-analytics-container {
       .orders-analytics {
         flex-direction: column !important;
-        
+
         h3 {
           font-size: 18px !important;
           margin-bottom: 10px !important;
         }
-        
+
         .orders {
           display: flex !important;
           width: 100% !important;
           justify-content: space-between !important;
           margin-top: 10px !important;
           margin-bottom: 15px !important;
-          
+
           button {
             padding: 6px 10px !important;
             font-size: 12px !important;
           }
         }
       }
-      
+
       .chart-container {
         height: 250px !important;
         margin-top: 10px !important;
         overflow-x: hidden !important;
-        
+
         canvas {
           max-width: 100% !important;
         }
       }
     }
-    
+
     /* Adjust table for mobile */
     table {
       font-size: 12px !important;
-      
-      th, td {
+
+      th,
+      td {
         padding: 8px 5px !important;
       }
     }
-    
+
     /* Make order summary cards stack on mobile */
     .current-order-summary {
       .order-stats {
         display: flex !important;
         flex-direction: column !important;
-        
+
         > div {
           width: 100% !important;
           margin-right: 0 !important;
           margin-bottom: 10px !important;
-          
+
           h2 {
             font-size: 24px !important;
           }
-          
+
           p {
             font-size: 14px !important;
           }
@@ -3399,13 +3624,13 @@ ul {
       }
     }
   }
-  
+
   /* Fix for chart labels */
   .p-chart {
     .p-chart-legend {
       ul {
         flex-wrap: wrap !important;
-        
+
         li {
           margin-bottom: 5px !important;
           font-size: 12px !important;
@@ -3422,24 +3647,24 @@ ul {
     .orders-analytics-container {
       padding: 15px !important;
       margin-bottom: 15px !important;
-      
+
       > div:first-child {
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
         margin-bottom: 15px !important;
-        
+
         h3 {
           font-size: 18px !important;
           margin-bottom: 10px !important;
         }
-        
+
         .orders {
           display: flex !important;
           width: 100% !important;
           flex-wrap: wrap !important;
           gap: 10px !important;
-          
+
           p {
             font-size: 12px !important;
             padding: 6px 12px !important;
@@ -3449,95 +3674,95 @@ ul {
           }
         }
       }
-      
+
       /* Chart container */
       > div:last-child {
         height: 250px !important;
-        
+
         canvas {
           max-width: 100% !important;
           height: auto !important;
         }
       }
     }
-    
+
     /* Bottom container with order summary and progression bar */
     .bottom-container {
       flex-direction: column !important;
-      
+
       /* Current Order Summary */
       .current-order-summary {
         width: 100% !important;
         margin-bottom: 20px !important;
         padding: 15px !important;
-        
+
         .current-order {
           flex-direction: column !important;
           align-items: flex-start !important;
-          
+
           > div:first-child {
             width: 100% !important;
             margin-bottom: 10px !important;
-            
+
             h2 {
               font-size: 18px !important;
               margin-bottom: 5px !important;
             }
-            
+
             p {
               font-size: 14px !important;
             }
           }
-          
+
           > div:last-child {
             display: none !important; /* Hide image on mobile for space */
           }
         }
-        
+
         /* Order stats boxes */
         .total-orders {
           display: grid !important;
           grid-template-columns: 1fr 1fr !important;
           gap: 10px !important;
           margin: 15px 0 !important;
-          
+
           .total-order-box {
             padding: 12px !important;
-            
+
             h3 {
               font-size: 20px !important;
               margin-bottom: 5px !important;
             }
-            
+
             p {
               font-size: 12px !important;
             }
-            
+
             &:last-child {
               grid-column: span 2 !important;
             }
           }
         }
-        
+
         /* Table sorting header */
         .sort {
           display: none !important; /* Hide on mobile, show in table */
         }
-        
+
         /* Order table */
         .order-table {
           width: 100% !important;
           overflow-x: auto !important;
           display: block !important;
-          
+
           table {
             min-width: 500px !important;
             font-size: 12px !important;
-            
+
             td {
               padding: 8px 5px !important;
               white-space: nowrap !important;
-              
+
               .status {
                 padding: 4px 8px !important;
                 font-size: 11px !important;
@@ -3546,24 +3771,22 @@ ul {
           }
         }
       }
-      
+
       /* Progression Bar */
 
-
-      
       .progressionBar {
         width: 100% !important;
-        
+
         .progress {
           padding: 15px !important;
-          
+
           > div:first-child {
             margin-bottom: 15px !important;
-            
+
             h2 {
               font-size: 18px !important;
             }
-            
+
             p {
               font-size: 14px !important;
             }
@@ -3579,25 +3802,25 @@ ul {
   .inventory-dashboard-container {
     .orders-analytics-container {
       padding: 20px !important;
-      
+
       > div:last-child {
         height: 300px !important;
       }
     }
-    
+
     .bottom-container {
       flex-direction: column !important;
-      
-      .current-order-summary, 
+
+      .current-order-summary,
       .progressionBar {
         width: 100% !important;
         margin-bottom: 20px !important;
       }
-      
+
       .total-orders {
         display: flex !important;
         flex-wrap: wrap !important;
-        
+
         .total-order-box {
           flex: 1 1 30% !important;
           min-width: 150px !important;
@@ -3612,36 +3835,36 @@ ul {
   .inventory-dashboard-container {
     width: 100% !important;
     padding: 10px !important;
-    
+
     .inventory-dashboard-container-wrapper {
       width: 100% !important;
       display: flex !important;
       flex-direction: column !important;
       background-color: transparent !important; /* Remove red background */
-      
+
       .summary-container {
         width: 100% !important;
         margin-bottom: 15px !important;
         padding: 15px !important;
-        
+
         h3 {
           font-size: 18px !important;
           margin-bottom: 10px !important;
         }
-        
+
         p {
           font-size: 14px !important;
         }
-        
+
         > div:last-child {
           display: none !important; /* Hide image on mobile for better space usage */
         }
       }
-      
+
       .boxes-container {
         width: 100% !important;
         flex-direction: column !important;
-        
+
         > div {
           width: 100% !important;
           margin-bottom: 10px !important;
@@ -3680,11 +3903,11 @@ ul {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
     overflow-y: auto !important;
     border-radius: 0 0 15px 15px !important;
-    
+
     &.active {
       transform: translateY(0) !important;
     }
-    
+
     /* Center the content */
     .sidebar-header {
       display: flex !important;
@@ -3692,16 +3915,16 @@ ul {
       position: relative !important;
       padding: 15px !important;
       border-bottom: 1px solid #eaeaea !important;
-      
+
       .logo {
         text-align: center !important;
-        
+
         img {
           height: 60px !important;
           margin: 0 auto !important;
         }
       }
-      
+
       .close-btn {
         position: absolute !important;
         top: 15px !important;
@@ -3712,17 +3935,17 @@ ul {
         cursor: pointer !important;
       }
     }
-    
+
     /* Style the menu items */
     .sidebar-menu {
       list-style: none !important;
       padding: 10px 0 !important;
       margin: 0 !important;
       text-align: center !important;
-      
+
       li {
         margin: 5px 0 !important;
-        
+
         a {
           display: flex !important;
           align-items: center !important;
@@ -3731,7 +3954,7 @@ ul {
           color: #333 !important;
           text-decoration: none !important;
           font-size: 16px !important;
-          
+
           .icon {
             margin-right: 10px !important;
           }
@@ -3739,12 +3962,12 @@ ul {
       }
     }
   }
-  
+
   /* Hide the desktop sidebar on mobile */
   .left-menu {
     display: none !important;
   }
-  
+
   /* Show hamburger only on mobile */
   .hamburger {
     display: block !important;
@@ -3753,36 +3976,35 @@ ul {
 
 /* STRICTLY hide mobile sidebar on tablet and desktop */
 @media screen and (min-width: 768px) {
-  .financial-summary{
+  .financial-summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
-    border: 1px solid #E9E7E7;
+    border: 1px solid #e9e7e7;
     border-radius: 3px;
     padding: 7px 10px;
-    button{
-      background: #EFEFEF;
-      border: 1px solid #EFEFEF;
+    button {
+      background: #efefef;
+      border: 1px solid #efefef;
       width: 70px;
       padding: 5px 0px;
       color: #565656;
-
     }
   }
-  .mobile-sidebar, 
+  .mobile-sidebar,
   .sidebar-overlay {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
-  
+
   /* Show desktop sidebar on larger screens */
   .left-menu {
     display: block !important;
   }
-  
+
   /* Hide hamburger on larger screens if needed */
   .hamburger {
     display: none !important;
@@ -3801,12 +4023,12 @@ ul {
     background-color: rgba(0, 0, 0, 0.5) !important;
     z-index: 999 !important;
     display: none !important;
-    
+
     &.active {
       display: block !important;
     }
   }
-  
+
   /* Mobile sidebar */
   .mobile-sidebar {
     position: fixed !important;
@@ -3819,11 +4041,11 @@ ul {
     transition: left 0.3s ease-in-out !important;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2) !important;
     overflow-y: auto !important;
-    
+
     &.active {
       left: 0 !important; /* Slide in from left */
     }
-    
+
     /* Header with logo and close button */
     .sidebar-header {
       display: flex !important;
@@ -3831,13 +4053,13 @@ ul {
       align-items: center !important;
       padding: 15px !important;
       border-bottom: 1px solid #eaeaea !important;
-      
+
       .logo {
         img {
           height: 40px !important;
         }
       }
-      
+
       .close-btn {
         background: none !important;
         border: none !important;
@@ -3846,16 +4068,16 @@ ul {
         color: #333 !important;
       }
     }
-    
+
     /* Left-aligned menu items */
     .sidebar-menu {
       list-style: none !important;
       padding: 0 !important;
       margin: 0 !important;
-      
+
       li {
         border-bottom: 1px solid #f0f0f0 !important;
-        
+
         a {
           display: flex !important;
           align-items: center !important;
@@ -3863,24 +4085,24 @@ ul {
           color: #333 !important;
           text-decoration: none !important;
           font-size: 16px !important;
-          
+
           .icon {
             margin-right: 15px !important;
             width: 20px !important;
             display: flex !important;
             justify-content: center !important;
           }
-          
+
           &:active {
             background-color: #f5f5f5 !important;
           }
         }
-        
+
         &.logout {
           margin-top: 20px !important;
-          
+
           a {
-            color: #FF4B4B !important;
+            color: #ff4b4b !important;
           }
         }
       }
