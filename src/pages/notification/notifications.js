@@ -4,47 +4,118 @@ import { useRef, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
+import sortNotification from "../../assets/images/crew/sortnotification.png";
+import NotificationDetailsModal from "../../components/NotificationDetailsModal";
 
 export default function Notifications({ role }) {
-
   const menuRight = useRef(null);
-  const items = [
+  const [showModal, setShowModal] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+
+  const notificationData = [
     {
-      label: "View",
+      id: 1,
+      title: "Priority",
+      icon: sortNotification,
     },
     {
-      label: "Delete",
+      id: 2,
+      title: "Type",
+      icon: sortNotification,
     },
     {
-      label: "Mark as Read",
+      id: 3,
+      title: "Description",
+      icon: sortNotification,
+    },
+    {
+      id: 4,
+      title: "Status",
+      icon: sortNotification,
+    },
+    {
+      id: 5,
+      title: "Details",
+      icon: sortNotification,
     },
   ];
-  const [notifications, setNotifications] = useState([
-    {
-      title: "Deficiency Follow-Ups",
-      message:
-        "Hull cleaning and inspection is due on December 6, 2024. Confirm service provider arrangements.",
-      isNew: true,
-      isread: true,
-      create_at: "2 hours ago",
-    },
-    {
-      title: "Upcoming Certification Expirations",
-      message:
-        "The recent MARPOL Annex I audit identified an environmental compliance deficiency. Submit proof of corrective action by February 21, 2024.",
-      isNew: false,
-      isread: true,
-      create_at: "Yesterday",
-    },
-    {
-      title: "Scheduled Inspections",
-      message:
-        "SOLAS has released new amendments impacting safety equipment protocols. Review and integrate the changes by April 15, 2024, to ensure ongoing compliance.",
-      isNew: false,
-      isread: false,
-      create_at: "Nov 7, 2024",
-    },
-  ]);
+
+  const notificationBodyData = [
+    [
+      { id: 1, title: "High" },
+      { id: 2, title: "Booking Issue" },
+      { id: 3, title: "Client Reported.." },
+      { id: 4, title: "Assign To Manager" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "Low" },
+      { id: 2, title: "Payment Error" },
+      { id: 3, title: "Transaction Failed Due...." },
+      { id: 4, title: "Acknowledged" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "High" },
+      { id: 2, title: "Supplier Delay" },
+      { id: 3, title: "Client Wants To Cancel Reservation" },
+      { id: 4, title: "Resolve & Archive" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "Medium" },
+      { id: 2, title: "Booking Issue" },
+      { id: 3, title: "Client Updated Their Contact Information" },
+      { id: 4, title: "Acknowledged" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "Low" },
+      { id: 2, title: "Payment Error" },
+      { id: 3, title: "Client Inquired About Their Status" },
+      { id: 4, title: "Resolve & Archive" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "High" },
+      { id: 2, title: "Supplier Delay" },
+      { id: 3, title: "Client Asked About Additional Services" },
+      { id: 4, title: "Assign To Manager" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "Medium" },
+      { id: 2, title: "Booking Issue" },
+      { id: 3, title: "Client Requested Special Arrangements" },
+      { id: 4, title: "Acknowledged" },
+      { id: 5, title: "View Details" },
+    ],
+    [
+      { id: 1, title: "Low" },
+      { id: 2, title: "Payment Error" },
+      {
+        id: 3,
+        title: "Client Submitted A Refund Request ",
+      },
+      { id: 4, title: "Resolve & Archive" },
+      { id: 5, title: "View Details" },
+    ],
+  ];
+
+  const handleViewDetails = (row) => {
+    const modalData = {
+      type: row[1].title,
+      relatedId: row[2].title,
+      vendor: row[3].title,
+      description: row[4].title,
+      priority: row[0].title,
+      status: row[3].title,
+      timestamp: row[4].title,
+    };
+    setSelectedNotification(modalData);
+    setShowModal(true);
+  };
+
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -52,298 +123,72 @@ export default function Notifications({ role }) {
         <div className="sub-header-left">
           <div className="flex align-items-center">
             <h3 className="mr-2">Notifications </h3>
-            <Badge value="89" severity="warning"></Badge>
-          </div>
-          <p>List of all details notifications</p>
-        </div>
-
-        {/* Right Section: Action Button */}
-        <div className="sub-header-right">
-          <div className="p-input-icon-left search">
-            <i className="pi pi-search" />
-            <InputText type="search" placeholder="Search" />
+            <Badge
+              value="20"
+              severity="danger"
+              style={{ backgroundColor: "#EF4444 !important" }}
+            ></Badge>
           </div>
         </div>
       </div>
-      <div className="card-wrapper-gap">
-
-        <div className="card">
-          <div className="card-wraper">
-            <div className="grid align-items-center justify-content-between mb-3 notification-title">
-              <div className="col-6">
-                <h3 className="my-0">Compliance Notifications</h3>
-              </div>
-              <div className="col-6 text-right">
-                <Button
-                  className="p-0"
-                  onClick={(event) => menuRight.current.toggle(event)}
-                  aria-controls="popup_menu_right"
-                  aria-haspopup
-                >
-                  <i className="pi pi-ellipsis-v" />
-                </Button>
-                <Menu
-                  className="export-menu"
-                  model={items}
-                  popup
-                  ref={menuRight}
-                  id="popup_menu_right"
-                  popupAlignment="right"
-                />
-              </div>
-            </div>
-            <ul className="notification-list">
-              {notifications.map((item, index) => (
-                <li key={index}>
-                  <Card
-                    className={
-                      item.isNew === true
-                        ? "new mb-2"
-                        : item.isread === true
-                          ? "read mb-2"
-                          : "mb-2"
-                    }
-                  >
-                    <div className="grid justify-content-between">
-                      <div className="col-10">
-                        {item?.isNew === true ? (
-                          <Badge value="New" severity="success"></Badge>
-                        ) : (
-                          ""
-                        )}
-                        <h3 className="mb-2">{item.title}</h3>
-                        <p className="m-0">{item.message}</p>
-                      </div>
-                      <div className="col-2">
-                        <p className="text-right time">{item.create_at}</p>
-                      </div>
-                    </div>
-                  </Card>
-                </li>
+      <div className="notification-filter">
+        <div className="all-notification">All Notification</div>
+        <div>High Priority</div>
+        <div>Medium Priority</div>
+        <div>Low Priority</div>
+      </div>
+      <div className="notification-table-container">
+        <table className="notification-table">
+          <thead>
+            <tr className="header-row">
+              {notificationData.map((item) => (
+                <th key={item.id} className="header-cell">
+                  <div className="header-content">
+                    <span>{item.title}</span>
+                    <img src={item.icon} alt="sortNotification" />
+                  </div>
+                </th>
               ))}
-            </ul>
-            {role === "Captain" ? (
-              <>
-
-                <div className="grid align-items-center justify-content-between mb-3 mt-4 notification-title">
-                  <div className="col-6">
-                    <h3 className="my-0">Maintenance Notifications</h3>
-                  </div>
-                  <div className="col-6 text-right">
-                    <Button
-                      className="p-0"
-                      onClick={(event) => menuRight.current.toggle(event)}
-                      aria-controls="popup_menu_right"
-                      aria-haspopup
+            </tr>
+          </thead>
+          <tbody>
+            {notificationBodyData.map((row, rowIndex) => (
+              <tr key={rowIndex} className="body-row">
+                {row.map((item, index) => (
+                  <td key={item.id} className="body-cell">
+                    <div
+                      className={`body-content ${
+                        index === 0
+                          ? `priority-${item.title.toLowerCase()}`
+                          : index === 3
+                          ? `status-${item.title
+                              .toLowerCase()
+                              .replace(/[&\s]+/g, "-")}`
+                          : ""
+                      }`}
                     >
-                      <i className="pi pi-ellipsis-v" />
-                    </Button>
-                    <Menu
-                      className="export-menu"
-                      model={items}
-                      popup
-                      ref={menuRight}
-                      id="popup_menu_right"
-                      popupAlignment="right"
-                    />
-                  </div>
-                </div>
-                <ul className="notification-list">
-                  {notifications.map((item, index) => (
-                    <li key={index}>
-                      <Card
-                        className={
-                          item.isNew === true
-                            ? "new mb-2"
-                            : item.isread === true
-                              ? "read mb-2"
-                              : "mb-2"
-                        }
-                      >
-                        <div className="grid justify-content-between">
-                          <div className="col-10">
-                            {item?.isNew === true ? (
-                              <Badge value="New" severity="success"></Badge>
-                            ) : (
-                              ""
-                            )}
-                            <h3 className="mb-2">{item.title}</h3>
-                            <p className="m-0">{item.message}</p>
-                          </div>
-                          <div className="col-2">
-                            <p className="text-right time">{item.create_at}</p>
-                          </div>
-                        </div>
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="grid align-items-center justify-content-between mb-3 mt-4 notification-title">
-                  <div className="col-6">
-                    <h3 className="my-0">Financial Notifications</h3>
-                  </div>
-                  <div className="col-6 text-right">
-                    <Button
-                      className="p-0"
-                      onClick={(event) => menuRight.current.toggle(event)}
-                      aria-controls="popup_menu_right"
-                      aria-haspopup
-                    >
-                      <i className="pi pi-ellipsis-v" />
-                    </Button>
-                    <Menu
-                      className="export-menu"
-                      model={items}
-                      popup
-                      ref={menuRight}
-                      id="popup_menu_right"
-                      popupAlignment="right"
-                    />
-                  </div>
-                </div>
-                <ul className="notification-list">
-                  {notifications.map((item, index) => (
-                    <li key={index}>
-                      <Card
-                        className={
-                          item.isNew === true
-                            ? "new mb-2"
-                            : item.isread === true
-                              ? "read mb-2"
-                              : "mb-2"
-                        }
-                      >
-                        <div className="grid justify-content-between">
-                          <div className="col-10">
-                            {item?.isNew === true ? (
-                              <Badge value="New" severity="success"></Badge>
-                            ) : (
-                              ""
-                            )}
-                            <h3 className="mb-2">{item.title}</h3>
-                            <p className="m-0">{item.message}</p>
-                          </div>
-                          <div className="col-2">
-                            <p className="text-right time">{item.create_at}</p>
-                          </div>
-                        </div>
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="grid align-items-center justify-content-between mb-3 mt-4 notification-title">
-                  <div className="col-6">
-                    <h3 className="my-0">Crew Management Notifications</h3>
-                  </div>
-                  <div className="col-6 text-right">
-                    <Button
-                      className="p-0"
-                      onClick={(event) => menuRight.current.toggle(event)}
-                      aria-controls="popup_menu_right"
-                      aria-haspopup
-                    >
-                      <i className="pi pi-ellipsis-v" />
-                    </Button>
-                    <Menu
-                      className="export-menu"
-                      model={items}
-                      popup
-                      ref={menuRight}
-                      id="popup_menu_right"
-                      popupAlignment="right"
-                    />
-                  </div>
-                </div>
-                <ul className="notification-list">
-                  {notifications.map((item, index) => (
-                    <li key={index}>
-                      <Card
-                        className={
-                          item.isNew === true
-                            ? "new mb-2"
-                            : item.isread === true
-                              ? "read mb-2"
-                              : "mb-2"
-                        }
-                      >
-                        <div className="grid justify-content-between">
-                          <div className="col-10">
-                            {item?.isNew === true ? (
-                              <Badge value="New" severity="success"></Badge>
-                            ) : (
-                              ""
-                            )}
-                            <h3 className="mb-2">{item.title}</h3>
-                            <p className="m-0">{item.message}</p>
-                          </div>
-                          <div className="col-2">
-                            <p className="text-right time">{item.create_at}</p>
-                          </div>
-                        </div>
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="grid align-items-center justify-content-between mb-3 mt-4 notification-title">
-                  <div className="col-6">
-                    <h3 className="my-0">Document and Warranty Notifications</h3>
-                  </div>
-                  <div className="col-6 text-right">
-                    <Button
-                      className="p-0"
-                      onClick={(event) => menuRight.current.toggle(event)}
-                      aria-controls="popup_menu_right"
-                      aria-haspopup
-                    >
-                      <i className="pi pi-ellipsis-v" />
-                    </Button>
-                    <Menu
-                      className="export-menu"
-                      model={items}
-                      popup
-                      ref={menuRight}
-                      id="popup_menu_right"
-                      popupAlignment="right"
-                    />
-                  </div>
-                </div>
-                <ul className="notification-list">
-                  {notifications.map((item, index) => (
-                    <li key={index}>
-                      <Card
-                        className={
-                          item.isNew === true
-                            ? "new mb-2"
-                            : item.isread === true
-                              ? "read mb-2"
-                              : "mb-2"
-                        }
-                      >
-                        <div className="grid justify-content-between">
-                          <div className="col-10">
-                            {item?.isNew === true ? (
-                              <Badge value="New" severity="success"></Badge>
-                            ) : (
-                              ""
-                            )}
-                            <h3 className="mb-2">{item.title}</h3>
-                            <p className="m-0">{item.message}</p>
-                          </div>
-                          <div className="col-2">
-                            <p className="text-right time">{item.create_at}</p>
-                          </div>
-                        </div>
-                      </Card>
-                    </li>
-                  ))}
-                </ul> </>)
-              : ""}
-          </div>
-        </div>
+                      {index === 4 ? (
+                        <Button
+                          label={item.title}
+                          className="p-button-outlined p-button-primary view-details-btn"
+                          onClick={() => handleViewDetails(row)}
+                        />
+                      ) : (
+                        <span>{item.title}</span>
+                      )}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      <NotificationDetailsModal
+        visible={showModal}
+        onHide={() => setShowModal(false)}
+        notificationData={selectedNotification}
+      />
     </>
   );
 }
