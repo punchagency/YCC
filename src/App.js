@@ -92,16 +92,17 @@ import ContactUs from "./pages/landing-pages/contact-us";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Calendar from "./pages/calendar/calendar";
 import { NotificationsProvider } from "./context/notificationsContext";
+import { ToastProvider } from "./components/Toast";
 
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 //context imports
 
 function App() {
   return (
-    <div className="App">
+    <ToastProvider>
       <NotificationsProvider>
         <Routes>
-          <Route path="/get-started" element={<GetStarted />} />
+          <Route path="/get-started" element={<GetStarted />} /> 
           <Route path="/apply" element={<VendorStarted />} />
 
           <Route path="/login" element={<Login />} />
