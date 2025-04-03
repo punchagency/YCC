@@ -138,11 +138,11 @@ function App() {
           </Route>
 
           <Route>
-            <Route path="/new/dashboard" element={<AdminDashboard1 />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard1 />} />
           </Route>
         </Routes>
       </NotificationsProvider>
-    </div>
+    </ToastProvider>
   );
 }
 
