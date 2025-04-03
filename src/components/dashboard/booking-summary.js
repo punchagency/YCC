@@ -28,10 +28,10 @@ const BookingSummary = () => {
         <Box sx={{display: "flex", padding: "20px", flexDirection: "row", gap: "20px", height: "300px", width: "100%"}}>
         
         <Grid container sx={{ display: "flex", gap: "20px", height: "100%", width: "100%"}}>
-          <Grid item xs={12} md={6} lg={6.5} sx={{height: "100%", backgroundColor: "red"}}>
+          <Grid item xs={12} md={6} lg={6.5} sx={{height: "100%", width: "100%"}}>
             <BookingCalenderCard />
           </Grid>
-          <Grid item xs={12} md={6} lg={5} sx={{height: "100%", backgroundColor: "blue"}}>
+          <Grid item xs={12} md={6} lg={5} sx={{height: "100%", backgroundColor: "blue", width: "100%"}}>
             <Typography>
                 Booking Summary
             </Typography>
