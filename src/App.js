@@ -93,6 +93,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Calendar from "./pages/calendar/calendar";
 import { NotificationsProvider } from "./context/notificationsContext"
 
+import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 //context imports
 
 function App() {
@@ -247,6 +248,10 @@ function App() {
             element={<Notifications role={"Captain"} />}
           />
         {/* <Route path="/settings" element={<Settings />} /> */}
+        </Route>
+
+        <Route>
+         <Route path="/new/dashboard" element={<AdminDashboard1 />} />
         </Route>
 
             <Route
