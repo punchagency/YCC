@@ -14,11 +14,11 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#F9F9FA",
     color: "#212121",
-    fontSize: 14,
+    fontSize: "14px",
     padding: "4px 8px",
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+    fontSize: "14px",
     padding: "4px 8px",
   },
 }));
@@ -38,7 +38,9 @@ const rows = [
   createData('#10234', 'John Doe', 'In Progress', 100.00, '2021-01-01'),
   createData('#10235', 'John Doe', 'Completed', 100.00, '2021-01-01'),
   createData('#10236', 'John Doe', 'Pending', 1200.00, '2021-01-01'),
-  createData('#10237', 'John Doe', 'In Progress', 180.00, '2021-01-01')
+  createData('#10237', 'John Doe', 'In Progress', 180.00, '2021-01-01'),
+  createData('#10238', 'John Doe', 'In Progress', 12280.00, '2021-01-01'),
+  
 ];
 
 const statusColors = {
@@ -66,7 +68,7 @@ export default function BasicTable() {
               <StyledTableCell component="th" scope="row">
                 <span style={{display: "flex", alignItems: "center", gap: "0px"}}>
                   <TableBodyText sx={{paddingRight: "5px"}}>{row.orderId}</TableBodyText>
-                  <FileCopyOutlinedIcon sx={{ fontSize: 16, color: "#6E7079" }}/>
+                  <FileCopyOutlinedIcon sx={{ fontSize: "16px", color: "#6E7079" }}/>
                 </span>
               </StyledTableCell>
               <StyledTableCell align="right"><TableBodyText>{row.customer}</TableBodyText></StyledTableCell>
@@ -84,7 +86,7 @@ export default function BasicTable() {
 const TableTitleText = styled(Typography)({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 500,
-  fontSize: 16,
+  fontSize: "16px",
   lineHeight: "24px",
   letterSpacing: "0px",
   verticalAlign: "middle",
@@ -95,11 +97,11 @@ const TableTitleText = styled(Typography)({
 const TableBodyText = styled(Typography)({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
-  fontSize: 14,
+  fontSize: "14px",
   lineHeight: "100%",
   letterSpacing: "0%",
   color: "#6E7079",
-  padding: "10px 20px",
+  padding: "10px 10px",
 });
 
 const StatusBox = styled(Box) (({theme, status}) => ({  

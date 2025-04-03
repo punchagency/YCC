@@ -315,7 +315,7 @@ const Dashboard1 = () => {
                 </Box>
 
                 <Box>
-                  <FinancialSummaryButton>View</FinancialSummaryButton>
+                  <FinancialSummaryButton><ViewButtonText>View</ViewButtonText></FinancialSummaryButton>
                 </Box>
               </Box>
               ))}
@@ -403,5 +403,15 @@ export const FinancialSummaryDescriptionText = styled(Typography)({
   fontSize: "12px",
   color: "#212121",
 });
+
+const ViewButtonText = styled(Typography)({
+  fontFamily: "Plus Jakarta Sans",
+  fontWeight: 500,
+  fontSize: "14px",
+  lineHeight: "100%",
+  letterSpacing: "0%",
+  color: "#565656",
+});
+
 
 export default Dashboard1;

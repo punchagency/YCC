@@ -1,12 +1,15 @@
 import { Box, Typography, styled, Grid } from "@mui/material";
 import BookingCalenderCard from "./booking-calender-card";
+import BookingSummaryInfoCard from "./booking-summary-info-card";
+
+
 const BookingSummary = () => {
   return (
     <Box
       sx={{
         backgroundColor: "white",
         borderRadius: "8px",
-        padding: "20px",
+        padding: "15px",
         boxShadow: "0px 2px 8px 0px #0000001A",
         textAlign: "start",
       }}
@@ -25,14 +28,12 @@ const BookingSummary = () => {
 
         <Box sx={{display: "flex", padding: "10px", flexDirection: "row", gap: "20px", height: "100%", width: "100%"}}>
         
-        <Grid container >
+        <Grid container spacing={2} >
           <Grid item xs={12} md={6} lg={7.5} sx={{height: "100%", width: "100%"}}>
             <BookingCalenderCard />
           </Grid>
-          <Grid item xs={12} md={6} lg={4.5} sx={{height: "100%", backgroundColor: "red", width: "100%"}}>
-            <Typography>
-                Booking Summary
-            </Typography>
+          <Grid item xs={12} md={6} lg={4.5} sx={{height: "100%", width: "100%"}}>
+            <BookingSummaryInfoCard />
           </Grid>
         </Grid>
 
