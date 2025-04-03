@@ -3311,6 +3311,7 @@ ul {
     padding: 15px !important;
     
     .inventory-dashboard-container-wrapper {
+      background: red !important;
       .summary-container {
         padding: 20px !important;
       }
@@ -3752,6 +3753,23 @@ ul {
 
 /* STRICTLY hide mobile sidebar on tablet and desktop */
 @media screen and (min-width: 768px) {
+  .financial-summary{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    border: 1px solid #E9E7E7;
+    border-radius: 3px;
+    padding: 7px 10px;
+    button{
+      background: #EFEFEF;
+      border: 1px solid #EFEFEF;
+      width: 70px;
+      padding: 5px 0px;
+      color: #565656;
+
+    }
+  }
   .mobile-sidebar, 
   .sidebar-overlay {
     display: none !important;
