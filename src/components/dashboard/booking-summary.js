@@ -4,8 +4,6 @@ const BookingSummary = () => {
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
         backgroundColor: "white",
         borderRadius: "8px",
         padding: "20px",
@@ -25,13 +23,13 @@ const BookingSummary = () => {
         Track deliveries, view tasks, and add new ones seamlessly.
         </DashBoardDescriptionText>
 
-        <Box sx={{display: "flex", padding: "20px", flexDirection: "row", gap: "20px", height: "300px", width: "100%"}}>
+        <Box sx={{display: "flex", padding: "10px", flexDirection: "row", gap: "20px", height: "100%", width: "100%"}}>
         
-        <Grid container sx={{ display: "flex", gap: "20px", height: "100%", width: "100%"}}>
-          <Grid item xs={12} md={6} lg={6.5} sx={{height: "100%", width: "100%"}}>
+        <Grid container >
+          <Grid item xs={12} md={6} lg={7.5} sx={{height: "100%", width: "100%"}}>
             <BookingCalenderCard />
           </Grid>
-          <Grid item xs={12} md={6} lg={5} sx={{height: "100%", backgroundColor: "blue", width: "100%"}}>
+          <Grid item xs={12} md={6} lg={4.5} sx={{height: "100%", backgroundColor: "red", width: "100%"}}>
             <Typography>
                 Booking Summary
             </Typography>

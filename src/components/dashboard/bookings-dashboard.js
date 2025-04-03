@@ -60,13 +60,12 @@ const Dashboard1 = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
         backgroundColor: "#F8FBFF",
         padding: "20px",
         gap: "20px",
       }}
     >
-      <Grid container spacing={2}>
+      <Grid  container  spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
           {/* Low Inventories */}
           <Box

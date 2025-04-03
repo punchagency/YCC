@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
 import { useUser } from "../context/userContext";
@@ -17,11 +17,13 @@ import logoutLogo from "../assets/images/crew/logout.png";
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const location = useLocation();
 
   const menuItems = [
     {
       label: "Dashboard",
       icon: <img src={homeLogo} alt="Dashboard" width={15} height={15} />,
+      className: location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
       command: () => {
         navigate("/admin/dashboard");
       },
@@ -29,38 +31,35 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Calendar",
       icon: "pi pi-calendar",
+      className: location.pathname === "/admin/calendar-management" ? "active-menu-item" : "",
       command: () => {
         navigate("/admin/calendar-management");
       },
     },
-          {
-            label: "Inventory Management",
-            icon: "pi pi-file",
-            command: () => {
-              navigate("/admin/inventory-management");
-            },
-          },
-          {
-            label: "Orders",
-            icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
-            command: () => {
-              navigate("/admin/orders-management");
-            },
-          },  
-          {
-            label: "Bookings",
-            icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
-            command: () => {
-              navigate("/admin/bookings-management");
-            },
-          },
-    // {
-    //   label: "Bookings",
-    //   icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
-    //   command: () => {
-    //     navigate("/crew/bookings");
-    //   },
-    // },
+    {
+      label: "Inventory Management",
+      icon: "pi pi-file",
+      className: location.pathname === "/admin/inventory-management" ? "active-menu-item" : "",
+      command: () => {
+        navigate("/admin/inventory-management");
+      },
+    },
+    {
+      label: "Orders",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className: location.pathname === "/admin/orders-management" ? "active-menu-item" : "",
+      command: () => {
+        navigate("/admin/orders-management");
+      },
+    },
+    {
+      label: "Bookings",
+      icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
+      className: location.pathname === "/admin/bookings-management" ? "active-menu-item" : "",
+      command: () => {
+        navigate("/admin/bookings-management");
+      },
+    },
     {
       label: "Financial Management",
       icon: (
@@ -100,7 +99,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Settings",
       icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
       command: () => {
-      navigate("/admin/settings");
+        navigate("/admin/settings");
       },
     },
     {
@@ -147,8 +146,8 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           onClick={() => setIsCollapsed(!isCollapsed)}
         />
       </div>
-      <div>
-        <PanelMenu model={menuItems} />
+      <div >
+        <PanelMenu  model={menuItems} />
       </div>
     </div>
   );

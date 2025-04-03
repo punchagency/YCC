@@ -39,7 +39,7 @@ const CurrentOrderSummary = () => {
           Displays real-time updates on placed, pending, and completed orders.
         </DashBoardDescriptionText>
 
-        <Box sx={{ display: "flex", flexDirection: "row", gap: "20px", marginTop: "20px" }}>
+        <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", marginTop: "20px" }}>
           {summaryData.map((item, index) => (
             <SummaryWidgetBox>
                 <Box>
@@ -51,7 +51,7 @@ const CurrentOrderSummary = () => {
         </Box>
 
           {/* Table */}
-        <Box sx={{marginTop: "15px"}}>
+        <Box sx={{marginTop: "10px"}}>
           <BasicTable />
         </Box>
       </Box>
@@ -85,9 +85,9 @@ const CurrentSummarySubText = styled(Typography)({
 
 const SummaryWidgetBox = styled(Box)({
     display: "flex",
-    width: 232,
-    height: 106,
-    gap: 10,
+    width: "100%",
+    height: "100%",
+    gap: "10px",
     paddingTop: 14,
     paddingRight: 20,
     paddingBottom: 14,

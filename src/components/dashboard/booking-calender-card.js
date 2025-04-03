@@ -27,9 +27,10 @@ const BookingCalenderCard = () => {
       <Box
         sx={{
           width: "100%",
-          maxWidth: "300px",
-          maxHeight: "300px",
-          bgcolor: "#ffffff",
+          maxWidth: "100%",
+          height: "370px",
+          //bgcolor: "#ffffff",
+          backgroundColor: "yellow",
           borderRadius: "24px",
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
           padding: "20px",
@@ -46,8 +47,10 @@ const BookingCalenderCard = () => {
           <Typography
             sx={{
               color: "#212121",
-              fontSize: "13px",
+              fontSize: "18px",
               fontWeight: 500,
+              backgroundColor: "red",
+              width: "100%",
             }}
           >
             March{" "}
@@ -91,7 +94,7 @@ const BookingCalenderCard = () => {
 
 
 
-        <Grid container spacing={2}  sx={{ mb: 4 }}>
+        <Grid container spacing={1}  sx={{ mb: 4 }}>
   {calendarData.flat().map((day, index) => {
     const isPreviousMonth = index < 2;
     const isNextMonth = index > 31;
@@ -102,8 +105,9 @@ const BookingCalenderCard = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 0,
-        margin: 0
+        padding: "25px",
+        maxWidth: "90%",
+        margin: 0,
       }}>
         <Button
           onClick={() => setSelectedDate(day)}
@@ -112,7 +116,7 @@ const BookingCalenderCard = () => {
             width: "25px",
             height: "25px",
             padding: "0px",
-            fontSize: "12px",
+            fontSize: "14px",
             fontWeight: 600,
             borderRadius: "8px",
             display: "flex",
@@ -138,7 +142,7 @@ const BookingCalenderCard = () => {
 
 
           <Box sx={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-        <Box sx={{ marginTop: "10px" }}>
+        <Box sx={{ backgroundColor: "lightgray", width: "100%"}}>
           <Typography
             sx={{
               color: "#212121",
