@@ -11,7 +11,13 @@ import searchLogo from "../assets/images/crew/searchLogo.png";
 import { useUser } from "./../context/userContext"; // Import User Context
 import { Dropdown } from "primereact/dropdown";
 import { Menu } from "primereact/menu";
-import MobileSidebar from './MobileSidebar'; // Re-import MobileSidebar
+import manprofile from "../assets/images/crew/manprofile.png";
+import sortBy from "../assets/images/crew/sortBy.png";
+import more from "../assets/images/crew/more.png";
+import filterBy from "../assets/images/crew/filterBy.png";
+import icon from "../assets/images/crew/Icon.png";
+import share from "../assets/images/crew/share.png";
+import MobileSidebar from "./MobileSidebar"; // Re-import MobileSidebar
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -25,22 +31,71 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const shareMenuRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Filter options
-  const filterOptions = [
-    { label: "Vendor", value: "vendor" },
-    { label: "Yacht", value: "yacht" },
-    { label: "Order Status", value: "orderStatus" },
-    { label: "Priority", value: "priority" },
-    { label: "Delivery Date", value: "deliveryDate" },
+  // Add refs for the new menus
+  const filterMenuRef = useRef(null);
+  const sortMenuRef = useRef(null);
+
+  // Define menu items for Filter and Sort
+  const filterItems = [
+    {
+      label: "Vendor",
+      command: () => {
+        console.log("Filter by Vendor");
+      },
+    },
+    {
+      label: "Yacht",
+      command: () => {
+        console.log("Filter by Yacht");
+      },
+    },
+    {
+      label: "Order Status",
+      command: () => {
+        console.log("Filter by Order Status");
+      },
+    },
+    {
+      label: "Priority",
+      command: () => {
+        console.log("Filter by Priority");
+      },
+    },
+    {
+      label: "Delivery Date",
+      command: () => {
+        console.log("Filter by Delivery Date");
+      },
+    },
   ];
 
-  // Sort options
-  const sortOptions = [
-    { label: "Date Placed", value: "datePlaced" },
-    { label: "Order Value", value: "orderValue" },
-    { label: "Urgency", value: "urgency" },
-    { label: "Fulfillment Status", value: "fulfillmentStatus" },
+  const sortItems = [
+    {
+      label: "Date Placed",
+      command: () => {
+        console.log("Sort by Date Placed");
+      },
+    },
+    {
+      label: "Order Value",
+      command: () => {
+        console.log("Sort by Order Value");
+      },
+    },
+    {
+      label: "Urgency",
+      command: () => {
+        console.log("Sort by Urgency");
+      },
+    },
+    {
+      label: "Fulfillment Status",
+      command: () => {
+        console.log("Sort by Fulfillment Status");
+      },
+    },
   ];
 
   // Share menu items
@@ -90,12 +145,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   ]);
 
   // Get user's name from the profile data
-  const userName =
-    user?.profile?.firstName && user?.profile?.lastName
-      ? `${user.profile.firstName} ${user.profile.lastName}`
-      : user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.profile?.businessName
+  const userName = "";
 
   // Get profile picture if available
   const profilePicture = user?.profile?.profilePicture || avatar;
@@ -119,214 +169,164 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const start = (
     <>
       <div
-        className="header-container"
-        style={{ 
-          display: "flex", 
-          alignItems: "center", 
+        style={{
+          display: "flex",
+          alignItems: "center",
           width: "100%",
-          flexWrap: isMobile ? "wrap" : "nowrap"
+          gap: "15px",
         }}
       >
-        <div 
-          className="hamburger" 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          style={{ 
+        {/* Hamburger Menu */}
+        <div
+          style={{
+            cursor: "pointer",
             marginRight: "10px",
-            cursor: "pointer"
           }}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          <img src={hamburger} alt="Menu" className="profile-image" />
+          <img
+            src={hamburger}
+            alt="menu"
+            style={{ width: "24px", height: "24px" }}
+          />
         </div>
 
-        {/* Search icon for mobile that toggles search input */}
-        {isMobile && (
-          <div 
-            style={{ 
-              marginRight: "10px",
-              cursor: "pointer"
-            }}
-            onClick={() => setShowMobileSearch(!showMobileSearch)}
-          >
-            <i className="pi pi-search" style={{ fontSize: '1.2rem' }}></i>
-          </div>
-        )}
-
-        {/* Search container - hidden on mobile unless toggled */}
+        {/* Search Input */}
         <div
-          className="search-container"
           style={{
             position: "relative",
-            display: isMobile && !showMobileSearch ? "none" : "flex",
+            display: "flex",
             alignItems: "center",
-            flex: "1",
-            marginRight: "15px",
-            width: isMobile ? "100%" : "auto",
-            order: isMobile ? "3" : "0",
-            marginTop: isMobile && showMobileSearch ? "10px" : "0",
-            transition: "all 0.3s ease"
+            width: "350px",
           }}
         >
           <img
             src={searchLogo}
             alt="search"
-            className="profile-image"
             style={{ position: "absolute", left: "10px" }}
           />
           <input
             type="text"
-            placeholder="Search"
+            placeholder="Search Reports"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            style={{ 
-              paddingLeft: "35px", 
+            style={{
+              paddingLeft: "35px",
               width: "100%",
-              height: "36px",
-              borderRadius: "4px",
-              border: "1px solid #ced4da"
+              height: "40px",
+              border: "1px solid #ced4da",
+              borderRadius: "30px",
+              backgroundColor: "#F5F6FA",
+              fontSize: "10px",
             }}
           />
-          {isMobile && showMobileSearch && (
-            <Button 
-              icon="pi pi-times" 
-              className="p-button-text p-button-rounded" 
-              onClick={() => setShowMobileSearch(false)}
-              style={{ position: "absolute", right: "5px" }}
-            />
-          )}
         </div>
 
-        {/* Only show these controls on the Bookings page - outside the search container */}
-        {isBookingsPage && !isMobile && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            {/* Filter Dropdown */}
-            <Dropdown
-              value={selectedFilter}
-              options={filterOptions}
-              onChange={(e) => setSelectedFilter(e.value)}
-              placeholder="Filter By"
-              style={{
-                width: "120px",
-                height: "36px",
-                textAlign: "center",
-                alignItems: "center",
-              }}
-              panelStyle={{ fontSize: "0.7rem" }}
-            />
-
-            {/* Sort Dropdown */}
-            <Dropdown
-              value={selectedSort}
-              options={sortOptions}
-              onChange={(e) => setSelectedSort(e.value)}
-              placeholder="Sort By"
-              style={{
-                width: "120px",
-                height: "36px",
-                textAlign: "center",
-                alignItems: "center",
-              }}
-              panelStyle={{ fontSize: "0.7rem" }}
-            />
-
-            {/* Share Button */}
+        {/* Controls Container */}
+        {!isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {/* Filter By Button and Menu */}
+            <Menu model={filterItems} popup ref={filterMenuRef} />
             <Button
-              icon="pi pi-share-alt"
-              className="p-button-outlined p-button-sm"
+              label="Filter By"
+              icon={
+                <img
+                  src={filterBy}
+                  alt="filter"
+                  style={{
+                    width: "12px",
+                    height: "12px",
+                    marginRight: "4px",
+                  }}
+                />
+              }
+              onClick={(e) => filterMenuRef.current.toggle(e)}
+              style={{
+                height: "30px",
+                width: "85px",
+                backgroundColor: "#F5F6FA",
+                border: "1px solid #ced4da",
+                borderRadius: "8px",
+                color: "#495057",
+                fontSize: "12px",
+                padding: "0.5rem 0.5rem",
+                marginLeft: "-10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
+              }}
+            />
+
+            {/* Sort By Button and Menu */}
+            <Menu model={sortItems} popup ref={sortMenuRef} />
+            <Button
+              label="Sort By"
+              icon={
+                <img
+                  src={sortBy}
+                  alt="sort"
+                  style={{
+                    width: "12px",
+                    height: "12px",
+                    marginRight: "4px",
+                  }}
+                />
+              }
+              onClick={(e) => sortMenuRef.current.toggle(e)}
+              style={{
+                height: "30px",
+                width: "85px",
+                backgroundColor: "#F5F6FA",
+                border: "1px solid #ced4da",
+                borderRadius: "8px",
+                color: "#495057",
+                fontSize: "12px",
+                padding: "0.5rem 0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
+              }}
+            />
+
+            {/* Share Button and Menu */}
+            <Menu model={shareItems} popup ref={shareMenuRef} />
+            <Button
+              label="Share"
+              icon={
+                <img
+                  src={share}
+                  alt="share"
+                  style={{ width: "12px", height: "12px" }}
+                />
+              }
               onClick={(e) => shareMenuRef.current.toggle(e)}
-              aria-controls="share-menu"
-              aria-haspopup
-              style={{ height: "36px", width: "36px" }}
-            />
-            <Menu model={shareItems} popup ref={shareMenuRef} id="share-menu" />
-          </div>
-        )}
-        
-        {/* Mobile filter/sort button for bookings page */}
-        {isBookingsPage && isMobile && (
-          <div style={{ marginLeft: "auto" }}>
-            <Button
-              icon="pi pi-filter"
-              className="p-button-outlined p-button-sm"
-              onClick={(e) => {
-                // Show a mobile-friendly filter/sort panel
-                // This could be implemented as another overlay panel
-                console.log("Show mobile filters");
+              style={{
+                height: "30px",
+                width: "85px",
+                backgroundColor: "#F5F6FA",
+                border: "1px solid #ced4da",
+                borderRadius: "8px",
+                color: "#495057",
+                fontSize: "12px",
+                padding: "0.5rem 0.5rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
               }}
-              style={{ height: "36px", width: "36px" }}
             />
           </div>
         )}
       </div>
-
-      {/* Display selected filters if any - only on Bookings page */}
-      {isBookingsPage && (selectedFilter || selectedSort) && (
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginTop: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-          {selectedFilter && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                backgroundColor: "#f0f7ff",
-                padding: "5px 10px",
-                borderRadius: "4px",
-                border: "1px solid #d0e1fd",
-              }}
-            >
-              <span>
-                Filter:{" "}
-                {filterOptions.find((f) => f.value === selectedFilter)?.label}
-              </span>
-              <Button
-                icon="pi pi-times"
-                className="p-button-text p-button-rounded p-button-sm"
-                onClick={() => setSelectedFilter(null)}
-                style={{ padding: "2px", margin: "0 0 0 5px" }}
-              />
-            </div>
-          )}
-
-          {selectedSort && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                backgroundColor: "#f0f7ff",
-                padding: "5px 10px",
-                borderRadius: "4px",
-                border: "1px solid #d0e1fd",
-              }}
-            >
-              <span>
-                Sort: {sortOptions.find((s) => s.value === selectedSort)?.label}
-              </span>
-              <Button
-                icon="pi pi-times"
-                className="p-button-text p-button-rounded p-button-sm"
-                onClick={() => setSelectedSort(null)}
-                style={{ padding: "2px", margin: "0 0 0 5px" }}
-              />
-            </div>
-          )}
-        </div>
-      )}
     </>
   );
 
   const end = (
     <>
+      {/* Theme Toggle Switch */}
+
       {/* Notification Overlay Panel */}
       <OverlayPanel ref={overlayPanelRef} className="notification-overlay">
         <div className="flex align-items-center justify-content-between mb-3">
@@ -367,51 +367,145 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         />
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            background: "#F5F6FA",
+            borderRadius: "30px",
+            padding: "2px",
+            width: "64px",
+            height: "32px",
+            marginRight: "16px",
+            cursor: "pointer",
+            position: "relative",
+          }}
+          onClick={() => setIsDarkMode(!isDarkMode)}
+        >
+          {/* Sun Icon */}
+          <div
+            style={{
+              width: "50%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill={isDarkMode ? "#94A3B8" : "#0F172A"}
+            >
+              <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" />
+              <path d="M12 2V4M12 20V22M4 12H2M6.31412 6.31412L4.8999 4.8999M17.6859 6.31412L19.1001 4.8999M6.31412 17.69L4.8999 19.1042M17.6859 17.69L19.1001 19.1042M22 12H20" />
+            </svg>
+          </div>
+          {/* Moon Icon */}
+          <div
+            style={{
+              width: "50%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1,
+            }}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill={isDarkMode ? "#0F172A" : "#94A3B8"}
+            >
+              <path d="M21.9548 12.9564C20.5779 15.3717 17.9791 17.0001 15 17.0001C10.5817 17.0001 7 13.4184 7 9.00006C7 6.02097 8.62837 3.42225 11.0436 2.04535C5.96731 2.52504 2 6.79927 2 12.0001C2 17.5229 6.47715 22.0001 12 22.0001C17.2008 22.0001 21.475 18.0327 21.9548 12.9564Z" />
+            </svg>
+          </div>
+          {/* Sliding Background */}
+          <div
+            style={{
+              position: "absolute",
+              width: "50%",
+              height: "28px",
+              backgroundColor: "#fff",
+              borderRadius: "28px",
+              transition: "transform 0.3s ease",
+              transform: `translateX(${isDarkMode ? "100%" : "0"})`,
+              left: "2px",
+              top: "2px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          />
+        </div>
+
+        {/* Notification Bell */}
         <Button
-          icon="pi pi-bell"
+          icon={
+            <img
+              src={icon}
+              alt="notification"
+              style={{ width: "24px", height: "24px",  }}
+            />
+          }
           className="notifications"
           onClick={(event) => overlayPanelRef.current.toggle(event)}
           aria-haspopup
-          rounded
-          style={{ width: "36px", height: "36px" }}
+          style={{
+            width: "40px",
+            height: "40px",
+            background: "transparent",
+            border: "none",
+          }}
         />
-        <div 
-          style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            gap: "10px" 
+        <img
+          src={manprofile}
+          alt="Profile"
+          className="profile-image"
+          style={{
+            width: "30px",
+            height: "30px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <img
-            src={avatar}
-            alt="Profile"
-            className="profile-image"
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
-          />
-          {!isMobile && <p>{userName}</p>}
+          <div>
+            <p>{userName}</p>
+            <p>Admin</p>
+          </div>
+          <div style={{ marginTop: "-20px" }}>
+            <img
+              src={more}
+              alt="more"
+              style={{ width: "15px", height: "15px" }}
+            />
+          </div>
         </div>
       </div>
     </>
   );
-  
+
   // Return both the Menubar and the MobileSidebar
   return (
     <>
-      <Menubar 
-        start={start} 
-        end={end} 
-        style={{ 
+      <Menubar
+        start={start}
+        end={end}
+        style={{
           padding: isMobile ? "8px" : "16px",
-          flexWrap: "wrap"
+          flexWrap: "wrap",
         }}
       />
-      <MobileSidebar 
-        isOpen={mobileMenuOpen} 
+      <MobileSidebar
+        isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         role={role}
       />

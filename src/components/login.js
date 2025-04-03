@@ -75,23 +75,8 @@ const LoginForm = () => {
 
         // Store user data
         loginUser(response.data.user);
-        const userRole = response.data.user?.role;
 
-        // Get the intended destination or use default based on role
-        const from = location.state?.from || getRoleDefaultPath(userRole);
-
-        if (userRole === "captain") {
-          navigate("/crew/inventory/dashboard");// navigate("/dashboard");
-        } else if (userRole === "service_provider") {
-          navigate("/crew/inventory/dashboard");//navigate("/service_provider/dashboard");
-        } else if (userRole === "supplier") {
-          navigate("/crew/inventory/dashboard");//navigate("/supplier/dashboard");
-        } else if (userRole === "crew_member") {
-          navigate("/crew/inventory/dashboard");
-        } else {
-          console.error("Unknown role:", userRole);
-          setError("Invalid role. Please contact support.");
-        }
+        navigate("/admin/dashboard");
       } else {
         setError(response.message || "Login failed. Please try again.");
       }
@@ -100,22 +85,6 @@ const LoginForm = () => {
       setError(error.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Helper function to get default path based on role
-  const getRoleDefaultPath = (role) => {
-    switch (role) {
-      case "captain":
-        return "/dashboard";
-      case "crew_member":
-        return "/crew/inventory/dashboard";
-      case "service_provider":
-        return "/service_provider/dashboard";
-      case "supplier":
-        return "/supplier/dashboard";
-      default:
-        return "/";
     }
   };
 

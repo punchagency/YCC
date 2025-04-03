@@ -9,7 +9,7 @@ import { BookingProvider } from "../context/booking/bookingContext";
 import { ServiceProvider } from "../context/service/serviceContext";
 import { ToastProvider } from "../context/toast/toastContext";
 
-const Layout = ({ role }) => {
+const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <ToastProvider>
@@ -40,4 +40,4 @@ const Layout = ({ role }) => {
   );
 };
 
-export default Layout;
+export default AdminLayout;
