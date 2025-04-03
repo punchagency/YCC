@@ -330,20 +330,20 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       separator: true,
       style: { margin: "15px 0" },
     },
-    {
-      label: "Help Centre",
-      icon: <img src={helpLogo} alt="Help Centre" width={15} height={15} />,
-      command: () => {
-        navigate("/crew/help");
-      },
-    },
-    {
-      label: "Contact Us",
-      icon: <img src={contactLogo} alt="Contact Us" width={15} height={15} />,
-      command: () => {
-        navigate("/crew/contact");
-      },
-    },
+    // {
+    //   label: "Help Centre",
+    //   icon: <img src={helpLogo} alt="Help Centre" width={15} height={15} />,
+    //   command: () => {
+    //     navigate("/crew/help");
+    //   },
+    // },
+    // {
+    //   label: "Contact Us",
+    //   icon: <img src={contactLogo} alt="Contact Us" width={15} height={15} />,
+    //   command: () => {
+    //     navigate("/crew/contact");
+    //   },
+    // },
     {
       label: "Log Out",
       icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,

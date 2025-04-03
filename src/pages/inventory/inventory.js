@@ -17,6 +17,7 @@ import plus from "../../assets/images/crew/plus.png";
 import arrowup from "../../assets/images/crew/arrowup.png";
 import barup from "../../assets/images/crew/barup.png";
 import { useUser } from "../../context/userContext";
+import downArrow from "../../assets/images/crew/downArrow.png";
 // import { getUserProfie } from "../../services/authService";
 
 const Calendar = () => {
@@ -274,7 +275,7 @@ const Inventory = () => {
               fontWeight: "600",
             }}
           >
-            AI Summary
+            Low Inventories
           </h3>
           <p
             style={{
@@ -283,8 +284,7 @@ const Inventory = () => {
               margin: "0 0 15px 0",
             }}
           >
-            Highlights what needs attention (e.g., upcoming orders, expiring
-            certificates, career suggestions, etc.)
+            Low inventory alerts on the dashboard to notify vendors of stock shortages in real time 
           </p>
 
           {/* Upcoming Orders Card */}
@@ -909,39 +909,93 @@ const Inventory = () => {
             <div className="inventory-dashboard-container-wrapper">
               <div className="summary-container">
                 <div>
-                  <h3>AI Summary</h3>
+                  <h3>Low Inventories </h3>
                   <p>
-                    Highlights what needs attention (eg., upcoming orders,
-                    expiring certificates, career, suggestions, etc.)
+                    Low inventory alerts on the dashboard to notify vendors of
+                    stock shortages in real time
                   </p>
                 </div>
-                <div>
+                {/* <div>
                   <img src={lone} alt="" />
-                </div>
+                </div> */}
               </div>
               <div className="boxes-container">
-                <div>
-                  <img src={upcomingLogo} alt="" />
-                  <span>$1k</span>
-                  <span>Upcoming Orders</span>
-                  <span style={{ fontSize: "9px" }}>+8% from yesterday</span>
+                <div
+                  style={{ alignContent: "center", justifyContent: "center" }}
+                >
+                  <span>-8%</span>
+                  <span>Engine Oil</span>
+                  <span style={{ fontSize: "9px" }}>-5% from today</span>
+                  <span
+                    style={{
+                      backgroundColor: "white",
+                      height: "7px",
+                      borderRadius: "10px",
+                      marginTop: "2px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        backgroundColor: "#909ADE",
+                        height: "7px",
+                        borderRadius: "10px",
+                        width: "20%",
+                      }}
+                    ></p>
+                  </span>
                 </div>
-                <div>
-                  <img src={iconexpire} alt="" />
+                <div
+                  style={{ alignContent: "center", justifyContent: "center" }}
+                >
                   <span>5</span>
-                  <span>Expiring Certifications</span>
+                  <span>Fuel</span>
                   <span style={{ fontSize: "9px" }}>+12% from yesterday</span>
+                  <span
+                    style={{
+                      backgroundColor: "white",
+                      height: "7px",
+                      borderRadius: "10px",
+                      marginTop: "2px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        backgroundColor: "#D1D185",
+                        height: "7px",
+                        borderRadius: "10px",
+                        width: "40%",
+                      }}
+                    ></p>
+                  </span>
                 </div>
-                <div>
-                  <img src={iconcareer} alt="" />
-                  <span>10</span>
-                  <span>Career Suggestions</span>
-                  <span style={{ fontSize: "9px" }}>+0.5% from yesterday</span>
+                <div
+                  style={{ alignContent: "center", justifyContent: "center" }}
+                >
+                  <span>-25%</span>
+                  <span>Diesel</span>
+                  <span style={{ fontSize: "9px" }}>-25% From Last Week</span>
+                  <span
+                    style={{
+                      backgroundColor: "white",
+                      height: "7px",
+                      borderRadius: "10px",
+                      marginTop: "2px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        backgroundColor: "#A2D4A2",
+                        height: "7px",
+                        borderRadius: "10px",
+                        width: "50%",
+                      }}
+                    ></p>
+                  </span>
                 </div>
               </div>
             </div>
             <div className="orders-analytics-container">
-              <div>
+              {/* <div>
                 <div>
                   <h3>Orders Analytics</h3>
                 </div>
@@ -950,8 +1004,8 @@ const Inventory = () => {
                   <p>Online orders</p>
                   <p>Monthly</p>
                 </div>
-              </div>
-              <div style={{ width: "100%" }}>
+              </div> */}
+              {/* <div style={{ width: "100%" }}>
                 <Line
                   data={{
                     labels: analyticsData.map((item) => item.labels),
@@ -1016,6 +1070,48 @@ const Inventory = () => {
                     },
                   }}
                 />
+              </div> */}
+              <div>
+                <h2>Financial Summary</h2>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <h5>Monthly</h5>
+                  <img src={downArrow} alt="" />
+                </div>
+              </div>
+              <div>
+                <section className="financial-summary">
+                    <main>
+                      <p>Invoice  INV-006</p>
+                      <p>Amount : $4,200-Due: 2025-08-05</p>
+                    </main>
+                    <main>
+                      <button>View</button>
+                    </main>
+                </section>
+                <section className="financial-summary">
+                    <main>
+                      <p>Invoice  INV-007</p>
+                      <p>Amount : $7,800-Due: 2025-09-12</p>
+                    </main>
+                    <main>
+                      <button>View</button>
+                    </main>
+                </section>
+                <section className="financial-summary">
+                    <main>
+                      <p>Invoice  INV-008</p>
+                      <p>Amount : $10,200-Due: 2025-14-19</p>
+                    </main>
+                    <main>
+                      <button>View</button>
+                    </main>
+                </section>
               </div>
             </div>
             <div className="bottom-container">
