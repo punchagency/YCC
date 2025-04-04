@@ -11,6 +11,7 @@ export default function Notifications({ role }) {
   const menuRight = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   const notificationData = [
     {
@@ -102,6 +103,15 @@ export default function Notifications({ role }) {
     ],
   ];
 
+  const filteredNotifications = notificationBodyData.filter((row) => {
+    if (activeFilter === "all") return true;
+    return row[0].title.toLowerCase() === activeFilter.toLowerCase();
+  });
+
+  const handleFilterClick = (filter) => {
+    setActiveFilter(filter);
+  };
+
   const handleViewDetails = (row) => {
     const modalData = {
       type: row[1].title,
@@ -118,72 +128,125 @@ export default function Notifications({ role }) {
 
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        {/* Left Section: Heading and Subheading */}
-        <div className="sub-header-left">
-          <div className="flex align-items-center">
-            <h3 className="mr-2">Notifications </h3>
-            <Badge
-              value="20"
-              severity="danger"
-              style={{ backgroundColor: "#EF4444 !important" }}
-            ></Badge>
+      <div className="notification-container">
+        {/* Header Section */}
+        <div className="notification-header">
+          <div className="header-title">
+            <h3>Notifications</h3>
+            <Badge value="20" severity="danger" />
           </div>
         </div>
-      </div>
-      <div className="notification-filter">
-        <div className="all-notification">All Notification</div>
-        <div>High Priority</div>
-        <div>Medium Priority</div>
-        <div>Low Priority</div>
-      </div>
-      <div className="notification-table-container">
-        <table className="notification-table">
-          <thead>
-            <tr className="header-row">
-              {notificationData.map((item) => (
-                <th key={item.id} className="header-cell">
-                  <div className="header-content">
-                    <span>{item.title}</span>
-                    <img src={item.icon} alt="sortNotification" />
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {notificationBodyData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="body-row">
-                {row.map((item, index) => (
-                  <td key={item.id} className="body-cell">
-                    <div
-                      className={`body-content ${
-                        index === 0
-                          ? `priority-${item.title.toLowerCase()}`
-                          : index === 3
-                          ? `status-${item.title
-                              .toLowerCase()
-                              .replace(/[&\s]+/g, "-")}`
-                          : ""
-                      }`}
-                    >
-                      {index === 4 ? (
-                        <Button
-                          label={item.title}
-                          className="p-button-outlined p-button-primary view-details-btn"
-                          onClick={() => handleViewDetails(row)}
-                        />
-                      ) : (
-                        <span>{item.title}</span>
-                      )}
+
+        {/* Filter Section */}
+        <div className="notification-filter">
+          <div className="filter-scroll-container">
+            <div
+              className={`filter-item ${activeFilter === "all" ? "active" : ""}`}
+              onClick={() => handleFilterClick("all")}
+            >
+              All Notification
+            </div>
+            <div
+              className={`filter-item ${activeFilter === "high" ? "active" : ""}`}
+              onClick={() => handleFilterClick("high")}
+            >
+              High Priority
+            </div>
+            <div
+              className={`filter-item ${activeFilter === "medium" ? "active" : ""}`}
+              onClick={() => handleFilterClick("medium")}
+            >
+              Medium Priority
+            </div>
+            <div
+              className={`filter-item ${activeFilter === "low" ? "active" : ""}`}
+              onClick={() => handleFilterClick("low")}
+            >
+              Low Priority
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Card View */}
+          
+        <div className="notification-mobile-view">
+          {filteredNotifications.map((row, index) => (
+            <div key={index} className="notification-card">
+              <div className="notification-card-header">
+                <div className={`priority-badge priority-${row[0].title.toLowerCase()}`}>
+                  {row[0].title}
+                </div>
+                <div className="notification-type">{row[1].title}</div>
+              </div>
+              <div className="notification-description">{row[2].title}</div>
+              <div className="notification-card-footer">
+                <div className={`status-badge status-${row[3].title.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {row[3].title}
+                </div>
+                <Button
+                  label="View Details"
+                  className="p-button-outlined p-button-primary"
+                  onClick={() => handleViewDetails(row)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="notification-table-container desktop-only">
+          <table className="notification-table">
+            <thead>
+              <tr className="header-row">
+                {notificationData.map((item) => (
+                  <th key={item.id} className="header-cell">
+                    <div className="header-content">
+                      <span>{item.title}</span>
+                      <img
+                        src={item.icon}
+                        alt="sortNotification"
+                        style={{ width: "20px", height: "20px" }}
+                      />
                     </div>
-                  </td>
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredNotifications.map((row, rowIndex) => (
+                <tr key={rowIndex} className="body-row">
+                  {row.map((item, index) => (
+                    <td key={item.id} className="body-cell">
+                      <div
+                        className={`body-content ${
+                          index === 0
+                            ? `priority-${item.title.toLowerCase()}`
+                            : index === 3
+                            ? `status-${item.title  
+                                .toLowerCase()
+                                .replace(/[&\s]+/g, "-")}`
+                            : ""
+                        }`}
+                      >
+                        {index === 4 ? (
+                          <Button
+                            label={item.title}
+                            className="p-button-outlined p-button-primary view-details-btn"
+                            onClick={() => handleViewDetails(row)}
+                          />
+                        ) : (
+                          <span>{item.title}</span>
+                        )}
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
       <NotificationDetailsModal
         visible={showModal}
         onHide={() => setShowModal(false)}
