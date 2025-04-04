@@ -32,31 +32,31 @@
 .notification-filter {
   margin-bottom: 20px;
   overflow: hidden;
-  
+
   .filter-scroll-container {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
-    
+
     &::-webkit-scrollbar {
       display: none;
     }
-    
+
     .filter-item {
       cursor: pointer;
-      
+
       &.active {
-        background: #0387D9;
-        color: #FFFFFF;
+        background: #0387d9;
+        color: #ffffff;
       }
-      
+
       &:hover {
-        background: #F5F6FA;
-        
+        background: #f5f6fa;
+
         &.active {
-          background: #0387D9;
+          background: #0387d9;
         }
       }
 
@@ -79,15 +79,15 @@
 
   .notification-table {
     min-width: 800px; // Minimum width to prevent squishing
-    
+
     .header-cell {
       padding: 15px 10px;
-      
+
       .header-content {
         display: flex;
         align-items: center;
         gap: 5px;
-        
+
         img {
           width: 16px;
           height: 16px;
@@ -97,10 +97,10 @@
 
     .body-cell {
       padding: 10px;
-      
+
       .body-content {
         font-size: 14px;
-        
+
         &.priority-high,
         &.priority-medium,
         &.priority-low {
@@ -108,7 +108,7 @@
           width: auto;
           min-width: 90px;
         }
-        
+
         &.status-assign-to-manager,
         &.status-acknowledged,
         &.status-resolve-archive {
@@ -125,7 +125,7 @@
 @media screen and (max-width: 768px) {
   .notification-filter {
     margin: 10px;
-    
+
     .filter-item {
       padding: 8px 15px;
       font-size: 13px;
@@ -136,17 +136,17 @@
   .notification-table-responsive {
     margin: 10px;
     padding: 5px;
-    
+
     .notification-table {
       .header-cell {
         padding: 10px 8px;
         font-size: 13px;
       }
-      
+
       .body-cell {
         padding: 8px;
         font-size: 13px;
-        
+
         .body-content {
           &.priority-high,
           &.priority-medium,
@@ -154,7 +154,7 @@
             padding: 6px;
             min-width: 80px;
           }
-          
+
           &.status-assign-to-manager,
           &.status-acknowledged,
           &.status-resolve-archive {
@@ -168,7 +168,7 @@
 
   .sub-header-panel {
     padding: 10px;
-    
+
     h3 {
       font-size: 18px;
     }
@@ -189,20 +189,26 @@
   table-layout: fixed; // Add this for better column control
 
   // Define column widths
-  th, td {
-    &:nth-child(1) { // Priority column
+  th,
+  td {
+    &:nth-child(1) {
+      // Priority column
       width: 10%;
     }
-    &:nth-child(2) { // Type column
+    &:nth-child(2) {
+      // Type column
       width: 10%;
     }
-    &:nth-child(3) { // Description column
+    &:nth-child(3) {
+      // Description column
       width: 20%; // Increased width for description
     }
-    &:nth-child(4) { // Status column
+    &:nth-child(4) {
+      // Status column
       width: 10%;
     }
-    &:nth-child(5) { // Details column
+    &:nth-child(5) {
+      // Details column
       width: 10%;
     }
   }
@@ -237,31 +243,31 @@
 }
 // Priority styles
 .priority-high {
-  background-color: #E2F9F0;
+  background-color: #e2f9f0;
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #1A9E6D;
+  color: #1a9e6d;
   border-radius: 5px;
   padding: 10px 0px;
 }
 
 .priority-medium {
-  background-color: #FFFEDB;
+  background-color: #fffedb;
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #827F29;
+  color: #827f29;
   border-radius: 5px;
   padding: 10px 0px;
 }
 
 .priority-low {
-  background-color: #E414171A;
+  background-color: #e414171a;
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #DB5F61;
+  color: #db5f61;
   border-radius: 5px;
   padding: 10px 0px;
 }
@@ -269,17 +275,17 @@
 // Status styles
 
 .status-assign-to-manager {
-  background-color: #F2E3FF;
+  background-color: #f2e3ff;
   width: 140px;
   text-align: center;
   font-weight: bold;
-  color: #906FAD;
+  color: #906fad;
   border-radius: 5px;
   padding: 10px 5px;
 }
 
 .status-acknowledged {
-  background-color: #DBF4FF;
+  background-color: #dbf4ff;
   width: 140px;
   text-align: center;
   font-weight: bold;
@@ -289,16 +295,16 @@
 }
 
 .status-resolve-archive {
-  background-color: #E3FFDB;
+  background-color: #e3ffdb;
   width: 140px;
   text-align: center;
   font-weight: bold;
-  color: #768F6F;
+  color: #768f6f;
   border-radius: 5px;
   padding: 10px 5px;
 }
 .view-details-btn {
-  border: 1px solid #E5E7EB !important;
+  border: 1px solid #e5e7eb !important;
   color: #495057 !important;
   background: transparent !important;
   padding: 8px 16px !important;
@@ -316,7 +322,7 @@
   .p-dialog-header {
     background: #f8f9fa;
     padding: 1rem 1.5rem;
-    
+
     .p-dialog-title {
       font-size: 1.1rem;
       font-weight: 600;
@@ -353,31 +359,30 @@
         font-weight: 500;
 
         &.priority-high {
-          background-color: #E2F9F0;
-          color: #1A9E6D;
+          background-color: #e2f9f0;
+          color: #1a9e6d;
         }
 
         &.priority-medium {
-          background-color: #FFFEDB;
-          color: #827F29;
+          background-color: #fffedb;
+          color: #827f29;
         }
 
         &.priority-low {
-          background-color: #E414171A;
-          color: #DB5F61;
+          background-color: #e414171a;
+          color: #db5f61;
         }
       }
     }
   }
 }
 
-
 .notification-filter {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
-  width:45%;
-  background: #FFFFFF;
+  width: 45%;
+  background: #ffffff;
   padding: 10px 10px;
   margin-left: 20px;
   border-radius: 10px;
@@ -392,29 +397,29 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
-  color: #6C757D;
+  color: #6c757d;
 }
 
 .notification-filter .filter-item:hover {
-  background-color: #F5F6FA;
+  background-color: #f5f6fa;
 }
 
 .notification-filter .filter-item.active {
-  background-color: #0387D9;
+  background-color: #0387d9;
   color: white;
 }
 
 /* Update existing priority styles to match filter colors */
 .priority-high {
-  color: #EF4444 !important;
+  color: #ef4444 !important;
 }
 
 .priority-medium {
-  color: #F59E0B !important;
+  color: #f59e0b !important;
 }
 
 .priority-low {
-  color: #10B981 !important;
+  color: #10b981 !important;
 }
 
 .header-cell {
@@ -427,12 +432,12 @@
   align-items: center; // Vertically centers items
   gap: 8px; // Consistent spacing between title and icon
   justify-content: flex-start; // Aligns items to the left
-  
+
   .header-title {
     font-weight: 500;
     color: #666;
   }
-  
+
   .header-icon {
     width: 20px;
     height: 20px;
@@ -442,6 +447,139 @@
 }
 
 // end of Notification styles
+
+// start of report screen
+
+.report-container-inventory-reports-and-bar-graph {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.report-container-inventory-reports {
+  background: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  margin-left: 15px;
+  width: 550px;
+  border-radius: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 10px;
+  height: 250px;
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #212121;
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+}
+.report-container-flop {
+  display: flex;
+  padding: 10px 10px;
+  .report-container-flop-2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 10px;
+    margin-top: -4px;
+    .report-progress-outer-bar {
+      background: #ececec;
+      width: 300px;
+      height: 10px;
+      border-radius: 20px;
+      margin-right: 15px;
+      .report-progress-inner-bar {
+        background: linear-gradient(to right, #7fdd53, #2fea9b);
+        width: 200px;
+        height: 100%;
+        border-radius: 20px;
+      }
+    }
+    .report-progress-text {
+      margin-top: 15px;
+      p {
+        color: lightgrey;
+      }
+    }
+  }
+}
+
+// for bar graph
+.report-container-bar-graph {
+  background: #ffffff;
+  margin-bottom: 20px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  margin-left: 15px;
+  width: 550px;
+  border-radius: 10px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 10px;
+  height: 250px;
+}
+
+// for active users
+.metrics-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: -5px;
+  padding: 20px;
+  width: 500px;
+
+  height: 250px;
+  margin-top: -10px;
+}
+
+.metric-card {
+  background: #ffffff;
+  border-radius: 12px;
+  margin-top: -25px;
+  margin-bottom: 30px;
+  width: 220px;
+  height: 120px;
+  padding: 16px; // Adjusted padding
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+
+  .metric-header {
+    margin-bottom: 5px; // Adjusted margin
+
+    span {
+      font-size: 14px;
+      color: #64748b;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+  }
+
+  .sparkline {
+    height: 40px; // Adjusted height
+    position: relative; // Added position
+    overflow: hidden; // Added overflow
+    margin-top: 0; // Adjusted margin
+  }
+}
+
+.order-summary-text-header {
+  padding-left: 35px;
+  padding-top: 10px;
+  margin-bottom: 30px;
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #212121;
+  }
+}
+
+// end of report screen
 
 body {
   margin: 0;
@@ -2566,18 +2704,19 @@ ul {
 .box-order-container {
   display: flex;
   justify-content: space-between;
-  padding-left: 10px;
-  padding-right: 15px;
+  padding-left: 35px;
+  padding-right: 35px;
   .box1-order {
-    width: 40%;
+    width: 24%;
     background: #fff;
+    height: 150px;
     margin-top: -10px;
     border-radius: 10px;
     padding: 10px 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-right: 10px;
     p {
-      font-size: 12px;
+      font-size: 14px;
     }
     .flexdrop {
       display: flex;
@@ -2585,8 +2724,9 @@ ul {
       align-items: center;
     }
     img {
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
+      margin-right: 5px;
     }
     .pending-order-container {
       display: flex;
@@ -2595,7 +2735,8 @@ ul {
       padding: 10px;
       border-radius: 10px;
       p {
-        font-size: 12px;
+        font-size: 15px;
+        font-weight: bold;
       }
     }
   }
@@ -4304,7 +4445,7 @@ ul {
 
 .notification-container {
   padding: 16px;
-  
+
   @media (max-width: 768px) {
     padding: 12px;
   }
@@ -4312,16 +4453,16 @@ ul {
 
 .notification-header {
   margin-bottom: 20px;
-  
+
   .header-title {
     display: flex;
     align-items: center;
     gap: 12px;
-    
+
     h3 {
       margin: 0;
       font-size: 24px;
-      
+
       @media (max-width: 768px) {
         font-size: 20px;
       }
@@ -4332,31 +4473,31 @@ ul {
 .notification-filter {
   margin-bottom: 20px;
   overflow: hidden;
-  
+
   .filter-scroll-container {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
-    
+
     &::-webkit-scrollbar {
       display: none;
     }
-    
+
     .filter-item {
       cursor: pointer;
-      
+
       &.active {
-        background: #0387D9;
-        color: #FFFFFF;
+        background: #0387d9;
+        color: #ffffff;
       }
-      
+
       &:hover {
-        background: #F5F6FA;
-        
+        background: #f5f6fa;
+
         &.active {
-          background: #0387D9;
+          background: #0387d9;
         }
       }
     }
@@ -4365,64 +4506,82 @@ ul {
 
 .notification-mobile-view {
   display: none;
-  
+
   @media (max-width: 768px) {
     display: block;
   }
-  
+
   .notification-card {
     background: white;
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
     .notification-card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
-      
+
       .priority-badge {
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 500;
-        
-        &.priority-high { background: #FEE2E2; color: #EF4444; }
-        &.priority-medium { background: #FEF3C7; color: #F59E0B; }
-        &.priority-low { background: #D1FAE5; color: #10B981; }
+
+        &.priority-high {
+          background: #fee2e2;
+          color: #ef4444;
+        }
+        &.priority-medium {
+          background: #fef3c7;
+          color: #f59e0b;
+        }
+        &.priority-low {
+          background: #d1fae5;
+          color: #10b981;
+        }
       }
-      
+
       .notification-type {
         font-size: 13px;
-        color: #6B7280;
+        color: #6b7280;
       }
     }
-    
+
     .notification-description {
       font-size: 14px;
       color: #374151;
       margin-bottom: 16px;
       line-height: 1.5;
     }
-    
+
     .notification-card-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      
+
       .status-badge {
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 500;
-        
-        &.status-assign-to-manager { background: #EDE9FE; color: #6D28D9; }
-        &.status-acknowledged { background: #DBEAFE; color: #2563EB; }
-        &.status-resolve-archive { background: #D1FAE5; color: #059669; }
+
+        &.status-assign-to-manager {
+          background: #ede9fe;
+          color: #6d28d9;
+        }
+        &.status-acknowledged {
+          background: #dbeafe;
+          color: #2563eb;
+        }
+        &.status-resolve-archive {
+          background: #d1fae5;
+          color: #059669;
+        }
       }
-      
+
       .p-button {
         font-size: 12px;
         padding: 6px 12px;
@@ -4434,5 +4593,102 @@ ul {
 .desktop-only {
   @media (max-width: 768px) {
     display: none;
+  }
+}
+
+.selling-products-container {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 95.5%;
+  padding: 24px;
+  margin-bottom: 24px;
+  margin-left: 30px;
+  margin-top: 24px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+
+  .selling-products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+  }
+
+  .selling-products-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    th {
+      font-weight: 600;
+      color: #64748b;
+      font-size: 14px;
+      
+      i {
+        margin-left: 4px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    }
+
+    td {
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .status-confirmed {
+      background: #fff8e6;
+      color: #b98900;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .status-in-progress {
+      background: #e6f7ff;
+      color: #0077cc;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .status-pending {
+      background: #fff1f0;
+      color: #cf1322;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .status-completed {
+      background: #e6fffb;
+      color: #08979c;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .status-flagged {
+      background: #fff0f6;
+      color: #eb2f96;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
   }
 }
