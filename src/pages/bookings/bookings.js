@@ -547,7 +547,7 @@ const Bookings = () => {
                               className="header-checkbox"
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Booking ID
                             <img
                               src={sortIcon}
@@ -558,7 +558,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Service Type
                             <img
                               src={sortIcon}
@@ -569,7 +569,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Vendor Assigned 
                             <img
                               src={sortIcon}
@@ -580,7 +580,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Price
                             <img
                               src={sortIcon}
@@ -591,7 +591,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Date & Time
                             <img
                               src={sortIcon}
@@ -602,7 +602,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Booking Status
                             <img
                               src={sortIcon}
@@ -613,7 +613,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Internal Notes & Comments
                             <img
                               src={sortIcon}
@@ -624,7 +624,7 @@ const Bookings = () => {
                               }}
                             />
                           </th>
-                          <th>
+                          <th style={{fontSize: "12px"}}>
                             Actions
                             <img
                               src={sortIcon}
