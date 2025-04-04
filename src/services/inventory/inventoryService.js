@@ -4,6 +4,7 @@ import { useUser } from "../../context/userContext"; // Import at the top level
 // Use the base API URL, not the auth URL
 const API_URL = "http://localhost:7000/api";
 
+
 // Add authentication token to requests
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
