@@ -752,3 +752,41 @@
 .theme-toggle-icon.inactive svg {
   fill: #94A3B8;
 }
+
+/* Notification filter styles */
+.notification-filter {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.notification-filter .filter-item {
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  color: #6C757D;
+}
+
+.notification-filter .filter-item:hover {
+  background-color: #F5F6FA;
+}
+
+.notification-filter .filter-item.active {
+  background-color: #0387D9;
+  color: white;
+}
+
+/* Update existing priority styles to match filter colors */
+.priority-high {
+  color: #EF4444 !important;
+}
+
+.priority-medium {
+  color: #F59E0B !important;
+}
+
+.priority-low {
+  color: #10B981 !important;
+}
