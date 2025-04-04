@@ -3,9 +3,10 @@ import DashboardTitleBar from "../../../../components/dashboard/title-bar";
 import Section1FinancialManagement from "./section1-financial-management";
 import Section2FinancialManagement from "./section2-financial-management";
 import Section3FinancialManagement from "./section3-financial-management";
-
+import { useTheme } from "../../../../context/theme/themeContext";
 
 const AdminFinancialManagement = () => {
+  const { theme } = useTheme();
   return (
     <Box
     sx={{
@@ -14,6 +15,8 @@ const AdminFinancialManagement = () => {
       maxWidth: "100%",
       display: "flex",
       flexDirection: "column",
+      backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
+
     }}
   >
       <DashboardTitleBar title="Financial Management" />

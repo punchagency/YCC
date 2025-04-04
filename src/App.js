@@ -149,9 +149,6 @@ function App() {
             <Route path="/admin/notifications" element={<Notifications />} />
             <Route path="/admin/reports" element={<Reports />} />
             <Route path="/admin/settings" element={<CrewSetting />} />
-            {/* Add other admin routes here look at the setup of the above admin dashboard route */}
-
-
           </Route>
         </Routes>
       </NotificationsProvider>

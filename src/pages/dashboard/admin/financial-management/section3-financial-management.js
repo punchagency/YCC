@@ -11,27 +11,32 @@ import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import downloadIcon from "../../../../assets/images/icons/financial-management/download-icon.png";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Pagination from "./pagination";
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+import { useTheme } from "../../../../context/theme/themeContext";
+const StyledTableCell = styled(TableCell)(({ mode }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#F9F9FA",
-    color: "#212121",
+    backgroundColor: mode === "light" ? "#F9F9FA" : "#7F7F7F",
+    color: mode === "light" ? "#212121" : "white",
     fontSize: "14px",
     padding: "10px 32px",
   },
   [`&.${tableCellClasses.body}`]: {
+    backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
     fontSize: "14px",
     padding: "0px",
     },
   [`&:first-child`]: {
     width: "20px",
     padding: "0px",
+    backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
   },
   [`&:nth-child(2)`]: {
     padding: "0px",
+    backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
+
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const StyledTableRow = styled(TableRow)(({ mode }) => ({
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -62,6 +67,7 @@ const statusColors = {
 const Section3FinancialManagement = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const { theme } = useTheme();
   return (
     <Box
       sx={{
@@ -72,7 +78,7 @@ const Section3FinancialManagement = () => {
       }}
     >
       <Box>
-        <CustomTypography>Customer Orders</CustomTypography>
+        <CustomTypography mode={theme}>Customer Orders</CustomTypography>
         <Box
           sx={{
             display: "flex",
@@ -81,33 +87,33 @@ const Section3FinancialManagement = () => {
             alignItems: "center",
           }}
         >
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} mode={theme}>
             <Table aria-label="customized table">
               <TableHead>
                 <TableRow>
-                <StyledTableCell>
-                    <TableTitleText>
-                      <CustomCheckbox />
+                <StyledTableCell mode={theme}>
+                    <TableTitleText mode={theme}>
+                      <CustomCheckbox mode={theme} />
                     </TableTitleText>
                   </StyledTableCell>
-                  <StyledTableCell>
-                    <TableTitleText>
-                      Transaction <FilterListIcon sx={{ fontSize: "17px", color: "#6E7079" }} />
+                  <StyledTableCell mode={theme}>
+                    <TableTitleText mode={theme}>
+                      Transaction <FilterListIcon sx={{ fontSize: "17px", color: theme === "light" ? "#6E7079" : "white" }} />
                     </TableTitleText>
                   </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <TableTitleText>
-                      Status <FilterListIcon sx={{ fontSize: "17px", color: "#6E7079" }} />
+                  <StyledTableCell align="right" mode={theme}>
+                    <TableTitleText mode={theme}>
+                      Status <FilterListIcon sx={{ fontSize: "17px", color: theme === "light" ? "#6E7079" : "white" }} />
                     </TableTitleText>
                   </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <TableTitleText>
-                      Amount <FilterListIcon sx={{ fontSize: "17px", color: "#6E7079" }} />
+                  <StyledTableCell align="right" mode={theme}>
+                    <TableTitleText mode={theme}>
+                      Amount <FilterListIcon sx={{ fontSize: "17px", color: theme === "light" ? "#6E7079" : "white" }} />
                     </TableTitleText>
                   </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <TableTitleText>
-                      Actions <FilterListIcon sx={{ fontSize: "17px", color: "#6E7079" }} />
+                  <StyledTableCell align="right" mode={theme}>
+                    <TableTitleText mode={theme}>
+                      Actions <FilterListIcon sx={{ fontSize: "17px", color: theme === "light" ? "#6E7079" : "white" }} />
                     </TableTitleText>
                   </StyledTableCell>
                 </TableRow>
@@ -115,13 +121,13 @@ const Section3FinancialManagement = () => {
               <TableBody>
                 {rows.map((row) => (
                   <StyledTableRow key={row.transaction}>
-                    <StyledTableCell align="right">
-                      <TableBodyText>
-                        <CustomCheckbox />
+                    <StyledTableCell align="right" mode={theme}>
+                      <TableBodyText mode={theme}>
+                        <CustomCheckbox mode={theme} />
                       </TableBodyText>
                     </StyledTableCell>
-                    <StyledTableCell component="th" scope="row">
-                      <TableBodyText sx={{ paddingRight: "5px" }}>
+                    <StyledTableCell component="th" scope="row" mode={theme}>
+                      <TableBodyText mode={theme} sx={{ paddingRight: "5px"}}>
                         {row.transaction}&nbsp;&nbsp;
                         <FileCopyOutlinedIcon
                           sx={{
@@ -132,21 +138,21 @@ const Section3FinancialManagement = () => {
                         />
                       </TableBodyText>
                     </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <TableBodyText>
+                    <StyledTableCell align="right" mode={theme}>
+                      <TableBodyText mode={theme}>
                         <StatusBox status={row.status}>{row.status}</StatusBox>
                       </TableBodyText>
                     </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <TableBodyText>${row.amount}</TableBodyText>
+                    <StyledTableCell align="right" mode={theme}>
+                      <TableBodyText mode={theme}>${row.amount}</TableBodyText>
                     </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <TableBodyText>
+                    <StyledTableCell align="right" mode={theme}>
+                      <TableBodyText mode={theme}>
                         <Box sx={{ display: "flex", gap: "9px" }}>
-                          <ActionButton sx={{ padding: "5px 5px", margin: 0, minWidth: "auto" }}>
+                          <ActionButton mode={theme} sx={{ padding: "5px 5px", margin: 0, minWidth: "auto" }}>
                             <img src={downloadIcon} alt="download" style={{ display: "block" }} />
                           </ActionButton>
-                        <ActionButton>
+                        <ActionButton mode={theme}>
                           Pay Now
                           </ActionButton>
                         </Box>
@@ -156,7 +162,7 @@ const Section3FinancialManagement = () => {
                 ))}
                 {/* pagination: this row should be the last row*/}
                 <TableRow>
-                    <StyledTableCell colSpan={5} align="right">
+                    <StyledTableCell colSpan={5} align="right" mode={theme}>
                         <Pagination 
                          currentPage={currentPage}
                          itemsPerPage={itemsPerPage}
@@ -173,16 +179,16 @@ const Section3FinancialManagement = () => {
   );
 };
 
-export const CustomTypography = styled(Typography)(({ theme }) => ({
+export const CustomTypography = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 600,
   fontSize: "16px",
   lineHeight: "111%",
   letterSpacing: "0%",
-  color: "#212121",
+  color: mode === "light" ? "#212121" : "white",
 }));
 
-const TableTitleText = styled(Typography)({
+  const TableTitleText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 500,
   fontSize: "16px",
@@ -190,29 +196,29 @@ const TableTitleText = styled(Typography)({
   letterSpacing: "0px",
   verticalAlign: "middle",
   textAlign: "center",
-  color: "#212121",
+  color: mode === "light" ? "#212121" : "white",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   gap: "7px",
-});
+}));
 
-const TableBodyText = styled(Typography)({
+const TableBodyText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "14px",
   lineHeight: "100%",
   letterSpacing: "0%",
-  color: "#6E7079",
+  color: mode === "light" ? "#6E7079" : "white",
   padding: "10px 10px",
   textAlign: "center",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
-});
+}));
 
-const StatusBox = styled(Box)(({ theme, status }) => ({
+  const StatusBox = styled(Box)(({ mode, status }) => ({
   backgroundColor: statusColors[status].backgroundColor,
   color: statusColors[status].color,
   borderRadius: "6px",
@@ -221,20 +227,20 @@ const StatusBox = styled(Box)(({ theme, status }) => ({
   textAlign: "center",
 }));
 
-const ActionButton = styled(Button)(({ theme }) => ({
+  const ActionButton = styled(Button)(({ mode }) => ({
   borderRadius: "5.21px",
   borderWidth: "0.87px",
   paddingRight: "10px",
   paddingLeft: "10px",
-  backgroundColor: "#FFFFFF",
-  color: "#495057",
+  backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
+  color: mode === "light" ? "#495057" : "white",
   padding: "5px 5px",
   border: "0.87px solid #E5E7EB",
   textTransform: "none",
 }));
 
-const CustomCheckbox = styled(Checkbox)(({ theme }) => ({
-  color: "#6E7079",
+  const CustomCheckbox = styled(Checkbox)(({ mode }) => ({
+  color: mode === "light" ? "#6E7079" : "white",
   borderRadius: "15px",
   "&.Mui-checked": {
     color: "#0387D9",

@@ -3,8 +3,10 @@ import { useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
+import { useTheme } from "../../../../context/theme/themeContext";
 
 const Section2FinancialManagement = () => {
+  const { theme } = useTheme();
   const [selectedButton, setSelectedButton] = useState("Pending Invoices");
   const buttons = ["Pending Invoices", "Completed Payments", "Upcoming Events"];
   const options = ["All", "Pending", "Completed", "Upcoming"];
@@ -41,7 +43,7 @@ const Section2FinancialManagement = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          backgroundColor: "#FFFFFF",
+          backgroundColor: theme === "light" ? "#FFFFFF" : "#7F7F7F",
           paddingX: "4px",
           paddingY: "2px",
           borderRadius: "8px",
@@ -53,6 +55,7 @@ const Section2FinancialManagement = () => {
             key={index}
             active={selectedButton === option}
             onClick={() => setSelectedButton(option)}
+            mode={theme}
           >
             {option}
           </CustomButton>
@@ -69,25 +72,27 @@ const Section2FinancialManagement = () => {
         }}
       >
         <Box>
-          <FilterButton onClick={handleClick}>
+          <FilterButton onClick={handleClick} mode={theme}>
             <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <FilterListIcon sx={{ color: "#000000", fontSize: "17px" }} />
+              <FilterListIcon sx={{ color: theme === "light" ? "#000000" : "white", fontSize: "17px" }} />
               <Typography
-                sx={{ color: "#9b9b9b", fontWeight: 400, fontSize: "13px" }}
+                sx={{ color: theme === "light" ? "#9b9b9b" : "white", fontWeight: 400, fontSize: "13px" }}
               >
                 {selected || "Select Filter"}
               </Typography>
             </Box>
             <KeyboardArrowDownIcon
-              sx={{ color: "#000000", fontSize: "17px" }}
+              sx={{ color: theme === "light" ? "#000000" : "white", fontSize: "17px" }}
             />
           </FilterButton>
 
-          <FilterMenu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <FilterMenu anchorEl={anchorEl} open={open} onClose={handleClose} mode={theme}>
             {options.map((option) => (
               <FilterMenuItem
                 key={option}
-                onClick={() => handleSelect(option)}>
+                onClick={() => handleSelect(option)}
+                mode={theme}
+              >
                 {option}
               </FilterMenuItem>
             ))}
@@ -113,9 +118,10 @@ const Section2FinancialManagement = () => {
           placeholder="Search Transactions"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          mode={theme}
           startAdornment={
             <InputAdornment position="start" sx={{ ml: "16px", mr: "4px" }}>
-              <SearchIcon sx={{ color: "#212121", fontSize: "17px" }} />
+              <SearchIcon sx={{ color: theme === "light" ? "#212121" : "white", fontSize: "17px" }} />
             </InputAdornment>
           }
          
@@ -127,7 +133,7 @@ const Section2FinancialManagement = () => {
   );
 };
 
-export const CustomButton = styled(Button)(({ active }) => ({
+export const CustomButton = styled(Button)(({ active, mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 600,
   fontSize: "12px",
@@ -136,19 +142,19 @@ export const CustomButton = styled(Button)(({ active }) => ({
   textAlign: "center",
   verticalAlign: "middle",
   textTransform: "none",
-  color: active ? "#FFFFFF" : "#212121",
+  color: mode === "light" ? active ? "#FFFFFF" : "#212121" : active ? "white" : "#212121",
   padding: "10px",
   margin: "0px",
-  backgroundColor: active ? "#0387D9" : "#FFFFFF",
+  backgroundColor: active ? "#0387D9" : mode === "light" ? "#FFFFFF" : "#7F7F7F",
   borderRadius: "8px",
 }));
 
-export const FilterButton = styled(Button)(({ active }) => ({
+export const FilterButton = styled(Button)(({ active, mode }) => ({
   display: "flex",
   justifyContent: "space-between",
   padding: "4px 6px ",
   width: "150px",
-  backgroundColor: "#FFFFFF",
+  backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
   borderRadius: "8px",
   border: "1px solid #d5d5d5",
   boxShadow: "none",
@@ -159,35 +165,37 @@ export const FilterButton = styled(Button)(({ active }) => ({
   },
 }));
 
-export const FilterMenu = styled(Menu)(({ anchorEl }) => ({
+export const FilterMenu = styled(Menu)(({ anchorEl, mode }) => ({
   "& .MuiPaper-root": {
     width: anchorEl?.offsetWidth,
     borderRadius: "8px",
     marginTop: "4px",
     boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-    backgroundColor: "#F6F6F6",
+    backgroundColor: mode === "light" ? "#F6F6F6" : "#7F7F7F",
   },
 }));
 
-export const FilterMenuItem = styled(MenuItem)(({ active }) => ({
+export const FilterMenuItem = styled(MenuItem)(({ active, mode }) => ({
   padding: "8px 16px",
+  color: mode === "light" ? "#212121" : "white",
   "&:hover": {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: mode === "light" ? "#FFFFFF" : "#03141F",
+    color: mode === "light" ? "#212121" : "white",
   },
 }));
 
-export const CustomInputBase = styled(InputBase)(({ active }) => ({
+export const CustomInputBase = styled(InputBase)(({ active, mode }) => ({
     width: "100%",
     height: "30px",
     borderRadius: "25px",
     border: "1px solid #d5d5d5",
-    backgroundColor: "#ffffff",
+    backgroundColor: mode === "light" ? "#ffffff" : "#7F7F7F",
     "& .MuiInputBase-input": {
-      color: "#212121",
+      color: mode === "light" ? "#212121" : "white",
       fontSize: "13px",
       fontWeight: 400,
       "&::placeholder": {
-        color: "#9b9b9b",
+        color: mode === "light" ? "#9b9b9b" : "white",
         opacity: 1,
       },
     },
