@@ -1,6 +1,8 @@
 import { Box, Typography, styled } from "@mui/material";
 import BasicTable from "./basic-table";
+import { useTheme } from "../../context/theme/themeContext";
 const CurrentOrderSummary = () => {
+  const { theme } = useTheme();
   const summaryData = [
     {
       title: "Total Orders",
@@ -20,7 +22,7 @@ const CurrentOrderSummary = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "white",
+        backgroundColor: theme === "light" ? "white" : "#03141F",
         borderRadius: "8px",
         padding: "20px",
         boxShadow: "0px 2px 8px 0px #0000001A",
@@ -34,17 +36,17 @@ const CurrentOrderSummary = () => {
           gap: "10px",
         }}
       >
-        <DashBoardTitleText>Current Order Summary</DashBoardTitleText>
-        <DashBoardDescriptionText>
+        <DashBoardTitleText mode={theme}>Current Order Summary</DashBoardTitleText>
+        <DashBoardDescriptionText mode={theme}>
           Displays real-time updates on placed, pending, and completed orders.
         </DashBoardDescriptionText>
 
         <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", marginTop: "20px" }}>
           {summaryData.map((item, index) => (
-            <SummaryWidgetBox>
+            <SummaryWidgetBox mode={theme}>
                 <Box>
-                    <DashBoardTitleText>{item.value}</DashBoardTitleText>
-                    <CurrentSummarySubText>{item.title}</CurrentSummarySubText>
+                    <DashBoardTitleText mode={theme}>{item.value}</DashBoardTitleText>
+                    <CurrentSummarySubText mode={theme}>{item.title}</CurrentSummarySubText>
                 </Box>
             </SummaryWidgetBox>
           ))}
@@ -59,31 +61,32 @@ const CurrentOrderSummary = () => {
   );
 };
 
-const DashBoardTitleText = styled(Typography)({
+const DashBoardTitleText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 600,
   fontSize: "20px",
   lineHeight: "32px",
   letterSpacing: "0%",
-  color: "#212121",
-});
+  color: mode === "light" ? "#212121" : "white",
+}));
 
-const DashBoardDescriptionText = styled(Typography)({
+const DashBoardDescriptionText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "12px",
-});
-const CurrentSummarySubText = styled(Typography)({
+  color: mode === "light" ? "#212121" : "white",
+}));
+const CurrentSummarySubText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 500,
   fontSize: 14,
   marginTop: "10px",
   padding: 0,
   letterSpacing: 0,
-  color: "#212121",
-});
+  color: mode === "light" ? "#212121" : "white",
+}));
 
-const SummaryWidgetBox = styled(Box)({
+const SummaryWidgetBox = styled(Box)(({ mode }) => ({
     display: "flex",
     width: "100%",
     height: "100%",
@@ -97,7 +100,8 @@ const SummaryWidgetBox = styled(Box)({
     textAlign: "center",
     alignItems: "center",
     justifyContent: "center",
-});
+    backgroundColor: mode === "light" ? "white" : "#7A7A7A",
+}));
 
 
 export default CurrentOrderSummary;

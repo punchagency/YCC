@@ -1,10 +1,29 @@
 import { Box, Typography } from "@mui/material";
+import DashboardTitleBar from "../../../../components/dashboard/title-bar";
+import Section1FinancialManagement from "./section1-financial-management";
+import Section2FinancialManagement from "./section2-financial-management";
+import Section3FinancialManagement from "./section3-financial-management";
+import { useTheme } from "../../../../context/theme/themeContext";
 
 const AdminFinancialManagement = () => {
+  const { theme } = useTheme();
   return (
-    <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "center", alignItems: "center" }} >
-      <Typography variant="h6">Coming Soon</Typography>
-    </Box>
+    <Box
+    sx={{
+      height: "100%",
+      width: "100%",
+      maxWidth: "100%",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
+
+    }}
+  >
+      <DashboardTitleBar title="Financial Management" />
+      <Section1FinancialManagement />
+      <Section2FinancialManagement />
+      <Section3FinancialManagement />
+  </Box>
   );
 };
 

@@ -7,8 +7,10 @@ import Grid from "@mui/material/Grid";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import { useTheme } from "../../context/theme/themeContext";
 
 const BookingCalenderCard = () => {
+  const { theme } = useTheme();
   const [selectedDate, setSelectedDate] = useState(13);
   const [viewingDate, setViewingDate] = useState(11);
 
@@ -28,7 +30,7 @@ const BookingCalenderCard = () => {
         width: "100%",
         maxWidth: "100%",
         height: "370px",
-        bgcolor: "#ffffff",
+        bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
         borderRadius: "24px",
         boxShadow: "0px 1px 8px 0px #0000001F",
         padding: "20px",
@@ -47,7 +49,7 @@ const BookingCalenderCard = () => {
       >
         <Typography
           sx={{
-            color: "#212121",
+            color: theme === "light" ? "#212121" : "white",
             fontSize: "18px",
             fontWeight: 500,
             fontFamily: "Plus Jakarta Sans",
@@ -65,11 +67,11 @@ const BookingCalenderCard = () => {
             sx={{
               width: "40px",
               height: "40px",
-              bgcolor: "#ffffff",
+              bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
               border: "1px solid #fafafa",
-              color: "#212121",
+              color: theme === "light" ? "#212121" : "white",
               "&:hover": {
-                bgcolor: "#f5f5f5",
+                bgcolor: theme === "light" ? "#f5f5f5" : "#7A7A7A",
               },
             }}
           >
@@ -79,11 +81,11 @@ const BookingCalenderCard = () => {
             sx={{
               width: "40px",
               height: "40px",
-              bgcolor: "#ffffff",
+              bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
               border: "1px solid #fafafa",
-              color: "#212121",
+              color: theme === "light" ? "#212121" : "white",
               "&:hover": {
-                bgcolor: "#f5f5f5",
+                bgcolor: theme === "light" ? "#f5f5f5" : "#7A7A7A",
               },
             }}
           >
@@ -128,10 +130,10 @@ const BookingCalenderCard = () => {
                   justifyContent: "center",
                   bgcolor: isSelected ? "#0387d9" : "transparent",
                   color: isSelected
-                    ? "#ffffff"
+                    ? theme === "light" ? "#ffffff" : "white"
                     : isPreviousMonth || isNextMonth
                     ? "rgba(107, 107, 107, 0.4)"
-                    : "#212121",
+                    : theme === "light" ? "#212121" : "white",
                   "&:hover": {
                     bgcolor: isSelected ? "#0387d9" : "rgba(0, 0, 0, 0.04)",
                   },
@@ -155,7 +157,7 @@ const BookingCalenderCard = () => {
         <Box sx={{width: "50%" }}>
           <Typography
             sx={{
-              color: "#212121",
+              color: theme === "light" ? "#212121" : "white",
               fontSize: "10px",
               fontWeight: 500,
               fontFamily: "Plus Jakarta Sans",
@@ -165,7 +167,7 @@ const BookingCalenderCard = () => {
           </Typography>
           <Typography
             sx={{
-              color: "#6b6b6b",
+              color: theme === "light" ? "#6b6b6b" : "white",
               marginTop: "5px",
               fontFamily: "Plus Jakarta Sans",
               fontSize: "12px",
@@ -186,7 +188,7 @@ const BookingCalenderCard = () => {
             startIcon={<AddBoxIcon />}
             sx={{
               bgcolor: "#0387d9",
-              color: "#ffffff",
+              color: theme === "light" ? "#ffffff" : "white",
               borderRadius: "10px",
               padding: "10px 20px",
               fontWeight: 500,

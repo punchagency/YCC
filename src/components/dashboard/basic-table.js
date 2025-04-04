@@ -9,11 +9,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
-
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+import { useTheme } from "../../context/theme/themeContext";
+const StyledTableCell = styled(TableCell)(({ mode }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#F9F9FA",
-    color: "#212121",
+    backgroundColor: mode === "light" ? "white" : "#7A7A7A",
+    color: mode === "light" ? "#212121" : "white",
     fontSize: "14px",
     padding: "4px 8px",
   },
@@ -23,8 +23,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-
+const StyledTableRow = styled(TableRow)(({ mode }) => ({
+  backgroundColor: mode === "light" ? "white" : "#7A7A7A",
   '&:last-child td, &:last-child th': {
     border: 0,
   },
@@ -50,31 +50,32 @@ const statusColors = {
 };
 
 export default function BasicTable() {
+  const { theme } = useTheme();
   return (
     <TableContainer component={Paper}>
       <Table aria-label="customized table">
-        <TableHead>
+        <TableHead sx={{backgroundColor: theme === "light" ? "white" : "#7A7A7A"}}>
           <TableRow>
-            <StyledTableCell><TableTitleText>Order ID</TableTitleText></StyledTableCell>
-            <StyledTableCell align="right"><TableTitleText>Customer</TableTitleText></StyledTableCell>
-            <StyledTableCell align="right"><TableTitleText>Status</TableTitleText></StyledTableCell>
-            <StyledTableCell align="right"><TableTitleText>Amount</TableTitleText></StyledTableCell>
-            <StyledTableCell align="right"><TableTitleText>Date</TableTitleText></StyledTableCell>
+            <StyledTableCell mode={theme}><TableTitleText mode={theme}>Order ID</TableTitleText></StyledTableCell>
+            <StyledTableCell mode={theme} align="right"><TableTitleText mode={theme}>Customer</TableTitleText></StyledTableCell>
+            <StyledTableCell mode={theme} align="right"><TableTitleText mode={theme}>Status</TableTitleText></StyledTableCell>
+            <StyledTableCell mode={theme} align="right"><TableTitleText mode={theme}>Amount</TableTitleText></StyledTableCell>
+            <StyledTableCell mode={theme} align="right"><TableTitleText mode={theme}>Date</TableTitleText></StyledTableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody sx={{backgroundColor: theme === "light" ? "white" : "#7A7A7A"}}>
           {rows.map((row) => (
-            <StyledTableRow key={row.orderId}>
+            <StyledTableRow key={row.orderId} mode={theme}>
               <StyledTableCell component="th" scope="row">
                 <span style={{display: "flex", alignItems: "center", gap: "0px"}}>
-                  <TableBodyText sx={{paddingRight: "5px"}}>{row.orderId}</TableBodyText>
-                  <FileCopyOutlinedIcon sx={{ fontSize: "16px", color: "#6E7079" }}/>
+                  <TableBodyText mode={theme} sx={{paddingRight: "5px"}}>{row.orderId}</TableBodyText>
+                      <FileCopyOutlinedIcon sx={{ fontSize: "16px", color: theme === "light" ? "#6E7079" : "white" }}/>
                 </span>
               </StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText>{row.customer}</TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><StatusBox status={row.status}>{row.status}</StatusBox></StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText>${row.amount}</TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText>{row.date}</TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme}>{row.customer}</TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme} padding="0px"><StatusBox mode={theme} status={row.status}>{row.status}</StatusBox></TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme}>${row.amount}</TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme}>{row.date}</TableBodyText></StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
@@ -83,7 +84,7 @@ export default function BasicTable() {
   );
 }
 
-const TableTitleText = styled(Typography)({
+const TableTitleText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 500,
   fontSize: "16px",
@@ -91,20 +92,25 @@ const TableTitleText = styled(Typography)({
   letterSpacing: "0px",
   verticalAlign: "middle",
   textAlign: "center  ",
-  color: "#212121",
-});
+  color: mode === "light" ? "#212121" : "white",
+}));
 
-const TableBodyText = styled(Typography)({
+const TableBodyText = styled(Typography)(({mode, padding}) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "14px",
   lineHeight: "100%",
   letterSpacing: "0%",
-  color: "#6E7079",
-  padding: "10px 10px",
-});
+  color: mode === "light" ? "#6E7079" : "white",
+  padding: padding ? padding : "10px 10px",
+  textAlign: "center",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center", 
+  width: "100%",
+}));
 
-const StatusBox = styled(Box) (({theme, status}) => ({  
+const StatusBox = styled(Box) (({mode, status}) => ({  
   backgroundColor: statusColors[status].backgroundColor,
   color: statusColors[status].color,
   borderRadius: "6px",

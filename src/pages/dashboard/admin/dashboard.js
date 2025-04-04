@@ -14,7 +14,7 @@ const AdminDashboard1 = () => {
         flexDirection: "column",
       }}
     >
-      <DashboardTitleBar />
+      <DashboardTitleBar title="Dashboard" />
       <Dashboard1 />
     </Box>
   );

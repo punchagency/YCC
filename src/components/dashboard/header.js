@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, styled, InputBase, Button, IconButton } from '@mui/material';
+import { Box, Typography, styled, InputBase, Button } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import SortIcon from '@mui/icons-material/Sort';
