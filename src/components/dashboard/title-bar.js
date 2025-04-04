@@ -1,7 +1,7 @@
 import React from 'react'
 import {Box, Typography} from '@mui/material'
 
-const dashboardTitleBar = () => {
+const DashboardTitleBar = ({title}) => {
   return (
     <Box sx={{
         display: 'flex',
@@ -18,9 +18,9 @@ const dashboardTitleBar = () => {
             color: '#212121',
             fontFamily: 'Plus Jakarta Sans',
         }}
-        >Dashboard</Typography>
+        >{title}</Typography>
     </Box>
   )
 }
 
-export default dashboardTitleBar
+export default DashboardTitleBar;

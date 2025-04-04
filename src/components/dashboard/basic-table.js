@@ -72,7 +72,7 @@ export default function BasicTable() {
                 </span>
               </StyledTableCell>
               <StyledTableCell align="right"><TableBodyText>{row.customer}</TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><StatusBox status={row.status}>{row.status}</StatusBox></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText padding="0px"><StatusBox status={row.status}>{row.status}</StatusBox></TableBodyText></StyledTableCell>
               <StyledTableCell align="right"><TableBodyText>${row.amount}</TableBodyText></StyledTableCell>
               <StyledTableCell align="right"><TableBodyText>{row.date}</TableBodyText></StyledTableCell>
             </StyledTableRow>
@@ -94,15 +94,20 @@ const TableTitleText = styled(Typography)({
   color: "#212121",
 });
 
-const TableBodyText = styled(Typography)({
+const TableBodyText = styled(Typography)(({padding}) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "14px",
   lineHeight: "100%",
   letterSpacing: "0%",
   color: "#6E7079",
-  padding: "10px 10px",
-});
+  padding: padding ? padding : "10px 10px",
+  textAlign: "center",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+}));
 
 const StatusBox = styled(Box) (({theme, status}) => ({  
   backgroundColor: statusColors[status].backgroundColor,
