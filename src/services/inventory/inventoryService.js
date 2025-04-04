@@ -2,7 +2,7 @@ import axios from "axios";
 import { useUser } from "../../context/userContext"; // Import at the top level
 
 // Use the base API URL, not the auth URL
-const API_URL = "http://localhost:7000/api";
+const API_URL = "https://ycc-ee4d189a3af8.herokuapp.com/api";
 
 // Add authentication token to requests
 const getAuthHeader = () => {
