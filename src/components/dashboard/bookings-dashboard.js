@@ -11,9 +11,10 @@ import {
 } from "@mui/material";
 import CurrentOrderSummary from "./current-order-summary";
 import BookingSummary from "./booking-summary";
-
+import { useTheme } from "../../context/theme/themeContext";
 
 const Dashboard1 = () => {
+  const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("monthly");
 
@@ -60,7 +61,7 @@ const Dashboard1 = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#F8FBFF",
+        backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
         padding: "20px",
         gap: "20px",
       }}
@@ -72,7 +73,7 @@ const Dashboard1 = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              backgroundColor: "white",
+              backgroundColor: theme === "light" ? "white" : "#03141F",
               borderRadius: "8px",
               padding: "20px",
               boxShadow: "0px 2px 8px 0px #0000001A",
@@ -87,8 +88,8 @@ const Dashboard1 = () => {
                 gap: "10px",
               }}
             >
-              <DashBoardTitleText>Low Inventories</DashBoardTitleText>
-              <DashBoardDescriptionText>
+              <DashBoardTitleText mode={theme}>Low Inventories</DashBoardTitleText>
+              <DashBoardDescriptionText mode={theme}>
                 Low inventory alerts on the dashboard to notify vendors of stock
                 shortages in real time.
               </DashBoardDescriptionText>
@@ -126,8 +127,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleText>-8%</DashBoardTitleText>
-                    <DashBoardTitleText>Engine Oil</DashBoardTitleText>
+                    <DashBoardTitleInventoryText mode={theme}>-8%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>Engine Oil</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -175,8 +176,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleText>-13%</DashBoardTitleText>
-                    <DashBoardTitleText>Fuel</DashBoardTitleText>
+                    <DashBoardTitleInventoryText mode={theme}>-13%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>Fuel</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -224,8 +225,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleText>-25%</DashBoardTitleText>
-                    <DashBoardTitleText>Diesel</DashBoardTitleText>
+                    <DashBoardTitleInventoryText mode={theme}>-25%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>Diesel</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -255,7 +256,7 @@ const Dashboard1 = () => {
           {/* Financial Summary */}
           <Box
             sx={{
-              backgroundColor: "white",
+              backgroundColor: theme === "light" ? "white" : "#03141F",
               borderRadius: "8px",
               padding: "20px",
               boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
@@ -271,7 +272,7 @@ const Dashboard1 = () => {
                 justifyContent: "space-between",
               }}
             >
-              <DashBoardTitleText>Financial Summary</DashBoardTitleText>
+              <DashBoardTitleText mode={theme}>Financial Summary</DashBoardTitleText>
               <CustomSelect
                 open={open}
                 onClose={handleClose}
@@ -305,17 +306,18 @@ const Dashboard1 = () => {
                   padding: "10px",
                   borderRadius: "8px",
                 border: "1px solid #EFEFEF",
+                backgroundColor: theme === "light" ? "white" : "#03141F",
               }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <FinancialSummaryDescriptionText>Invoice {item.invoiceNumber}</FinancialSummaryDescriptionText>
-                  <FinancialSummaryDescriptionText>
+                  <FinancialSummaryDescriptionText mode={theme}>Invoice {item.invoiceNumber}</FinancialSummaryDescriptionText>
+                  <FinancialSummaryDescriptionText mode={theme}>
                   Amount: {item.amount} - Due: {item.dueDate}
                   </FinancialSummaryDescriptionText>
                 </Box>
 
                 <Box>
-                  <FinancialSummaryButton><ViewButtonText>View</ViewButtonText></FinancialSummaryButton>
+                  <FinancialSummaryButton mode={theme}><ViewButtonText mode={theme}>View</ViewButtonText></FinancialSummaryButton>
                 </Box>
               </Box>
               ))}
@@ -346,20 +348,33 @@ const Dashboard1 = () => {
   );
 };
 
-export const DashBoardTitleText = styled(Typography)({
+export const DashBoardTitleText = styled(Typography) (( { mode }) => ({
+  fontFamily: "Plus Jakarta Sans",
+  fontWeight: 700,
+  fontSize: "15px",
+  lineHeight: "111.00000000000001%",
+  letterSpacing: "0%",
+  color: mode === "light" ? "#212121" : "white",
+}));
+
+export const DashBoardTitleInventoryText = styled(Typography) (( { mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 700,
   fontSize: "15px",
   lineHeight: "111.00000000000001%",
   letterSpacing: "0%",
   color: "#212121",
-});
+}));
 
-export const DashBoardDescriptionText = styled(Typography)({
+
+export const DashBoardDescriptionText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "12px",
-});
+  color: mode === "light" ? "#212121" : "white",
+}));
+
+
 
 const CustomLinearProgress = styled(LinearProgress)(({ theme, color }) => ({
   height: 10,
@@ -397,12 +412,12 @@ const FinancialSummaryButton = styled(Button)({
   
 });
 
-export const FinancialSummaryDescriptionText = styled(Typography)({
+  export const FinancialSummaryDescriptionText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "12px",
-  color: "#212121",
-});
+  color: mode === "light" ? "#212121" : "white",
+}));
 
 const ViewButtonText = styled(Typography)({
   fontFamily: "Plus Jakarta Sans",
