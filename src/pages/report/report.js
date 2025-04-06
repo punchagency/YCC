@@ -23,6 +23,7 @@ import wavyline from "../../assets/images/crew/wavyline.png";
 import wavyback from "../../assets/images/crew/wavyback.png";
 import profileReport from "../../assets/images/crew/profile-report.png";
 import profileReport2 from "../../assets/images/crew/profile-report2.png";
+import sortIcon from "../../assets/images/crew/sort.png";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -50,10 +51,11 @@ const Reports = () => {
     ],
     datasets: [
       {
-        data: [320, 280, 150, 200, 350, 290, 220, 190, 280, 390, 250, 380],
-        backgroundColor: "#1B59F8",
-        barThickness: 8,
-        borderRadius: 4,
+        data: [100, 140, 130, 220, 260, 190, 220, 100, 270, 320, 350, 370],
+        backgroundColor: "#4318FF",
+        borderRadius: 8,
+        barThickness: 15,
+        maxBarThickness: 8,
       },
     ],
   };
@@ -68,23 +70,33 @@ const Reports = () => {
         ticks: {
           stepSize: 100,
           font: {
-            size: 10,
+            size: 12,
+            family: "Plus Jakarta Sans",
           },
-          color: "#666",
+          color: "#A3AED0",
         },
         grid: {
-          color: "#F2F7FF",
+          color: "#F4F7FE",
+          drawBorder: false,
+        },
+        border: {
+          display: false,
         },
       },
       x: {
         grid: {
           display: false,
+          drawBorder: false,
         },
         ticks: {
           font: {
-            size: 10,
+            size: 12,
+            family: "Plus Jakarta Sans",
           },
-          color: "#666",
+          color: "#A3AED0",
+        },
+        border: {
+          display: false,
         },
       },
     },
@@ -93,17 +105,63 @@ const Reports = () => {
         display: false,
       },
       tooltip: {
-        enabled: false,
+        enabled: true,
+        backgroundColor: "#ffffff",
+        titleColor: "#000000",
+        bodyColor: "#000000",
+        borderColor: "#F4F7FE",
+        borderWidth: 1,
+        padding: 12,
+        titleFont: {
+          size: 12,
+          family: "Plus Jakarta Sans",
+        },
+        bodyFont: {
+          size: 12,
+          family: "Plus Jakarta Sans",
+        },
+        displayColors: false,
       },
+    },
+  };
+
+  const sparklineOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { display: false },
+      y: {
+        display: false,
+        min: 0,
+        max: 10,
+      },
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
     },
     elements: {
-      point: {
-        radius: 0,
-      },
+      point: { radius: 0 },
       line: {
         tension: 0.4,
+        borderWidth: 1.5,
+        borderColor: "#0D6EFD",
+        fill: true,
+        backgroundColor: "rgba(13, 110, 253, 0.1)",
       },
     },
+  };
+
+  const sparklineData = {
+    labels: ["", "", "", "", "", "", "", "", "", "", "", ""],
+    datasets: [
+      {
+        data: [5, 6, 4, 7, 5, 6, 8, 7, 6, 7, 8, 9],
+        borderColor: "#0D6EFD",
+        fill: true,
+        backgroundColor: "rgba(13, 110, 253, 0.1)",
+      },
+    ],
   };
 
   return (
@@ -119,6 +177,153 @@ const Reports = () => {
         </div>
       </div>
 
+      <div className="report-container-inventory-reports-and-bar-graph">
+        <div className="report-container-inventory-reports">
+          <div>
+            <h2>Inventory Report</h2>
+            <div>
+              <div className="report-container-flop">
+                <div>
+                  <img src={profileReport} alt="iconcontainer" />
+                </div>
+                <div className="report-container-flop-2">
+                  <div>
+                    <p style={{ color: "#212121", fontWeight: "bold" }}>
+                      Vaccination Rate
+                    </p>
+                    <div className="report-progress-outer-bar">
+                      <div className="report-progress-inner-bar"></div>
+                    </div>
+                  </div>
+                  <div className="report-progress-text">
+                    <p>88% Correct</p>
+                  </div>
+                </div>
+              </div>
+              <div className="report-container-flop">
+                <div>
+                  <img src={profileReport} alt="iconcontainer" />
+                </div>
+                <div className="report-container-flop-2">
+                  <div>
+                    <p style={{ color: "#212121", fontWeight: "bold" }}>
+                      Health Screening
+                    </p>
+                    <div className="report-progress-outer-bar">
+                      <div className="report-progress-inner-bar"></div>
+                    </div>
+                  </div>
+                  <div className="report-progress-text">
+                    <p>92% Correct</p>
+                  </div>
+                </div>
+              </div>
+              <div className="report-container-flop">
+                <div>
+                  <img src={profileReport} alt="iconcontainer" />
+                </div>
+                <div className="report-container-flop-2">
+                  <div>
+                    <p style={{ color: "#212121", fontWeight: "bold" }}>
+                      Testing Availability
+                    </p>
+                    <div className="report-progress-outer-bar">
+                      <div className="report-progress-inner-bar"></div>
+                    </div>
+                  </div>
+                  <div className="report-progress-text">
+                    <p>89% Correct</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="report-container-bar-graph">
+          <div style={{ width: "100%", height: "100%", padding: "10px" }}>
+            <Bar data={activityChartData} options={chartOptions} />
+          </div>
+        </div>
+
+        <div className="metrics-container">
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>Active Users</span>
+              <h2>27/80</h2>
+            </div>
+            <div className="sparkline">
+              <Line
+                data={sparklineData}
+                options={sparklineOptions}
+                style={{
+                  height: "45px",
+                  marginTop: "-10px",
+                  marginBottom: "-10px",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>Questions Answered</span>
+              <h2>3,298</h2>
+            </div>
+            <div className="sparkline">
+              <Line
+                data={sparklineData}
+                options={sparklineOptions}
+                style={{
+                  height: "45px",
+                  marginTop: "-10px",
+                  marginBottom: "-10px",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>Av. Session Length</span>
+              <h2>2m 34s</h2>
+            </div>
+            <div className="sparkline">
+              <Line
+                data={sparklineData}
+                options={sparklineOptions}
+                style={{
+                  height: "45px",
+                  marginTop: "-10px",
+                  marginBottom: "-10px",
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="metric-card">
+            <div className="metric-header">
+              <span>Current Knowledge</span>
+              <h2>86%</h2>
+            </div>
+            <div className="sparkline">
+              <Line
+                data={sparklineData}
+                options={sparklineOptions}
+                style={{
+                  height: "25px",
+                  marginTop: "-5px",
+                  marginBottom: "-5px",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="order-summary-text-header">
+        <h2>Order Summary</h2>
+      </div>
+
       <div className="box-order-container">
         <div className="box1-order">
           <div
@@ -129,8 +334,9 @@ const Reports = () => {
               padding: "0px 9px",
             }}
           >
-            <div>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <img src={lockLogo} alt="lockLogo" />
+              <h3>All Orders</h3>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ marginRight: "5px" }}>This week</p>
@@ -143,16 +349,16 @@ const Reports = () => {
           </div>
           <div className="pending-order-container">
             <div>
-              <p>All Orders</p>
-              <p>0</p>
+              <p>In progress</p>
+              <p>885</p>
             </div>
             <div>
               <p>Pending</p>
-              <p>0</p>
+              <p>579</p>
             </div>
             <div>
               <p>Completed</p>
-              <p>0</p>
+              <p>9981</p>
             </div>
           </div>
         </div>
@@ -165,8 +371,9 @@ const Reports = () => {
               padding: "0px 9px",
             }}
           >
-            <div>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <img src={lockLogo} alt="lockLogo" />
+              <h3>Inventory</h3>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ marginRight: "5px" }}>This week</p>
@@ -179,16 +386,16 @@ const Reports = () => {
           </div>
           <div className="pending-order-container">
             <div>
-              <p>Canceled</p>
-              <p>0</p>
+              <p>In progress</p>
+              <p>885</p>
             </div>
             <div>
-              <p>Returned</p>
-              <p>0</p>
+              <p>Pending</p>
+              <p>5</p>
             </div>
             <div>
-              <p>Damaged</p>
-              <p>0</p>
+              <p>Completed</p>
+              <p>22</p>
             </div>
           </div>
         </div>
@@ -201,8 +408,9 @@ const Reports = () => {
               padding: "0px 9px",
             }}
           >
-            <div>
-              <img src={cart} alt="cart" />
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={lockLogo} alt="lockLogo" />
+              <h3>Bookings</h3>
             </div>
             <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ marginRight: "5px" }}>This week</p>
@@ -215,289 +423,160 @@ const Reports = () => {
           </div>
           <div className="pending-order-container">
             <div>
-              <p style={{ color: "#EF4444" }}>Abandoned Cart</p>
-              <p>0</p>
+              <p>In progress</p>
+              <p>457</p>
             </div>
             <div>
-              <p>Customers</p>
-              <p>0</p>
+              <p>Pending </p>
+              <p>25</p>
+            </div>
+            <div>
+              <p>Completed</p>
+              <p>232</p>
+            </div>
+          </div>
+        </div>
+        <div className="box1-order">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0px 9px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={lockLogo} alt="lockLogo" />
+              <h3>Financial</h3>
+            </div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <p style={{ marginRight: "5px" }}>This week</p>
+              <img
+                src={dropdown}
+                alt="dropdown"
+                style={{ width: "15px", height: "15px" }}
+              />
+            </div>
+          </div>
+          <div className="pending-order-container">
+            <div>
+              <p>In progress</p>
+              <p>457</p>
+            </div>
+            <div>
+              <p>Pending </p>
+              <p>25</p>
+            </div>
+            <div>
+              <p>Completed</p>
+              <p>232</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="report-container">
-        <div className="report-container-1">
-          <div className="reportdiv">
-            <div className="fbox">
-              <p style={{ textAlign: "left", fontSize: "11px" }}>
-                Strongest Topics
-              </p>
-              <div className="progress-container">
-                <img src={doctor} alt="lone" />
-                <div className="progress-container-1">
-                  <div className="progress-container-1-1"></div>
-                </div>
-                <div className="progress-value">
-                  <span style={{ fontSize: "10px" }}>95%</span>
-                  <span style={{ fontSize: "10px" }}>correct</span>
-                </div>
-              </div>
-
-              {/* Second Progress Bar */}
-              <div className="progress-container" style={{ marginTop: "20px" }}>
-                <img src={profileReport} alt="container" />
-                <div className="progress-container-1">
-                  <div
-                    className="progress-container-1-1"
-                    style={{ width: "65%" }}
-                  ></div>
-                </div>
-                <div className="progress-value">
-                  <span style={{ fontSize: "10px" }}>65%</span>
-                  <span style={{ fontSize: "10px" }}>correct</span>
-                </div>
-              </div>
-
-              {/* Third Progress Bar */}
-              <div className="progress-container" style={{ marginTop: "20px" }}>
-                <img src={profileReport2} alt="neworder" />
-                <div className="progress-container-1">
-                  <div
-                    className="progress-container-1-1"
-                    style={{ width: "45%" }}
-                  ></div>
-                </div>
-                <div className="progress-value">
-                  <span style={{ fontSize: "10px" }}>45%</span>
-                  <span style={{ fontSize: "10px" }}>correct</span>
-                </div>
-              </div>
-            </div>
-            <div className="activity-container-1">
-              <div className="activity-container">
-                <h3>Activity</h3>
-                <p>Month</p>
-              </div>
-              <div style={{ height: "150px", marginTop: "10px" }}>
-                <Bar data={activityChartData} options={chartOptions} />
-              </div>
-            </div>
-          </div>
-          <div className="report-table-container">
-            <table className="report-table">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Sales</th>
-                  <th>Order Type</th>
-                  <th>Tracking ID</th>
-                  <th>Order Total</th>
-                  <th>Profit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Safety Vest #1</td>
-                  <td>245</td>
-                  <td>Standard</td>
-                  <td>#TRK-001</td>
-                  <td>$3,500.00</td>
-                  <td>$875.00</td>
-                </tr>
-                <tr>
-                  <td>First Aid Kit Pro</td>
-                  <td>189</td>
-                  <td>Express</td>
-                  <td>#TRK-002</td>
-                  <td>$4,725.00</td>
-                  <td>$1,181.25</td>
-                </tr>
-                <tr>
-                  <td>Engine Oil Filter</td>
-                  <td>312</td>
-                  <td>Standard</td>
-                  <td>#TRK-003</td>
-                  <td>$2,808.00</td>
-                  <td>$702.00</td>
-                </tr>
-                <tr>
-                  <td>Navigation Compass</td>
-                  <td>156</td>
-                  <td>Express</td>
-                  <td>#TRK-004</td>
-                  <td>$5,460.00</td>
-                  <td>$1,365.00</td>
-                </tr>
-                <tr>
-                  <td>Life Jacket Type III</td>
-                  <td>278</td>
-                  <td>Standard</td>
-                  <td>#TRK-005</td>
-                  <td>$3,475.00</td>
-                  <td>$868.75</td>
-                </tr>
-                <tr>
-                  <td>Hydraulic Fluid</td>
-                  <td>423</td>
-                  <td>Express</td>
-                  <td>#TRK-006</td>
-                  <td>$2,780.25</td>
-                  <td>$695.06</td>
-                </tr>
-                <tr>
-                  <td>LED Floodlight</td>
-                  <td>167</td>
-                  <td>Standard</td>
-                  <td>#TRK-007</td>
-                  <td>$3,172.33</td>
-                  <td>$793.08</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <div className="selling-products-container">
+        <div className="selling-products-header">
+          <h2>Selling Products</h2>
+          <Button
+            label="AI Report Generate"
+            icon="pi pi-file"
+            className="p-button-primary"
+          />
         </div>
-        <div>
-          <div className="active-users-container-1">
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div className="active-users-container">
-              <span>Active users</span>
-              <span>
-                27/<i>80</i>
-              </span>
-              <div
-                style={{
-                  backgroundImage: `url(${wavyback})`,
-                  width: "100%",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                <img src={wavyline} alt="wavyline" />
-              </div>
-            </div>
-            <div></div>
-          </div>
-        </div>
+
+        <table className="selling-products-table">
+          <thead>
+            <tr>
+              <th>
+                Product Name <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Sales <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Order Type <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Tracking ID <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Order Total <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Profit <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                1500 <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Status <img src={sortIcon} alt="sortIcon" />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fuel</td>
+              <td>Sold</td>
+              <td>Earned</td>
+              <td>Placed</td>
+              <td>Processed</td>
+              <td>Net</td>
+              <td>Widgets Pro</td>
+              <td>
+                <span className="status-confirmed">Confirmed</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Energy</td>
+              <td>Delivered</td>
+              <td>Generated</td>
+              <td>Allocated</td>
+              <td>Completed</td>
+              <td>Gross</td>
+              <td>Widgets Plus</td>
+              <td>
+                <span className="status-in-progress">In Progress</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Power</td>
+              <td>Distributed</td>
+              <td>Produced</td>
+              <td>Assigned</td>
+              <td>Finalized</td>
+              <td>Total</td>
+              <td>Widgets Max</td>
+              <td>
+                <span className="status-pending">Pending</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Electricity</td>
+              <td>Supplied</td>
+              <td>Achieved</td>
+              <td>Settled</td>
+              <td>Executed</td>
+              <td>Balance</td>
+              <td>Widgets Elite</td>
+              <td>
+                <span className="status-completed">Completed</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Gas</td>
+              <td>Rendered</td>
+              <td>Accumulated</td>
+              <td>Distributed</td>
+              <td>Confirmed</td>
+              <td>Surplus</td>
+              <td>Widgets Standard</td>
+              <td>
+                <span className="status-flagged">Flagged</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </>
   );

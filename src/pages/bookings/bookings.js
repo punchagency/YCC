@@ -27,6 +27,7 @@ import downloadIcon from "../../assets/images/crew/downloadIcon.png";
 import times from "../../assets/images/crew/times.png";
 import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
+import sortIcon from "../../assets/images/crew/sort.png";
 import "./bookings.css";
 
 // Context
@@ -298,7 +299,9 @@ const Bookings = () => {
                     marginBottom: "20px",
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>Manage Booking {editingBooking?.bookingId}</h3>
+                  <h3 style={{ margin: 0 }}>
+                    Manage Booking {editingBooking?.bookingId}
+                  </h3>
                   <Button
                     icon="pi pi-times"
                     className="p-button-rounded p-button-text"
@@ -353,8 +356,15 @@ const Bookings = () => {
                       <Dropdown
                         id="serviceName"
                         name="serviceName"
-                        value={editingBooking?.services.map((service) => service.service._id).join(', ') || ""}
-                        options={services.map((service) => ({ label: service.name, value: service._id }))}
+                        value={
+                          editingBooking?.services
+                            .map((service) => service.service._id)
+                            .join(", ") || ""
+                        }
+                        options={services.map((service) => ({
+                          label: service.name,
+                          value: service._id,
+                        }))}
                         onChange={handleEditServiceChange}
                         placeholder="Select service name"
                         style={{ width: "100%" }}
@@ -527,432 +537,336 @@ const Bookings = () => {
               <div className="bookings-container">
                 {/* Desktop view */}
                 <div className="desktop-view">
-                  <table
-                    className="inventory-header-table"
-                    style={{
-                      width: "100%",
-                      tableLayout: "fixed",
-                      borderCollapse: "collapse",
-                      marginBottom: "0",
-                      fontSize: "0.8rem",
-                    }}
-                  >
-                    <thead>
-                      <tr>
-                        <th
-                          style={{
-                            width: "10%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
+                  <div className="bookings-table-container">
+                    <table className="bookings-table">
+                      <thead>
+                        <tr>
+                          <th>
+                            <input
+                              type="checkbox"
+                              className="header-checkbox"
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Booking ID
                             <img
-                              src={sort}
+                              src={sortIcon}
                               alt="sort"
                               style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
                               }}
                             />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Booking ID
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "12%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{  display: "flex",
-                              alignItems: "center", 
-                              justifyContent: "center", 
-                              gap: "5px",
-                              padding: "5px"
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Service Type
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Vendor Assigned 
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Price
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Date & Time
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Booking Status
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Internal Notes & Comments
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                          <th style={{fontSize: "12px"}}>
+                            Actions
+                            <img
+                              src={sortIcon}
+                              alt="sort"
+                              style={{
+                                marginBottom: "-3px",
+                                marginLeft: "5px",
+                              }}
+                            />
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {bookings.map((booking, index) => (
+                          <tr
+                            key={index}
+                            style={{
+                              borderBottom: "1px solid #eee",
+                              backgroundColor:
+                                index % 2 === 0 ? "#fff" : "#f9f9f9",
                             }}
                           >
-                            <img
-                              src={sort}
-                              alt="sort"
+                            <td>
+                              <input type="checkbox" />
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              {booking.bookingId}
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              {booking.services
+                                ?.map((service) => service.service?.name)
+                                .join(", ")}
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              {booking.name}
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              ${booking.totalPrice}
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              {new Date(booking.bookingDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }
+                              )}
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              <span
+                                style={{
+                                  backgroundColor:
+                                    booking.status === "confirmed"
+                                      ? "#e6f7ee"
+                                      : booking.status === "pending"
+                                      ? "#fff8e6"
+                                      : booking.status === "completed"
+                                      ? "#e6f0ff"
+                                      : booking.status === "in progress"
+                                      ? "#e6f7ff"
+                                      : booking.status === "flagged"
+                                      ? "#ffe6e6"
+                                      : "#ffebeb",
+                                  color:
+                                    booking.status === "confirmed"
+                                      ? "#1d9d74"
+                                      : booking.status === "pending"
+                                      ? "#ff9800"
+                                      : booking.status === "completed"
+                                      ? "#3366ff"
+                                      : booking.status === "in progress"
+                                      ? "#0099cc"
+                                      : booking.status === "flagged"
+                                      ? "#ff4d4f"
+                                      : "#ff4d4f",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  fontSize: "10px",
+                                }}
+                              >
+                                {booking.status}
+                              </span>
+                            </td>
+                            <td style={{ padding: "8px", fontSize: "11px" }}>
+                              <Button
+                                icon="pi pi-eye"
+                                className="p-button-text p-button-sm"
+                                style={{
+                                  padding: "2px",
+                                  fontSize: "10px",
+                                  color: "#0387D9",
+                                }}
+                                onClick={() =>
+                                  handleViewReview(booking.reviews)
+                                }
+                                label="Participant Reviews..."
+                              />
+                            </td>
+                            <td
                               style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Email
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Service Name
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "12%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Price
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "10%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Date
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "12%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Status
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, fontSize: "10px" }}>
-                              Notes & Comments
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "14%",
-                            textAlign: "center",
-                            padding: "8px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <p style={{ margin: 0, fontSize: "10px" }}>Actions</p>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bookings.map((booking, index) => (
-                        <tr
-                          key={index}
-                          style={{
-                            borderBottom: "1px solid #eee",
-                            backgroundColor:
-                              index % 2 === 0 ? "#fff" : "#f9f9f9",
-                          }}
-                        >
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.bookingId}
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.email}
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {booking.services?.map((service) => service.service?.name).join(', ')}
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            ${booking.totalPrice}
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            {new Date(booking.bookingDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            <span
-                              style={{
-                                backgroundColor:
-                                  booking.status === "confirmed"
-                                    ? "#e6f7ee"
-                                    : booking.status === "pending"
-                                    ? "#fff8e6"
-                                    : booking.status === "completed"
-                                    ? "#e6f0ff"
-                                    : booking.status === "in progress"
-                                    ? "#e6f7ff"
-                                    : booking.status === "flagged"
-                                    ? "#ffe6e6"
-                                    : "#ffebeb",
-                                color:
-                                  booking.status === "confirmed"
-                                    ? "#1d9d74"
-                                    : booking.status === "pending"
-                                    ? "#ff9800"
-                                    : booking.status === "completed"
-                                    ? "#3366ff"
-                                    : booking.status === "in progress"
-                                    ? "#0099cc"
-                                    : booking.status === "flagged"
-                                    ? "#ff4d4f"
-                                    : "#ff4d4f",
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                fontSize: "10px",
+                                padding: "6px",
+                                borderBottom: "1px solid #eee",
                               }}
                             >
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td style={{ padding: "8px", fontSize: "11px" }}>
-                            <Button
-                              icon="pi pi-eye"
-                              className="p-button-text p-button-sm"
-                              style={{
-                                padding: "2px",
-                                fontSize: "10px",
-                                color: "#0387D9",
-                              }}
-                              onClick={() => handleViewReview(booking.reviews)}
-                              label="Participant Reviews..."
-                            />
-                          </td>
-                          <td
-                            style={{
-                              padding: "6px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            <div style={{ display: "flex", gap: "3px" }}>
-                              {/* View button */}
-                              <Button
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                }}
-                                tooltip="View Details"
-                                tooltipOptions={{ position: "top" }}
-                                onClick={() => handleViewBooking(booking)}
-                              >
-                                <div style={{ backgroundColor: "white" }}>
-                                  <img
-                                    src={eyeblock}
-                                    alt="View"
-                                    style={{ width: "15px", height: "15px" }}
-                                  />
-                                </div>
-                              </Button>
-
-                              {/* Edit button */}
-                              <Button
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                }}
-                                tooltip="Edit"
-                                tooltipOptions={{ position: "top" }}
-                                onClick={() => handleEditBooking(booking)}
-                              >
-                                <img
-                                  src={editLogo}
-                                  alt="Edit"
-                                  style={{ width: "15px", height: "15px" }}
-                                />
-                              </Button>
-                              <Button
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                }}
-                                tooltip="Edit"
-                                tooltipOptions={{ position: "top" }}
-                                // onClick={() => handleEditBooking(booking)}
-                              >
-                                <img
-                                  src={times}
-                                  alt="times"
-                                  style={{ width: "15px", height: "15px" }}
-                                />
-                              </Button>
-
-                              {/* Status button */}
-                              <Button
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                }}
-                                tooltip="Change Status"
-                                tooltipOptions={{ position: "top" }}
-                                onClick={(e) => {
-                                  setSelectedBookingForStatus(booking);
-                                  statusMenuRef.current.toggle(e);
-                                }}
-                              >
-                                {/* <i
-                                  className="pi pi-check-circle"
+                              <div style={{ display: "flex", gap: "3px" }}>
+                                {/* View button */}
+                                <Button
+                                  className="p-button-text p-button-sm"
                                   style={{
-                                    fontSize: "14px",
-                                    color: "#4880FF",
-                                    border: "1px solid #4880FF",
-                                    borderRadius: "50%",
+                                    width: "20px",
+                                    height: "20px",
                                     padding: "1px",
                                   }}
-                                ></i> */}
+                                  tooltip="View Details"
+                                  tooltipOptions={{ position: "top" }}
+                                  onClick={() => handleViewBooking(booking)}
+                                >
+                                  <div style={{ backgroundColor: "white" }}>
+                                    <img
+                                      src={eyeblock}
+                                      alt="View"
+                                      style={{ width: "15px", height: "15px" }}
+                                    />
+                                  </div>
+                                </Button>
+
+                                {/* Edit button */}
+                                <Button
+                                  className="p-button-text p-button-sm"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "1px",
+                                  }}
+                                  tooltip="Edit"
+                                  tooltipOptions={{ position: "top" }}
+                                  onClick={() => handleEditBooking(booking)}
+                                >
+                                  <img
+                                    src={editLogo}
+                                    alt="Edit"
+                                    style={{ width: "15px", height: "15px" }}
+                                  />
+                                </Button>
+                                <Button
+                                  className="p-button-text p-button-sm"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "1px",
+                                  }}
+                                  tooltip="Edit"
+                                  tooltipOptions={{ position: "top" }}
+                                  // onClick={() => handleEditBooking(booking)}
+                                >
+                                  <img
+                                    src={times}
+                                    alt="times"
+                                    style={{ width: "15px", height: "15px" }}
+                                  />
+                                </Button>
+
+                                {/* Status button */}
+                                <Button
+                                  className="p-button-text p-button-sm"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "1px",
+                                  }}
+                                  tooltip="Change Status"
+                                  tooltipOptions={{ position: "top" }}
+                                  onClick={(e) => {
+                                    setSelectedBookingForStatus(booking);
+                                    statusMenuRef.current.toggle(e);
+                                  }}
+                                >
+                                  {/* <i
+                                    className="pi pi-check-circle"
+                                    style={{
+                                      fontSize: "14px",
+                                      color: "#4880FF",
+                                      border: "1px solid #4880FF",
+                                      borderRadius: "50%",
+                                      padding: "1px",
+                                    }}
+                                  ></i> */}
+                                  <img
+                                    src={check}
+                                    alt="Download"
+                                    style={{ width: "15px", height: "15px" }}
+                                  />
+                                </Button>
+
+                                {/* Download button */}
+                                {/* <Button
+                                  icon="pi pi-download"
+                                  className="p-button-text p-button-sm"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "1px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "50%",
+                                  }}
+                                  tooltip="Download"
+                                  tooltipOptions={{ position: "top" }}
+                                /> */}
                                 <img
-                                  src={check}
+                                  src={downloadIcon}
                                   alt="Download"
                                   style={{ width: "15px", height: "15px" }}
                                 />
-                              </Button>
 
-                              {/* Download button */}
-                              {/* <Button
-                                icon="pi pi-download"
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "50%",
-                                }}
-                                tooltip="Download"
-                                tooltipOptions={{ position: "top" }}
-                              /> */}
-                              <img
-                                src={downloadIcon}
-                                alt="Download"
-                                style={{ width: "15px", height: "15px" }}
-                              />
-
-                              {/* Upload button */}
-                              <Button
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  width: "20px",
-                                  height: "20px",
-                                  padding: "1px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "50%",
-                                }}
-                                tooltip="Upload Booking"
-                                tooltipOptions={{ position: "top" }}
-                                onClick={() => handleUploadBooking(booking)}
-                              >
-                                <img
-                                  src={uploadBooking}
-                                  alt="Upload"
-                                  style={{ width: "15px", height: "15px" }}
-                                />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                                {/* Upload button */}
+                                <Button
+                                  className="p-button-text p-button-sm"
+                                  style={{
+                                    width: "20px",
+                                    height: "20px",
+                                    padding: "1px",
+                                    border: "1px solid #ddd",
+                                    borderRadius: "50%",
+                                  }}
+                                  tooltip="Upload Booking"
+                                  tooltipOptions={{ position: "top" }}
+                                  onClick={() => handleUploadBooking(booking)}
+                                >
+                                  <img
+                                    src={uploadBooking}
+                                    alt="Upload"
+                                    style={{ width: "15px", height: "15px" }}
+                                  />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 {/* Mobile view */}
@@ -1099,7 +1013,11 @@ const Bookings = () => {
                 >
                   Service Name
                 </label>
-                <div className="view-field">{viewBooking.services.map((service) => service.service.name).join(', ')}</div>
+                <div className="view-field">
+                  {viewBooking.services
+                    .map((service) => service.service.name)
+                    .join(", ")}
+                </div>
               </div>
               <div
                 className="form-group"
@@ -1137,11 +1055,14 @@ const Bookings = () => {
                   Date
                 </label>
                 <div className="view-field">
-                  {new Date(viewBooking.bookingDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+                  {new Date(viewBooking.bookingDate).toLocaleDateString(
+                    "en-US",
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }
+                  )}
                 </div>
               </div>
               <div
@@ -1228,7 +1149,9 @@ const Bookings = () => {
                     lineHeight: "1.5",
                   }}
                 >
-                  {viewBooking.reviews?.map((review) => review.review).join(', ') || 'No reviews'}
+                  {viewBooking.reviews
+                    ?.map((review) => review.review)
+                    .join(", ") || "No reviews"}
                 </div>
               </div>
             </div>
