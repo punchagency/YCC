@@ -447,7 +447,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             <img
               src={icon}
               alt="notification"
-              style={{ width: "24px", height: "24px",  }}
+              style={{ width: "24px", height: "24px" }}
             />
           }
           className="notifications"
@@ -503,11 +503,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         style={{
           padding: isMobile ? "8px" : "16px",
           flexWrap: "wrap",
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          color: theme === "light" ? "#103B57" : "#F8FBFF",
         }}
       />
       <MobileSidebar
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
+        style={{
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          color: theme === "light" ? "#103B57" : "#F8FBFF",
+        }}
         role={role}
       />
     </>

@@ -222,9 +222,7 @@ export default function Notifications({ role }) {
                           index === 0
                             ? `priority-${item.title.toLowerCase()}`
                             : index === 3
-                            ? `status-${item.title  
-                                .toLowerCase()
-                                .replace(/[&\s]+/g, "-")}`
+                            ? `status-${item.title.toLowerCase().replace(/[&\s]+/g, "-")}`
                             : ""
                         }`}
                       >

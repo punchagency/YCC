@@ -33,6 +33,8 @@ import "./bookings.css";
 // Context
 import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
+import { useTheme } from "../../context/theme/themeContext";
+
 const Bookings = () => {
   
   const navigate = useNavigate();
@@ -41,6 +43,7 @@ const Bookings = () => {
   // Context
   const { bookings, deleteBooking, fetchBookings, updateBooking, updateBookingStatus } = useBooking();
   const { services, fetchServices } = useService();
+  const { theme } = useTheme();
 
 
 
@@ -256,7 +259,13 @@ const Bookings = () => {
 
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
+      <div 
+        className="flex align-items-center justify-content-between sub-header-panel"
+        style={{
+          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+          color: theme === "light" ? "#103B57" : "#FFFFFF",
+        }}
+      >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
             <h3>Bookings</h3>
@@ -264,623 +273,649 @@ const Bookings = () => {
         </div>
       </div>
 
-      <div className="inventory-container">
-        <SwitchTransition mode="out-in">
-          <CSSTransition
-            key={showEditForm ? "edit-form" : "bookings-table"}
-            timeout={300}
-            classNames="fade"
-            unmountOnExit
-          >
-            {showEditForm ? (
-              <div
-                className="booking-edit-container"
-                style={{
-                  padding: "20px",
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-                  margin: "20px 0",
-                  width: "95%",
-                  minHeight: "400px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignContent: "center",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                }}
-              >
+      <div
+        className="bookings-wrapper"
+        style={{
+          height: "100%",
+          width: "100%",
+          maxWidth: "100%",
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
+          color: theme === "light" ? "#103B57" : "#FFFFFF",
+        }}
+      >
+        <div className="inventory-container">
+          <SwitchTransition mode="out-in">
+            <CSSTransition
+              key={showEditForm ? "edit-form" : "bookings-table"}
+              timeout={300}
+              classNames="fade"
+              unmountOnExit
+            >
+              {showEditForm ? (
                 <div
+                  className="booking-edit-container"
                   style={{
+                    padding: "20px",
+                    backgroundColor: "white",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                    margin: "20px 0",
+                    width: "95%",
+                    minHeight: "400px",
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "20px",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    marginLeft: "auto",
+                    marginRight: "auto",
                   }}
                 >
-                  <h3 style={{ margin: 0 }}>
-                    Manage Booking {editingBooking?.bookingId}
-                  </h3>
-                  <Button
-                    icon="pi pi-times"
-                    className="p-button-rounded p-button-text"
-                    onClick={() => setShowEditForm(false)}
-                    aria-label="Close"
-                  />
-                </div>
-
-                <div className="p-fluid">
-                  {/* Customer and Service Name */}
                   <div
-                    className="p-grid p-formgrid"
                     style={{
                       display: "flex",
-                      gap: "15px",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       marginBottom: "20px",
                     }}
                   >
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="email"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Customer Email*
-                      </label>
-                      <InputText
-                        id="email"
-                        name="email"
-                        value={editingBooking?.email || ""}
-                        onChange={handleEditInputChange}
-                        placeholder="Enter customer email"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="serviceName"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Service Name*
-                      </label>
-                      <Dropdown
-                        id="serviceName"
-                        name="serviceName"
-                        value={
-                          editingBooking?.services
-                            .map((service) => service.service._id)
-                            .join(", ") || ""
-                        }
-                        options={services.map((service) => ({
-                          label: service.name,
-                          value: service._id,
-                        }))}
-                        onChange={handleEditServiceChange}
-                        placeholder="Select service name"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Price and Date & Time */}
-                  <div
-                    className="p-grid p-formgrid"
-                    style={{
-                      display: "flex",
-                      gap: "15px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="totalPrice"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Price*
-                      </label>
-                      <InputText
-                        id="totalPrice"
-                        name="totalPrice"
-                        value={editingBooking?.totalPrice || ""}
-                        onChange={handleEditInputChange}
-                        placeholder="Enter price"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="bookingDate"
-                        name="bookingDate"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Date & Time*
-                      </label>
-                      <Calendar
-                        id="bookingDate"
-                        name="bookingDate"
-                        value={
-                          editingBooking?.bookingDate
-                            ? new Date(editingBooking.bookingDate)
-                            : null
-                        }
-                        onChange={handleEditDateChange}
-                        showTime
-                        showIcon
-                        placeholder="Select date and time"
-                        style={{ width: "100%" }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Booking Status and Internal Notes */}
-                  <div
-                    className="p-grid p-formgrid"
-                    style={{
-                      display: "flex",
-                      gap: "15px",
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="status"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Booking Status*
-                      </label>
-                      <Dropdown
-                        id="status"
-                        value={editingBooking?.status || ""}
-                        options={[
-                          { label: "completed", value: "completed" },
-                          { label: "pending", value: "pending" },
-                          { label: "cancelled", value: "cancelled" },
-                          { label: "in progress", value: "in progress" },
-                          { label: "flagged", value: "flagged" },
-                          { label: "confirmed", value: "confirmed" },
-                          { label: "rescheduled", value: "rescheduled" },
-                        ]}
-                        onChange={handleEditStatusChange}
-                        placeholder="Select status"
-                        style={{ width: "100%" }}
-                        className="no-dropdown-scrollbar"
-                      />
-                    </div>
-                    <div className="p-field" style={{ flex: 1 }}>
-                      <label
-                        htmlFor="reviews"
-                        style={{
-                          display: "block",
-                          marginBottom: "8px",
-                          fontWeight: "500",
-                          textAlign: "left",
-                        }}
-                      >
-                        Internal Notes & Comments
-                      </label>
-                      <InputTextarea
-                        id="reviews"
-                        name="reviews"
-                        value={editingBooking?.reviews || ""}
-                        onChange={handleEditInputChange}
-                        placeholder="Enter notes and comments"
-                        style={{ width: "100%", minHeight: "80px" }}
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit and Cancel Buttons */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: "15px",
-                      marginTop: "20px",
-                    }}
-                  >
+                    <h3 style={{ margin: 0 }}>
+                      Manage Booking {editingBooking?.bookingId}
+                    </h3>
                     <Button
-                      label="Cancel"
                       icon="pi pi-times"
+                      className="p-button-rounded p-button-text"
                       onClick={() => setShowEditForm(false)}
-                      style={{
-                        backgroundColor: "#EF4444",
-                        border: "none",
-                        width: "150px",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Button
-                      label="Save Changes"
-                      icon="pi pi-check"
-                      onClick={handleSaveBooking}
-                      style={{
-                        backgroundColor: "#0387D9",
-                        border: "none",
-                        width: "150px",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "12px",
-                      }}
+                      aria-label="Close"
                     />
                   </div>
+
+                  <div className="p-fluid">
+                    {/* Customer and Service Name */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        gap: "15px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="email"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Customer Email*
+                        </label>
+                        <InputText
+                          id="email"
+                          name="email"
+                          value={editingBooking?.email || ""}
+                          onChange={handleEditInputChange}
+                          placeholder="Enter customer email"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="serviceName"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Service Name*
+                        </label>
+                        <Dropdown
+                          id="serviceName"
+                          name="serviceName"
+                          value={
+                            editingBooking?.services
+                              .map((service) => service.service._id)
+                              .join(", ") || ""
+                          }
+                          options={services.map((service) => ({
+                            label: service.name,
+                            value: service._id,
+                          }))}
+                          onChange={handleEditServiceChange}
+                          placeholder="Select service name"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Price and Date & Time */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        gap: "15px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="totalPrice"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Price*
+                        </label>
+                        <InputText
+                          id="totalPrice"
+                          name="totalPrice"
+                          value={editingBooking?.totalPrice || ""}
+                          onChange={handleEditInputChange}
+                          placeholder="Enter price"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="bookingDate"
+                          name="bookingDate"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Date & Time*
+                        </label>
+                        <Calendar
+                          id="bookingDate"
+                          name="bookingDate"
+                          value={
+                            editingBooking?.bookingDate
+                              ? new Date(editingBooking.bookingDate)
+                              : null
+                          }
+                          onChange={handleEditDateChange}
+                          showTime
+                          showIcon
+                          placeholder="Select date and time"
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Booking Status and Internal Notes */}
+                    <div
+                      className="p-grid p-formgrid"
+                      style={{
+                        display: "flex",
+                        gap: "15px",
+                        marginBottom: "30px",
+                      }}
+                    >
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="status"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Booking Status*
+                        </label>
+                        <Dropdown
+                          id="status"
+                          value={editingBooking?.status || ""}
+                          options={[
+                            { label: "completed", value: "completed" },
+                            { label: "pending", value: "pending" },
+                            { label: "cancelled", value: "cancelled" },
+                            { label: "in progress", value: "in progress" },
+                            { label: "flagged", value: "flagged" },
+                            { label: "confirmed", value: "confirmed" },
+                            { label: "rescheduled", value: "rescheduled" },
+                          ]}
+                          onChange={handleEditStatusChange}
+                          placeholder="Select status"
+                          style={{ width: "100%" }}
+                          className="no-dropdown-scrollbar"
+                        />
+                      </div>
+                      <div className="p-field" style={{ flex: 1 }}>
+                        <label
+                          htmlFor="reviews"
+                          style={{
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "500",
+                            textAlign: "left",
+                          }}
+                        >
+                          Internal Notes & Comments
+                        </label>
+                        <InputTextarea
+                          id="reviews"
+                          name="reviews"
+                          value={editingBooking?.reviews || ""}
+                          onChange={handleEditInputChange}
+                          placeholder="Enter notes and comments"
+                          style={{ width: "100%", minHeight: "80px" }}
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit and Cancel Buttons */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "15px",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <Button
+                        label="Cancel"
+                        icon="pi pi-times"
+                        onClick={() => setShowEditForm(false)}
+                        style={{
+                          backgroundColor: "#EF4444",
+                          border: "none",
+                          width: "150px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                        }}
+                      />
+                      <Button
+                        label="Save Changes"
+                        icon="pi pi-check"
+                        onClick={handleSaveBooking}
+                        style={{
+                          backgroundColor: "#0387D9",
+                          border: "none",
+                          width: "150px",
+                          color: "white",
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="bookings-container">
-                {/* Desktop view */}
-                <div className="desktop-view">
-                  <div className="bookings-table-container">
-                    <table className="bookings-table">
-                      <thead>
-                        <tr>
-                          <th>
-                            <input
-                              type="checkbox"
-                              className="header-checkbox"
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Booking ID
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Service Type
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Vendor Assigned 
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Price
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Date & Time
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Booking Status
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Internal Notes & Comments
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                          <th style={{fontSize: "12px"}}>
-                            Actions
-                            <img
-                              src={sortIcon}
-                              alt="sort"
-                              style={{
-                                marginBottom: "-3px",
-                                marginLeft: "5px",
-                              }}
-                            />
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {bookings.map((booking, index) => (
-                          <tr
-                            key={index}
-                            style={{
-                              borderBottom: "1px solid #eee",
-                              backgroundColor:
-                                index % 2 === 0 ? "#fff" : "#f9f9f9",
-                            }}
-                          >
-                            <td>
-                              <input type="checkbox" />
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              {booking.bookingId}
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              {booking.services
-                                ?.map((service) => service.service?.name)
-                                .join(", ")}
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              {booking.name}
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              ${booking.totalPrice}
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              {new Date(booking.bookingDate).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                }
-                              )}
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              <span
+              ) : (
+                <div className="bookings-container">
+                  {/* Desktop view */}
+                  <div className="desktop-view" >
+                    <div className="bookings-table-container" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                      <div 
+                        className="table-container" 
+                        style={{
+                          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        <table 
+                          className="bookings-table"
+                          style={{
+                            backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                            color: theme === "light" ? "#103B57" : "#FFFFFF",
+                          }}
+                        >
+                          <thead style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                            <tr style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                              <th style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                                <input
+                                  type="checkbox"
+                                  className="header-checkbox"
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Booking ID
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Service Type
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Vendor Assigned 
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Price
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Date & Time
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Booking Status
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Internal Notes & Comments
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                              <th style={{fontSize: "12px"}}>
+                                Actions
+                                <img
+                                  src={sortIcon}
+                                  alt="sort"
+                                  style={{
+                                    marginBottom: "-3px",
+                                    marginLeft: "5px",
+                                  }}
+                                />
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                            {bookings.map((booking, index) => (
+                              <tr
+                                key={index}
                                 style={{
-                                  backgroundColor:
-                                    booking.status === "confirmed"
-                                      ? "#e6f7ee"
-                                      : booking.status === "pending"
-                                      ? "#fff8e6"
-                                      : booking.status === "completed"
-                                      ? "#e6f0ff"
-                                      : booking.status === "in progress"
-                                      ? "#e6f7ff"
-                                      : booking.status === "flagged"
-                                      ? "#ffe6e6"
-                                      : "#ffebeb",
-                                  color:
-                                    booking.status === "confirmed"
-                                      ? "#1d9d74"
-                                      : booking.status === "pending"
-                                      ? "#ff9800"
-                                      : booking.status === "completed"
-                                      ? "#3366ff"
-                                      : booking.status === "in progress"
-                                      ? "#0099cc"
-                                      : booking.status === "flagged"
-                                      ? "#ff4d4f"
-                                      : "#ff4d4f",
-                                  padding: "2px 6px",
-                                  borderRadius: "4px",
-                                  fontSize: "10px",
+                                  borderBottom: "1px solid #eee",
+                                  color: theme === "light" ? "#103B57" : "#FFFFFF",
+                                  
                                 }}
                               >
-                                {booking.status}
-                              </span>
-                            </td>
-                            <td style={{ padding: "8px", fontSize: "11px" }}>
-                              <Button
-                                icon="pi pi-eye"
-                                className="p-button-text p-button-sm"
-                                style={{
-                                  padding: "2px",
-                                  fontSize: "10px",
-                                  color: "#0387D9",
-                                }}
-                                onClick={() =>
-                                  handleViewReview(booking.reviews)
-                                }
-                                label="Participant Reviews..."
-                              />
-                            </td>
-                            <td
-                              style={{
-                                padding: "6px",
-                                borderBottom: "1px solid #eee",
-                              }}
-                            >
-                              <div style={{ display: "flex", gap: "3px" }}>
-                                {/* View button */}
-                                <Button
-                                  className="p-button-text p-button-sm"
+                                <td>
+                                  <input type="checkbox" />
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  {booking.bookingId}
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  {booking.services
+                                    ?.map((service) => service.service?.name)
+                                    .join(", ")}
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  {booking.name}
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  ${booking.totalPrice}
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  {new Date(booking.bookingDate).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    }
+                                  )}
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  <span
+                                    style={{
+                                      backgroundColor:
+                                        booking.status === "confirmed"
+                                          ? "#e6f7ee"
+                                          : booking.status === "pending"
+                                          ? "#fff8e6"
+                                          : booking.status === "completed"
+                                          ? "#e6f0ff"
+                                          : booking.status === "in progress"
+                                          ? "#e6f7ff"
+                                          : booking.status === "flagged"
+                                          ? "#ffe6e6"
+                                          : "#ffebeb",
+                                      color:
+                                        booking.status === "confirmed"
+                                          ? "#1d9d74"
+                                          : booking.status === "pending"
+                                          ? "#ff9800"
+                                          : booking.status === "completed"
+                                          ? "#3366ff"
+                                          : booking.status === "in progress"
+                                          ? "#0099cc"
+                                          : booking.status === "flagged"
+                                          ? "#ff4d4f"
+                                          : "#ff4d4f",
+                                      padding: "2px 6px",
+                                      borderRadius: "4px",
+                                      fontSize: "10px",
+                                    }}
+                                  >
+                                    {booking.status}
+                                  </span>
+                                </td>
+                                <td style={{ padding: "8px", fontSize: "11px" }}>
+                                  <Button
+                                    icon="pi pi-eye"
+                                    className="p-button-text p-button-sm"
+                                    style={{
+                                      padding: "2px",
+                                      fontSize: "10px",
+                                      color: "#0387D9",
+                                    }}
+                                    onClick={() =>
+                                      handleViewReview(booking.reviews)
+                                    }
+                                    label="Participant Reviews..."
+                                  />
+                                </td>
+                                <td
                                   style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
+                                    padding: "6px",
+                                    borderBottom: "1px solid #eee",
                                   }}
-                                  tooltip="View Details"
-                                  tooltipOptions={{ position: "top" }}
-                                  onClick={() => handleViewBooking(booking)}
                                 >
-                                  <div style={{ backgroundColor: "white" }}>
+                                  <div style={{ display: "flex", gap: "3px" }}>
+                                    {/* View button */}
+                                    <Button
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                      }}
+                                      tooltip="View Details"
+                                      tooltipOptions={{ position: "top" }}
+                                      onClick={() => handleViewBooking(booking)}
+                                    >
+                                      <div style={{ backgroundColor: "white" }}>
+                                        <img
+                                          src={eyeblock}
+                                          alt="View"
+                                          style={{ width: "15px", height: "15px" }}
+                                        />
+                                      </div>
+                                    </Button>
+
+                                    {/* Edit button */}
+                                    <Button
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                      }}
+                                      tooltip="Edit"
+                                      tooltipOptions={{ position: "top" }}
+                                      onClick={() => handleEditBooking(booking)}
+                                    >
+                                      <img
+                                        src={editLogo}
+                                        alt="Edit"
+                                        style={{ width: "15px", height: "15px" }}
+                                      />
+                                    </Button>
+                                    <Button
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                      }}
+                                      tooltip="Edit"
+                                      tooltipOptions={{ position: "top" }}
+                                      // onClick={() => handleEditBooking(booking)}
+                                    >
+                                      <img
+                                        src={times}
+                                        alt="times"
+                                        style={{ width: "15px", height: "15px" }}
+                                      />
+                                    </Button>
+
+                                    {/* Status button */}
+                                    <Button
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                      }}
+                                      tooltip="Change Status"
+                                      tooltipOptions={{ position: "top" }}
+                                      onClick={(e) => {
+                                        setSelectedBookingForStatus(booking);
+                                        statusMenuRef.current.toggle(e);
+                                      }}
+                                    >
+                                      {/* <i
+                                        className="pi pi-check-circle"
+                                        style={{
+                                          fontSize: "14px",
+                                          color: "#4880FF",
+                                          border: "1px solid #4880FF",
+                                          borderRadius: "50%",
+                                          padding: "1px",
+                                        }}
+                                      ></i> */}
+                                      <img
+                                        src={check}
+                                        alt="Download"
+                                        style={{ width: "15px", height: "15px" }}
+                                      />
+                                    </Button>
+
+                                    {/* Download button */}
+                                    {/* <Button
+                                      icon="pi pi-download"
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                        border: "1px solid #ddd",
+                                        borderRadius: "50%",
+                                      }}
+                                      tooltip="Download"
+                                      tooltipOptions={{ position: "top" }}
+                                    /> */}
                                     <img
-                                      src={eyeblock}
-                                      alt="View"
+                                      src={downloadIcon}
+                                      alt="Download"
                                       style={{ width: "15px", height: "15px" }}
                                     />
+
+                                    {/* Upload button */}
+                                    <Button
+                                      className="p-button-text p-button-sm"
+                                      style={{
+                                        width: "20px",
+                                        height: "20px",
+                                        padding: "1px",
+                                        border: "1px solid #ddd",
+                                        borderRadius: "50%",
+                                      }}
+                                      tooltip="Upload Booking"
+                                      tooltipOptions={{ position: "top" }}
+                                      onClick={() => handleUploadBooking(booking)}
+                                    >
+                                      <img
+                                        src={uploadBooking}
+                                        alt="Upload"
+                                        style={{ width: "15px", height: "15px" }}
+                                      />
+                                    </Button>
                                   </div>
-                                </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
 
-                                {/* Edit button */}
-                                <Button
-                                  className="p-button-text p-button-sm"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
-                                  }}
-                                  tooltip="Edit"
-                                  tooltipOptions={{ position: "top" }}
-                                  onClick={() => handleEditBooking(booking)}
-                                >
-                                  <img
-                                    src={editLogo}
-                                    alt="Edit"
-                                    style={{ width: "15px", height: "15px" }}
-                                  />
-                                </Button>
-                                <Button
-                                  className="p-button-text p-button-sm"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
-                                  }}
-                                  tooltip="Edit"
-                                  tooltipOptions={{ position: "top" }}
-                                  // onClick={() => handleEditBooking(booking)}
-                                >
-                                  <img
-                                    src={times}
-                                    alt="times"
-                                    style={{ width: "15px", height: "15px" }}
-                                  />
-                                </Button>
-
-                                {/* Status button */}
-                                <Button
-                                  className="p-button-text p-button-sm"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
-                                  }}
-                                  tooltip="Change Status"
-                                  tooltipOptions={{ position: "top" }}
-                                  onClick={(e) => {
-                                    setSelectedBookingForStatus(booking);
-                                    statusMenuRef.current.toggle(e);
-                                  }}
-                                >
-                                  {/* <i
-                                    className="pi pi-check-circle"
-                                    style={{
-                                      fontSize: "14px",
-                                      color: "#4880FF",
-                                      border: "1px solid #4880FF",
-                                      borderRadius: "50%",
-                                      padding: "1px",
-                                    }}
-                                  ></i> */}
-                                  <img
-                                    src={check}
-                                    alt="Download"
-                                    style={{ width: "15px", height: "15px" }}
-                                  />
-                                </Button>
-
-                                {/* Download button */}
-                                {/* <Button
-                                  icon="pi pi-download"
-                                  className="p-button-text p-button-sm"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
-                                    border: "1px solid #ddd",
-                                    borderRadius: "50%",
-                                  }}
-                                  tooltip="Download"
-                                  tooltipOptions={{ position: "top" }}
-                                /> */}
-                                <img
-                                  src={downloadIcon}
-                                  alt="Download"
-                                  style={{ width: "15px", height: "15px" }}
-                                />
-
-                                {/* Upload button */}
-                                <Button
-                                  className="p-button-text p-button-sm"
-                                  style={{
-                                    width: "20px",
-                                    height: "20px",
-                                    padding: "1px",
-                                    border: "1px solid #ddd",
-                                    borderRadius: "50%",
-                                  }}
-                                  tooltip="Upload Booking"
-                                  tooltipOptions={{ position: "top" }}
-                                  onClick={() => handleUploadBooking(booking)}
-                                >
-                                  <img
-                                    src={uploadBooking}
-                                    alt="Upload"
-                                    style={{ width: "15px", height: "15px" }}
-                                  />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  {/* Mobile view */}
+                  <div className="mobile-view">
+                    {bookings.map((booking, index) => (
+                      <div key={index} className="mobile-booking-wrapper">
+                        {renderResponsiveBookingRow(booking)}
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                {/* Mobile view */}
-                <div className="mobile-view">
-                  {bookings.map((booking, index) => (
-                    <div key={index} className="mobile-booking-wrapper">
-                      {renderResponsiveBookingRow(booking)}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CSSTransition>
-        </SwitchTransition>
+              )}
+            </CSSTransition>
+          </SwitchTransition>
+        </div>
       </div>
 
       {/* Review Modal */}
