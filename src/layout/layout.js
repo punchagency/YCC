@@ -9,12 +9,15 @@ import { BookingProvider } from "../context/booking/bookingContext";
 import { ServiceProvider } from "../context/service/serviceContext";
 import { ToastProvider } from "../context/toast/toastContext";
 import { ThemeProvider } from "../context/theme/themeContext";
+import { TransactionProvider } from "../context/transaction/transactionContext";
+
 
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <ThemeProvider>
     <ToastProvider>
+    <TransactionProvider>
     <DashboardAIProvider>
       <BookingProvider>
           <ServiceProvider>
@@ -38,6 +41,7 @@ const AdminLayout = ({ role }) => {
     </ServiceProvider>
     </BookingProvider>
     </DashboardAIProvider>
+    </TransactionProvider>
     </ToastProvider>
     </ThemeProvider>
   );

@@ -7,16 +7,15 @@ import {
 
 
 const Pagination = ({
-  totalItems = 200,
-  totalPages = 44,
-  currentPage = 1,
-  itemsPerPage = 10,
+  totalItems,
+  totalPages,
+  currentPage,
+  itemsPerPage,
   onPageChange,
   onItemsPerPageChange,
 }) => {
   const startItem = (currentPage - 1) * itemsPerPage + 1
   const endItem = Math.min(currentPage * itemsPerPage, totalItems)
-
   const handleItemsPerPageChange = (event) => {
     onItemsPerPageChange?.(event.target.value)
   }
