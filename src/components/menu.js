@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
@@ -14,12 +14,48 @@ import helpLogo from "../assets/images/crew/info.png";
 import contactLogo from "../assets/images/crew/shape.png";
 import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
+import { confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog } from "primereact/confirmdialog";
 
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { theme, changeTheme } = useTheme();
   const location = useLocation();
+  const [activeItem, setActiveItem] = useState(null);
+
+  const handleLogout = () => {
+    confirmDialog({
+      message: "Are you sure you want to log out?",
+      header: "Logout Confirmation",
+      icon: "pi pi-exclamation-triangle",
+      acceptClassName: "p-button-danger",
+      acceptLabel: "Yes",
+      rejectLabel: "Cancel",
+      accept: () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+      },
+      reject: () => {
+        // Do nothing on cancel
+      },
+      style: { textAlign: "center" },
+      footer: (options) => (
+        <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+          <Button
+            label="Cancel"
+            className="p-button-outlined"
+            onClick={options.reject}
+          />
+          <Button
+            label="Yes"
+            className="p-button-danger"
+            onClick={options.accept}
+          />
+        </div>
+      ),
+    });
+  };
 
   const menuItems = [
     {
@@ -29,6 +65,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
       command: () => {
         navigate("/admin/dashboard");
+      },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -41,6 +83,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/calendar-management");
       },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
     {
       label: "Inventory Management",
@@ -51,6 +99,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => {
         navigate("/admin/inventory-management");
+      },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -63,6 +117,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/orders-management");
       },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
     {
       label: "Bookings",
@@ -73,6 +133,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => {
         navigate("/admin/bookings-management");
+      },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -88,6 +154,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/financial-management");
       },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
     {
       label: "Notifications",
@@ -102,6 +174,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/notifications");
       },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
     {
       label: "Reports",
@@ -109,12 +187,24 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/reports");
       },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
     {
       label: "Settings",
       icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
       command: () => {
         navigate("/admin/settings");
+      },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -138,13 +228,48 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Log Out",
       icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,
-      command: () => {
-        localStorage.removeItem("token");
-        navigate("/login");
-      },
+      command: handleLogout,
       style: { color: "#FF4B4B" },
+      onMouseDown: () => {
+        document.body.classList.add("menu-item-active");
+      },
+      onMouseUp: () => {
+        document.body.classList.remove("menu-item-active");
+      },
     },
   ];
+
+  // Create a better active state handler
+  const handleActiveStateStart = (e) => {
+    // Stop event propagation to prevent PrimeReact from handling it
+    e.stopPropagation();
+    document.body.classList.add("menu-item-active");
+  };
+
+  const handleActiveStateEnd = (e) => {
+    // Add a small delay to make the effect visible
+    setTimeout(() => {
+      document.body.classList.remove("menu-item-active");
+    }, 300);
+  };
+
+  // Apply these handlers to each menu item
+  menuItems.forEach((item) => {
+    if (item.label) {
+      item.onMouseDown = handleActiveStateStart;
+      item.onMouseUp = handleActiveStateEnd;
+      item.onMouseLeave = handleActiveStateEnd;
+
+      // Override any PrimeReact built-in handlers
+      item.props = {
+        ...item.props,
+        className: `${item.className || ""} custom-menu-item`,
+        onMouseDown: handleActiveStateStart,
+        onMouseUp: handleActiveStateEnd,
+        onMouseLeave: handleActiveStateEnd,
+      };
+    }
+  });
 
   menuItems.forEach((item) => {
     if (item.label) {
@@ -157,29 +282,32 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   });
 
   return (
-    <div
-      className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
-      style={{
-        backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-      }}
-    >
-      <div className="flex justify-content-center align-items-center logo-wraper">
-        <div className="logo relative">
-          <a href="/admin/dashboard">
-            <img src={logo} alt="Company logo" className="image-full" />
-          </a>
+    <>
+      <ConfirmDialog />
+      <div
+        className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
+        style={{
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+        }}
+      >
+        <div className="flex justify-content-center align-items-center logo-wraper">
+          <div className="logo relative">
+            <a href="/admin/dashboard">
+              <img src={logo} alt="Company logo" className="image-full" />
+            </a>
+          </div>
+          <Button
+            icon="pi pi-times"
+            text
+            className="p-0 collapse-close-btn"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          />
         </div>
-        <Button
-          icon="pi pi-times"
-          text
-          className="p-0 collapse-close-btn"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        />
+        <div>
+          <PanelMenu model={menuItems} />
+        </div>
       </div>
-      <div>
-        <PanelMenu model={menuItems} />
-      </div>
-    </div>
+    </>
   );
 };
 
