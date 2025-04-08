@@ -7,7 +7,7 @@
 
 :root {
   --bg-color: #ffffff;
-  --text-color: #333333;
+  --text-color: #103B57;
   --card-bg: #ffffff;
   --border-color: #e0e0e0;
   --primary-color: #0387d9;
@@ -21,7 +21,7 @@
 
 .dark-theme {
   --bg-color: #03141f;
-  --text-color: #ffffff;
+  --text-color: #F8FBFF;
   --card-bg: #0a2133;
   --border-color: #1e3a4f;
   --sidebar-bg: #051825;
@@ -244,10 +244,10 @@
 // Priority styles
 .priority-high {
   background-color: #e2f9f0;
+  color: purple !important;  // Changed to purple
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #1a9e6d;
   border-radius: 5px;
   padding: 10px 0px;
 }
@@ -257,7 +257,7 @@
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #827f29;
+  color: red;
   border-radius: 5px;
   padding: 10px 0px;
 }
@@ -267,7 +267,7 @@
   width: 100px;
   text-align: center;
   font-weight: bold;
-  color: #db5f61;
+  color: red;
   border-radius: 5px;
   padding: 10px 0px;
 }
@@ -360,7 +360,7 @@
 
         &.priority-high {
           background-color: #e2f9f0;
-          color: #1a9e6d;
+          color: purple;  // Changed to purple
         }
 
         &.priority-medium {
@@ -411,7 +411,7 @@
 
 /* Update existing priority styles to match filter colors */
 .priority-high {
-  color: #ef4444 !important;
+  color: purple !important;  // Changed to purple
 }
 
 .priority-medium {
@@ -4531,16 +4531,16 @@ ul {
         font-weight: 500;
 
         &.priority-high {
-          background: #fee2e2;
-          color: #ef4444;
+          background: #E2F9F0 !important;
+          color: purple !important;
         }
         &.priority-medium {
-          background: #fef3c7;
-          color: #f59e0b;
+          background: #FFFEDB !important;
+          color: #827F29 !important;
         }
         &.priority-low {
-          background: #d1fae5;
-          color: #10b981;
+          background: #E414171A !important;
+          color: #DB5F61 !important;
         }
       }
 
@@ -4689,6 +4689,194 @@ ul {
 
     tbody tr:hover {
       background: #f8fafc;
+    }
+  }
+}
+
+.settings-container {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 24px;
+  margin: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .settings-form-group {
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #1E293B;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .p-inputtext,
+    .p-password,
+    .p-dropdown {
+      width: 100%;
+      height: 40px;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border: 1px solid #E2E8F0;
+      border-radius: 4px;
+      height: 40px;
+
+      span {
+        color: #64748B;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .delete-account {
+    .delete-buttons {
+      display: flex;
+      gap: 16px;
+
+      .p-button {
+        flex: 1;
+        height: 40px;
+      }
+    }
+  }
+
+  .settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+
+    .p-button {
+      min-width: 120px;
+      height: 40px;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .settings-container {
+    margin: 10px;
+    padding: 16px;
+
+    .settings-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+}
+
+.inventory-table {
+  tbody {
+    tr {
+      &:hover {
+        td {
+          .dark-theme & {
+            color: #495057;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Add these styles for the menu items
+.p-panelmenu {
+  background-color: transparent !important;
+
+  .p-panelmenu-header {
+    background-color: transparent !important;
+    
+    > a {
+      background-color: transparent !important;
+      color: var(--text-color) !important;
+      border: none !important;
+      padding: 1rem;
+
+      // Remove all hover styles
+      &:hover, &:focus, &:active {
+        background-color: transparent !important;
+        color: inherit !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+
+  .p-panelmenu-content {
+    background-color: transparent !important;
+    border: none !important;
+
+    .p-menuitem {
+      background-color: transparent !important;
+
+      .p-menuitem-link {
+        background-color: transparent !important;
+        color: var(--text-color) !important;
+        border: none !important;
+
+        // Remove all hover styles
+        &:hover, &:focus, &:active {
+          background-color: transparent !important;
+          color: inherit !important;
+          box-shadow: none !important;
+        }
+
+        // Override PrimeReact's default hover styles
+        .p-menuitem-text, .p-menuitem-icon {
+          &:hover {
+            color: inherit !important;
+          }
+        }
+      }
+    }
+  }
+
+  // Ensure no hover effects on any nested elements
+  * {
+    background-color: transparent !important;
+    &:hover {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+  }
+}
+
+// Target PrimeReact menu items specifically
+.p-panelmenu {
+  .p-menuitem-text {
+    color: var(--text-color) !important;
+  }
+  
+  .p-menuitem-icon {
+    color: var(--text-color) !important;
+  }
+  
+  // Override hover states specifically targeting text
+  .p-menuitem-link:hover .p-menuitem-text,
+  .p-menuitem-link:focus .p-menuitem-text,
+  .p-menuitem-link:active .p-menuitem-text,
+  .p-panelmenu-header > a:hover .p-menuitem-text,
+  a.p-panelmenu-header-link:hover span {
+    color: var(--text-color) !important;
+  }
+  
+  // Force text color
+  span, a, div {
+    &:hover, &:focus, &:active {
+      color: var(--text-color) !important;
     }
   }
 }

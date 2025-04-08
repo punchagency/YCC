@@ -17,7 +17,7 @@ const CrewSetting = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { notificationsEnabled, toggleNotifications } = useNotifications();
- 
+
   const toast = React.useRef(null);
   const deleteMenuRef = useRef(null);
 
@@ -30,6 +30,7 @@ const CrewSetting = () => {
   const [language, setLanguage] = useState(null);
   const [timezone, setTimezone] = useState(null);
   const [accountVisibility, setAccountVisibility] = useState(true);
+  const [theme, setTheme] = useState("light");
 
   // Language options
   const languages = [
@@ -182,34 +183,9 @@ const CrewSetting = () => {
     }, 3000);
   };
 
-  // Template for dropdown items
-  const languageOptionTemplate = (option) => {
-    return (
-      <div
-        className="language-item"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      >
-        {option.name}
-      </div>
-    );
-  };
-
-  const selectedLanguageTemplate = (option, props) => {
-    if (option) {
-      return (
-        <div
-          className="language-item"
-          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-        >
-          {option.name}
-        </div>
-      );
-    }
-    return (
-      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-        {props.placeholder}
-      </span>
-    );
+  const changeTheme = () => {
+    // Implement theme change logic here
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
@@ -224,365 +200,88 @@ const CrewSetting = () => {
           </div>
         </div>
       </div>
-      <div
-        className="settings-container"
-        style={{
-          padding: "20px",
-          backgroundColor: "var(--bg-color, #fff)",
-          color: "var(--text-color, #333)",
-          borderRadius: "8px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-        }}
-      >
-        <h2
-          style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            textAlign: "left",
-          }}
-        >
-          Manage Settings
-        </h2>
-
-        {/* Form container with flex display for name and email */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          {/* Name input */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="name"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Name
-            </label>
+      <div className="settings-container">
+        <div className="settings-grid">
+          <div className="settings-form-group">
+            <label>Username</label>
             <InputText
-              id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              placeholder="Name"
             />
           </div>
 
-          {/* Email input */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="email"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Email
-            </label>
+          <div className="settings-form-group">
+            <label>Email</label>
             <InputText
-              id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              placeholder="Enter Email Address"
             />
           </div>
-        </div>
 
-        {/* Form container with flex display for password fields */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          {/* Password input */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="password"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Password
-            </label>
+          <div className="settings-form-group">
+            <label>Password</label>
             <Password
-              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              toggleMask
+              placeholder="Password"
               feedback={false}
-              style={{
-                width: "100%",
-              }}
-              inputStyle={{
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                width: "100%",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              toggleMask
             />
           </div>
 
-          {/* Confirm Password input */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="confirmPassword"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Confirm Password
-            </label>
-            <InputText
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm Password"
+          <div className="settings-form-group">
+            <label>Confirm Password</label>
+            <Password
+              value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              placeholder="Confirm Password"
+              feedback={false}
+              toggleMask
             />
           </div>
-        </div>
 
-        {/* Form container with flex display for phone and 2FA */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          {/* Phone input */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="phone"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Phone Number
-            </label>
+          <div className="settings-form-group">
+            <label>Phone Number</label>
             <InputText
-              id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
+              placeholder="Add Phone Number"
             />
           </div>
 
-          {/* Two-Factor Authentication */}
-          <div style={{ flex: 1 }}>
-            <label
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Two-Factor Authentication
-            </label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginTop: "10px",
-              }}
-            >
-              <Checkbox
-                inputId="twoFactor"
-                checked={twoFactorEnabled}
-                onChange={(e) => setTwoFactorEnabled(e.checked)}
-                style={{ marginRight: "10px" }}
-              />
-              <label
-                htmlFor="twoFactor"
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  cursor: "pointer",
-                }}
-              >
-                Enable Two-Factor Authentication
-              </label>
-            </div>
+          <div className="settings-form-group">
+            <label>Two-Factor Authentication</label>
+            <InputText placeholder="Verify Your Two-Factor Authentication" />
           </div>
-        </div>
 
-        {/* Form container with flex display for language and timezone */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          {/* Language dropdown */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="language"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Language
-            </label>
+          <div className="settings-form-group">
+            <label>Language</label>
             <Dropdown
-              id="language"
               value={language}
               options={languages}
               onChange={(e) => setLanguage(e.value)}
               optionLabel="name"
               placeholder="Select Language"
-              itemTemplate={languageOptionTemplate}
-              valueTemplate={selectedLanguageTemplate}
-              style={{
-                width: "100%",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-              panelStyle={{
-                border: "1px solid #e0e0e0",
-              }}
-              inputStyle={{
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-              }}
             />
           </div>
 
-          {/* Timezone dropdown */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="timezone"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Timezone
-            </label>
+          <div className="settings-form-group">
+            <label>Time Zone</label>
             <Dropdown
-              id="timezone"
               value={timezone}
               options={timezones}
               onChange={(e) => setTimezone(e.value)}
               optionLabel="name"
-              placeholder="Select Timezone"
-              itemTemplate={languageOptionTemplate}
-              valueTemplate={selectedLanguageTemplate}
-              style={{
-                width: "100%",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-              panelStyle={{
-                border: "1px solid #e0e0e0",
-              }}
-              inputStyle={{
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-              }}
+              placeholder="Set Time Zone"
             />
           </div>
-        </div>
 
-        {/* Theme and Notification Settings */}
-        <div
-          style={{
-            display: "flex",
-            gap: "20px",
-            marginBottom: "20px",
-            marginTop: "20px",
-            justifyContent: "space-between",
-          }}
-        >
-          {/* Notifications toggle */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="notifications"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Notifications
-            </label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <i
-                  className="pi pi-bell"
-                  style={{ fontSize: "1.2rem", marginRight: "8px" }}
-                ></i>
-                <span>{notificationsEnabled ? "Turn on" : "Turn off"}</span>
-              </div>
+          <div className="settings-form-group">
+            <label>Notifications</label>
+            <div className="toggle-container">
+              <span>Turn On</span>
               <InputSwitch
                 checked={notificationsEnabled}
                 onChange={toggleNotifications}
@@ -590,89 +289,18 @@ const CrewSetting = () => {
             </div>
           </div>
 
-          {/* Theme toggle */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="theme"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Theme
-            </label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                
-                  <i
-                    className="pi pi-moon"
-                    style={{
-                      fontSize: "1.2rem",
-                      marginRight: "8px",
-                      color: "#6B7280",
-                    }}
-                  ></i>
-                
-                
-              </div>
-             
+          <div className="settings-form-group">
+            <label>Theme (Light/Dark Mode)</label>
+            <div className="toggle-container">
+              <span>Light Mode</span>
+              <InputSwitch checked={theme === "dark"} onChange={changeTheme} />
             </div>
           </div>
-        </div>
 
-        {/* Account visibility and Delete Account row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: "20px",
-            marginTop: "20px",
-          }}
-        >
-          {/* Account visibility toggle */}
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="accountVisibility"
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                fontWeight: "500",
-                textAlign: "left",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-              }}
-            >
-              Account Visibility
-            </label>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "10px",
-                border: "1px solid #e0e0e0",
-                borderRadius: "4px",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center" }}>
-                <i
-                  className="pi pi-eye"
-                  style={{ fontSize: "1.2rem", marginRight: "8px" }}
-                ></i>
-                <span>{accountVisibility ? "On" : "Off"}</span>
-              </div>
+          <div className="settings-form-group">
+            <label>Account Visibility</label>
+            <div className="toggle-container">
+              <span>Visible Now</span>
               <InputSwitch
                 checked={accountVisibility}
                 onChange={(e) => setAccountVisibility(e.value)}
@@ -680,80 +308,25 @@ const CrewSetting = () => {
             </div>
           </div>
 
-          {/* Delete Account button */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-            }}
-          >
-            <Button
-              label="Delete Account"
-              icon="pi pi-trash"
-              className="p-button-danger p-button-outlined"
-              onClick={(e) => deleteMenuRef.current.toggle(e)}
-              aria-haspopup
-              aria-controls="delete-menu"
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                width: "auto",
-                height: "45px",
-                fontSize: "14px",
-              }}
-            />
-
-            <Menu
-              model={[
-                {
-                  label: "Delete Account",
-                  icon: "pi pi-trash",
-                  command: () => confirmDeleteAccount(),
-                },
-                {
-                  label: "Cancel",
-                  icon: "pi pi-times",
-                },
-              ]}
-              popup
-              ref={deleteMenuRef}
-              id="delete-menu"
-            />
+          <div className="settings-form-group delete-account">
+            <label>Delete Account</label>
+            <div className="delete-buttons">
+              <Button label="No" className="p-button-danger" />
+              <Button label="Yes" className="p-button-primary" />
+            </div>
           </div>
         </div>
 
-        {/* Save Button */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "30px",
-          }}
-        >
+        <div className="settings-actions">
           <Button
             label="Cancel"
-            onClick={handleSaveChanges}
-            style={{
-              backgroundColor: "#EF4444",
-              border: "none",
-              padding: "10px 20px",
-              width: "150px",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              marginRight: "10px",
-            }}
+            className="p-button-danger"
+            onClick={() => navigate(-1)}
           />
-
           <Button
-            label="Save Changes"
+            label="Save"
+            className="p-button-primary"
             onClick={handleSaveChanges}
-            style={{
-              backgroundColor: "#0387D9",
-              border: "none",
-              padding: "10px 20px",
-              width: "150px",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-            }}
           />
         </div>
       </div>

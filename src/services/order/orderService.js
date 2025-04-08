@@ -15,22 +15,14 @@ const getAuthHeader = () => {
 export const createOrder = async (orderData) => {
   try {
     const response = await axios.post(`${API_URL}/orders`, orderData, {
-      headers: getAuthHeader(),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
     });
-
-    return {
-      success: true,
-      data: response.data,
-    };
+    return response.data;
   } catch (error) {
-    console.error(
-      "Error creating order:",
-      error.response?.data || error.message
-    );
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to create order",
-    };
+    throw error.response?.data || error;
   }
 };
 

@@ -13,17 +13,20 @@ import homeLogo from "../assets/images/crew/homeLogo.png";
 import helpLogo from "../assets/images/crew/info.png";
 import contactLogo from "../assets/images/crew/shape.png";
 import logoutLogo from "../assets/images/crew/logout.png";
+import { useTheme } from "../context/theme/themeContext";
 
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const { theme, changeTheme } = useTheme();
   const location = useLocation();
 
   const menuItems = [
     {
       label: "Dashboard",
       icon: <img src={homeLogo} alt="Dashboard" width={15} height={15} />,
-      className: location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
+      className:
+        location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
       command: () => {
         navigate("/admin/dashboard");
       },
@@ -31,7 +34,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Calendar",
       icon: "pi pi-calendar",
-      className: location.pathname === "/admin/calendar-management" ? "active-menu-item" : "",
+      className:
+        location.pathname === "/admin/calendar-management"
+          ? "active-menu-item"
+          : "",
       command: () => {
         navigate("/admin/calendar-management");
       },
@@ -39,7 +45,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Inventory Management",
       icon: "pi pi-file",
-      className: location.pathname === "/admin/inventory-management" ? "active-menu-item" : "",
+      className:
+        location.pathname === "/admin/inventory-management"
+          ? "active-menu-item"
+          : "",
       command: () => {
         navigate("/admin/inventory-management");
       },
@@ -47,7 +56,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Orders",
       icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
-      className: location.pathname === "/admin/orders-management" ? "active-menu-item" : "",
+      className:
+        location.pathname === "/admin/orders-management"
+          ? "active-menu-item"
+          : "",
       command: () => {
         navigate("/admin/orders-management");
       },
@@ -55,7 +67,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     {
       label: "Bookings",
       icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
-      className: location.pathname === "/admin/bookings-management" ? "active-menu-item" : "",
+      className:
+        location.pathname === "/admin/bookings-management"
+          ? "active-menu-item"
+          : "",
       command: () => {
         navigate("/admin/bookings-management");
       },
@@ -131,8 +146,23 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
   ];
 
+  menuItems.forEach((item) => {
+    if (item.label) {
+      item.style = {
+        ...item.style,
+        color: theme === "light" ? "#103B57" : "#FFFFFF",
+      };
+      item.className = `${item.className || ""} no-hover-effect`;
+    }
+  });
+
   return (
-    <div className={`left-menu ${isCollapsed ? "collapsed" : ""}`}>
+    <div
+      className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
+      style={{
+        backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+      }}
+    >
       <div className="flex justify-content-center align-items-center logo-wraper">
         <div className="logo relative">
           <a href="/admin/dashboard">
@@ -146,8 +176,8 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           onClick={() => setIsCollapsed(!isCollapsed)}
         />
       </div>
-      <div >
-        <PanelMenu  model={menuItems} />
+      <div>
+        <PanelMenu model={menuItems} />
       </div>
     </div>
   );
