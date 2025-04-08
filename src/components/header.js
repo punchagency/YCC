@@ -368,7 +368,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         />
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <div
+        {/* <div
           style={{
             display: "flex",
             alignItems: "center",
@@ -383,7 +383,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           }}
           onClick={() => changeTheme()}
         >
-          {/* Sun Icon */}
+         
           <div
             style={{
               width: "50%",
@@ -404,7 +404,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               <path d="M12 2V4M12 20V22M4 12H2M6.31412 6.31412L4.8999 4.8999M17.6859 6.31412L19.1001 4.8999M6.31412 17.69L4.8999 19.1042M17.6859 17.69L19.1001 19.1042M22 12H20" />
             </svg>
           </div>
-          {/* Moon Icon */}
+          
           <div
             style={{
               width: "50%",
@@ -424,7 +424,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               <path d="M21.9548 12.9564C20.5779 15.3717 17.9791 17.0001 15 17.0001C10.5817 17.0001 7 13.4184 7 9.00006C7 6.02097 8.62837 3.42225 11.0436 2.04535C5.96731 2.52504 2 6.79927 2 12.0001C2 17.5229 6.47715 22.0001 12 22.0001C17.2008 22.0001 21.475 18.0327 21.9548 12.9564Z" />
             </svg>
           </div>
-          {/* Sliding Background */}
+          Sliding Background
           <div
             style={{
               position: "absolute",
@@ -439,7 +439,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
             }}
           />
-        </div>
+        </div> */}
 
         {/* Notification Bell */}
         <Button
@@ -447,7 +447,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             <img
               src={icon}
               alt="notification"
-              style={{ width: "24px", height: "24px",  }}
+              style={{ width: "24px", height: "24px" }}
             />
           }
           className="notifications"
@@ -503,11 +503,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         style={{
           padding: isMobile ? "8px" : "16px",
           flexWrap: "wrap",
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          color: theme === "light" ? "#103B57" : "#F8FBFF",
         }}
       />
       <MobileSidebar
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
+        style={{
+          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          color: theme === "light" ? "#103B57" : "#F8FBFF",
+        }}
         role={role}
       />
     </>
