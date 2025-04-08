@@ -18,7 +18,7 @@ import filterBy from "../assets/images/crew/filterBy.png";
 import icon from "../assets/images/crew/Icon.png";
 import share from "../assets/images/crew/share.png";
 import MobileSidebar from "./MobileSidebar"; // Re-import MobileSidebar
-import { useTheme } from "../context/theme/themeContext";
+// import { useTheme } from "../context/theme/themeContext";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const shareMenuRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const { theme, changeTheme } = useTheme();
+  // const { theme, changeTheme } = useTheme();
 
   // Add refs for the new menus
   const filterMenuRef = useRef(null);
@@ -327,6 +327,15 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const end = (
     <>
       {/* Theme Toggle Switch */}
+      {/* 
+      <Button 
+        icon={theme === "light" ? "pi pi-moon" : "pi pi-sun"} 
+        onClick={changeTheme} 
+        className="p-button-rounded p-button-text" 
+        tooltip={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+        tooltipOptions={{ position: 'bottom' }}
+      />
+      */}
 
       {/* Notification Overlay Panel */}
       <OverlayPanel ref={overlayPanelRef} className="notification-overlay">
@@ -381,7 +390,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             cursor: "pointer",
             position: "relative",
           }}
-          onClick={() => changeTheme()}
+          // onClick={() => changeTheme()}
         >
           {/* Sun Icon */}
           <div
@@ -398,7 +407,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               width="14"
               height="14"
               viewBox="0 0 24 24"
-              fill={theme === "light" ? "#94A3B8" : "#0F172A"}
+              // fill={theme === "light" ? "#94A3B8" : "#0F172A"}
             >
               <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" />
               <path d="M12 2V4M12 20V22M4 12H2M6.31412 6.31412L4.8999 4.8999M17.6859 6.31412L19.1001 4.8999M6.31412 17.69L4.8999 19.1042M17.6859 17.69L19.1001 19.1042M22 12H20" />
@@ -419,7 +428,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               width="14"
               height="14"
               viewBox="0 0 24 24"
-              fill={theme === "light" ? "#0F172A" : "#94A3B8"}
+              // fill={theme === "light" ? "#0F172A" : "#94A3B8"}
             >
               <path d="M21.9548 12.9564C20.5779 15.3717 17.9791 17.0001 15 17.0001C10.5817 17.0001 7 13.4184 7 9.00006C7 6.02097 8.62837 3.42225 11.0436 2.04535C5.96731 2.52504 2 6.79927 2 12.0001C2 17.5229 6.47715 22.0001 12 22.0001C17.2008 22.0001 21.475 18.0327 21.9548 12.9564Z" />
             </svg>
@@ -433,7 +442,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               backgroundColor: "#fff",
               borderRadius: "28px",
               transition: "transform 0.3s ease",
-              transform: `translateX(${theme === "light" ? "100%" : "0"})`,
+              // transform: `translateX(${theme === "light" ? "100%" : "0"})`,
               left: "2px",
               top: "2px",
               boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -503,17 +512,19 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         style={{
           padding: isMobile ? "8px" : "16px",
           flexWrap: "wrap",
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-          color: theme === "light" ? "#103B57" : "#F8FBFF",
+          // backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          // color: theme === "light" ? "#103B57" : "#F8FBFF",
         }}
       />
       <MobileSidebar
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        style={{
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-          color: theme === "light" ? "#103B57" : "#F8FBFF",
-        }}
+        style={
+          {
+            // backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+            // color: theme === "light" ? "#103B57" : "#F8FBFF",
+          }
+        }
         role={role}
       />
     </>
