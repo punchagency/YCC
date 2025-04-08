@@ -1,17 +1,16 @@
 import { Box, Typography, Button, styled, Menu, MenuItem, InputBase, InputAdornment } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "../../../../context/theme/themeContext";
 
-const Section2FinancialManagement = () => {
+const Section2FinancialManagement = ({setPage, setLimit, setTransactionStatus, setSearch, transactionStatus}) => {
   const { theme } = useTheme();
-  const [selectedButton, setSelectedButton] = useState("Pending Invoices");
-  const buttons = ["Pending Invoices", "Completed Payments", "Upcoming Events"];
-  const options = ["All", "Pending", "Completed", "Upcoming"];
+  const [selectedButton, setSelectedButton] = useState("");
+  const buttons = ["Pending Invoices", "Completed Payments", "Failed Payments"];
+  const options = ["all", "pending", "completed", "failed"];
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
   const open = Boolean(anchorEl);
 
@@ -23,8 +22,34 @@ const Section2FinancialManagement = () => {
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    const debounce = setTimeout(() => {
+        setSearch(query);
+    }, 300);
+  
+    return () => clearTimeout(debounce);
+  }, [query]);
+
   const handleSelect = (option) => {
-    setSelected(option);
+   
+    if(option === "all"){
+      setTransactionStatus("");
+    }else{
+      setTransactionStatus(option);
+    }
+
+    handleClose();
+  };
+
+  const handleButtonClick = (option) => {
+    setSelectedButton(option);
+    if(option === "Pending Invoices"){
+      setTransactionStatus("pending");
+    }else if(option === "Completed Payments"){
+      setTransactionStatus("completed");
+    }else if(option === "Failed Payments"){
+      setTransactionStatus("failed");
+    }
     handleClose();
   };
   return (
@@ -54,7 +79,7 @@ const Section2FinancialManagement = () => {
           <CustomButton
             key={index}
             active={selectedButton === option}
-            onClick={() => setSelectedButton(option)}
+            onClick={() => handleButtonClick(option)}
             mode={theme}
           >
             {option}
@@ -78,7 +103,7 @@ const Section2FinancialManagement = () => {
               <Typography
                 sx={{ color: theme === "light" ? "#9b9b9b" : "white", fontWeight: 400, fontSize: "13px" }}
               >
-                {selected || "Select Filter"}
+                {transactionStatus || "Select Filter"}
               </Typography>
             </Box>
             <KeyboardArrowDownIcon

@@ -1,5 +1,5 @@
-import { Box, Typography, styled, Button, Checkbox } from "@mui/material";
-import { useState } from "react";
+import { Box, Typography, styled, Button, Checkbox, CircularProgress, Skeleton } from "@mui/material";
+import { useState, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -11,7 +11,9 @@ import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import downloadIcon from "../../../../assets/images/icons/financial-management/download-icon.png";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Pagination from "./pagination";
-import { useTheme } from "../../../../context/theme/themeContext";
+import { useTheme } from "../../../../context/theme/themeContext"
+
+
 const StyledTableCell = styled(TableCell)(({ mode }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: mode === "light" ? "#F9F9FA" : "#7F7F7F",
@@ -44,30 +46,47 @@ const StyledTableRow = styled(TableRow)(({ mode }) => ({
     backgroundColor: "#F9F9FA",
   },
 }));
-
-function createData(transaction, status, amount) {
-  return { transaction, status, amount };
-}
-
-const rows = [
-  createData("#10234", "In Progress", 100.0),
-  createData("#10235", "Completed", 100.0),
-  createData("#10236", "Pending", 1200.0),
-  createData("#10237", "In Progress", 180.0),
-  createData("#10238", "In Progress", 12280.0),
-  createData("#10239", "Pending", 12280.0),
-];
-
-const statusColors = {
-  "In Progress": { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
-  Completed: { backgroundColor: "#5570F11A", color: "#3D56D8" },
-  Pending: { backgroundColor: "#FFF3E4", color: "#896942" },
-};
-
-const Section3FinancialManagement = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+const Section3FinancialManagement = ({ transactions, loading, page, limit, setPage, setLimit, totalPages, totalItems }) => {
     const { theme } = useTheme();
+
+    
+    function createData(transaction, status, amount) {
+      return { transaction, status, amount };
+    }
+    
+    const rows = useMemo(() => {
+      return transactions.map((transaction) =>
+        createData(
+          transaction.transactionId,
+          transaction.transactionStatus,
+          transaction.transactionAmount
+        )
+      );
+    }, [transactions]);
+
+    if (loading) {
+      return (
+
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              height: "400px",
+              width: "100%",
+              padding: "20px",
+            }}
+          >
+             <CustomTypography mode={theme}>Customer Orders</CustomTypography>
+            {/* Skeleton for loading table rows */}
+            <Skeleton variant="rectangular" height={45} />
+            <Skeleton variant="rectangular" height={45} />
+            <Skeleton variant="rectangular" height={45} />
+            <Skeleton variant="rectangular" height={45} />
+            {/* Skeleton for other elements as needed */}
+          </Box>
+      );
+    }
   return (
     <Box
       sx={{
@@ -140,7 +159,7 @@ const Section3FinancialManagement = () => {
                     </StyledTableCell>
                     <StyledTableCell align="right" mode={theme}>
                       <TableBodyText mode={theme}>
-                        <StatusBox status={row.status}>{row.status}</StatusBox>
+                        <StatusBox status={row.status.toLowerCase()}>{row.status}</StatusBox>
                       </TableBodyText>
                     </StyledTableCell>
                     <StyledTableCell align="right" mode={theme}>
@@ -160,14 +179,17 @@ const Section3FinancialManagement = () => {
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
+                
                 {/* pagination: this row should be the last row*/}
                 <TableRow>
                     <StyledTableCell colSpan={5} align="right" mode={theme}>
-                        <Pagination 
-                         currentPage={currentPage}
-                         itemsPerPage={itemsPerPage}
-                         onPageChange={setCurrentPage}
-                         onItemsPerPageChange={setItemsPerPage}/>
+                        <Pagination
+                         totalPages={totalPages}
+                         totalItems={totalItems}
+                         currentPage={page}
+                         itemsPerPage={limit}
+                         onPageChange={setPage}
+                         onItemsPerPageChange={setLimit}/>
                     </StyledTableCell>
                 </TableRow>
               </TableBody>
@@ -178,7 +200,13 @@ const Section3FinancialManagement = () => {
     </Box>
   );
 };
-
+const statusColors = {
+  //"in progress": { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
+  completed: { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
+  failed: {
+  backgroundColor: "#FFE2E2",color: "#D32F2F"},
+  pending: { backgroundColor: "#FFF3E4", color: "#896942" },
+};
 export const CustomTypography = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 600,
