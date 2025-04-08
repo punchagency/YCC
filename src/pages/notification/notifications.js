@@ -1,17 +1,19 @@
 import { InputText } from "primereact/inputtext";
 import { Badge } from "primereact/badge";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import sortNotification from "../../assets/images/crew/sortnotification.png";
 import NotificationDetailsModal from "../../components/NotificationDetailsModal";
+import { getNotifications } from "../../services/notification/notificationService";
 
 export default function Notifications({ role }) {
   const menuRight = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [notifications, setNotifications] = useState([]);
 
   const notificationData = [
     {
@@ -41,67 +43,28 @@ export default function Notifications({ role }) {
     },
   ];
 
-  const notificationBodyData = [
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Reported.." },
-      { id: 4, title: "Assign To Manager" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      { id: 3, title: "Transaction Failed Due...." },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Supplier Delay" },
-      { id: 3, title: "Client Wants To Cancel Reservation" },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Medium" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Updated Their Contact Information" },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      { id: 3, title: "Client Inquired About Their Status" },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Supplier Delay" },
-      { id: 3, title: "Client Asked About Additional Services" },
-      { id: 4, title: "Assign To Manager" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Medium" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Requested Special Arrangements" },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      {
-        id: 3,
-        title: "Client Submitted A Refund Request ",
-      },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-  ];
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await getNotifications();
+        if (response.success) {
+          setNotifications(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const notificationBodyData = notifications.map(notification => [
+    { id: 1, title: notification.priority },
+    { id: 2, title: notification.type },
+    { id: 3, title: notification.description },
+    { id: 4, title: notification.status },
+    { id: 5, title: "View Details" },
+  ]);
 
   const filteredNotifications = notificationBodyData.filter((row) => {
     if (activeFilter === "all") return true;
@@ -112,36 +75,29 @@ export default function Notifications({ role }) {
     setActiveFilter(filter);
   };
 
-  const handleViewDetails = (row) => {
-    const modalData = {
-      type: row[1].title,
-      relatedId: row[2].title,
-      vendor: row[3].title,
-      description: row[4].title,
-      priority: row[0].title,
-      status: row[3].title,
-      timestamp: row[4].title,
-    };
-    setSelectedNotification(modalData);
+  const handleViewDetails = (index) => {
+    const notification = notifications[index];
+    console.log("Selected notification:", notification);
+    setSelectedNotification(notification);
     setShowModal(true);
   };
 
   return (
     <>
       <div className="notification-container">
-        {/* Header Section */}
         <div className="notification-header">
           <div className="header-title">
             <h3>Notifications</h3>
-            <Badge value="20" severity="danger" />
+            <Badge value={notifications.length} severity="danger" />
           </div>
         </div>
 
-        {/* Filter Section */}
         <div className="notification-filter">
           <div className="filter-scroll-container">
             <div
-              className={`filter-item ${activeFilter === "all" ? "active" : ""}`}
+              className={`filter-item ${
+                activeFilter === "all" ? "active" : ""
+              }`}
               onClick={() => handleFilterClick("all")}
             >
               All Notification
@@ -167,33 +123,36 @@ export default function Notifications({ role }) {
           </div>
         </div>
 
-        {/* Mobile Card View */}
-          
         <div className="notification-mobile-view">
           {filteredNotifications.map((row, index) => (
             <div key={index} className="notification-card">
               <div className="notification-card-header">
-                <div className={`priority-badge priority-${row[0].title.toLowerCase()}`}>
+                <div
+                  className={`priority-badge priority-${row[0].title.toLowerCase()}`}
+                >
                   {row[0].title}
                 </div>
                 <div className="notification-type">{row[1].title}</div>
               </div>
               <div className="notification-description">{row[2].title}</div>
               <div className="notification-card-footer">
-                <div className={`status-badge status-${row[3].title.toLowerCase().replace(/\s+/g, '-')}`}>
+                <div
+                  className={`status-badge status-${row[3].title
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                >
                   {row[3].title}
                 </div>
                 <Button
                   label="View Details"
                   className="p-button-outlined p-button-primary"
-                  onClick={() => handleViewDetails(row)}
+                  onClick={() => handleViewDetails(index)}
                 />
               </div>
             </div>
           ))}
         </div>
 
-        {/* Desktop Table View */}
         <div className="notification-table-container desktop-only">
           <table className="notification-table">
             <thead>
@@ -230,7 +189,7 @@ export default function Notifications({ role }) {
                           <Button
                             label={item.title}
                             className="p-button-outlined p-button-primary view-details-btn"
-                            onClick={() => handleViewDetails(row)}
+                            onClick={() => handleViewDetails(rowIndex)}
                           />
                         ) : (
                           <span>{item.title}</span>
