@@ -13,16 +13,24 @@ export const getNotifications = async () => {
       headers: getAuthHeader(),
     });
 
+    // Transform the API response to match our notification structure
+    const transformedData = response.data.data.map((complaint) => ({
+      priority: complaint.priority || "Low",
+      type: complaint.type || "General Issue",
+      description: complaint.description,
+      status: complaint.status || "Pending",
+      _id: complaint._id,
+    }));
+
     return {
       success: true,
-      data: response.data,
+      data: transformedData,
     };
   } catch (error) {
-    console.error("Error fetching complaints:", error);
+    console.error("Error fetching notifications:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch complaints",
+      error: error.response?.data?.message || "Failed to fetch notifications",
     };
   }
-};  
-
+};
