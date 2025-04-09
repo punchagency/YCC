@@ -10,7 +10,9 @@ import { ServiceProvider } from "../context/service/serviceContext";
 import { ToastProvider } from "../context/toast/toastContext";
 import { ThemeProvider } from "../context/theme/themeContext";
 import { TransactionProvider } from "../context/transaction/transactionContext";
-
+import { OrderProvider } from "../context/order/orderContext";
+import { InvoiceProvider } from "../context/invoice/invoiceContext";
+import { InventoryProvider } from "../context/inventory/inventoryContext";
 
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -19,6 +21,9 @@ const AdminLayout = ({ role }) => {
     <ToastProvider>
     <TransactionProvider>
     <DashboardAIProvider>
+    <InventoryProvider>
+    <OrderProvider>
+    <InvoiceProvider>
       <BookingProvider>
           <ServiceProvider>
         <main className="flex page relative wrapper">
@@ -40,6 +45,9 @@ const AdminLayout = ({ role }) => {
     </main>
     </ServiceProvider>
     </BookingProvider>
+    </InvoiceProvider>
+    </OrderProvider>
+    </InventoryProvider>
     </DashboardAIProvider>
     </TransactionProvider>
     </ToastProvider>

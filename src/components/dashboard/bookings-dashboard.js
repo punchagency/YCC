@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -12,15 +12,26 @@ import {
 import CurrentOrderSummary from "./current-order-summary";
 import BookingSummary from "./booking-summary";
 import { useTheme } from "../../context/theme/themeContext";
-
+import { useOrder } from "../../context/order/orderContext";
+import { useInvoice } from "../../context/invoice/invoiceContext";
+import { useInventory } from "../../context/inventory/inventoryContext";
 const Dashboard1 = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("monthly");
-
+  const { orderSummary, fetchOrderSummary } = useOrder();
+  const { invoices, fetchInvoices } = useInvoice();
+  const { lowInventory, fetchLowInventory } = useInventory();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  useEffect(() => {
+    fetchOrderSummary();
+    fetchInvoices();
+    fetchLowInventory();
+  }, []);
+
+  console.log('lowInventory', lowInventory);
   const menuItems = [
     {
       label: "Monthly",
@@ -35,25 +46,6 @@ const Dashboard1 = () => {
       value: "weekly",
     },
   ];
-
-  const financialSummaryData = [
-    {
-      invoiceNumber: "INV-006",
-      amount: "$4,200",
-      dueDate: "2025-08-05",
-    },
-    {
-      invoiceNumber: "INV-007",
-      amount: "$3,500",
-      dueDate: "2025-08-10",
-    },  
-    {
-      invoiceNumber: "INV-008",
-      amount: "$2,800",
-      dueDate: "2025-08-15",
-    }]
-    
-    
   
 
   return (
@@ -69,7 +61,7 @@ const Dashboard1 = () => {
       <Grid  container  spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
           {/* Low Inventories */}
-          <Box
+        {lowInventory && lowInventory.length > 0 && <Box
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -127,8 +119,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>-8%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>Engine Oil</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0].percentageLeft}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0].product.name} </DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -140,12 +132,12 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      -5% from yesterday
+                      {lowInventory[0].quantity} left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#909ADE"
                       variant="determinate"
-                      value={50}
+                      value={lowInventory[0].percentageLeft}
                     />
                   </Box>
                 </Box>
@@ -176,8 +168,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>-13%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>Fuel</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1].percentageLeft}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1].product.name}</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -189,12 +181,12 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      -13% from yesterday
+                      {lowInventory[1].quantity} left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#D1D185"
                       variant="determinate"
-                      value={50}
+                      value={lowInventory[1].percentageLeft}
                     />
                   </Box>
                 </Box>
@@ -225,8 +217,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>-25%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>Diesel</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2].percentageLeft}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2].product.name}</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -238,23 +230,23 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      -25% from yesterday
+                      {lowInventory[2].quantity} left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#A2D4A2"
                       variant="determinate"
-                      value={25}
+                      value={lowInventory[2].percentageLeft}
                     />
                   </Box>
                 </Box>
               </Box>
             </Box>
-          </Box>
+          </Box>}
         </Grid>
 
         <Grid item xs={12} md={6} lg={6} >
           {/* Financial Summary */}
-          <Box
+          {invoices && <Box
             sx={{
               backgroundColor: theme === "light" ? "white" : "#03141F",
               borderRadius: "8px",
@@ -297,7 +289,7 @@ const Dashboard1 = () => {
                 marginTop: "10px",
               }}
             > 
-              {financialSummaryData.map((item, index) => (
+              {invoices.map((item, index) => (
                 <Box key={index} sx={{
                   display: "flex",
                   flexDirection: "row",
@@ -310,9 +302,9 @@ const Dashboard1 = () => {
               }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <FinancialSummaryDescriptionText mode={theme}>Invoice {item.invoiceNumber}</FinancialSummaryDescriptionText>
+                  <FinancialSummaryDescriptionText mode={theme}>Invoice {item.invoiceId}</FinancialSummaryDescriptionText>
                   <FinancialSummaryDescriptionText mode={theme}>
-                  Amount: {item.amount} - Due: {item.dueDate}
+                  Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} - Due: {new Date(item.invoiceDueDate).toISOString().split("T")[0]}
                   </FinancialSummaryDescriptionText>
                 </Box>
 
@@ -325,7 +317,7 @@ const Dashboard1 = () => {
               
               
             </Box>
-          </Box>
+          </Box>}
         </Grid>
       </Grid>
 
@@ -334,7 +326,7 @@ const Dashboard1 = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
           {/* Current Order Summary */}   
-            <CurrentOrderSummary />
+           {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
         </Grid>
 
         <Grid item xs={12} md={6} lg={6}>

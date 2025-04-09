@@ -44,12 +44,12 @@ const rows = [
 ];
 
 const statusColors = {
-  "In Progress": {backgroundColor: "#E2F9F0", color: "#1A9E6D"},
-  "Completed": {backgroundColor: "#5570F11A", color: "#3D56D8"},
-  "Pending": {backgroundColor: "#FFF3E4", color: "#896942"},
+  in_progress: {backgroundColor: "#E2F9F0", color: "#1A9E6D"},
+  completed: {backgroundColor: "#5570F11A", color: "#3D56D8"},
+  pending: {backgroundColor: "#FFF3E4", color: "#896942"},
 };
 
-export default function BasicTable() {
+export default function BasicTable({ orders }) {
   const { theme } = useTheme();
   return (
     <TableContainer component={Paper}>
@@ -64,20 +64,20 @@ export default function BasicTable() {
           </TableRow>
         </TableHead>
         <TableBody sx={{backgroundColor: theme === "light" ? "white" : "#7A7A7A"}}>
-          {rows.map((row) => (
-            <StyledTableRow key={row.orderId} mode={theme}>
+          { orders && orders.length > 0 ? orders.map((order) => (
+            <StyledTableRow key={order.orderId} mode={theme}>
               <StyledTableCell component="th" scope="row">
                 <span style={{display: "flex", alignItems: "center", gap: "0px"}}>
-                  <TableBodyText mode={theme} sx={{paddingRight: "5px"}}>{row.orderId}</TableBodyText>
+                  <TableBodyText mode={theme} sx={{paddingRight: "5px"}}>{order.orderId}</TableBodyText>
                       <FileCopyOutlinedIcon sx={{ fontSize: "16px", color: theme === "light" ? "#6E7079" : "white" }}/>
                 </span>
               </StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText mode={theme}>{row.customer}</TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText mode={theme} padding="0px"><StatusBox mode={theme} status={row.status}>{row.status}</StatusBox></TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText mode={theme}>${row.amount}</TableBodyText></StyledTableCell>
-              <StyledTableCell align="right"><TableBodyText mode={theme}>{row.date}</TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme}>{order.customerName || order.customer.name}</TableBodyText></StyledTableCell>
+            {order.status && <StyledTableCell align="right"><TableBodyText mode={theme} padding="0px"><StatusBox mode={theme} status={order?.status}>{order?.status}</StatusBox></TableBodyText></StyledTableCell>} 
+              <StyledTableCell align="right"><TableBodyText mode={theme}>${parseFloat(order.totalPrice).toFixed(2)}</TableBodyText></StyledTableCell>
+              <StyledTableCell align="right"><TableBodyText mode={theme}>{new Date(order.orderDate).toISOString().split("T")[0]}</TableBodyText></StyledTableCell>
             </StyledTableRow>
-          ))}
+          )) : <StyledTableRow mode={theme}><StyledTableCell colSpan={5}><TableBodyText sx={{textAlign: "center", width: "100%", height: "245px", display: "flex", alignItems: "center", justifyContent: "center"}} mode={theme}>No orders found</TableBodyText></StyledTableCell></StyledTableRow >}
         </TableBody>
       </Table>
     </TableContainer>
@@ -98,9 +98,9 @@ const TableTitleText = styled(Typography)(({ mode }) => ({
 const TableBodyText = styled(Typography)(({mode, padding}) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
-  fontSize: "14px",
+  fontSize: "13px",
   lineHeight: "100%",
-  letterSpacing: "0%",
+  letterSpacing: "-0.01em",
   color: mode === "light" ? "#6E7079" : "white",
   padding: padding ? padding : "10px 10px",
   textAlign: "center",
@@ -111,8 +111,8 @@ const TableBodyText = styled(Typography)(({mode, padding}) => ({
 }));
 
 const StatusBox = styled(Box) (({mode, status}) => ({  
-  backgroundColor: statusColors[status].backgroundColor,
-  color: statusColors[status].color,
+  backgroundColor: statusColors[status]?.backgroundColor || "transparent",
+  color: statusColors[status]?.color || "transparent",
   borderRadius: "6px",
   padding: "4px 11px",
   width: "100px",
