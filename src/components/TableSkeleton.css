@@ -26,17 +26,14 @@
 
 .skeleton-row {
   display: flex;
-  padding: 16px 24px;
-  border-bottom: 1px solid #EAECF0;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
   align-items: center;
 }
 
 .skeleton-row:last-child {
   border-bottom: none;
-}
-
-.skeleton-cell {
-  padding: 0 12px;
 }
 
 /* Mobile skeleton adjustments */
@@ -59,42 +56,5 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-  }
-}
-
-/* Add these specific styles for notification skeleton */
-.skeleton-badge {
-  height: 24px;
-  width: 60px;
-  background: #f0f0f0;
-  border-radius: 12px;
-  animation: pulse 1.5s infinite;
-}
-
-.skeleton-text {
-  height: 16px;
-  width: 100%;
-  background: #f0f0f0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite;
-}
-
-.skeleton-button {
-  height: 36px;
-  width: 100px;
-  background: #f0f0f0;
-  border-radius: 8px;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
   }
 } 

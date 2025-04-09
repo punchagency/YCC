@@ -2,7 +2,7 @@ import { Box, Typography, styled, Grid } from "@mui/material";
 import BookingCalenderCard from "./booking-calender-card";
 import BookingSummaryInfoCard from "./booking-summary-info-card";
 import { useTheme } from "../../context/theme/themeContext";
-import UpdatedCalendar from "./updated-calendar";
+
 const BookingSummary = () => {
   const { theme } = useTheme();
   return (
@@ -31,8 +31,7 @@ const BookingSummary = () => {
         
         <Grid container spacing={2} >
           <Grid item xs={12} md={6} lg={7.5} sx={{height: "100%", width: "100%"}}>
-            {/* <BookingCalenderCard /> */}
-            <UpdatedCalendar />
+            <BookingCalenderCard />
           </Grid>
           <Grid item xs={12} md={6} lg={4.5} sx={{height: "100%", width: "100%"}}>
             <BookingSummaryInfoCard />

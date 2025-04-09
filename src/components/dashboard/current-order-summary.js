@@ -1,20 +1,20 @@
 import { Box, Typography, styled } from "@mui/material";
 import BasicTable from "./basic-table";
 import { useTheme } from "../../context/theme/themeContext";
-const CurrentOrderSummary = ({ orderSummary }) => {
+const CurrentOrderSummary = () => {
   const { theme } = useTheme();
   const summaryData = [
     {
       title: "Total Orders",
-      value: orderSummary.totalData,
+      value: 523,
     },
     {
       title: "Pending Orders",
-      value: orderSummary.pendingOrders,
+      value: 20,
     },
     {
       title: "Completed Orders",
-      value: orderSummary.completedOrders,
+      value: 620,
     },
   ];
   return (
@@ -54,7 +54,7 @@ const CurrentOrderSummary = ({ orderSummary }) => {
 
           {/* Table */}
         <Box sx={{marginTop: "10px"}}>
-        {orderSummary && <BasicTable orders={orderSummary.result} />}
+          <BasicTable />
         </Box>
       </Box>
     </Box>

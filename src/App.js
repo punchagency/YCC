@@ -95,7 +95,6 @@ import { NotificationsProvider } from "./context/notificationsContext";
 import { ToastProvider } from "./components/Toast";
 import AdminFinancialManagement from "./pages/dashboard/admin/financial-management/admin-financial-management";
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
-import Profile from "./pages/profile/profile"; 
 //context imports
 
 function App() {
@@ -103,7 +102,7 @@ function App() {
     <ToastProvider>
       <NotificationsProvider>
         <Routes>
-          <Route path="/get-started" element={<GetStarted />} />
+          <Route path="/get-started" element={<GetStarted />} /> 
           <Route path="/apply" element={<VendorStarted />} />
 
           <Route path="/login" element={<Login />} />
@@ -138,17 +137,14 @@ function App() {
             <Route path="/contact-us" element={<ContactUs />} />
           </Route>
 
+
           {/* Admin Routes */}
           <Route element={<AdminLayout />}>
-            <Route path="/admin/profile" element={<Profile />} />
             <Route path="/admin/dashboard" element={<AdminDashboard1 />} />
             <Route path="/admin/bookings-management" element={<Bookings />} />
             <Route path="/admin/orders-management" element={<Order />} />
             <Route path="/admin/inventory-management" element={<Invent />} />
-            <Route
-              path="/admin/financial-management"
-              element={<AdminFinancialManagement />}
-            />
+            <Route path="/admin/financial-management" element={<AdminFinancialManagement />} />
             <Route path="/admin/calendar-management" element={<Calendar />} />
             <Route path="/admin/notifications" element={<Notifications />} />
             <Route path="/admin/reports" element={<Reports />} />

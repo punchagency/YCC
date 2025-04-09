@@ -142,18 +142,3 @@ export const deleteInventoryItem = async (id) => {
     };
   }
 };
-
-export const getLowInventory = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/inventory/low-stock`, {
-      headers: getAuthHeader(),
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching low inventory:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || "Failed to fetch low inventory",
-    };
-  }
-};

@@ -10,10 +10,8 @@ import { ServiceProvider } from "../context/service/serviceContext";
 import { ToastProvider } from "../context/toast/toastContext";
 import { ThemeProvider } from "../context/theme/themeContext";
 import { TransactionProvider } from "../context/transaction/transactionContext";
-import { OrderProvider } from "../context/order/orderContext";
-import { InvoiceProvider } from "../context/invoice/invoiceContext";
-import { InventoryProvider } from "../context/inventory/inventoryContext";
-import { CalendarProvider } from "../context/calendar/calendarContext";
+
+
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
@@ -21,12 +19,8 @@ const AdminLayout = ({ role }) => {
     <ToastProvider>
     <TransactionProvider>
     <DashboardAIProvider>
-    <InventoryProvider>
-    <OrderProvider>
-    <InvoiceProvider>
       <BookingProvider>
           <ServiceProvider>
-            <CalendarProvider>
         <main className="flex page relative wrapper">
           <LeftMenu
             role={role}
@@ -44,12 +38,8 @@ const AdminLayout = ({ role }) => {
         <ChatbotDashboard />
       </div>
     </main>
-    </CalendarProvider>
     </ServiceProvider>
     </BookingProvider>
-    </InvoiceProvider>
-    </OrderProvider>
-    </InventoryProvider>
     </DashboardAIProvider>
     </TransactionProvider>
     </ToastProvider>

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import avatar from "../assets/images/avatar.svg";
@@ -19,7 +19,6 @@ import icon from "../assets/images/crew/Icon.png";
 import share from "../assets/images/crew/share.png";
 import MobileSidebar from "./MobileSidebar"; // Re-import MobileSidebar
 import { useTheme } from "../context/theme/themeContext";
-import { getNotifications } from "../services/notification/notificationService";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -34,38 +33,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const { theme, changeTheme } = useTheme();
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const response = await getNotifications();
-      if (response.success) {
-        const transformedData = response.data.map((item) => ({
-          priority: item.priority || "Low",
-          type: item.type || "General Issue",
-          description: item.message || item.description,
-          status: item.status || "Pending",
-          createdAt: item.create_at || item.createdAt,
-          _id: item._id,
-        }));
-        setNotifications(transformedData);
-        setError(null);
-      } else {
-        setError(response.error);
-      }
-    } catch (err) {
-      setError("Failed to fetch notifications");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Add refs for the new menus
   const filterMenuRef = useRef(null);
@@ -156,6 +123,27 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       },
     },
   ];
+
+  const [notifications] = useState([
+    {
+      title: "Deficiency Follow-Ups",
+      message: "The recent MARPOL Annex I audit ..",
+      isNew: true,
+      create_at: "2 hours ago",
+    },
+    {
+      title: "Upcoming Certification Expirations",
+      message: "The ISPS Code certification for Vessel..",
+      isNew: false,
+      create_at: "Yesterday",
+    },
+    {
+      title: "Scheduled Inspections",
+      message: "Vessel A has a scheduled Flag State ins..",
+      isNew: false,
+      create_at: "Nov 7, 2024",
+    },
+  ]);
 
   // Get user's name from the profile data
   const userName = "";
@@ -341,125 +329,41 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       {/* Theme Toggle Switch */}
 
       {/* Notification Overlay Panel */}
-      <OverlayPanel
-        ref={overlayPanelRef}
-        className="notification-overlay"
-        style={{ width: "320px", padding: "16px" }}
-      >
+      <OverlayPanel ref={overlayPanelRef} className="notification-overlay">
         <div className="flex align-items-center justify-content-between mb-3">
-          <div className="flex align-items-center">
-            <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "600" }}>
-              Notifications
-            </h4>
+          <div className="flex align-items-center title">
+            <i className="pi pi-bell" />
+            <h4 className="mx-2">Notifications</h4>
+            <Badge value={notifications?.length} severity="warning"></Badge>
           </div>
         </div>
 
-        <div
-          className="notification-list"
-          style={{ maxHeight: "400px", overflowY: "auto" }}
-        >
+        <ul className="notification-list mb-3">
           {notifications.map((item, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                padding: "12px 0",
-                borderBottom: "1px solid #E4E7EC",
-                position: "relative",
-              }}
-            >
-              {/* Priority Dot */}
-              <div
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor:
-                    item.priority === "High"
-                      ? "#F04438"
-                      : item.priority === "Medium"
-                      ? "#F79009"
-                      : "#12B76A",
-                  marginTop: "6px",
-                  marginRight: "12px",
-                }}
-              />
-
-              {/* Content */}
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#344054",
-                      marginBottom: "4px",
-                    }}
-                  >
-                    {item.priority} Priority
-                  </span>
-
-                  {/* More Options Icon */}
-                  <button
-                    style={{
-                      border: "none",
-                      background: "none",
-                      padding: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <i
-                      className="pi pi-ellipsis-h"
-                      style={{ color: "#667085", fontSize: "16px" }}
-                    />
-                  </button>
+            <li key={index}>
+              <Card className={item.isNew === true ? "new mb-2" : "mb-2"}>
+                <div className="flex justify-content-between">
+                  <div>
+                    {item?.isNew === true ? (
+                      <Badge value="New" severity="success"></Badge>
+                    ) : (
+                      ""
+                    )}
+                    <h3 className="mb-2">{item.title}</h3>
+                    <p className="m-0">{item.message}</p>
+                  </div>
+                  <div>
+                    <p className="text-right time">{item.create_at}</p>
+                  </div>
                 </div>
-
-                <p
-                  style={{
-                    margin: "0",
-                    fontSize: "14px",
-                    color: "#475467",
-                  }}
-                >
-                  {item.description}
-                </p>
-
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: "#667085",
-                    marginTop: "4px",
-                    display: "block",
-                  }}
-                >
-                  {item.create_at}
-                </span>
-              </div>
-            </div>
+              </Card>
+            </li>
           ))}
-        </div>
-
-        {/* View All Button */}
+        </ul>
         <Button
-          label="View All Notifications"
-          className="p-button-text"
-          style={{
-            width: "100%",
-            marginTop: "16px",
-            color: "#0387D9",
-            border: "1px solid #0387D9",
-            borderRadius: "8px",
-            padding: "8px",
-            backgroundColor: "transparent",
-          }}
+          label="View all notifications"
+          outlined
+          className="w-full p-outline-button-primary"
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
@@ -556,23 +460,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             border: "none",
           }}
         />
-        <div 
-          className="profile-section" 
-          onClick={() => navigate('/admin/profile')}
-          style={{ cursor: 'pointer' }}
-        >
-          <img
-            src={manprofile}
-            alt="Profile"
-            className="profile-image"
-            style={{
-              width: "30px",
-              height: "30px",
-              borderRadius: "50%",
-              objectFit: "cover",
-            }}
-          />
-        </div>
+        <img
+          src={manprofile}
+          alt="Profile"
+          className="profile-image"
+          style={{
+            width: "30px",
+            height: "30px",
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
         <div
           style={{
             display: "flex",
