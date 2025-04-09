@@ -55,3 +55,32 @@ export const TableSkeleton = ({ showSummary = true }) => {
     </div>
   );
 };
+
+// Add this specific skeleton for notifications
+export const NotificationTableSkeleton = () => {
+  return (
+    <div className="skeleton-wrapper">
+      <div className="table-skeleton">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="skeleton-row">
+            <div className="skeleton-cell" style={{ width: '100px' }}>
+              <div className="skeleton-badge"></div>
+            </div>
+            <div className="skeleton-cell" style={{ width: '150px' }}>
+              <div className="skeleton-text"></div>
+            </div>
+            <div className="skeleton-cell" style={{ width: '300px' }}>
+              <div className="skeleton-text"></div>
+            </div>
+            <div className="skeleton-cell" style={{ width: '150px' }}>
+              <div className="skeleton-badge"></div>
+            </div>
+            <div className="skeleton-cell" style={{ width: '120px' }}>
+              <div className="skeleton-button"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

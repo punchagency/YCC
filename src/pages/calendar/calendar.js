@@ -126,6 +126,140 @@ const EventCard = ({ title, start, location, description }) => {
   );
 };
 
+const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
+  const formatDate = (date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const formatTime = (dateString) => {
+    return new Date(dateString).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatLocation = (location) => {
+    const locationMap = {
+      zoom: "Virtual - Zoom Meeting",
+      "google-meet": "Virtual - Google Meet",
+      "ms-teams": "Virtual - Microsoft Teams",
+      "in-person": "In Person Meeting",
+    };
+    return locationMap[location] || location;
+  };
+
+  return (
+    <Dialog
+      visible={visible}
+      onHide={onHide}
+      header={`Events for ${selectedDate ? formatDate(selectedDate) : ""}`}
+      className="day-events-modal"
+      style={{ width: "500px" }}
+    >
+      <div className="day-events-content">
+        {events.length === 0 ? (
+          <p>No events scheduled for this day</p>
+        ) : (
+          events.map((event) => (
+            <div
+              key={event._id}
+              className="event-item"
+              style={{
+                marginBottom: "20px",
+                padding: "15px",
+                borderRadius: "8px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #e9ecef",
+              }}
+            >
+              <h4 style={{ margin: "0 0 10px 0", color: "#344054" }}>
+                {event.title}
+              </h4>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#667085",
+                  marginBottom: "5px",
+                }}
+              >
+                <i className="pi pi-clock" style={{ marginRight: "8px" }}></i>
+                {formatTime(event.start)} - {formatTime(event.end)}
+              </div>
+              <div
+                style={{
+                  fontSize: "14px",
+                  color: "#667085",
+                  marginBottom: "8px",
+                }}
+              >
+                <i
+                  className="pi pi-map-marker"
+                  style={{ marginRight: "8px" }}
+                ></i>
+                {formatLocation(event.location)}
+              </div>
+              {event.description && (
+                <p
+                  style={{
+                    margin: "10px 0 0 0",
+                    fontSize: "14px",
+                    color: "#475467",
+                    padding: "10px",
+                    backgroundColor: "#fff",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {event.description}
+                </p>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </Dialog>
+  );
+};
+
+const AllEventsModal = ({ visible, onHide, events }) => {
+  return (
+    <Dialog
+      visible={visible}
+      onHide={onHide}
+      header="All Events"
+      className="day-events-modal"
+      style={{ width: "500px" }}
+    >
+      <div className="day-events-content">
+        {events.map((event, index) => (
+          <React.Fragment key={event._id}>
+            {index > 0 && (
+              <div
+                className="event-divider"
+                style={{
+                  height: "1px",
+                  background: "#E4E7EC",
+                  margin: "10px 0",
+                }}
+              ></div>
+            )}
+            <EventCard
+              title={event.title}
+              start={event.start}
+              location={event.location}
+              description={event.description}
+            />
+          </React.Fragment>
+        ))}
+      </div>
+    </Dialog>
+  );
+};
+
 export default function CalendarPage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [activeView, setActiveView] = useState("events");
@@ -142,6 +276,10 @@ export default function CalendarPage() {
     end: null,
     location: "",
   });
+  const [showDayEventsModal, setShowDayEventsModal] = useState(false);
+  const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [selectedModalDate, setSelectedModalDate] = useState(null);
+  const [showAllEventsModal, setShowAllEventsModal] = useState(false);
 
   const loadEvents = async () => {
     setIsLoading(true);
@@ -201,8 +339,7 @@ export default function CalendarPage() {
   }, []);
 
   const handleSeeMore = () => {
-    // Handle see more action
-    console.log("See more events clicked");
+    setShowAllEventsModal(true);
   };
 
   // Calendar component state and functions
@@ -532,6 +669,20 @@ export default function CalendarPage() {
     return Array.from(types);
   };
 
+  // Update the click handler for calendar days
+  const handleDayClick = (day) => {
+    setSelectedDay(day);
+    const date = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      day
+    );
+    const dayEvents = getEventsForDay(day);
+    setSelectedDateEvents(dayEvents);
+    setSelectedModalDate(date);
+    setShowDayEventsModal(true);
+  };
+
   return (
     <>
       <Toast ref={toast} />
@@ -600,49 +751,55 @@ export default function CalendarPage() {
           ) : !calendarEvents?.data?.length ? (
             <div>No events found</div>
           ) : (
-            calendarEvents.data.map((event, index) => (
-              <React.Fragment key={event._id}>
-                {index > 0 && (
-                  <div
-                    className="event-divider"
-                    style={{
-                      height: "1px",
-                      background: "#E4E7EC",
-                      margin: "10px 0",
-                    }}
-                  ></div>
-                )}
-                <EventCard
-                  title={event.title}
-                  start={event.start}
-                  location={event.location}
-                  description={event.description}
-                />
-              </React.Fragment>
-            ))
-          )}
+            <>
+              {/* Show only first 2 events */}
+              {calendarEvents.data.slice(0, 2).map((event, index) => (
+                <React.Fragment key={event._id}>
+                  {index > 0 && (
+                    <div
+                      className="event-divider"
+                      style={{
+                        height: "1px",
+                        background: "#E4E7EC",
+                        margin: "10px 0",
+                      }}
+                    ></div>
+                  )}
+                  <EventCard
+                    title={event.title}
+                    start={event.start}
+                    location={event.location}
+                    description={event.description}
+                  />
+                </React.Fragment>
+              ))}
 
-          <div
-            className="see-more-container"
-            style={{ marginTop: "20px", textAlign: "center" }}
-          >
-            <button
-              className="see-more-button"
-              onClick={handleSeeMore}
-              style={{
-                width: "100%",
-                padding: "12px",
-                background: "transparent",
-                color: "#0387D9",
-                border: "1px solid #0387D9",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: 500,
-              }}
-            >
-              See More Events
-            </button>
-          </div>
+              {/* Show See More button if there are more than 2 events */}
+              {calendarEvents.data.length > 2 && (
+                <div
+                  className="see-more-container"
+                  style={{ marginTop: "20px", textAlign: "center" }}
+                >
+                  <button
+                    className="see-more-button"
+                    onClick={handleSeeMore}
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      background: "transparent",
+                      color: "#0387D9",
+                      border: "1px solid #0387D9",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontWeight: 500,
+                    }}
+                  >
+                    See More Events
+                  </button>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <div
@@ -822,7 +979,7 @@ export default function CalendarPage() {
                       fontSize: isMobile ? "11px" : "inherit",
                       overflow: "hidden",
                     }}
-                    onClick={() => setSelectedDay(day)}
+                    onClick={() => handleDayClick(day)}
                   >
                     <span
                       style={{
@@ -966,6 +1123,19 @@ export default function CalendarPage() {
       </div>
 
       {renderEventModal()}
+
+      <DayEventsModal
+        visible={showDayEventsModal}
+        onHide={() => setShowDayEventsModal(false)}
+        events={selectedDateEvents}
+        selectedDate={selectedModalDate}
+      />
+
+      <AllEventsModal
+        visible={showAllEventsModal}
+        onHide={() => setShowAllEventsModal(false)}
+        events={calendarEvents?.data || []}
+      />
     </>
   );
 }

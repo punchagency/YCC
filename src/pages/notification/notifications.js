@@ -1,247 +1,304 @@
-import { InputText } from "primereact/inputtext";
+import { useRef, useState, useEffect } from "react";
 import { Badge } from "primereact/badge";
-import { useRef, useState } from "react";
-import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { Menu } from "primereact/menu";
-import sortNotification from "../../assets/images/crew/sortnotification.png";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import NotificationDetailsModal from "../../components/NotificationDetailsModal";
+import sortNotification from "../../assets/images/crew/sortnotification.png";
+import { getNotifications } from "../../services/notification/notificationService";
+import { TableSkeleton } from "../../components/TableSkeleton";
 
 export default function Notifications({ role }) {
-  const menuRight = useRef(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const notificationData = [
-    {
-      id: 1,
-      title: "Priority",
-      icon: sortNotification,
-    },
-    {
-      id: 2,
-      title: "Type",
-      icon: sortNotification,
-    },
-    {
-      id: 3,
-      title: "Description",
-      icon: sortNotification,
-    },
-    {
-      id: 4,
-      title: "Status",
-      icon: sortNotification,
-    },
-    {
-      id: 5,
-      title: "Details",
-      icon: sortNotification,
-    },
-  ];
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
-  const notificationBodyData = [
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Reported.." },
-      { id: 4, title: "Assign To Manager" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      { id: 3, title: "Transaction Failed Due...." },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Supplier Delay" },
-      { id: 3, title: "Client Wants To Cancel Reservation" },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Medium" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Updated Their Contact Information" },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      { id: 3, title: "Client Inquired About Their Status" },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "High" },
-      { id: 2, title: "Supplier Delay" },
-      { id: 3, title: "Client Asked About Additional Services" },
-      { id: 4, title: "Assign To Manager" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Medium" },
-      { id: 2, title: "Booking Issue" },
-      { id: 3, title: "Client Requested Special Arrangements" },
-      { id: 4, title: "Acknowledged" },
-      { id: 5, title: "View Details" },
-    ],
-    [
-      { id: 1, title: "Low" },
-      { id: 2, title: "Payment Error" },
-      {
-        id: 3,
-        title: "Client Submitted A Refund Request ",
-      },
-      { id: 4, title: "Resolve & Archive" },
-      { id: 5, title: "View Details" },
-    ],
-  ];
-
-  const filteredNotifications = notificationBodyData.filter((row) => {
-    if (activeFilter === "all") return true;
-    return row[0].title.toLowerCase() === activeFilter.toLowerCase();
-  });
-
-  const handleFilterClick = (filter) => {
-    setActiveFilter(filter);
+  const fetchNotifications = async () => {
+    setLoading(true);
+    try {
+      const response = await getNotifications();
+      if (response.success) {
+        const transformedData = response.data.map((item) => ({
+          priority: item.priority || "Low",
+          type: item.type || "General Issue",
+          description: item.message || item.description,
+          status: item.status || "Pending",
+          createdAt: item.create_at || item.createdAt,
+          _id: item._id,
+        }));
+        setNotifications(transformedData);
+        setError(null);
+      } else {
+        setError(response.error);
+      }
+    } catch (err) {
+      setError("Failed to fetch notifications");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const filteredNotifications = notifications.filter((notification) =>
+    activeFilter === "all"
+      ? true
+      : notification.priority.toLowerCase() === activeFilter.toLowerCase()
+  );
+
+  const handleFilterClick = (filter) => setActiveFilter(filter);
 
   const handleViewDetails = (row) => {
-    const modalData = {
-      type: row[1].title,
-      relatedId: row[2].title,
-      vendor: row[3].title,
-      description: row[4].title,
-      priority: row[0].title,
-      status: row[3].title,
-      timestamp: row[4].title,
-    };
-    setSelectedNotification(modalData);
+    setSelectedNotification(row);
     setShowModal(true);
   };
+
+  const priorityTemplate = (rowData) => {
+    const bgColors = {
+      high: { bg: "#ECFDF3", color: "#027A48" },
+      medium: { bg: "#FFFAEB", color: "#B54708" },
+      low: { bg: "#FEF3F2", color: "#B42318" },
+    };
+
+    const style = bgColors[rowData.priority.toLowerCase()] || {
+      bg: "#F2F4F7",
+      color: "#344054",
+    };
+
+    return (
+      <span
+        style={{
+          backgroundColor: style.bg,
+          color: style.color,
+          padding: "2px 8px",
+          borderRadius: "16px",
+          fontSize: "12px",
+        }}
+      >
+        {rowData.priority}
+      </span>
+    );
+  };
+
+  const statusTemplate = (rowData) => {
+    const statusStyles = {
+      "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
+      acknowledged: { bg: "#EFF8FF", color: "#175CD3" },
+      "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
+      "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
+      pending: { bg: "#FEF3F2", color: "#B42318" },
+    };
+
+    const style = statusStyles[rowData.status.toLowerCase()] || {
+      bg: "#F2F4F7",
+      color: "#344054",
+    };
+
+    return (
+      <span
+        style={{
+          backgroundColor: style.bg,
+          color: style.color,
+          padding: "2px 8px",
+          borderRadius: "16px",
+          fontSize: "12px",
+        }}
+      >
+        {rowData.status}
+      </span>
+    );
+  };
+
+  const actionTemplate = (rowData) => {
+    return (
+      <Button
+        label="View Details"
+        className="p-button-outlined"
+        style={{
+          border: "1px solid #D0D5DD",
+          color: "#344054",
+          backgroundColor: "white",
+          padding: "8px 14px",
+          fontSize: "14px",
+          borderRadius: "8px",
+        }}
+        onClick={() => handleViewDetails(rowData)}
+      />
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="notification-container">
+        <div
+          className="notification-header"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h3>Notifications</h3>
+          <Badge value="--" severity="danger" />
+        </div>
+
+        <div className="notification-filter">
+          {["all", "high", "medium", "low"].map((filter) => (
+            <Button
+              key={filter}
+              label={
+                filter.charAt(0).toUpperCase() + filter.slice(1) + " Priority"
+              }
+              className={`p-button-text ${
+                activeFilter === filter ? "p-button-primary" : ""
+              }`}
+              disabled={true}
+              style={{ color: "black" }}
+            />
+          ))}
+        </div>
+
+        <TableSkeleton
+          columns={[
+            { width: "100px" }, // Priority
+            { width: "150px" }, // Type
+            { width: "300px" }, // Description
+            { width: "150px" }, // Status
+            { width: "120px" }, // Action
+          ]}
+          rows={5}
+          showHeader={true}
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="notification-container">
+        <div
+          className="error-message"
+          style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}
+        >
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="notification-container">
-        {/* Header Section */}
-        <div className="notification-header">
-          <div className="header-title">
-            <h3>Notifications</h3>
-            <Badge value="20" severity="danger" />
-          </div>
+        <div
+          className="notification-header"
+          style={{ display: "flex", alignItems: "center" }}
+        >
+          <h3>Notifications</h3>
+          <Badge
+            value={notifications.length}
+            severity="danger"
+            style={{ marginLeft: "7px" }}
+          />
         </div>
 
-        {/* Filter Section */}
         <div className="notification-filter">
-          <div className="filter-scroll-container">
-            <div
-              className={`filter-item ${activeFilter === "all" ? "active" : ""}`}
-              onClick={() => handleFilterClick("all")}
-            >
-              All Notification
-            </div>
-            <div
-              className={`filter-item ${activeFilter === "high" ? "active" : ""}`}
-              onClick={() => handleFilterClick("high")}
-            >
-              High Priority
-            </div>
-            <div
-              className={`filter-item ${activeFilter === "medium" ? "active" : ""}`}
-              onClick={() => handleFilterClick("medium")}
-            >
-              Medium Priority
-            </div>
-            <div
-              className={`filter-item ${activeFilter === "low" ? "active" : ""}`}
-              onClick={() => handleFilterClick("low")}
-            >
-              Low Priority
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Card View */}
-          
-        <div className="notification-mobile-view">
-          {filteredNotifications.map((row, index) => (
-            <div key={index} className="notification-card">
-              <div className="notification-card-header">
-                <div className={`priority-badge priority-${row[0].title.toLowerCase()}`}>
-                  {row[0].title}
-                </div>
-                <div className="notification-type">{row[1].title}</div>
-              </div>
-              <div className="notification-description">{row[2].title}</div>
-              <div className="notification-card-footer">
-                <div className={`status-badge status-${row[3].title.toLowerCase().replace(/\s+/g, '-')}`}>
-                  {row[3].title}
-                </div>
-                <Button
-                  label="View Details"
-                  className="p-button-outlined p-button-primary"
-                  onClick={() => handleViewDetails(row)}
-                />
-              </div>
-            </div>
+          {["all", "high", "medium", "low"].map((filter) => (
+            <Button
+              key={filter}
+              label={
+                filter.charAt(0).toUpperCase() + filter.slice(1) + " Priority"
+              }
+              className={`p-button-text ${
+                activeFilter === filter ? "p-button-primary" : ""
+              }`}
+              onClick={() => handleFilterClick(filter)}
+            />
           ))}
         </div>
 
-        {/* Desktop Table View */}
-        <div className="notification-table-container desktop-only">
-          <table className="notification-table">
-            <thead>
-              <tr className="header-row">
-                {notificationData.map((item) => (
-                  <th key={item.id} className="header-cell">
-                    <div className="header-content">
-                      <span>{item.title}</span>
-                      <img
-                        src={item.icon}
-                        alt="sortNotification"
-                        style={{ width: "20px", height: "20px" }}
-                      />
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredNotifications.map((row, rowIndex) => (
-                <tr key={rowIndex} className="body-row">
-                  {row.map((item, index) => (
-                    <td key={item.id} className="body-cell">
-                      <div
-                        className={`body-content ${
-                          index === 0
-                            ? `priority-${item.title.toLowerCase()}`
-                            : index === 3
-                            ? `status-${item.title.toLowerCase().replace(/[&\s]+/g, "-")}`
-                            : ""
-                        }`}
-                      >
-                        {index === 4 ? (
-                          <Button
-                            label={item.title}
-                            className="p-button-outlined p-button-primary view-details-btn"
-                            onClick={() => handleViewDetails(row)}
-                          />
-                        ) : (
-                          <span>{item.title}</span>
-                        )}
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="notification-table" style={{ padding: "20px" }}>
+          <DataTable
+            value={filteredNotifications}
+            responsiveLayout="scroll"
+            style={{
+              border: "1px solid #EAECF0",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <Column
+              field="priority"
+              header="Priority"
+              body={priorityTemplate}
+              style={{ padding: "16px 24px" }}
+              headerStyle={{
+                backgroundColor: "#F9FAFB",
+                color: "#667085",
+                fontWeight: "500",
+                fontSize: "12px",
+                padding: "12px 24px",
+                borderBottom: "1px solid #EAECF0",
+              }}
+            />
+            <Column
+              field="type"
+              header="Type"
+              style={{ padding: "16px 24px" }}
+              headerStyle={{
+                backgroundColor: "#F9FAFB",
+                color: "#667085",
+                fontWeight: "500",
+                fontSize: "12px",
+                padding: "12px 24px",
+                borderBottom: "1px solid #EAECF0",
+              }}
+            />
+            <Column
+              field="description"
+              header="Description"
+              style={{ padding: "16px 24px" }}
+              headerStyle={{
+                backgroundColor: "#F9FAFB",
+                color: "#667085",
+                fontWeight: "500",
+                fontSize: "12px",
+                padding: "12px 24px",
+                borderBottom: "1px solid #EAECF0",
+              }}
+            />
+            <Column
+              field="status"
+              header="Status"
+              body={statusTemplate}
+              style={{ padding: "16px 24px" }}
+              headerStyle={{
+                backgroundColor: "#F9FAFB",
+                color: "#667085",
+                fontWeight: "500",
+                fontSize: "12px",
+                padding: "12px 24px",
+                borderBottom: "1px solid #EAECF0",
+              }}
+            />
+            <Column
+              header="Action"
+              body={actionTemplate}
+              style={{ padding: "16px 24px" }}
+              headerStyle={{
+                backgroundColor: "#F9FAFB",
+                color: "#667085",
+                fontWeight: "500",
+                fontSize: "12px",
+                padding: "12px 24px",
+                borderBottom: "1px solid #EAECF0",
+              }}
+            />
+          </DataTable>
         </div>
       </div>
 
