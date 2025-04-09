@@ -1,7 +1,7 @@
 /* Custom styles for day cells */
 .custom-day-cell {
    /*  //height: 40px !important; Reduce the height of each cell */
-    border-radius: 8px !important; /* Add border radius */
+    border-radius: 12px !important; /* Add border radius */
     border: none !important;
   }
   
@@ -9,29 +9,7 @@
   .custom-day-cell.bg-blue-500 {
     background-color: #0387d9 !important; /* Blue color for today's cell */
     color: white !important; /* Text color */
+    padding: 0px !important;
+    margin: 0px !important;
   }
   
-  .custom-event-cell {
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background-color: red;
-  }
-  /* Dot style for events */
-.fc-daygrid-day-number {
-    position: relative;
-  }
-  
-  .fc-daygrid-day-number .fc-daygrid-day-events {
-    display: none; /* Hide event text */
-  }
-  
-  .fc-daygrid-day-number .fc-daygrid-event-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #0387d9; /* Blue dot for events */
-    position: absolute;
-    top: 10px; /* Adjust for positioning */
-    left: 10px; /* Adjust for positioning */
-  }

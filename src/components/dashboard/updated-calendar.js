@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, Button, IconButton } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -9,30 +9,85 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";  // Optional, only if you're using list view
+import CreateEventModal from "./create-event-modal";
+import ViewEventModal from "./view-event-modal";
 
 import "../../assets/styles/scss/components/calendar.css";
-
+import { useCalendar } from "../../context/calendar/calendarContext";
 const UpdatedCalendar = () => {
+    const { events, selectedDate, setSelectedDate, fetchEventsByDate, startDate, endDate, setStartDate, setEndDate } = useCalendar();
   const { theme } = useTheme();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Start of the current month
+  const currentDate = new Date();
+  const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  
+  // End of the current month
+  const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  
+  const eventsForToday = events.filter((event) => {
+    const eventDate = new Date(event.start);
+    return (
+      eventDate.getFullYear() === currentDate.getFullYear() &&
+      eventDate.getMonth() === currentDate.getMonth() &&
+      eventDate.getDate() === currentDate.getDate() 
+    );
+  });
+  
+  // Fetch events when component mounts
+  useEffect(() => {
+    fetchEventsByDate();
+  }, []); 
 
-  const handleDateChange = (direction) => {
-    const newDate = new Date(currentDate);
-    newDate.setMonth(currentDate.getMonth() + direction);
-    setCurrentDate(newDate);
+  // Fetch events when currentDate (month) changes
+ // useEffect(() => {
+    //setStartDate(startOfMonth);
+   // setEndDate(endOfMonth);
+  //  fetchEventsByDate(startOfMonth, endOfMonth); // Fetch based on the new month
+  //}, [currentDate]);
+
+  const handleCalendarChange = (arg) => {
+    // This is triggered when the calendar's view changes
+    const newDate = arg.view.currentStart; // Get the start date of the new view
+  
+    // Get the current month and the month from the new view's start date
+    const currentMonth = currentDate.getMonth();
+    const newMonth = newDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const newYear = newDate.getFullYear();
+  
+    // Logic to fetch events from the current month to the selected month
+    if (newYear < currentYear || (newYear === currentYear && newMonth < currentMonth)) {
+      // Moved to previous month(s)
+      const startOfSelectedMonth = new Date(newYear, newMonth, 1); // Start of selected month
+      const endOfCurrentMonth = new Date(currentYear, currentMonth + 1, 0); // End of current month
+      fetchEventsByDate(startOfSelectedMonth, endOfCurrentMonth); // Fetch events from selected month to current month
+    } else if (newYear > currentYear || (newYear === currentYear && newMonth > currentMonth)) {
+      // Moved to next month(s)
+      const startOfCurrentMonth = new Date(currentYear, currentMonth, 1); // Start of current month
+      const endOfSelectedMonth = new Date(newYear, newMonth + 1, 0); // End of selected month
+      fetchEventsByDate(startOfCurrentMonth, endOfSelectedMonth); // Fetch events from current month to selected month
+    }
+
   };
-
-  const formattedDate = currentDate.toLocaleString("default", {
-    month: "long",
-    year: "numeric",
+  
+  
+  // Format the current date to display month and year
+  const formattedDate = currentDate.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric',
   });
 
-  const events = [
-    { title: 'Event 1', date: '2025-04-10' }, // Example event
-    { title: 'Event 2', date: '2025-04-12' }, // Example event
-  ];
+  const [openModal, setOpenModal] = useState(false);
 
-
+  const handleModal = () => {
+    setOpenModal(!openModal);
+  }
+  const [openViewModal, setOpenViewModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const handleViewEventModal = (event) => {
+    setOpenViewModal(!openViewModal);
+    setSelectedEvent(event);
+  }
   return (
     <Box
       sx={{
@@ -45,54 +100,88 @@ const UpdatedCalendar = () => {
     >
 
       <Box
-        sx={{
-          "& .fc": {
-            fontFamily: "Plus Jakarta Sans",
-            color: theme === "light" ? "#212121" : "#fff",
-          },
-          "& .fc-event": {
-            backgroundColor: "#0387d9",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "0.85rem",
-            padding: "4px",
-          },
-          "& .fc-toolbar-title": {
-            fontSize: "1.2rem",
-            fontWeight: 600,
-          },
-          "& .fc-daygrid-day-number": {
-            color: theme === "light" ? "#212121" : "#fff",
-          },
-        }}
       >
-        <FullCalendar
-          plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
-          initialView="dayGridMonth"
-          events={events}
-          height="300px"
-          initialDate={currentDate}
-          dayHeaders={false}
-          dayCellClassNames={({ date }) => {
-            const today = new Date();
-            let classes = '';
-            if (date.toDateString() === today.toDateString()) {
-              classes += ' bg-blue-500'; // Highlight today's cell
-            }
-            classes += ' custom-day-cell'; // Add custom class for border radius and height adjustments
-            return classes;
-          }}
-          eventClassNames={(info) => {
-            // Add a custom class to the event's cell
-            return ['custom-event-cell'];
-          }}
-          eventContent={(eventInfo) => {
-            return (
-              <div style={{ width: "1px", height: "1px", borderRadius: "50%", backgroundColor: "#0387d9" }} />
-            );
-          }}
+       { events && <FullCalendar
+  plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
+  initialView="dayGridMonth"
+  datesSet={handleCalendarChange}
+  events={events}
+  height="250px"
+  initialDate={currentDate}
+  dayHeaders={false}
+  dayCellClassNames={({ date }) => {
+    const today = new Date();
+    let classes = '';
+    if (date.toDateString() === today.toDateString()) {
+      classes += ' bg-blue-500'; // Highlight today's cell
+    }
+    classes += ' custom-day-cell'; // Add custom class for border radius and height adjustments
+    return classes;
+  }}
+  dateClick={(info) => {
+    const clickedDate = info.date;
+    const sameDayEvents = events.filter((event) => {
+      const eventDate = new Date(event.start);
+      return (
+        eventDate.getFullYear() === clickedDate.getFullYear() &&
+        eventDate.getMonth() === clickedDate.getMonth() &&
+        eventDate.getDate() === clickedDate.getDate()
+      );
+    });
+    setOpenViewModal(true);
+    setSelectedEvent(sameDayEvents);
+  }}
+  eventClick={(info) => {
+    const clickedDate = new Date(info.event.start);
 
-        />
+    const eventsForDay = events.filter((e) => {
+      const eventDate = new Date(e.start);
+      return (
+        eventDate.getFullYear() === clickedDate.getFullYear() &&
+        eventDate.getMonth() === clickedDate.getMonth() &&
+        eventDate.getDate() === clickedDate.getDate()
+      );
+    });
+    setOpenViewModal(true);
+    setSelectedEvent(eventsForDay);
+  }}
+  eventClassNames={'custom-event-cell minimized'}
+  eventContent={(eventInfo) => {
+    return (
+      <div style={{ width: "1px", height: "1px", borderRadius: "50%", backgroundColor: "#0387d9" }} />
+    );
+  }}
+  eventDisplay="background"
+  dayCellContent={({ date }) => {
+    const eventsForDay = events.filter((event) => {
+      const eventDate = new Date(event.start);
+      return (
+        eventDate.getFullYear() === date.getFullYear() &&
+        eventDate.getMonth() === date.getMonth() &&
+        eventDate.getDate() === date.getDate()
+      );
+    });
+    
+    return (
+      <div>
+        <span>{date.getDate()}</span>
+        {eventsForDay.length > 0 && (
+          <div
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#0387d9',
+              margin: '4px auto 0', // Position the dot below the day number
+            }}
+          />
+        )}
+      </div>
+    );
+  }}
+/>
+
+}
       </Box>
 
       <Box mt={3} display="flex" justifyContent="space-between" alignItems="center">
@@ -113,7 +202,7 @@ const UpdatedCalendar = () => {
               mt: 0.5,
             }}
           >
-            No tasks for this day.
+           { eventsForToday.length > 0 ? `${eventsForToday.length} task(s) for today.` : "No tasks for today."}
           </Typography>
         </Box>
 
@@ -132,10 +221,13 @@ const UpdatedCalendar = () => {
               bgcolor: "rgba(3, 135, 217, 0.9)",
             },
           }}
+          onClick={handleModal}
         >
           Add Task
         </Button>
       </Box>
+      <CreateEventModal open={openModal} handleClose={handleModal} />
+      <ViewEventModal open={openViewModal} handleClose={handleViewEventModal} event={selectedEvent} />
     </Box>
   );
 };
