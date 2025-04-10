@@ -26,8 +26,42 @@ import plus from "../../assets/images/crew/plus.png";
 import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useTheme } from "../../context/theme/themeContext";
+import { Paginator } from "primereact/paginator";
 
 import { TableSkeleton } from "../../components/TableSkeleton";
+
+const InventoryTableSkeleton = () => {
+  const { theme } = useTheme();
+  return (
+    <div className="inventory-skeleton">
+      {[...Array(10)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            padding: "10px",
+            borderBottom: "1px solid #eaecf0",
+            backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+          }}
+        >
+          {[...Array(7)].map((_, j) => (
+            <div
+              key={j}
+              style={{
+                flex: j === 0 ? "2" : "1",
+                height: "20px",
+                backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
+                marginRight: "10px",
+                borderRadius: "4px",
+                animation: "pulse 1.5s infinite",
+              }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Invent = () => {
   const navigate = useNavigate();
@@ -72,28 +106,26 @@ const Invent = () => {
 
   const { theme } = useTheme();
 
+  // Add pagination state
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isPageLoading, setIsPageLoading] = useState(false);
+
   // Fetch inventory data when component mounts
   useEffect(() => {
     fetchInventoryData();
   }, []);
 
   // Function to fetch inventory data from API
-  const fetchInventoryData = async () => {
-    setIsDataLoading(true);
+  const fetchInventoryData = async (page = 1) => {
+    setIsPageLoading(true);
     try {
-      const result = await getInventoryData();
-      console.log("API Response:", result);
-      console.log("Data structure:", result.data);
+      const result = await getInventoryData({ page });
 
       if (result.success) {
-        // The inventory array is in result.data.data.result
-        const inventoryData = result.data.data.result || [];
-        if (!Array.isArray(inventoryData)) {
-          console.error("Inventory data is not an array:", inventoryData);
-          return;
-        }
-
-        // Transform API data to match the format expected by the component
+        const inventoryData = result.data || [];
         const formattedItems = inventoryData.map((item) => ({
           id: item._id,
           productName: item.product?.name || "Unknown Product",
@@ -104,7 +136,7 @@ const Invent = () => {
         }));
 
         setInventoryItems(formattedItems);
-        console.log("Inventory data loaded:", formattedItems);
+        setTotalRecords(result.pagination?.totalItems || 0);
       } else {
         console.error("Failed to load inventory data:", result.error);
         if (toast.current) {
@@ -118,16 +150,8 @@ const Invent = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while loading data",
-          life: 3000,
-        });
-      }
     } finally {
-      setIsDataLoading(false);
+      setIsPageLoading(false);
     }
   };
 
@@ -408,6 +432,14 @@ const Invent = () => {
       price: item.price.toFixed(2),
     });
     setShowViewModal(true);
+  };
+
+  // Add pagination change handler
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    const page = Math.floor(event.first / rows) + 1;
+    setCurrentPage(page);
+    fetchInventoryData(page);
   };
 
   // Render mobile card view for inventory items
@@ -802,144 +834,175 @@ const Invent = () => {
                     </thead>
                   </table>
 
-                  <table
-                    className="inventory-table"
-                    style={{
-                      width: "100%",
-                      tableLayout: "fixed",
-                      borderCollapse: "collapse",
-                      marginTop: "0",
-                    }}
-                  >
-                    <tbody>
-                      {inventoryItems.map((item, index) => (
-                        <tr key={index}>
-                          <td
-                            style={{
-                              width: "20%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.productName}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.category}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.serviceArea}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.stockQuantity} units
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            ${item.price.toFixed(2)}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "10px",
-                              }}
-                            >
-                              <img
-                                src={eyesIn}
-                                alt="view"
+                  {isPageLoading ? (
+                    <InventoryTableSkeleton />
+                  ) : (
+                    <>
+                      <table
+                        className="inventory-table"
+                        style={{
+                          width: "100%",
+                          tableLayout: "fixed",
+                          borderCollapse: "collapse",
+                          marginTop: "0",
+                        }}
+                      >
+                        <tbody>
+                          {inventoryItems.map((item, index) => (
+                            <tr key={index}>
+                              <td
                                 style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer",
+                                  width: "20%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
                                 }}
-                                onClick={() => handleView(index)}
-                              />
-                              <img
-                                src={editLogo}
-                                alt="edit"
+                              >
+                                {item.productName}
+                              </td>
+                              <td
                                 style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer",
+                                  width: "15%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
                                 }}
-                                onClick={() => handleEdit(index)}
-                              />
-                              <img
-                                src={deleteLogo}
-                                alt="delete"
+                              >
+                                {item.category}
+                              </td>
+                              <td
                                 style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer",
+                                  width: "15%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
                                 }}
-                                onClick={() => handleDelete(index)}
-                              />
-                            </div>
-                          </td>
-                          <td
-                            style={{
-                              width: "5%",
-                              padding: "10px",
-                              textAlign: "center",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              style={{
-                                width: "12px",
-                                height: "12px",
-                              }}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              >
+                                {item.serviceArea}
+                              </td>
+                              <td
+                                style={{
+                                  width: "15%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                {item.stockQuantity} units
+                              </td>
+                              <td
+                                style={{
+                                  width: "15%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                ${item.price.toFixed(2)}
+                              </td>
+                              <td
+                                style={{
+                                  width: "15%",
+                                  padding: "10px",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                  }}
+                                >
+                                  <img
+                                    src={eyesIn}
+                                    alt="view"
+                                    style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={() => handleView(index)}
+                                  />
+                                  <img
+                                    src={editLogo}
+                                    alt="edit"
+                                    style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={() => handleEdit(index)}
+                                  />
+                                  <img
+                                    src={deleteLogo}
+                                    alt="delete"
+                                    style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      cursor: "pointer",
+                                    }}
+                                    onClick={() => handleDelete(index)}
+                                  />
+                                </div>
+                              </td>
+                              <td
+                                style={{
+                                  width: "5%",
+                                  padding: "10px",
+                                  textAlign: "center",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  style={{
+                                    width: "12px",
+                                    height: "12px",
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          marginTop: "20px",
+                        }}
+                      >
+                        <Button
+                          label="Add New Product"
+                          icon="pi pi-plus"
+                          onClick={handleAddProduct}
+                          style={{
+                            backgroundColor: "#0387D9",
+                            border: "none",
+                            borderRadius: "5px",
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Add pagination after the table */}
                   <div
+                    className="custom-pagination"
                     style={{
+                      padding: "1rem",
                       display: "flex",
-                      justifyContent: "center",
-                      marginTop: "20px",
+                      justifyContent: "flex-end",
+                      borderTop: "1px solid #eaecf0",
+                      marginTop: "1rem",
                     }}
                   >
-                    <Button
-                      label="Add New Product"
-                      icon="pi pi-plus"
-                      onClick={handleAddProduct}
+                    <Paginator
+                      first={first}
+                      rows={rows}
+                      totalRecords={totalRecords}
+                      onPageChange={onPageChange}
+                      template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                       style={{
-                        backgroundColor: "#0387D9",
-                        border: "none",
-                        borderRadius: "5px",
+                        backgroundColor:
+                          theme === "light" ? "#FFFFFF" : "#03141F",
+                        color: theme === "light" ? "#103B57" : "grey",
                       }}
                     />
                   </div>
@@ -957,7 +1020,7 @@ const Invent = () => {
       <Dialog
         visible={showEditModal}
         onHide={() => setShowEditModal(false)}
-        header="Edit Inventory Item"
+        header="Update Stock"
         className="edit-inventory-modal"
         modal
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
@@ -1174,13 +1237,14 @@ const Invent = () => {
           >
             <Button
               label="Cancel"
-              icon="pi pi-times"
               onClick={() => setShowAddModal(false)}
               className="p-button-text"
+              autoFocus={false}
               style={{
                 backgroundColor: "#EF4444",
                 color: "#fff",
                 width: "200px",
+                outline: "none",
               }}
             />
             <Button
@@ -1208,19 +1272,18 @@ const Invent = () => {
           backdropFilter: "blur(4px)",
         }}
         footer={
-          <div>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
             <Button
-              label="No"
-              icon="pi pi-times"
+              label="Cancel"
+              style={{ backgroundColor: "#EF4444", color: "#fff", border:"1px solid #EF4444", width:"100px", outline:"none"}}
               onClick={() => setShowDeleteConfirmation(false)}
               className="p-button-text"
               disabled={isLoading}
             />
             <Button
               label={isLoading ? "Deleting..." : "Yes"}
-              icon="pi pi-check"
+              style={{ backgroundColor: "#0387D9", color: "#fff", border:"1px solid #0387D9", width:"100px", outline:"none"}}
               onClick={confirmDelete}
-              autoFocus
               className="p-button-danger"
               disabled={isLoading}
             />
@@ -1239,87 +1302,164 @@ const Invent = () => {
       <Dialog
         visible={showViewModal}
         onHide={() => setShowViewModal(false)}
-        header="Inventory Details"
+        header="Inventory Summary"
         className="view-inventory-modal"
         modal
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "30vw" }}
+        style={{ width: "35vw" }}
         maskStyle={{
           backgroundColor: "rgba(0, 0, 0, 0.9)",
           backdropFilter: "blur(4px)",
         }}
       >
-        <div
-          className="view-form"
-          style={{
-            border: "1px solid #E0E0E9",
-            borderRadius: "10px",
-            padding: "20px",
-          }}
-        >
-          <div className="form-row">
-            <div
-              className="form-group"
+        <div className="view-form">
+          {/* Product Image and Name Section */}
+          {/* <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px',
+            marginBottom: '24px',
+            padding: '12px',
+            backgroundColor: '#F9FAFB',
+            borderRadius: '8px'
+          }}>
+            <img 
+              src={viewItem.image || "path-to-default-yacht-image"} 
+              alt={viewItem.productName}
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                width: '48px',
+                height: '48px',
+                borderRadius: '4px',
+                objectFit: 'cover'
               }}
-            >
-              <label htmlFor="productName">Product Name</label>
-              <div className="view-field">{viewItem.productName}</div>
+            />
+            <div>
+              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Yacht</h3>
             </div>
+          </div> */}
+
+          {/* Details Grid */}
+          <div style={{ display: "grid", gap: "16px" }}>
+            {/* <div className="detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#6B7280', fontSize: '14px' }}>ID</span>
+              <span style={{ color: '#111827', fontSize: '14px', fontWeight: '500' }}>#2468520</span>
+            </div> */}
+
             <div
-              className="form-group"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
+              className="detail-row"
+              style={{ display: "flex", justifyContent: "space-between" }}
             >
-              <label htmlFor="category">Category</label>
-              <div className="view-field">{viewItem.category}</div>
+              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+                Product Name
+              </span>
+              <span
+                style={{
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {viewItem.productName}
+              </span>
+            </div>
+
+            <div
+              className="detail-row"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+                Category
+              </span>
+              <span
+                style={{
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {viewItem.category}
+              </span>
+            </div>
+
+            <div
+              className="detail-row"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <span style={{ color: "#6B7280", fontSize: "14px" }}>Price</span>
+              <span
+                style={{
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {viewItem.price}
+              </span>
+            </div>
+
+            <div
+              className="detail-row"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+                Availability
+              </span>
+              <span
+                style={{
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {viewItem.stockQuantity}
+              </span>
+            </div>
+
+            {/* <div className="detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: '#6B7280', fontSize: '14px' }}>Supplier</span>
+              <span style={{ color: '#111827', fontSize: '14px', fontWeight: '500' }}>{viewItem.supplier}</span>
+            </div> */}
+
+            <div
+              className="detail-row"
+              style={{ display: "flex", justifyContent: "space-between" }}
+            >
+              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+                Service Area
+              </span>
+              <span
+                style={{
+                  color: "#111827",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {viewItem.serviceArea}
+              </span>
             </div>
           </div>
 
-          <div className="form-row">
-            <div
-              className="form-group"
+          {/* Description Section */}
+          {/* <div style={{ marginTop: '24px' }}>
+            <h4 style={{ 
+              margin: '0 0 8px 0', 
+              fontSize: '14px', 
+              color: '#6B7280' 
+            }}>Description</h4>
+            <textarea
+              placeholder="Enter Product Description"
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #D1D5DB',
+                borderRadius: '6px',
+                minHeight: '80px',
+                fontSize: '14px',
+                color: '#111827',
+                resize: 'vertical'
               }}
-            >
-              <label htmlFor="serviceArea">Service Area</label>
-              <div className="view-field">{viewItem.serviceArea}</div>
-            </div>
-            <div
-              className="form-group"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <label htmlFor="stockQuantity">Stock Quantity</label>
-              <div className="view-field">{viewItem.stockQuantity}</div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div
-              className="form-group"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <label htmlFor="price">Price</label>
-              <div className="view-field">${viewItem.price}</div>
-            </div>
-          </div>
+            />
+          </div> */}
         </div>
       </Dialog>
     </>

@@ -89,4 +89,94 @@
   .skeleton-row .p-skeleton {
     width: 100% !important;
   }
+}
+
+.pagination-container {
+  margin-top: 20px;
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #eaecf0;
+}
+
+.inventory-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.inventory-item {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* Customize Paginator styles */
+.p-paginator {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+}
+
+.inventory-container {
+  position: relative;
+  padding-bottom: 70px; /* Make room for pagination */
+}
+
+.custom-pagination {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #eaecf0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Make sure table fills available space */
+.p-datatable {
+  height: calc(100% - 70px);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.inventory-skeleton {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.inventory-skeleton > div:last-child {
+  border-bottom: none;
 } 

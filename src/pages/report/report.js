@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,7 @@ import wavyback from "../../assets/images/crew/wavyback.png";
 import profileReport from "../../assets/images/crew/profile-report.png";
 import profileReport2 from "../../assets/images/crew/profile-report2.png";
 import sortIcon from "../../assets/images/crew/sort.png";
+import { getInventoryHealthReport } from "../../services/reports/reports";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -163,6 +164,31 @@ const Reports = () => {
       },
     ],
   };
+
+  // const [healthReports, setHealthReports] = useState({
+  //   stockLevels: { rate: 0, correct: 0 },
+  //   supplierAvailability: { rate: 0, correct: 0 },
+  //   customerSatisfaction: { rate: 0, correct: 0 },
+  //   loading: true,
+  //   error: null,
+  // });
+
+  //  useEffect(() => {
+  //    fetchHealthReports();
+  //  }, []);
+
+  //  const fetchHealthReports = async () => {
+  //   try {
+  //       const response = await getInventoryHealthReport();  
+  //       if(response.success){
+  //           setHealthReports({
+  //             vaccinationRate: {
+  //           });
+  //       }
+  //   } catch (error) {
+        
+  //   }
+  //  }
 
   return (
     <>

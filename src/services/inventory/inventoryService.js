@@ -4,7 +4,6 @@ import { useUser } from "../../context/userContext"; // Import at the top level
 // Use the base API URL, not the auth URL
 const API_URL = process.env.REACT_APP_API_URL;
 
-
 // Add authentication token to requests
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
@@ -87,19 +86,22 @@ export const createInventoryData = async (inventoryData) => {
   }
 };
 
-export const getInventoryData = async () => {
+export const getInventoryData = async (params = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/inventory`, {
-      headers: getAuthHeader(),
-    });
+    const { page = 1 } = params;
 
-    // Log the response structure
-    console.log("Raw API response:", response);
+    const response = await axios.get(
+      `${API_URL}/inventory?page=${page}&limit=10`,
+      {
+        headers: getAuthHeader(),
+      }
+    );
 
-    // Make sure we're returning the correct structure
     return {
       success: true,
-      data: response.data, // Should contain { data: [...] }
+      data: response.data.data,
+      pagination: response.data.pagination,
+      message: response.data.message,
     };
   } catch (error) {
     console.error("Error fetching inventory data:", error);
