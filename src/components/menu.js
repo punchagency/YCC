@@ -4,14 +4,23 @@ import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
 import { useUser } from "../context/userContext";
 import logo from "../assets/images/logo-login.png";
-import orderLogo from "../assets/images/crew/order1.png";
-import financeLogo from "../assets/images/crew/financeLogo.png";
-import complianceLogo from "../assets/images/crew/complianceLogo.png";
-import reportLogo from "../assets/images/crew/reportLogo.png";
-import settingsLogo from "../assets/images/crew/settingsLogo.png";
-import homeLogo from "../assets/images/crew/homeLogo.png";
-import helpLogo from "../assets/images/crew/info.png";
-import contactLogo from "../assets/images/crew/shape.png";
+// import orderLogo from "../assets/images/crew/order1.png";
+// import financeLogo from "../assets/images/crew/financeLogo.png";
+// import complianceLogo from "../assets/images/crew/complianceLogo.png";
+// import reportLogo from "../assets/images/crew/reportLogo.png";
+// import settingsLogo from "../assets/images/crew/settingsLogo.png";
+// import homeLogo from "../assets/images/crew/homeLogo.png";
+// import helpLogo from "../assets/images/crew/info.png";
+// import contactLogo from "../assets/images/crew/shape.png";
+import dashboardLogo from "../assets/images/crew/dashboard-icon.png";
+import calendarLogo from "../assets/images/crew/calendar-icon.png";
+import inventoryLogo from "../assets/images/crew/inventory-icon.png";
+import orderLogo from "../assets/images/crew/order-icon.png";
+import bookingLogo from "../assets/images/crew/booking-icon.png";
+import financeLogo from "../assets/images/crew/financial-icon.png";
+import settingsLogo from "../assets/images/crew/settings-icon.png";
+import notificationLogo from "../assets/images/crew/notification-icon.png";
+import reportLogo from "../assets/images/crew/report-icon.png";
 import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
 import { confirmDialog } from "primereact/confirmdialog";
@@ -60,7 +69,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
     {
       label: "Dashboard",
-      icon: <img src={homeLogo} alt="Dashboard" width={15} height={15} />,
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
       className:
         location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
       command: () => {
@@ -75,7 +84,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
     {
       label: "Calendar",
-      icon: "pi pi-calendar",
+      icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
       className:
         location.pathname === "/admin/calendar-management"
           ? "active-menu-item"
@@ -92,7 +101,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
     {
       label: "Inventory Management",
-      icon: "pi pi-file",
+      icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
       className:
         location.pathname === "/admin/inventory-management"
           ? "active-menu-item"
@@ -126,7 +135,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
     {
       label: "Bookings",
-      icon: <img src={orderLogo} alt="Bookings" width={15} height={15} />,
+      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
       className:
         location.pathname === "/admin/bookings-management"
           ? "active-menu-item"
@@ -165,7 +174,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Notifications",
       icon: (
         <img
-          src={complianceLogo}
+          src={notificationLogo}
           alt="Compliance Tracking"
           width={15}
           height={15}
