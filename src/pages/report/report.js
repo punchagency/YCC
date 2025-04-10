@@ -24,7 +24,11 @@ import wavyback from "../../assets/images/crew/wavyback.png";
 import profileReport from "../../assets/images/crew/profile-report.png";
 import profileReport2 from "../../assets/images/crew/profile-report2.png";
 import sortIcon from "../../assets/images/crew/sort.png";
-import { getInventoryHealthReport } from "../../services/reports/reports";
+import {
+  getInventoryHealthReport,
+  getSystemChartData,
+  getSystemMetrics,
+} from "../../services/reports/reports";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -35,30 +39,137 @@ const Reports = () => {
     navigate("/crew/inventory/summary");
   };
 
-  const activityChartData = {
-    labels: [
-      "JAN",
-      "FEB",
-      "MAR",
-      "APR",
-      "MAY",
-      "JUN",
-      "JUL",
-      "AUG",
-      "SEP",
-      "OCT",
-      "NOV",
-      "DEC",
-    ],
+  const [activityData, setActivityData] = useState({
+    labels: [],
     datasets: [
       {
-        data: [100, 140, 130, 220, 260, 190, 220, 100, 270, 320, 350, 370],
+        label: "Bookings",
+        data: [],
         backgroundColor: "#4318FF",
         borderRadius: 8,
         barThickness: 15,
         maxBarThickness: 8,
       },
+      {
+        label: "Orders",
+        data: [],
+        backgroundColor: "#6AD2FF",
+        borderRadius: 8,
+        barThickness: 15,
+        maxBarThickness: 8,
+      },
     ],
+  });
+
+  const [healthReports, setHealthReports] = useState({
+    stockLevels: { rate: 0, correct: 0 },
+    supplierAvailability: { rate: 0, correct: 0 },
+    customerSatisfaction: { rate: 0, correct: 0 },
+    loading: true,
+    error: null,
+  });
+
+  const [systemMetrics, setSystemMetrics] = useState([]);
+
+  useEffect(() => {
+    fetchHealthReports();
+    fetchSystemActivity();
+    fetchSystemMetrics();
+  }, []);
+
+  const fetchHealthReports = async () => {
+    try {
+      const response = await getInventoryHealthReport();
+      console.log("Response", response);
+      if (response.success) {
+        setHealthReports({
+          stockLevels: {
+            rate: Math.round(response.data.data.stockLevels) || 0,
+          },
+          supplierAvailability: {
+            rate: Math.round(response.data.data.supplierAvailability) || 0,
+          },
+          customerSatisfaction: {
+            rate: Math.round(response.data.data.customerSatisfaction) || 0,
+          },
+          loading: false,
+          error: null,
+        });
+      } else {
+        setHealthReports((prev) => ({
+          ...prev,
+          loading: false,
+          error: response.error || "Failed to fetch inventory health report",
+        }));
+      }
+    } catch (error) {
+      setHealthReports((prev) => ({
+        ...prev,
+        loading: false,
+        error:
+          error.message ||
+          "An error occurred while fetching inventory health report",
+      }));
+    }
+  };
+
+  const fetchSystemActivity = async () => {
+    try {
+      const response = await getSystemChartData();
+      if (response.success) {
+        const chartData = response.data;
+
+        setActivityData({
+          labels: chartData.map((item) => item.month),
+          datasets: [
+            {
+              label: "Bookings",
+              data: chartData.map((item) => item.bookings),
+              backgroundColor: "#4318FF",
+              borderRadius: 8,
+              barThickness: 15,
+              maxBarThickness: 8,
+            },
+            {
+              label: "Orders",
+              data: chartData.map((item) => item.orders),
+              backgroundColor: "#6AD2FF",
+              borderRadius: 8,
+              barThickness: 15,
+              maxBarThickness: 8,
+            },
+          ],
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching system activity:", error);
+    }
+  };
+
+  const fetchSystemMetrics = async () => {
+    try {
+      const response = await getSystemMetrics();
+      if (response.success) {
+        // Map the titles to your preferred display names
+        const mappedMetrics = response.data.map((metric) => {
+          const customTitles = {
+            Users: "Active Users",
+            "Customer Satisfaction": "Customer Rating",
+            "Resolved Complaints": "Issues Resolved",
+            "Total Revenue": "Revenue",
+          };
+
+          return {
+            ...metric,
+            title: customTitles[metric.title] || metric.title,
+          };
+        });
+
+        setSystemMetrics(mappedMetrics);
+      }
+    } catch (error) {
+      console.error("Error fetching system metrics:", error);
+    }
   };
 
   const chartOptions = {
@@ -67,9 +178,8 @@ const Reports = () => {
     scales: {
       y: {
         beginAtZero: true,
-        max: 400,
         ticks: {
-          stepSize: 100,
+          stepSize: 5,
           font: {
             size: 12,
             family: "Plus Jakarta Sans",
@@ -103,7 +213,15 @@ const Reports = () => {
     },
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "top",
+        labels: {
+          font: {
+            size: 12,
+            family: "Plus Jakarta Sans",
+          },
+          color: "#A3AED0",
+        },
       },
       tooltip: {
         enabled: true,
@@ -121,7 +239,6 @@ const Reports = () => {
           size: 12,
           family: "Plus Jakarta Sans",
         },
-        displayColors: false,
       },
     },
   };
@@ -165,31 +282,6 @@ const Reports = () => {
     ],
   };
 
-  // const [healthReports, setHealthReports] = useState({
-  //   stockLevels: { rate: 0, correct: 0 },
-  //   supplierAvailability: { rate: 0, correct: 0 },
-  //   customerSatisfaction: { rate: 0, correct: 0 },
-  //   loading: true,
-  //   error: null,
-  // });
-
-  //  useEffect(() => {
-  //    fetchHealthReports();
-  //  }, []);
-
-  //  const fetchHealthReports = async () => {
-  //   try {
-  //       const response = await getInventoryHealthReport();  
-  //       if(response.success){
-  //           setHealthReports({
-  //             vaccinationRate: {
-  //           });
-  //       }
-  //   } catch (error) {
-        
-  //   }
-  //  }
-
   return (
     <>
       <div
@@ -215,14 +307,19 @@ const Reports = () => {
                 <div className="report-container-flop-2">
                   <div>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Vaccination Rate
+                      Customer Satisfaction
                     </p>
                     <div className="report-progress-outer-bar">
-                      <div className="report-progress-inner-bar"></div>
+                      <div
+                        className="report-progress-inner-bar"
+                        style={{
+                          width: `${healthReports.customerSatisfaction.rate}%`,
+                        }}
+                      ></div>
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>88% Correct</p>
+                    <p>{healthReports.customerSatisfaction.rate}% Correct</p>
                   </div>
                 </div>
               </div>
@@ -233,14 +330,19 @@ const Reports = () => {
                 <div className="report-container-flop-2">
                   <div>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Health Screening
+                      Supplier Availability
                     </p>
                     <div className="report-progress-outer-bar">
-                      <div className="report-progress-inner-bar"></div>
+                      <div
+                        className="report-progress-inner-bar"
+                        style={{
+                          width: `${healthReports.supplierAvailability.rate}%`,
+                        }}
+                      ></div>
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>92% Correct</p>
+                    <p>{healthReports.supplierAvailability.rate}% Correct</p>
                   </div>
                 </div>
               </div>
@@ -251,14 +353,19 @@ const Reports = () => {
                 <div className="report-container-flop-2">
                   <div>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Testing Availability
+                      Stock Levels
                     </p>
                     <div className="report-progress-outer-bar">
-                      <div className="report-progress-inner-bar"></div>
+                      <div
+                        className="report-progress-inner-bar"
+                        style={{
+                          width: `${healthReports.stockLevels.rate}%`,
+                        }}
+                      ></div>
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>89% Correct</p>
+                    <p>{healthReports.stockLevels.rate}% Correct</p>
                   </div>
                 </div>
               </div>
@@ -267,82 +374,30 @@ const Reports = () => {
         </div>
         <div className="report-container-bar-graph">
           <div style={{ width: "100%", height: "100%", padding: "10px" }}>
-            <Bar data={activityChartData} options={chartOptions} />
+            <Bar data={activityData} options={chartOptions} />
           </div>
         </div>
 
         <div className="metrics-container">
-          <div className="metric-card">
-            <div className="metric-header">
-              <span>Active Users</span>
-              <h2>27/80</h2>
+          {systemMetrics.map((metric, index) => (
+            <div key={index} className="metric-card">
+              <div className="metric-header">
+                <span>{metric.title}</span>
+                <h2>{metric.value}</h2>
+              </div>
+              <div className="sparkline">
+                <Line
+                  data={sparklineData}
+                  options={sparklineOptions}
+                  style={{
+                    height: index === 3 ? "25px" : "45px",
+                    marginTop: index === 3 ? "-5px" : "-10px",
+                    marginBottom: index === 3 ? "-5px" : "-10px",
+                  }}
+                />
+              </div>
             </div>
-            <div className="sparkline">
-              <Line
-                data={sparklineData}
-                options={sparklineOptions}
-                style={{
-                  height: "45px",
-                  marginTop: "-10px",
-                  marginBottom: "-10px",
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-header">
-              <span>Questions Answered</span>
-              <h2>3,298</h2>
-            </div>
-            <div className="sparkline">
-              <Line
-                data={sparklineData}
-                options={sparklineOptions}
-                style={{
-                  height: "45px",
-                  marginTop: "-10px",
-                  marginBottom: "-10px",
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-header">
-              <span>Av. Session Length</span>
-              <h2>2m 34s</h2>
-            </div>
-            <div className="sparkline">
-              <Line
-                data={sparklineData}
-                options={sparklineOptions}
-                style={{
-                  height: "45px",
-                  marginTop: "-10px",
-                  marginBottom: "-10px",
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="metric-card">
-            <div className="metric-header">
-              <span>Current Knowledge</span>
-              <h2>86%</h2>
-            </div>
-            <div className="sparkline">
-              <Line
-                data={sparklineData}
-                options={sparklineOptions}
-                style={{
-                  height: "25px",
-                  marginTop: "-5px",
-                  marginBottom: "-5px",
-                }}
-              />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 

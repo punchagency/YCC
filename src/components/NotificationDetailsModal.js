@@ -1,5 +1,5 @@
 import { Dialog } from "primereact/dialog";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
   const { t } = useTranslation();
@@ -65,7 +65,7 @@ const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
     <Dialog
       visible={visible}
       onHide={onHide}
-      header={t('notifications.details.title')}
+      header={t("notifications.details.title")}
       style={{
         width: "400px",
         borderRadius: "12px",
@@ -83,13 +83,13 @@ const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
       }}
     >
       <div className="notification-details-content">
-        {renderDetailRow(t('notifications.type'), notificationData?.type)}
+        {renderDetailRow(t("notifications.type"), notificationData?.type)}
         {renderDetailRow(
-          t('notifications.details.relatedId'),
+          t("notifications.details.relatedId"),
           notificationData?.relatedId || "ORD-1234"
         )}
         {renderDetailRow(
-          t('notifications.details.vendorClient'),
+          t("notifications.details.vendorClient"),
           notificationData?.vendor || "Vendor A"
         )}
         {renderDetailRow("Description", notificationData?.description)}

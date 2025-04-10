@@ -123,6 +123,7 @@ const Invent = () => {
     setIsPageLoading(true);
     try {
       const result = await getInventoryData({ page });
+      console.log(result);
 
       if (result.success) {
         const inventoryData = result.data || [];
@@ -344,7 +345,6 @@ const Invent = () => {
     setIsLoading(true);
 
     try {
-      // Call the API to create a new product
       const result = await createInventoryData({
         productName: newItem.productName,
         category: newItem.category,
@@ -365,7 +365,7 @@ const Invent = () => {
           alert("Product added successfully");
         }
 
-        // Add the new product to the local state with data from API response
+        // Add the new product to the beginning of the array instead of the end
         const responseData = result.data.data;
         const product = {
           id: responseData._id,
@@ -376,7 +376,7 @@ const Invent = () => {
           price: responseData.price,
         };
 
-        setInventoryItems([...inventoryItems, product]);
+        setInventoryItems([product, ...inventoryItems]);
 
         // Reset the form
         setNewItem({
@@ -1272,17 +1272,31 @@ const Invent = () => {
           backdropFilter: "blur(4px)",
         }}
         footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+          >
             <Button
               label="Cancel"
-              style={{ backgroundColor: "#EF4444", color: "#fff", border:"1px solid #EF4444", width:"100px", outline:"none"}}
+              style={{
+                backgroundColor: "#EF4444",
+                color: "#fff",
+                border: "1px solid #EF4444",
+                width: "100px",
+                outline: "none",
+              }}
               onClick={() => setShowDeleteConfirmation(false)}
               className="p-button-text"
               disabled={isLoading}
             />
             <Button
               label={isLoading ? "Deleting..." : "Yes"}
-              style={{ backgroundColor: "#0387D9", color: "#fff", border:"1px solid #0387D9", width:"100px", outline:"none"}}
+              style={{
+                backgroundColor: "#0387D9",
+                color: "#fff",
+                border: "1px solid #0387D9",
+                width: "100px",
+                outline: "none",
+              }}
               onClick={confirmDelete}
               className="p-button-danger"
               disabled={isLoading}

@@ -20,6 +20,17 @@ import share from "../assets/images/crew/share.png";
 import MobileSidebar from "./MobileSidebar"; // Re-import MobileSidebar
 import { useTheme } from "../context/theme/themeContext";
 import { getNotifications } from "../services/notification/notificationService";
+import { Dialog } from "primereact/dialog";
+import { 
+  downloadInventoryReport,
+  downloadOrderReport,
+  downloadBookingReport,
+  downloadFinancialReport,
+  downloadInventoryExcel,
+  downloadOrderExcel,
+  downloadBookingExcel,
+  downloadFinancialExcel
+} from "../services/reports/reports";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -37,6 +48,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showExcelModal, setShowExcelModal] = useState(false);
 
   useEffect(() => {
     fetchNotifications();
@@ -145,14 +158,14 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       label: "Export as PDF",
       icon: "pi pi-file-pdf",
       command: () => {
-        console.log("Export as PDF");
+        setShowExportModal(true);
       },
     },
     {
       label: "Export as Excel",
       icon: "pi pi-file-excel",
       command: () => {
-        console.log("Export as Excel");
+        setShowExcelModal(true);
       },
     },
   ];
@@ -556,10 +569,10 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             border: "none",
           }}
         />
-        <div 
-          className="profile-section" 
-          onClick={() => navigate('/admin/profile')}
-          style={{ cursor: 'pointer' }}
+        <div
+          className="profile-section"
+          onClick={() => navigate("/admin/profile")}
+          style={{ cursor: "pointer" }}
         >
           <img
             src={manprofile}
@@ -596,6 +609,82 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     </>
   );
 
+  const handleExport = async (type) => {
+    try {
+      switch (type) {
+        case "inventory":
+          const inventoryResult = await downloadInventoryReport();
+          if (!inventoryResult.success) {
+            console.error("Failed to download inventory report");
+          }
+          break;
+        case "order":
+          const orderResult = await downloadOrderReport();
+          if (!orderResult.success) {
+            console.error("Failed to download order report");
+          }
+          break;
+        case "booking":
+          const bookingResult = await downloadBookingReport();
+          if (!bookingResult.success) {
+            console.error("Failed to download booking report");
+          }
+          break;
+        case "financial":
+          console.log("Starting financial export...");
+          const financialResult = await downloadFinancialReport();
+          console.log("Financial export result:", financialResult);
+          if (!financialResult.success) {
+            console.error("Failed to download financial report");
+          }
+          break;
+        default:
+          console.log("Unknown report type");
+      }
+    } catch (error) {
+      console.error("Error in handleExport:", error);
+    } finally {
+      setShowExportModal(false);
+    }
+  };
+
+  const handleExcelExport = async (type) => {
+    try {
+      switch (type) {
+        case "inventory":
+          const inventoryResult = await downloadInventoryExcel();
+          if (!inventoryResult.success) {
+            console.error("Failed to download inventory excel");
+          }
+          break;
+        case "order":
+          const orderResult = await downloadOrderExcel();
+          if (!orderResult.success) {
+            console.error("Failed to download order excel");
+          }
+          break;
+        case "booking":
+          const bookingResult = await downloadBookingExcel();
+          if (!bookingResult.success) {
+            console.error("Failed to download booking excel");
+          }
+          break;
+        case "financial":
+          const financialResult = await downloadFinancialExcel();
+          if (!financialResult.success) {
+            console.error("Failed to download financial excel");
+          }
+          break;
+        default:
+          console.log("Unknown report type");
+      }
+    } catch (error) {
+      console.error("Error downloading excel:", error);
+    } finally {
+      setShowExcelModal(false);
+    }
+  };
+
   // Return both the Menubar and the MobileSidebar
   return (
     <>
@@ -618,6 +707,138 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         }}
         role={role}
       />
+
+      {/* Add the Export Modal */}
+      <Dialog
+        visible={showExportModal}
+        onHide={() => setShowExportModal(false)}
+        header="Export Reports"
+        style={{ width: "400px" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        modal
+        className="export-modal"
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Button
+            label="Export Order Report"
+            icon="pi pi-file-pdf"
+            onClick={() => handleExport("order")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Booking Report"
+            icon="pi pi-file-pdf"
+            onClick={() => handleExport("booking")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Inventory Report"
+            icon="pi pi-file-pdf"
+            onClick={() => handleExport("inventory")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Financial Report"
+            icon="pi pi-file-pdf"
+            onClick={() => handleExport("financial")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+        </div>
+      </Dialog>
+
+      {/* Add the Excel Export Modal */}
+      <Dialog
+        visible={showExcelModal}
+        onHide={() => setShowExcelModal(false)}
+        header="Export Excel Reports"
+        style={{ width: "400px" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        modal
+        className="export-modal"
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <Button
+            label="Export Order Excel"
+            icon="pi pi-file-excel"
+            onClick={() => handleExcelExport("order")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Booking Excel"
+            icon="pi pi-file-excel"
+            onClick={() => handleExcelExport("booking")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Inventory Excel"
+            icon="pi pi-file-excel"
+            onClick={() => handleExcelExport("inventory")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+          <Button
+            label="Export Financial Excel"
+            icon="pi pi-file-excel"
+            onClick={() => handleExcelExport("financial")}
+            style={{
+              backgroundColor: "#ffffff",
+              color: "#495057",
+              border: "1px solid #ced4da",
+              justifyContent: "flex-start",
+              padding: "1rem",
+              width: "100%",
+            }}
+          />
+        </div>
+      </Dialog>
     </>
   );
 };
