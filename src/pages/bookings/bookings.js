@@ -28,26 +28,31 @@ import times from "../../assets/images/crew/times.png";
 import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
 import sortIcon from "../../assets/images/crew/sort.png";
+import axios from "axios";
 import "./bookings.css";
+import { getAllBookingService } from "../../services/bookings/bookingService";
 
 // Context
 import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
 import { useTheme } from "../../context/theme/themeContext";
+import { createBookingService } from "../../services/bookings/bookingService";
+import { useToast } from "../../components/Toast";
 
 const Bookings = () => {
-  
   const navigate = useNavigate();
 
-
   // Context
-  const { bookings, deleteBooking, fetchBookings, updateBooking, updateBookingStatus } = useBooking();
+  const {
+    bookings,
+    deleteBooking,
+    fetchBookings,
+    updateBooking,
+    updateBookingStatus,
+  } = useBooking();
   const { services, fetchServices } = useService();
   const { theme } = useTheme();
-
-
-
-
+  const { showSuccess, showError } = useToast();
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedReview, setSelectedReview] = useState("");
@@ -61,6 +66,10 @@ const Bookings = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedBookingForUpload, setSelectedBookingForUpload] =
     useState(null);
+  // fetching of services
+  const [getServices, setGetServices] = useState([]);
+  const [bookingData, setBookingData] = useState([]);
+
   const [uploadForm, setUploadForm] = useState({
     invoiceNumber: "",
     date: null,
@@ -68,6 +77,21 @@ const Bookings = () => {
     file: null,
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showAddBookingModal, setShowAddBookingModal] = useState(false);
+  const [newBooking, setNewBooking] = useState({
+    serviceType: "",
+    vendorAssigned: "",
+    vesselLocation: "",
+    dateTime: null,
+    bookingStatus: "Pending",
+    internalNotes: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+
   // Add this useEffect to handle window resizing
   useEffect(() => {
     const handleResize = () => {
@@ -75,8 +99,8 @@ const Bookings = () => {
     };
     fetchBookings();
     fetchServices();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleViewReview = (review) => {
@@ -99,7 +123,6 @@ const Bookings = () => {
     setShowEditForm(true);
   };
 
-  
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
@@ -114,7 +137,7 @@ const Bookings = () => {
     const service = services.find((service) => service._id === value);
     setEditingBooking({
       ...editingBooking,
-      services: [{service: service}],
+      services: [{ service: service }],
     });
   };
 
@@ -133,12 +156,11 @@ const Bookings = () => {
   };
 
   const handleSaveBooking = () => {
-    updateBooking(editingBooking._id, editingBooking)
-      .then((success) => {
-        if (success) {
-          setShowEditForm(false);
-        }
-      });
+    updateBooking(editingBooking._id, editingBooking).then((success) => {
+      if (success) {
+        setShowEditForm(false);
+      }
+    });
   };
 
   const handleUploadBooking = (booking) => {
@@ -167,11 +189,159 @@ const Bookings = () => {
     });
   };
 
+  // Add this function to handle form changes
+  const handleNewBookingChange = (field, value) => {
+    setNewBooking((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Update the handleCreateBooking function
+  const handleCreateBooking = async () => {
+    try {
+      const selectedService = getFormattedServices().find(
+        (s) => s.value === newBooking.serviceType
+      );
+
+      if (!selectedService) {
+        showError("Please select a service");
+        return;
+      }
+
+      const bookingData = {
+        services: [
+          {
+            service: selectedService.value,
+            quantity: 1,
+          },
+        ],
+        vendorAssigned: selectedService.vendorId,
+        vendorLocation: selectedService.vendorId,
+        dateTime: newBooking.dateTime,
+        bookingStatus: newBooking.bookingStatus || "Pending",
+        internalNotes: newBooking.internalNotes,
+      };
+
+      const response = await createBookingService(bookingData);
+      console.log("Create Booking Response:", response);
+
+      if (response.status) {
+        showSuccess("Booking created successfully");
+
+        // Format the new booking to match the existing structure using response.booking
+        const newBookingEntry = {
+          _id: response.booking._id,
+          bookingId: response.booking.bookingId,
+          services: [
+            {
+              service: {
+                name: selectedService.label,
+                _id: selectedService.value,
+              },
+              quantity: response.booking.services[0].quantity,
+              _id: response.booking.services[0]._id,
+            },
+          ],
+          vendorAssigned: {
+            businessName: selectedService.vendorName,
+            businessAddress: selectedService.businessAddress,
+            _id: response.booking.vendorAssigned,
+          },
+          dateTime: response.booking.dateTime,
+          bookingStatus: response.booking.bookingStatus,
+          paymentStatus: response.booking.paymentStatus,
+          vendorName: selectedService.vendorName,
+          vesselLocation: selectedService.businessAddress,
+          internalNotes: response.booking.internalNotes,
+          createdAt: response.booking.createdAt,
+          updatedAt: response.booking.updatedAt,
+        };
+
+        console.log("New Booking Entry:", newBookingEntry);
+
+        // Add the new booking to the start of the list
+        setBookingData((prevBookings) => [newBookingEntry, ...prevBookings]);
+
+        // Close modal and reset form
+        setShowAddBookingModal(false);
+        setNewBooking({
+          serviceType: "",
+          vendorAssigned: "",
+          vesselLocation: "",
+          dateTime: null,
+          bookingStatus: "Pending",
+          internalNotes: "",
+        });
+      } else {
+        showError(response.message || "Failed to create booking");
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      showError(error.response?.data?.message || "Failed to create booking");
+    }
+  };
+
+  useEffect(() => {
+    fetchBookingsData();
+  }, [currentPage, pageSize]);
+
+  const fetchBookingsData = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllBookingService(currentPage, pageSize);
+      console.log("Fetched bookings response:", response);
+
+      if (response.status) {
+        const formattedBookings = response.data.map((booking) => ({
+          ...booking,
+          vendorName: booking.vendorAssigned?.businessName || "Not Assigned",
+          vesselLocation:
+            booking.vendorAssigned?.businessAddress || "Not Available",
+        }));
+
+        setBookingData(formattedBookings);
+
+        // Set total records from pagination info
+        const total = response.pagination?.total || formattedBookings.length;
+        console.log("Setting total records:", total);
+        setTotalRecords(total);
+      } else {
+        console.error("Error fetching bookings data:", response.message);
+        showError(response.message || "Failed to fetch bookings");
+      }
+    } catch (error) {
+      console.error("Error fetching bookings data:", error);
+      showError("Failed to fetch bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update the getFormattedServices function
+  const getFormattedServices = () => {
+    // Flatten all services from all vendors
+    const allServices = services.reduce((acc, vendor) => {
+      const vendorServices = vendor.services.map((service) => ({
+        label: service.name, // Service name for display
+        value: service._id, // Service ID
+        vendorName: vendor.businessName,
+        businessAddress: vendor.businessAddress,
+        vendorId: vendor._id,
+        description: service.description,
+      }));
+      return [...acc, ...vendorServices];
+    }, []);
+
+    console.log("Formatted Services:", allServices);
+    return allServices;
+  };
+
   // Add this responsive table rendering function to your Bookings component
   const renderResponsiveBookingRow = (booking) => {
     return (
       <div className="mobile-booking-card">
-        <div className="mobile-booking-header">
+        {/* <div className="mobile-booking-header">
           <span className="booking-id">{booking.id}</span>
           <span
             className={`booking-status status-${booking.status.toLowerCase()}`}
@@ -252,14 +422,78 @@ const Bookings = () => {
               style={{ width: "16px", height: "16px" }}
             />
           </Button>
-        </div>
+        </div> */}
       </div>
     );
   };
 
+  // Add this skeleton loader component
+  const renderSkeletonLoader = () => {
+    return Array(5)
+      .fill(0)
+      .map((_, index) => (
+        <tr key={index}>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "20px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "100px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "150px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "150px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "120px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "100px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "150px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "100px", height: "20px" }}
+            ></div>
+          </td>
+          <td>
+            <div
+              className="skeleton-loader"
+              style={{ width: "120px", height: "20px" }}
+            ></div>
+          </td>
+        </tr>
+      ));
+  };
+
   return (
     <>
-      <div 
+      <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{
           backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
@@ -320,9 +554,7 @@ const Bookings = () => {
                       marginBottom: "20px",
                     }}
                   >
-                    <h3 style={{ margin: 0 }}>
-                      Manage Booking {editingBooking?.bookingId}
-                    </h3>
+                    <h3 style={{ margin: 0 }}>Manage Booking</h3>
                     <Button
                       icon="pi pi-times"
                       className="p-button-rounded p-button-text"
@@ -557,30 +789,53 @@ const Bookings = () => {
               ) : (
                 <div className="bookings-container">
                   {/* Desktop view */}
-                  <div className="desktop-view" >
-                    <div className="bookings-table-container" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                      <div 
-                        className="table-container" 
+                  <div className="desktop-view">
+                    <div
+                      className="bookings-table-container"
+                      style={{
+                        backgroundColor:
+                          theme === "light" ? "#FFFFFF" : "#03141F",
+                      }}
+                    >
+                      <div
+                        className="table-container"
                         style={{
-                          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
                         }}
                       >
-                        <table 
+                        <table
                           className="bookings-table"
                           style={{
-                            backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                            backgroundColor:
+                              theme === "light" ? "#FFFFFF" : "#03141F",
                             color: theme === "light" ? "#103B57" : "#FFFFFF",
                           }}
                         >
-                          <thead style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                            <tr style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                              <th style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                          <thead
+                            style={{
+                              backgroundColor:
+                                theme === "light" ? "#FFFFFF" : "#03141F",
+                            }}
+                          >
+                            <tr
+                              style={{
+                                backgroundColor:
+                                  theme === "light" ? "#FFFFFF" : "#03141F",
+                              }}
+                            >
+                              <th
+                                style={{
+                                  backgroundColor:
+                                    theme === "light" ? "#FFFFFF" : "#03141F",
+                                }}
+                              >
                                 <input
                                   type="checkbox"
                                   className="header-checkbox"
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Booking ID
                                 <img
                                   src={sortIcon}
@@ -591,7 +846,7 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Service Type
                                 <img
                                   src={sortIcon}
@@ -602,8 +857,8 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
-                                Vendor Assigned 
+                              <th style={{ fontSize: "12px" }}>
+                                Vendor Assigned
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -613,8 +868,8 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
-                                Price
+                              <th style={{ fontSize: "12px" }}>
+                                Vesse Location
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -624,7 +879,7 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Date & Time
                                 <img
                                   src={sortIcon}
@@ -635,7 +890,7 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Booking Status
                                 <img
                                   src={sortIcon}
@@ -646,7 +901,7 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Internal Notes & Comments
                                 <img
                                   src={sortIcon}
@@ -657,7 +912,7 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{fontSize: "12px"}}>
+                              <th style={{ fontSize: "12px" }}>
                                 Actions
                                 <img
                                   src={sortIcon}
@@ -670,242 +925,404 @@ const Bookings = () => {
                               </th>
                             </tr>
                           </thead>
-                          <tbody style={{backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                            {bookings.map((booking, index) => (
-                              <tr
-                                key={index}
-                                style={{
-                                  borderBottom: "1px solid #eee",
-                                  color: theme === "light" ? "#103B57" : "#FFFFFF",
-                                  
-                                }}
-                              >
-                                <td>
-                                  <input type="checkbox" />
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  {booking.bookingId}
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  {booking.services
-                                    ?.map((service) => service.service?.name)
-                                    .join(", ")}
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  {booking.name}
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  ${booking.totalPrice}
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  {new Date(booking.bookingDate).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    }
-                                  )}
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  <span
+                          <tbody
+                            style={{
+                              backgroundColor:
+                                theme === "light" ? "#FFFFFF" : "#03141F",
+                            }}
+                          >
+                            {loading
+                              ? renderSkeletonLoader()
+                              : bookingData.map((booking, index) => (
+                                  <tr
+                                    key={index}
                                     style={{
-                                      backgroundColor:
-                                        booking.status === "confirmed"
-                                          ? "#e6f7ee"
-                                          : booking.status === "pending"
-                                          ? "#fff8e6"
-                                          : booking.status === "completed"
-                                          ? "#e6f0ff"
-                                          : booking.status === "in progress"
-                                          ? "#e6f7ff"
-                                          : booking.status === "flagged"
-                                          ? "#ffe6e6"
-                                          : "#ffebeb",
+                                      borderBottom: "1px solid #eee",
                                       color:
-                                        booking.status === "confirmed"
-                                          ? "#1d9d74"
-                                          : booking.status === "pending"
-                                          ? "#ff9800"
-                                          : booking.status === "completed"
-                                          ? "#3366ff"
-                                          : booking.status === "in progress"
-                                          ? "#0099cc"
-                                          : booking.status === "flagged"
-                                          ? "#ff4d4f"
-                                          : "#ff4d4f",
-                                      padding: "2px 6px",
-                                      borderRadius: "4px",
-                                      fontSize: "10px",
+                                        theme === "light"
+                                          ? "#103B57"
+                                          : "#FFFFFF",
                                     }}
                                   >
-                                    {booking.status}
-                                  </span>
-                                </td>
-                                <td style={{ padding: "8px", fontSize: "11px" }}>
-                                  <Button
-                                    icon="pi pi-eye"
-                                    className="p-button-text p-button-sm"
-                                    style={{
-                                      padding: "2px",
-                                      fontSize: "10px",
-                                      color: "#0387D9",
-                                    }}
-                                    onClick={() =>
-                                      handleViewReview(booking.reviews)
-                                    }
-                                    label="Participant Reviews..."
-                                  />
-                                </td>
-                                <td
-                                  style={{
-                                    padding: "6px",
-                                    borderBottom: "1px solid #eee",
-                                  }}
-                                >
-                                  <div style={{ display: "flex", gap: "3px" }}>
-                                    {/* View button */}
-                                    <Button
-                                      className="p-button-text p-button-sm"
+                                    <td>
+                                      <input type="checkbox" />
+                                    </td>
+                                    <td
                                       style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                      }}
-                                      tooltip="View Details"
-                                      tooltipOptions={{ position: "top" }}
-                                      onClick={() => handleViewBooking(booking)}
-                                    >
-                                      <div style={{ backgroundColor: "white" }}>
-                                        <img
-                                          src={eyeblock}
-                                          alt="View"
-                                          style={{ width: "15px", height: "15px" }}
-                                        />
-                                      </div>
-                                    </Button>
-
-                                    {/* Edit button */}
-                                    <Button
-                                      className="p-button-text p-button-sm"
-                                      style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                      }}
-                                      tooltip="Edit"
-                                      tooltipOptions={{ position: "top" }}
-                                      onClick={() => handleEditBooking(booking)}
-                                    >
-                                      <img
-                                        src={editLogo}
-                                        alt="Edit"
-                                        style={{ width: "15px", height: "15px" }}
-                                      />
-                                    </Button>
-                                    <Button
-                                      className="p-button-text p-button-sm"
-                                      style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                      }}
-                                      tooltip="Edit"
-                                      tooltipOptions={{ position: "top" }}
-                                      // onClick={() => handleEditBooking(booking)}
-                                    >
-                                      <img
-                                        src={times}
-                                        alt="times"
-                                        style={{ width: "15px", height: "15px" }}
-                                      />
-                                    </Button>
-
-                                    {/* Status button */}
-                                    <Button
-                                      className="p-button-text p-button-sm"
-                                      style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                      }}
-                                      tooltip="Change Status"
-                                      tooltipOptions={{ position: "top" }}
-                                      onClick={(e) => {
-                                        setSelectedBookingForStatus(booking);
-                                        statusMenuRef.current.toggle(e);
+                                        padding: "8px",
+                                        fontSize: "11px",
                                       }}
                                     >
-                                      {/* <i
-                                        className="pi pi-check-circle"
+                                      {booking.bookingId}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      {booking.services?.[0]?.service?.name ||
+                                        "N/A"}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      {booking.vendorAssigned?.businessName ||
+                                        "Not Assigned"}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      {booking.vendorAssigned
+                                        ?.businessAddress || "Not Available"}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      {new Date(
+                                        booking.dateTime
+                                      ).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      <span
                                         style={{
-                                          fontSize: "14px",
-                                          color: "#4880FF",
-                                          border: "1px solid #4880FF",
-                                          borderRadius: "50%",
-                                          padding: "1px",
+                                          backgroundColor:
+                                            booking.bookingStatus ===
+                                            "Confirmed"
+                                              ? "#e6f7ee"
+                                              : booking.bookingStatus ===
+                                                "Pending"
+                                              ? "#fff8e6"
+                                              : booking.bookingStatus ===
+                                                "Completed"
+                                              ? "#e6f0ff"
+                                              : "#ffebeb",
+                                          color:
+                                            booking.bookingStatus ===
+                                            "Confirmed"
+                                              ? "#1d9d74"
+                                              : booking.bookingStatus ===
+                                                "Pending"
+                                              ? "#ff9800"
+                                              : booking.bookingStatus ===
+                                                "Completed"
+                                              ? "#3366ff"
+                                              : "#ff4d4f",
+                                          padding: "2px 6px",
+                                          borderRadius: "4px",
+                                          fontSize: "10px",
                                         }}
-                                      ></i> */}
-                                      <img
-                                        src={check}
-                                        alt="Download"
-                                        style={{ width: "15px", height: "15px" }}
-                                      />
-                                    </Button>
-
-                                    {/* Download button */}
-                                    {/* <Button
-                                      icon="pi pi-download"
-                                      className="p-button-text p-button-sm"
+                                      >
+                                        {booking.bookingStatus}
+                                      </span>
+                                    </td>
+                                    <td
                                       style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                        border: "1px solid #ddd",
-                                        borderRadius: "50%",
+                                        padding: "8px",
+                                        fontSize: "11px",
                                       }}
-                                      tooltip="Download"
-                                      tooltipOptions={{ position: "top" }}
-                                    /> */}
-                                    <img
-                                      src={downloadIcon}
-                                      alt="Download"
-                                      style={{ width: "15px", height: "15px" }}
-                                    />
-
-                                    {/* Upload button */}
-                                    <Button
-                                      className="p-button-text p-button-sm"
-                                      style={{
-                                        width: "20px",
-                                        height: "20px",
-                                        padding: "1px",
-                                        border: "1px solid #ddd",
-                                        borderRadius: "50%",
-                                      }}
-                                      tooltip="Upload Booking"
-                                      tooltipOptions={{ position: "top" }}
-                                      onClick={() => handleUploadBooking(booking)}
                                     >
-                                      <img
-                                        src={uploadBooking}
-                                        alt="Upload"
-                                        style={{ width: "15px", height: "15px" }}
-                                      />
-                                    </Button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
+                                      {booking.internalNotes || "No notes"}
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "6px",
+                                        borderBottom: "1px solid #eee",
+                                      }}
+                                    >
+                                      <div
+                                        style={{ display: "flex", gap: "3px" }}
+                                      >
+                                        {/* View button */}
+                                        <Button
+                                          className="p-button-text p-button-sm"
+                                          style={{
+                                            width: "20px",
+                                            height: "20px",
+                                            padding: "1px",
+                                          }}
+                                          tooltip="View Details"
+                                          tooltipOptions={{ position: "top" }}
+                                          onClick={() =>
+                                            handleViewBooking(booking)
+                                          }
+                                        >
+                                          <div
+                                            style={{ backgroundColor: "white" }}
+                                          >
+                                            <img
+                                              src={eyeblock}
+                                              alt="View"
+                                              style={{
+                                                width: "15px",
+                                                height: "15px",
+                                              }}
+                                            />
+                                          </div>
+                                        </Button>
+
+                                        {/* Edit button */}
+                                        <Button
+                                          className="p-button-text p-button-sm"
+                                          style={{
+                                            width: "20px",
+                                            height: "20px",
+                                            padding: "1px",
+                                          }}
+                                          tooltip="Edit"
+                                          tooltipOptions={{ position: "top" }}
+                                          onClick={() =>
+                                            handleEditBooking(booking)
+                                          }
+                                        >
+                                          <img
+                                            src={editLogo}
+                                            alt="Edit"
+                                            style={{
+                                              width: "15px",
+                                              height: "15px",
+                                            }}
+                                          />
+                                        </Button>
+                                        <Button
+                                          className="p-button-text p-button-sm"
+                                          style={{
+                                            width: "20px",
+                                            height: "20px",
+                                            padding: "1px",
+                                          }}
+                                          tooltip="Edit"
+                                          tooltipOptions={{ position: "top" }}
+                                          // onClick={() => handleEditBooking(booking)}
+                                        >
+                                          <img
+                                            src={times}
+                                            alt="times"
+                                            style={{
+                                              width: "15px",
+                                              height: "15px",
+                                            }}
+                                          />
+                                        </Button>
+
+                                        {/* Status button */}
+                                        <Button
+                                          className="p-button-text p-button-sm"
+                                          style={{
+                                            width: "20px",
+                                            height: "20px",
+                                            padding: "1px",
+                                          }}
+                                          tooltip="Change Status"
+                                          tooltipOptions={{ position: "top" }}
+                                          onClick={(e) => {
+                                            setSelectedBookingForStatus(
+                                              booking
+                                            );
+                                            statusMenuRef.current.toggle(e);
+                                          }}
+                                        >
+                                          {/* <i
+                                          className="pi pi-check-circle"
+                                          style={{
+                                            fontSize: "14px",
+                                            color: "#4880FF",
+                                            border: "1px solid #4880FF",
+                                            borderRadius: "50%",
+                                            padding: "1px",
+                                          }}
+                                        ></i> */}
+                                          <img
+                                            src={check}
+                                            alt="Download"
+                                            style={{
+                                              width: "15px",
+                                              height: "15px",
+                                            }}
+                                          />
+                                        </Button>
+
+                                        {/* Download button */}
+                                        {/* <Button
+                                        icon="pi pi-download"
+                                        className="p-button-text p-button-sm"
+                                        style={{
+                                          width: "20px",
+                                          height: "20px",
+                                          padding: "1px",
+                                          border: "1px solid #ddd",
+                                          borderRadius: "50%",
+                                        }}
+                                        tooltip="Download"
+                                        tooltipOptions={{ position: "top" }}
+                                      /> */}
+                                        <img
+                                          src={downloadIcon}
+                                          alt="Download"
+                                          style={{
+                                            width: "15px",
+                                            height: "15px",
+                                          }}
+                                        />
+
+                                        {/* Upload button */}
+                                        <Button
+                                          className="p-button-text p-button-sm"
+                                          style={{
+                                            width: "20px",
+                                            height: "20px",
+                                            padding: "1px",
+                                            border: "1px solid #ddd",
+                                            borderRadius: "50%",
+                                          }}
+                                          tooltip="Upload Booking"
+                                          tooltipOptions={{ position: "top" }}
+                                          onClick={() =>
+                                            handleUploadBooking(booking)
+                                          }
+                                        >
+                                          <img
+                                            src={uploadBooking}
+                                            alt="Upload"
+                                            style={{
+                                              width: "15px",
+                                              height: "15px",
+                                            }}
+                                          />
+                                        </Button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
                           </tbody>
                         </table>
+                      </div>
+                      <div
+                        style={{
+                          textAlign: "right",
+                          display: "flex",
+                          justifyContent: "flex-end",
+                          marginTop: "10px",
+                          width: "100%",
+                        }}
+                      >
+                        <button
+                          className="p-button-text p-button-sm"
+                          onClick={() => setShowAddBookingModal(true)}
+                          style={{
+                            backgroundColor: "#0387D9",
+                            color: "white",
+                            borderRadius: "5px",
+                            padding: "5px 10px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: "5px",
+                            border: "1px solid #0387D9",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <img src={plus} alt="Add Booking" />
+                          Add Booking
+                        </button>
+                      </div>
+                      {/* Pagination component */}
+                      <div
+                        className="pagination-container"
+                        style={{
+                          padding: "1rem",
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                          borderTop: "1px solid #eee",
+                          marginTop: "1rem",
+                        }}
+                      >
+                        <div className="flex justify-content-between align-items-center">
+                          <div className="flex align-items-center gap-2">
+                            <span
+                              style={{
+                                color:
+                                  theme === "light" ? "#103B57" : "#FFFFFF",
+                              }}
+                            >
+                              Rows per page:
+                            </span>
+                            <Dropdown
+                              value={pageSize}
+                              options={[5, 10, 15, 20, 30, 50]}
+                              onChange={(e) => {
+                                setPageSize(e.value);
+                                setCurrentPage(1);
+                              }}
+                              className="p-inputtext-sm"
+                            />
+                          </div>
+
+                          <div className="flex align-items-center gap-3">
+                            <Button
+                              icon="pi pi-angle-left"
+                              onClick={() =>
+                                setCurrentPage((prev) => Math.max(1, prev - 1))
+                              }
+                              disabled={currentPage === 1}
+                              className="p-button-text"
+                            />
+                            <span
+                              style={{
+                                color:
+                                  theme === "light" ? "#103B57" : "#FFFFFF",
+                              }}
+                            >
+                              Page {currentPage} of{" "}
+                              {Math.ceil(totalRecords / pageSize)}
+                            </span>
+                            <Button
+                              icon="pi pi-angle-right"
+                              onClick={() => setCurrentPage((prev) => prev + 1)}
+                              disabled={
+                                currentPage >=
+                                Math.ceil(totalRecords / pageSize)
+                              }
+                              className="p-button-text"
+                            />
+                            <span
+                              className="text-sm"
+                              style={{
+                                color:
+                                  theme === "light" ? "#103B57" : "#FFFFFF",
+                              }}
+                            >
+                              Total Records: {totalRecords}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Mobile view */}
                   <div className="mobile-view">
-                    {bookings.map((booking, index) => (
+                    {bookingData.map((booking, index) => (
                       <div key={index} className="mobile-booking-wrapper">
                         {renderResponsiveBookingRow(booking)}
                       </div>
@@ -1090,14 +1507,11 @@ const Bookings = () => {
                   Date
                 </label>
                 <div className="view-field">
-                  {new Date(viewBooking.bookingDate).toLocaleDateString(
-                    "en-US",
-                    {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    }
-                  )}
+                  {new Date(viewBooking.dateTime).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </div>
               </div>
               <div
@@ -1119,27 +1533,27 @@ const Bookings = () => {
                   <span
                     style={{
                       backgroundColor:
-                        viewBooking.status === "confirmed"
+                        viewBooking.bookingStatus === "confirmed"
                           ? "#e6f7ee"
-                          : viewBooking.status === "pending"
+                          : viewBooking.bookingStatus === "pending"
                           ? "#fff8e6"
-                          : viewBooking.status === "completed"
+                          : viewBooking.bookingStatus === "completed"
                           ? "#e6f0ff"
-                          : viewBooking.status === "in progress"
+                          : viewBooking.bookingStatus === "in progress"
                           ? "#e6f7ff"
-                          : viewBooking.status === "flagged"
+                          : viewBooking.bookingStatus === "flagged"
                           ? "#ffe6e6"
                           : "#ffebeb",
                       color:
-                        viewBooking.status === "confirmed"
+                        viewBooking.bookingStatus === "confirmed"
                           ? "#1d9d74"
-                          : viewBooking.status === "pending"
+                          : viewBooking.bookingStatus === "pending"
                           ? "#ff9800"
-                          : viewBooking.status === "completed"
+                          : viewBooking.bookingStatus === "completed"
                           ? "#3366ff"
-                          : viewBooking.status === "in progress"
+                          : viewBooking.bookingStatus === "in progress"
                           ? "#0099cc"
-                          : viewBooking.status === "flagged"
+                          : viewBooking.bookingStatus === "flagged"
                           ? "#ff4d4f"
                           : "#ff4d4f",
                       padding: "4px 8px",
@@ -1147,7 +1561,7 @@ const Bookings = () => {
                       fontSize: "0.8rem",
                     }}
                   >
-                    {viewBooking.status}
+                    {viewBooking.bookingStatus}
                   </span>
                 </div>
               </div>
@@ -1426,6 +1840,128 @@ const Bookings = () => {
             </div>
           </div>
         )}
+      </Dialog>
+
+      {/* Add Booking Modal */}
+      <Dialog
+        visible={showAddBookingModal}
+        onHide={() => setShowAddBookingModal(false)}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header="Add New Booking"
+        className="booking-dialog"
+      >
+        <div className="p-fluid grid formgrid">
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="serviceType">Service Type</label>
+            <Dropdown
+              id="serviceType"
+              value={newBooking.serviceType}
+              options={getFormattedServices()}
+              onChange={(e) => {
+                console.log("Selected Service:", e.value);
+                const selectedService = getFormattedServices().find(
+                  (s) => s.value === e.value
+                );
+                console.log("Service Details:", selectedService);
+
+                handleNewBookingChange("serviceType", e.value);
+                // Auto-populate vendor and location
+                if (selectedService) {
+                  handleNewBookingChange(
+                    "vendorAssigned",
+                    selectedService.vendorName
+                  );
+                  handleNewBookingChange(
+                    "vesselLocation",
+                    selectedService.businessAddress
+                  );
+                }
+              }}
+              placeholder="Select a service"
+              optionLabel="label"
+            />
+          </div>
+
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="vendorAssigned">Vendor Assigned</label>
+            <InputText
+              id="vendorAssigned"
+              value={newBooking.vendorAssigned}
+              disabled
+              placeholder="Vendor will be auto-assigned"
+            />
+          </div>
+
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="vesselLocation">Vessel Location</label>
+            <InputText
+              id="vesselLocation"
+              value={newBooking.vesselLocation}
+              disabled
+              placeholder="Location will be auto-assigned"
+            />
+          </div>
+
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="dateTime">Date & Time</label>
+            <Calendar
+              id="dateTime"
+              value={newBooking.dateTime}
+              onChange={(e) => handleNewBookingChange("dateTime", e.value)}
+              showTime
+              placeholder="March-15-2025 - 10:30 Pm"
+            />
+          </div>
+
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="bookingStatus">Booking Status</label>
+            <Dropdown
+              id="bookingStatus"
+              value={newBooking.bookingStatus}
+              options={["Cancel", "Pending", "Confirmed", "Completed"]}
+              onChange={(e) => handleNewBookingChange("bookingStatus", e.value)}
+              placeholder="Select Status"
+            />
+          </div>
+
+          <div className="col-12 md:col-6 field">
+            <label htmlFor="internalNotes">
+              Internal Notes & Comments Section
+            </label>
+            <InputText
+              id="internalNotes"
+              value={newBooking.internalNotes}
+              onChange={(e) =>
+                handleNewBookingChange("internalNotes", e.target.value)
+              }
+              placeholder="Leave a note here..."
+            />
+          </div>
+        </div>
+
+        <div
+          className="dialog-footer"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "1rem",
+            marginTop: "2rem",
+          }}
+        >
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            onClick={() => setShowAddBookingModal(false)}
+            className="p-button-danger"
+            style={{ backgroundColor: "#EF4444", border: "none" }}
+          />
+          <Button
+            label="Save"
+            icon="pi pi-check"
+            onClick={handleCreateBooking}
+            style={{ backgroundColor: "#0387D9", border: "none" }}
+          />
+        </div>
       </Dialog>
     </>
   );

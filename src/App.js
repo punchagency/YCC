@@ -96,7 +96,6 @@ import { ToastProvider } from "./components/Toast";
 import AdminFinancialManagement from "./pages/dashboard/admin/financial-management/admin-financial-management";
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 import Profile from "./pages/profile/profile"; 
-//context imports
 
 function App() {
   return (

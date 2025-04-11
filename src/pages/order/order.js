@@ -163,9 +163,9 @@ let allProductOptions = []
         ],
       });
     } else {
-      setOrderForm({
-        ...orderForm,
-        [field]: e.value,
+    setOrderForm({
+      ...orderForm,
+      [field]: e.value,
       });
     }
   };
@@ -229,13 +229,13 @@ let allProductOptions = []
       if (response.status) {
         showSuccess("Order created successfully");
 
-        // Reset form
-        setOrderForm({
-          customerName: "",
+    // Reset form
+    setOrderForm({
+      customerName: "",
           products: [{ id: null, quantity: 1 }],
-          deliveryDate: null,
+      deliveryDate: null,
           additionalNotes: "",
-        });
+    });
 
         setShowOrderForm(false);
         fetchOrders();
@@ -260,7 +260,7 @@ let allProductOptions = []
 
   // Render mobile summary boxes
   const renderMobileSummaryBoxes = () => {
-    return (
+  return (
       <div style={{ padding: "0 10px" }}>
         {/* First summary box */}
         <div
@@ -292,8 +292,8 @@ let allProductOptions = []
                 alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
               />
-            </div>
-          </div>
+        </div>
+      </div>
 
           <div
             style={{
@@ -302,7 +302,7 @@ let allProductOptions = []
               textAlign: "center",
             }}
           >
-            <div>
+      <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -312,7 +312,7 @@ let allProductOptions = []
                 {summaryData.allOrders}
               </p>
             </div>
-            <div>
+        <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -321,7 +321,7 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.pending}
               </p>
-            </div>
+        </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -345,11 +345,11 @@ let allProductOptions = []
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -358,15 +358,15 @@ let allProductOptions = []
               alt="lockLogo"
               style={{ width: "20px", height: "20px" }}
             />
-            <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
-              />
+                />
+              </div>
             </div>
-          </div>
 
           <div
             style={{
@@ -375,7 +375,7 @@ let allProductOptions = []
               textAlign: "center",
             }}
           >
-            <div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -384,8 +384,8 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.cancelled}
               </p>
-            </div>
-            <div>
+              </div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -394,8 +394,8 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.returned}
               </p>
-            </div>
-            <div>
+              </div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -404,9 +404,9 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.damaged}
               </p>
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Third summary box */}
         <div
@@ -418,11 +418,11 @@ let allProductOptions = []
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+            <div  
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -446,9 +446,9 @@ let allProductOptions = []
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               textAlign: "center",
-            }}
-          >
-            <div>
+              }}
+            >
+              <div>
               <p
                 style={{
                   margin: "0 0 5px 0",
@@ -461,7 +461,7 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 0
               </p>
-            </div>
+              </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -735,19 +735,19 @@ let allProductOptions = []
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-                      <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                        <img
-                          src={dropdown}
-                          alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                        />
-                      </div>
-                    </div>
+                />
+              </div>
+            </div>
 
                     <div
                       style={{
@@ -756,7 +756,7 @@ let allProductOptions = []
                         textAlign: "center",
                       }}
                     >
-                      <div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -775,8 +775,8 @@ let allProductOptions = []
                         >
                           {summaryData.allOrders}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -795,8 +795,8 @@ let allProductOptions = []
                         >
                           {summaryData.pending}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -815,9 +815,9 @@ let allProductOptions = []
                         >
                           {summaryData.completed}
                         </p>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
 
                   {/* Second summary box */}
                   <div
@@ -834,11 +834,11 @@ let allProductOptions = []
                         color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -847,19 +847,19 @@ let allProductOptions = []
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-                      <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                        <img
-                          src={dropdown}
-                          alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                        />
-                      </div>
-                    </div>
+                />
+              </div>
+            </div>
 
                     <div
                       style={{
@@ -868,7 +868,7 @@ let allProductOptions = []
                         textAlign: "center",
                       }}
                     >
-                      <div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -887,8 +887,8 @@ let allProductOptions = []
                         >
                           {summaryData.cancelled}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -907,7 +907,7 @@ let allProductOptions = []
                         >
                           {summaryData.returned}
                         </p>
-                      </div>
+              </div>
                       <div>
                         <p
                           style={{
@@ -927,15 +927,15 @@ let allProductOptions = []
                         >
                           {summaryData.damaged}
                         </p>
-                      </div>
-                    </div>
-                  </div>
+            </div>
+          </div>
+        </div>
 
                   {/* Third summary box */}
                   <div
-                    style={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "8px",
                       padding: "15px",
                       marginBottom: "15px",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -945,13 +945,13 @@ let allProductOptions = []
                         theme === "light" ? "#FFFFFF" : "#03141F",
                         color: theme === "light" ? "#103B57" : "#FFFFFF",
 
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -972,10 +972,10 @@ let allProductOptions = []
                           }}
                         />
                       </div>
-                    </div>
+                </div>
 
-                    <div
-                      style={{
+                  <div
+                    style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
                         textAlign: "center",
@@ -983,7 +983,7 @@ let allProductOptions = []
                     >
                       <div>
                         <p
-                          style={{
+                        style={{
                             margin: "0 0 5px 0",
                             fontSize: "13px",
                             color: "#EF4444",
@@ -1089,7 +1089,7 @@ let allProductOptions = []
                             <button className="action-btn" title="Edit Order">
                               <i className="pi pi-pencil" />
                             </button>
-                          </div>
+                    </div>
                         </td> */}
                       </tr>
                     ))}
@@ -1153,19 +1153,19 @@ let allProductOptions = []
                 </div>
               </div>
 
-              {/* Stock Quantity and Select Product */}
+                  {/* Stock Quantity and Select Product */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="quantity">Quantity*</label>
-                  <InputText
+                      <InputText
                     id="quantity"
                     name="quantity"
                     value={orderForm.products[0].quantity}
                     onChange={handleQuantityChange}
-                    placeholder="Enter quantity"
-                    keyfilter="pint"
-                  />
-                </div>
+                        placeholder="Enter quantity"
+                        keyfilter="pint"
+                      />
+                    </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Select Product*</label>
                   <Dropdown
@@ -1181,29 +1181,29 @@ let allProductOptions = []
                 </div>
               </div>
 
-              {/* Order Status and Delivery Date */}
+                  {/* Order Status and Delivery Date */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="orderStatus">Order Status*</label>
-                  <Dropdown
-                    id="orderStatus"
-                    value={orderForm.orderStatus}
-                    options={statusOptions}
-                    onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                    placeholder="Select status"
-                  />
-                </div>
+                      <Dropdown
+                        id="orderStatus"
+                        value={orderForm.orderStatus}
+                        options={statusOptions}
+                        onChange={(e) => handleDropdownChange(e, "orderStatus")}
+                        placeholder="Select status"
+                      />
+                    </div>
                 <div className="p-field">
                   <label htmlFor="deliveryDate">Delivery Date*</label>
-                  <Calendar
-                    id="deliveryDate"
-                    value={orderForm.deliveryDate}
-                    onChange={handleDateChange}
-                    showIcon
-                    placeholder="Select date"
-                  />
-                </div>
-              </div>
+                      <Calendar
+                        id="deliveryDate"
+                        value={orderForm.deliveryDate}
+                        onChange={handleDateChange}
+                        showIcon
+                        placeholder="Select date"
+                      />
+                    </div>
+                  </div>
 
               {/* Notes */}
               <div className="p-field">
@@ -1218,25 +1218,25 @@ let allProductOptions = []
               </div>
 
               <div className="dialog-footer">
-                <Button
-                  label="Cancel"
-                  icon="pi pi-times"
+                    <Button
+                      label="Cancel"
+                      icon="pi pi-times"
                   onClick={() => setShowOrderModal(false)}
                   className="p-button-danger"
-                />
-                <Button
-                  label="Create Order"
-                  icon="pi pi-check"
-                  onClick={() => {
-                    handleSubmit();
+                    />
+                    <Button
+                      label="Create Order"
+                      icon="pi pi-check"
+                      onClick={() => {
+                        handleSubmit();
                     setShowOrderModal(false);
                   }}
                   className="p-button-primary"
-                />
-              </div>
-            </div>
+                    />
+                  </div>
+                </div>
           </Dialog>
-        </div>
+              </div>
       </div>
     </>
   );

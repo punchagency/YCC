@@ -765,14 +765,14 @@ export default function CalendarPage() {
                       }}
                     ></div>
                   )}
-                  <EventCard
-                    title={event.title}
+              <EventCard
+                title={event.title}
                     start={event.start}
-                    location={event.location}
+                location={event.location}
                     description={event.description}
-                  />
-                </React.Fragment>
-              ))}
+              />
+            </React.Fragment>
+          ))}
 
               {/* Show See More button if there are more than 2 events */}
               {calendarEvents.data.length > 2 && (
@@ -794,9 +794,9 @@ export default function CalendarPage() {
                       fontWeight: 500,
                     }}
                   >
-                    See More Events
-                  </button>
-                </div>
+              See More Events
+            </button>
+          </div>
               )}
             </>
           )}
@@ -963,16 +963,16 @@ export default function CalendarPage() {
                 const dayEvents = getEventsForDay(day);
 
                 return (
-                  <div
-                    key={`current-${day}`}
-                    style={{
-                      backgroundColor: "white",
+                <div
+                  key={`current-${day}`}
+                  style={{
+                    backgroundColor: "white",
                       padding: isMobile ? "4px 2px" : "8px",
-                      position: "relative",
-                      cursor: "pointer",
+                    position: "relative",
+                    cursor: "pointer",
                       border:
                         day === selectedDay ? "1px solid #0387D9" : "none",
-                      backgroundColor:
+                    backgroundColor:
                         day === selectedDay
                           ? "rgba(3, 135, 217, 0.1)"
                           : "white",
@@ -980,24 +980,24 @@ export default function CalendarPage() {
                       overflow: "hidden",
                     }}
                     onClick={() => handleDayClick(day)}
-                  >
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                         width: isMobile ? "20px" : "28px",
                         height: isMobile ? "20px" : "28px",
-                        borderRadius: "50%",
-                        fontWeight: 500,
+                      borderRadius: "50%",
+                      fontWeight: 500,
                         backgroundColor: isToday(day)
                           ? "#0387D9"
                           : "transparent",
-                        color: isToday(day) ? "white" : "inherit",
-                      }}
-                    >
-                      {day}
-                    </span>
+                      color: isToday(day) ? "white" : "inherit",
+                    }}
+                  >
+                    {day}
+                  </span>
 
                     {/* Show actual events instead of static ones */}
                     {!isMobile &&
@@ -1006,16 +1006,16 @@ export default function CalendarPage() {
                           key={event._id}
                           style={{ marginTop: index === 0 ? "5px" : "2px" }}
                         >
-                          <div
-                            style={{
-                              marginBottom: "3px",
-                              padding: "3px 6px",
-                              borderRadius: "4px",
-                              fontSize: "11px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              color: "white",
+                      <div
+                        style={{
+                          marginBottom: "3px",
+                          padding: "3px 6px",
+                          borderRadius: "4px",
+                          fontSize: "11px",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          color: "white",
                               backgroundColor:
                                 event.type === "meeting"
                                   ? "#0387D9"
@@ -1027,8 +1027,8 @@ export default function CalendarPage() {
                             }}
                           >
                             {event.title}
-                          </div>
-                        </div>
+                      </div>
+                    </div>
                       ))}
 
                     {/* For mobile, just show a dot if there are events */}
@@ -1042,8 +1042,8 @@ export default function CalendarPage() {
                           margin: "2px auto 0",
                         }}
                       ></div>
-                    )}
-                  </div>
+                  )}
+                </div>
                 );
               })}
 
@@ -1079,9 +1079,9 @@ export default function CalendarPage() {
 
             {/* Calendar Footer with Legend */}
             <div style={{ marginTop: "15px" }}>
-              <div
-                style={{
-                  display: "flex",
+                <div
+                  style={{
+                    display: "flex",
                   gap: isMobile ? "10px" : "15px",
                   flexWrap: "wrap",
                   justifyContent: isMobile ? "center" : "flex-start",
@@ -1090,19 +1090,19 @@ export default function CalendarPage() {
                 {getUniqueEventTypes().map((type) => (
                   <div
                     key={type}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
                       fontSize: isMobile ? "10px" : "12px",
-                      color: "#667085",
-                    }}
-                  >
-                    <span
-                      style={{
+                    color: "#667085",
+                  }}
+                >
+                  <span
+                    style={{
                         width: isMobile ? "10px" : "12px",
                         height: isMobile ? "10px" : "12px",
-                        borderRadius: "50%",
-                        marginRight: "5px",
+                      borderRadius: "50%",
+                      marginRight: "5px",
                         backgroundColor:
                           type === "meeting"
                             ? "#0387D9"
@@ -1111,10 +1111,10 @@ export default function CalendarPage() {
                             : type === "workshop"
                             ? "#F79009"
                             : "#F04438",
-                      }}
-                    ></span>
+                    }}
+                  ></span>
                     <span style={{ textTransform: "capitalize" }}>{type}</span>
-                  </div>
+                </div>
                 ))}
               </div>
             </div>

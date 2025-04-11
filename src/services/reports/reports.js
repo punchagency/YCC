@@ -204,7 +204,8 @@ const downloadFinancialReport = async () => {
     console.error("Error response:", error.response);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to download financial report",
+      error:
+        error.response?.data?.message || "Failed to download financial report",
     };
   }
 };
@@ -300,7 +301,8 @@ const downloadBookingExcel = async () => {
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to download booking excel",
+      error:
+        error.response?.data?.message || "Failed to download booking excel",
     };
   }
 };
@@ -331,7 +333,8 @@ const downloadFinancialExcel = async () => {
   } catch (error) {
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to download financial excel",
+      error:
+        error.response?.data?.message || "Failed to download financial excel",
     };
   }
 };
