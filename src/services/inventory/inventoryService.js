@@ -55,7 +55,7 @@ export const createInventoryData = async (inventoryData) => {
 
     // Format data to match API requirements with supplier field
     const formattedData = {
-      supplier: SUPPLIER_ID, // Add the supplier field that the backend requires
+      supplier: inventoryData.supplierId, // Add the supplier field that the backend requires
       quantity: parseInt(inventoryData.quantity || inventoryData.stockQuantity),
       price: parseFloat(inventoryData.price),
       serviceArea: inventoryData.serviceArea,

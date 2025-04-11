@@ -84,107 +84,62 @@ let allProductOptions = []
     additionalNotes: "",
   });
 
+  const runCount = useRef(0);
+
   // Add useEffect to fetch inventory data when component mounts
   useEffect(() => {
-    fetchInventoryData();
-    fetchOrders();
-    fetchAllInventoryItems();
+    const fetchData = async () => {
+      await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
+      await fetchOrders(); // if needed
+    };
   
-    // Store full supplier and product objects in the maps
+    if (runCount.current < 1) {
+      runCount.current += 1;
+      fetchData();
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (!allInventoryItems || allInventoryItems.length === 0) return;
+  
+    const suppliersMap = new Map();
+    const productsMap = new Map();
+  
     allInventoryItems.forEach((item) => {
-      if (item.supplier) allSuppliersMap.set(item.supplier._id, item.supplier); // Store entire supplier object
-      if (item.product) allProductsMap.set(item.product._id, item.product); // Store entire product object
+      if (item.supplier) suppliersMap.set(item.supplier._id, item.supplier);
+      if (item.product) productsMap.set(item.product._id, item.product);
     });
   
-    // Convert the maps to arrays, including both ID and name
-    const allSupplierOptions = Array.from(allSuppliersMap.values()).map((supplier) => ({
+    const supplierOptions = Array.from(suppliersMap.values()).map((supplier) => ({
       label: supplier.businessName,
-      value: supplier._id, // Use _id as the value
+      value: supplier._id,
     }));
   
-    const allProductOptions = Array.from(allProductsMap.values()).map((product) => ({
+    const productOptions = Array.from(productsMap.values()).map((product) => ({
       label: product.name,
-      value: product._id, // Use _id as the value
+      value: product._id,
     }));
   
-    // Set the state for both dropdown options
-    setSupplierOptions(allSupplierOptions);
-    setProductOptions(allProductOptions);
-  
+    setSupplierOptions(supplierOptions);
+    setProductOptions(productOptions);
+    setLoading(false);
   }, [allInventoryItems]);
   
-    useEffect(() => {
-      if (selectedSupplier) {
-        const filteredProducts = allInventoryItems
-          .filter(item => item.supplier?._id === selectedSupplier._id)
-          .map(item => item.product);
-    
-        const uniqueProducts = Array.from(
-          new Map(filteredProducts.map(p => [p._id, p])).values()
-        );
-    
-        setProductOptions(uniqueProducts);
-      } else {
-        setProductOptions(allProductOptions);
-      }
-    }, [selectedSupplier]);
     
     useEffect(() => {
       if (selectedProduct) {
-        const filteredSuppliers = allInventoryItems
-          .filter(item => item.product?._id === selectedProduct._id)
-          .map(item => item.supplier);
-    
-        const uniqueSuppliers = Array.from(
-          new Map(filteredSuppliers.map(s => [s._id, s])).values()
+        console.log('selectedProduct', selectedProduct);
+        const match = allInventoryItems.find(
+          item => item.product?._id === selectedProduct
         );
-    
-        setSupplierOptions(uniqueSuppliers);
-      } else {
-        setSupplierOptions(allSupplierOptions);
+        console.log('match', match);
+        if (match?.supplier?._id) {
+          setSelectedSupplier(match.supplier._id);
+        }
       }
     }, [selectedProduct]);
     
 
-
-
-  // Function to fetch inventory data and format it for dropdown
-  const fetchInventoryData = async () => {
-    try {
-      const result = await getInventoryData();
-      //console.log("API Response:", result);
-
-      if (result.success) {
-        const inventoryData = result.data || [];
-        if (!Array.isArray(inventoryData)) {
-          console.error("Inventory data is not an array:", inventoryData);
-          return;
-        }
-
-        // Transform inventory data into product options
-        const options = inventoryData.map((item) => ({
-          label: item.product?.name || "Unknown Product",
-          value: item._id, // This is the inventory ID
-          productId: item.product?._id, // Add the actual product ID
-          price: item.price,
-          quantity: item.quantity,
-          category: item.product?.category,
-          serviceArea: item.product?.serviceArea,
-        }));
-
-      } else {
-        console.error("Failed to load inventory data:", result.error);
-        {
-          showError("Failed to load product data");
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching inventory data:", error);
-      {
-        showError("An unexpected error occurred while loading product data");
-      }
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -221,7 +176,7 @@ let allProductOptions = []
       products: [
         {
           ...orderForm.products[0],
-          quantity: parseInt(e.target.value) || 1,
+          quantity: parseInt(e.target.value) || 0,
         },
       ],
     });
@@ -239,9 +194,14 @@ let allProductOptions = []
       !selectedSupplier ||
       !selectedProduct ||
       !orderForm.customerName ||
-      !orderForm.deliveryDate
+      !orderForm.deliveryDate 
     ) {
       showError("Please fill in all required fields");
+      return;
+    }
+
+    if (orderForm.products[0].quantity === 0) {
+      showError("Quantity cannot be 0");
       return;
     }
 
@@ -266,7 +226,7 @@ let allProductOptions = []
       const response = await createOrder(orderData);
       console.log("Order response:", response);
 
-      if (response.success) {
+      if (response.status) {
         showSuccess("Order created successfully");
 
         // Reset form
@@ -278,6 +238,7 @@ let allProductOptions = []
         });
 
         setShowOrderForm(false);
+        fetchOrders();
        
       } else {
         showError(response.error || "Failed to create order");
@@ -686,7 +647,7 @@ let allProductOptions = []
     );
   };
 
-  return allInventoryItems?.length === 0 ? (
+  return loading ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
     </div>
@@ -1178,16 +1139,17 @@ let allProductOptions = []
                 </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Supplier Name*</label>
-                 {supplierOptions?.length > 0 ? <Dropdown
+                 <Dropdown
                     id="selectedProduct"
+                    disabled={true}
                     value={selectedSupplier}
                     options={supplierOptions.map(option => ({
                       label: option.label,
                       value: option.value
                     }))}
                     onChange={(e) => setSelectedSupplier(e.target.value)}
-                    placeholder="Select a supplier"
-                  /> : <Skeleton width="100%" height="40px" />}
+                    placeholder="supplier generated automatically"
+                  />
                 </div>
               </div>
 
@@ -1209,7 +1171,10 @@ let allProductOptions = []
                   <Dropdown
                     id="selectedProduct"
                     value={selectedProduct}
-                    options={productOptions}
+                    options={productOptions.map(option => ({
+                      label: option.label,
+                      value: option.value
+                    }))}
                     onChange={(e) => setSelectedProduct(e.target.value)}
                     placeholder="Select a product"
                   />
