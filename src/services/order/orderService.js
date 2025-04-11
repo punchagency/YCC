@@ -13,8 +13,15 @@ const getAuthHeader = () => {
 
 // Create a new order
 export const createOrder = async (orderData) => {
+  const { supplierId, products, customerName, deliveryDate, additionalNotes } = orderData;
   try {
-    const response = await axios.post(`${API_URL}/orders`, orderData, {
+    const response = await axios.post(`${API_URL}/orders`, {
+      supplierId,
+      products,
+      customerName,
+      deliveryDate,
+      additionalNotes,
+    }, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json',

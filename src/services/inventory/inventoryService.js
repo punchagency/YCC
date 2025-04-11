@@ -55,7 +55,7 @@ export const createInventoryData = async (inventoryData) => {
 
     // Format data to match API requirements with supplier field
     const formattedData = {
-      supplier: SUPPLIER_ID, // Add the supplier field that the backend requires
+      supplier: inventoryData.supplierId, // Add the supplier field that the backend requires
       quantity: parseInt(inventoryData.quantity || inventoryData.stockQuantity),
       price: parseFloat(inventoryData.price),
       serviceArea: inventoryData.serviceArea,
@@ -112,6 +112,37 @@ export const getInventoryData = async (params = {}) => {
   }
 };
 
+export const getAllInventoryItems = async () => {
+  try {
+    let allInventoryItems = [];
+    let page = 1;
+    let hasNextPage = true;
+  
+    while (hasNextPage) {
+      const response = await axios.get(`${API_URL}/inventory`, {
+        params: {
+          page,
+          pageSize: 10
+        },
+        headers: getAuthHeader(),
+      });
+      const inventoryItems = response.data.data;
+      allInventoryItems.push(...inventoryItems);
+  
+      const pagination = response.data.pagination;
+      hasNextPage = pagination?.hasNextPage;
+      page++;
+    }
+    
+    return allInventoryItems;
+  } catch (error) {
+    console.error("Error fetching all inventory items:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch all inventory items",
+    };
+  }
+}
 export const updateInventoryItem = async (id, itemData) => {
   try {
     const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
