@@ -263,7 +263,7 @@ let allProductOptions = []
       };
 
       console.log("Sending order data:", orderData);
-   /*   const response = await createOrder(orderData);
+      const response = await createOrder(orderData);
       console.log("Order response:", response);
 
       if (response.success) {
@@ -282,10 +282,8 @@ let allProductOptions = []
       } else {
         showError(response.error || "Failed to create order");
       }
-        */
     } catch (error) {
-      console.error("Error creating order:", error);
-      showError("An unexpected error occurred");
+      showError(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -688,7 +686,7 @@ let allProductOptions = []
     );
   };
 
-  return allInventoryItems.length === 0 ? (
+  return allInventoryItems?.length === 0 ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
     </div>
@@ -1180,10 +1178,13 @@ let allProductOptions = []
                 </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Supplier Name*</label>
-                 {supplierOptions.length > 0 ? <Dropdown
+                 {supplierOptions?.length > 0 ? <Dropdown
                     id="selectedProduct"
                     value={selectedSupplier}
-                    options={supplierOptions}
+                    options={supplierOptions.map(option => ({
+                      label: option.label,
+                      value: option.value
+                    }))}
                     onChange={(e) => setSelectedSupplier(e.target.value)}
                     placeholder="Select a supplier"
                   /> : <Skeleton width="100%" height="40px" />}
