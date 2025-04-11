@@ -147,20 +147,20 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
 
   // Share menu items
   const shareItems = [
-    {
-      label: "Email",
-      icon: "pi pi-envelope",
-      command: () => {
-        console.log("Share via email");
-      },
-    },
-    {
-      label: "Export as PDF",
-      icon: "pi pi-file-pdf",
-      command: () => {
-        setShowExportModal(true);
-      },
-    },
+   // {
+      //label: "Email",
+      //icon: "pi pi-envelope",
+      //command: () => {
+       // console.log("Share via email");
+      //},
+    //},
+   // {
+     // label: "Export as PDF",
+      //icon: "pi pi-file-pdf",
+      //command: () => {
+        //setShowExportModal(true);
+      //},
+    //},
     {
       label: "Export as Excel",
       icon: "pi pi-file-excel",
