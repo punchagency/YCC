@@ -81,7 +81,7 @@ const Order = () => {
       console.log("API Response:", result);
 
       if (result.success) {
-        const inventoryData = result.data.data.result || [];
+        const inventoryData = result.data || [];
         if (!Array.isArray(inventoryData)) {
           console.error("Inventory data is not an array:", inventoryData);
           return;
@@ -135,9 +135,9 @@ const Order = () => {
         ],
       });
     } else {
-      setOrderForm({
-        ...orderForm,
-        [field]: e.value,
+    setOrderForm({
+      ...orderForm,
+      [field]: e.value,
       });
     }
   };
@@ -195,15 +195,15 @@ const Order = () => {
       if (response.success) {
         showSuccess("Order created successfully");
 
-        // Reset form
-        setOrderForm({
-          customerName: "",
+    // Reset form
+    setOrderForm({
+      customerName: "",
           products: [{ id: null, quantity: 1 }],
-          deliveryDate: null,
+      deliveryDate: null,
           additionalNotes: "",
-        });
+    });
 
-        setShowOrderForm(false);
+    setShowOrderForm(false);
       } else {
         showError(response.error || "Failed to create order");
       }
@@ -225,7 +225,7 @@ const Order = () => {
 
   // Render mobile summary boxes
   const renderMobileSummaryBoxes = () => {
-    return (
+  return (
       <div style={{ padding: "0 10px" }}>
         {/* First summary box */}
         <div
@@ -257,8 +257,8 @@ const Order = () => {
                 alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
               />
-            </div>
-          </div>
+        </div>
+      </div>
 
           <div
             style={{
@@ -267,7 +267,7 @@ const Order = () => {
               textAlign: "center",
             }}
           >
-            <div>
+      <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -277,7 +277,7 @@ const Order = () => {
                 {summaryData.allOrders}
               </p>
             </div>
-            <div>
+        <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -286,7 +286,7 @@ const Order = () => {
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.pending}
               </p>
-            </div>
+        </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -310,11 +310,11 @@ const Order = () => {
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -323,15 +323,15 @@ const Order = () => {
               alt="lockLogo"
               style={{ width: "20px", height: "20px" }}
             />
-            <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
-              />
+                />
+              </div>
             </div>
-          </div>
 
           <div
             style={{
@@ -340,7 +340,7 @@ const Order = () => {
               textAlign: "center",
             }}
           >
-            <div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -349,8 +349,8 @@ const Order = () => {
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.cancelled}
               </p>
-            </div>
-            <div>
+              </div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -359,8 +359,8 @@ const Order = () => {
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.returned}
               </p>
-            </div>
-            <div>
+              </div>
+              <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -369,9 +369,9 @@ const Order = () => {
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.damaged}
               </p>
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Third summary box */}
         <div
@@ -383,11 +383,11 @@ const Order = () => {
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+            <div  
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -411,9 +411,9 @@ const Order = () => {
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               textAlign: "center",
-            }}
-          >
-            <div>
+              }}
+            >
+              <div>
               <p
                 style={{
                   margin: "0 0 5px 0",
@@ -426,7 +426,7 @@ const Order = () => {
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 0
               </p>
-            </div>
+              </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -700,19 +700,19 @@ const Order = () => {
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-                      <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                        <img
-                          src={dropdown}
-                          alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                        />
-                      </div>
-                    </div>
+                />
+              </div>
+            </div>
 
                     <div
                       style={{
@@ -721,7 +721,7 @@ const Order = () => {
                         textAlign: "center",
                       }}
                     >
-                      <div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -740,8 +740,8 @@ const Order = () => {
                         >
                           {summaryData.allOrders}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -760,8 +760,8 @@ const Order = () => {
                         >
                           {summaryData.pending}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -780,9 +780,9 @@ const Order = () => {
                         >
                           {summaryData.completed}
                         </p>
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
 
                   {/* Second summary box */}
                   <div
@@ -799,11 +799,11 @@ const Order = () => {
                         color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -812,19 +812,19 @@ const Order = () => {
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-                      <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                        <img
-                          src={dropdown}
-                          alt="dropdown"
+                <img
+                  src={dropdown}
+                  alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                        />
-                      </div>
-                    </div>
+                />
+              </div>
+            </div>
 
                     <div
                       style={{
@@ -833,7 +833,7 @@ const Order = () => {
                         textAlign: "center",
                       }}
                     >
-                      <div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -852,8 +852,8 @@ const Order = () => {
                         >
                           {summaryData.cancelled}
                         </p>
-                      </div>
-                      <div>
+              </div>
+              <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -872,7 +872,7 @@ const Order = () => {
                         >
                           {summaryData.returned}
                         </p>
-                      </div>
+              </div>
                       <div>
                         <p
                           style={{
@@ -892,15 +892,15 @@ const Order = () => {
                         >
                           {summaryData.damaged}
                         </p>
-                      </div>
-                    </div>
-                  </div>
+            </div>
+          </div>
+        </div>
 
                   {/* Third summary box */}
                   <div
-                    style={{
-                      backgroundColor: "white",
-                      borderRadius: "8px",
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "8px",
                       padding: "15px",
                       marginBottom: "15px",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -910,13 +910,13 @@ const Order = () => {
                         theme === "light" ? "#FFFFFF" : "#03141F",
                         color: theme === "light" ? "#103B57" : "#FFFFFF",
 
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -937,10 +937,10 @@ const Order = () => {
                           }}
                         />
                       </div>
-                    </div>
+                </div>
 
-                    <div
-                      style={{
+                  <div
+                    style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
                         textAlign: "center",
@@ -948,7 +948,7 @@ const Order = () => {
                     >
                       <div>
                         <p
-                          style={{
+                        style={{
                             margin: "0 0 5px 0",
                             fontSize: "13px",
                             color: "#EF4444",
@@ -1054,7 +1054,7 @@ const Order = () => {
                             <button className="action-btn" title="Edit Order">
                               <i className="pi pi-pencil" />
                             </button>
-                          </div>
+                    </div>
                         </td> */}
                       </tr>
                     ))}
@@ -1094,64 +1094,64 @@ const Order = () => {
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="customerName">Customer Name*</label>
-                  <InputText
-                    id="customerName"
-                    name="customerName"
-                    value={orderForm.customerName}
-                    onChange={handleInputChange}
-                    placeholder="Enter customer name"
-                  />
-                </div>
-              </div>
+                      <InputText
+                        id="customerName"
+                        name="customerName"
+                        value={orderForm.customerName}
+                        onChange={handleInputChange}
+                        placeholder="Enter customer name"
+                      />
+                    </div>
+                  </div>
 
-              {/* Stock Quantity and Select Product */}
+                  {/* Stock Quantity and Select Product */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="quantity">Quantity*</label>
-                  <InputText
+                      <InputText
                     id="quantity"
                     name="quantity"
                     value={orderForm.products[0].quantity}
                     onChange={handleQuantityChange}
-                    placeholder="Enter quantity"
-                    keyfilter="pint"
-                  />
-                </div>
+                        placeholder="Enter quantity"
+                        keyfilter="pint"
+                      />
+                    </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Select Product*</label>
-                  <Dropdown
-                    id="selectedProduct"
+                      <Dropdown
+                        id="selectedProduct"
                     value={orderForm.products[0].inventoryId}
-                    options={productOptions}
+                        options={productOptions}
                     onChange={(e) => handleDropdownChange(e, "selectedProduct")}
-                    placeholder="Select a product"
-                  />
-                </div>
-              </div>
+                        placeholder="Select a product"
+                      />
+                    </div>
+                  </div>
 
-              {/* Order Status and Delivery Date */}
+                  {/* Order Status and Delivery Date */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="orderStatus">Order Status*</label>
-                  <Dropdown
-                    id="orderStatus"
-                    value={orderForm.orderStatus}
-                    options={statusOptions}
-                    onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                    placeholder="Select status"
-                  />
-                </div>
+                      <Dropdown
+                        id="orderStatus"
+                        value={orderForm.orderStatus}
+                        options={statusOptions}
+                        onChange={(e) => handleDropdownChange(e, "orderStatus")}
+                        placeholder="Select status"
+                      />
+                    </div>
                 <div className="p-field">
                   <label htmlFor="deliveryDate">Delivery Date*</label>
-                  <Calendar
-                    id="deliveryDate"
-                    value={orderForm.deliveryDate}
-                    onChange={handleDateChange}
-                    showIcon
-                    placeholder="Select date"
-                  />
-                </div>
-              </div>
+                      <Calendar
+                        id="deliveryDate"
+                        value={orderForm.deliveryDate}
+                        onChange={handleDateChange}
+                        showIcon
+                        placeholder="Select date"
+                      />
+                    </div>
+                  </div>
 
               {/* Notes */}
               <div className="p-field">
@@ -1166,25 +1166,25 @@ const Order = () => {
               </div>
 
               <div className="dialog-footer">
-                <Button
-                  label="Cancel"
-                  icon="pi pi-times"
+                    <Button
+                      label="Cancel"
+                      icon="pi pi-times"
                   onClick={() => setShowOrderModal(false)}
                   className="p-button-danger"
-                />
-                <Button
-                  label="Create Order"
-                  icon="pi pi-check"
-                  onClick={() => {
-                    handleSubmit();
+                    />
+                    <Button
+                      label="Create Order"
+                      icon="pi pi-check"
+                      onClick={() => {
+                        handleSubmit();
                     setShowOrderModal(false);
                   }}
                   className="p-button-primary"
-                />
-              </div>
-            </div>
+                    />
+                  </div>
+                </div>
           </Dialog>
-        </div>
+              </div>
       </div>
     </>
   );
