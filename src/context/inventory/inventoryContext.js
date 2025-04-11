@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getLowInventory } from "../../services/inventory/inventoryService";
-
+import { getLowInventory, getAllInventoryItems } from "../../services/inventory/inventoryService";
 const InventoryContext = createContext();
 
 
@@ -17,6 +16,7 @@ export const InventoryProvider = ({ children }) => {
     const [lowInventory, setLowInventory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [allInventoryItems, setAllInventoryItems] = useState([]);
 
     const fetchLowInventory = async () => { 
         try {
@@ -30,11 +30,17 @@ export const InventoryProvider = ({ children }) => {
         }
     };
 
+    const fetchAllInventoryItems = async () => {
+        const response = await getAllInventoryItems();
+        setAllInventoryItems(response);
+    };
     const value = {
         lowInventory,
         loading,
         error,
         fetchLowInventory,
+        allInventoryItems,
+        fetchAllInventoryItems,
     };
 
     return (

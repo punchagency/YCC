@@ -14,11 +14,13 @@ import { OrderProvider } from "../context/order/orderContext";
 import { InvoiceProvider } from "../context/invoice/invoiceContext";
 import { InventoryProvider } from "../context/inventory/inventoryContext";
 import { CalendarProvider } from "../context/calendar/calendarContext";
+import { SupplierProvider } from "../context/supplier/supplierContext";
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <ThemeProvider>
     <ToastProvider>
+    <SupplierProvider>
     <TransactionProvider>
     <DashboardAIProvider>
     <InventoryProvider>
@@ -52,6 +54,7 @@ const AdminLayout = ({ role }) => {
     </InventoryProvider>
     </DashboardAIProvider>
     </TransactionProvider>
+    </SupplierProvider>
     </ToastProvider>
     </ThemeProvider>
   );
