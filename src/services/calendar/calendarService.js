@@ -49,3 +49,24 @@ export const fetchEvents = async (startDate, endDate) => {
     };
   }
 };
+
+export const addGuestService = async (eventId, guestEmails) => {
+  try {
+    const response = await axios.post(`${API_URL}/events/invite-guests`, {
+      eventId,
+      guestEmails,
+    }, {
+      headers: getAuthHeader(),
+    });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error adding guest:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to add guest",
+    };
+  }
+};
