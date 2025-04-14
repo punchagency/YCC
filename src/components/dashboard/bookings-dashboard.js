@@ -121,8 +121,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0].percentageLeft}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0].product.name} </DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0]?.product?.name || "N/A"} </DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -134,12 +134,12 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      {lowInventory[0].quantity} left from yesterday
+                      {lowInventory[0]?.quantity || "N/A"} left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#909ADE"
                       variant="determinate"
-                      value={lowInventory[0].percentageLeft}
+                      value={lowInventory[0]?.percentageLeft || 0}
                     />
                   </Box>
                 </Box>
@@ -170,8 +170,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1].percentageLeft}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1].product.name}</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1]?.product?.name || "N/A"}</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -183,12 +183,12 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      {lowInventory[1].quantity} left from yesterday
+                      {lowInventory[1]?.quantity || "N/A" } left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#D1D185"
                       variant="determinate"
-                      value={lowInventory[1].percentageLeft}
+                      value={lowInventory[1]?.percentageLeft || 0}
                     />
                   </Box>
                 </Box>
@@ -219,8 +219,8 @@ const Dashboard1 = () => {
                       gap: "10px",
                     }}
                   >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2].percentageLeft}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2].product.name}</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
+                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2]?.product?.name  || "N/A"}</DashBoardTitleInventoryText>
                   </Box>
 
                   <Box
@@ -232,12 +232,12 @@ const Dashboard1 = () => {
                   >
                     <span style={{ fontSize: "12px" }}>
                       {" "}
-                      {lowInventory[2].quantity} left from yesterday
+                      {lowInventory[2]?.quantity || "N/A"} left from yesterday
                     </span>
                     <CustomLinearProgress
                       color="#A2D4A2"
                       variant="determinate"
-                      value={lowInventory[2].percentageLeft}
+                      value={lowInventory[2]?.percentageLeft || 0}
                     />
                   </Box>
                 </Box>
