@@ -198,16 +198,15 @@ const ViewEventModal = ({ open, handleClose, event }) => {
                 gap={2}
                 alignItems="center"
               >
-                <Button
+                <CustomConfirmButton
                   variant="contained"
-                  color="primary"
                   onClick={() => {
                     handleAddGuestModal();
                     setEventId(e._id);
                   }}
                 >
                   Add Guests
-                </Button>
+                </CustomConfirmButton>
               </Box>
             </Box>
           ))
