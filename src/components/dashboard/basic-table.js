@@ -44,10 +44,19 @@ const rows = [
 ];
 
 const statusColors = {
-  in_progress: {backgroundColor: "#E2F9F0", color: "#1A9E6D"},
-  completed: {backgroundColor: "#5570F11A", color: "#3D56D8"},
-  pending: {backgroundColor: "#FFF3E4", color: "#896942"},
+  pending: { backgroundColor: "#FFF3E4", color: "#C97A00" },        // Orange/Amber
+  confirmed: { backgroundColor: "#E6F4FF", color: "#1E88E5" },      // Soft blue
+  shipped: { backgroundColor: "#E3F2FD", color: "#1976D2" },        // Medium blue
+  delivered: { backgroundColor: "#E2F9F0", color: "#1A9E6D" },      // Green
+  cancelled: { backgroundColor: "#FCE8E6", color: "#D32F2F" },      // Red
+  declined: { backgroundColor: "#FAE7F1", color: "#C2185B" },       // Dark pink
+  delayed: { backgroundColor: "#FFF8E1", color: "#F9A825" },        // Yellow/Amber
+  flagged: { backgroundColor: "#F3E5F5", color: "#8E24AA" },       // Purple
+
+  in_progress: { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
+  completed: { backgroundColor: "#5570F11A", color: "#3D56D8" },
 };
+
 
 export default function BasicTable({ orders }) {
   const { theme } = useTheme();

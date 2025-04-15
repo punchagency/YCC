@@ -50,9 +50,9 @@ const BookingSummary = () => {
 
 const DashBoardTitleText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
-  fontWeight: 600,
-  fontSize: "20px",
-  lineHeight: "32px",
+  fontWeight: 700,
+  fontSize: "15px",
+  lineHeight: "111.00000000000001%",
   letterSpacing: "0%",
   color: mode === "light" ? "#212121" : "white",
 }));
