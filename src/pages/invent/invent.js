@@ -685,6 +685,45 @@ const Invent = () => {
     }
   };
 
+  // Add this style to your component
+  const dropdownStyles = {
+    border: 'none',
+    boxShadow: 'none'
+  };
+
+  // Add this to your component's useEffect
+  useEffect(() => {
+    // Add custom styles to remove borders from dropdown
+    const style = document.createElement('style');
+    style.textContent = `
+      .no-border-dropdown .p-dropdown {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      .no-border-dropdown .p-dropdown:not(.p-disabled).p-focus {
+        box-shadow: none !important;
+        border-color: transparent !important;
+      }
+      
+      .no-border-dropdown .p-dropdown-panel {
+        border: 1px solid #ced4da;
+      }
+      
+      /* Make the input field have only bottom border */
+      .no-border-dropdown .p-dropdown .p-dropdown-label {
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        border-radius: 0;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <>
       <div
@@ -1280,7 +1319,7 @@ const Invent = () => {
 
           <div className="form-row">
             <div
-              className="form-group"
+              className="form-group-1"
               style={{ display: "block", marginBottom: "15px", border: "none" }}
             >
               <label htmlFor="serviceArea">Service Area</label>
@@ -1292,10 +1331,12 @@ const Invent = () => {
                   setNewItem({ ...newItem, serviceArea: e.value })
                 }
                 placeholder="Select a service area"
-                style={{ width: "100%" }}
+                style={{ width: "100%", height: "45px", alignContent: "center" }}
+                inputStyle={dropdownStyles}
                 className="no-border-dropdown"
               />
             </div>
+
             <div
               className="form-group"
               style={{ display: "block", marginBottom: "15px" }}
