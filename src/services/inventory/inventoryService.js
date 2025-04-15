@@ -49,28 +49,25 @@ const getUserId = () => {
 
 export const createInventoryData = async (inventoryData) => {
   try {
-    // If inventoryData is FormData, use it directly
-    // Otherwise, create a new FormData object
-    const formData = inventoryData instanceof FormData 
-      ? inventoryData 
-      : new FormData();
-    
-    // If inventoryData is not FormData, append all properties
-    if (!(inventoryData instanceof FormData)) {
-      Object.keys(inventoryData).forEach(key => {
-        if (key === 'inventoryImage' && inventoryData[key]) {
-          formData.append(key, inventoryData[key]);
-        } else {
-          formData.append(key, inventoryData[key]);
-        }
-      });
+    // Check if we're dealing with FormData
+    const isFormData = inventoryData instanceof FormData;
+
+    // For debugging - log what's in the FormData
+    if (isFormData) {
+      console.log("FormData contents:");
+      for (let pair of inventoryData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
     }
 
-    const response = await axios.post(`${API_URL}/inventory`, formData, {
-      headers: {
-        ...getAuthHeader(),
-        'Content-Type': 'multipart/form-data',
-      },
+    // Set the appropriate headers
+    const headers = {
+      ...getAuthHeader(),
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    };
+
+    const response = await axios.post(`${API_URL}/inventory`, inventoryData, {
+      headers: headers,
     });
 
     return {

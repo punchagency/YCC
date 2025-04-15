@@ -103,7 +103,6 @@ const Invent = () => {
     serviceArea: "",
     stockQuantity: "",
     price: "",
-    inventoryImage: null,
   });
 
   const { theme } = useTheme();
@@ -283,15 +282,15 @@ const Invent = () => {
     setShowAddModal(true);
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setNewItem({
-        ...newItem,
-        inventoryImage: file,
-      });
-    }
-  };
+  // const handleFileUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setNewItem({
+  //       ...newItem,
+  //       inventoryImage: file,
+  //     });
+  //   }
+  // };
 
   const handleSaveProduct = async () => {
     // Validate form
@@ -318,20 +317,18 @@ const Invent = () => {
     setIsLoading(true);
 
     try {
-      // Create FormData object to handle file upload
-      const formData = new FormData();
-      formData.append("productName", newItem.productName);
-      formData.append("category", newItem.category);
-      formData.append("serviceArea", newItem.serviceArea);
-      formData.append("quantity", parseInt(newItem.stockQuantity));
-      formData.append("price", parseFloat(newItem.price));
+      // Instead of FormData, use a regular JSON object
+      const inventoryData = {
+        productName: newItem.productName,
+        category: newItem.category,
+        serviceArea: newItem.serviceArea,
+        quantity: parseInt(newItem.stockQuantity),
+        price: parseFloat(newItem.price),
+      };
 
-      // Append the file if it exists
-      if (newItem.inventoryImage) {
-        formData.append("inventoryImage", newItem.inventoryImage);
-      }
+      console.log("Sending inventory data:", inventoryData);
 
-      const result = await createInventoryData(formData);
+      const result = await createInventoryData(inventoryData);
 
       if (result.success) {
         if (toast.current) {
@@ -365,7 +362,6 @@ const Invent = () => {
           serviceArea: "",
           stockQuantity: "",
           price: "",
-          inventoryImage: null,
         });
 
         setShowAddModal(false);
@@ -747,6 +743,46 @@ const Invent = () => {
                       <tr>
                         <th
                           style={{
+                            width: "5%",
+                            textAlign: "center",
+                            padding: "10px",
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectAll}
+                              onChange={handleSelectAll}
+                              style={{
+                                margin: 0,
+                                width: "17px",
+                                height: "17px",
+                              }}
+                            />
+                            {selectedItems.length > 0 && (
+                              <img
+                                src={deleteLogo}
+                                alt="delete"
+                                style={{
+                                  width: "18px",
+                                  height: "18px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={handleBulkDelete}
+                              />
+                            )}
+                          </div>
+                        </th>
+                        <th
+                          style={{
                             width: "20%",
                             textAlign: "left",
                             padding: "10px",
@@ -895,46 +931,6 @@ const Invent = () => {
                             </p>
                           </div>
                         </th>
-                        <th
-                          style={{
-                            width: "5%",
-                            textAlign: "center",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "8px",
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectAll}
-                              onChange={handleSelectAll}
-                              style={{
-                                margin: 0,
-                                width: "19px",
-                                height: "19px",
-                              }}
-                            />
-                            {selectedItems.length > 0 && (
-                              <img
-                                src={deleteLogo}
-                                alt="delete"
-                                style={{
-                                  width: "18px",
-                                  height: "18px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={handleBulkDelete}
-                              />
-                            )}
-                          </div>
-                        </th>
                       </tr>
                     </thead>
                   </table>
@@ -955,6 +951,24 @@ const Invent = () => {
                         <tbody>
                           {inventoryItems.map((item, index) => (
                             <tr key={index}>
+                              <td
+                                style={{
+                                  width: "5%",
+                                  padding: "10px",
+                                  textAlign: "center",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedItems.includes(item.id)}
+                                  onChange={(e) => handleSelectItem(e, item.id)}
+                                  style={{
+                                    width: "16px",
+                                    height: "16px",
+                                  }}
+                                />
+                              </td>
                               <td
                                 style={{
                                   width: "20%",
@@ -1045,24 +1059,6 @@ const Invent = () => {
                                     onClick={() => handleDelete(index)}
                                   />
                                 </div>
-                              </td>
-                              <td
-                                style={{
-                                  width: "5%",
-                                  padding: "10px",
-                                  textAlign: "center",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedItems.includes(item.id)}
-                                  onChange={(e) => handleSelectItem(e, item.id)}
-                                  style={{
-                                    width: "16px",
-                                    height: "16px",
-                                  }}
-                                />
                               </td>
                             </tr>
                           ))}
