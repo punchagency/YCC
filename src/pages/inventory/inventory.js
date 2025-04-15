@@ -256,7 +256,7 @@ const Inventory = () => {
 
   // Render mobile dashboard
   const renderMobileDashboard = () => {
-    return (
+  return (
       <div style={{ padding: "10px" }}>
         {/* AI Summary Section */}
         <div
@@ -311,7 +311,7 @@ const Inventory = () => {
               }}
             >
               <span style={{ color: "#4880FF", fontSize: "14px" }}>$</span>
-            </div>
+          </div>
             <div style={{ flex: 1 }}>
               <h4
                 style={{
@@ -334,8 +334,8 @@ const Inventory = () => {
               >
                 +9% from yesterday
               </p>
-            </div>
-          </div>
+        </div>
+      </div>
 
           {/* Expiring Certifications Card */}
           <div
@@ -385,7 +385,7 @@ const Inventory = () => {
                 +7% from yesterday
               </p>
             </div>
-          </div>
+                  </div>
 
           {/* Career Suggestions Card */}
           <div
@@ -435,7 +435,7 @@ const Inventory = () => {
               </p>
             </div>
           </div>
-        </div>
+                  </div>
 
         {/* Orders Analytics Section */}
         <div
@@ -714,8 +714,8 @@ const Inventory = () => {
               icon="pi pi-ellipsis-v"
               className="p-button-text p-button-rounded p-button-plain"
               style={{ width: "30px", height: "30px" }}
-            />
-          </div>
+                    />
+                  </div>
           <p
             style={{
               fontSize: "12px",
@@ -735,18 +735,18 @@ const Inventory = () => {
               marginBottom: "10px",
             }}
           >
-            <Button
+                      <Button
               icon="pi pi-chevron-left"
               className="p-button-text p-button-rounded"
               style={{ width: "30px", height: "30px" }}
             />
             <h4 style={{ margin: "0", fontSize: "14px" }}>March 2025</h4>
-            <Button
+                      <Button
               icon="pi pi-chevron-right"
               className="p-button-text p-button-rounded"
               style={{ width: "30px", height: "30px" }}
-            />
-          </div>
+                      />
+                    </div>
 
           {/* Calendar days header */}
           <div
@@ -764,10 +764,10 @@ const Inventory = () => {
                   style={{ fontSize: "12px", color: "#666", padding: "5px 0" }}
                 >
                   {day}
-                </div>
+                  </div>
               )
             )}
-          </div>
+                </div>
 
           {/* Calendar grid */}
           <div
@@ -802,9 +802,9 @@ const Inventory = () => {
                 }}
               >
                 {day}
-              </div>
+            </div>
             ))}
-          </div>
+                  </div>
 
           {/* Task stats */}
           <div
@@ -838,8 +838,8 @@ const Inventory = () => {
                 <span style={{ fontSize: "11px", color: "#4880FF" }}>
                   Tasks Completed
                 </span>
-              </div>
-            </div>
+                  </div>
+                  </div>
             <div
               style={{
                 backgroundColor: "#f0f7ff",
@@ -875,7 +875,7 @@ const Inventory = () => {
               marginTop: "10px",
             }}
           >
-            <Button
+                      <Button
               label="Add Task"
               icon="pi pi-plus"
               style={{
@@ -883,10 +883,10 @@ const Inventory = () => {
                 border: "none",
                 borderRadius: "4px",
               }}
-            />
-          </div>
-        </div>
-      </div>
+                      />
+                    </div>
+                  </div>
+                </div>
     );
   };
 
@@ -902,24 +902,24 @@ const Inventory = () => {
             <div className="sub-header-left sub-header-left-with-arrow">
               <div className="content">
                 <h3>Dashboard</h3>
-              </div>
+            </div>
             </div>
           </div>
-          <div className="inventory-dashboard-container">
-            <div className="inventory-dashboard-container-wrapper">
-              <div className="summary-container">
-                <div>
+      <div className="inventory-dashboard-container">
+        <div className="inventory-dashboard-container-wrapper">
+          <div className="summary-container">
+            <div>
                   <h3>Low Inventories </h3>
-                  <p>
+              <p>
                     Low inventory alerts on the dashboard to notify vendors of
                     stock shortages in real time
-                  </p>
-                </div>
+              </p>
+            </div>
                 {/* <div>
-                  <img src={lone} alt="" />
+              <img src={lone} alt="" />
                 </div> */}
-              </div>
-              <div className="boxes-container">
+          </div>
+          <div className="boxes-container">
                 <div
                   style={{ alignContent: "center", justifyContent: "center" }}
                 >
@@ -943,13 +943,13 @@ const Inventory = () => {
                       }}
                     ></p>
                   </span>
-                </div>
+            </div>
                 <div
                   style={{ alignContent: "center", justifyContent: "center" }}
                 >
-                  <span>5</span>
+              <span>5</span>
                   <span>Fuel</span>
-                  <span style={{ fontSize: "9px" }}>+12% from yesterday</span>
+              <span style={{ fontSize: "9px" }}>+12% from yesterday</span>
                   <span
                     style={{
                       backgroundColor: "white",
@@ -967,7 +967,7 @@ const Inventory = () => {
                       }}
                     ></p>
                   </span>
-                </div>
+            </div>
                 <div
                   style={{ alignContent: "center", justifyContent: "center" }}
                 >
@@ -991,85 +991,85 @@ const Inventory = () => {
                       }}
                     ></p>
                   </span>
-                </div>
-              </div>
             </div>
-            <div className="orders-analytics-container">
+          </div>
+        </div>
+        <div className="orders-analytics-container">
               {/* <div>
-                <div>
-                  <h3>Orders Analytics</h3>
-                </div>
-                <div className="orders">
-                  <p>Offline orders</p>
-                  <p>Online orders</p>
-                  <p>Monthly</p>
-                </div>
+            <div>
+              <h3>Orders Analytics</h3>
+            </div>
+            <div className="orders">
+              <p>Offline orders</p>
+              <p>Online orders</p>
+              <p>Monthly</p>
+            </div>
               </div> */}
               {/* <div style={{ width: "100%" }}>
-                <Line
-                  data={{
-                    labels: analyticsData.map((item) => item.labels),
-                    datasets: [
-                      {
-                        label: "Revenue",
-                        data: analyticsData.map((item) => item.revenue),
-                        borderColor: "#FF9500",
-                        backgroundColor: "transparent",
-                        tension: 0.8,
-                        fill: false,
-                        cubicInterpolationMode: "default",
-                        pointStyle: "circle",
-                        borderWidth: 3,
-                      },
-                      {
-                        label: "Cost",
-                        data: analyticsData.map((item) => item.cost),
-                        borderColor: "#347AE2",
-                        backgroundColor: "transparent",
-                        tension: 0.8,
-                        fill: false,
-                        cubicInterpolationMode: "default",
-                        pointStyle: "circle",
-                        borderWidth: 3,
-                      },
-                    ],
-                  }}
-                  options={{
-                    responsive: true,
+            <Line
+              data={{
+                labels: analyticsData.map((item) => item.labels),
+                datasets: [
+                  {
+                    label: "Revenue",
+                    data: analyticsData.map((item) => item.revenue),
+                    borderColor: "#FF9500",
+                    backgroundColor: "transparent",
+                    tension: 0.8,
+                    fill: false,
+                    cubicInterpolationMode: "default",
+                    pointStyle: "circle",
+                    borderWidth: 3,
+                  },
+                  {
+                    label: "Cost",
+                    data: analyticsData.map((item) => item.cost),
+                    borderColor: "#347AE2",
+                    backgroundColor: "transparent",
+                    tension: 0.8,
+                    fill: false,
+                    cubicInterpolationMode: "default",
+                    pointStyle: "circle",
+                    borderWidth: 3,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      display: true,
+                      drawBorder: false,
+                      color: "#f0f0f0",
                     },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                        grid: {
-                          display: true,
-                          drawBorder: false,
-                          color: "#f0f0f0",
-                        },
-                      },
-                      x: {
-                        grid: {
-                          display: false,
-                        },
-                      },
+                  },
+                  x: {
+                    grid: {
+                      display: false,
                     },
-                    elements: {
-                      line: {
-                        tension: 0.4,
-                        borderWidth: 3,
-                        capBezierPoints: true,
-                      },
-                      point: {
-                        radius: 0,
-                        hoverRadius: 0,
-                      },
-                    },
-                  }}
-                />
+                  },
+                },
+                elements: {
+                  line: {
+                    tension: 0.4,
+                    borderWidth: 3,
+                    capBezierPoints: true,
+                  },
+                  point: {
+                    radius: 0,
+                    hoverRadius: 0,
+                  },
+                },
+              }}
+            />
               </div> */}
               <div>
                 <h2>Financial Summary</h2>
@@ -1112,397 +1112,397 @@ const Inventory = () => {
                       <button>View</button>
                     </main>
                 </section>
-              </div>
-            </div>
-            <div className="bottom-container">
-              <div className="current-order-summary">
-                <div className="current-order">
-                  <div>
-                    <h2>Current Order Summary</h2>
-                    <p>
+          </div>
+        </div>
+        <div className="bottom-container">
+          <div className="current-order-summary">
+            <div className="current-order">
+              <div>
+                <h2>Current Order Summary</h2>
+                <p>
                       Display real-time updates on placed, pending, and
                       completing orders.
-                    </p>
-                  </div>
-                  <div>
-                    <img src={lone} alt="" />
-                  </div>
-                </div>
-                <div className="total-orders">
-                  <div className="total-order-box">
-                    <h3>522</h3>
-                    <p>Total Orders</p>
-                  </div>
-                  <div className="total-order-box">
-                    <h3>120</h3>
-                    <p>Pending Orders</p>
-                  </div>
-                  <div className="total-order-box">
-                    <h3>402</h3>
-                    <p>Completed Orders</p>
-                  </div>
-                </div>
-                <div className="sort">
-                  <div>
-                    <p>Order ID</p>
-                    <img src={sort} alt="okay" />
-                  </div>
-                  <div>
-                    <p>Customer</p>
-                    <img src={sort} alt="okay" />
-                  </div>
-                  <div>
-                    <p>Status</p>
-                    <img src={sort} alt="okay" />
-                  </div>
-                  <div>
-                    <p>Amount</p>
-                    <img src={sort} alt="okay" />
-                  </div>
-                  <div>
-                    <p>Date</p>
-                    <img src={sort} alt="okay" />
-                  </div>
-                </div>
-                <div>
-                  <table className="order-table">
-                    <tbody>
-                      <tr>
-                        <td>#YCC-156</td>
-                        <td>John Smith</td>
-                        <td>
-                          <span className="status pending">Pending</span>
-                        </td>
-                        <td>$2,500.00</td>
-                        <td>2024-03-15</td>
-                      </tr>
-                      <tr>
-                        <td>#YCC-157</td>
-                        <td>Sarah Johnson</td>
-                        <td>
-                          <span className="status completed">Completed</span>
-                        </td>
-                        <td>$1,800.00</td>
-                        <td>2024-03-14</td>
-                      </tr>
-                      <tr>
-                        <td>#YCC-158</td>
-                        <td>Mike Wilson</td>
-                        <td>
-                          <span className="status processing">Processing</span>
-                        </td>
-                        <td>$3,200.00</td>
-                        <td>2024-03-14</td>
-                      </tr>
-                      <tr>
-                        <td>#YCC-159</td>
-                        <td>Emma Davis</td>
-                        <td>
-                          <span className="status pending">Pending</span>
-                        </td>
-                        <td>$950.00</td>
-                        <td>2024-03-13</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                </p>
               </div>
+              <div>
+                <img src={lone} alt="" />
+              </div>
+            </div>
+            <div className="total-orders">
+              <div className="total-order-box">
+                <h3>522</h3>
+                <p>Total Orders</p>
+              </div>
+              <div className="total-order-box">
+                <h3>120</h3>
+                <p>Pending Orders</p>
+              </div>
+              <div className="total-order-box">
+                <h3>402</h3>
+                <p>Completed Orders</p>
+              </div>
+            </div>
+            <div className="sort">
+              <div>
+                <p>Order ID</p>
+                <img src={sort} alt="okay" />
+              </div>
+              <div>
+                <p>Customer</p>
+                <img src={sort} alt="okay" />
+              </div>
+              <div>
+                <p>Status</p>
+                <img src={sort} alt="okay" />
+              </div>
+              <div>
+                <p>Amount</p>
+                <img src={sort} alt="okay" />
+              </div>
+              <div>
+                <p>Date</p>
+                <img src={sort} alt="okay" />
+              </div>
+            </div>
+            <div>
+              <table className="order-table">
+                <tbody>
+                  <tr>
+                    <td>#YCC-156</td>
+                    <td>John Smith</td>
+                    <td>
+                      <span className="status pending">Pending</span>
+                    </td>
+                    <td>$2,500.00</td>
+                    <td>2024-03-15</td>
+                  </tr>
+                  <tr>
+                    <td>#YCC-157</td>
+                    <td>Sarah Johnson</td>
+                    <td>
+                      <span className="status completed">Completed</span>
+                    </td>
+                    <td>$1,800.00</td>
+                    <td>2024-03-14</td>
+                  </tr>
+                  <tr>
+                    <td>#YCC-158</td>
+                    <td>Mike Wilson</td>
+                    <td>
+                      <span className="status processing">Processing</span>
+                    </td>
+                    <td>$3,200.00</td>
+                    <td>2024-03-14</td>
+                  </tr>
+                  <tr>
+                    <td>#YCC-159</td>
+                    <td>Emma Davis</td>
+                    <td>
+                      <span className="status pending">Pending</span>
+                    </td>
+                    <td>$950.00</td>
+                    <td>2024-03-13</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-              <div className="progressionBar">
-                <div className="progress">
-                  <div>
-                    <h2>Task & Delivery Calendar</h2>
+          <div className="progressionBar">
+            <div className="progress">
+              <div>
+                <h2>Task & Delivery Calendar</h2>
                     <p>
                       Track deliveries, view task, and add new ones seamlessly.
                     </p>
-                  </div>
-                  <div>
-                    <img src={lone} alt="" />
-                  </div>
-                </div>
-                <div style={{ display: "flex" }}>
-                  <div className="calendar-container">
+              </div>
+              <div>
+                <img src={lone} alt="" />
+              </div>
+            </div>
+            <div style={{ display: "flex" }}>
+              <div className="calendar-container">
+                <div>
+                  <Calendar />
+                  <div className="calendar-container-smalls">
                     <div>
-                      <Calendar />
-                      <div className="calendar-container-smalls">
-                        <div>
                           <h3 className="smalls-h3">
                             Tasks for March 11th, 2025
                           </h3>
-                          <p>No tasks for this day</p>
-                        </div>
-                        <div>
+                      <p>No tasks for this day</p>
+                    </div>
+                    <div>
                           <button
                             style={{ display: "flex", alignItems: "center" }}
                           >
-                            <img
-                              src={plus}
-                              style={{
-                                width: "10px",
-                                height: "10px",
-                                marginRight: "5px",
-                              }}
-                            />{" "}
-                            Add Task
-                          </button>
-                        </div>
-                      </div>
+                        <img
+                          src={plus}
+                          style={{
+                            width: "10px",
+                            height: "10px",
+                            marginRight: "5px",
+                          }}
+                        />{" "}
+                        Add Task
+                      </button>
                     </div>
                   </div>
-                  <div>
+                </div>
+              </div>
+              <div>
+                <div>
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "left",
+                      marginLeft: "5px",
+                    }}
+                  >
+                    Tasks This Year
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        border: "1px solid #E6E6E6",
+                        padding: "3px",
+                        borderRadius: "5px",
+                        marginLeft: "5px",
+                      }}
+                    >
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                        <img
+                          src={arrowup}
+                          alt=""
+                          style={{
+                            width: "10px",
+                            height: "10px",
+                            marginRight: "5px",
+                          }}
+                        />
+                        <p style={{ fontSize: "8px", color: "#78ABCA" }}>
+                          9.2%
+                        </p>
+                      </div>
+                      <p style={{ fontSize: "8px" }}>31 DAYS AGO</p>
+                    </div>
                     <div>
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          textAlign: "left",
-                          marginLeft: "5px",
-                        }}
-                      >
-                        Tasks This Year
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            flexDirection: "column",
-                            border: "1px solid #E6E6E6",
-                            padding: "3px",
-                            borderRadius: "5px",
-                            marginLeft: "5px",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={arrowup}
-                              alt=""
-                              style={{
-                                width: "10px",
-                                height: "10px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ fontSize: "8px", color: "#78ABCA" }}>
-                              9.2%
-                            </p>
-                          </div>
-                          <p style={{ fontSize: "8px" }}>31 DAYS AGO</p>
-                        </div>
-                        <div>
-                          <h3 style={{ fontSize: "12px", color: "#78ABCA" }}>
-                            643
-                          </h3>
-                          <p style={{ fontSize: "8px" }}>Tasks This Week</p>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          paddingLeft: "5px",
-                          paddingRight: "5px",
-                          backgroundColor: "#7FB4D480",
-                          borderRadius: "0px 0px 5px 5px",
-                          marginLeft: "5px",
-                          marginTop: "7px",
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontSize: "8px",
-                            color: "#78ABCA",
-                            marginRight: "5px",
-                          }}
-                        >
-                          22% Decrease from last year
-                        </p>
+                      <h3 style={{ fontSize: "12px", color: "#78ABCA" }}>
+                        643
+                      </h3>
+                      <p style={{ fontSize: "8px" }}>Tasks This Week</p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingLeft: "5px",
+                      paddingRight: "5px",
+                      backgroundColor: "#7FB4D480",
+                      borderRadius: "0px 0px 5px 5px",
+                      marginLeft: "5px",
+                      marginTop: "7px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "8px",
+                        color: "#78ABCA",
+                        marginRight: "5px",
+                      }}
+                    >
+                      22% Decrease from last year
+                    </p>
                         <img
                           src={barup}
                           alt="barup"
                           width="10px"
                           height="10px"
                         />
-                      </div>
+                  </div>
 
-                      {/* Second task stats container */}
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          textAlign: "left",
-                          marginLeft: "5px",
-                          marginTop: "15px",
-                        }}
-                      >
-                        Tasks This Month
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            flexDirection: "column",
-                            border: "1px solid #E6E6E6",
-                            padding: "3px",
-                            borderRadius: "5px",
-                            marginLeft: "5px",
-                          }}
-                        >
+                  {/* Second task stats container */}
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "left",
+                      marginLeft: "5px",
+                      marginTop: "15px",
+                    }}
+                  >
+                    Tasks This Month
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        border: "1px solid #E6E6E6",
+                        padding: "3px",
+                        borderRadius: "5px",
+                        marginLeft: "5px",
+                      }}
+                    >
                           <div
                             style={{ display: "flex", alignItems: "center" }}
                           >
-                            <img
-                              src={arrowup}
-                              alt=""
-                              style={{
-                                width: "10px",
-                                height: "10px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ fontSize: "8px", color: "#78ABCA" }}>
-                              12.5%
-                            </p>
-                          </div>
-                          <p style={{ fontSize: "8px" }}>15 DAYS AGO</p>
-                        </div>
-                        <div>
-                          <h3 style={{ fontSize: "12px", color: "#78ABCA" }}>
-                            287
-                          </h3>
-                          <p style={{ fontSize: "8px" }}>Tasks This Month</p>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          paddingLeft: "5px",
-                          paddingRight: "5px",
-                          backgroundColor: "#7DBD7D80",
-                          borderRadius: "0px 0px 5px 5px",
-                          marginLeft: "5px",
-                          marginTop: "7px",
-                        }}
-                      >
-                        <p
+                        <img
+                          src={arrowup}
+                          alt=""
                           style={{
-                            fontSize: "8px",
-                            color: "#78ABCA",
+                            width: "10px",
+                            height: "10px",
                             marginRight: "5px",
                           }}
-                        >
-                          15% Increase from last month
+                        />
+                        <p style={{ fontSize: "8px", color: "#78ABCA" }}>
+                          12.5%
                         </p>
+                      </div>
+                      <p style={{ fontSize: "8px" }}>15 DAYS AGO</p>
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: "12px", color: "#78ABCA" }}>
+                        287
+                      </h3>
+                      <p style={{ fontSize: "8px" }}>Tasks This Month</p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingLeft: "5px",
+                      paddingRight: "5px",
+                      backgroundColor: "#7DBD7D80",
+                      borderRadius: "0px 0px 5px 5px",
+                      marginLeft: "5px",
+                      marginTop: "7px",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "8px",
+                        color: "#78ABCA",
+                        marginRight: "5px",
+                      }}
+                    >
+                      15% Increase from last month
+                    </p>
                         <img
                           src={barup}
                           alt="barup"
                           width="10px"
                           height="10px"
                         />
-                      </div>
+                  </div>
 
-                      {/* Third task stats container */}
-                      <p
-                        style={{
-                          fontSize: "12px",
-                          textAlign: "left",
-                          marginLeft: "5px",
-                          marginTop: "15px",
-                        }}
-                      >
-                        Tasks This Week
-                      </p>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            flexDirection: "column",
-                            border: "1px solid #E6E6E6",
-                            padding: "3px",
-                            borderRadius: "5px",
-                            marginLeft: "5px",
-                          }}
-                        >
+                  {/* Third task stats container */}
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "left",
+                      marginLeft: "5px",
+                      marginTop: "15px",
+                    }}
+                  >
+                    Tasks This Week
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        border: "1px solid #E6E6E6",
+                        padding: "3px",
+                        borderRadius: "5px",
+                        marginLeft: "5px",
+                      }}
+                    >
                           <div
                             style={{ display: "flex", alignItems: "center" }}
                           >
-                            <img
-                              src={arrowup}
+                        <img
+                          src={arrowup}
                               alt="arrowup"
-                              style={{
-                                width: "10px",
-                                height: "10px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ fontSize: "8px", color: "#78ABCA" }}>
-                              18.3%
-                            </p>
-                          </div>
-                          <p style={{ fontSize: "8px" }}>7 DAYS AGO</p>
-                        </div>
-                        <div>
+                          style={{
+                            width: "10px",
+                            height: "10px",
+                            marginRight: "5px",
+                          }}
+                        />
+                        <p style={{ fontSize: "8px", color: "#78ABCA" }}>
+                          18.3%
+                        </p>
+                      </div>
+                      <p style={{ fontSize: "8px" }}>7 DAYS AGO</p>
+                    </div>
+                    <div>
                           <h3 style={{ fontSize: "12px", color: "#78ABCA" }}>
                             42
                           </h3>
-                          <p style={{ fontSize: "8px" }}>Tasks This Week</p>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          paddingLeft: "5px",
-                          paddingRight: "6px",
-                          backgroundColor: "#EE999980",
-                          borderRadius: "0px 0px 5px 5px",
-                          marginLeft: "5px",
-                          marginTop: "7px",
-                        }}
-                      >
-                        <p style={{ fontSize: "8px", color: "#000000" }}>
-                          8% Increase from last week
-                        </p>
+                      <p style={{ fontSize: "8px" }}>Tasks This Week</p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingLeft: "5px",
+                      paddingRight: "6px",
+                      backgroundColor: "#EE999980",
+                      borderRadius: "0px 0px 5px 5px",
+                      marginLeft: "5px",
+                      marginTop: "7px",
+                    }}
+                  >
+                    <p style={{ fontSize: "8px", color: "#000000" }}>
+                      8% Increase from last week
+                    </p>
                         <img
                           src={barup}
                           alt="barup"
                           width="10px"
                           height="10px"
                         />
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
         </>
       )}
     </>

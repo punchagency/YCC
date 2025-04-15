@@ -31,6 +31,7 @@ import {
   downloadBookingExcel,
   downloadFinancialExcel
 } from "../services/reports/reports";
+import './header.css';
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -195,16 +196,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const start = (
     <>
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
+        style={{ 
+          display: "flex", 
+          alignItems: "center", 
           width: "100%",
           gap: "15px",
         }}
       >
         {/* Hamburger Menu */}
-        <div
-          style={{
+        <div 
+          className="hamburger-container"
+          style={{ 
             cursor: "pointer",
             marginRight: "10px",
           }}
@@ -236,8 +238,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             placeholder="Search Reports"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            style={{
-              paddingLeft: "35px",
+            style={{ 
+              paddingLeft: "35px", 
               width: "100%",
               height: "40px",
               border: "1px solid #ced4da",
@@ -259,7 +261,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 <img
                   src={filterBy}
                   alt="filter"
-                  style={{
+            style={{
                     width: "12px",
                     height: "12px",
                     marginRight: "4px",
@@ -318,7 +320,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
 
             {/* Share Button and Menu */}
             <Menu model={shareItems} popup ref={shareMenuRef} />
-            <Button
+              <Button
               label="Share"
               icon={
                 <img
@@ -342,10 +344,10 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 justifyContent: "center",
                 gap: "4px",
               }}
-            />
-          </div>
-        )}
-      </div>
+              />
+            </div>
+          )}
+        </div>
     </>
   );
 
@@ -569,7 +571,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             border: "none",
           }}
         />
-        <div
+        <div 
           className="profile-section"
           onClick={() => navigate("/admin/profile")}
           style={{ cursor: "pointer" }}
@@ -684,22 +686,22 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       setShowExcelModal(false);
     }
   };
-
+  
   // Return both the Menubar and the MobileSidebar
   return (
     <>
-      <Menubar
-        start={start}
-        end={end}
-        style={{
+      <Menubar 
+        start={start} 
+        end={end} 
+        style={{ 
           padding: isMobile ? "8px" : "16px",
           flexWrap: "wrap",
           backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
           color: theme === "light" ? "#103B57" : "#F8FBFF",
         }}
       />
-      <MobileSidebar
-        isOpen={mobileMenuOpen}
+      <MobileSidebar 
+        isOpen={mobileMenuOpen} 
         onClose={() => setMobileMenuOpen(false)}
         style={{
           backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",

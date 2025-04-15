@@ -13,6 +13,19 @@
   gap: 20px;
 }
 
+.no-border-dropdown .p-dropdown {
+  border: none;
+  box-shadow: none;
+}
+
+/* If you need to add a border on focus, you can style it separately */
+.no-border-dropdown .p-dropdown:focus,
+.no-border-dropdown .p-dropdown.p-focus {
+  box-shadow: none;
+  border: none;
+  outline: none;
+}
+
 .analytics-card {
   background: white;
   border-radius: 12px;
@@ -163,6 +176,7 @@
     opacity: 1;
   }
 }
+
 
 .inventory-skeleton {
   animation: fadeIn 0.3s ease-in;

@@ -27,6 +27,7 @@ import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useTheme } from "../../context/theme/themeContext";
 import { Paginator } from "primereact/paginator";
+import { Dropdown } from "primereact/dropdown";
 
 import { TableSkeleton } from "../../components/TableSkeleton";
 
@@ -102,6 +103,7 @@ const Invent = () => {
     serviceArea: "",
     stockQuantity: "",
     price: "",
+    inventoryImage: null,
   });
 
   const { theme } = useTheme();
@@ -112,6 +114,17 @@ const Invent = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [isPageLoading, setIsPageLoading] = useState(false);
+
+  // Add these state variables at the top with your other state variables
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  // Inside your component, define the service area options
+  const serviceAreaOptions = [
+    { label: "Caribbean", value: "caribbean" },
+    { label: "Mediterranean", value: "mediterranean" },
+    { label: "USA", value: "usa" },
+  ];
 
   // Fetch inventory data when component mounts
   useEffect(() => {
@@ -266,58 +279,18 @@ const Invent = () => {
     setShowDeleteConfirmation(true);
   };
 
-  const confirmDelete = async () => {
-    setIsLoading(true);
-
-    try {
-      // Call the API to delete the item
-      const result = await deleteInventoryItem(itemToDelete.id);
-
-      if (result.success) {
-        // Update the local state by removing the deleted item
-        const updatedItems = inventoryItems.filter(
-          (_, index) => index !== itemToDelete.index
-        );
-        setInventoryItems(updatedItems);
-
-        // Show success message
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product deleted successfully",
-            life: 3000,
-          });
-        }
-      } else {
-        // Show error message
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to delete product",
-            life: 3000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while deleting the product",
-          life: 3000,
-        });
-      }
-    } finally {
-      setIsLoading(false);
-      setShowDeleteConfirmation(false);
-    }
-  };
-
   const handleAddProduct = () => {
     setShowAddModal(true);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewItem({
+        ...newItem,
+        inventoryImage: file,
+      });
+    }
   };
 
   const handleSaveProduct = async () => {
@@ -345,13 +318,20 @@ const Invent = () => {
     setIsLoading(true);
 
     try {
-      const result = await createInventoryData({
-        productName: newItem.productName,
-        category: newItem.category,
-        serviceArea: newItem.serviceArea,
-        quantity: parseInt(newItem.stockQuantity),
-        price: parseFloat(newItem.price),
-      });
+      // Create FormData object to handle file upload
+      const formData = new FormData();
+      formData.append("productName", newItem.productName);
+      formData.append("category", newItem.category);
+      formData.append("serviceArea", newItem.serviceArea);
+      formData.append("quantity", parseInt(newItem.stockQuantity));
+      formData.append("price", parseFloat(newItem.price));
+
+      // Append the file if it exists
+      if (newItem.inventoryImage) {
+        formData.append("inventoryImage", newItem.inventoryImage);
+      }
+
+      const result = await createInventoryData(formData);
 
       if (result.success) {
         if (toast.current) {
@@ -385,6 +365,7 @@ const Invent = () => {
           serviceArea: "",
           stockQuantity: "",
           price: "",
+          inventoryImage: null,
         });
 
         setShowAddModal(false);
@@ -440,6 +421,107 @@ const Invent = () => {
     const page = Math.floor(event.first / rows) + 1;
     setCurrentPage(page);
     fetchInventoryData(page);
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = (e) => {
+    const checked = e.target.checked;
+    setSelectAll(checked);
+
+    if (checked) {
+      // Select all items
+      const allItemIds = inventoryItems.map((item) => item.id);
+      setSelectedItems(allItemIds);
+    } else {
+      // Deselect all
+      setSelectedItems([]);
+    }
+  };
+
+  // Handle individual item selection
+  const handleSelectItem = (e, itemId) => {
+    const checked = e.target.checked;
+
+    if (checked) {
+      setSelectedItems((prev) => [...prev, itemId]);
+    } else {
+      setSelectedItems((prev) => prev.filter((id) => id !== itemId));
+
+      // If we're unchecking an item, also uncheck the "select all" checkbox
+      if (selectAll) {
+        setSelectAll(false);
+      }
+    }
+  };
+
+  // Add bulk delete function
+  const handleBulkDelete = () => {
+    if (selectedItems.length === 0) return;
+
+    setItemToDelete({
+      multiple: true,
+      ids: selectedItems,
+    });
+    setShowDeleteConfirmation(true);
+  };
+
+  // Modify the existing confirmDelete function to handle bulk deletion
+  const confirmDelete = async () => {
+    setIsLoading(true);
+    try {
+      if (itemToDelete.multiple) {
+        // Here you would call your API to delete multiple items
+        // For example:
+        // const result = await deleteMultipleInventoryItems(itemToDelete.ids);
+
+        // For now, let's just delete them one by one
+        let successCount = 0;
+        for (const id of itemToDelete.ids) {
+          const result = await deleteInventoryItem(id);
+          if (result.success) {
+            successCount++;
+          }
+        }
+
+        // Refresh the inventory list
+        fetchInventoryData();
+        setSelectedItems([]);
+        setSelectAll(false);
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: `Successfully deleted ${successCount} items`,
+          life: 3000,
+        });
+      } else {
+        // Original single item deletion logic
+        const result = await deleteInventoryItem(itemToDelete.id);
+        if (result.success) {
+          const updatedItems = inventoryItems.filter(
+            (_, index) => index !== itemToDelete.index
+          );
+          setInventoryItems(updatedItems);
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product deleted successfully",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while deleting",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   // Render mobile card view for inventory items
@@ -569,19 +651,19 @@ const Invent = () => {
   // Render inventory items with loading state
   const renderInventoryItems = () => {
     if (isDataLoading) {
-      return (
-        <div
-          className="loading-container"
-          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-        >
-          <ProgressSpinner
-            style={{ width: "50px", height: "50px" }}
-            strokeWidth="4"
-            fill="var(--surface-ground)"
-            animationDuration=".5s"
-          />
-        </div>
-      );
+      // return (
+      //   <div
+      //     className="loading-container"
+      //     style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
+      //   >
+      //     <ProgressSpinner
+      //       style={{ width: "50px", height: "50px" }}
+      //       strokeWidth="4"
+      //       fill="var(--surface-ground)"
+      //       animationDuration=".5s"
+      //     />
+      //   </div>
+      // );
     }
 
     if (inventoryItems.length === 0) {
@@ -821,14 +903,37 @@ const Invent = () => {
                             borderBottom: "1px solid #eee",
                           }}
                         >
-                          <input
-                            type="checkbox"
+                          <div
                             style={{
-                              margin: 0,
-                              width: "14px",
-                              height: "14px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "8px",
                             }}
-                          />
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectAll}
+                              onChange={handleSelectAll}
+                              style={{
+                                margin: 0,
+                                width: "19px",
+                                height: "19px",
+                              }}
+                            />
+                            {selectedItems.length > 0 && (
+                              <img
+                                src={deleteLogo}
+                                alt="delete"
+                                style={{
+                                  width: "18px",
+                                  height: "18px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={handleBulkDelete}
+                              />
+                            )}
+                          </div>
                         </th>
                       </tr>
                     </thead>
@@ -951,9 +1056,11 @@ const Invent = () => {
                               >
                                 <input
                                   type="checkbox"
+                                  checked={selectedItems.includes(item.id)}
+                                  onChange={(e) => handleSelectItem(e, item.id)}
                                   style={{
-                                    width: "12px",
-                                    height: "12px",
+                                    width: "16px",
+                                    height: "16px",
                                   }}
                                 />
                               </td>
@@ -1178,16 +1285,19 @@ const Invent = () => {
           <div className="form-row">
             <div
               className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
+              style={{ display: "block", marginBottom: "15px", border: "none" }}
             >
               <label htmlFor="serviceArea">Service Area</label>
-              <InputText
+              <Dropdown
                 id="serviceArea"
                 value={newItem.serviceArea}
+                options={serviceAreaOptions}
                 onChange={(e) =>
-                  setNewItem({ ...newItem, serviceArea: e.target.value })
+                  setNewItem({ ...newItem, serviceArea: e.value })
                 }
+                placeholder="Select a service area"
                 style={{ width: "100%" }}
+                className="no-border-dropdown"
               />
             </div>
             <div
@@ -1309,7 +1419,11 @@ const Invent = () => {
             className="pi pi-exclamation-triangle"
             style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
           ></i>
-          <span>Are you sure you want to delete this product?</span>
+          <span>
+            {itemToDelete?.multiple
+              ? `Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`
+              : "Are you sure you want to delete this product?"}
+          </span>
         </div>
       </Dialog>
 
