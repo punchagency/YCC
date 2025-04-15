@@ -61,13 +61,13 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
       headers: getAuthHeader(),
       params: {
         page,
-        limit
+        limit,
       },
     });
-    
+
     // Log the response to check the structure
     console.log("Bookings API Response:", response.data);
-    
+
     // Make sure we're returning both the data and pagination info
     return {
       status: true,
@@ -75,8 +75,8 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
       pagination: {
         total: response.data.total || response.data.length,
         page: response.data.page || page,
-        limit: response.data.limit || limit
-      }
+        limit: response.data.limit || limit,
+      },
     };
   } catch (error) {
     console.error("Error in getAllBookingService:", error);
@@ -87,8 +87,34 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
       pagination: {
         total: 0,
         page: page,
-        limit: limit
+        limit: limit,
+      },
+    };
+  }
+};
+
+export const bulkDeleteBookings = async (bookingIds) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/bulk-delete-bookings`,
+      { bookingIds },
+      {
+        headers: getAuthHeader(),
       }
+    );
+
+    return {
+      success: true,
+      message: response.data.message || "Bookings deleted successfully",
+    };
+  } catch (error) {
+    console.error(
+      "Error bulk deleting bookings:",
+      error.response?.data || error.message
+    );
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete bookings",
     };
   }
 };

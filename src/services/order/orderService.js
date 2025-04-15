@@ -13,20 +13,25 @@ const getAuthHeader = () => {
 
 // Create a new order
 export const createOrder = async (orderData) => {
-  const { supplierId, products, customerName, deliveryDate, additionalNotes } = orderData;
+  const { supplierId, products, customerName, deliveryDate, additionalNotes } =
+    orderData;
   try {
-    const response = await axios.post(`${API_URL}/orders`, {
-      supplierId,
-      products,
-      customerName,
-      deliveryDate,
-      additionalNotes,
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-        'Content-Type': 'application/json',
+    const response = await axios.post(
+      `${API_URL}/orders`,
+      {
+        supplierId,
+        products,
+        customerName,
+        deliveryDate,
+        additionalNotes,
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -234,5 +239,29 @@ export const getOrderSummary = async () => {
   }
 };
 
+// Bulk delete orders
+export const bulkDeleteOrders = async (orderIds) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/orders/bulk-delete-orders`,
+      { orderIds },
+      {
+        headers: getAuthHeader(),
+      }
+    );
 
-
+    return {
+      success: true,
+      message: response.data.message || "Orders deleted successfully",
+    };
+  } catch (error) {
+    console.error(
+      "Error bulk deleting orders:",
+      error.response?.data || error.message
+    );
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete orders",
+    };
+  }
+};

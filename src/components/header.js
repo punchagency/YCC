@@ -31,6 +31,7 @@ import {
   downloadBookingExcel,
   downloadFinancialExcel
 } from "../services/reports/reports";
+import './header.css';
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -204,6 +205,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       >
         {/* Hamburger Menu */}
         <div 
+          className="hamburger-container"
           style={{ 
             cursor: "pointer",
             marginRight: "10px",

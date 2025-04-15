@@ -30,13 +30,17 @@ import eyeblock from "../../assets/images/crew/eyeblock.png";
 import sortIcon from "../../assets/images/crew/sort.png";
 import axios from "axios";
 import "./bookings.css";
-import { getAllBookingService } from "../../services/bookings/bookingService";
+import {
+  getAllBookingService,
+  createBookingService,
+  deleteBookingService,
+  bulkDeleteBookings,
+} from "../../services/bookings/bookingService";
 
 // Context
 import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
 import { useTheme } from "../../context/theme/themeContext";
-import { createBookingService } from "../../services/bookings/bookingService";
 import { useToast } from "../../components/Toast";
 
 const Bookings = () => {
@@ -91,6 +95,11 @@ const Bookings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedBookings, setSelectedBookings] = useState([]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState(null);
 
   // Add this useEffect to handle window resizing
   useEffect(() => {
@@ -491,6 +500,62 @@ const Bookings = () => {
       ));
   };
 
+  const handleSelectAll = (e) => {
+    const checked = e.target.checked;
+    setSelectAll(checked);
+
+    if (checked) {
+      // Select all bookings from bookingData (the array that's actually being displayed)
+      setSelectedBookings(bookingData);
+    } else {
+      // Deselect all
+      setSelectedBookings([]);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedBookings.length === 0) return;
+
+    setBookingToDelete({
+      multiple: true,
+      ids: selectedBookings.map((booking) => booking._id),
+    });
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    setLoading(true);
+    try {
+      if (bookingToDelete.multiple) {
+        const result = await bulkDeleteBookings(bookingToDelete.ids);
+
+        if (result.success) {
+          // Refresh the bookings list
+          fetchBookings();
+          setSelectedBookings([]);
+          setSelectAll(false);
+
+          showSuccess(
+            `Successfully deleted ${bookingToDelete.ids.length} bookings`
+          );
+        } else {
+          showError(result.error || "Failed to delete bookings");
+        }
+      } else {
+        // Original single booking deletion logic
+        await deleteBookingService(bookingToDelete._id);
+        fetchBookings();
+        showSuccess("Booking deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting bookings:", error);
+      showError("An error occurred while deleting");
+    } finally {
+      setLoading(false);
+      setShowDeleteConfirmation(false);
+    }
+  };
+
   return (
     <>
       <div
@@ -833,7 +898,20 @@ const Bookings = () => {
                                 <input
                                   type="checkbox"
                                   className="header-checkbox"
+                                  checked={selectAll}
+                                  onChange={handleSelectAll}
                                 />
+                                {selectedBookings.length > 0 && (
+                                  <i
+                                    className="pi pi-trash"
+                                    style={{
+                                      cursor: "pointer",
+                                      color: "#ff4d4f",
+                                      marginLeft: "8px",
+                                    }}
+                                    onClick={handleBulkDelete}
+                                  />
+                                )}
                               </th>
                               <th style={{ fontSize: "12px" }}>
                                 Booking ID
@@ -945,7 +1023,27 @@ const Bookings = () => {
                                     }}
                                   >
                                     <td>
-                                      <input type="checkbox" />
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedBookings.includes(
+                                          booking
+                                        )}
+                                        onChange={(e) => {
+                                          const selected = e.target.checked;
+                                          setSelectedBookings(
+                                            selected
+                                              ? [...selectedBookings, booking]
+                                              : selectedBookings.filter(
+                                                  (b) => b._id !== booking._id
+                                                )
+                                          );
+
+                                          // If we're unchecking an item, also uncheck the "select all" checkbox
+                                          if (!selected && selectAll) {
+                                            setSelectAll(false);
+                                          }
+                                        }}
+                                      />
                                     </td>
                                     <td
                                       style={{
@@ -1143,15 +1241,15 @@ const Bookings = () => {
                                           }}
                                         >
                                           {/* <i
-                                          className="pi pi-check-circle"
-                                          style={{
-                                            fontSize: "14px",
-                                            color: "#4880FF",
-                                            border: "1px solid #4880FF",
-                                            borderRadius: "50%",
-                                            padding: "1px",
-                                          }}
-                                        ></i> */}
+                                className="pi pi-check-circle"
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#4880FF",
+                                  border: "1px solid #4880FF",
+                                  borderRadius: "50%",
+                                  padding: "1px",
+                                }}
+                              ></i> */}
                                           <img
                                             src={check}
                                             alt="Download"
@@ -1164,18 +1262,18 @@ const Bookings = () => {
 
                                         {/* Download button */}
                                         {/* <Button
-                                        icon="pi pi-download"
-                                        className="p-button-text p-button-sm"
-                                        style={{
-                                          width: "20px",
-                                          height: "20px",
-                                          padding: "1px",
-                                          border: "1px solid #ddd",
-                                          borderRadius: "50%",
-                                        }}
-                                        tooltip="Download"
-                                        tooltipOptions={{ position: "top" }}
-                                      /> */}
+                              icon="pi pi-download"
+                              className="p-button-text p-button-sm"
+                              style={{
+                                width: "20px",
+                                height: "20px",
+                                padding: "1px",
+                                border: "1px solid #ddd",
+                                borderRadius: "50%",
+                              }}
+                              tooltip="Download"
+                              tooltipOptions={{ position: "top" }}
+                            /> */}
                                         <img
                                           src={downloadIcon}
                                           alt="Download"
@@ -1961,6 +2059,48 @@ const Bookings = () => {
             onClick={handleCreateBooking}
             style={{ backgroundColor: "#0387D9", border: "none" }}
           />
+        </div>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        visible={showDeleteConfirmation}
+        onHide={() => setShowDeleteConfirmation(false)}
+        header="Confirm Deletion"
+        footer={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "10px",
+            }}
+          >
+            <Button
+              label="No"
+              icon="pi pi-times"
+              onClick={() => setShowDeleteConfirmation(false)}
+              className="p-button-text"
+            />
+            <Button
+              label="Yes"
+              icon="pi pi-check"
+              onClick={confirmDelete}
+              loading={loading}
+              className="p-button-danger"
+            />
+          </div>
+        }
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
+          />
+          <span>
+            {bookingToDelete?.multiple
+              ? `Are you sure you want to delete ${bookingToDelete.ids.length} selected bookings? This action cannot be undone.`
+              : "Are you sure you want to delete this booking?"}
+          </span>
         </div>
       </Dialog>
     </>

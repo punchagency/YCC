@@ -112,7 +112,7 @@ const Section3FinancialManagement = ({ transactions, loading, page, limit, setPa
                 <TableRow>
                 <StyledTableCell mode={theme}>
                     <TableTitleText mode={theme}>
-                      <CustomCheckbox mode={theme} />
+                      {/* <CustomCheckbox mode={theme} /> */}
                     </TableTitleText>
                   </StyledTableCell>
                   <StyledTableCell mode={theme}>
@@ -142,7 +142,7 @@ const Section3FinancialManagement = ({ transactions, loading, page, limit, setPa
                   <StyledTableRow key={row.transaction}>
                     <StyledTableCell align="right" mode={theme}>
                       <TableBodyText mode={theme}>
-                        <CustomCheckbox mode={theme} />
+                        {/* <CustomCheckbox mode={theme} /> */}
                       </TableBodyText>
                     </StyledTableCell>
                     <StyledTableCell component="th" scope="row" mode={theme}>
