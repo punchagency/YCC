@@ -98,8 +98,8 @@ const BookingSummaryInfoCard = () => {
             <EventCard
               mode={theme}
               sx={{
-                borderBottomLeftRadius: "0px",
-                borderBottomRightRadius: "0px",
+                borderBottomLeftRadius:  event.location === "in-person" || event.location === "In-Person" ? "8px" : "0px",
+                borderBottomRightRadius: event.location === "in-person" || event.location === "In-Person" ? "8px" : "0px",
               }}
             >
               <Box
@@ -132,7 +132,7 @@ const BookingSummaryInfoCard = () => {
             </EventCard>
             <Box
               sx={{
-                display: "flex",
+                display: event.location === "in-person"|| event.location === "In-Person" ? "none" : "flex",
                 flexDirection: "row",
                 backgroundColor: "#0387D91A",
                 borderBottomLeftRadius: "8px",
@@ -154,7 +154,7 @@ const BookingSummaryInfoCard = () => {
               >
                 <VideocamIcon sx={{ color: "#0387D9" }} />
                 <EventNameText mode={theme}>
-                  &nbsp;{event.description}
+                  &nbsp;{event.location}
                 </EventNameText>
               </Box>
 

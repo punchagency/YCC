@@ -17,17 +17,7 @@ import CalendarIcon from "@mui/icons-material/CalendarMonth";
 import { useCalendar } from "../../context/calendar/calendarContext";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "55vw",
-  bgcolor: "background.paper",
-  borderRadius: 3,
-  boxShadow: 24,
-  p: 4,
-};
+
 
 const ViewEventModal = ({ open, handleClose, event }) => {
   const { addGuest } = useCalendar();
@@ -58,8 +48,24 @@ const ViewEventModal = ({ open, handleClose, event }) => {
   if (!event) return null;
 
   return (
-    <Modal open={open} onClose={handleClose} sx={{overflowY: "scroll",}}>
-      <Box sx={style}>
+    <Modal open={open} onClose={handleClose}>
+      <Box sx=
+      {{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: { xs: '90%', sm: '70%', md: '50%' },
+        maxHeight: '80vh',
+        overflowY: 'auto',
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        borderRadius: 2,
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+      }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Event Details</Typography>
           <IconButton onClick={handleClose}>
