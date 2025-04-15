@@ -15,7 +15,7 @@ import ViewEventModal from "./view-event-modal";
 import "../../assets/styles/scss/components/calendar.css";
 import { useCalendar } from "../../context/calendar/calendarContext";
 const UpdatedCalendar = () => {
-    const { events, selectedDate, setSelectedDate, fetchEventsByDate, startDate, endDate, setStartDate, setEndDate } = useCalendar();
+    const { events, selectedDate, setSelectedDate, fetchEventsByDate, startDate, endDate, setStartDate, setEndDate, eventsForTodayAndTomorrow } = useCalendar();
   const { theme } = useTheme();
   // Start of the current month
   const currentDate = new Date();
@@ -24,7 +24,7 @@ const UpdatedCalendar = () => {
   // End of the current month
   const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
   
-  const eventsForToday = events.filter((event) => {
+  const eventsForToday = eventsForTodayAndTomorrow.filter((event) => {
     const eventDate = new Date(event.start);
     return (
       eventDate.getFullYear() === currentDate.getFullYear() &&

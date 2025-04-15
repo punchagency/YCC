@@ -33,7 +33,6 @@ const Dashboard1 = () => {
     fetchLowInventory();
   }, []);
 
-  console.log('lowInventory', lowInventory);
   const menuItems = [
     {
       label: "Monthly",

@@ -22,10 +22,12 @@ export const CalendarProvider = ({ children }) => {
     const [startDate, setStartDate] = useState(currentMonth);
     const [endDate, setEndDate] = useState(nextMonth);
     const [events, setEvents] = useState([]);
+    const [eventsForTodayAndTomorrow, setEventsForTodayAndTomorrow] = useState([]);
 
     const addEvent = async (event) => {
         const response = await createEvent(event);
         if (response.success) {
+            fetchEventsForTodayAndTomorrow()
             setEvents([...events, response.data.data]);
             toast.current.show({ severity: 'success', summary: 'Success', detail: 'Event added successfully' });
         } else {
@@ -40,6 +42,21 @@ export const CalendarProvider = ({ children }) => {
         }
         const response = await fetchEvents(startDate, endDate);
         setEvents(response.data.data || []);
+    };
+
+    const fetchEventsForTodayAndTomorrow = async () => {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+        const startOfTomorrow = new Date();
+        startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+        startOfTomorrow.setHours(0, 0, 0, 0);
+        const endOfTomorrow = new Date();
+        endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
+        endOfTomorrow.setHours(23, 59, 59, 999);
+        const response = await fetchEvents(startOfToday, endOfTomorrow);
+        setEventsForTodayAndTomorrow(response.data.data || []);
     };
 
     const addGuest = async (eventId, guestEmails) => {
@@ -63,7 +80,9 @@ export const CalendarProvider = ({ children }) => {
             endDate,
             setEndDate,
             addGuest,
-            
+            eventsForTodayAndTomorrow,
+            fetchEventsForTodayAndTomorrow,
+
         }
   return (
     <CalendarContext.Provider value={value}>
