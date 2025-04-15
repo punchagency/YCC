@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
@@ -202,6 +202,24 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       item.className = `${item.className || ""} menu-item`;
     }
   });
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .p-panelmenu .p-menuitem-text {
+        transition: color 0.2s;
+      }
+      .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text,
+      .p-panelmenu .p-menuitem-link:hover .p-menuitem-text {
+        color: white !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <>
