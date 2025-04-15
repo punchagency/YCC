@@ -49,39 +49,39 @@ const getUserId = () => {
 
 export const createInventoryData = async (inventoryData) => {
   try {
-    // Get the user ID from localStorage or use a hardcoded supplier ID
-    const userId = localStorage.getItem("id");
-    const SUPPLIER_ID = userId; // Use the ID from your successful response
+    // If inventoryData is FormData, use it directly
+    // Otherwise, create a new FormData object
+    const formData = inventoryData instanceof FormData 
+      ? inventoryData 
+      : new FormData();
+    
+    // If inventoryData is not FormData, append all properties
+    if (!(inventoryData instanceof FormData)) {
+      Object.keys(inventoryData).forEach(key => {
+        if (key === 'inventoryImage' && inventoryData[key]) {
+          formData.append(key, inventoryData[key]);
+        } else {
+          formData.append(key, inventoryData[key]);
+        }
+      });
+    }
 
-    // Format data to match API requirements with supplier field
-    const formattedData = {
-      supplier: inventoryData.supplierId, // Add the supplier field that the backend requires
-      quantity: parseInt(inventoryData.quantity || inventoryData.stockQuantity),
-      price: parseFloat(inventoryData.price),
-      serviceArea: inventoryData.serviceArea,
-      category: inventoryData.category,
-      productName: inventoryData.productName,
-    };
-
-    console.log("Sending inventory data with supplier ID:", formattedData);
-
-    const response = await axios.post(`${API_URL}/inventory`, formattedData, {
+    const response = await axios.post(`${API_URL}/inventory`, formData, {
       headers: {
         ...getAuthHeader(),
-        "Content-Type": "application/json",
+        'Content-Type': 'multipart/form-data',
       },
     });
 
-    console.log("Response from API:", response.data);
-
-    return { success: true, data: response.data };
+    return {
+      success: true,
+      data: response.data,
+    };
   } catch (error) {
-    console.error("Error creating inventory data:", error);
-    console.error("Error details:", error.response?.data);
-
+    console.error("Error creating inventory:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to create inventory data",
+      error: error.response?.data?.message || "Failed to create inventory",
     };
   }
 };
@@ -117,32 +117,33 @@ export const getAllInventoryItems = async () => {
     let allInventoryItems = [];
     let page = 1;
     let hasNextPage = true;
-  
+
     while (hasNextPage) {
       const response = await axios.get(`${API_URL}/inventory`, {
         params: {
           page,
-          pageSize: 10
+          pageSize: 10,
         },
         headers: getAuthHeader(),
       });
       const inventoryItems = response.data.data;
       allInventoryItems.push(...inventoryItems);
-  
+
       const pagination = response.data.pagination;
       hasNextPage = pagination?.hasNextPage;
       page++;
     }
-    
+
     return allInventoryItems;
   } catch (error) {
     console.error("Error fetching all inventory items:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch all inventory items",
+      error:
+        error.response?.data?.message || "Failed to fetch all inventory items",
     };
   }
-}
+};
 export const updateInventoryItem = async (id, itemData) => {
   try {
     const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
@@ -187,6 +188,27 @@ export const getLowInventory = async () => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch low inventory",
+    };
+  }
+};
+
+export const deleteAllInventoryItems = async (inventoryIds) => {
+  try {
+    const response = await axios.delete(`${API_URL}/inventory/bulk-delete`, {
+      headers: getAuthHeader(),
+      data: { inventoryIds }, // Send IDs in request body
+    });
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error("Error in deleteAllInventoryItems:", error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message || "Failed to delete inventory items",
     };
   }
 };

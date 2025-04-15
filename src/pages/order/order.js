@@ -14,7 +14,12 @@ import iconContainer from "../../assets/images/crew/iconContainer.png";
 import neworder from "../../assets/images/crew/neworder.png";
 import "./order.css"; // We'll create this CSS file for transitions
 import { getInventoryData } from "../../services/inventory/inventoryService"; // Add this import
-import { createOrder, getOrders } from "../../services/order/orderService"; // Add this import
+import {
+  createOrder,
+  getOrders,
+  deleteOrder,
+  bulkDeleteOrders
+} from "../../services/order/orderService"; // Add this import
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { formatCurrency, formatDate } from "../../utils/formatters";
@@ -50,12 +55,11 @@ const Order = () => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-let allSuppliersMap = new Map();
-let allProductsMap = new Map();
+  let allSuppliersMap = new Map();
+  let allProductsMap = new Map();
 
-
-let allSupplierOptions = []
-let allProductOptions = []
+  let allSupplierOptions = [];
+  let allProductOptions = [];
 
   // Add back the status options
   const statusOptions = [
@@ -77,7 +81,7 @@ let allProductOptions = []
   }, []);
 
   const [orderForm, setOrderForm] = useState({
-    supplier:null,
+    supplier: null,
     customerName: "",
     products: [{ id: null, quantity: 1 }],
     deliveryDate: null,
@@ -92,54 +96,53 @@ let allProductOptions = []
       await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
       await fetchOrders(); // if needed
     };
-  
+
     if (runCount.current < 1) {
       runCount.current += 1;
       fetchData();
     }
   }, []);
-  
+
   useEffect(() => {
     if (!allInventoryItems || allInventoryItems.length === 0) return;
-  
+
     const suppliersMap = new Map();
     const productsMap = new Map();
-  
+
     allInventoryItems.forEach((item) => {
       if (item.supplier) suppliersMap.set(item.supplier._id, item.supplier);
       if (item.product) productsMap.set(item.product._id, item.product);
     });
-  
-    const supplierOptions = Array.from(suppliersMap.values()).map((supplier) => ({
-      label: supplier.businessName,
-      value: supplier._id,
-    }));
-  
+
+    const supplierOptions = Array.from(suppliersMap.values()).map(
+      (supplier) => ({
+        label: supplier.businessName,
+        value: supplier._id,
+      })
+    );
+
     const productOptions = Array.from(productsMap.values()).map((product) => ({
       label: product.name,
       value: product._id,
     }));
-  
+
     setSupplierOptions(supplierOptions);
     setProductOptions(productOptions);
     setLoading(false);
   }, [allInventoryItems]);
-  
-    
-    useEffect(() => {
-      if (selectedProduct) {
-        console.log('selectedProduct', selectedProduct);
-        const match = allInventoryItems.find(
-          item => item.product?._id === selectedProduct
-        );
-        console.log('match', match);
-        if (match?.supplier?._id) {
-          setSelectedSupplier(match.supplier._id);
-        }
-      }
-    }, [selectedProduct]);
-    
 
+  useEffect(() => {
+    if (selectedProduct) {
+      console.log("selectedProduct", selectedProduct);
+      const match = allInventoryItems.find(
+        (item) => item.product?._id === selectedProduct
+      );
+      console.log("match", match);
+      if (match?.supplier?._id) {
+        setSelectedSupplier(match.supplier._id);
+      }
+    }
+  }, [selectedProduct]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -163,9 +166,9 @@ let allProductOptions = []
         ],
       });
     } else {
-    setOrderForm({
-      ...orderForm,
-      [field]: e.value,
+      setOrderForm({
+        ...orderForm,
+        [field]: e.value,
       });
     }
   };
@@ -194,7 +197,7 @@ let allProductOptions = []
       !selectedSupplier ||
       !selectedProduct ||
       !orderForm.customerName ||
-      !orderForm.deliveryDate 
+      !orderForm.deliveryDate
     ) {
       showError("Please fill in all required fields");
       return;
@@ -229,17 +232,16 @@ let allProductOptions = []
       if (response.status) {
         showSuccess("Order created successfully");
 
-    // Reset form
-    setOrderForm({
-      customerName: "",
+        // Reset form
+        setOrderForm({
+          customerName: "",
           products: [{ id: null, quantity: 1 }],
-      deliveryDate: null,
+          deliveryDate: null,
           additionalNotes: "",
-    });
+        });
 
         setShowOrderForm(false);
         fetchOrders();
-       
       } else {
         showError(response.error || "Failed to create order");
       }
@@ -260,7 +262,7 @@ let allProductOptions = []
 
   // Render mobile summary boxes
   const renderMobileSummaryBoxes = () => {
-  return (
+    return (
       <div style={{ padding: "0 10px" }}>
         {/* First summary box */}
         <div
@@ -292,8 +294,8 @@ let allProductOptions = []
                 alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
               />
-        </div>
-      </div>
+            </div>
+          </div>
 
           <div
             style={{
@@ -302,7 +304,7 @@ let allProductOptions = []
               textAlign: "center",
             }}
           >
-      <div>
+            <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -312,7 +314,7 @@ let allProductOptions = []
                 {summaryData.allOrders}
               </p>
             </div>
-        <div>
+            <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -321,7 +323,7 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.pending}
               </p>
-        </div>
+            </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -345,11 +347,11 @@ let allProductOptions = []
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -358,15 +360,15 @@ let allProductOptions = []
               alt="lockLogo"
               style={{ width: "20px", height: "20px" }}
             />
-              <div style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
+              <img
+                src={dropdown}
+                alt="dropdown"
                 style={{ width: "12px", height: "12px", marginLeft: "5px" }}
-                />
-              </div>
+              />
             </div>
+          </div>
 
           <div
             style={{
@@ -375,7 +377,7 @@ let allProductOptions = []
               textAlign: "center",
             }}
           >
-              <div>
+            <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -384,8 +386,8 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.cancelled}
               </p>
-              </div>
-              <div>
+            </div>
+            <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -394,8 +396,8 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.returned}
               </p>
-              </div>
-              <div>
+            </div>
+            <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
               >
@@ -404,9 +406,9 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 {summaryData.damaged}
               </p>
-              </div>
             </div>
           </div>
+        </div>
 
         {/* Third summary box */}
         <div
@@ -418,11 +420,11 @@ let allProductOptions = []
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
         >
-            <div  
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
               marginBottom: "10px",
             }}
           >
@@ -446,9 +448,9 @@ let allProductOptions = []
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               textAlign: "center",
-              }}
-            >
-              <div>
+            }}
+          >
+            <div>
               <p
                 style={{
                   margin: "0 0 5px 0",
@@ -461,7 +463,7 @@ let allProductOptions = []
               <p style={{ margin: 0, fontSize: "16px", fontWeight: "bold" }}>
                 0
               </p>
-              </div>
+            </div>
             <div>
               <p
                 style={{ margin: "0 0 5px 0", fontSize: "13px", color: "#666" }}
@@ -474,10 +476,26 @@ let allProductOptions = []
             </div>
           </div>
         </div>
-        <div className="table-container" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-          <table className="orders-table" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-            <thead style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-              <tr style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
+        <div
+          className="table-container"
+          style={{ backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F" }}
+        >
+          <table
+            className="orders-table"
+            style={{
+              backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+            }}
+          >
+            <thead
+              style={{
+                backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+              }}
+            >
+              <tr
+                style={{
+                  backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                }}
+              >
                 <th>Select</th>
                 <th>Customer Name</th>
                 <th>Order Date</th>
@@ -487,7 +505,7 @@ let allProductOptions = []
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
-            </thead>  
+            </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
@@ -647,6 +665,68 @@ let allProductOptions = []
     );
   };
 
+  const [selectAll, setSelectAll] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
+
+  const handleSelectAll = (e) => {
+    const checked = e.target.checked;
+    setSelectAll(checked);
+    
+    if (checked) {
+      // Select all orders
+      setSelectedOrders(orders);
+    } else {
+      // Deselect all
+      setSelectedOrders([]);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedOrders.length === 0) return;
+    
+    setOrderToDelete({
+      multiple: true,
+      ids: selectedOrders.map(order => order._id)
+    });
+    setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    setIsLoading(true);
+    try {
+      if (orderToDelete.multiple) {
+        const result = await bulkDeleteOrders(orderToDelete.ids);
+        
+        if (result.success) {
+          // Refresh the orders list
+          fetchOrders();
+          setSelectedOrders([]);
+          setSelectAll(false);
+          
+          showSuccess(`Successfully deleted ${orderToDelete.ids.length} orders`);
+        } else {
+          showError(result.error || "Failed to delete orders");
+        }
+      } else {
+        // Original single order deletion logic
+        const result = await deleteOrder(orderToDelete._id);
+        if (result.success) {
+          fetchOrders();
+          showSuccess("Order deleted successfully");
+        } else {
+          showError(result.error || "Failed to delete order");
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting orders:", error);
+      showError("An error occurred while deleting");
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+    }
+  };
+
   return loading ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
@@ -719,7 +799,7 @@ let allProductOptions = []
                       marginRight: "10px",
                       backgroundColor:
                         theme === "light" ? "#FFFFFF" : "#03141F",
-                        color: theme === "light" ? "#103B57" : "#FFFFFF",
+                      color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
                     <div
@@ -735,19 +815,19 @@ let allProductOptions = []
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-              <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
+                        <img
+                          src={dropdown}
+                          alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                />
-              </div>
-            </div>
+                        />
+                      </div>
+                    </div>
 
                     <div
                       style={{
@@ -756,7 +836,7 @@ let allProductOptions = []
                         textAlign: "center",
                       }}
                     >
-              <div>
+                      <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -775,8 +855,8 @@ let allProductOptions = []
                         >
                           {summaryData.allOrders}
                         </p>
-              </div>
-              <div>
+                      </div>
+                      <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -795,8 +875,8 @@ let allProductOptions = []
                         >
                           {summaryData.pending}
                         </p>
-              </div>
-              <div>
+                      </div>
+                      <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -815,9 +895,9 @@ let allProductOptions = []
                         >
                           {summaryData.completed}
                         </p>
-              </div>
-            </div>
-          </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Second summary box */}
                   <div
@@ -831,14 +911,14 @@ let allProductOptions = []
                       marginLeft: "10px",
                       backgroundColor:
                         theme === "light" ? "#FFFFFF" : "#03141F",
-                        color: theme === "light" ? "#103B57" : "#FFFFFF",
+                      color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -847,19 +927,19 @@ let allProductOptions = []
                         alt="lockLogo"
                         style={{ width: "20px", height: "20px" }}
                       />
-              <div style={{ display: "flex", alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center" }}>
                         <p style={{ margin: 0, fontSize: "14px" }}>This week</p>
-                <img
-                  src={dropdown}
-                  alt="dropdown"
+                        <img
+                          src={dropdown}
+                          alt="dropdown"
                           style={{
                             width: "12px",
                             height: "12px",
                             marginLeft: "5px",
                           }}
-                />
-              </div>
-            </div>
+                        />
+                      </div>
+                    </div>
 
                     <div
                       style={{
@@ -868,7 +948,7 @@ let allProductOptions = []
                         textAlign: "center",
                       }}
                     >
-              <div>
+                      <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -887,8 +967,8 @@ let allProductOptions = []
                         >
                           {summaryData.cancelled}
                         </p>
-              </div>
-              <div>
+                      </div>
+                      <div>
                         <p
                           style={{
                             margin: "0 0 5px 0",
@@ -907,7 +987,7 @@ let allProductOptions = []
                         >
                           {summaryData.returned}
                         </p>
-              </div>
+                      </div>
                       <div>
                         <p
                           style={{
@@ -927,15 +1007,15 @@ let allProductOptions = []
                         >
                           {summaryData.damaged}
                         </p>
-            </div>
-          </div>
-        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Third summary box */}
                   <div
-                style={{
-                  backgroundColor: "white",
-                  borderRadius: "8px",
+                    style={{
+                      backgroundColor: "white",
+                      borderRadius: "8px",
                       padding: "15px",
                       marginBottom: "15px",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
@@ -943,15 +1023,14 @@ let allProductOptions = []
                       marginLeft: "10px",
                       backgroundColor:
                         theme === "light" ? "#FFFFFF" : "#03141F",
-                        color: theme === "light" ? "#103B57" : "#FFFFFF",
-
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                      color: theme === "light" ? "#103B57" : "#FFFFFF",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
                         marginBottom: "10px",
                       }}
                     >
@@ -972,10 +1051,10 @@ let allProductOptions = []
                           }}
                         />
                       </div>
-                </div>
+                    </div>
 
-                  <div
-                    style={{
+                    <div
+                      style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr",
                         textAlign: "center",
@@ -983,7 +1062,7 @@ let allProductOptions = []
                     >
                       <div>
                         <p
-                        style={{
+                          style={{
                             margin: "0 0 5px 0",
                             fontSize: "13px",
                             color: "#EF4444",
@@ -1025,30 +1104,127 @@ let allProductOptions = []
                   </div>
                 </div>
               </div>
-              <div className="table-container" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                <table className="orders-table" style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                  <thead style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                    <tr style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                      {/* <th>Select</th> */}
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>Customer Name</th>
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>Order Date</th>
-                      {/* <th>Order Type</th> */}
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>Tracking ID</th>
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>Order Total</th>
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>Status</th>
-                      <th style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
-                        <input type="checkbox" />
+              <div
+                className="table-container"
+                style={{
+                  backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                }}
+              >
+                <table
+                  className="orders-table"
+                  style={{
+                    backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                  }}
+                >
+                  <thead
+                    style={{
+                      backgroundColor:
+                        theme === "light" ? "#FFFFFF" : "#03141F",
+                    }}
+                  >
+                    <tr
+                      style={{
+                        backgroundColor:
+                          theme === "light" ? "#FFFFFF" : "#03141F",
+                      }}
+                    >
+                      <th style={{ width: "5%" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={selectAll}
+                            onChange={handleSelectAll}
+                            style={{
+                              margin: 0,
+                              width: "16px",
+                              height: "16px",
+                            }}
+                          />
+                          {selectedOrders.length > 0 && (
+                            <i 
+                              className="pi pi-trash" 
+                              style={{ cursor: "pointer", color: "#ff4d4f", marginLeft: "8px" }}
+                              onClick={handleBulkDelete}
+                            />
+                          )}
+                        </div>
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        Customer Name
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        Order Date
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        Tracking ID
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        Order Total
+                      </th>
+                      <th
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        Status
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map((order) => (
-                      <tr key={order.id} style={{backgroundColor:theme === "light" ? "#FFFFFF" : "#03141F"}}>
+                      <tr
+                        key={order.id}
+                        style={{
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                        }}
+                      >
+                        <td data-label="Select">
+                          <input
+                            type="checkbox"
+                            checked={selectedOrders.includes(order)}
+                            onChange={(e) => {
+                              const selected = e.target.checked;
+                              setSelectedOrders(
+                                selected
+                                  ? [...selectedOrders, order]
+                                  : selectedOrders.filter(
+                                      (o) => o._id !== order._id
+                                    )
+                              );
+                              
+                              // If we're unchecking an item, also uncheck the "select all" checkbox
+                              if (!selected && selectAll) {
+                                setSelectAll(false);
+                              }
+                            }}
+                          />
+                        </td>
                         <td data-label="Customer Name">{order.customerName}</td>
                         <td data-label="Order Date">
                           {formatDate(order.orderDate)}
                         </td>
-                        {/* <td data-label="Order Type">{order.orderType}</td> */}
                         <td data-label="Tracking ID">
                           <div className="tracking-id">
                             <span>{order.orderId}</span>
@@ -1065,32 +1241,6 @@ let allProductOptions = []
                             {order.status}
                           </span>
                         </td>
-                        <td data-label="Select">
-                          <input
-                            type="checkbox"
-                            checked={selectedOrders.includes(order)}
-                            onChange={(e) => {
-                              const selected = e.target.checked;
-                              setSelectedOrders(
-                                selected
-                                  ? [...selectedOrders, order]
-                                  : selectedOrders.filter(
-                                      (o) => o.id !== order.id
-                                    )
-                              );
-                            }}
-                          />
-                        </td>
-                        {/* <td data-label="Actions">
-                          <div className="action-buttons">
-                            <button className="action-btn" title="View Details">
-                              <i className="pi pi-eye" />
-                            </button>
-                            <button className="action-btn" title="Edit Order">
-                              <i className="pi pi-pencil" />
-                            </button>
-                    </div>
-                        </td> */}
                       </tr>
                     ))}
                     <tr style={{ marginRight: "20px" }}>
@@ -1139,13 +1289,13 @@ let allProductOptions = []
                 </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Supplier Name*</label>
-                 <Dropdown
+                  <Dropdown
                     id="selectedProduct"
                     disabled={true}
                     value={selectedSupplier}
-                    options={supplierOptions.map(option => ({
+                    options={supplierOptions.map((option) => ({
                       label: option.label,
-                      value: option.value
+                      value: option.value,
                     }))}
                     onChange={(e) => setSelectedSupplier(e.target.value)}
                     placeholder="supplier generated automatically"
@@ -1153,27 +1303,27 @@ let allProductOptions = []
                 </div>
               </div>
 
-                  {/* Stock Quantity and Select Product */}
+              {/* Stock Quantity and Select Product */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="quantity">Quantity*</label>
-                      <InputText
+                  <InputText
                     id="quantity"
                     name="quantity"
                     value={orderForm.products[0].quantity}
                     onChange={handleQuantityChange}
-                        placeholder="Enter quantity"
-                        keyfilter="pint"
-                      />
-                    </div>
+                    placeholder="Enter quantity"
+                    keyfilter="pint"
+                  />
+                </div>
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Select Product*</label>
                   <Dropdown
                     id="selectedProduct"
                     value={selectedProduct}
-                    options={productOptions.map(option => ({
+                    options={productOptions.map((option) => ({
                       label: option.label,
-                      value: option.value
+                      value: option.value,
                     }))}
                     onChange={(e) => setSelectedProduct(e.target.value)}
                     placeholder="Select a product"
@@ -1181,29 +1331,29 @@ let allProductOptions = []
                 </div>
               </div>
 
-                  {/* Order Status and Delivery Date */}
+              {/* Order Status and Delivery Date */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="orderStatus">Order Status*</label>
-                      <Dropdown
-                        id="orderStatus"
-                        value={orderForm.orderStatus}
-                        options={statusOptions}
-                        onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                        placeholder="Select status"
-                      />
-                    </div>
+                  <Dropdown
+                    id="orderStatus"
+                    value={orderForm.orderStatus}
+                    options={statusOptions}
+                    onChange={(e) => handleDropdownChange(e, "orderStatus")}
+                    placeholder="Select status"
+                  />
+                </div>
                 <div className="p-field">
                   <label htmlFor="deliveryDate">Delivery Date*</label>
-                      <Calendar
-                        id="deliveryDate"
-                        value={orderForm.deliveryDate}
-                        onChange={handleDateChange}
-                        showIcon
-                        placeholder="Select date"
-                      />
-                    </div>
-                  </div>
+                  <Calendar
+                    id="deliveryDate"
+                    value={orderForm.deliveryDate}
+                    onChange={handleDateChange}
+                    showIcon
+                    placeholder="Select date"
+                  />
+                </div>
+              </div>
 
               {/* Notes */}
               <div className="p-field">
@@ -1218,25 +1368,61 @@ let allProductOptions = []
               </div>
 
               <div className="dialog-footer">
-                    <Button
-                      label="Cancel"
-                      icon="pi pi-times"
+                <Button
+                  label="Cancel"
+                  icon="pi pi-times"
                   onClick={() => setShowOrderModal(false)}
                   className="p-button-danger"
-                    />
-                    <Button
-                      label="Create Order"
-                      icon="pi pi-check"
-                      onClick={() => {
-                        handleSubmit();
+                />
+                <Button
+                  label="Create Order"
+                  icon="pi pi-check"
+                  onClick={() => {
+                    handleSubmit();
                     setShowOrderModal(false);
                   }}
                   className="p-button-primary"
-                    />
-                  </div>
-                </div>
-          </Dialog>
+                />
               </div>
+            </div>
+          </Dialog>
+        </div>
+
+        <Dialog
+          visible={showDeleteConfirmation}
+          onHide={() => setShowDeleteConfirmation(false)}
+          header="Confirm Deletion"
+          footer={
+            <div style={{ 
+              display: "flex", 
+              justifyContent: "flex-end", 
+              gap: "10px" 
+            }}>
+              <Button
+                label="No"
+                icon="pi pi-times"
+                onClick={() => setShowDeleteConfirmation(false)}
+                className="p-button-text"
+              />
+              <Button
+                label="Yes"
+                icon="pi pi-check"
+                onClick={confirmDelete}
+                loading={isLoading}
+                className="p-button-danger"
+              />
+            </div>
+          }
+        >
+          <div className="confirmation-content">
+            <i className="pi pi-exclamation-triangle" style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }} />
+            <span>
+              {orderToDelete?.multiple 
+                ? `Are you sure you want to delete ${orderToDelete.ids.length} selected orders? This action cannot be undone.`
+                : "Are you sure you want to delete this order?"}
+            </span>
+          </div>
+        </Dialog>
       </div>
     </>
   );

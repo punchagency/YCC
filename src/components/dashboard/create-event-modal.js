@@ -1,13 +1,28 @@
 import React, { useState } from "react";
-import { Modal, Box, Typography, TextField, Button, Grid, DialogActions } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { Dialog } from "primereact/dialog";
 import { useCalendar } from "../../context/calendar/calendarContext";
-import AddBoxIcon from '@mui/icons-material/AddBox';
-
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import { Calendar as PrimeCalendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 const CreateEventModal = ({ open, handleClose }) => {
-const { addEvent } = useCalendar()
+  const { addEvent } = useCalendar();
+  const locationOptions = [
+    { label: "Zoom", value: "Zoom" },
+    { label: "Google Meet", value: "Google Meet" },
+    { label: "Microsoft Teams", value: "Microsoft Teams" },
+    { label: "In-Person", value: "In-Person" },
+  ];
   const [event, setEvent] = useState({
     title: "",
     description: "",
@@ -17,6 +32,7 @@ const { addEvent } = useCalendar()
   });
 
   const handleChange = (e) => {
+    console.log(e.target);
     const { name, value } = e.target;
     setEvent((prev) => ({ ...prev, [name]: value }));
   };
@@ -40,112 +56,92 @@ const { addEvent } = useCalendar()
   };
 
   return (
-    <Modal open={open} onClose={handleClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          width: '65vh',
-        }}
-      >
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Create Event
-        </Typography>
-        <Grid container spacing={2} sx={{ mt: 2, p: 2 }}>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Event Title"
-          name="title"
-          value={event.title}
-          onChange={handleChange}
-          variant="outlined"
-          sx={{ borderRadius: "8px" }}
-        />
-      </Grid>
+    <Dialog 
+    visible={open} 
+    onHide={handleClose}
+    header="Create Event"
+    style={{ width: "500px" }}
+    >
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Box sx={{ width: "100%" }}>
+            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Event Title *</Typography>
+            <TextField
+              fullWidth
+              name="title"
+              value={event.title}
+              onChange={handleChange}
+              variant="outlined"
+            />
+            </Box>
+          </Grid>
 
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          multiline
-          rows={3}
-          label="Description"
-          name="description"
-          value={event.description}
-          onChange={handleChange}
-          variant="outlined"
-        />
-      </Grid>
+          <Grid item xs={12}>
+            <Box sx={{ width: "100%" }}>
+            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Description</Typography>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              name="description"
+              value={event.description}
+              onChange={handleChange}
+              variant="outlined"
+            />
+            </Box>
+          </Grid>
 
-      <Grid item xs={12} sm={6}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            label="Start Date & Time"
-            value={event.start}
-            onChange={(newValue) => handleDateChange("start", newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                variant="outlined"
-              />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ width: "100%" }}>
+              <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Start Date *</Typography>
+            <PrimeCalendar
+              id="start"
+              value={event.start}
+              onChange={(e) => handleDateChange("start", e.value)}
+              showTime
+              showSeconds={false}
+              placeholder="Select start date and time"
+              required
+            />
+            </Box>
+          </Grid>
 
-      <Grid item xs={12} sm={6}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            label="End Date & Time"
-            value={event.end}
-            onChange={(newValue) => handleDateChange("end", newValue)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                fullWidth
-                variant="outlined"
-              />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ width: "100%" }}>
+              <Typography variant="body1" sx={{ fontSize: "14px", color: "#000000" }}>End Date</Typography>
+            <PrimeCalendar
+              id="end"
+              value={event.end}
+              onChange={(e) => handleDateChange("end", e.value)}
+              showTime
+              showSeconds={false}
+              placeholder="Select end date and time"
+              required
+            />  
+            </Box>
+          </Grid>
 
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Location"
-          name="location"
-          value={event.location}
-          onChange={handleChange}
-          variant="outlined"
-        />
-      </Grid>
-    </Grid>
-        <DialogActions sx={{ mt: 2 }}>
-          <Button onClick={handleClose} 
-          variant="outlined"
-           sx={{
-            bgcolor: "#ffffff",
-            color: "#000000",
-            borderRadius: "10px",
-            padding: "10px 20px",
-            fontWeight: 500,
-            textTransform: "none",
-            fontSize: "12px",
-            ":hover": {
-              bgcolor: "rgba(0, 0, 0, 0.1)",
-            },
-          }}>
-            Cancel
-          </Button>
-          <Button variant="contained"
+          <Grid item xs={12}>
+            <Box sx={{ width: "100%" }}> 
+            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Location *</Typography>
+          <Dropdown
+              id="location"
+              value={event.location}
+              options={locationOptions}
+              onChange={(e) => setEvent({ ...event, location: e.value })}
+              placeholder="Select location type"
+              style={{ width: "100%" }}
+            />
+            </Box>
+          </Grid>
+        </Grid>
+
+      <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+        <Button onClick={handleClose} variant="outlined">
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
           startIcon={<AddBoxIcon />}
           sx={{
             bgcolor: "#0387d9",
@@ -159,14 +155,13 @@ const { addEvent } = useCalendar()
               bgcolor: "rgba(3, 135, 217, 0.9)",
             },
           }}
-          onClick={handleSubmit}>
-            Create Event
-          </Button>
-        </DialogActions>
+          onClick={handleSubmit}
+        >
+          Create Event
+        </Button>
       </Box>
-    </Modal>
+    </Dialog>
   );
 };
 
 export default CreateEventModal;
-
