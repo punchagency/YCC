@@ -309,9 +309,9 @@ const CrewSetting = () => {
           </div>
 
           <div className="settings-form-group delete-account">
-            <label>Delete Account</label>
+            <label>Delete Accounts</label>
             <div className="delete-buttons">
-              <Button label="No" className="p-button-danger" />
+              <Button label="No" className="p-button-danger" style={{width:"100px !important"}}/>
               <Button label="Yes" className="p-button-primary" />
             </div>
           </div>

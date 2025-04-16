@@ -209,3 +209,43 @@ export const deleteAllInventoryItems = async (inventoryIds) => {
     };
   }
 };
+
+// Add this new function to update product inventory status
+export const updateProductInventoryStatus = async (
+  productId,
+  status,
+  quantityChange = 0
+) => {
+  try {
+    const headers = {
+      ...getAuthHeader(),
+      "Content-Type": "application/json",
+    };
+
+    const data = {
+      status: status,
+      quantityChange: quantityChange,
+    };
+
+    const response = await axios.patch(
+      `${API_URL}/inventory/product/${productId}/status`,
+      data,
+      {
+        headers: headers,
+      }
+    );
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error updating product inventory status:`, error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message ||
+        "Failed to update product inventory status",
+    };
+  }
+};

@@ -3,9 +3,15 @@ import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Tooltip } from "primereact/tooltip";
+import { Menu } from "primereact/menu";
+import { Toast } from "primereact/toast";
 import NotificationDetailsModal from "../../components/NotificationDetailsModal";
 import sortNotification from "../../assets/images/crew/sortnotification.png";
-import { getNotifications } from "../../services/notification/notificationService";
+import {
+  getNotifications,
+  updateNotificationStatus,
+} from "../../services/notification/notificationService";
 import { TableSkeleton } from "../../components/TableSkeleton";
 
 export default function Notifications({ role }) {
@@ -15,6 +21,9 @@ export default function Notifications({ role }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const statusMenu = useRef(null);
+  const toast = useRef(null);
 
   useEffect(() => {
     fetchNotifications();
@@ -58,6 +67,49 @@ export default function Notifications({ role }) {
     setShowModal(true);
   };
 
+  const handleStatusChange = async (notificationId, newStatus) => {
+    setStatusLoading(true);
+    try {
+      const response = await updateNotificationStatus(
+        notificationId,
+        newStatus
+      );
+      if (response.success) {
+        // Update the local state
+        setNotifications(
+          notifications.map((notification) =>
+            notification._id === notificationId
+              ? { ...notification, status: newStatus }
+              : notification
+          )
+        );
+
+        toast.current.show({
+          severity: "success",
+          summary: "Status Updated",
+          detail: `Notification status changed to ${newStatus}`,
+          life: 3000,
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Update Failed",
+          detail: response.error || "Failed to update status",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while updating status",
+        life: 3000,
+      });
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   const priorityTemplate = (rowData) => {
     const bgColors = {
       high: { bg: "#ECFDF3", color: "#027A48" },
@@ -88,10 +140,13 @@ export default function Notifications({ role }) {
   const statusTemplate = (rowData) => {
     const statusStyles = {
       "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
-      acknowledged: { bg: "#EFF8FF", color: "#175CD3" },
+      flagged: { bg: "#EFF8FF", color: "#175CD3" },
       "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
       "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
       pending: { bg: "#FEF3F2", color: "#B42318" },
+      "in-progress": { bg: "#FFFAEB", color: "#B54708" },
+      resolved: { bg: "#ECFDF3", color: "#027A48" },
+      dismissed: { bg: "#F2F4F7", color: "#344054" },
     };
 
     const style = statusStyles[rowData.status.toLowerCase()] || {
@@ -99,18 +154,48 @@ export default function Notifications({ role }) {
       color: "#344054",
     };
 
+    const statusOptions = [
+      { label: "Pending", value: "pending" },
+      { label: "In Progress", value: "in-progress" },
+      { label: "Resolved", value: "resolved" },
+      { label: "Dismissed", value: "dismissed" },
+      { label: "Flagged", value: "flagged" },
+    ];
+
+    const statusMenuItems = statusOptions.map((option) => ({
+      label: option.label,
+      command: () => handleStatusChange(rowData._id, option.value),
+    }));
+
     return (
-      <span
-        style={{
-          backgroundColor: style.bg,
-          color: style.color,
-          padding: "2px 8px",
-          borderRadius: "16px",
-          fontSize: "12px",
-        }}
-      >
-        {rowData.status}
-      </span>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span
+          style={{
+            backgroundColor: style.bg,
+            color: style.color,
+            padding: "2px 8px",
+            borderRadius: "16px",
+            fontSize: "12px",
+            marginRight: "8px",
+          }}
+        >
+          {rowData.status}
+        </span>
+        <Button
+          icon="pi pi-check-circle"
+          className="p-button-rounded p-button-text p-button-sm"
+          tooltip="Change Status"
+          tooltipOptions={{ position: "top" }}
+          onClick={(e) => statusMenu.current.toggle(e)}
+          disabled={statusLoading}
+        />
+        <Menu
+          model={statusMenuItems}
+          popup
+          ref={statusMenu}
+          id={`status-menu-${rowData._id}`}
+        />
+      </div>
     );
   };
 
@@ -193,6 +278,7 @@ export default function Notifications({ role }) {
 
   return (
     <>
+      <Toast ref={toast} />
       <div className="notification-container">
         <div
           className="notification-header"
@@ -286,7 +372,7 @@ export default function Notifications({ role }) {
               }}
             />
             <Column
-              header="Action"
+              header="Actions"
               body={actionTemplate}
               style={{ padding: "16px 24px" }}
               headerStyle={{
@@ -304,7 +390,11 @@ export default function Notifications({ role }) {
 
       <NotificationDetailsModal
         visible={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={() => {
+          setShowModal(false);
+          // Refresh notifications after modal is closed to get updated status
+          fetchNotifications();
+        }}
         notificationData={selectedNotification}
       />
     </>

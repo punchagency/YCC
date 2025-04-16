@@ -382,8 +382,8 @@ const Reports = () => {
           {systemMetrics.map((metric, index) => (
             <div key={index} className="metric-card">
               <div className="metric-header">
-                <span>{metric.title}</span>
-                <h2>{metric.value}</h2>
+                <span style={{fontSize:"15px"}}>{metric.title}</span>
+                <h2 style={{fontSize:"25px"}}>{metric.value}</h2>
               </div>
               <div className="sparkline">
                 <Line

@@ -28,6 +28,7 @@ import times from "../../assets/images/crew/times.png";
 import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
 import sortIcon from "../../assets/images/crew/sort.png";
+import deleteIcon from "../../assets/images/crew/delete.png";
 import axios from "axios";
 import "./bookings.css";
 import {
@@ -35,6 +36,7 @@ import {
   createBookingService,
   deleteBookingService,
   bulkDeleteBookings,
+  updateBookingStatusService,
 } from "../../services/bookings/bookingService";
 
 // Context
@@ -42,6 +44,7 @@ import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
 import { useTheme } from "../../context/theme/themeContext";
 import { useToast } from "../../components/Toast";
+import { formGroupClasses } from "@mui/material";
 
 const Bookings = () => {
   const navigate = useNavigate();
@@ -87,7 +90,7 @@ const Bookings = () => {
     vendorAssigned: "",
     vesselLocation: "",
     dateTime: null,
-    bookingStatus: "Pending",
+    bookingStatus: "pending",
     internalNotes: "",
   });
 
@@ -117,9 +120,47 @@ const Bookings = () => {
     setShowReviewModal(true);
   };
 
-  // Add this function to handle status changes
-  const handleStatusChange = (booking, newStatus) => {
-    updateBookingStatus(booking._id, newStatus);
+  // Update the handleStatusChange function to ensure real-time updates
+  const handleStatusChange = async (booking, newStatus) => {
+    try {
+      setLoading(true);
+
+      // Convert status to lowercase to match backend expectations
+      const lowercaseStatus = newStatus.toLowerCase();
+
+      console.log(
+        `Updating booking ${booking._id} status to ${lowercaseStatus}`
+      );
+
+      // Call the API directly to ensure immediate update
+      const result = await updateBookingStatusService(
+        booking._id,
+        lowercaseStatus
+      );
+
+      if (result.status) {
+        // Update the local state immediately for real-time feedback
+        const updatedBookings = bookingData.map((item) => {
+          if (item._id === booking._id) {
+            return { ...item, bookingStatus: lowercaseStatus };
+          }
+          return item;
+        });
+
+        setBookingData(updatedBookings);
+        showSuccess(`Booking status updated to ${newStatus}`);
+
+        // Also refresh from server to ensure data consistency
+        fetchBookings();
+      } else {
+        showError(result.message || "Failed to update booking status");
+      }
+    } catch (error) {
+      console.error("Error updating booking status:", error);
+      showError("An error occurred while updating the booking status");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleViewBooking = (booking) => {
@@ -165,11 +206,48 @@ const Bookings = () => {
   };
 
   const handleSaveBooking = () => {
-    updateBooking(editingBooking._id, editingBooking).then((success) => {
-      if (success) {
-        setShowEditForm(false);
-      }
-    });
+    try {
+      console.log("Starting to save booking with data:", editingBooking);
+
+      // Create a properly formatted booking object for the API
+      const bookingData = {
+        services:
+          editingBooking.services?.map((service) => ({
+            service: service.service?._id,
+            quantity: service.quantity || 1,
+          })) || [],
+        vendorAssigned:
+          typeof editingBooking.vendorAssigned === "object"
+            ? editingBooking.vendorAssigned._id
+            : editingBooking.vendorAssigned,
+        vendorLocation: editingBooking.vesselLocation, // Map vesselLocation to vendorLocation for the API
+        dateTime: editingBooking.bookingDate,
+        bookingStatus: editingBooking.bookingStatus,
+        internalNotes: editingBooking.reviews,
+      };
+
+      console.log("Formatted booking data for API:", bookingData);
+
+      // Call the updateBooking function with the formatted data
+      updateBooking(editingBooking._id, bookingData)
+        .then((success) => {
+          console.log("Update booking response:", success);
+          if (success) {
+            showSuccess("Booking updated successfully");
+            setShowEditForm(false);
+            fetchBookingsData(); // Refresh the bookings list
+          } else {
+            showError("Failed to update booking");
+          }
+        })
+        .catch((error) => {
+          console.error("Error in updateBooking:", error);
+          showError("An error occurred while updating the booking");
+        });
+    } catch (error) {
+      console.error("Error in handleSaveBooking:", error);
+      showError("An error occurred while preparing the booking update");
+    }
   };
 
   const handleUploadBooking = (booking) => {
@@ -226,11 +304,13 @@ const Bookings = () => {
           },
         ],
         vendorAssigned: selectedService.vendorId,
-        vendorLocation: selectedService.vendorId,
+        vendorLocation: newBooking.vesselLocation,
         dateTime: newBooking.dateTime,
-        bookingStatus: newBooking.bookingStatus || "Pending",
+        bookingStatus: newBooking.bookingStatus || "pending",
         internalNotes: newBooking.internalNotes,
       };
+
+      console.log("Creating booking with data:", bookingData);
 
       const response = await createBookingService(bookingData);
       console.log("Create Booking Response:", response);
@@ -261,7 +341,7 @@ const Bookings = () => {
           bookingStatus: response.booking.bookingStatus,
           paymentStatus: response.booking.paymentStatus,
           vendorName: selectedService.vendorName,
-          vesselLocation: selectedService.businessAddress,
+          vesselLocation: newBooking.vesselLocation,
           internalNotes: response.booking.internalNotes,
           createdAt: response.booking.createdAt,
           updatedAt: response.booking.updatedAt,
@@ -279,7 +359,7 @@ const Bookings = () => {
           vendorAssigned: "",
           vesselLocation: "",
           dateTime: null,
-          bookingStatus: "Pending",
+          bookingStatus: "pending",
           internalNotes: "",
         });
       } else {
@@ -305,8 +385,7 @@ const Bookings = () => {
         const formattedBookings = response.data.map((booking) => ({
           ...booking,
           vendorName: booking.vendorAssigned?.businessName || "Not Assigned",
-          vesselLocation:
-            booking.vendorAssigned?.businessAddress || "Not Available",
+          vesselLocation: booking.vendorLocation || "Not Available",
         }));
 
         setBookingData(formattedBookings);
@@ -329,21 +408,19 @@ const Bookings = () => {
 
   // Update the getFormattedServices function
   const getFormattedServices = () => {
-    // Flatten all services from all vendors
-    const allServices = services.reduce((acc, vendor) => {
-      const vendorServices = vendor.services.map((service) => ({
-        label: service.name, // Service name for display
-        value: service._id, // Service ID
-        vendorName: vendor.businessName,
-        businessAddress: vendor.businessAddress,
-        vendorId: vendor._id,
-        description: service.description,
-      }));
-      return [...acc, ...vendorServices];
-    }, []);
+    if (!services || !Array.isArray(services)) return [];
 
-    console.log("Formatted Services:", allServices);
-    return allServices;
+    return services.flatMap((vendor) => {
+      if (!vendor.services || !Array.isArray(vendor.services)) return [];
+
+      return vendor.services.map((service) => ({
+        label: `${vendor.businessName} - ${service.name}`,
+        value: service._id,
+        vendorId: vendor._id,
+        vendorName: vendor.businessName,
+        // Remove businessAddress if it's being included here
+      }));
+    });
   };
 
   // Add this responsive table rendering function to your Bookings component
@@ -503,52 +580,103 @@ const Bookings = () => {
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
     setSelectAll(checked);
-
+    
     if (checked) {
-      // Select all bookings from bookingData (the array that's actually being displayed)
-      setSelectedBookings(bookingData);
+      // Select all bookings
+      const allBookingIds = bookingData.map(booking => booking._id);
+      setSelectedBookings(allBookingIds);
+      console.log("Selected all bookings:", allBookingIds);
     } else {
       // Deselect all
       setSelectedBookings([]);
+      console.log("Deselected all bookings");
+    }
+  };
+
+  const handleSelectBooking = (e, bookingId) => {
+    const checked = e.target.checked;
+    console.log(`${checked ? 'Selecting' : 'Deselecting'} booking:`, bookingId);
+    
+    if (checked) {
+      setSelectedBookings(prev => [...prev, bookingId]);
+    } else {
+      setSelectedBookings(prev => prev.filter(id => id !== bookingId));
+      
+      // If we're unchecking an item, also uncheck the "select all" checkbox
+      if (selectAll) {
+        setSelectAll(false);
+      }
     }
   };
 
   const handleBulkDelete = () => {
-    if (selectedBookings.length === 0) return;
+    if (selectedBookings.length === 0) {
+      showError("No bookings selected");
+      return;
+    }
 
+    console.log("Initiating bulk delete for bookings:", selectedBookings);
+    
     setBookingToDelete({
       multiple: true,
-      ids: selectedBookings.map((booking) => booking._id),
+      ids: selectedBookings
+    });
+    
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteClick = (booking) => {
+    setBookingToDelete({
+      _id: booking._id,
+      multiple: false,
     });
     setShowDeleteConfirmation(true);
   };
 
   const confirmDelete = async () => {
-    setLoading(true);
     try {
-      if (bookingToDelete.multiple) {
-        const result = await bulkDeleteBookings(bookingToDelete.ids);
-
-        if (result.success) {
-          // Refresh the bookings list
-          fetchBookings();
+      setLoading(true);
+      console.log("Confirming deletion for:", bookingToDelete);
+      
+      if (bookingToDelete?.multiple) {
+        console.log("Performing bulk deletion for IDs:", bookingToDelete.ids);
+        
+        const response = await bulkDeleteBookings(bookingToDelete.ids);
+        console.log("Bulk delete response:", response);
+        
+        if (response.success) {
+          // Remove the deleted bookings from the state
+          setBookingData(prevBookings => 
+            prevBookings.filter(booking => !bookingToDelete.ids.includes(booking._id))
+          );
+          
+          // Clear selection
           setSelectedBookings([]);
           setSelectAll(false);
-
-          showSuccess(
-            `Successfully deleted ${bookingToDelete.ids.length} bookings`
-          );
+          
+          showSuccess(`Successfully deleted ${bookingToDelete.ids.length} bookings`);
         } else {
-          showError(result.error || "Failed to delete bookings");
+          showError(response.error || "Failed to delete bookings");
         }
       } else {
-        // Original single booking deletion logic
-        await deleteBookingService(bookingToDelete._id);
-        fetchBookings();
-        showSuccess("Booking deleted successfully");
+        // Single booking deletion
+        console.log("Deleting single booking:", bookingToDelete);
+        
+        const response = await deleteBookingService(bookingToDelete._id);
+        console.log("Single delete response:", response);
+        
+        if (response.success) {
+          setBookingData(prevBookings => 
+            prevBookings.filter(booking => booking._id !== bookingToDelete._id)
+          );
+          
+          showSuccess("Booking deleted successfully");
+        } else {
+          showError(response.error || "Failed to delete booking");
+        }
       }
     } catch (error) {
-      console.error("Error deleting bookings:", error);
+      console.error("Error in confirmDelete:", error);
       showError("An error occurred while deleting");
     } finally {
       setLoading(false);
@@ -628,227 +756,124 @@ const Bookings = () => {
                     />
                   </div>
 
-                  <div className="p-fluid">
-                    {/* Customer and Service Name */}
-                    <div
-                      className="p-grid p-formgrid"
-                      style={{
-                        display: "flex",
-                        gap: "15px",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="email"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Customer Email*
-                        </label>
-                        <InputText
-                          id="email"
-                          name="email"
-                          value={editingBooking?.email || ""}
-                          onChange={handleEditInputChange}
-                          placeholder="Enter customer email"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="serviceName"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Service Name*
-                        </label>
-                        <Dropdown
-                          id="serviceName"
-                          name="serviceName"
-                          value={
-                            editingBooking?.services
-                              .map((service) => service.service._id)
-                              .join(", ") || ""
+                  <div className="p-fluid grid formgrid">
+                    <div className="col-12 md:col-6 field">
+                      <label htmlFor="serviceType">Service Type</label>
+                      <Dropdown
+                        id="serviceType"
+                        name="serviceType"
+                        style={{height:"45px"}}
+                        value={
+                          editingBooking?.services
+                            ?.map((service) => service?.service?._id)
+                            .filter(Boolean)
+                            .join(", ") || ""
+                        }
+                        options={getFormattedServices()}
+                        onChange={(e) => {
+                          console.log("Selected Service:", e.value);
+                          const selectedService = getFormattedServices().find(
+                            (s) => s.value === e.value
+                          );
+                          console.log("Service Details:", selectedService);
+
+                          // First update the service selection
+                          handleEditServiceChange(e);
+
+                          // Only update the vendor, not the location
+                          if (selectedService) {
+                            setEditingBooking((prev) => ({
+                              ...prev,
+                              vendorAssigned: selectedService.vendorName,
+                              // Completely removed vesselLocation auto-population
+                            }));
                           }
-                          options={services.map((service) => ({
-                            label: service.name,
-                            value: service._id,
-                          }))}
-                          onChange={handleEditServiceChange}
-                          placeholder="Select service name"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Price and Date & Time */}
-                    <div
-                      className="p-grid p-formgrid"
-                      style={{
-                        display: "flex",
-                        gap: "15px",
-                        marginBottom: "20px",
-                      }}
-                    >
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="totalPrice"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Price*
-                        </label>
-                        <InputText
-                          id="totalPrice"
-                          name="totalPrice"
-                          value={editingBooking?.totalPrice || ""}
-                          onChange={handleEditInputChange}
-                          placeholder="Enter price"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="bookingDate"
-                          name="bookingDate"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Date & Time*
-                        </label>
-                        <Calendar
-                          id="bookingDate"
-                          name="bookingDate"
-                          value={
-                            editingBooking?.bookingDate
-                              ? new Date(editingBooking.bookingDate)
-                              : null
-                          }
-                          onChange={handleEditDateChange}
-                          showTime
-                          showIcon
-                          placeholder="Select date and time"
-                          style={{ width: "100%" }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Booking Status and Internal Notes */}
-                    <div
-                      className="p-grid p-formgrid"
-                      style={{
-                        display: "flex",
-                        gap: "15px",
-                        marginBottom: "30px",
-                      }}
-                    >
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="status"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Booking Status*
-                        </label>
-                        <Dropdown
-                          id="status"
-                          value={editingBooking?.status || ""}
-                          options={[
-                            { label: "completed", value: "completed" },
-                            { label: "pending", value: "pending" },
-                            { label: "cancelled", value: "cancelled" },
-                            { label: "in progress", value: "in progress" },
-                            { label: "flagged", value: "flagged" },
-                            { label: "confirmed", value: "confirmed" },
-                            { label: "rescheduled", value: "rescheduled" },
-                          ]}
-                          onChange={handleEditStatusChange}
-                          placeholder="Select status"
-                          style={{ width: "100%" }}
-                          className="no-dropdown-scrollbar"
-                        />
-                      </div>
-                      <div className="p-field" style={{ flex: 1 }}>
-                        <label
-                          htmlFor="reviews"
-                          style={{
-                            display: "block",
-                            marginBottom: "8px",
-                            fontWeight: "500",
-                            textAlign: "left",
-                          }}
-                        >
-                          Internal Notes & Comments
-                        </label>
-                        <InputTextarea
-                          id="reviews"
-                          name="reviews"
-                          value={editingBooking?.reviews || ""}
-                          onChange={handleEditInputChange}
-                          placeholder="Enter notes and comments"
-                          style={{ width: "100%", minHeight: "80px" }}
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Submit and Cancel Buttons */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "flex-end",
-                        gap: "15px",
-                        marginTop: "20px",
-                      }}
-                    >
-                      <Button
-                        label="Cancel"
-                        icon="pi pi-times"
-                        onClick={() => setShowEditForm(false)}
-                        style={{
-                          backgroundColor: "#EF4444",
-                          border: "none",
-                          width: "150px",
-                          color: "white",
-                          fontWeight: "bold",
-                          fontSize: "12px",
                         }}
-                      />
-                      <Button
-                        label="Save Changes"
-                        icon="pi pi-check"
-                        onClick={handleSaveBooking}
-                        style={{
-                          backgroundColor: "#0387D9",
-                          border: "none",
-                          width: "150px",
-                          color: "white",
-                          fontWeight: "bold",
-                          fontSize: "12px",
-                        }}
+                        placeholder="Select a service"
+                        optionLabel="label"
                       />
                     </div>
+
+                    <div className="col-12 md:col-6 field">
+                      <label htmlFor="vendorAssigned">Vendor Assigned</label>
+                      <InputText
+                        id="vendorAssigned"
+                        name="vendorAssigned"
+                        value={
+                          typeof editingBooking?.vendorAssigned === "string"
+                            ? editingBooking.vendorAssigned
+                            : ""
+                        }
+                        disabled
+                        placeholder="Vendor will be auto-assigned"
+                      />
+                    </div>
+
+                    <div className="col-12 md:col-6 field">
+                      <label htmlFor="vesselLocation">Vessel Location</label>
+                      <InputText
+                        id="vesselLocation"
+                        name="vesselLocation"
+                        value={editingBooking?.vesselLocation || ""}
+                        onChange={handleEditInputChange}
+                        placeholder="Enter vessel location"
+                      />
+                    </div>
+
+                    <div className="col-12 md:col-6 field">
+                      <label htmlFor="bookingDate">Date & Time</label>
+                      <Calendar
+                        id="bookingDate"
+                        name="bookingDate"
+                        value={
+                          editingBooking?.bookingDate
+                            ? new Date(editingBooking.bookingDate)
+                            : null
+                        }
+                        onChange={handleEditDateChange}
+                        showTime
+                        placeholder="March-15-2025 - 10:30 Pm"
+                      />
+                    </div>
+
+                    <div className="col-12 md:col-6 field">
+                      <label htmlFor="reviews">
+                        Internal Notes & Comments Section
+                      </label>
+                      <InputText
+                        id="reviews"
+                       
+                        name="reviews"
+                        value={editingBooking?.reviews || ""}
+                        onChange={handleEditInputChange}
+                        placeholder="Leave a note here..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submit and Cancel Buttons */}
+                  <div
+                    className="dialog-footer"
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: "1rem",
+                      marginTop: "2rem",
+                    }}
+                  >
+                    <Button
+                      label="Cancel"
+                      icon="pi pi-times"
+                      onClick={() => setShowEditForm(false)}
+                      className="p-button-danger"
+                      style={{ backgroundColor: "#EF4444", border: "none" }}
+                    />
+                    <Button
+                      label="Save Changes"
+                      icon="pi pi-check"
+                      onClick={handleSaveBooking}
+                      style={{ backgroundColor: "#0387D9", border: "none" }}
+                    />
                   </div>
                 </div>
               ) : (
@@ -947,7 +972,7 @@ const Bookings = () => {
                                 />
                               </th>
                               <th style={{ fontSize: "12px" }}>
-                                Vesse Location
+                                Vessel Location
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1026,29 +1051,17 @@ const Bookings = () => {
                                       <input
                                         type="checkbox"
                                         checked={selectedBookings.includes(
-                                          booking
+                                          booking._id
                                         )}
-                                        onChange={(e) => {
-                                          const selected = e.target.checked;
-                                          setSelectedBookings(
-                                            selected
-                                              ? [...selectedBookings, booking]
-                                              : selectedBookings.filter(
-                                                  (b) => b._id !== booking._id
-                                                )
-                                          );
-
-                                          // If we're unchecking an item, also uncheck the "select all" checkbox
-                                          if (!selected && selectAll) {
-                                            setSelectAll(false);
-                                          }
-                                        }}
+                                        onChange={(e) =>
+                                          handleSelectBooking(e, booking._id)
+                                        }
                                       />
                                     </td>
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       {booking.bookingId}
@@ -1056,7 +1069,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       {booking.services?.[0]?.service?.name ||
@@ -1065,7 +1078,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       {booking.vendorAssigned?.businessName ||
@@ -1074,16 +1087,15 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
-                                      {booking.vendorAssigned
-                                        ?.businessAddress || "Not Available"}
+                                      {booking.vesselLocation}
                                     </td>
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       {new Date(
@@ -1099,45 +1111,52 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       <span
                                         style={{
                                           backgroundColor:
                                             booking.bookingStatus ===
-                                            "Confirmed"
+                                            "confirmed"
                                               ? "#e6f7ee"
                                               : booking.bookingStatus ===
-                                                "Pending"
+                                                "pending"
                                               ? "#fff8e6"
                                               : booking.bookingStatus ===
-                                                "Completed"
+                                                "completed"
                                               ? "#e6f0ff"
+                                              : booking.bookingStatus ===
+                                                "declined"
+                                              ? "#ffebeb"
                                               : "#ffebeb",
                                           color:
                                             booking.bookingStatus ===
-                                            "Confirmed"
+                                            "confirmed"
                                               ? "#1d9d74"
                                               : booking.bookingStatus ===
-                                                "Pending"
+                                                "pending"
                                               ? "#ff9800"
                                               : booking.bookingStatus ===
-                                                "Completed"
+                                                "completed"
                                               ? "#3366ff"
                                               : "#ff4d4f",
                                           padding: "2px 6px",
                                           borderRadius: "4px",
-                                          fontSize: "10px",
+                                          fontSize: "14px",
                                         }}
                                       >
-                                        {booking.bookingStatus}
+                                        {/* Capitalize first letter for display */}
+                                        {booking.bookingStatus
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                          booking.bookingStatus.slice(1)}
                                       </span>
                                     </td>
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "11px",
+                                        fontSize: "14px",
                                       }}
                                     >
                                       {booking.internalNotes || "No notes"}
@@ -1172,8 +1191,8 @@ const Bookings = () => {
                                               src={eyeblock}
                                               alt="View"
                                               style={{
-                                                width: "15px",
-                                                height: "15px",
+                                                width: "17px",
+                                                height: "17px",
                                               }}
                                             />
                                           </div>
@@ -1197,8 +1216,8 @@ const Bookings = () => {
                                             src={editLogo}
                                             alt="Edit"
                                             style={{
-                                              width: "15px",
-                                              height: "15px",
+                                              width: "17px",
+                                              height: "17px",
                                             }}
                                           />
                                         </Button>
@@ -1209,12 +1228,14 @@ const Bookings = () => {
                                             height: "20px",
                                             padding: "1px",
                                           }}
-                                          tooltip="Edit"
+                                          tooltip="Delete"
                                           tooltipOptions={{ position: "top" }}
-                                          // onClick={() => handleEditBooking(booking)}
+                                          onClick={() =>
+                                            handleDeleteClick(booking)
+                                          }
                                         >
                                           <img
-                                            src={times}
+                                            src={deleteIcon}
                                             alt="times"
                                             style={{
                                               width: "15px",
@@ -1254,8 +1275,8 @@ const Bookings = () => {
                                             src={check}
                                             alt="Download"
                                             style={{
-                                              width: "15px",
-                                              height: "15px",
+                                              width: "17px",
+                                              height: "17px",
                                             }}
                                           />
                                         </Button>
@@ -1273,15 +1294,15 @@ const Bookings = () => {
                               }}
                               tooltip="Download"
                               tooltipOptions={{ position: "top" }}
-                            /> */}
+                            /> 
                                         <img
                                           src={downloadIcon}
                                           alt="Download"
                                           style={{
-                                            width: "15px",
-                                            height: "15px",
+                                            width: "17px",
+                                            height: "17px",
                                           }}
-                                        />
+                                        /> */}
 
                                         {/* Upload button */}
                                         <Button
@@ -1293,7 +1314,7 @@ const Bookings = () => {
                                             border: "1px solid #ddd",
                                             borderRadius: "50%",
                                           }}
-                                          tooltip="Upload Booking"
+                                          tooltip="Upload Invoice"
                                           tooltipOptions={{ position: "top" }}
                                           onClick={() =>
                                             handleUploadBooking(booking)
@@ -1303,8 +1324,8 @@ const Bookings = () => {
                                             src={uploadBooking}
                                             alt="Upload"
                                             style={{
-                                              width: "15px",
-                                              height: "15px",
+                                              width: "17px",
+                                              height: "17px",
                                             }}
                                           />
                                         </Button>
@@ -1456,29 +1477,29 @@ const Bookings = () => {
       <Menu
         model={[
           {
-            label: "confirmed",
-            command: () =>
-              handleStatusChange(selectedBookingForStatus, "confirmed"),
-          },
-          {
-            label: "completed",
-            command: () =>
-              handleStatusChange(selectedBookingForStatus, "completed"),
-          },
-          {
-            label: "pending",
+            label: "Pending",
             command: () =>
               handleStatusChange(selectedBookingForStatus, "pending"),
           },
           {
-            label: "in progress",
+            label: "Confirmed",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "in progress"),
+              handleStatusChange(selectedBookingForStatus, "confirmed"),
           },
           {
-            label: "flagged",
+            label: "Completed",
             command: () =>
-              handleStatusChange(selectedBookingForStatus, "flagged"),
+              handleStatusChange(selectedBookingForStatus, "completed"),
+          },
+          {
+            label: "Cancelled",
+            command: () =>
+              handleStatusChange(selectedBookingForStatus, "cancelled"),
+          },
+          {
+            label: "Declined",
+            command: () =>
+              handleStatusChange(selectedBookingForStatus, "declined"),
           },
         ]}
         popup
@@ -1487,220 +1508,170 @@ const Bookings = () => {
         style={{ fontSize: "0.8rem" }}
       />
 
-      {/* View Booking Details Modal */}
+      {/* View Booking Modal */}
       <Dialog
         visible={showViewModal}
         onHide={() => setShowViewModal(false)}
         header="Booking Details"
-        className="view-booking-modal"
+        className="booking-details-modal"
         modal
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "30vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        style={{ width: "500px" }}
+        contentStyle={{ padding: "0" }}
+        headerStyle={{
+          borderBottom: "1px solid #e0e0e0",
+          padding: "15px 20px",
         }}
+        showHeader={true}
+        closeIcon={<i className="pi pi-times" style={{ fontSize: "1rem" }} />}
       >
         {viewBooking && (
-          <div
-            className="view-form"
-            style={{
-              border: "1px solid #E0E0E9",
-              borderRadius: "10px",
-              padding: "20px",
-            }}
-          >
-            <div className="form-row">
+          <div style={{ padding: "10px", height: "500px" }}>
+            <div
+              style={{
+                backgroundColor: "#f9f9f9",
+                padding: "15px 20px",
+                height: "400px",
+                lineHeight: "43px",
+              }}
+            >
               <div
-                className="form-group"
                 style={{
                   display: "flex",
-                  alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: "15px",
+                  marginBottom: "12px",
                 }}
               >
-                <label
-                  htmlFor="bookingId"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
-                >
-                  Booking ID
-                </label>
-                <div className="view-field">{viewBooking.bookingId}</div>
+                <span style={{ fontWeight: "500", color: "#555" }}>ID</span>
+                <span style={{ fontWeight: "400" }}>
+                  {viewBooking.bookingId}
+                </span>
               </div>
-              <div
-                className="form-group"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "15px",
-                }}
-              >
-                <label
-                  htmlFor="email"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
-                >
-                  Email
-                </label>
-                <div className="view-field">{viewBooking.email}</div>
-              </div>
-            </div>
 
-            <div className="form-row">
               <div
-                className="form-group"
                 style={{
                   display: "flex",
-                  alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: "15px",
+                  marginBottom: "12px",
                 }}
               >
-                <label
-                  htmlFor="services"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
-                >
-                  Service Name
-                </label>
-                <div className="view-field">
-                  {viewBooking.services
-                    .map((service) => service.service.name)
-                    .join(", ")}
-                </div>
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Service Type
+                </span>
+                <span style={{ fontWeight: "400" }}>
+                  {viewBooking.services[0]?.service?.name || "Yachting"}
+                </span>
               </div>
-              <div
-                className="form-group"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "15px",
-                }}
-              >
-                <label
-                  htmlFor="totalPrice"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
-                >
-                  Price
-                </label>
-                <div className="view-field">${viewBooking.totalPrice}</div>
-              </div>
-            </div>
 
-            <div className="form-row">
               <div
-                className="form-group"
                 style={{
                   display: "flex",
-                  alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: "15px",
+                  marginBottom: "12px",
                 }}
               >
-                <label
-                  htmlFor="date"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
-                >
-                  Date
-                </label>
-                <div className="view-field">
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Vendor Assigned
+                </span>
+                <span style={{ fontWeight: "400" }}>
+                  {viewBooking.vendorAssigned?.businessName || "John Doe"}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "12px",
+                }}
+              >
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Vessel Location
+                </span>
+                <span style={{ fontWeight: "400" }}>
+                  {viewBooking.vesselLocation}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "12px",
+                }}
+              >
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Date & Time
+                </span>
+                <span style={{ fontWeight: "400" }}>
                   {new Date(viewBooking.dateTime).toLocaleDateString("en-US", {
-                    year: "numeric",
                     month: "short",
-                    day: "numeric",
+                    day: "2-digit",
+                    year: "numeric",
+                  })}{" "}
+                  {new Date(viewBooking.dateTime).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
                   })}
-                </div>
+                </span>
               </div>
+
               <div
-                className="form-group"
                 style={{
                   display: "flex",
-                  alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: "15px",
+                  marginBottom: "12px",
                 }}
               >
-                <label
-                  htmlFor="status"
-                  style={{ fontWeight: "600", fontSize: "0.9rem" }}
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Booking Status
+                </span>
+                <span
+                  style={{
+                    backgroundColor:
+                      viewBooking.bookingStatus === "confirmed"
+                        ? "#fff8e6"
+                        : viewBooking.bookingStatus === "completed"
+                        ? "#e6f0ff"
+                        : viewBooking.bookingStatus === "pending"
+                        ? "#fff8e6"
+                        : "#ffebeb",
+                    color:
+                      viewBooking.bookingStatus === "confirmed"
+                        ? "#ff9800"
+                        : viewBooking.bookingStatus === "completed"
+                        ? "#3366ff"
+                        : viewBooking.bookingStatus === "pending"
+                        ? "#ff9800"
+                        : "#ff4d4f",
+                    padding: "2px 10px",
+                    borderRadius: "12px",
+                    fontSize: "0.85rem",
+                    fontWeight: "500",
+                  }}
                 >
-                  Status
-                </label>
-                <div className="view-field">
-                  <span
-                    style={{
-                      backgroundColor:
-                        viewBooking.bookingStatus === "confirmed"
-                          ? "#e6f7ee"
-                          : viewBooking.bookingStatus === "pending"
-                          ? "#fff8e6"
-                          : viewBooking.bookingStatus === "completed"
-                          ? "#e6f0ff"
-                          : viewBooking.bookingStatus === "in progress"
-                          ? "#e6f7ff"
-                          : viewBooking.bookingStatus === "flagged"
-                          ? "#ffe6e6"
-                          : "#ffebeb",
-                      color:
-                        viewBooking.bookingStatus === "confirmed"
-                          ? "#1d9d74"
-                          : viewBooking.bookingStatus === "pending"
-                          ? "#ff9800"
-                          : viewBooking.bookingStatus === "completed"
-                          ? "#3366ff"
-                          : viewBooking.bookingStatus === "in progress"
-                          ? "#0099cc"
-                          : viewBooking.bookingStatus === "flagged"
-                          ? "#ff4d4f"
-                          : "#ff4d4f",
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      fontSize: "0.8rem",
-                    }}
-                  >
-                    {viewBooking.bookingStatus}
-                  </span>
-                </div>
+                  {viewBooking.bookingStatus.charAt(0).toUpperCase() +
+                    viewBooking.bookingStatus.slice(1)}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "0",
+                }}
+              >
+                <span style={{ fontWeight: "500", color: "#555" }}>
+                  Internal Notes & Comments Section
+                </span>
               </div>
             </div>
 
-            <div className="form-row">
-              <div
-                className="form-group"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginBottom: "15px",
-                  width: "100%",
-                }}
-              >
-                <label
-                  htmlFor="reviews"
-                  style={{
-                    fontWeight: "600",
-                    fontSize: "0.9rem",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Participant Reviews
-                </label>
-                <div
-                  className="view-field"
-                  style={{
-                    padding: "10px",
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "4px",
-                    minHeight: "60px",
-                    fontSize: "0.85rem",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  {viewBooking.reviews
-                    ?.map((review) => review.review)
-                    .join(", ") || "No reviews"}
-                </div>
-              </div>
+            <div style={{ padding: "15px 20px" }}>
+              <p style={{ margin: "0", color: "#666", fontSize: "0.9rem" }}>
+                {viewBooking.internalNotes || "No notes available"}
+              </p>
             </div>
           </div>
         )}
@@ -1963,15 +1934,12 @@ const Bookings = () => {
                 console.log("Service Details:", selectedService);
 
                 handleNewBookingChange("serviceType", e.value);
-                // Auto-populate vendor and location
+
+                // Only auto-populate vendor, not location
                 if (selectedService) {
                   handleNewBookingChange(
                     "vendorAssigned",
                     selectedService.vendorName
-                  );
-                  handleNewBookingChange(
-                    "vesselLocation",
-                    selectedService.businessAddress
                   );
                 }
               }}
@@ -1995,8 +1963,10 @@ const Bookings = () => {
             <InputText
               id="vesselLocation"
               value={newBooking.vesselLocation}
-              disabled
-              placeholder="Location will be auto-assigned"
+              onChange={(e) =>
+                handleNewBookingChange("vesselLocation", e.target.value)
+              }
+              placeholder="Enter vessel location"
             />
           </div>
 
@@ -2016,7 +1986,7 @@ const Bookings = () => {
             <Dropdown
               id="bookingStatus"
               value={newBooking.bookingStatus}
-              options={["Cancel", "Pending", "Confirmed", "Completed"]}
+              options={["cancel", "pending", "confirmed", "completed"]}
               onChange={(e) => handleNewBookingChange("bookingStatus", e.value)}
               placeholder="Select Status"
             />
@@ -2080,6 +2050,7 @@ const Bookings = () => {
               icon="pi pi-times"
               onClick={() => setShowDeleteConfirmation(false)}
               className="p-button-text"
+              style={{ width: "200px" }}
             />
             <Button
               label="Yes"
@@ -2087,6 +2058,7 @@ const Bookings = () => {
               onClick={confirmDelete}
               loading={loading}
               className="p-button-danger"
+              style={{ width: "200px" }}
             />
           </div>
         }

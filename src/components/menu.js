@@ -78,6 +78,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/dashboard");
       },
+      style:{color:"red"}
     },
     {
       label: "Calendar",
@@ -200,6 +201,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         color: theme === "light" ? "#103B57" : "#FFFFFF",
       };
       item.className = `${item.className || ""} menu-item`;
+      
     }
   });
 

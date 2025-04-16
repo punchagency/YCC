@@ -20,6 +20,7 @@ export const getNotifications = async () => {
       description: complaint.description,
       status: complaint.status || "Pending",
       _id: complaint._id,
+      createdAt: complaint.createdAt || complaint.create_at || new Date(),
     }));
 
     return {
@@ -31,6 +32,36 @@ export const getNotifications = async () => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch notifications",
+    };
+  }
+};
+
+export const updateNotificationStatus = async (notificationId, status) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}/complaints/${notificationId}/status`,
+      { status },
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        data: response.data.data,
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to update notification status",
+      };
+    }
+  } catch (error) {
+    console.error("Error updating notification status:", error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message ||
+        "An error occurred while updating notification status",
     };
   }
 };
