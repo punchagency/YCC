@@ -18,7 +18,7 @@ import {
   createOrder,
   getOrders,
   deleteOrder,
-  bulkDeleteOrders
+  bulkDeleteOrders,
 } from "../../services/order/orderService"; // Add this import
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -508,8 +508,15 @@ const Order = () => {
             </thead>
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id}>
-                  <td data-label="Select">
+                <tr
+                  key={order.id}
+                  style={{
+                    backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleViewOrder(order)}
+                >
+                  <td data-label="Select" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       checked={selectedOrders.includes(order)}
@@ -518,8 +525,13 @@ const Order = () => {
                         setSelectedOrders(
                           selected
                             ? [...selectedOrders, order]
-                            : selectedOrders.filter((o) => o.id !== order.id)
+                            : selectedOrders.filter((o) => o._id !== order._id)
                         );
+
+                        // If we're unchecking an item, also uncheck the "select all" checkbox
+                        if (!selected && selectAll) {
+                          setSelectAll(false);
+                        }
                       }}
                     />
                   </td>
@@ -672,7 +684,7 @@ const Order = () => {
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
     setSelectAll(checked);
-    
+
     if (checked) {
       // Select all orders
       setSelectedOrders(orders);
@@ -684,10 +696,10 @@ const Order = () => {
 
   const handleBulkDelete = () => {
     if (selectedOrders.length === 0) return;
-    
+
     setOrderToDelete({
       multiple: true,
-      ids: selectedOrders.map(order => order._id)
+      ids: selectedOrders.map((order) => order._id),
     });
     setShowDeleteConfirmation(true);
   };
@@ -697,14 +709,16 @@ const Order = () => {
     try {
       if (orderToDelete.multiple) {
         const result = await bulkDeleteOrders(orderToDelete.ids);
-        
+
         if (result.success) {
           // Refresh the orders list
           fetchOrders();
           setSelectedOrders([]);
           setSelectAll(false);
-          
-          showSuccess(`Successfully deleted ${orderToDelete.ids.length} orders`);
+
+          showSuccess(
+            `Successfully deleted ${orderToDelete.ids.length} orders`
+          );
         } else {
           showError(result.error || "Failed to delete orders");
         }
@@ -725,6 +739,17 @@ const Order = () => {
       setIsLoading(false);
       setShowDeleteConfirmation(false);
     }
+  };
+
+  // Add these state variables at the top with your other state variables
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showOrderDetailsModal, setShowOrderDetailsModal] = useState(false);
+
+  // Add this function to handle viewing order details
+  const handleViewOrder = (order) => {
+    console.log("Viewing order details:", order);
+    setSelectedOrder(order);
+    setShowOrderDetailsModal(true);
   };
 
   return loading ? (
@@ -1129,7 +1154,13 @@ const Order = () => {
                       }}
                     >
                       <th style={{ width: "5%" }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
                           <input
                             type="checkbox"
                             checked={selectAll}
@@ -1141,9 +1172,13 @@ const Order = () => {
                             }}
                           />
                           {selectedOrders.length > 0 && (
-                            <i 
-                              className="pi pi-trash" 
-                              style={{ cursor: "pointer", color: "#ff4d4f", marginLeft: "8px" }}
+                            <i
+                              className="pi pi-trash"
+                              style={{
+                                cursor: "pointer",
+                                color: "#ff4d4f",
+                                marginLeft: "8px",
+                              }}
                               onClick={handleBulkDelete}
                             />
                           )}
@@ -1198,9 +1233,14 @@ const Order = () => {
                         style={{
                           backgroundColor:
                             theme === "light" ? "#FFFFFF" : "#03141F",
+                          cursor: "pointer",
                         }}
+                        onClick={() => handleViewOrder(order)}
                       >
-                        <td data-label="Select">
+                        <td
+                          data-label="Select"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <input
                             type="checkbox"
                             checked={selectedOrders.includes(order)}
@@ -1213,7 +1253,7 @@ const Order = () => {
                                       (o) => o._id !== order._id
                                     )
                               );
-                              
+
                               // If we're unchecking an item, also uncheck the "select all" checkbox
                               if (!selected && selectAll) {
                                 setSelectAll(false);
@@ -1297,6 +1337,7 @@ const Order = () => {
                       label: option.label,
                       value: option.value,
                     }))}
+                    style={{ height: "45px" }}
                     onChange={(e) => setSelectedSupplier(e.target.value)}
                     placeholder="supplier generated automatically"
                   />
@@ -1325,6 +1366,7 @@ const Order = () => {
                       label: option.label,
                       value: option.value,
                     }))}
+                    style={{ height: "45px" }}
                     onChange={(e) => setSelectedProduct(e.target.value)}
                     placeholder="Select a product"
                   />
@@ -1339,6 +1381,7 @@ const Order = () => {
                     id="orderStatus"
                     value={orderForm.orderStatus}
                     options={statusOptions}
+                    style={{ height: "45px" }}
                     onChange={(e) => handleDropdownChange(e, "orderStatus")}
                     placeholder="Select status"
                   />
@@ -1370,17 +1413,17 @@ const Order = () => {
               <div className="dialog-footer">
                 <Button
                   label="Cancel"
-                  icon="pi pi-times"
                   onClick={() => setShowOrderModal(false)}
                   className="p-button-danger"
+                  style={{ width: "200px", padding: "10px" }}
                 />
                 <Button
                   label="Create Order"
-                  icon="pi pi-check"
                   onClick={() => {
                     handleSubmit();
                     setShowOrderModal(false);
                   }}
+                  style={{ width: "200px", padding: "10px" }}
                   className="p-button-primary"
                 />
               </div>
@@ -1393,11 +1436,13 @@ const Order = () => {
           onHide={() => setShowDeleteConfirmation(false)}
           header="Confirm Deletion"
           footer={
-            <div style={{ 
-              display: "flex", 
-              justifyContent: "flex-end", 
-              gap: "10px" 
-            }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+              }}
+            >
               <Button
                 label="No"
                 icon="pi pi-times"
@@ -1415,13 +1460,198 @@ const Order = () => {
           }
         >
           <div className="confirmation-content">
-            <i className="pi pi-exclamation-triangle" style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }} />
+            <i
+              className="pi pi-exclamation-triangle"
+              style={{
+                fontSize: "2rem",
+                color: "#ff9800",
+                marginRight: "10px",
+              }}
+            />
             <span>
-              {orderToDelete?.multiple 
+              {orderToDelete?.multiple
                 ? `Are you sure you want to delete ${orderToDelete.ids.length} selected orders? This action cannot be undone.`
                 : "Are you sure you want to delete this order?"}
             </span>
           </div>
+        </Dialog>
+
+        <Dialog
+          visible={showOrderDetailsModal}
+          onHide={() => setShowOrderDetailsModal(false)}
+          header="Order Details"
+          style={{ width: isMobile ? "95vw" : "50vw" }}
+          className="order-details-modal"
+        >
+          {selectedOrder && (
+            <div className="order-details-container">
+              {/* Order ID and Status */}
+              <div className="detail-header" style={{ marginBottom: "20px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <h2 style={{ margin: 0 }}>
+                    Order #{selectedOrder.orderNumber || selectedOrder._id}
+                  </h2>
+                  <span
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: "4px",
+                      backgroundColor:
+                        selectedOrder.status === "delivered"
+                          ? "#D1FAE5"
+                          : selectedOrder.status === "shipped"
+                          ? "#EFF6FF"
+                          : selectedOrder.status === "confirmed"
+                          ? "#FEF3C7"
+                          : selectedOrder.status === "cancelled"
+                          ? "#FEE2E2"
+                          : "#F3F4F6",
+                      color:
+                        selectedOrder.status === "delivered"
+                          ? "#065F46"
+                          : selectedOrder.status === "shipped"
+                          ? "#1E40AF"
+                          : selectedOrder.status === "confirmed"
+                          ? "#92400E"
+                          : selectedOrder.status === "cancelled"
+                          ? "#B91C1C"
+                          : "#374151",
+                      fontWeight: "500",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {selectedOrder.status}
+                  </span>
+                </div>
+                <p style={{ margin: "5px 0 0 0", color: "#6B7280" }}>
+                  Created on{" "}
+                  {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* Order Details */}
+              <div
+                className="details-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "20px",
+                  marginBottom: "20px",
+                }}
+              >
+                <div className="detail-item">
+                  <h4
+                    style={{
+                      margin: "0 0 5px 0",
+                      color: "#6B7280",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Customer
+                  </h4>
+                  <p style={{ margin: 0, fontWeight: "500", fontSize: "16px" }}>
+                    {selectedOrder.customerName}
+                  </p>
+                </div>
+
+                {/* <div className="detail-item">
+                  <h4 style={{ margin: "0 0 5px 0", color: "#6B7280", fontWeight: "500", fontSize: "14px" }}>Supplier</h4>
+                  <p style={{ margin: 0, fontWeight: "500", fontSize: "16px" }}>{selectedOrder.supplier?.businessName || "Not specified"}</p>
+                </div> */}
+
+                <div className="detail-item">
+                  <h4
+                    style={{
+                      margin: "0 0 5px 0",
+                      color: "#6B7280",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Order Date
+                  </h4>
+                  <p style={{ margin: 0, fontWeight: "500", fontSize: "16px" }}>
+                    {new Date(selectedOrder.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="detail-item">
+                  <h4
+                    style={{
+                      margin: "0 0 5px 0",
+                      color: "#6B7280",
+                      fontWeight: "500",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Delivery Date
+                  </h4>
+                  <p style={{ margin: 0, fontWeight: "500", fontSize: "16px" }}>
+                    {selectedOrder.deliveryDate
+                      ? new Date(
+                          selectedOrder.deliveryDate
+                        ).toLocaleDateString()
+                      : "Not specified"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Products Section */}
+              {/* <div className="products-section" style={{ marginBottom: "20px" }}>
+                <h3 style={{ margin: "0 0 10px 0" }}>Products</h3>
+                <div className="products-table" style={{ border: "1px solid #E5E7EB", borderRadius: "8px", overflow: "hidden" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "#F9FAFB", borderBottom: "1px solid #E5E7EB" }}>
+                        <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "14px", color: "#374151" }}>Product</th>
+                        <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "14px", color: "#374151" }}>Quantity</th>
+                        <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "14px", color: "#374151" }}>Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedOrder.products && selectedOrder.products.map((product, index) => (
+                        <tr key={index} style={{ borderBottom: index < selectedOrder.products.length - 1 ? "1px solid #E5E7EB" : "none" }}>
+                          <td style={{ padding: "12px 16px", fontSize: "14px" }}>
+                            {product.product?.name || "Unknown Product"}
+                          </td>
+                          <td style={{ padding: "12px 16px", fontSize: "14px", textAlign: "right" }}>
+                            {product.quantity || 1}
+                          </td>
+                          <td style={{ padding: "12px 16px", fontSize: "14px", textAlign: "right" }}>
+                            {product.price ? `$${product.price.toFixed(2)}` : "N/A"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div> */}
+
+              {/* Notes Section */}
+              {selectedOrder.notes && (
+                <div className="notes-section">
+                  <h3 style={{ margin: "0 0 10px 0" }}>Notes</h3>
+                  <div
+                    style={{
+                      padding: "12px 16px",
+                      backgroundColor: "#F9FAFB",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      color: "#374151",
+                    }}
+                  >
+                    {selectedOrder.notes}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </Dialog>
       </div>
     </>

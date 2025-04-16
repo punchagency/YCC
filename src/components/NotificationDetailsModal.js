@@ -65,7 +65,7 @@ const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
     <Dialog
       visible={visible}
       onHide={onHide}
-      header={t("notifications.details.title")}
+      header={t("Notification Details")}
       style={{
         width: "400px",
         borderRadius: "12px",
@@ -83,13 +83,13 @@ const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
       }}
     >
       <div className="notification-details-content">
-        {renderDetailRow(t("notifications.type"), notificationData?.type)}
+        {renderDetailRow(t("Type"), notificationData?.type)}
         {renderDetailRow(
-          t("notifications.details.relatedId"),
+          t("Related ID"),
           notificationData?.relatedId || "ORD-1234"
         )}
         {renderDetailRow(
-          t("notifications.details.vendorClient"),
+          t("Vendor / Client"),
           notificationData?.vendor || "Vendor A"
         )}
         {renderDetailRow("Description", notificationData?.description)}

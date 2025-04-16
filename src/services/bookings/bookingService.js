@@ -18,21 +18,52 @@ export const getBookingService = async (vendorId) => {
 
 export const updateBookingService = async (bookingId, booking) => {
   try {
-    const response = await axios.patch(`${API_URL}/${bookingId}`, booking);
-    return response.data;
+    console.log("Calling API to update booking:", bookingId);
+    console.log("Data being sent to API:", booking);
+
+    const response = await axios.patch(`${API_URL}/${bookingId}`, booking, {
+      headers: getAuthHeader(),
+    });
+
+    console.log("API response for booking update:", response.data);
+
+    return {
+      status: true,
+      data: response.data,
+      message: "Booking updated successfully",
+    };
   } catch (error) {
-    throw error;
+    console.error("Error in updateBookingService:", error);
+    console.error("Error response:", error.response?.data);
+
+    return {
+      status: false,
+      message: error.response?.data?.message || "Failed to update booking",
+      error: error,
+    };
   }
 };
 
 export const updateBookingStatusService = async (bookingId, status) => {
   try {
-    const response = await axios.patch(`${API_URL}/${bookingId}/status`, {
-      status,
-    });
-    return response.data;
+    const response = await axios.patch(
+      `${process.env.REACT_APP_API_URL}/bookings/${bookingId}/status`,
+      { status },
+      { headers: getAuthHeader() }
+    );
+
+    return {
+      status: true,
+      data: response.data,
+      message: "Status updated successfully",
+    };
   } catch (error) {
-    throw error;
+    console.error("Error updating booking status:", error);
+    return {
+      status: false,
+      message:
+        error.response?.data?.message || "Failed to update booking status",
+    };
   }
 };
 
@@ -95,23 +126,26 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
 
 export const bulkDeleteBookings = async (bookingIds) => {
   try {
+    console.log("Calling bulkDeleteBookings API with IDs:", bookingIds);
+
     const response = await axios.post(
-      `${API_URL}/bulk-delete-bookings`,
+      `${API_URL}/bulk-delete-bookings`, // Make sure this endpoint matches your backend
       { bookingIds },
       {
         headers: getAuthHeader(),
       }
     );
 
+    console.log("Bulk delete API response:", response.data);
+
     return {
       success: true,
       message: response.data.message || "Bookings deleted successfully",
     };
   } catch (error) {
-    console.error(
-      "Error bulk deleting bookings:",
-      error.response?.data || error.message
-    );
+    console.error("Error in bulkDeleteBookings:", error);
+    console.error("Error response:", error.response?.data);
+
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete bookings",

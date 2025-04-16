@@ -807,13 +807,12 @@ const Invent = () => {
                               }}
                             />
                             {selectedItems.length > 0 && (
-                              <img
-                                src={deleteLogo}
-                                alt="delete"
+                              <i
+                                className="pi pi-trash"
                                 style={{
-                                  width: "18px",
-                                  height: "18px",
                                   cursor: "pointer",
+                                  color: "#ff4d4f",
+                                  marginLeft: "8px",
                                 }}
                                 onClick={handleBulkDelete}
                               />
@@ -1331,7 +1330,11 @@ const Invent = () => {
                   setNewItem({ ...newItem, serviceArea: e.value })
                 }
                 placeholder="Select a service area"
-                style={{ width: "100%", height: "45px", alignContent: "center" }}
+                style={{
+                  width: "100%",
+                  height: "45px",
+                  alignContent: "center",
+                }}
                 inputStyle={dropdownStyles}
                 className="no-border-dropdown"
               />
