@@ -12,6 +12,7 @@ const DashboardTitleBar = ({title}) => {
         padding: '10px',
         backgroundColor: theme === "light" ? "white" : "#03141F",
         border: '1px solid #E0E0E0',
+        
     }}>
         <Typography
         sx={{
