@@ -11,8 +11,10 @@ import sortNotification from "../../assets/images/crew/sortnotification.png";
 import {
   getNotifications,
   updateNotificationStatus,
+  updateComplaintStatus,
 } from "../../services/notification/notificationService";
 import { TableSkeleton } from "../../components/TableSkeleton";
+import { useToast } from "../../components/Toast";
 
 export default function Notifications({ role }) {
   const [showModal, setShowModal] = useState(false);
@@ -22,8 +24,8 @@ export default function Notifications({ role }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
-  const statusMenu = useRef(null);
   const toast = useRef(null);
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     fetchNotifications();
@@ -46,11 +48,25 @@ export default function Notifications({ role }) {
         setError(null);
       } else {
         setError(response.error);
+        showToast("error", "Error", response.error || "Failed to fetch notifications");
       }
     } catch (err) {
       setError("Failed to fetch notifications");
+      showToast("error", "Error", "An error occurred while fetching notifications");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const showToast = (severity, summary, detail) => {
+    if (toast.current) {
+      toast.current.show({ severity, summary, detail, life: 3000 });
+    }
+    
+    if (severity === "success" && showSuccess) {
+      showSuccess(detail);
+    } else if (severity === "error" && showError) {
+      showError(detail);
     }
   };
 
@@ -70,10 +86,7 @@ export default function Notifications({ role }) {
   const handleStatusChange = async (notificationId, newStatus) => {
     setStatusLoading(true);
     try {
-      const response = await updateNotificationStatus(
-        notificationId,
-        newStatus
-      );
+      const response = await updateComplaintStatus(notificationId, newStatus);
       if (response.success) {
         // Update the local state
         setNotifications(
@@ -84,27 +97,12 @@ export default function Notifications({ role }) {
           )
         );
 
-        toast.current.show({
-          severity: "success",
-          summary: "Status Updated",
-          detail: `Notification status changed to ${newStatus}`,
-          life: 3000,
-        });
+        showToast("success", "Success", `Notification status changed to ${newStatus}`);
       } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Update Failed",
-          detail: response.error || "Failed to update status",
-          life: 3000,
-        });
+        showToast("error", "Error", response.error || "Failed to update status");
       }
     } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while updating status",
-        life: 3000,
-      });
+      showToast("error", "Error", "An error occurred while updating status");
     } finally {
       setStatusLoading(false);
     }
@@ -138,6 +136,9 @@ export default function Notifications({ role }) {
   };
 
   const statusTemplate = (rowData) => {
+    // Create a ref for this specific row
+    const rowStatusMenu = useRef(null);
+    
     const statusStyles = {
       "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
       flagged: { bg: "#EFF8FF", color: "#175CD3" },
@@ -158,13 +159,16 @@ export default function Notifications({ role }) {
       { label: "Pending", value: "pending" },
       { label: "In Progress", value: "in-progress" },
       { label: "Resolved", value: "resolved" },
-      { label: "Dismissed", value: "dismissed" },
       { label: "Flagged", value: "flagged" },
     ];
 
+    // Create menu items specifically for this notification
     const statusMenuItems = statusOptions.map((option) => ({
       label: option.label,
-      command: () => handleStatusChange(rowData._id, option.value),
+      command: () => {
+        console.log(`Changing notification ${rowData._id} status to ${option.value}`);
+        handleStatusChange(rowData._id, option.value);
+      },
     }));
 
     return (
@@ -186,13 +190,13 @@ export default function Notifications({ role }) {
           className="p-button-rounded p-button-text p-button-sm"
           tooltip="Change Status"
           tooltipOptions={{ position: "top" }}
-          onClick={(e) => statusMenu.current.toggle(e)}
+          onClick={(e) => rowStatusMenu.current.toggle(e)}
           disabled={statusLoading}
         />
         <Menu
           model={statusMenuItems}
           popup
-          ref={statusMenu}
+          ref={rowStatusMenu}
           id={`status-menu-${rowData._id}`}
         />
       </div>

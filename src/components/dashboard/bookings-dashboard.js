@@ -58,316 +58,361 @@ const Dashboard1 = () => {
         backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
         padding: "20px",
         gap: "20px",
+        backgroundColor: "lighgrey",
       }}
     >
-      <Grid  container  spacing={2}>
+      <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
           {/* Low Inventories */}
-        {lowInventory && lowInventory.length > 0? <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              backgroundColor: theme === "light" ? "white" : "#03141F",
-              borderRadius: "8px",
-              padding: "20px",
-              boxShadow: "0px 2px 8px 0px #0000001A",
-              textAlign: "start",
-              gap: "30px",
-            }}
-          >
+          {lowInventory && lowInventory.length > 0 ? (
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                gap: "10px",
+                backgroundColor: theme === "light" ? "white" : "#03141F",
+                borderRadius: "8px",
+                padding: "20px",
+                boxShadow: "0px 2px 8px 0px #0000001A",
+                textAlign: "start",
+                gap: "30px",
               }}
             >
-              <DashBoardTitleText mode={theme}>Low Inventories</DashBoardTitleText>
-              <DashBoardDescriptionText mode={theme}>
-                Low inventory alerts on the dashboard to notify vendors of stock
-                shortages in real time.
-              </DashBoardDescriptionText>
-            </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
+                <DashBoardTitleText mode={theme}>
+                  Low Inventories
+                </DashBoardTitleText>
+                <DashBoardDescriptionText mode={theme}>
+                  Low inventory alerts on the dashboard to notify vendors of
+                  stock shortages in real time.
+                </DashBoardDescriptionText>
+              </Box>
 
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "10px",
+                }}
+              >
+                <Box
+                  sx={{
+                    backgroundColor: "#E3E7FF",
+                    borderRadius: "8px",
+                    padding: "17px",
+                    height: "180px",
+                    width: "275px",
+                    alignContent: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "20px",
+                      textAlign: "start",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[0]?.percentageLeft || "N/A"}%
+                      </DashBoardTitleInventoryText>
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[0]?.product?.name || "N/A"}{" "}
+                      </DashBoardTitleInventoryText>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px" }}>
+                        {" "}
+                        {lowInventory[0]?.quantity || "N/A"} left from yesterday
+                      </span>
+                      <CustomLinearProgress
+                        color="#909ADE"
+                        variant="determinate"
+                        value={lowInventory[0]?.percentageLeft || 0}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    backgroundColor: "#FFFFD0",
+                    borderRadius: "8px",
+                    padding: "17px",
+                    height: "180px",
+                    width: "275px",
+                    alignContent: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "20px",
+                      textAlign: "start",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[1]?.percentageLeft || "N/A"}%
+                      </DashBoardTitleInventoryText>
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[1]?.product?.name || "N/A"}
+                      </DashBoardTitleInventoryText>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px" }}>
+                        {" "}
+                        {lowInventory[1]?.quantity || "N/A"} left from yesterday
+                      </span>
+                      <CustomLinearProgress
+                        color="#D1D185"
+                        variant="determinate"
+                        value={lowInventory[1]?.percentageLeft || 0}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    backgroundColor: "#E0F1E0",
+                    borderRadius: "8px",
+                    padding: "17px",
+                    height: "180px",
+                    width: "275px",
+                    alignContent: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "20px",
+                      textAlign: "start",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[2]?.percentageLeft || "N/A"}%
+                      </DashBoardTitleInventoryText>
+                      <DashBoardTitleInventoryText mode={theme}>
+                        {lowInventory[2]?.product?.name || "N/A"}
+                      </DashBoardTitleInventoryText>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <span style={{ fontSize: "12px" }}>
+                        {" "}
+                        {lowInventory[2]?.quantity || "N/A"} left from yesterday
+                      </span>
+                      <CustomLinearProgress
+                        color="#A2D4A2"
+                        variant="determinate"
+                        value={lowInventory[2]?.percentageLeft || 0}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          ) : (
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "row",
-                gap: "10px",
+                flexDirection: "column",
+                backgroundColor: theme === "light" ? "white" : "#03141F",
+                borderRadius: "8px",
+                padding: "20px",
+                boxShadow: "0px 2px 8px 0px #0000001A",
+                textAlign: "start",
+                gap: "30px",
+                height: "100%",
+                justifyContent: "center",
+                alignItems: "center",
               }}
             >
-              <Box
-                sx={{
-                  backgroundColor: "#E3E7FF",
-                  borderRadius: "8px",
-                  padding: "17px",
-                  height: "180px",
-                  width: "275px",
-                  alignContent: "center",
-                }}
-              >
-                <Box
+              <DashBoardTitleText mode={theme}>
+                No Available Inventories
+              </DashBoardTitleText>
+              <DashBoardDescriptionText mode={theme}>
+                No low inventory alerts found. Please check back later.
+              </DashBoardDescriptionText>
+              <Link to="/admin/inventory-management">
+                <Button
+                  variant="contained"
+                  startIcon={<AddBoxIcon />}
                   sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "20px",
-                    textAlign: "start",
+                    bgcolor: "#0387d9",
+                    color: "#ffffff",
+                    borderRadius: "10px",
+                    padding: "10px 20px",
+                    fontWeight: 500,
+                    textTransform: "none",
+                    fontSize: "12px",
+                    ":hover": {
+                      bgcolor: "rgba(3, 135, 217, 0.9)",
+                    },
                   }}
+                  mode={theme}
                 >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[0]?.product?.name || "N/A"} </DashBoardTitleInventoryText>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <span style={{ fontSize: "12px" }}>
-                      {" "}
-                      {lowInventory[0]?.quantity || "N/A"} left from yesterday
-                    </span>
-                    <CustomLinearProgress
-                      color="#909ADE"
-                      variant="determinate"
-                      value={lowInventory[0]?.percentageLeft || 0}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  backgroundColor: "#FFFFD0",
-                  borderRadius: "8px",
-                  padding: "17px",
-                  height: "180px",
-                  width: "275px",
-                  alignContent: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "20px",
-                    textAlign: "start",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[1]?.product?.name || "N/A"}</DashBoardTitleInventoryText>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <span style={{ fontSize: "12px" }}>
-                      {" "}
-                      {lowInventory[1]?.quantity || "N/A" } left from yesterday
-                    </span>
-                    <CustomLinearProgress
-                      color="#D1D185"
-                      variant="determinate"
-                      value={lowInventory[1]?.percentageLeft || 0}
-                    />
-                  </Box>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  backgroundColor: "#E0F1E0",
-                  borderRadius: "8px",
-                  padding: "17px",
-                  height: "180px",
-                  width: "275px",
-                  alignContent: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "20px",
-                    textAlign: "start",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2]?.percentageLeft || "N/A"}%</DashBoardTitleInventoryText>
-                    <DashBoardTitleInventoryText mode={theme}>{lowInventory[2]?.product?.name  || "N/A"}</DashBoardTitleInventoryText>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <span style={{ fontSize: "12px" }}>
-                      {" "}
-                      {lowInventory[2]?.quantity || "N/A"} left from yesterday
-                    </span>
-                    <CustomLinearProgress
-                      color="#A2D4A2"
-                      variant="determinate"
-                      value={lowInventory[2]?.percentageLeft || 0}
-                    />
-                  </Box>
-                </Box>
-              </Box>
+                  Add Inventory
+                </Button>
+              </Link>
             </Box>
-          </Box> : <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            backgroundColor: theme === "light" ? "white" : "#03141F",
-            borderRadius: "8px",
-            padding: "20px",
-            boxShadow: "0px 2px 8px 0px #0000001A",
-            textAlign: "start",
-            gap: "30px",
-            height: "100%",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-            <DashBoardTitleText mode={theme}>No Available Inventories</DashBoardTitleText>
-            <DashBoardDescriptionText mode={theme}>No low inventory alerts found. Please check back later.</DashBoardDescriptionText>
-           <Link to="/admin/inventory-management">
-            <Button            
-           variant="contained"
-          startIcon={<AddBoxIcon />}
-          sx={{
-            bgcolor: "#0387d9",
-            color: "#ffffff",
-            borderRadius: "10px",
-            padding: "10px 20px",
-            fontWeight: 500,
-            textTransform: "none",
-            fontSize: "12px",
-            ":hover": {
-              bgcolor: "rgba(3, 135, 217, 0.9)",
-            },
-          }}mode={theme}>Add Inventory</Button></Link>
-          </Box>}
+          )}
         </Grid>
 
-        <Grid item xs={12} md={6} lg={6} >
+        <Grid item xs={12} md={6} lg={6}>
           {/* Financial Summary */}
-          {invoices && <Box
-            sx={{
-              backgroundColor: theme === "light" ? "white" : "#03141F",
-              borderRadius: "8px",
-              padding: "20px",
-              boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
-              textAlign: "start",
-              gap: "30px",
-            }}
-          >
+          {invoices && (
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "10px",
-                justifyContent: "space-between",
+                backgroundColor: theme === "light" ? "white" : "#03141F",
+                borderRadius: "8px",
+                padding: "20px",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.1)",
+                textAlign: "start",
+                gap: "30px",
               }}
             >
-              <DashBoardTitleText mode={theme}>Financial Summary</DashBoardTitleText>
-              <CustomSelect
-                open={open}
-                onClose={handleClose}
-                onOpen={handleOpen}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                variant="outlined"
-              >
-                {menuItems.map((item) => (
-                  <MenuItem key={item.value} value={item.value}>
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </CustomSelect>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                marginTop: "10px",
-              }}
-            > 
-              {invoices.map((item, index) => (
-                <Box key={index} sx={{
+              <Box
+                sx={{
                   display: "flex",
                   flexDirection: "row",
                   gap: "10px",
                   justifyContent: "space-between",
-                  padding: "10px",
-                  borderRadius: "8px",
-                border: "1px solid #EFEFEF",
-                backgroundColor: theme === "light" ? "white" : "#03141F",
-              }}
+                }}
               >
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <FinancialSummaryDescriptionText mode={theme}>Invoice {item.invoiceId}</FinancialSummaryDescriptionText>
-                  <FinancialSummaryDescriptionText mode={theme}>
-                  Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} - Due: {new Date(item.invoiceDueDate).toISOString().split("T")[0]}
-                  </FinancialSummaryDescriptionText>
-                </Box>
-
-                <Box>
-                  <FinancialSummaryButton mode={theme}><ViewButtonText mode={theme}>View</ViewButtonText></FinancialSummaryButton>
-                </Box>
+                <DashBoardTitleText mode={theme}>
+                  Financial Summary
+                </DashBoardTitleText>
+                <CustomSelect
+                  open={open}
+                  onClose={handleClose}
+                  onOpen={handleOpen}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  variant="outlined"
+                >
+                  {menuItems.map((item) => (
+                    <MenuItem key={item.value} value={item.value}>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </CustomSelect>
               </Box>
-              ))}
 
-              
-              
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  marginTop: "10px",
+                }}
+              >
+                {invoices.map((item, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "10px",
+                      justifyContent: "space-between",
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #EFEFEF",
+                      backgroundColor: theme === "light" ? "white" : "#03141F",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                      }}
+                    >
+                      <FinancialSummaryDescriptionText mode={theme}>
+                        Invoice {item.invoiceId}
+                      </FinancialSummaryDescriptionText>
+                      <FinancialSummaryDescriptionText mode={theme}>
+                        Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} -
+                        Due:{" "}
+                        {
+                          new Date(item.invoiceDueDate)
+                            .toISOString()
+                            .split("T")[0]
+                        }
+                      </FinancialSummaryDescriptionText>
+                    </Box>
+
+                    <Box>
+                      <FinancialSummaryButton mode={theme}>
+                        <ViewButtonText mode={theme}>View</ViewButtonText>
+                      </FinancialSummaryButton>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
             </Box>
-          </Box>}
+          )}
         </Grid>
       </Grid>
 
-
-
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
-          {/* Current Order Summary */}   
-           {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
+          {/* Current Order Summary */}
+          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
         </Grid>
 
         <Grid item xs={12} md={6} lg={6}>
           {/* Booking Summary */}
           <BookingSummary />
         </Grid>
-        
-        
       </Grid>
     </Box>
   );

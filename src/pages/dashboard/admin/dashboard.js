@@ -13,6 +13,8 @@ const AdminDashboard1 = () => {
         maxHeight: "100%",
         display: "flex",
         flexDirection: "column",
+        
+
       }}
     >
       <DashboardTitleBar title="Dashboard" />
