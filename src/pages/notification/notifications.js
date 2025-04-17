@@ -26,6 +26,7 @@ export default function Notifications({ role }) {
   const [statusLoading, setStatusLoading] = useState(false);
   const toast = useRef(null);
   const { showSuccess, showError } = useToast();
+  const menuRefs = useRef({});
 
   useEffect(() => {
     fetchNotifications();
@@ -136,9 +137,6 @@ export default function Notifications({ role }) {
   };
 
   const statusTemplate = (rowData) => {
-    // Create a ref for this specific row
-    const rowStatusMenu = useRef(null);
-    
     const statusStyles = {
       "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
       flagged: { bg: "#EFF8FF", color: "#175CD3" },
@@ -162,7 +160,6 @@ export default function Notifications({ role }) {
       { label: "Flagged", value: "flagged" },
     ];
 
-    // Create menu items specifically for this notification
     const statusMenuItems = statusOptions.map((option) => ({
       label: option.label,
       command: () => {
@@ -190,13 +187,13 @@ export default function Notifications({ role }) {
           className="p-button-rounded p-button-text p-button-sm"
           tooltip="Change Status"
           tooltipOptions={{ position: "top" }}
-          onClick={(e) => rowStatusMenu.current.toggle(e)}
+          onClick={(e) => menuRefs.current[rowData._id]?.toggle(e)}
           disabled={statusLoading}
         />
         <Menu
           model={statusMenuItems}
           popup
-          ref={rowStatusMenu}
+          ref={(el) => menuRefs.current[rowData._id] = el}
           id={`status-menu-${rowData._id}`}
         />
       </div>
