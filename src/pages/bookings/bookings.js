@@ -84,6 +84,9 @@ const Bookings = () => {
     file: null,
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth > 768 && window.innerWidth <= 1024
+  );
   const [showAddBookingModal, setShowAddBookingModal] = useState(false);
   const [newBooking, setNewBooking] = useState({
     serviceType: "",
@@ -108,6 +111,7 @@ const Bookings = () => {
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
+      setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
     };
     fetchBookings();
     fetchServices();
@@ -423,50 +427,63 @@ const Bookings = () => {
     });
   };
 
-  // Add this responsive table rendering function to your Bookings component
+  // Update the renderResponsiveBookingRow function to match the backend data structure
   const renderResponsiveBookingRow = (booking) => {
+    const status = booking.bookingStatus || "pending";
+
     return (
       <div className="mobile-booking-card">
-        {/* <div className="mobile-booking-header">
-          <span className="booking-id">{booking.id}</span>
-          <span
-            className={`booking-status status-${booking.status.toLowerCase()}`}
-          >
-            {booking.status}
+        <div className="mobile-booking-header">
+          <span className="booking-id">
+            {booking._id ? booking._id.substring(0, 8) : "N/A"}
+          </span>
+          <span className={`booking-status status-${status.toLowerCase()}`}>
+            {status}
           </span>
         </div>
 
         <div className="mobile-booking-details">
           <div className="detail-row">
             <span className="detail-label">Service:</span>
-            <span className="detail-value">{booking.serviceType}</span>
+            <span className="detail-value">
+              {(booking.services && booking.services[0]?.service?.name) ||
+                "N/A"}
+            </span>
           </div>
 
           <div className="detail-row">
             <span className="detail-label">Vendor:</span>
-            <span className="detail-value">{booking.vendorAssigned}</span>
+            <span className="detail-value">
+              {booking.vendorAssigned?.businessName || "Not Assigned"}
+            </span>
           </div>
 
           <div className="detail-row">
             <span className="detail-label">Location:</span>
-            <span className="detail-value">{booking.serviceArea}</span>
+            <span className="detail-value">
+              {booking.vesselLocation || "N/A"}
+            </span>
           </div>
 
           <div className="detail-row">
             <span className="detail-label">Date:</span>
             <span className="detail-value">
-              {new Date(booking.date).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })}
+              {booking.dateTime
+                ? new Date(booking.dateTime).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A"}
             </span>
           </div>
 
-          {booking.notes && (
+          {booking.internalNotes && (
             <div className="detail-row notes">
               <span className="detail-label">Notes:</span>
-              <span className="detail-value">{booking.notes}</span>
+              <span className="detail-value">{booking.internalNotes}</span>
             </div>
           )}
         </div>
@@ -508,7 +525,7 @@ const Bookings = () => {
               style={{ width: "16px", height: "16px" }}
             />
           </Button>
-        </div> */}
+        </div>
       </div>
     );
   };
@@ -580,10 +597,10 @@ const Bookings = () => {
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
     setSelectAll(checked);
-    
+
     if (checked) {
       // Select all bookings
-      const allBookingIds = bookingData.map(booking => booking._id);
+      const allBookingIds = bookingData.map((booking) => booking._id);
       setSelectedBookings(allBookingIds);
       console.log("Selected all bookings:", allBookingIds);
     } else {
@@ -595,13 +612,13 @@ const Bookings = () => {
 
   const handleSelectBooking = (e, bookingId) => {
     const checked = e.target.checked;
-    console.log(`${checked ? 'Selecting' : 'Deselecting'} booking:`, bookingId);
-    
+    console.log(`${checked ? "Selecting" : "Deselecting"} booking:`, bookingId);
+
     if (checked) {
-      setSelectedBookings(prev => [...prev, bookingId]);
+      setSelectedBookings((prev) => [...prev, bookingId]);
     } else {
-      setSelectedBookings(prev => prev.filter(id => id !== bookingId));
-      
+      setSelectedBookings((prev) => prev.filter((id) => id !== bookingId));
+
       // If we're unchecking an item, also uncheck the "select all" checkbox
       if (selectAll) {
         setSelectAll(false);
@@ -616,12 +633,12 @@ const Bookings = () => {
     }
 
     console.log("Initiating bulk delete for bookings:", selectedBookings);
-    
+
     setBookingToDelete({
       multiple: true,
-      ids: selectedBookings
+      ids: selectedBookings,
     });
-    
+
     setShowDeleteConfirmation(true);
   };
 
@@ -637,39 +654,45 @@ const Bookings = () => {
     try {
       setLoading(true);
       console.log("Confirming deletion for:", bookingToDelete);
-      
+
       if (bookingToDelete?.multiple) {
         console.log("Performing bulk deletion for IDs:", bookingToDelete.ids);
-        
+
         const response = await bulkDeleteBookings(bookingToDelete.ids);
         console.log("Bulk delete response:", response);
-        
+
         if (response.success) {
           // Remove the deleted bookings from the state
-          setBookingData(prevBookings => 
-            prevBookings.filter(booking => !bookingToDelete.ids.includes(booking._id))
+          setBookingData((prevBookings) =>
+            prevBookings.filter(
+              (booking) => !bookingToDelete.ids.includes(booking._id)
+            )
           );
-          
+
           // Clear selection
           setSelectedBookings([]);
           setSelectAll(false);
-          
-          showSuccess(`Successfully deleted ${bookingToDelete.ids.length} bookings`);
+
+          showSuccess(
+            `Successfully deleted ${bookingToDelete.ids.length} bookings`
+          );
         } else {
           showError(response.error || "Failed to delete bookings");
         }
       } else {
         // Single booking deletion
         console.log("Deleting single booking:", bookingToDelete);
-        
+
         const response = await deleteBookingService(bookingToDelete._id);
         console.log("Single delete response:", response);
-        
+
         if (response.success) {
-          setBookingData(prevBookings => 
-            prevBookings.filter(booking => booking._id !== bookingToDelete._id)
+          setBookingData((prevBookings) =>
+            prevBookings.filter(
+              (booking) => booking._id !== bookingToDelete._id
+            )
           );
-          
+
           showSuccess("Booking deleted successfully");
         } else {
           showError(response.error || "Failed to delete booking");
@@ -695,7 +718,14 @@ const Bookings = () => {
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Bookings</h3>
+            <h3
+              style={{
+                fontSize: isMobile ? "16px" : isTablet ? "18px" : "20px",
+                margin: "0 0 10px 0",
+              }}
+            >
+              Bookings
+            </h3>
           </div>
         </div>
       </div>
@@ -703,13 +733,14 @@ const Bookings = () => {
       <div
         className="bookings-wrapper"
         style={{
-          height: "100%",
+          height: "100vh",
           width: "100%",
           maxWidth: "100%",
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
-          color: theme === "light" ? "#103B57" : "#FFFFFF",
+          backgroundColor: "#F8FBFF",
+          overflowX: "hidden",
         }}
       >
         <div className="inventory-container">
@@ -762,7 +793,7 @@ const Bookings = () => {
                       <Dropdown
                         id="serviceType"
                         name="serviceType"
-                        style={{height:"45px"}}
+                        style={{ height: "45px" }}
                         value={
                           editingBooking?.services
                             ?.map((service) => service?.service?._id)
@@ -842,7 +873,6 @@ const Bookings = () => {
                       </label>
                       <InputText
                         id="reviews"
-                       
                         name="reviews"
                         value={editingBooking?.reviews || ""}
                         onChange={handleEditInputChange}
@@ -892,6 +922,9 @@ const Bookings = () => {
                         style={{
                           backgroundColor:
                             theme === "light" ? "#FFFFFF" : "#03141F",
+                          overflowX: "auto",
+                          width: "100%",
+                          maxWidth: "100%",
                         }}
                       >
                         <table
@@ -900,8 +933,41 @@ const Bookings = () => {
                             backgroundColor:
                               theme === "light" ? "#FFFFFF" : "#03141F",
                             color: theme === "light" ? "#103B57" : "#FFFFFF",
+                            width: "100%",
+                            fontSize: isMobile
+                              ? "12px"
+                              : isTablet
+                              ? "13px"
+                              : "14px",
+                            tableLayout: "fixed",
                           }}
                         >
+                          <colgroup>
+                            <col
+                              style={{ width: isMobile ? "40px" : "20px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "100px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "100px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "120px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "120px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "120px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "100px" : "40px" }}
+                            />
+                            <col
+                              style={{ width: isMobile ? "120px" : "40px" }}
+                            />
+                          </colgroup>
                           <thead
                             style={{
                               backgroundColor:
@@ -916,8 +982,10 @@ const Bookings = () => {
                             >
                               <th
                                 style={{
-                                  backgroundColor:
-                                    theme === "light" ? "#FFFFFF" : "#03141F",
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  fontWeight: "500",
+                                  padding: "10px 5px",
+                                  textAlign: "center",
                                 }}
                               >
                                 <input
@@ -938,7 +1006,15 @@ const Bookings = () => {
                                   />
                                 )}
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "10px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Booking ID
                                 <img
                                   src={sortIcon}
@@ -949,18 +1025,34 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Service Type
                                 <img
                                   src={sortIcon}
                                   alt="sort"
                                   style={{
                                     marginBottom: "-3px",
-                                    marginLeft: "5px",
+                                    marginLeft: "3px",
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Vendor Assigned
                                 <img
                                   src={sortIcon}
@@ -971,7 +1063,15 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Vessel Location
                                 <img
                                   src={sortIcon}
@@ -982,7 +1082,15 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Date & Time
                                 <img
                                   src={sortIcon}
@@ -993,7 +1101,15 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Booking Status
                                 <img
                                   src={sortIcon}
@@ -1004,18 +1120,15 @@ const Bookings = () => {
                                   }}
                                 />
                               </th>
-                              <th style={{ fontSize: "12px" }}>
-                                Internal Notes & Comments
-                                <img
-                                  src={sortIcon}
-                                  alt="sort"
-                                  style={{
-                                    marginBottom: "-3px",
-                                    marginLeft: "5px",
-                                  }}
-                                />
-                              </th>
-                              <th style={{ fontSize: "12px" }}>
+                              <th
+                                style={{
+                                  fontSize: isMobile ? "12px" : "11px",
+                                  padding: "10px 5px",
+                                  whiteSpace: "nowrap",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                }}
+                              >
                                 Actions
                                 <img
                                   src={sortIcon}
@@ -1061,7 +1174,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       {booking.bookingId}
@@ -1069,7 +1182,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       {booking.services?.[0]?.service?.name ||
@@ -1078,7 +1191,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       {booking.vendorAssigned?.businessName ||
@@ -1087,7 +1200,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       {booking.vesselLocation}
@@ -1095,7 +1208,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       {new Date(
@@ -1111,7 +1224,7 @@ const Bookings = () => {
                                     <td
                                       style={{
                                         padding: "8px",
-                                        fontSize: "14px",
+                                        fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
                                       <span
@@ -1143,7 +1256,7 @@ const Bookings = () => {
                                               : "#ff4d4f",
                                           padding: "2px 6px",
                                           borderRadius: "4px",
-                                          fontSize: "14px",
+                                          fontSize: "10px",
                                         }}
                                       >
                                         {/* Capitalize first letter for display */}
@@ -1152,14 +1265,6 @@ const Bookings = () => {
                                           .toUpperCase() +
                                           booking.bookingStatus.slice(1)}
                                       </span>
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: "14px",
-                                      }}
-                                    >
-                                      {booking.internalNotes || "No notes"}
                                     </td>
                                     <td
                                       style={{
@@ -1191,8 +1296,12 @@ const Bookings = () => {
                                               src={eyeblock}
                                               alt="View"
                                               style={{
-                                                width: "17px",
-                                                height: "17px",
+                                                width: isMobile
+                                                  ? "24px"
+                                                  : "20px",
+                                                height: isMobile
+                                                  ? "24px"
+                                                  : "20px",
                                               }}
                                             />
                                           </div>
@@ -1216,8 +1325,10 @@ const Bookings = () => {
                                             src={editLogo}
                                             alt="Edit"
                                             style={{
-                                              width: "17px",
-                                              height: "17px",
+                                              width: isMobile ? "20px" : "20px",
+                                              height: isMobile
+                                                ? "20px"
+                                                : "20px",
                                             }}
                                           />
                                         </Button>
@@ -1238,8 +1349,10 @@ const Bookings = () => {
                                             src={deleteIcon}
                                             alt="times"
                                             style={{
-                                              width: "15px",
-                                              height: "15px",
+                                              width: isMobile ? "20px" : "10px",
+                                              height: isMobile
+                                                ? "20px"
+                                                : "10px",
                                             }}
                                           />
                                         </Button>
@@ -1275,34 +1388,13 @@ const Bookings = () => {
                                             src={check}
                                             alt="Download"
                                             style={{
-                                              width: "17px",
-                                              height: "17px",
+                                              width: isMobile ? "20px" : "20px",
+                                              height: isMobile
+                                                ? "20px"
+                                                : "20px",
                                             }}
                                           />
                                         </Button>
-
-                                        {/* Download button */}
-                                        {/* <Button
-                              icon="pi pi-download"
-                              className="p-button-text p-button-sm"
-                              style={{
-                                width: "20px",
-                                height: "20px",
-                                padding: "1px",
-                                border: "1px solid #ddd",
-                                borderRadius: "50%",
-                              }}
-                              tooltip="Download"
-                              tooltipOptions={{ position: "top" }}
-                            /> 
-                                        <img
-                                          src={downloadIcon}
-                                          alt="Download"
-                                          style={{
-                                            width: "17px",
-                                            height: "17px",
-                                          }}
-                                        /> */}
 
                                         {/* Upload button */}
                                         <Button
@@ -1324,8 +1416,10 @@ const Bookings = () => {
                                             src={uploadBooking}
                                             alt="Upload"
                                             style={{
-                                              width: "17px",
-                                              height: "17px",
+                                              width: isMobile ? "20px" : "20px",
+                                              height: isMobile
+                                                ? "20px"
+                                                : "20px",
                                             }}
                                           />
                                         </Button>
@@ -1441,11 +1535,156 @@ const Bookings = () => {
 
                   {/* Mobile view */}
                   <div className="mobile-view">
-                    {bookingData.map((booking, index) => (
-                      <div key={index} className="mobile-booking-wrapper">
-                        {renderResponsiveBookingRow(booking)}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        margin: "20px 0",
+                        padding: "0 15px",
+                      }}
+                    >
+                      <button
+                        className="p-button-text p-button-sm"
+                        onClick={() => setShowAddBookingModal(true)}
+                        style={{
+                          backgroundColor: "#0387D9",
+                          color: "white",
+                          borderRadius: "5px",
+                          padding: "10px 15px",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          gap: "5px",
+                          border: "1px solid #0387D9",
+                          cursor: "pointer",
+                          width: "100%",
+                          maxWidth: "250px",
+                        }}
+                      >
+                        <img src={plus} alt="Add Booking" />
+                        Add Booking
+                      </button>
+                    </div>
+                    {bookings && bookings.length > 0 ? (
+                      bookings.map((booking, index) => (
+                        <div
+                          key={booking._id || index}
+                          className="mobile-booking-wrapper"
+                        >
+                          {renderResponsiveBookingRow(booking)}
+                        </div>
+                      ))
+                    ) : (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "20px",
+                          color: "#6b7280",
+                        }}
+                      >
+                        {loading ? "Loading bookings..." : "No bookings found"}
                       </div>
-                    ))}
+                    )}
+                    {/* Mobile Pagination */}
+                    {bookingData && bookingData.length > 0 && (
+                      <div
+                        className="mobile-pagination"
+                        style={{
+                          padding: "15px",
+                          marginTop: "20px",
+                          backgroundColor:
+                            theme === "light" ? "#FFFFFF" : "#03141F",
+                          borderRadius: "8px",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "15px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "100%",
+                              gap: "10px",
+                            }}
+                          >
+                            <Button
+                              icon="pi pi-angle-left"
+                              onClick={() =>
+                                setCurrentPage((prev) => Math.max(1, prev - 1))
+                              }
+                              disabled={currentPage === 1}
+                              className="p-button-rounded p-button-outlined"
+                              style={{ minWidth: "40px" }}
+                            />
+
+                            <span
+                              style={{
+                                color:
+                                  theme === "light" ? "#103B57" : "#FFFFFF",
+                              }}
+                            >
+                              Page {currentPage} of{" "}
+                              {Math.ceil(totalRecords / pageSize)}
+                            </span>
+
+                            <Button
+                              icon="pi pi-angle-right"
+                              onClick={() => setCurrentPage((prev) => prev + 1)}
+                              disabled={
+                                currentPage >=
+                                Math.ceil(totalRecords / pageSize)
+                              }
+                              className="p-button-rounded p-button-outlined"
+                              style={{ minWidth: "40px" }}
+                            />
+                          </div>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <span
+                              style={{
+                                color:
+                                  theme === "light" ? "#103B57" : "#FFFFFF",
+                              }}
+                            >
+                              Rows per page:
+                            </span>
+                            <Dropdown
+                              value={pageSize}
+                              options={[5, 10, 15, 20, 30]}
+                              onChange={(e) => {
+                                setPageSize(e.value);
+                                setCurrentPage(1);
+                              }}
+                              className="p-inputtext-sm"
+                              style={{ width: "80px" }}
+                            />
+                          </div>
+
+                          <div
+                            style={{
+                              fontSize: "0.9rem",
+                              color: theme === "light" ? "#103B57" : "#FFFFFF",
+                            }}
+                          >
+                            Total Records: {totalRecords}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

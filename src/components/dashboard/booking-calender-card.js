@@ -8,9 +8,15 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useTheme } from "../../context/theme/themeContext";
+import { useMediaQuery } from "@mui/material";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 
 const BookingCalenderCard = () => {
   const { theme } = useTheme();
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
+
   const [selectedDate, setSelectedDate] = useState(13);
   const [viewingDate, setViewingDate] = useState(11);
 
@@ -29,14 +35,16 @@ const BookingCalenderCard = () => {
       sx={{
         width: "100%",
         maxWidth: "100%",
-        height: "370px",
+        height: "auto",
+        minHeight: { xs: "auto", md: "370px" },
         bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
-        borderRadius: "24px",
+        borderRadius: { xs: "16px", md: "24px" },
         boxShadow: "0px 1px 8px 0px #0000001F",
-        padding: "20px",
+        padding: { xs: "15px", sm: "18px", md: "20px" },
         display: "flex",
         flexDirection: "column",
-        gap: "10px",
+        gap: { xs: "8px", md: "10px" },
+        overflow: "hidden",
       }}
     >
       <Box
@@ -44,13 +52,13 @@ const BookingCalenderCard = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "10px",
+          marginBottom: { xs: "5px", md: "10px" },
         }}
       >
         <Typography
           sx={{
             color: theme === "light" ? "#212121" : "white",
-            fontSize: "18px",
+            fontSize: { xs: "16px", md: "18px" },
             fontWeight: 500,
             fontFamily: "Plus Jakarta Sans",
             width: "100%",
@@ -62,11 +70,11 @@ const BookingCalenderCard = () => {
           </Box>
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: { xs: 0.5, md: 1 } }}>
           <IconButton
             sx={{
-              width: "40px",
-              height: "40px",
+              width: { xs: "32px", md: "40px" },
+              height: { xs: "32px", md: "40px" },
               bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
               border: "1px solid #fafafa",
               color: theme === "light" ? "#212121" : "white",
@@ -75,12 +83,12 @@ const BookingCalenderCard = () => {
               },
             }}
           >
-            <ChevronLeftIcon />
+            <ChevronLeftIcon fontSize={isMobile ? "small" : "medium"} />
           </IconButton>
           <IconButton
             sx={{
-              width: "40px",
-              height: "40px",
+              width: { xs: "32px", md: "40px" },
+              height: { xs: "32px", md: "40px" },
               bgcolor: theme === "light" ? "#ffffff" : "#7A7A7A",
               border: "1px solid #fafafa",
               color: theme === "light" ? "#212121" : "white",
@@ -89,12 +97,12 @@ const BookingCalenderCard = () => {
               },
             }}
           >
-            <ChevronRightIcon />
+            <ChevronRightIcon fontSize={isMobile ? "small" : "medium"} />
           </IconButton>
         </Box>
       </Box>
 
-      <Grid container spacing={1}>
+      <Grid container spacing={isMobile ? 0.5 : 1}>
         {calendarData.flat().map((day, index) => {
           const isPreviousMonth = index < 2;
           const isNextMonth = index > 31;
@@ -104,25 +112,30 @@ const BookingCalenderCard = () => {
           return (
             <Grid
               item
-              xs={1}
+              xs={2}
+              sm={2}
+              md={1}
               key={index}
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "25px",
-                maxWidth: "90%",
+                padding: {
+                  xs: isMobile ? "12px 0" : "15px 0",
+                  md: "25px",
+                },
+                maxWidth: isMobile ? "16.66%" : "90%",
                 margin: 0,
               }}
             >
               <Button
                 onClick={() => setSelectedDate(day)}
                 sx={{
-                  minWidth: "25px",
-                  width: "25px",
-                  height: "25px",
+                  minWidth: { xs: "20px", md: "25px" },
+                  width: { xs: "20px", md: "25px" },
+                  height: { xs: "20px", md: "25px" },
                   padding: "0px",
-                  fontSize: "14px",
+                  fontSize: { xs: "12px", md: "14px" },
                   fontWeight: 600,
                   borderRadius: "8px",
                   display: "flex",
@@ -130,10 +143,14 @@ const BookingCalenderCard = () => {
                   justifyContent: "center",
                   bgcolor: isSelected ? "#0387d9" : "transparent",
                   color: isSelected
-                    ? theme === "light" ? "#ffffff" : "white"
+                    ? theme === "light"
+                      ? "#ffffff"
+                      : "white"
                     : isPreviousMonth || isNextMonth
                     ? "rgba(107, 107, 107, 0.4)"
-                    : theme === "light" ? "#212121" : "white",
+                    : theme === "light"
+                    ? "#212121"
+                    : "white",
                   "&:hover": {
                     bgcolor: isSelected ? "#0387d9" : "rgba(0, 0, 0, 0.04)",
                   },
@@ -149,16 +166,18 @@ const BookingCalenderCard = () => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "flex-start", sm: "center" },
           justifyContent: "space-between",
+          gap: { xs: 2, sm: 0 },
+          mt: { xs: 1, md: 0 },
         }}
       >
-        <Box sx={{width: "50%" }}>
+        <Box sx={{ width: { xs: "100%", sm: "50%" } }}>
           <Typography
             sx={{
               color: theme === "light" ? "#212121" : "white",
-              fontSize: "10px",
+              fontSize: { xs: "9px", sm: "10px" },
               fontWeight: 500,
               fontFamily: "Plus Jakarta Sans",
             }}
@@ -170,7 +189,7 @@ const BookingCalenderCard = () => {
               color: theme === "light" ? "#6b6b6b" : "white",
               marginTop: "5px",
               fontFamily: "Plus Jakarta Sans",
-              fontSize: "12px",
+              fontSize: { xs: "11px", sm: "12px" },
             }}
           >
             No tasks for this day.
@@ -180,20 +199,23 @@ const BookingCalenderCard = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: { xs: "center", sm: "flex-end" },
+            width: { xs: "100%", sm: "auto" },
           }}
         >
           <Button
             variant="contained"
-            startIcon={<AddBoxIcon />}
+            startIcon={
+              <AddBoxIcon sx={{ fontSize: isMobile ? "16px" : "inherit" }} />
+            }
             sx={{
               bgcolor: "#0387d9",
               color: theme === "light" ? "#ffffff" : "white",
               borderRadius: "10px",
-              padding: "10px 20px",
+              padding: { xs: "8px 15px", md: "10px 20px" },
               fontWeight: 500,
               textTransform: "none",
-              fontSize: "12px",
+              fontSize: { xs: "11px", md: "12px" },
               "&:hover": {
                 bgcolor: "rgba(3, 135, 217, 0.9)",
               },

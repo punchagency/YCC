@@ -29,7 +29,7 @@ import {
   fetchEvents,
   updateEvent,
   deleteEvent,
-  inviteGuests
+  inviteGuests,
 } from "../../services/calendar/calendarService";
 import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
@@ -92,7 +92,6 @@ const EventCard = ({
       });
     }
   };
-  
 
   // Helper function to format location
   const formatLocation = (location) => {
@@ -141,18 +140,23 @@ const EventCard = ({
           {description && (
             <p style={{ margin: "5px 0 0 0", color: "#666" }}>{description}</p>
           )}
-          
+
           {/* Add this to show guest count */}
           {getGuestCount(event) > 0 && (
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              marginTop: "5px",
-              color: "#0387D9",
-              fontSize: "12px"
-            }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "5px",
+                color: "#0387D9",
+                fontSize: "12px",
+              }}
+            >
               <i className="pi pi-users" style={{ marginRight: "5px" }}></i>
-              <span>{getGuestCount(event)} {getGuestCount(event) === 1 ? 'guest' : 'guests'}</span>
+              <span>
+                {getGuestCount(event)}{" "}
+                {getGuestCount(event) === 1 ? "guest" : "guests"}
+              </span>
             </div>
           )}
         </div>
@@ -254,56 +258,79 @@ const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
                   {event.description}
                 </p>
               )}
-              
+
               {/* Add this section to display guests */}
               {(event.guests?.length > 0 || event.guestEmails?.length > 0) && (
-                <div className="event-guests" style={{ 
-                  marginTop: "15px", 
-                  padding: "10px", 
-                  backgroundColor: "#f8f9fa", 
-                  borderRadius: "4px" 
-                }}>
-                  <h4 style={{ 
-                    fontSize: "14px", 
-                    fontWeight: "600", 
-                    marginBottom: "8px",
-                    color: "#344054" 
-                  }}>
+                <div
+                  className="event-guests"
+                  style={{
+                    marginTop: "15px",
+                    padding: "10px",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                      color: "#344054",
+                    }}
+                  >
                     Guests
                   </h4>
-                  
+
                   <div className="guest-list">
-                    {event.guestEmails && event.guestEmails.map((email, idx) => (
-                      <div key={`email-${idx}`} className="guest-item" style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px"
-                      }}>
-                        <i className="pi pi-envelope" style={{ 
-                          marginRight: "8px", 
-                          color: "#667085",
-                          fontSize: "12px" 
-                        }}></i>
-                        <span style={{ fontSize: "13px", color: "#475467" }}>{email}</span>
-                      </div>
-                    ))}
-                    
-                    {event.guests && event.guests.map((guest, idx) => (
-                      <div key={`guest-${idx}`} className="guest-item" style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px"
-                      }}>
-                        <i className="pi pi-user" style={{ 
-                          marginRight: "8px", 
-                          color: "#667085",
-                          fontSize: "12px" 
-                        }}></i>
-                        <span style={{ fontSize: "13px", color: "#475467" }}>
-                          {guest.email || guest.name || `Guest ${idx + 1}`}
-                        </span>
-                      </div>
-                    ))}
+                    {event.guestEmails &&
+                      event.guestEmails.map((email, idx) => (
+                        <div
+                          key={`email-${idx}`}
+                          className="guest-item"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <i
+                            className="pi pi-envelope"
+                            style={{
+                              marginRight: "8px",
+                              color: "#667085",
+                              fontSize: "12px",
+                            }}
+                          ></i>
+                          <span style={{ fontSize: "13px", color: "#475467" }}>
+                            {email}
+                          </span>
+                        </div>
+                      ))}
+
+                    {event.guests &&
+                      event.guests.map((guest, idx) => (
+                        <div
+                          key={`guest-${idx}`}
+                          className="guest-item"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <i
+                            className="pi pi-user"
+                            style={{
+                              marginRight: "8px",
+                              color: "#667085",
+                              fontSize: "12px",
+                            }}
+                          ></i>
+                          <span style={{ fontSize: "13px", color: "#475467" }}>
+                            {guest.email || guest.name || `Guest ${idx + 1}`}
+                          </span>
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}
@@ -315,7 +342,13 @@ const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
   );
 };
 
-const AllEventsModal = ({ visible, onHide, events, onEventUpdate, onAddGuest }) => {
+const AllEventsModal = ({
+  visible,
+  onHide,
+  events,
+  onEventUpdate,
+  onAddGuest,
+}) => {
   const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
   const [showDeleteEventModal, setShowDeleteEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -506,43 +539,62 @@ const AllEventsModal = ({ visible, onHide, events, onEventUpdate, onAddGuest }) 
             </div>
             <div className="field">
               <label>Current Guests</label>
-              <div className="current-guests" style={{ 
-                padding: "10px", 
-                backgroundColor: "#f8f9fa", 
-                borderRadius: "4px",
-                marginBottom: "15px" 
-              }}>
-                {selectedEvent.guestEmails && selectedEvent.guestEmails.map((email, idx) => (
-                  <div key={`email-${idx}`} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px"
-                  }}>
-                    <i className="pi pi-envelope" style={{ 
-                      marginRight: "8px", 
-                      color: "#667085",
-                      fontSize: "12px" 
-                    }}></i>
-                    <span style={{ fontSize: "13px", color: "#475467" }}>{email}</span>
-                  </div>
-                ))}
-                
-                {selectedEvent.guests && selectedEvent.guests.map((guest, idx) => (
-                  <div key={`guest-${idx}`} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px"
-                  }}>
-                    <i className="pi pi-user" style={{ 
-                      marginRight: "8px", 
-                      color: "#667085",
-                      fontSize: "12px" 
-                    }}></i>
-                    <span style={{ fontSize: "13px", color: "#475467" }}>
-                      {guest.email || guest.name || `Guest ${idx + 1}`}
-                    </span>
-                  </div>
-                ))}
+              <div
+                className="current-guests"
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                  marginBottom: "15px",
+                }}
+              >
+                {selectedEvent.guestEmails &&
+                  selectedEvent.guestEmails.map((email, idx) => (
+                    <div
+                      key={`email-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-envelope"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {email}
+                      </span>
+                    </div>
+                  ))}
+
+                {selectedEvent.guests &&
+                  selectedEvent.guests.map((guest, idx) => (
+                    <div
+                      key={`guest-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-user"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {guest.email || guest.name || `Guest ${idx + 1}`}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
             <div
@@ -628,7 +680,7 @@ export default function CalendarPage() {
   const [showDeleteEventModal, setShowDeleteEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showAddGuestModal, setShowAddGuestModal] = useState(false);
-  const [guestEmails, setGuestEmails] = useState(['']);
+  const [guestEmails, setGuestEmails] = useState([""]);
 
   const loadEvents = async () => {
     setIsLoading(true);
@@ -791,6 +843,9 @@ export default function CalendarPage() {
           borderRadius: "8px",
           overflow: "hidden",
           border: "1px solid #E4E7EC",
+          width: "97%",
+          marginLeft: "5px",
+          marginRight: "5px",
         }}
       >
         <button
@@ -803,6 +858,7 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            // marginLeft:"5px"
           }}
         >
           Events
@@ -817,6 +873,7 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            // marginRight: "5px",
           }}
         >
           Calendar
@@ -1031,76 +1088,97 @@ export default function CalendarPage() {
   };
 
   const handleAddGuest = (event) => {
-    setSelectedEvent({...event});
+    setSelectedEvent({ ...event });
     setShowAddGuestModal(true);
   };
-  
+
   const addEmailField = () => {
-    setGuestEmails([...guestEmails, '']);
+    setGuestEmails([...guestEmails, ""]);
   };
-  
+
   const removeEmailField = (index) => {
     const newEmails = guestEmails.filter((_, i) => i !== index);
     setGuestEmails(newEmails);
   };
-  
+
   const handleEmailChange = (index, value) => {
     const newEmails = [...guestEmails];
     newEmails[index] = value;
     setGuestEmails(newEmails);
   };
-  
+
   const handleInviteGuests = async () => {
     try {
       // Filter out empty emails
-      const validEmails = guestEmails.filter(email => email.trim() !== '');
-      
+      const validEmails = guestEmails.filter((email) => email.trim() !== "");
+
       if (validEmails.length === 0) {
         toast.current.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Please enter at least one email address',
+          severity: "error",
+          summary: "Error",
+          detail: "Please enter at least one email address",
         });
         return;
       }
-      
+
       // Call API to send invites
       const result = await inviteGuests(selectedEvent._id, validEmails);
-      
+
       if (result.success) {
         toast.current.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: result.message || 'Invitations sent successfully',
+          severity: "success",
+          summary: "Success",
+          detail: result.message || "Invitations sent successfully",
         });
-        
+
         setShowAddGuestModal(false);
-        setGuestEmails(['']); // Reset the email list
+        setGuestEmails([""]); // Reset the email list
         loadEvents(); // Refresh events to show updated guest list
       } else {
         toast.current.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: result.error || 'Failed to send invitations',
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to send invitations",
         });
       }
     } catch (error) {
       toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'An error occurred while sending invitations',
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while sending invitations",
       });
     }
   };
 
   return (
-    <>
+    <div
+      style={{
+        background: "#F8FBFF",
+        position: "relative",
+        minHeight: "100vh",
+        width: "100%",
+        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflowX: "hidden",
+        overflowY: "hidden",
+      }}
+    >
       <Toast ref={toast} />
+
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
             <h3>Calendar</h3>
           </div>
+        </div>
+        <div className="sub-header-right">
+          <Button
+            label="Add Event"
+            className="p-button-primary"
+            icon="pi pi-plus"
+            onClick={() => setShowEventModal(true)}
+          />
         </div>
       </div>
 
@@ -1112,6 +1190,20 @@ export default function CalendarPage() {
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           gap: "20px",
+          padding: "0 20px 20px 20px",
+          overflowY: "auto",
+          flex: 1,
+          "&::-webkit-scrollbar": {
+            width: "0px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "transparent",
+          },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         <div
@@ -1626,43 +1718,62 @@ export default function CalendarPage() {
             </div>
             <div className="field">
               <label>Current Guests</label>
-              <div className="current-guests" style={{ 
-                padding: "10px", 
-                backgroundColor: "#f8f9fa", 
-                borderRadius: "4px",
-                marginBottom: "15px" 
-              }}>
-                {selectedEvent.guestEmails && selectedEvent.guestEmails.map((email, idx) => (
-                  <div key={`email-${idx}`} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px"
-                  }}>
-                    <i className="pi pi-envelope" style={{ 
-                      marginRight: "8px", 
-                      color: "#667085",
-                      fontSize: "12px" 
-                    }}></i>
-                    <span style={{ fontSize: "13px", color: "#475467" }}>{email}</span>
-                  </div>
-                ))}
-                
-                {selectedEvent.guests && selectedEvent.guests.map((guest, idx) => (
-                  <div key={`guest-${idx}`} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "5px"
-                  }}>
-                    <i className="pi pi-user" style={{ 
-                      marginRight: "8px", 
-                      color: "#667085",
-                      fontSize: "12px" 
-                    }}></i>
-                    <span style={{ fontSize: "13px", color: "#475467" }}>
-                      {guest.email || guest.name || `Guest ${idx + 1}`}
-                    </span>
-                  </div>
-                ))}
+              <div
+                className="current-guests"
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                  marginBottom: "15px",
+                }}
+              >
+                {selectedEvent.guestEmails &&
+                  selectedEvent.guestEmails.map((email, idx) => (
+                    <div
+                      key={`email-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-envelope"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {email}
+                      </span>
+                    </div>
+                  ))}
+
+                {selectedEvent.guests &&
+                  selectedEvent.guests.map((guest, idx) => (
+                    <div
+                      key={`guest-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-user"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {guest.email || guest.name || `Guest ${idx + 1}`}
+                      </span>
+                    </div>
+                  ))}
               </div>
             </div>
             <div
@@ -1762,19 +1873,23 @@ export default function CalendarPage() {
         visible={showAddGuestModal}
         onHide={() => {
           setShowAddGuestModal(false);
-          setGuestEmails(['']);
+          setGuestEmails([""]);
         }}
         header="Add Guests"
-        style={{ width: '500px' }}
+        style={{ width: "500px" }}
       >
         <div className="add-guest-form">
           {guestEmails.map((email, index) => (
-            <div key={index} className="email-input-container" style={{ 
-              display: 'flex', 
-              gap: '10px', 
-              marginBottom: '10px',
-              alignItems: 'center'
-            }}>
+            <div
+              key={index}
+              className="email-input-container"
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginBottom: "10px",
+                alignItems: "center",
+              }}
+            >
               <InputText
                 value={email}
                 onChange={(e) => handleEmailChange(index, e.target.value)}
@@ -1791,32 +1906,38 @@ export default function CalendarPage() {
               )}
             </div>
           ))}
-          
+
           <Button
             label="Add Another Guest"
             icon="pi pi-plus"
             onClick={addEmailField}
             className="p-button-text"
-            style={{ marginBottom: '20px' }}
+            style={{ marginBottom: "20px" }}
           />
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "0.5rem",
+            }}
+          >
             <Button
               label="Cancel"
               onClick={() => {
                 setShowAddGuestModal(false);
-                setGuestEmails(['']);
+                setGuestEmails([""]);
               }}
               className="p-button-text"
             />
             <Button
               label="Send Invites"
               onClick={handleInviteGuests}
-              disabled={guestEmails.every(email => email.trim() === '')}
+              disabled={guestEmails.every((email) => email.trim() === "")}
             />
           </div>
         </div>
       </Dialog>
-    </>
+    </div>
   );
 }

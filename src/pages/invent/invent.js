@@ -756,9 +756,10 @@ const Invent = () => {
           height: "100%",
           width: "100%",
           maxWidth: "100%",
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
-         
+          backgroundColor: "#F8FBFF",
         }}
       >
         <div className="inventory-container">

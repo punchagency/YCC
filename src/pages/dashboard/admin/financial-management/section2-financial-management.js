@@ -1,12 +1,33 @@
-import { Box, Typography, Button, styled, Menu, MenuItem, InputBase, InputAdornment } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  styled,
+  Menu,
+  MenuItem,
+  InputBase,
+  InputAdornment,
+  useMediaQuery,
+} from "@mui/material";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useState, useEffect } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "../../../../context/theme/themeContext";
 
-const Section2FinancialManagement = ({setPage, setLimit, setTransactionStatus, setSearch, transactionStatus}) => {
+const Section2FinancialManagement = ({
+  setPage,
+  setLimit,
+  setTransactionStatus,
+  setSearch,
+  transactionStatus,
+}) => {
   const { theme } = useTheme();
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
+
   const [selectedButton, setSelectedButton] = useState("");
   const buttons = ["Pending Invoices", "Completed Payments", "Failed Payments"];
   const options = ["all", "pending", "completed", "failed"];
@@ -24,17 +45,16 @@ const Section2FinancialManagement = ({setPage, setLimit, setTransactionStatus, s
 
   useEffect(() => {
     const debounce = setTimeout(() => {
-        setSearch(query);
+      setSearch(query);
     }, 300);
-  
+
     return () => clearTimeout(debounce);
   }, [query]);
 
   const handleSelect = (option) => {
-   
-    if(option === "all"){
+    if (option === "all") {
       setTransactionStatus("");
-    }else{
+    } else {
       setTransactionStatus(option);
     }
 
@@ -43,192 +63,229 @@ const Section2FinancialManagement = ({setPage, setLimit, setTransactionStatus, s
 
   const handleButtonClick = (option) => {
     setSelectedButton(option);
-    if(option === "Pending Invoices"){
+    if (option === "Pending Invoices") {
       setTransactionStatus("pending");
-    }else if(option === "Completed Payments"){
+    } else if (option === "Completed Payments") {
       setTransactionStatus("completed");
-    }else if(option === "Failed Payments"){
+    } else if (option === "Failed Payments") {
       setTransactionStatus("failed");
     }
     handleClose();
   };
+
   return (
     <Box
       sx={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: isMobile ? "column" : "row",
         justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0px 20px 0px 20px",
+        alignItems: isMobile ? "flex-start" : "center",
+        padding: isMobile
+          ? "10px"
+          : isTablet
+          ? "15px 20px"
+          : "0px 20px 0px 20px",
+        gap: isMobile ? "15px" : "0px",
       }}
     >
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: isMobile ? "column" : "row",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: isMobile ? "stretch" : "center",
           backgroundColor: theme === "light" ? "#FFFFFF" : "#7F7F7F",
-          paddingX: "4px",
+          paddingX: isMobile ? "2px" : "4px",
           paddingY: "2px",
           borderRadius: "8px",
-          gap: "10px",
+          gap: isMobile ? "5px" : isTablet ? "8px" : "10px",
+          width: isMobile ? "100%" : "auto",
         }}
       >
         {buttons.map((option, index) => (
-          <CustomButton
+          <Button
             key={index}
-            active={selectedButton === option}
+            active={selectedButton === option ? "true" : undefined}
             onClick={() => handleButtonClick(option)}
-            mode={theme}
+            sx={{
+              fontFamily: "Plus Jakarta Sans",
+              fontWeight: 600,
+              fontSize: isMobile ? "11px" : isTablet ? "11px" : "12px",
+              lineHeight: "100%",
+              letterSpacing: "0%",
+              textAlign: "center",
+              verticalAlign: "middle",
+              textTransform: "none",
+              color:
+                theme === "light"
+                  ? selectedButton === option
+                    ? "#FFFFFF"
+                    : "#212121"
+                  : selectedButton === option
+                  ? "white"
+                  : "#212121",
+              padding: isMobile ? "8px" : isTablet ? "9px" : "10px",
+              margin: "0px",
+              backgroundColor:
+                selectedButton === option
+                  ? "#0387D9"
+                  : theme === "light"
+                  ? "#FFFFFF"
+                  : "#7F7F7F",
+              borderRadius: "8px",
+              width: isMobile ? "100%" : "auto",
+            }}
           >
             {option}
-          </CustomButton>
+          </Button>
         ))}
       </Box>
 
       <Box
         sx={{
           display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: "10px",
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: isMobile ? "flex-start" : "space-between",
+          alignItems: isMobile ? "stretch" : "center",
+          gap: isMobile ? "10px" : isTablet ? "8px" : "10px",
+          width: isMobile ? "100%" : "auto",
         }}
       >
-        <Box>
-          <FilterButton onClick={handleClick} mode={theme}>
+        <Box sx={{ width: isMobile ? "100%" : "auto" }}>
+          <Button
+            onClick={handleClick}
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              padding: "4px 6px",
+              width: isMobile ? "100%" : "150px",
+              backgroundColor: theme === "light" ? "#FFFFFF" : "#7F7F7F",
+              borderRadius: "8px",
+              border: "1px solid #d5d5d5",
+              boxShadow: "none",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#c5c5c5",
+                boxShadow: "none",
+              },
+            }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <FilterListIcon sx={{ color: theme === "light" ? "#000000" : "white", fontSize: "17px" }} />
+              <FilterListIcon
+                sx={{
+                  color: theme === "light" ? "#000000" : "white",
+                  fontSize: isMobile ? "15px" : "17px",
+                }}
+              />
               <Typography
-                sx={{ color: theme === "light" ? "#9b9b9b" : "white", fontWeight: 400, fontSize: "13px" }}
+                sx={{
+                  color: theme === "light" ? "#9b9b9b" : "white",
+                  fontWeight: 400,
+                  fontSize: isMobile ? "12px" : "13px",
+                }}
               >
                 {transactionStatus || "Select Filter"}
               </Typography>
             </Box>
             <KeyboardArrowDownIcon
-              sx={{ color: theme === "light" ? "#000000" : "white", fontSize: "17px" }}
+              sx={{
+                color: theme === "light" ? "#000000" : "white",
+                fontSize: isMobile ? "15px" : "17px",
+              }}
             />
-          </FilterButton>
+          </Button>
 
-          <FilterMenu anchorEl={anchorEl} open={open} onClose={handleClose} mode={theme}>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            PaperProps={{
+              sx: {
+                width: anchorEl?.offsetWidth,
+                borderRadius: "8px",
+                marginTop: "4px",
+                boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
+                backgroundColor: theme === "light" ? "#F6F6F6" : "#7F7F7F",
+              },
+            }}
+          >
             {options.map((option) => (
-              <FilterMenuItem
+              <MenuItem
                 key={option}
                 onClick={() => handleSelect(option)}
-                mode={theme}
+                sx={{
+                  padding: "8px 16px",
+                  color: theme === "light" ? "#212121" : "white",
+                  fontSize: isMobile ? "12px" : "inherit",
+                  "&:hover": {
+                    backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+                    color: theme === "light" ? "#212121" : "white",
+                  },
+                }}
               >
                 {option}
-              </FilterMenuItem>
+              </MenuItem>
             ))}
-          </FilterMenu>
+          </Menu>
         </Box>
 
         <Box
           sx={{
-            width: "310px",
-        mx: "auto",
-      }}
-    >
-      <Box
-        component="div"
-        sx={{
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <CustomInputBase
-          placeholder="Search Transactions"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          mode={theme}
-          startAdornment={
-            <InputAdornment position="start" sx={{ ml: "16px", mr: "4px" }}>
-              <SearchIcon sx={{ color: theme === "light" ? "#212121" : "white", fontSize: "17px" }} />
-            </InputAdornment>
-          }
-         
-        />
+            width: isMobile ? "100%" : isTablet ? "250px" : "310px",
+            mx: isMobile ? "0" : "auto",
+          }}
+        >
+          <Box
+            component="div"
+            sx={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              width: "100%",
+            }}
+          >
+            <InputBase
+              placeholder="Search Transactions"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              sx={{
+                width: "100%",
+                height: "30px",
+                borderRadius: "25px",
+                border: "1px solid #d5d5d5",
+                backgroundColor: theme === "light" ? "#ffffff" : "#7F7F7F",
+                "& .MuiInputBase-input": {
+                  color: theme === "light" ? "#212121" : "white",
+                  fontSize: isMobile ? "12px" : "13px",
+                  fontWeight: 400,
+                  "&::placeholder": {
+                    color: theme === "light" ? "#9b9b9b" : "white",
+                    opacity: 1,
+                  },
+                },
+                pl: "0px",
+                pr: "16px",
+                "&:focus-within": {
+                  outline: "none",
+                  boxShadow: "0 0 0 1px #d5d5d5",
+                },
+              }}
+              startAdornment={
+                <InputAdornment position="start" sx={{ ml: "16px", mr: "4px" }}>
+                  <SearchIcon
+                    sx={{
+                      color: theme === "light" ? "#212121" : "white",
+                      fontSize: isMobile ? "15px" : "17px",
+                    }}
+                  />
+                </InputAdornment>
+              }
+            />
+          </Box>
+        </Box>
       </Box>
-      </Box>
-    </Box>
     </Box>
   );
 };
 
-export const CustomButton = styled(Button)(({ active, mode }) => ({
-  fontFamily: "Plus Jakarta Sans",
-  fontWeight: 600,
-  fontSize: "12px",
-  lineHeight: "100%",
-  letterSpacing: "0%",
-  textAlign: "center",
-  verticalAlign: "middle",
-  textTransform: "none",
-  color: mode === "light" ? active ? "#FFFFFF" : "#212121" : active ? "white" : "#212121",
-  padding: "10px",
-  margin: "0px",
-  backgroundColor: active ? "#0387D9" : mode === "light" ? "#FFFFFF" : "#7F7F7F",
-  borderRadius: "8px",
-}));
-
-export const FilterButton = styled(Button)(({ active, mode }) => ({
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "4px 6px ",
-  width: "150px",
-  backgroundColor: mode === "light" ? "#FFFFFF" : "#7F7F7F",
-  borderRadius: "8px",
-  border: "1px solid #d5d5d5",
-  boxShadow: "none",
-  textTransform: "none",
-  "&:hover": {
-    backgroundColor: "#c5c5c5",
-    boxShadow: "none",
-  },
-}));
-
-export const FilterMenu = styled(Menu)(({ anchorEl, mode }) => ({
-  "& .MuiPaper-root": {
-    width: anchorEl?.offsetWidth,
-    borderRadius: "8px",
-    marginTop: "4px",
-    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-    backgroundColor: mode === "light" ? "#F6F6F6" : "#7F7F7F",
-  },
-}));
-
-export const FilterMenuItem = styled(MenuItem)(({ active, mode }) => ({
-  padding: "8px 16px",
-  color: mode === "light" ? "#212121" : "white",
-  "&:hover": {
-    backgroundColor: mode === "light" ? "#FFFFFF" : "#03141F",
-    color: mode === "light" ? "#212121" : "white",
-  },
-}));
-
-export const CustomInputBase = styled(InputBase)(({ active, mode }) => ({
-    width: "100%",
-    height: "30px",
-    borderRadius: "25px",
-    border: "1px solid #d5d5d5",
-    backgroundColor: mode === "light" ? "#ffffff" : "#7F7F7F",
-    "& .MuiInputBase-input": {
-      color: mode === "light" ? "#212121" : "white",
-      fontSize: "13px",
-      fontWeight: 400,
-      "&::placeholder": {
-        color: mode === "light" ? "#9b9b9b" : "white",
-        opacity: 1,
-      },
-    },
-    pl: "0px",
-    pr: "16px",
-    "&:focus-within": {
-      outline: "none",
-      boxShadow: "0 0 0 1px #d5d5d5",
-    }
-}));
 export default Section2FinancialManagement;

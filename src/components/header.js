@@ -245,6 +245,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               border: "1px solid #ced4da",
               borderRadius: "30px",
               backgroundColor: "#F5F6FA",
+              outline: "none",
               fontSize: "10px",
             }}
           />

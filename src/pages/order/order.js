@@ -507,65 +507,74 @@ const Order = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
-                <tr
-                  key={order.id}
-                  style={{
-                    backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleViewOrder(order)}
-                >
-                  <td data-label="Select" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedOrders.includes(order)}
-                      onChange={(e) => {
-                        const selected = e.target.checked;
-                        setSelectedOrders(
-                          selected
-                            ? [...selectedOrders, order]
-                            : selectedOrders.filter((o) => o._id !== order._id)
-                        );
-
-                        // If we're unchecking an item, also uncheck the "select all" checkbox
-                        if (!selected && selectAll) {
-                          setSelectAll(false);
-                        }
-                      }}
-                    />
-                  </td>
-                  <td data-label="Customer Name">{order.customerName}</td>
-                  <td data-label="Order Date">{formatDate(order.orderDate)}</td>
-                  <td data-label="Order Type">{order.orderType}</td>
-                  <td data-label="Tracking ID">
-                    <div className="tracking-id">
-                      <span>{order.orderId}</span>
-                      <i className="pi pi-copy" />
-                    </div>
-                  </td>
-                  <td data-label="Order Total">
-                    {formatCurrency(order.totalPrice)}
-                  </td>
-                  <td data-label="Status">
-                    <span
-                      className={`status-badge status-${order.status.toLowerCase()}`}
+              {orders &&
+                orders.map((order) => (
+                  <tr
+                    key={order.id}
+                    style={{
+                      backgroundColor:
+                        theme === "light" ? "#FFFFFF" : "#03141F",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleViewOrder(order)}
+                  >
+                    <td
+                      data-label="Select"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td data-label="Actions">
-                    <div className="action-buttons">
-                      <button className="action-btn" title="View Details">
-                        <i className="pi pi-eye" />
-                      </button>
-                      <button className="action-btn" title="Edit Order">
-                        <i className="pi pi-pencil" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.includes(order)}
+                        onChange={(e) => {
+                          const selected = e.target.checked;
+                          setSelectedOrders(
+                            selected
+                              ? [...selectedOrders, order]
+                              : selectedOrders.filter(
+                                  (o) => o._id !== order._id
+                                )
+                          );
+
+                          // If we're unchecking an item, also uncheck the "select all" checkbox
+                          if (!selected && selectAll) {
+                            setSelectAll(false);
+                          }
+                        }}
+                      />
+                    </td>
+                    <td data-label="Customer Name">{order.customerName}</td>
+                    <td data-label="Order Date">
+                      {formatDate(order.orderDate)}
+                    </td>
+                    <td data-label="Order Type">{order.orderType}</td>
+                    <td data-label="Tracking ID">
+                      <div className="tracking-id">
+                        <span>{order.orderId}</span>
+                        <i className="pi pi-copy" />
+                      </div>
+                    </td>
+                    <td data-label="Order Total">
+                      {formatCurrency(order.totalPrice)}
+                    </td>
+                    <td data-label="Status">
+                      <span
+                        className={`status-badge status-${order.status.toLowerCase()}`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td data-label="Actions">
+                      <div className="action-buttons">
+                        <button className="action-btn" title="View Details">
+                          <i className="pi pi-eye" />
+                        </button>
+                        <button className="action-btn" title="Edit Order">
+                          <i className="pi pi-pencil" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               <tr>
                 <td
                   colSpan="8"
@@ -777,10 +786,10 @@ const Order = () => {
           height: "100%",
           width: "100%",
           maxWidth: "100%",
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
-          color: theme === "light" ? "#103B57" : "#FFFFFF",
+          backgroundColor: "#F8FBFF",
         }}
       >
         <div>
@@ -1227,62 +1236,65 @@ const Order = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order) => (
-                      <tr
-                        key={order.id}
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleViewOrder(order)}
-                      >
-                        <td
-                          data-label="Select"
-                          onClick={(e) => e.stopPropagation()}
+                    {orders &&
+                      orders.map((order) => (
+                        <tr
+                          key={order.id}
+                          style={{
+                            backgroundColor:
+                              theme === "light" ? "#FFFFFF" : "#03141F",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleViewOrder(order)}
                         >
-                          <input
-                            type="checkbox"
-                            checked={selectedOrders.includes(order)}
-                            onChange={(e) => {
-                              const selected = e.target.checked;
-                              setSelectedOrders(
-                                selected
-                                  ? [...selectedOrders, order]
-                                  : selectedOrders.filter(
-                                      (o) => o._id !== order._id
-                                    )
-                              );
-
-                              // If we're unchecking an item, also uncheck the "select all" checkbox
-                              if (!selected && selectAll) {
-                                setSelectAll(false);
-                              }
-                            }}
-                          />
-                        </td>
-                        <td data-label="Customer Name">{order.customerName}</td>
-                        <td data-label="Order Date">
-                          {formatDate(order.orderDate)}
-                        </td>
-                        <td data-label="Tracking ID">
-                          <div className="tracking-id">
-                            <span>{order.orderId}</span>
-                            <i className="pi pi-copy" />
-                          </div>
-                        </td>
-                        <td data-label="Order Total">
-                          {formatCurrency(order.totalPrice)}
-                        </td>
-                        <td data-label="Status">
-                          <span
-                            className={`status-badge status-${order.status.toLowerCase()}`}
+                          <td
+                            data-label="Select"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {order.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                            <input
+                              type="checkbox"
+                              checked={selectedOrders.includes(order)}
+                              onChange={(e) => {
+                                const selected = e.target.checked;
+                                setSelectedOrders(
+                                  selected
+                                    ? [...selectedOrders, order]
+                                    : selectedOrders.filter(
+                                        (o) => o._id !== order._id
+                                      )
+                                );
+
+                                // If we're unchecking an item, also uncheck the "select all" checkbox
+                                if (!selected && selectAll) {
+                                  setSelectAll(false);
+                                }
+                              }}
+                            />
+                          </td>
+                          <td data-label="Customer Name">
+                            {order.customerName}
+                          </td>
+                          <td data-label="Order Date">
+                            {formatDate(order.orderDate)}
+                          </td>
+                          <td data-label="Tracking ID">
+                            <div className="tracking-id">
+                              <span>{order.orderId}</span>
+                              <i className="pi pi-copy" />
+                            </div>
+                          </td>
+                          <td data-label="Order Total">
+                            {formatCurrency(order.totalPrice)}
+                          </td>
+                          <td data-label="Status">
+                            <span
+                              className={`status-badge status-${order.status.toLowerCase()}`}
+                            >
+                              {order.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
                     <tr style={{ marginRight: "20px" }}>
                       <td
                         colSpan="6"

@@ -269,260 +269,272 @@ const DashboardCrew = () => {
           {/* <Button label="Action" icon="pi pi-plus" className="p-button-primary" /> */}
         </div>
       </div>
-      <div className="card-wrapper-gap">
-        <div className="v-grid v-grid-two-column">
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Task Overview</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter}
-                        options={filterOptions}
-                        onChange={onFilterChange}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
+      <div 
+        className="dashboard-wrapper"
+        style={{
+          width: "100%",
+          maxWidth: "100%",
+          overflowX: "hidden", // Hide horizontal scrollbar
+          overflowY: "auto", // Allow vertical scrolling
+          height: "100vh",
+          backgroundColor: "#F8FBFF",
+        }}
+      >
+        <div className="card-wrapper-gap">
+          <div className="v-grid v-grid-two-column">
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Task Overview</span>
+                      <div className="filter-dropdown">
+                        <Dropdown
+                          value={selectedFilter}
+                          options={filterOptions}
+                          onChange={onFilterChange}
+                          placeholder="Select a filter"
+                          className="p-dropdown-sm"
+                        />
+                      </div>
                     </div>
+                  }
+                >
+                  <div className="pie-chart-wraper">
+                    {" "}
+                    {/* Custom width and height */}
+                    <Chart type="pie" data={data} options={options} />
                   </div>
-                }
-              >
-                <div className="pie-chart-wraper">
-                  {" "}
-                  {/* Custom width and height */}
-                  <Chart type="pie" data={data} options={options} />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Total No of Task</span>
-                    <div className="three-dot-menu">
-                      <Menu
-                        model={menuItems}
-                        popup
-                        ref={menuRef}
-                        className="right-aligned-menu"
-                      />
-                      <Button
-                        icon="pi pi-ellipsis-v"
-                        className="p-button-rounded p-button-text"
-                        aria-label="Options"
-                        onClick={(e) => menuRef.current.toggle(e)}
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Total No of Task</span>
+                      <div className="three-dot-menu">
+                        <Menu
+                          model={menuItems}
+                          popup
+                          ref={menuRef}
+                          className="right-aligned-menu"
+                        />
+                        <Button
+                          icon="pi pi-ellipsis-v"
+                          className="p-button-rounded p-button-text"
+                          aria-label="Options"
+                          onClick={(e) => menuRef.current.toggle(e)}
+                        />
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="dashboard-overview dashboard-overview-three-row">
+                    <div className="dashboard-overview-item">
+                      250
+                      <p>In progress</p>
+                    </div>
+                    <div className="dashboard-overview-item">
+                      170
+                      <p>Pending</p>
+                    </div>
+                    <div className="dashboard-overview-item">
+                      130
+                      <p>Completed</p>
                     </div>
                   </div>
-                }
-              >
-                <div className="dashboard-overview dashboard-overview-three-row">
-                  <div className="dashboard-overview-item">
-                    250
-                    <p>In progress</p>
-                  </div>
-                  <div className="dashboard-overview-item">
-                    170
-                    <p>Pending</p>
-                  </div>
-                  <div className="dashboard-overview-item">
-                    130
-                    <p>Completed</p>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Recent Document</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter1}
-                        options={filterOptions1}
-                        onChange={onFilterChange1}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Recent Document</span>
+                      <div className="filter-dropdown">
+                        <Dropdown
+                          value={selectedFilter1}
+                          options={filterOptions1}
+                          onChange={onFilterChange1}
+                          placeholder="Select a filter"
+                          className="p-dropdown-sm"
+                        />
+                      </div>
                     </div>
+                  }
+                >
+                  <div className="dashboard-overview">
+                    <DataTable
+                      value={document}
+                      rows={10}
+                      tableStyle={{ minWidth: "20rem" }}
+                      rowClassName="pointer-row"
+                    >
+                      <Column
+                        field="name"
+                        header="Document Name"
+                        style={{ width: "33%" }}
+                      />
+                      <Column
+                        field="date"
+                        header="Date Added"
+                        style={{ width: "33%" }}
+                      />
+                      <Column
+                        field="imageUrl"
+                        header="File Type"
+                        style={{ width: "33%" }}
+                        body={priorityTemplateImage}
+                      />
+                    </DataTable>
                   </div>
-                }
-              >
-                <div className="dashboard-overview">
-                  <DataTable
-                    value={document}
-                    rows={10}
-                    tableStyle={{ minWidth: "20rem" }}
-                    rowClassName="pointer-row"
-                  >
-                    <Column
-                      field="name"
-                      header="Document Name"
-                      style={{ width: "33%" }}
-                    />
-                    <Column
-                      field="date"
-                      header="Date Added"
-                      style={{ width: "33%" }}
-                    />
-                    <Column
-                      field="imageUrl"
-                      header="File Type"
-                      style={{ width: "33%" }}
-                      body={priorityTemplateImage}
-                    />
-                  </DataTable>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Total No of Document</span>
-                    <div className="three-dot-menu">
-                      <Menu
-                        model={menuItems}
-                        popup
-                        ref={menuRef}
-                        className="right-aligned-menu"
-                      />
-                      <Button
-                        icon="pi pi-ellipsis-v"
-                        className="p-button-rounded p-button-text"
-                        aria-label="Options"
-                        onClick={(e) => menuRef.current.toggle(e)}
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Total No of Document</span>
+                      <div className="three-dot-menu">
+                        <Menu
+                          model={menuItems}
+                          popup
+                          ref={menuRef}
+                          className="right-aligned-menu"
+                        />
+                        <Button
+                          icon="pi pi-ellipsis-v"
+                          className="p-button-rounded p-button-text"
+                          aria-label="Options"
+                          onClick={(e) => menuRef.current.toggle(e)}
+                        />
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="dashboard-overview dashboard-overview-three-row">
+                    <div className="dashboard-overview-item">
+                      30
+                      <p>Technical Doc</p>
+                    </div>
+                    <div className="dashboard-overview-item">
+                      20
+                      <p>Schematics</p>
+                    </div>
+                    <div className="dashboard-overview-item">
+                      16
+                      <p>Safety Docs</p>
                     </div>
                   </div>
-                }
-              >
-                <div className="dashboard-overview dashboard-overview-three-row">
-                  <div className="dashboard-overview-item">
-                    30
-                    <p>Technical Doc</p>
-                  </div>
-                  <div className="dashboard-overview-item">
-                    20
-                    <p>Schematics</p>
-                  </div>
-                  <div className="dashboard-overview-item">
-                    16
-                    <p>Safety Docs</p>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Upcoming Task</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter1}
-                        options={filterOptions1}
-                        onChange={onFilterChange1}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Upcoming Task</span>
+                      <div className="filter-dropdown">
+                        <Dropdown
+                          value={selectedFilter1}
+                          options={filterOptions1}
+                          onChange={onFilterChange1}
+                          placeholder="Select a filter"
+                          className="p-dropdown-sm"
+                        />
+                      </div>
                     </div>
+                  }
+                >
+                  <div className="dashboard-overview">
+                    <DataTable
+                      value={tasks}
+                      rows={10}
+                      tableStyle={{ minWidth: "20rem" }}
+                      rowClassName="pointer-row"
+                    >
+                      <Column
+                        field="name"
+                        header="Task name"
+                        style={{ width: "33%" }}
+                        body={loading ? skeletonTemplate : null}
+                      />
+                      <Column
+                        field="priority"
+                        header="Priority"
+                        style={{ width: "33%" }}
+                        body={(rowData) => priorityTemplate(rowData)}
+                      />
+                      <Column
+                        field="date"
+                        header="Due date"
+                        style={{ width: "33%" }}
+                        body={loading ? skeletonTemplate : null}
+                      />
+                    </DataTable>
                   </div>
-                }
-              >
-                <div className="dashboard-overview">
-                  <DataTable
-                    value={tasks}
-                    rows={10}
-                    tableStyle={{ minWidth: "20rem" }}
-                    rowClassName="pointer-row"
-                  >
-                    <Column
-                      field="name"
-                      header="Task name"
-                      style={{ width: "33%" }}
-                      body={loading ? skeletonTemplate : null}
-                    />
-                    <Column
-                      field="priority"
-                      header="Priority"
-                      style={{ width: "33%" }}
-                      body={(rowData) => priorityTemplate(rowData)}
-                    />
-                    <Column
-                      field="date"
-                      header="Due date"
-                      style={{ width: "33%" }}
-                      body={loading ? skeletonTemplate : null}
-                    />
-                  </DataTable>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Monthly Maintenance Trend</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter2}
-                        options={filterOptions2}
-                        onChange={onFilterChange2}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Monthly Maintenance Trend</span>
+                      <div className="filter-dropdown">
+                        <Dropdown
+                          value={selectedFilter2}
+                          options={filterOptions2}
+                          onChange={onFilterChange2}
+                          placeholder="Select a filter"
+                          className="p-dropdown-sm"
+                        />
+                      </div>
                     </div>
+                  }
+                >
+                  <div className="bar-chart-wrapper">
+                    <Chart type="line" data={lineData} options={lineOptions} />
                   </div>
-                }
-              >
-                <div className="bar-chart-wrapper">
-                  <Chart type="line" data={lineData} options={lineOptions} />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
 
-          <div className="item">
-            <div className="card flex justify-content-center">
-              <Card
-                title={
-                  <div className="card-header">
-                    <span>Document Access Frequency</span>
-                    <div className="filter-dropdown">
-                      <Dropdown
-                        value={selectedFilter1}
-                        options={filterOptions1}
-                        onChange={onFilterChange1}
-                        placeholder="Select a filter"
-                        className="p-dropdown-sm"
-                      />
+            <div className="item">
+              <div className="card flex justify-content-center">
+                <Card
+                  title={
+                    <div className="card-header">
+                      <span>Document Access Frequency</span>
+                      <div className="filter-dropdown">
+                        <Dropdown
+                          value={selectedFilter1}
+                          options={filterOptions1}
+                          onChange={onFilterChange1}
+                          placeholder="Select a filter"
+                          className="p-dropdown-sm"
+                        />
+                      </div>
                     </div>
+                  }
+                >
+                  <div className="bar-chart-wrapper">
+                    <Chart type="bar" data={barData} options={barOptions} />
                   </div>
-                }
-              >
-                <div className="bar-chart-wrapper">
-                  <Chart type="bar" data={barData} options={barOptions} />
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
           </div>
         </div>

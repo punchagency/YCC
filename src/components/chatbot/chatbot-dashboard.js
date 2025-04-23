@@ -77,6 +77,7 @@ const ChatbotDashboard = () => {
             <Fab
                 onClick={() => setIsAIAssistantOpen(true)}
                 disableRipple
+               
                 sx={{
                     position: "fixed",
                     bottom: 19,
@@ -84,7 +85,7 @@ const ChatbotDashboard = () => {
                     backgroundColor: 'transparent',
                     boxShadow: 'none',  // Removes the shadow
                     '&:hover': {
-                        backgroundColor: 'transparent', // Prevents background change on hover
+                        backgroundColor: 'red', // Prevents background change on hover
                         boxShadow: 'none', // Ensures no shadow on hover
                     }
                 }}
@@ -280,7 +281,7 @@ const ChatbotDashboard = () => {
                                             }}>
                                                 {item.role === 'assistant' && <>
                                                     <Box>
-                                                        <img src={BotIcon} alt="user" />
+                                                        {/* <img src={BotIcon} alt="user" /> */}
                                                     </Box>
                                                     <ChatbotTime>Chatbot {formatUtcTo12Hour(item.createdAt ? item.createdAt : new Date().toISOString())}</ChatbotTime>
                                                 </>}
