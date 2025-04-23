@@ -10,7 +10,7 @@ import settingsLogo from "../assets/images/crew/settingsLogo.png";
 import helpLogo from "../assets/images/crew/info.png";
 import contactLogo from "../assets/images/crew/shape.png";
 import logoutLogo from "../assets/images/crew/logout.png";
-import "../styles/sidebar.css"; // Import the sidebar styles
+import "../styles/mobileSidebar.css"; // Import the sidebar styles
 
 const MobileSidebar = ({ isOpen, onClose, role }) => {
   const navigate = useNavigate();

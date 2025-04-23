@@ -6,6 +6,9 @@ import { Column } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
+import { useMediaQuery } from "@mui/material";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { Box, Typography, Card, CardContent, Chip } from "@mui/material";
 import NotificationDetailsModal from "../../components/NotificationDetailsModal";
 import sortNotification from "../../assets/images/crew/sortnotification.png";
 import {
@@ -15,6 +18,247 @@ import {
 } from "../../services/notification/notificationService";
 import { TableSkeleton } from "../../components/TableSkeleton";
 import { useToast } from "../../components/Toast";
+import React from "react";
+
+// Mobile notification card component
+const MobileNotificationCard = ({
+  notification,
+  handleViewDetails,
+  handleStatusChange,
+  statusLoading,
+  theme,
+}) => {
+  const cellStatusMenu = useRef(null);
+
+  const statusStyles = {
+    "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
+    flagged: { bg: "#EFF8FF", color: "#175CD3" },
+    "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
+    "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
+    pending: { bg: "#FEF3F2", color: "#B42318" },
+    "in-progress": { bg: "#FFFAEB", color: "#B54708" },
+    resolved: { bg: "#ECFDF3", color: "#027A48" },
+    dismissed: { bg: "#F2F4F7", color: "#344054" },
+  };
+
+  const style = statusStyles[notification.status.toLowerCase()] || {
+    bg: "#F2F4F7",
+    color: "#344054",
+  };
+
+  const statusOptions = [
+    { label: "Pending", value: "pending" },
+    { label: "In Progress", value: "in-progress" },
+    { label: "Resolved", value: "resolved" },
+    { label: "Dismissed", value: "dismissed" },
+    { label: "Flagged", value: "flagged" },
+  ];
+
+  const statusMenuItems = statusOptions.map((option) => ({
+    label: option.label,
+    command: () => handleStatusChange(notification._id, option.value),
+  }));
+
+  const priorityStyles = {
+    high: { bg: "#ECFDF3", color: "#027A48" },
+    medium: { bg: "#FFFAEB", color: "#B54708" },
+    low: { bg: "#FEF3F2", color: "#B42318" },
+  };
+
+  const priorityStyle = priorityStyles[notification.priority.toLowerCase()] || {
+    bg: "#F2F4F7",
+    color: "#344054",
+  };
+
+  return (
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: "8px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        backgroundColor: "#F8FBFF",
+        height: "100%",
+        width: "100%",
+      }}
+    >
+      <CardContent sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 1.5,
+            alignItems: "center",
+          }}
+        >
+          <Chip
+            label={notification.priority}
+            size="small"
+            sx={{
+              backgroundColor: priorityStyle.bg,
+              color: priorityStyle.color,
+              fontSize: "12px",
+              height: "24px",
+            }}
+          />
+          <Chip
+            label={notification.status}
+            size="small"
+            sx={{
+              backgroundColor: style.bg,
+              color: style.color,
+              fontSize: "12px",
+              height: "24px",
+            }}
+          />
+        </Box>
+
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontSize: "14px",
+            fontWeight: 500,
+            mb: 1,
+            color: "#101828",
+          }}
+        >
+          {notification.type}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: "13px",
+            mb: 2,
+            color: "#475467",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {notification.description}
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "12px",
+              color: "#667085",
+            }}
+          >
+            {new Date(notification.createdAt).toLocaleDateString()}
+          </Typography>
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              icon="pi pi-check-circle"
+              className="p-button-rounded p-button-text p-button-sm"
+              tooltip="Change Status"
+              tooltipOptions={{ position: "top" }}
+              onClick={(e) => cellStatusMenu.current.toggle(e)}
+              disabled={statusLoading}
+              style={{ padding: "6px" }}
+            />
+            <Menu
+              model={statusMenuItems}
+              popup
+              ref={cellStatusMenu}
+              id={`status-menu-${notification._id}`}
+            />
+
+            <Button
+              label="View"
+              className="p-button-outlined p-button-sm"
+              style={{
+                border: "1px solid #D0D5DD",
+                color: "#344054",
+                backgroundColor: "white",
+                padding: "6px 12px",
+                fontSize: "12px",
+                borderRadius: "8px",
+              }}
+              onClick={() => handleViewDetails(notification)}
+            />
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
+const StatusCell = React.memo(
+  ({ rowData, handleStatusChange, statusLoading }) => {
+    const cellStatusMenu = useRef(null);
+
+    const statusStyles = {
+      "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
+      flagged: { bg: "#EFF8FF", color: "#175CD3" },
+      "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
+      "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
+      pending: { bg: "#FEF3F2", color: "#B42318" },
+      "in-progress": { bg: "#FFFAEB", color: "#B54708" },
+      resolved: { bg: "#ECFDF3", color: "#027A48" },
+      dismissed: { bg: "#F2F4F7", color: "#344054" },
+    };
+
+    const style = statusStyles[rowData.status.toLowerCase()] || {
+      bg: "#F2F4F7",
+      color: "#344054",
+    };
+
+    const statusOptions = [
+      { label: "Pending", value: "pending" },
+      { label: "In Progress", value: "in-progress" },
+      { label: "Resolved", value: "resolved" },
+      { label: "Dismissed", value: "dismissed" },
+      { label: "Flagged", value: "flagged" },
+    ];
+
+    const statusMenuItems = statusOptions.map((option) => ({
+      label: option.label,
+      command: () => handleStatusChange(rowData._id, option.value),
+    }));
+
+    return (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span
+          style={{
+            backgroundColor: style.bg,
+            color: style.color,
+            padding: "2px 8px",
+            borderRadius: "16px",
+            fontSize: "12px",
+            marginRight: "8px",
+          }}
+        >
+          {rowData.status}
+        </span>
+        <Button
+          icon="pi pi-check-circle"
+          className="p-button-rounded p-button-text p-button-sm"
+          tooltip="Change Status"
+          tooltipOptions={{ position: "top" }}
+          onClick={(e) => cellStatusMenu.current.toggle(e)}
+          disabled={statusLoading}
+        />
+        <Menu
+          model={statusMenuItems}
+          popup
+          ref={cellStatusMenu}
+          id={`status-menu-${rowData._id}`}
+        />
+      </div>
+    );
+  }
+);
 
 export default function Notifications({ role }) {
   const [showModal, setShowModal] = useState(false);
@@ -24,8 +268,15 @@ export default function Notifications({ role }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
+  const statusMenu = useRef(null);
   const toast = useRef(null);
   const { showSuccess, showError } = useToast();
+
+  // Add responsive detection
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
+  const { theme } = useMuiTheme();
 
   useEffect(() => {
     fetchNotifications();
@@ -48,11 +299,19 @@ export default function Notifications({ role }) {
         setError(null);
       } else {
         setError(response.error);
-        showToast("error", "Error", response.error || "Failed to fetch notifications");
+        showToast(
+          "error",
+          "Error",
+          response.error || "Failed to fetch notifications"
+        );
       }
     } catch (err) {
       setError("Failed to fetch notifications");
-      showToast("error", "Error", "An error occurred while fetching notifications");
+      showToast(
+        "error",
+        "Error",
+        "An error occurred while fetching notifications"
+      );
     } finally {
       setLoading(false);
     }
@@ -62,7 +321,7 @@ export default function Notifications({ role }) {
     if (toast.current) {
       toast.current.show({ severity, summary, detail, life: 3000 });
     }
-    
+
     if (severity === "success" && showSuccess) {
       showSuccess(detail);
     } else if (severity === "error" && showError) {
@@ -97,9 +356,17 @@ export default function Notifications({ role }) {
           )
         );
 
-        showToast("success", "Success", `Notification status changed to ${newStatus}`);
+        showToast(
+          "success",
+          "Success",
+          `Notification status changed to ${newStatus}`
+        );
       } else {
-        showToast("error", "Error", response.error || "Failed to update status");
+        showToast(
+          "error",
+          "Error",
+          response.error || "Failed to update status"
+        );
       }
     } catch (error) {
       showToast("error", "Error", "An error occurred while updating status");
@@ -136,70 +403,12 @@ export default function Notifications({ role }) {
   };
 
   const statusTemplate = (rowData) => {
-    // Create a ref for this specific row
-    const rowStatusMenu = useRef(null);
-    
-    const statusStyles = {
-      "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
-      flagged: { bg: "#EFF8FF", color: "#175CD3" },
-      "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
-      "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
-      pending: { bg: "#FEF3F2", color: "#B42318" },
-      "in-progress": { bg: "#FFFAEB", color: "#B54708" },
-      resolved: { bg: "#ECFDF3", color: "#027A48" },
-      dismissed: { bg: "#F2F4F7", color: "#344054" },
-    };
-
-    const style = statusStyles[rowData.status.toLowerCase()] || {
-      bg: "#F2F4F7",
-      color: "#344054",
-    };
-
-    const statusOptions = [
-      { label: "Pending", value: "pending" },
-      { label: "In Progress", value: "in-progress" },
-      { label: "Resolved", value: "resolved" },
-      { label: "Flagged", value: "flagged" },
-    ];
-
-    // Create menu items specifically for this notification
-    const statusMenuItems = statusOptions.map((option) => ({
-      label: option.label,
-      command: () => {
-        console.log(`Changing notification ${rowData._id} status to ${option.value}`);
-        handleStatusChange(rowData._id, option.value);
-      },
-    }));
-
     return (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <span
-          style={{
-            backgroundColor: style.bg,
-            color: style.color,
-            padding: "2px 8px",
-            borderRadius: "16px",
-            fontSize: "12px",
-            marginRight: "8px",
-          }}
-        >
-          {rowData.status}
-        </span>
-        <Button
-          icon="pi pi-check-circle"
-          className="p-button-rounded p-button-text p-button-sm"
-          tooltip="Change Status"
-          tooltipOptions={{ position: "top" }}
-          onClick={(e) => rowStatusMenu.current.toggle(e)}
-          disabled={statusLoading}
-        />
-        <Menu
-          model={statusMenuItems}
-          popup
-          ref={rowStatusMenu}
-          id={`status-menu-${rowData._id}`}
-        />
-      </div>
+      <StatusCell
+        rowData={rowData}
+        handleStatusChange={handleStatusChange}
+        statusLoading={statusLoading}
+      />
     );
   };
 
@@ -212,8 +421,8 @@ export default function Notifications({ role }) {
           border: "1px solid #D0D5DD",
           color: "#344054",
           backgroundColor: "white",
-          padding: "8px 14px",
-          fontSize: "14px",
+          padding: isTablet ? "6px 12px" : "8px 14px",
+          fontSize: isTablet ? "12px" : "14px",
           borderRadius: "8px",
         }}
         onClick={() => handleViewDetails(rowData)}
@@ -230,35 +439,51 @@ export default function Notifications({ role }) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            padding: isMobile ? "10px 15px" : "15px 20px",
           }}
         >
-          <h3>Notifications</h3>
+          <h3 style={{ fontSize: isMobile ? "18px" : "20px" }}>
+            Notifications
+          </h3>
           <Badge value="--" severity="danger" />
         </div>
 
-        <div className="notification-filter">
+        <div
+          className="notification-filter"
+          style={{
+            overflowX: isMobile ? "auto" : "visible",
+            whiteSpace: isMobile ? "nowrap" : "normal",
+            padding: isMobile ? "0 15px" : "0 20px",
+          }}
+        >
           {["all", "high", "medium", "low"].map((filter) => (
             <Button
               key={filter}
               label={
-                filter.charAt(0).toUpperCase() + filter.slice(1) + " Priority"
+                filter.charAt(0).toUpperCase() +
+                filter.slice(1) +
+                (isMobile ? "" : " Priority")
               }
               className={`p-button-text ${
                 activeFilter === filter ? "p-button-primary" : ""
               }`}
               disabled={true}
-              style={{ color: "black" }}
+              style={{
+                color: "black",
+                padding: isMobile ? "6px 10px" : "8px 16px",
+                fontSize: isMobile ? "12px" : "14px",
+              }}
             />
           ))}
         </div>
 
         <TableSkeleton
           columns={[
-            { width: "100px" }, // Priority
-            { width: "150px" }, // Type
-            { width: "300px" }, // Description
-            { width: "150px" }, // Status
-            { width: "120px" }, // Action
+            { width: isMobile ? "80px" : "100px" }, // Priority
+            { width: isMobile ? "120px" : "150px" }, // Type
+            { width: isMobile ? "200px" : "300px" }, // Description
+            { width: isMobile ? "120px" : "150px" }, // Status
+            { width: isMobile ? "100px" : "120px" }, // Action
           ]}
           rows={5}
           showHeader={true}
@@ -283,12 +508,21 @@ export default function Notifications({ role }) {
   return (
     <>
       <Toast ref={toast} />
-      <div className="notification-container">
+      <div
+        className="notification-container"
+        style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}
+      >
         <div
           className="notification-header"
-          style={{ display: "flex", alignItems: "center" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: isMobile ? "10px 15px" : "15px 20px",
+          }}
         >
-          <h3>Notifications</h3>
+          <h3 style={{ fontSize: isMobile ? "18px" : "20px" }}>
+            Notifications
+          </h3>
           <Badge
             value={notifications.length}
             severity="danger"
@@ -296,100 +530,156 @@ export default function Notifications({ role }) {
           />
         </div>
 
-        <div className="notification-filter">
+        <div
+          className="notification-filter"
+          style={{
+            overflowX: isMobile ? "auto" : "visible",
+            whiteSpace: isMobile ? "nowrap" : "normal",
+            padding: isMobile ? "0 15px" : "0 20px",
+          }}
+        >
           {["all", "high", "medium", "low"].map((filter) => (
             <Button
               key={filter}
               label={
-                filter.charAt(0).toUpperCase() + filter.slice(1) + " Priority"
+                filter.charAt(0).toUpperCase() +
+                filter.slice(1) +
+                (isMobile ? "" : " Priority")
               }
               className={`p-button-text ${
                 activeFilter === filter ? "p-button-primary" : ""
               }`}
               onClick={() => handleFilterClick(filter)}
+              style={{
+                padding: isMobile ? "6px 10px" : "8px 16px",
+                fontSize: isMobile ? "12px" : "14px",
+              }}
             />
           ))}
         </div>
 
-        <div className="notification-table" style={{ padding: "20px" }}>
-          <DataTable
-            value={filteredNotifications}
-            responsiveLayout="scroll"
+        {/* Mobile View */}
+        {isMobile && (
+          <Box sx={{ padding: "15px" }}>
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notification) => (
+                <MobileNotificationCard
+                  key={notification._id}
+                  notification={notification}
+                  handleViewDetails={handleViewDetails}
+                  handleStatusChange={handleStatusChange}
+                  statusLoading={statusLoading}
+                  theme={theme}
+                />
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  color: "#667085",
+                  padding: "20px 0",
+                }}
+              >
+                No notifications found
+              </Typography>
+            )}
+          </Box>
+        )}
+
+        {/* Desktop/Tablet View */}
+        {!isMobile && (
+          <div
+            className="notification-table"
             style={{
-              border: "1px solid #EAECF0",
-              borderRadius: "8px",
-              overflow: "hidden",
+              padding: isTablet ? "15px" : "20px",
+              overflowX: "auto",
             }}
           >
-            <Column
-              field="priority"
-              header="Priority"
-              body={priorityTemplate}
-              style={{ padding: "16px 24px" }}
-              headerStyle={{
-                backgroundColor: "#F9FAFB",
-                color: "#667085",
-                fontWeight: "500",
-                fontSize: "12px",
-                padding: "12px 24px",
-                borderBottom: "1px solid #EAECF0",
+            <DataTable
+              value={filteredNotifications}
+              responsiveLayout="scroll"
+              style={{
+                border: "1px solid #EAECF0",
+                borderRadius: "8px",
+                overflow: "hidden",
               }}
-            />
-            <Column
-              field="type"
-              header="Type"
-              style={{ padding: "16px 24px" }}
-              headerStyle={{
-                backgroundColor: "#F9FAFB",
-                color: "#667085",
-                fontWeight: "500",
-                fontSize: "12px",
-                padding: "12px 24px",
-                borderBottom: "1px solid #EAECF0",
-              }}
-            />
-            <Column
-              field="description"
-              header="Description"
-              style={{ padding: "16px 24px" }}
-              headerStyle={{
-                backgroundColor: "#F9FAFB",
-                color: "#667085",
-                fontWeight: "500",
-                fontSize: "12px",
-                padding: "12px 24px",
-                borderBottom: "1px solid #EAECF0",
-              }}
-            />
-            <Column
-              field="status"
-              header="Status"
-              body={statusTemplate}
-              style={{ padding: "16px 24px" }}
-              headerStyle={{
-                backgroundColor: "#F9FAFB",
-                color: "#667085",
-                fontWeight: "500",
-                fontSize: "12px",
-                padding: "12px 24px",
-                borderBottom: "1px solid #EAECF0",
-              }}
-            />
-            <Column
-              header="Actions"
-              body={actionTemplate}
-              style={{ padding: "16px 24px" }}
-              headerStyle={{
-                backgroundColor: "#F9FAFB",
-                color: "#667085",
-                fontWeight: "500",
-                fontSize: "12px",
-                padding: "12px 24px",
-                borderBottom: "1px solid #EAECF0",
-              }}
-            />
-          </DataTable>
-        </div>
+            >
+              <Column
+                field="priority"
+                header="Priority"
+                body={priorityTemplate}
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="type"
+                header="Type"
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="description"
+                header="Description"
+                style={{
+                  padding: isTablet ? "12px 16px" : "16px 24px",
+                  maxWidth: isTablet ? "200px" : "300px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="status"
+                header="Status"
+                body={statusTemplate}
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                header="Actions"
+                body={actionTemplate}
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+            </DataTable>
+          </div>
+        )}
       </div>
 
       <NotificationDetailsModal

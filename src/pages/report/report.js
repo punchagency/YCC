@@ -283,7 +283,16 @@ const Reports = () => {
   };
 
   return (
-    <>
+    <div
+      style={{
+        background: "#F8FBFF",
+        position: "relative",
+        minHeight: "100vh",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{ marginBottom: "30px" }}
@@ -295,21 +304,33 @@ const Reports = () => {
         </div>
       </div>
 
-      <div className="report-container-inventory-reports-and-bar-graph">
-        <div className="report-container-inventory-reports">
+      <div
+        className="report-container-inventory-reports-and-bar-graph"
+        style={{ width: "100%", paddingLeft: "20px" }}
+      >
+        <div
+          className="report-container-inventory-reports"
+          style={{ width: "35%" }}
+        >
           <div>
             <h2>Inventory Report</h2>
             <div>
-              <div className="report-container-flop">
+              <div className="report-container-flop" style={{ width: "100%" }}>
                 <div>
                   <img src={profileReport} alt="iconcontainer" />
                 </div>
-                <div className="report-container-flop-2">
-                  <div>
+                <div
+                  className="report-container-flop-2"
+                  style={{ width: "100%" }}
+                >
+                  <div style={{ width: "90%" }}>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
                       Customer Satisfaction
                     </p>
-                    <div className="report-progress-outer-bar">
+                    <div
+                      className="report-progress-outer-bar"
+                      style={{ width: "100%" }}
+                    >
                       <div
                         className="report-progress-inner-bar"
                         style={{
@@ -319,20 +340,26 @@ const Reports = () => {
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>{healthReports.customerSatisfaction.rate}% Correct</p>
+                    <p>{healthReports.customerSatisfaction.rate}% </p>
                   </div>
                 </div>
               </div>
-              <div className="report-container-flop">
+              <div className="report-container-flop" style={{ width: "100%" }}>
                 <div>
                   <img src={profileReport} alt="iconcontainer" />
                 </div>
-                <div className="report-container-flop-2">
-                  <div>
+                <div
+                  className="report-container-flop-2"
+                  style={{ width: "100%" }}
+                >
+                  <div style={{ width: "90%" }}>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
                       Supplier Availability
                     </p>
-                    <div className="report-progress-outer-bar">
+                    <div
+                      className="report-progress-outer-bar"
+                      style={{ width: "100%" }}
+                    >
                       <div
                         className="report-progress-inner-bar"
                         style={{
@@ -342,20 +369,26 @@ const Reports = () => {
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>{healthReports.supplierAvailability.rate}% Correct</p>
+                    <p>{healthReports.supplierAvailability.rate}%</p>
                   </div>
                 </div>
               </div>
-              <div className="report-container-flop">
+              <div className="report-container-flop" style={{ width: "100%" }}>
                 <div>
                   <img src={profileReport} alt="iconcontainer" />
                 </div>
-                <div className="report-container-flop-2">
-                  <div>
+                <div
+                  className="report-container-flop-2"
+                  style={{ width: "100%" }}
+                >
+                  <div style={{ width: "100%" }}>
                     <p style={{ color: "#212121", fontWeight: "bold" }}>
                       Stock Levels
                     </p>
-                    <div className="report-progress-outer-bar">
+                    <div
+                      className="report-progress-outer-bar"
+                      style={{ width: "100%" }}
+                    >
                       <div
                         className="report-progress-inner-bar"
                         style={{
@@ -365,35 +398,78 @@ const Reports = () => {
                     </div>
                   </div>
                   <div className="report-progress-text">
-                    <p>{healthReports.stockLevels.rate}% Correct</p>
+                    <p>{healthReports.stockLevels.rate}%</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="report-container-bar-graph">
+        <div className="report-container-bar-graph" style={{ width: "33%" }}>
           <div style={{ width: "100%", height: "100%", padding: "10px" }}>
             <Bar data={activityData} options={chartOptions} />
           </div>
         </div>
 
-        <div className="metrics-container">
+        <div className="metrics-container" style={{ width: "33%" }}>
           {systemMetrics.map((metric, index) => (
-            <div key={index} className="metric-card">
+            <div
+              key={index}
+              className="metric-card"
+              style={{
+                width: "90%",
+                overflow: "hidden",
+                position: "relative",
+                boxSizing: "border-box",
+              }}
+            >
               <div className="metric-header">
-                <span style={{fontSize:"15px"}}>{metric.title}</span>
-                <h2 style={{fontSize:"25px"}}>{metric.value}</h2>
+                <span style={{ fontSize: "15px" }}>{metric.title}</span>
+                <h2 style={{ fontSize: "25px" }}>{metric.value}</h2>
               </div>
-              <div className="sparkline">
+              <div
+                className="sparkline"
+                style={{
+                  height: "40px",
+                  width: "100%",
+                  overflow: "hidden",
+                  position: "relative",
+                  paddingBottom: "10px",
+                  marginBottom: "10px",
+                  boxSizing: "border-box",
+                }}
+              >
                 <Line
                   data={sparklineData}
-                  options={sparklineOptions}
-                  style={{
-                    height: index === 3 ? "25px" : "45px",
-                    marginTop: index === 3 ? "-5px" : "-10px",
-                    marginBottom: index === 3 ? "-5px" : "-10px",
+                  options={{
+                    ...sparklineOptions,
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        enabled: false,
+                      },
+                    },
+                    scales: {
+                      x: {
+                        display: false,
+                        grid: {
+                          display: false,
+                        },
+                      },
+                      y: {
+                        display: false,
+                        grid: {
+                          display: false,
+                        },
+                      },
+                    },
                   }}
+                  height={30}
+                  width={100}
                 />
               </div>
             </div>
@@ -405,8 +481,8 @@ const Reports = () => {
         <h2>Order Summary</h2>
       </div>
 
-      <div className="box-order-container">
-        <div className="box1-order">
+      <div className="box-order-container" style={{ minWidth: "800px" }}>
+        <div className="box1-order" style={{ minWidth: "180px" }}>
           <div
             style={{
               display: "flex",
@@ -429,21 +505,31 @@ const Reports = () => {
             </div>
           </div>
           <div className="pending-order-container">
-            <div>
-              <p>In progress</p>
-              <p>885</p>
+            <div style={{ marginRight: "5px" }}>
+              <p
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  minWidth: "50px",
+                  fontSize: "13px",
+                }}
+              >
+                In progress
+              </p>
+              <p style={{ fontSize: "12px" }}>885</p>
             </div>
-            <div>
-              <p>Pending</p>
-              <p>579</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Pending</p>
+              <p style={{ fontSize: "12px" }}>579</p>
             </div>
-            <div>
-              <p>Completed</p>
-              <p>9981</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Completed</p>
+              <p style={{ fontSize: "12px" }}>9981</p>
             </div>
           </div>
         </div>
-        <div className="box1-order">
+        <div className="box1-order" style={{ minWidth: "180px" }}>
           <div
             style={{
               display: "flex",
@@ -466,21 +552,31 @@ const Reports = () => {
             </div>
           </div>
           <div className="pending-order-container">
-            <div>
-              <p>In progress</p>
-              <p>885</p>
+            <div style={{ marginRight: "5px" }}>
+              <p
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  minWidth: "50px",
+                  fontSize: "13px",
+                }}
+              >
+                In progress
+              </p>
+              <p style={{ fontSize: "12px" }}>885</p>
             </div>
-            <div>
-              <p>Pending</p>
-              <p>5</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Pending</p>
+              <p style={{ fontSize: "12px" }}>5</p>
             </div>
-            <div>
-              <p>Completed</p>
-              <p>22</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Completed</p>
+              <p style={{ fontSize: "12px" }}>22</p>
             </div>
           </div>
         </div>
-        <div className="box1-order">
+        <div className="box1-order" style={{ minWidth: "180px" }}>
           <div
             style={{
               display: "flex",
@@ -503,21 +599,31 @@ const Reports = () => {
             </div>
           </div>
           <div className="pending-order-container">
-            <div>
-              <p>In progress</p>
-              <p>457</p>
+            <div style={{ marginRight: "5px" }}>
+              <p
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  minWidth: "50px",
+                  fontSize: "13px",
+                }}
+              >
+                In progress
+              </p>
+              <p style={{ fontSize: "12px" }}>457</p>
             </div>
-            <div>
-              <p>Pending </p>
-              <p>25</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Pending </p>
+              <p style={{ fontSize: "12px" }}>25</p>
             </div>
-            <div>
-              <p>Completed</p>
-              <p>232</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Completed</p>
+              <p style={{ fontSize: "12px" }}>232</p>
             </div>
           </div>
         </div>
-        <div className="box1-order">
+        <div className="box1-order" style={{ minWidth: "180px" }}>
           <div
             style={{
               display: "flex",
@@ -540,17 +646,27 @@ const Reports = () => {
             </div>
           </div>
           <div className="pending-order-container">
-            <div>
-              <p>In progress</p>
-              <p>457</p>
+            <div style={{ marginRight: "5px" }}>
+              <p
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  minWidth: "50px",
+                  fontSize: "13px",
+                }}
+              >
+                In progress
+              </p>
+              <p style={{ fontSize: "12px" }}>457</p>
             </div>
-            <div>
-              <p>Pending </p>
-              <p>25</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Pending </p>
+              <p style={{ fontSize: "12px" }}>25</p>
             </div>
-            <div>
-              <p>Completed</p>
-              <p>232</p>
+            <div style={{ marginRight: "5px" }}>
+              <p style={{ fontSize: "13px" }}>Completed</p>
+              <p style={{ fontSize: "12px" }}>232</p>
             </div>
           </div>
         </div>
@@ -659,8 +775,119 @@ const Reports = () => {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 };
+
+// Create and add a stylesheet element for responsive design
+const responsiveStyle = document.createElement("style");
+responsiveStyle.innerHTML = `
+  @media screen and (max-width: 768px) {
+    /* Main layout - stack everything vertically */
+    .report-container-inventory-reports-and-bar-graph {
+      display: flex !important;
+      flex-direction: column !important;
+      width: 100% !important;
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+    
+    /* Make all sections the EXACT same width on mobile */
+    .report-container-inventory-reports,
+    .report-container-bar-graph,
+    .metrics-container {
+      width: 92% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      margin-bottom: 20px !important;
+    }
+    
+    /* Make sure the chart container itself has the right styling */
+    .report-container-bar-graph {
+      background-color: #FFFFFF !important;
+      border-radius: 8px !important;
+      padding: 10px !important;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.05) !important;
+    }
+    
+    /* Style the chart's inner container */
+    .report-container-bar-graph > div {
+      width: 100% !important;
+      height: 250px !important;
+      padding: 5px !important;
+    }
+    
+    /* Stack order summary boxes vertically */
+    .box-order-container {
+      display: flex !important;
+      flex-direction: column !important;
+      min-width: unset !important;
+      width: 96% !important;
+      margin: 0 auto !important;
+    }
+    
+    .box1-order {
+      width: 100% !important;
+      min-width: unset !important;
+      margin-bottom: 15px !important;
+    }
+    
+    /* Fix selling products section */
+    .selling-products-container {
+      margin-top: 20px !important;
+      width: 96% !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    
+    .selling-products-header {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+    }
+    
+    .selling-products-header .p-button {
+      width: 100% !important;
+      margin-top: 10px !important;
+    }
+    
+    /* Make table horizontally scrollable */
+    .selling-products-container {
+      overflow-x: auto !important;
+    }
+    
+    .selling-products-table {
+      min-width: 600px !important;
+    }
+    
+    /* Adjust font sizes for better mobile readability */
+    h3 {
+      font-size: 20px !important;
+    }
+    
+    h2 {
+      font-size: 18px !important;
+    }
+    
+    .metric-header span {
+      font-size: 12px !important;
+    }
+    
+    .metric-header h2 {
+      font-size: 18px !important;
+    }
+    
+    /* Add margin to order summary title */
+    .order-summary-text-header {
+      margin-top: 15px !important;
+      padding-left: 2% !important;
+    }
+  }
+`;
+
+// Add style element to document head
+if (typeof document !== "undefined") {
+  document.head.appendChild(responsiveStyle);
+}
 
 export default Reports;

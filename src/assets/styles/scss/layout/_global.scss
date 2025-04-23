@@ -456,6 +456,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  
 }
 
 .report-container-inventory-reports {
@@ -3011,6 +3012,7 @@ ul {
 .report-container {
   display: flex;
   justify-content: space-between;
+  background: #fff;
   width: 100%;
   .reportdiv {
     display: flex;
