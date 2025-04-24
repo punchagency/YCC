@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
@@ -25,6 +25,7 @@ import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { ConfirmDialog } from "primereact/confirmdialog";
+import "../styles/menu.css";
 
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
@@ -71,32 +72,23 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       label: "Dashboard",
       icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
       className:
-        location.pathname === "/admin/dashboard" ? "active-menu-item" : "",
+        location.pathname === "/admin/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
       command: () => {
         navigate("/admin/dashboard");
       },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
-      },
+      style:{color:"red"}
     },
     {
       label: "Calendar",
       icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
       className:
         location.pathname === "/admin/calendar-management"
-          ? "active-menu-item"
+          ? "active-menu-item menu-red-background"
           : "",
       command: () => {
         navigate("/admin/calendar-management");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -104,16 +96,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
       className:
         location.pathname === "/admin/inventory-management"
-          ? "active-menu-item"
+          ? "active-menu-item menu-red-background"
           : "",
       command: () => {
         navigate("/admin/inventory-management");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -121,16 +107,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
       className:
         location.pathname === "/admin/orders-management"
-          ? "active-menu-item"
+          ? "active-menu-item menu-red-background"
           : "",
       command: () => {
         navigate("/admin/orders-management");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -138,16 +118,10 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
       className:
         location.pathname === "/admin/bookings-management"
-          ? "active-menu-item"
+          ? "active-menu-item menu-red-background"
           : "",
       command: () => {
         navigate("/admin/bookings-management");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -160,14 +134,12 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           height={15}
         />
       ),
+      className:
+        location.pathname === "/admin/financial-management"
+          ? "active-menu-item menu-red-background"
+          : "",
       command: () => {
         navigate("/admin/financial-management");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
@@ -180,105 +152,47 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
           height={15}
         />
       ),
+      className:
+        location.pathname === "/admin/notifications"
+          ? "active-menu-item menu-red-background"
+          : "",
       command: () => {
         navigate("/admin/notifications");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
       label: "Reports",
       icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
+      className:
+        location.pathname === "/admin/reports"
+          ? "active-menu-item menu-red-background"
+          : "",
       command: () => {
         navigate("/admin/reports");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
       label: "Settings",
       icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/admin/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
       command: () => {
         navigate("/admin/settings");
-      },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
       },
     },
     {
       separator: true,
       style: { margin: "15px 0" },
     },
-    // {
-    //   label: "Help Centre",
-    //   icon: <img src={helpLogo} alt="Help Centre" width={15} height={15} />,
-    //   command: () => {
-    //     navigate("/crew/help");
-    //   },
-    // },
-    // {
-    //   label: "Contact Us",
-    //   icon: <img src={contactLogo} alt="Contact Us" width={15} height={15} />,
-    //   command: () => {
-    //     navigate("/crew/contact");
-    //   },
-    // },
     {
       label: "Log Out",
       icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,
       command: handleLogout,
       style: { color: "#FF4B4B" },
-      onMouseDown: () => {
-        document.body.classList.add("menu-item-active");
-      },
-      onMouseUp: () => {
-        document.body.classList.remove("menu-item-active");
-      },
     },
   ];
-
-  // Create a better active state handler
-  const handleActiveStateStart = (e) => {
-    // Stop event propagation to prevent PrimeReact from handling it
-    e.stopPropagation();
-    document.body.classList.add("menu-item-active");
-  };
-
-  const handleActiveStateEnd = (e) => {
-    // Add a small delay to make the effect visible
-    setTimeout(() => {
-      document.body.classList.remove("menu-item-active");
-    }, 300);
-  };
-
-  // Apply these handlers to each menu item
-  menuItems.forEach((item) => {
-    if (item.label) {
-      item.onMouseDown = handleActiveStateStart;
-      item.onMouseUp = handleActiveStateEnd;
-      item.onMouseLeave = handleActiveStateEnd;
-
-      // Override any PrimeReact built-in handlers
-      item.props = {
-        ...item.props,
-        className: `${item.className || ""} custom-menu-item`,
-        onMouseDown: handleActiveStateStart,
-        onMouseUp: handleActiveStateEnd,
-        onMouseLeave: handleActiveStateEnd,
-      };
-    }
-  });
 
   menuItems.forEach((item) => {
     if (item.label) {
@@ -286,9 +200,28 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         ...item.style,
         color: theme === "light" ? "#103B57" : "#FFFFFF",
       };
-      item.className = `${item.className || ""} no-hover-effect`;
+      item.className = `${item.className || ""} menu-item`;
+      
     }
   });
+
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .p-panelmenu .p-menuitem-text {
+        transition: color 0.2s;
+      }
+      .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text,
+      .p-panelmenu .p-menuitem-link:hover .p-menuitem-text {
+        color: white !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
     <>

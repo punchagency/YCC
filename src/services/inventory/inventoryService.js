@@ -49,39 +49,36 @@ const getUserId = () => {
 
 export const createInventoryData = async (inventoryData) => {
   try {
-    // Get the user ID from localStorage or use a hardcoded supplier ID
-    const userId = localStorage.getItem("id");
-    const SUPPLIER_ID = userId; // Use the ID from your successful response
+    // Check if we're dealing with FormData
+    const isFormData = inventoryData instanceof FormData;
 
-    // Format data to match API requirements with supplier field
-    const formattedData = {
-      supplier: inventoryData.supplierId, // Add the supplier field that the backend requires
-      quantity: parseInt(inventoryData.quantity || inventoryData.stockQuantity),
-      price: parseFloat(inventoryData.price),
-      serviceArea: inventoryData.serviceArea,
-      category: inventoryData.category,
-      productName: inventoryData.productName,
+    // For debugging - log what's in the FormData
+    if (isFormData) {
+      console.log("FormData contents:");
+      for (let pair of inventoryData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
+    }
+
+    // Set the appropriate headers
+    const headers = {
+      ...getAuthHeader(),
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
 
-    console.log("Sending inventory data with supplier ID:", formattedData);
-
-    const response = await axios.post(`${API_URL}/inventory`, formattedData, {
-      headers: {
-        ...getAuthHeader(),
-        "Content-Type": "application/json",
-      },
+    const response = await axios.post(`${API_URL}/inventory`, inventoryData, {
+      headers: headers,
     });
 
-    console.log("Response from API:", response.data);
-
-    return { success: true, data: response.data };
+    return {
+      success: true,
+      data: response.data,
+    };
   } catch (error) {
-    console.error("Error creating inventory data:", error);
-    console.error("Error details:", error.response?.data);
-
+    console.error("Error creating inventory:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to create inventory data",
+      error: error.response?.data?.message || "Failed to create inventory",
     };
   }
 };
@@ -117,32 +114,33 @@ export const getAllInventoryItems = async () => {
     let allInventoryItems = [];
     let page = 1;
     let hasNextPage = true;
-  
+
     while (hasNextPage) {
       const response = await axios.get(`${API_URL}/inventory`, {
         params: {
           page,
-          pageSize: 10
+          pageSize: 10,
         },
         headers: getAuthHeader(),
       });
       const inventoryItems = response.data.data;
       allInventoryItems.push(...inventoryItems);
-  
+
       const pagination = response.data.pagination;
       hasNextPage = pagination?.hasNextPage;
       page++;
     }
-    
+
     return allInventoryItems;
   } catch (error) {
     console.error("Error fetching all inventory items:", error);
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to fetch all inventory items",
+      error:
+        error.response?.data?.message || "Failed to fetch all inventory items",
     };
   }
-}
+};
 export const updateInventoryItem = async (id, itemData) => {
   try {
     const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
@@ -187,6 +185,67 @@ export const getLowInventory = async () => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch low inventory",
+    };
+  }
+};
+
+export const deleteAllInventoryItems = async (inventoryIds) => {
+  try {
+    const response = await axios.delete(`${API_URL}/inventory/bulk-delete`, {
+      headers: getAuthHeader(),
+      data: { inventoryIds }, // Send IDs in request body
+    });
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error("Error in deleteAllInventoryItems:", error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message || "Failed to delete inventory items",
+    };
+  }
+};
+
+// Add this new function to update product inventory status
+export const updateProductInventoryStatus = async (
+  productId,
+  status,
+  quantityChange = 0
+) => {
+  try {
+    const headers = {
+      ...getAuthHeader(),
+      "Content-Type": "application/json",
+    };
+
+    const data = {
+      status: status,
+      quantityChange: quantityChange,
+    };
+
+    const response = await axios.patch(
+      `${API_URL}/inventory/product/${productId}/status`,
+      data,
+      {
+        headers: headers,
+      }
+    );
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error updating product inventory status:`, error);
+    return {
+      success: false,
+      error:
+        error.response?.data?.message ||
+        "Failed to update product inventory status",
     };
   }
 };

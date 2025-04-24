@@ -18,7 +18,11 @@ const LandingPageFooter = () => {
                 { name: "Vendor & Services", path: "/vendor-services" },
                 { name: "About Us", path: "/about-us" },
                 { name: "Resource Center", path: "/resource-center" },
+                { name: "Contact Us", path: "/contact-us" },
+                
             ],
+            
+            
             size: 2.5,
         },
         {
@@ -33,14 +37,14 @@ const LandingPageFooter = () => {
             ],
             size: 2.5,
         },
-        {
-            title: "Contacts",
-            links: [
-                { name: "contact@yachtcrewcenter.com", path: "mailto:contact@yachtcrewcenter.com" },
-                { name: "+1 954 532 0550", path: "tel:+19545320550" },
-            ],
-            size: 3,
-        },
+        // {
+        //     title: "Contacts",
+        //     links: [
+        //         { name: "contact@yachtcrewcenter.com", path: "mailto:contact@yachtcrewcenter.com" },
+        //         { name: "+1 954 532 0550", path: "tel:+19545320550" },
+        //     ],
+        //     size: 3,
+        // },
     ]
     return (<Box
         sx={{

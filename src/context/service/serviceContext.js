@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
 import { useToast } from '../toast/toastContext';
-import { getAllVendorServices } from "../../services/service/serviceService";
+import { getAllServices } from "../../services/service/serviceService";
 
 const ServiceContext = createContext();
 
@@ -18,7 +18,8 @@ export const ServiceProvider = ({ children }) => {
 
     const fetchServices = async () => {
         try {
-            const response = await getAllVendorServices();
+            const response = await getAllServices();
+            console.log("Services response:", response);
             setServices(response.data); 
         } catch (error) {
            toast.current.show({ severity: 'error', summary: 'Error', detail: error.message || 'Failed to fetch services' });

@@ -27,6 +27,7 @@ import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useTheme } from "../../context/theme/themeContext";
 import { Paginator } from "primereact/paginator";
+import { Dropdown } from "primereact/dropdown";
 
 import { TableSkeleton } from "../../components/TableSkeleton";
 
@@ -80,6 +81,7 @@ const Invent = () => {
     serviceArea: "",
     stockQuantity: "",
     price: "",
+    productImage: null,
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
@@ -113,6 +115,21 @@ const Invent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
+  // Add these state variables at the top with your other state variables
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  // Add this state variable with your other state variables
+  const [productImage, setProductImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  // Inside your component, define the service area options
+  const serviceAreaOptions = [
+    { label: "Caribbean", value: "caribbean" },
+    { label: "Mediterranean", value: "mediterranean" },
+    { label: "USA", value: "usa" },
+  ];
+
   // Fetch inventory data when component mounts
   useEffect(() => {
     fetchInventoryData();
@@ -134,6 +151,7 @@ const Invent = () => {
           serviceArea: item.product?.serviceArea || "Not specified",
           stockQuantity: item.quantity || 0,
           price: item.price || 0,
+          productImage: item.productImage || null,
         }));
 
         setInventoryItems(formattedItems);
@@ -215,6 +233,7 @@ const Invent = () => {
           serviceArea: editItem.serviceArea,
           stockQuantity: parseInt(editItem.stockQuantity),
           price: parseFloat(editItem.price),
+          productImage: editItem.productImage,
         };
 
         updatedItems[editItem.index] = updatedItem;
@@ -266,78 +285,37 @@ const Invent = () => {
     setShowDeleteConfirmation(true);
   };
 
-  const confirmDelete = async () => {
-    setIsLoading(true);
-
-    try {
-      // Call the API to delete the item
-      const result = await deleteInventoryItem(itemToDelete.id);
-
-      if (result.success) {
-        // Update the local state by removing the deleted item
-        const updatedItems = inventoryItems.filter(
-          (_, index) => index !== itemToDelete.index
-        );
-        setInventoryItems(updatedItems);
-
-        // Show success message
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product deleted successfully",
-            life: 3000,
-          });
-        }
-      } else {
-        // Show error message
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to delete product",
-            life: 3000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while deleting the product",
-          life: 3000,
-        });
-      }
-    } finally {
-      setIsLoading(false);
-      setShowDeleteConfirmation(false);
-    }
-  };
-
   const handleAddProduct = () => {
     setShowAddModal(true);
   };
 
+  // Add this function to handle image selection
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProductImage(file);
+      
+      // Create a preview URL for the selected image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
-    // Validate form
-    if (
-      !newItem.productName ||
-      !newItem.category ||
-      !newItem.serviceArea ||
-      !newItem.stockQuantity ||
-      !newItem.price
-    ) {
+    if (!newItem.productName || !newItem.category || !newItem.serviceArea) {
       if (toast.current) {
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: "Please fill in all required fields",
+          detail: "Product name, category, and service area are required",
           life: 3000,
         });
       } else {
-        alert("Please fill in all required fields");
+        alert("Product name, category, and service area are required");
       }
       return;
     }
@@ -345,24 +323,34 @@ const Invent = () => {
     setIsLoading(true);
 
     try {
-      const result = await createInventoryData({
-        productName: newItem.productName,
-        category: newItem.category,
-        serviceArea: newItem.serviceArea,
-        quantity: parseInt(newItem.stockQuantity),
-        price: parseFloat(newItem.price),
-      });
+      // Create a FormData object for file upload
+      const formData = new FormData();
+      formData.append("productName", newItem.productName);
+      formData.append("category", newItem.category);
+      formData.append("serviceArea", newItem.serviceArea);
+      formData.append("quantity", newItem.stockQuantity);
+      formData.append("price", newItem.price);
+      
+      // Append the image file if one was selected
+      if (productImage) {
+        formData.append("inventoryImage", productImage);
+        console.log("Adding image to form data:", productImage.name);
+      }
+
+      console.log("Submitting inventory with image:", !!productImage);
+      
+      const result = await createInventoryData(formData);
 
       if (result.success) {
         if (toast.current) {
           toast.current.show({
             severity: "success",
             summary: "Success",
-            detail: "Product added successfully",
+            detail: "Inventory added successfully",
             life: 3000,
           });
         } else {
-          alert("Product added successfully");
+          alert("Inventory added successfully");
         }
 
         // Add the new product to the beginning of the array instead of the end
@@ -374,11 +362,12 @@ const Invent = () => {
           serviceArea: responseData.product.serviceArea,
           stockQuantity: responseData.quantity,
           price: responseData.price,
+          productImage: responseData.productImage || null,
         };
 
         setInventoryItems([product, ...inventoryItems]);
 
-        // Reset the form
+        // Reset the form including the image
         setNewItem({
           productName: "",
           category: "",
@@ -386,6 +375,8 @@ const Invent = () => {
           stockQuantity: "",
           price: "",
         });
+        setProductImage(null);
+        setImagePreview(null);
 
         setShowAddModal(false);
       } else {
@@ -393,28 +384,24 @@ const Invent = () => {
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: result.error || "Failed to add product",
+            detail: result.error || "Failed to add inventory",
             life: 3000,
           });
         } else {
-          alert(result.error || "Failed to add product");
+          alert(result.error || "Failed to add inventory");
         }
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("Error adding inventory:", error);
       if (toast.current) {
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail:
-            "An unexpected error occurred: " +
-            (error.message || "Unknown error"),
+          detail: "An error occurred while adding inventory",
           life: 3000,
         });
       } else {
-        alert(
-          "An unexpected error occurred: " + (error.message || "Unknown error")
-        );
+        alert("An error occurred while adding inventory");
       }
     } finally {
       setIsLoading(false);
@@ -424,12 +411,13 @@ const Invent = () => {
   const handleView = (index) => {
     const item = inventoryItems[index];
     setViewItem({
-      id: index,
+      id: item.id,
       productName: item.productName,
       category: item.category,
       serviceArea: item.serviceArea,
-      stockQuantity: item.stockQuantity.toString(),
-      price: item.price.toFixed(2),
+      stockQuantity: item.stockQuantity,
+      price: item.price,
+      productImage: item.productImage,
     });
     setShowViewModal(true);
   };
@@ -440,6 +428,107 @@ const Invent = () => {
     const page = Math.floor(event.first / rows) + 1;
     setCurrentPage(page);
     fetchInventoryData(page);
+  };
+
+  // Handle select all checkbox
+  const handleSelectAll = (e) => {
+    const checked = e.target.checked;
+    setSelectAll(checked);
+
+    if (checked) {
+      // Select all items
+      const allItemIds = inventoryItems.map((item) => item.id);
+      setSelectedItems(allItemIds);
+    } else {
+      // Deselect all
+      setSelectedItems([]);
+    }
+  };
+
+  // Handle individual item selection
+  const handleSelectItem = (e, itemId) => {
+    const checked = e.target.checked;
+
+    if (checked) {
+      setSelectedItems((prev) => [...prev, itemId]);
+    } else {
+      setSelectedItems((prev) => prev.filter((id) => id !== itemId));
+
+      // If we're unchecking an item, also uncheck the "select all" checkbox
+      if (selectAll) {
+        setSelectAll(false);
+      }
+    }
+  };
+
+  // Add bulk delete function
+  const handleBulkDelete = () => {
+    if (selectedItems.length === 0) return;
+
+    setItemToDelete({
+      multiple: true,
+      ids: selectedItems,
+    });
+    setShowDeleteConfirmation(true);
+  };
+
+  // Modify the existing confirmDelete function to handle bulk deletion
+  const confirmDelete = async () => {
+    setIsLoading(true);
+    try {
+      if (itemToDelete.multiple) {
+        // Here you would call your API to delete multiple items
+        // For example:
+        // const result = await deleteMultipleInventoryItems(itemToDelete.ids);
+
+        // For now, let's just delete them one by one
+        let successCount = 0;
+        for (const id of itemToDelete.ids) {
+          const result = await deleteInventoryItem(id);
+          if (result.success) {
+            successCount++;
+          }
+        }
+
+        // Refresh the inventory list
+        fetchInventoryData();
+        setSelectedItems([]);
+        setSelectAll(false);
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: `Successfully deleted ${successCount} items`,
+          life: 3000,
+        });
+      } else {
+        // Original single item deletion logic
+        const result = await deleteInventoryItem(itemToDelete.id);
+        if (result.success) {
+          const updatedItems = inventoryItems.filter(
+            (_, index) => index !== itemToDelete.index
+          );
+          setInventoryItems(updatedItems);
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product deleted successfully",
+            life: 3000,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while deleting",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+    }
   };
 
   // Render mobile card view for inventory items
@@ -569,19 +658,19 @@ const Invent = () => {
   // Render inventory items with loading state
   const renderInventoryItems = () => {
     if (isDataLoading) {
-      return (
-        <div
-          className="loading-container"
-          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-        >
-          <ProgressSpinner
-            style={{ width: "50px", height: "50px" }}
-            strokeWidth="4"
-            fill="var(--surface-ground)"
-            animationDuration=".5s"
-          />
-        </div>
-      );
+      // return (
+      //   <div
+      //     className="loading-container"
+      //     style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
+      //   >
+      //     <ProgressSpinner
+      //       style={{ width: "50px", height: "50px" }}
+      //       strokeWidth="4"
+      //       fill="var(--surface-ground)"
+      //       animationDuration=".5s"
+      //     />
+      //   </div>
+      // );
     }
 
     if (inventoryItems.length === 0) {
@@ -607,13 +696,51 @@ const Invent = () => {
     }
   };
 
+  // Add this style to your component
+  const dropdownStyles = {
+    border: 'none',
+    boxShadow: 'none'
+  };
+
+  // Add this to your component's useEffect
+  useEffect(() => {
+    // Add custom styles to remove borders from dropdown
+    const style = document.createElement('style');
+    style.textContent = `
+      .no-border-dropdown .p-dropdown {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      .no-border-dropdown .p-dropdown:not(.p-disabled).p-focus {
+        box-shadow: none !important;
+        border-color: transparent !important;
+      }
+      
+      .no-border-dropdown .p-dropdown-panel {
+        border: 1px solid #ced4da;
+      }
+      
+      /* Make the input field have only bottom border */
+      .no-border-dropdown .p-dropdown .p-dropdown-label {
+        border: none;
+        border-bottom: 1px solid #ced4da;
+        border-radius: 0;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
     <>
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{
-          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-          color: theme === "light" ? "#103B57" : "grey",
+          
         }}
       >
         <div className="sub-header-left sub-header-left-with-arrow">
@@ -629,9 +756,10 @@ const Invent = () => {
           height: "100%",
           width: "100%",
           maxWidth: "100%",
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#103B57",
+          backgroundColor: "#F8FBFF",
         }}
       >
         <div className="inventory-container">
@@ -663,6 +791,45 @@ const Invent = () => {
                   >
                     <thead>
                       <tr>
+                        <th
+                          style={{
+                            width: "5%",
+                            textAlign: "center",
+                            padding: "10px",
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={selectAll}
+                              onChange={handleSelectAll}
+                              style={{
+                                margin: 0,
+                                width: "17px",
+                                height: "17px",
+                              }}
+                            />
+                            {selectedItems.length > 0 && (
+                              <i
+                                className="pi pi-trash"
+                                style={{
+                                  cursor: "pointer",
+                                  color: "#ff4d4f",
+                                  marginLeft: "8px",
+                                }}
+                                onClick={handleBulkDelete}
+                              />
+                            )}
+                          </div>
+                        </th>
                         <th
                           style={{
                             width: "20%",
@@ -813,23 +980,6 @@ const Invent = () => {
                             </p>
                           </div>
                         </th>
-                        <th
-                          style={{
-                            width: "5%",
-                            textAlign: "center",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <input
-                            type="checkbox"
-                            style={{
-                              margin: 0,
-                              width: "14px",
-                              height: "14px",
-                            }}
-                          />
-                        </th>
                       </tr>
                     </thead>
                   </table>
@@ -850,6 +1000,24 @@ const Invent = () => {
                         <tbody>
                           {inventoryItems.map((item, index) => (
                             <tr key={index}>
+                              <td
+                                style={{
+                                  width: "5%",
+                                  padding: "10px",
+                                  textAlign: "center",
+                                  borderBottom: "1px solid #eee",
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedItems.includes(item.id)}
+                                  onChange={(e) => handleSelectItem(e, item.id)}
+                                  style={{
+                                    width: "16px",
+                                    height: "16px",
+                                  }}
+                                />
+                              </td>
                               <td
                                 style={{
                                   width: "20%",
@@ -940,22 +1108,6 @@ const Invent = () => {
                                     onClick={() => handleDelete(index)}
                                   />
                                 </div>
-                              </td>
-                              <td
-                                style={{
-                                  width: "5%",
-                                  padding: "10px",
-                                  textAlign: "center",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  style={{
-                                    width: "12px",
-                                    height: "12px",
-                                  }}
-                                />
                               </td>
                             </tr>
                           ))}
@@ -1177,19 +1329,28 @@ const Invent = () => {
 
           <div className="form-row">
             <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
+              className="form-group-1"
+              style={{ display: "block", marginBottom: "15px", border: "none" }}
             >
               <label htmlFor="serviceArea">Service Area</label>
-              <InputText
+              <Dropdown
                 id="serviceArea"
                 value={newItem.serviceArea}
+                options={serviceAreaOptions}
                 onChange={(e) =>
-                  setNewItem({ ...newItem, serviceArea: e.target.value })
+                  setNewItem({ ...newItem, serviceArea: e.value })
                 }
-                style={{ width: "100%" }}
+                placeholder="Select a service area"
+                style={{
+                  width: "100%",
+                  height: "45px",
+                  alignContent: "center",
+                }}
+                inputStyle={dropdownStyles}
+                className="no-border-dropdown"
               />
             </div>
+
             <div
               className="form-group"
               style={{ display: "block", marginBottom: "15px" }}
@@ -1221,6 +1382,53 @@ const Invent = () => {
                 onChange={(e) =>
                   setNewItem({ ...newItem, price: e.target.value })
                 }
+                style={{ width: "100%" }}
+              />
+            </div>
+          </div>
+
+          <div
+            className="form-row"
+            style={{ display: "block", marginBottom: "15px" }}
+          >
+            <label htmlFor="productImage">Product Image</label>
+            <div style={{ marginTop: "8px" }}>
+              {imagePreview && (
+                <div style={{ marginBottom: "10px" }}>
+                  <img 
+                    src={imagePreview} 
+                    alt="Product preview" 
+                    style={{ 
+                      maxWidth: "100%", 
+                      maxHeight: "200px", 
+                      borderRadius: "4px",
+                      border: "1px solid #ced4da"
+                    }} 
+                  />
+                  <Button
+                    icon="pi pi-times"
+                    className="p-button-rounded p-button-danger p-button-text"
+                    onClick={() => {
+                      setProductImage(null);
+                      setImagePreview(null);
+                    }}
+                    style={{ position: "absolute", top: "5px", right: "5px" }}
+                    tooltip="Remove image"
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                id="productImage"
+                accept="image/*"
+                onChange={handleImageChange}
+                style={{ display: "none" }}
+              />
+              <Button
+                label={imagePreview ? "Change Image" : "Upload Image"}
+                icon="pi pi-upload"
+                onClick={() => document.getElementById("productImage").click()}
+                className="p-button-outlined"
                 style={{ width: "100%" }}
               />
             </div>
@@ -1309,7 +1517,11 @@ const Invent = () => {
             className="pi pi-exclamation-triangle"
             style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
           ></i>
-          <span>Are you sure you want to delete this product?</span>
+          <span>
+            {itemToDelete?.multiple
+              ? `Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`
+              : "Are you sure you want to delete this product?"}
+          </span>
         </div>
       </Dialog>
 
@@ -1328,7 +1540,7 @@ const Invent = () => {
       >
         <div className="view-form">
           {/* Product Image and Name Section */}
-          {/* <div style={{ 
+          <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: '12px',
@@ -1337,28 +1549,38 @@ const Invent = () => {
             backgroundColor: '#F9FAFB',
             borderRadius: '8px'
           }}>
-            <img 
-              src={viewItem.image || "path-to-default-yacht-image"} 
-              alt={viewItem.productName}
-              style={{
-                width: '48px',
-                height: '48px',
+            {viewItem.productImage ? (
+              <img 
+                src={viewItem.productImage} 
+                alt={viewItem.productName}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '4px',
+                  objectFit: 'cover'
+                }}
+              />
+            ) : (
+              <div style={{
+                width: '80px',
+                height: '80px',
                 borderRadius: '4px',
-                objectFit: 'cover'
-              }}
-            />
+                backgroundColor: '#E5E7EB',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="pi pi-image" style={{ fontSize: '24px', color: '#9CA3AF' }}></i>
+              </div>
+            )}
             <div>
-              <h3 style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>Yacht</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>{viewItem.productName}</h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#6B7280' }}>{viewItem.category}</p>
             </div>
-          </div> */}
+          </div>
 
           {/* Details Grid */}
           <div style={{ display: "grid", gap: "16px" }}>
-            {/* <div className="detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#6B7280', fontSize: '14px' }}>ID</span>
-              <span style={{ color: '#111827', fontSize: '14px', fontWeight: '500' }}>#2468520</span>
-            </div> */}
-
             <div
               className="detail-row"
               style={{ display: "flex", justifyContent: "space-between" }}
@@ -1429,11 +1651,6 @@ const Invent = () => {
               </span>
             </div>
 
-            {/* <div className="detail-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#6B7280', fontSize: '14px' }}>Supplier</span>
-              <span style={{ color: '#111827', fontSize: '14px', fontWeight: '500' }}>{viewItem.supplier}</span>
-            </div> */}
-
             <div
               className="detail-row"
               style={{ display: "flex", justifyContent: "space-between" }}
@@ -1452,28 +1669,6 @@ const Invent = () => {
               </span>
             </div>
           </div>
-
-          {/* Description Section */}
-          {/* <div style={{ marginTop: '24px' }}>
-            <h4 style={{ 
-              margin: '0 0 8px 0', 
-              fontSize: '14px', 
-              color: '#6B7280' 
-            }}>Description</h4>
-            <textarea
-              placeholder="Enter Product Description"
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #D1D5DB',
-                borderRadius: '6px',
-                minHeight: '80px',
-                fontSize: '14px',
-                color: '#111827',
-                resize: 'vertical'
-              }}
-            />
-          </div> */}
         </div>
       </Dialog>
     </>

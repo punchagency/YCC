@@ -22,12 +22,49 @@ import { Calendar as PrimeCalendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
+import three from "../../assets/images/crew/three.png";
+
 import {
   createEvent,
   fetchEvents,
+  updateEvent,
+  deleteEvent,
+  inviteGuests,
 } from "../../services/calendar/calendarService";
+import { Menu } from "primereact/menu";
+import { Calendar } from "primereact/calendar";
+import more from "../../assets/images/crew/more.png";
 
-const EventCard = ({ title, start, location, description }) => {
+const EventCard = ({
+  title,
+  start,
+  location,
+  description,
+  event,
+  onUpdate,
+  onDelete,
+  onAddGuest,
+}) => {
+  const menuRef = useRef(null);
+
+  const getEventMenuItems = () => [
+    {
+      label: "Update Event",
+      icon: "pi pi-pencil",
+      command: () => onUpdate(event),
+    },
+    {
+      label: "Delete Event",
+      icon: "pi pi-trash",
+      command: () => onDelete(event),
+    },
+    {
+      label: "Add Guest",
+      icon: "pi pi-user-plus",
+      command: () => onAddGuest(event),
+    },
+  ];
+
   // Helper function to format the date/time
   const formatEventTime = (startDate) => {
     const date = new Date(startDate);
@@ -67,6 +104,13 @@ const EventCard = ({ title, start, location, description }) => {
     return locationMap[location] || location;
   };
 
+  // Add this helper function to get guest count
+  const getGuestCount = (event) => {
+    const emailCount = event.guestEmails?.length || 0;
+    const guestCount = event.guests?.length || 0;
+    return emailCount + guestCount;
+  };
+
   return (
     <div
       className="profiles"
@@ -79,47 +123,56 @@ const EventCard = ({ title, start, location, description }) => {
           style={{ width: "40px", height: "40px", borderRadius: "50%" }}
         />
       </div>
-      <div style={{ flex: 1 }}>
-        <p
-          style={{ fontWeight: "bold", margin: "0 0 5px 0", fontSize: "16px" }}
-          className="header"
-        >
-          {title}
-        </p>
-        <p style={{ margin: "0 0 3px 0", fontSize: "14px", color: "#666" }}>
-          {formatEventTime(start)}
-        </p>
-        <p style={{ margin: "0 0 3px 0", fontSize: "14px", color: "#666" }}>
-          {formatLocation(location)}
-        </p>
-        <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#666" }}>
-          {description}
-        </p>
-        <div
-          className="profile_display"
-          style={{ display: "flex", alignItems: "center", gap: "8px" }}
-        >
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: "0 0 5px 0", fontSize: "16px" }}>{title}</h3>
+          <p style={{ margin: "0 0 5px 0", color: "#666" }}>
+            {formatEventTime(start)}
+          </p>
+          <p style={{ margin: 0, color: "#666" }}>{formatLocation(location)}</p>
+          {description && (
+            <p style={{ margin: "5px 0 0 0", color: "#666" }}>{description}</p>
+          )}
+
+          {/* Add this to show guest count */}
+          {getGuestCount(event) > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "5px",
+                color: "#0387D9",
+                fontSize: "12px",
+              }}
+            >
+              <i className="pi pi-users" style={{ marginRight: "5px" }}></i>
+              <span>
+                {getGuestCount(event)}{" "}
+                {getGuestCount(event) === 1 ? "guest" : "guests"}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="event-actions">
           <img
-            src={man1}
-            alt="attendee"
-            style={{ width: "24px", height: "24px", borderRadius: "50%" }}
+            src={three}
+            alt="menu"
+            style={{ cursor: "pointer" }}
+            onClick={(e) => menuRef.current.toggle(e)}
           />
-          <div
-            style={{
-              border: "1px solid #4880FF",
-              padding: "0",
-              height: "24px",
-              width: "24px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: "50%",
-              fontSize: "10px",
-              color: "#4880FF",
-            }}
-          >
-            <p style={{ margin: 0 }}>+</p>
-          </div>
+          <Menu
+            model={getEventMenuItems()}
+            popup
+            ref={menuRef}
+            style={{ width: "150px" }}
+          />
         </div>
       </div>
     </div>
@@ -127,81 +180,69 @@ const EventCard = ({ title, start, location, description }) => {
 };
 
 const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (dateString) => {
-    return new Date(dateString).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const formatLocation = (location) => {
-    const locationMap = {
-      zoom: "Virtual - Zoom Meeting",
-      "google-meet": "Virtual - Google Meet",
-      "ms-teams": "Virtual - Microsoft Teams",
-      "in-person": "In Person Meeting",
-    };
-    return locationMap[location] || location;
-  };
-
   return (
     <Dialog
       visible={visible}
       onHide={onHide}
-      header={`Events for ${selectedDate ? formatDate(selectedDate) : ""}`}
-      className="day-events-modal"
-      style={{ width: "500px" }}
+      header={`Events for ${selectedDate?.toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })}`}
+      style={{ width: "600px" }}
     >
       <div className="day-events-content">
         {events.length === 0 ? (
-          <p>No events scheduled for this day</p>
+          <p>No events scheduled for this day.</p>
         ) : (
-          events.map((event) => (
-            <div
-              key={event._id}
-              className="event-item"
-              style={{
-                marginBottom: "20px",
-                padding: "15px",
-                borderRadius: "8px",
-                backgroundColor: "#f8f9fa",
-                border: "1px solid #e9ecef",
-              }}
-            >
-              <h4 style={{ margin: "0 0 10px 0", color: "#344054" }}>
+          events.map((event, index) => (
+            <div key={event._id} className="event-item">
+              <h3
+                style={{
+                  margin: "0 0 10px 0",
+                  fontSize: "18px",
+                  color: "#344054",
+                }}
+              >
                 {event.title}
-              </h4>
+              </h3>
               <div
                 style={{
-                  fontSize: "14px",
-                  color: "#667085",
+                  display: "flex",
+                  alignItems: "center",
                   marginBottom: "5px",
                 }}
               >
-                <i className="pi pi-clock" style={{ marginRight: "8px" }}></i>
-                {formatTime(event.start)} - {formatTime(event.end)}
+                <i
+                  className="pi pi-calendar"
+                  style={{ marginRight: "8px", color: "#667085" }}
+                ></i>
+                <span style={{ fontSize: "14px", color: "#475467" }}>
+                  {new Date(event.start).toLocaleString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                  })}
+                </span>
               </div>
               <div
                 style={{
-                  fontSize: "14px",
-                  color: "#667085",
-                  marginBottom: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "5px",
                 }}
               >
                 <i
                   className="pi pi-map-marker"
-                  style={{ marginRight: "8px" }}
+                  style={{ marginRight: "8px", color: "#667085" }}
                 ></i>
-                {formatLocation(event.location)}
+                <span style={{ fontSize: "14px", color: "#475467" }}>
+                  {event.location}
+                </span>
               </div>
               {event.description && (
                 <p
@@ -217,6 +258,82 @@ const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
                   {event.description}
                 </p>
               )}
+
+              {/* Add this section to display guests */}
+              {(event.guests?.length > 0 || event.guestEmails?.length > 0) && (
+                <div
+                  className="event-guests"
+                  style={{
+                    marginTop: "15px",
+                    padding: "10px",
+                    backgroundColor: "#f8f9fa",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <h4
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                      color: "#344054",
+                    }}
+                  >
+                    Guests
+                  </h4>
+
+                  <div className="guest-list">
+                    {event.guestEmails &&
+                      event.guestEmails.map((email, idx) => (
+                        <div
+                          key={`email-${idx}`}
+                          className="guest-item"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <i
+                            className="pi pi-envelope"
+                            style={{
+                              marginRight: "8px",
+                              color: "#667085",
+                              fontSize: "12px",
+                            }}
+                          ></i>
+                          <span style={{ fontSize: "13px", color: "#475467" }}>
+                            {email}
+                          </span>
+                        </div>
+                      ))}
+
+                    {event.guests &&
+                      event.guests.map((guest, idx) => (
+                        <div
+                          key={`guest-${idx}`}
+                          className="guest-item"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <i
+                            className="pi pi-user"
+                            style={{
+                              marginRight: "8px",
+                              color: "#667085",
+                              fontSize: "12px",
+                            }}
+                          ></i>
+                          <span style={{ fontSize: "13px", color: "#475467" }}>
+                            {guest.email || guest.name || `Guest ${idx + 1}`}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
@@ -225,38 +342,317 @@ const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
   );
 };
 
-const AllEventsModal = ({ visible, onHide, events }) => {
+const AllEventsModal = ({
+  visible,
+  onHide,
+  events,
+  onEventUpdate,
+  onAddGuest,
+}) => {
+  const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
+  const [showDeleteEventModal, setShowDeleteEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const toast = useRef(null);
+
+  const handleUpdateClick = (event) => {
+    setSelectedEvent({ ...event }); // Create a copy of the event
+    setShowUpdateEventModal(true);
+  };
+
+  const handleDeleteClick = (event) => {
+    setSelectedEvent({ ...event });
+    setShowDeleteEventModal(true);
+  };
+
+  const handleUpdateEvent = async () => {
+    try {
+      const result = await updateEvent(selectedEvent._id, {
+        title: selectedEvent.title,
+        start: selectedEvent.start,
+        end: selectedEvent.end,
+        location: selectedEvent.location,
+        description: selectedEvent.description,
+        type: selectedEvent.type,
+      });
+
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Event updated successfully",
+        });
+        setShowUpdateEventModal(false);
+        onHide(); // Close the all events modal
+        onEventUpdate(); // Refresh the events
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to update event",
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while updating the event",
+      });
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    try {
+      const result = await deleteEvent(selectedEvent._id);
+
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Event deleted successfully",
+        });
+        setShowDeleteEventModal(false);
+        onHide(); // Close the all events modal
+        onEventUpdate(); // Refresh the events list
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to delete event",
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while deleting the event",
+      });
+    }
+  };
+
   return (
-    <Dialog
-      visible={visible}
-      onHide={onHide}
-      header="All Events"
-      className="day-events-modal"
-      style={{ width: "500px" }}
-    >
-      <div className="day-events-content">
-        {events.map((event, index) => (
-          <React.Fragment key={event._id}>
-            {index > 0 && (
+    <>
+      <Dialog
+        visible={visible}
+        onHide={onHide}
+        header="All Events"
+        className="day-events-modal"
+        style={{ width: "500px" }}
+      >
+        <div className="day-events-content">
+          {events.map((event, index) => (
+            <React.Fragment key={event._id}>
+              {index > 0 && (
+                <div
+                  className="event-divider"
+                  style={{
+                    height: "1px",
+                    background: "#E4E7EC",
+                    margin: "10px 0",
+                  }}
+                ></div>
+              )}
+              <EventCard
+                title={event.title}
+                start={event.start}
+                location={event.location}
+                description={event.description}
+                event={event}
+                onUpdate={handleUpdateClick}
+                onDelete={handleDeleteClick}
+                onAddGuest={onAddGuest}
+              />
+            </React.Fragment>
+          ))}
+        </div>
+      </Dialog>
+
+      {/* Update Event Modal */}
+      <Dialog
+        visible={showUpdateEventModal}
+        onHide={() => {
+          setShowUpdateEventModal(false);
+          setSelectedEvent(null);
+        }}
+        header="Update Event"
+        style={{ width: "500px" }}
+      >
+        {selectedEvent && (
+          <div className="update-event-form">
+            <div className="field">
+              <label>Title</label>
+              <InputText
+                value={selectedEvent.title}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, title: e.target.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Location</label>
+              <InputText
+                value={selectedEvent.location}
+                onChange={(e) =>
+                  setSelectedEvent({
+                    ...selectedEvent,
+                    location: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Description</label>
+              <InputTextarea
+                value={selectedEvent.description}
+                onChange={(e) =>
+                  setSelectedEvent({
+                    ...selectedEvent,
+                    description: e.target.value,
+                  })
+                }
+                rows={3}
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Start Date</label>
+              <Calendar
+                value={new Date(selectedEvent.start)}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, start: e.value })
+                }
+                showTime
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>End Date</label>
+              <Calendar
+                value={new Date(selectedEvent.end)}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, end: e.value })
+                }
+                showTime
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Current Guests</label>
               <div
-                className="event-divider"
+                className="current-guests"
                 style={{
-                  height: "1px",
-                  background: "#E4E7EC",
-                  margin: "10px 0",
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                  marginBottom: "15px",
                 }}
-              ></div>
-            )}
-            <EventCard
-              title={event.title}
-              start={event.start}
-              location={event.location}
-              description={event.description}
-            />
-          </React.Fragment>
-        ))}
-      </div>
-    </Dialog>
+              >
+                {selectedEvent.guestEmails &&
+                  selectedEvent.guestEmails.map((email, idx) => (
+                    <div
+                      key={`email-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-envelope"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {email}
+                      </span>
+                    </div>
+                  ))}
+
+                {selectedEvent.guests &&
+                  selectedEvent.guests.map((guest, idx) => (
+                    <div
+                      key={`guest-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-user"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {guest.email || guest.name || `Guest ${idx + 1}`}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                label="Cancel"
+                onClick={() => setShowUpdateEventModal(false)}
+                className="p-button-text"
+              />
+              <Button label="Update" onClick={handleUpdateEvent} />
+            </div>
+          </div>
+        )}
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog
+        visible={showDeleteEventModal}
+        onHide={() => setShowDeleteEventModal(false)}
+        header="Confirm Delete"
+        style={{ width: "400px" }}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
+          />
+          <span>Are you sure you want to delete this event?</span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "0.5rem",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            label="No"
+            onClick={() => setShowDeleteEventModal(false)}
+            className="p-button-text"
+          />
+          <Button
+            label="Yes"
+            onClick={handleDeleteEvent}
+            className="p-button-danger"
+          />
+        </div>
+      </Dialog>
+
+      <Toast ref={toast} />
+    </>
   );
 };
 
@@ -280,6 +676,11 @@ export default function CalendarPage() {
   const [selectedDateEvents, setSelectedDateEvents] = useState([]);
   const [selectedModalDate, setSelectedModalDate] = useState(null);
   const [showAllEventsModal, setShowAllEventsModal] = useState(false);
+  const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
+  const [showDeleteEventModal, setShowDeleteEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showAddGuestModal, setShowAddGuestModal] = useState(false);
+  const [guestEmails, setGuestEmails] = useState([""]);
 
   const loadEvents = async () => {
     setIsLoading(true);
@@ -442,6 +843,9 @@ export default function CalendarPage() {
           borderRadius: "8px",
           overflow: "hidden",
           border: "1px solid #E4E7EC",
+          width: "97%",
+          marginLeft: "5px",
+          marginRight: "5px",
         }}
       >
         <button
@@ -454,6 +858,7 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            // marginLeft:"5px"
           }}
         >
           Events
@@ -468,6 +873,7 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            // marginRight: "5px",
           }}
         >
           Calendar
@@ -489,22 +895,11 @@ export default function CalendarPage() {
 
   const handleSaveEvent = async () => {
     // Validate required fields
-    if (!newEvent.title || !newEvent.start || !newEvent.end) {
+    if (!newEvent.title || !newEvent.start) {
       toast.current.show({
         severity: "error",
         summary: "Required Fields",
         detail: "Please fill in all required fields",
-        life: 3000,
-      });
-      return;
-    }
-
-    // Validate end date is after start date
-    if (newEvent.end <= newEvent.start) {
-      toast.current.show({
-        severity: "error",
-        summary: "Invalid Dates",
-        detail: "End date must be after start date",
         life: 3000,
       });
       return;
@@ -600,7 +995,7 @@ export default function CalendarPage() {
           </div>
 
           <div className="field">
-            <label htmlFor="end">End Date & Time *</label>
+            <label htmlFor="end">End Date & Time</label>
             <PrimeCalendar
               id="end"
               value={newEvent.end}
@@ -609,7 +1004,6 @@ export default function CalendarPage() {
               showSeconds={false}
               placeholder="Select end date and time"
               minDate={newEvent.start}
-              required
             />
           </div>
 
@@ -683,14 +1077,108 @@ export default function CalendarPage() {
     setShowDayEventsModal(true);
   };
 
+  const handleEventUpdate = async (event) => {
+    setSelectedEvent({ ...event });
+    setShowUpdateEventModal(true);
+  };
+
+  const handleEventDelete = async (event) => {
+    setSelectedEvent({ ...event });
+    setShowDeleteEventModal(true);
+  };
+
+  const handleAddGuest = (event) => {
+    setSelectedEvent({ ...event });
+    setShowAddGuestModal(true);
+  };
+
+  const addEmailField = () => {
+    setGuestEmails([...guestEmails, ""]);
+  };
+
+  const removeEmailField = (index) => {
+    const newEmails = guestEmails.filter((_, i) => i !== index);
+    setGuestEmails(newEmails);
+  };
+
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...guestEmails];
+    newEmails[index] = value;
+    setGuestEmails(newEmails);
+  };
+
+  const handleInviteGuests = async () => {
+    try {
+      // Filter out empty emails
+      const validEmails = guestEmails.filter((email) => email.trim() !== "");
+
+      if (validEmails.length === 0) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Please enter at least one email address",
+        });
+        return;
+      }
+
+      // Call API to send invites
+      const result = await inviteGuests(selectedEvent._id, validEmails);
+
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: result.message || "Invitations sent successfully",
+        });
+
+        setShowAddGuestModal(false);
+        setGuestEmails([""]); // Reset the email list
+        loadEvents(); // Refresh events to show updated guest list
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to send invitations",
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while sending invitations",
+      });
+    }
+  };
+
   return (
-    <>
+    <div
+      style={{
+        background: "#F8FBFF",
+        position: "relative",
+        minHeight: "100vh",
+        width: "100%",
+        maxWidth: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflowX: "hidden",
+        overflowY: "hidden",
+      }}
+    >
       <Toast ref={toast} />
+
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
             <h3>Calendar</h3>
           </div>
+        </div>
+        <div className="sub-header-right">
+          <Button
+            label="Add Event"
+            className="p-button-primary"
+            icon="pi pi-plus"
+            onClick={() => setShowEventModal(true)}
+          />
         </div>
       </div>
 
@@ -702,6 +1190,20 @@ export default function CalendarPage() {
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
           gap: "20px",
+          padding: "0 20px 20px 20px",
+          overflowY: "auto",
+          flex: 1,
+          "&::-webkit-scrollbar": {
+            width: "0px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "transparent",
+          },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         <div
@@ -770,6 +1272,10 @@ export default function CalendarPage() {
                     start={event.start}
                     location={event.location}
                     description={event.description}
+                    event={event}
+                    onUpdate={handleEventUpdate}
+                    onDelete={handleEventDelete}
+                    onAddGuest={handleAddGuest}
                   />
                 </React.Fragment>
               ))}
@@ -1135,7 +1641,303 @@ export default function CalendarPage() {
         visible={showAllEventsModal}
         onHide={() => setShowAllEventsModal(false)}
         events={calendarEvents?.data || []}
+        onEventUpdate={loadEvents}
+        onAddGuest={handleAddGuest}
       />
-    </>
+
+      {/* Add the Update and Delete Modals */}
+      <Dialog
+        visible={showUpdateEventModal}
+        onHide={() => {
+          setShowUpdateEventModal(false);
+          setSelectedEvent(null);
+        }}
+        header="Update Event"
+        style={{ width: "500px" }}
+      >
+        {selectedEvent && (
+          <div className="update-event-form">
+            <div className="field">
+              <label>Title</label>
+              <InputText
+                value={selectedEvent.title}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, title: e.target.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Location</label>
+              <InputText
+                value={selectedEvent.location}
+                onChange={(e) =>
+                  setSelectedEvent({
+                    ...selectedEvent,
+                    location: e.target.value,
+                  })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Description</label>
+              <InputTextarea
+                value={selectedEvent.description}
+                onChange={(e) =>
+                  setSelectedEvent({
+                    ...selectedEvent,
+                    description: e.target.value,
+                  })
+                }
+                rows={3}
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Start Date</label>
+              <Calendar
+                value={new Date(selectedEvent.start)}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, start: e.value })
+                }
+                showTime
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>End Date</label>
+              <Calendar
+                value={new Date(selectedEvent.end)}
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, end: e.value })
+                }
+                showTime
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label>Current Guests</label>
+              <div
+                className="current-guests"
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "4px",
+                  marginBottom: "15px",
+                }}
+              >
+                {selectedEvent.guestEmails &&
+                  selectedEvent.guestEmails.map((email, idx) => (
+                    <div
+                      key={`email-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-envelope"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {email}
+                      </span>
+                    </div>
+                  ))}
+
+                {selectedEvent.guests &&
+                  selectedEvent.guests.map((guest, idx) => (
+                    <div
+                      key={`guest-${idx}`}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "5px",
+                      }}
+                    >
+                      <i
+                        className="pi pi-user"
+                        style={{
+                          marginRight: "8px",
+                          color: "#667085",
+                          fontSize: "12px",
+                        }}
+                      ></i>
+                      <span style={{ fontSize: "13px", color: "#475467" }}>
+                        {guest.email || guest.name || `Guest ${idx + 1}`}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                label="Cancel"
+                onClick={() => setShowUpdateEventModal(false)}
+                className="p-button-text"
+              />
+              <Button
+                label="Update"
+                onClick={async () => {
+                  const result = await updateEvent(
+                    selectedEvent._id,
+                    selectedEvent
+                  );
+                  if (result.success) {
+                    toast.current.show({
+                      severity: "success",
+                      summary: "Success",
+                      detail: "Event updated successfully",
+                    });
+                    setShowUpdateEventModal(false);
+                    loadEvents();
+                  } else {
+                    toast.current.show({
+                      severity: "error",
+                      summary: "Error",
+                      detail: result.error || "Failed to update event",
+                    });
+                  }
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </Dialog>
+
+      <Dialog
+        visible={showDeleteEventModal}
+        onHide={() => setShowDeleteEventModal(false)}
+        header="Confirm Delete"
+        style={{ width: "400px" }}
+      >
+        <div className="confirmation-content">
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
+          />
+          <span>Are you sure you want to delete this event?</span>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "0.5rem",
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            label="No"
+            onClick={() => setShowDeleteEventModal(false)}
+            className="p-button-text"
+          />
+          <Button
+            label="Yes"
+            onClick={async () => {
+              const result = await deleteEvent(selectedEvent._id);
+              if (result.success) {
+                toast.current.show({
+                  severity: "success",
+                  summary: "Success",
+                  detail: "Event deleted successfully",
+                });
+                setShowDeleteEventModal(false);
+                loadEvents();
+              } else {
+                toast.current.show({
+                  severity: "error",
+                  summary: "Error",
+                  detail: result.error || "Failed to delete event",
+                });
+              }
+            }}
+            className="p-button-danger"
+          />
+        </div>
+      </Dialog>
+
+      <Dialog
+        visible={showAddGuestModal}
+        onHide={() => {
+          setShowAddGuestModal(false);
+          setGuestEmails([""]);
+        }}
+        header="Add Guests"
+        style={{ width: "500px" }}
+      >
+        <div className="add-guest-form">
+          {guestEmails.map((email, index) => (
+            <div
+              key={index}
+              className="email-input-container"
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginBottom: "10px",
+                alignItems: "center",
+              }}
+            >
+              <InputText
+                value={email}
+                onChange={(e) => handleEmailChange(index, e.target.value)}
+                placeholder="Enter guest email"
+                className="w-full"
+                style={{ flex: 1 }}
+              />
+              {guestEmails.length > 1 && (
+                <Button
+                  icon="pi pi-times"
+                  onClick={() => removeEmailField(index)}
+                  className="p-button-rounded p-button-danger p-button-text"
+                />
+              )}
+            </div>
+          ))}
+
+          <Button
+            label="Add Another Guest"
+            icon="pi pi-plus"
+            onClick={addEmailField}
+            className="p-button-text"
+            style={{ marginBottom: "20px" }}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "0.5rem",
+            }}
+          >
+            <Button
+              label="Cancel"
+              onClick={() => {
+                setShowAddGuestModal(false);
+                setGuestEmails([""]);
+              }}
+              className="p-button-text"
+            />
+            <Button
+              label="Send Invites"
+              onClick={handleInviteGuests}
+              disabled={guestEmails.every((email) => email.trim() === "")}
+            />
+          </div>
+        </div>
+      </Dialog>
+    </div>
   );
 }

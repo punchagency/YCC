@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from "react";
-import { fetchEvents, createEvent } from "../../services/calendar/calendarService";
+import { fetchEvents, createEvent, addGuestService } from "../../services/calendar/calendarService";
 import { useToast } from '../toast/toastContext';
 export const CalendarContext = createContext();
 
@@ -15,17 +15,35 @@ export const useCalendar = () => {
 
 export const CalendarProvider = ({ children }) => {
     const { toast } = useToast();
-    const currentMonth = new Date();
-    const nextMonth = new Date(currentMonth);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const startOfCurrentMonth = new Date();
+startOfCurrentMonth.setDate(1);
+startOfCurrentMonth.setHours(0, 0, 0, 0);
+
+const endOfCurrentMonth = new Date(startOfCurrentMonth);
+endOfCurrentMonth.setMonth(endOfCurrentMonth.getMonth() + 1);
+endOfCurrentMonth.setDate(0); // Sets to the last day of the previous month (i.e., current month)
+endOfCurrentMonth.setHours(23, 59, 59, 999);
+
+const startOfNextMonth = new Date(endOfCurrentMonth);
+startOfNextMonth.setDate(1);
+startOfNextMonth.setMonth(startOfNextMonth.getMonth() + 1);
+startOfNextMonth.setHours(0, 0, 0, 0);
+
+const endOfNextMonth = new Date(startOfNextMonth);
+endOfNextMonth.setMonth(endOfNextMonth.getMonth() + 1);
+endOfNextMonth.setDate(0);
+endOfNextMonth.setHours(23, 59, 59, 999);
+
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [startDate, setStartDate] = useState(currentMonth);
-    const [endDate, setEndDate] = useState(nextMonth);
+    const [startDate, setStartDate] = useState(startOfCurrentMonth);
+    const [endDate, setEndDate] = useState(endOfCurrentMonth);
     const [events, setEvents] = useState([]);
+    const [eventsForTodayAndTomorrow, setEventsForTodayAndTomorrow] = useState([]);
 
     const addEvent = async (event) => {
         const response = await createEvent(event);
         if (response.success) {
+            fetchEventsForTodayAndTomorrow()
             setEvents([...events, response.data.data]);
             toast.current.show({ severity: 'success', summary: 'Success', detail: 'Event added successfully' });
         } else {
@@ -35,13 +53,37 @@ export const CalendarProvider = ({ children }) => {
 
     const fetchEventsByDate = async (startDate, endDate) => {
         if (!startDate || !endDate) {
-            startDate = currentMonth;
-            endDate = nextMonth;
+            startDate = startOfCurrentMonth;
+            endDate = endOfCurrentMonth;
         }
         const response = await fetchEvents(startDate, endDate);
         setEvents(response.data.data || []);
     };
 
+    const fetchEventsForTodayAndTomorrow = async () => {
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+        const startOfTomorrow = new Date();
+        startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+        startOfTomorrow.setHours(0, 0, 0, 0);
+        const endOfTomorrow = new Date();
+        endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
+        endOfTomorrow.setHours(23, 59, 59, 999);
+        const response = await fetchEvents(startOfToday, endOfTomorrow);
+        setEventsForTodayAndTomorrow(response.data.data || []);
+    };
+
+    const addGuest = async (eventId, guestEmails) => {
+        const response = await addGuestService(eventId, guestEmails);
+        if (response.success) {
+            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Guest added successfully' });
+        } else {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: response.error || 'Failed to add guest' });
+        }
+        fetchEventsByDate();
+    }
         const value = {
             selectedDate,
             setSelectedDate,
@@ -53,6 +95,10 @@ export const CalendarProvider = ({ children }) => {
             setStartDate,
             endDate,
             setEndDate,
+            addGuest,
+            eventsForTodayAndTomorrow,
+            fetchEventsForTodayAndTomorrow,
+
         }
   return (
     <CalendarContext.Provider value={value}>

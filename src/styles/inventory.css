@@ -1,0 +1,21 @@
+/* Dropdown styling */
+.no-border-dropdown .p-dropdown {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.no-border-dropdown .p-dropdown:not(.p-disabled).p-focus {
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+.no-border-dropdown .p-dropdown-panel {
+  border: 1px solid #ced4da;
+}
+
+/* Make the input field have only bottom border */
+.no-border-dropdown .p-dropdown .p-dropdown-label {
+  border: none;
+  border-bottom: 1px solid #ced4da;
+  border-radius: 0;
+} 

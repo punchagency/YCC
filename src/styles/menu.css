@@ -1,0 +1,47 @@
+/* Add these styles for the active menu item */
+.menu-red-background,
+.p-panelmenu .p-panelmenu-header.menu-red-background > a {
+  background-color: #0387d9 !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+.menu-red-background .p-menuitem-icon img,
+.p-panelmenu .p-panelmenu-header.menu-red-background > a .p-menuitem-icon img {
+  filter: brightness(0) invert(1) !important; /* Make icon white */
+}
+
+/* Add hover effect for menu items */
+.menu-item:hover,
+.p-panelmenu .p-panelmenu-header > a:hover {
+  background-color: #0387d9 !important;
+  border-radius: 8px !important;
+  color: white !important;
+}
+
+/* Apply these styles to override PrimeReact's default styling */
+.p-panelmenu .p-panelmenu-header.menu-red-background > a:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 75, 75, 0.4) !important;
+}
+
+.p-panelmenu .p-panelmenu-header.menu-red-background > a .p-menuitem-text {
+  color: white !important;
+}
+
+/* Strengthen text color rules */
+.menu-red-background,
+.p-panelmenu .p-panelmenu-header.menu-red-background > a,
+.p-panelmenu .p-panelmenu-header.menu-red-background > a .p-menuitem-text,
+.p-panelmenu .p-panelmenu-header.menu-red-background > a .p-menuitem-icon,
+.menu-red-background .p-menuitem-text,
+.menu-red-background .p-menuitem-icon {
+  color: white !important;
+}
+
+/* Add !important to the hover style for text color */
+.menu-item:hover,
+.p-panelmenu .p-panelmenu-header > a:hover,
+.p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text,
+.p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-icon {
+  color: white !important;
+}
