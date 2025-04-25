@@ -134,10 +134,10 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         <StyledButton variant="contained" onClick={() => handleOpenDialog("csv")}>
           Upload from CSV
         </StyledButton>
-        <StyledButton variant="contained" onClick={() => handleOpenDialog("excel")}>
+        <StyledButton variant="contained"  disabled={true} onClick={() => handleOpenDialog("excel")}>
           Upload from Excel
         </StyledButton>
-        <StyledButton variant="contained" onClick={() => handleOpenDialog("api")}>
+        <StyledButton variant="contained" disabled={true} onClick={() => handleOpenDialog("api")}>
           Enter API for bulk upload
         </StyledButton>
       </Box>

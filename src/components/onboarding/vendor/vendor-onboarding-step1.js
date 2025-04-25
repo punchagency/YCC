@@ -150,10 +150,10 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         <StyledButton variant="contained" onClick={() => handleOpenDialog("csv")}>
           Upload from CSV
         </StyledButton>
-        <StyledButton variant="contained" onClick={() => handleOpenDialog("excel")}>
+        <StyledButton variant="contained" disabled={true} onClick={() => handleOpenDialog("excel")}>
           Upload from Excel
         </StyledButton>
-        <StyledButton variant="contained" onClick={() => handleOpenDialog("manual")}>
+        <StyledButton variant="contained" disabled={true} onClick={() => handleOpenDialog("manual")}>
           Enter manually
         </StyledButton>
       </Box>
