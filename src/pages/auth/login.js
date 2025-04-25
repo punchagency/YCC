@@ -1,27 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import backgroundImageCaptain from "../../assets/images/captain_login_bg.jpg";
-import backgroundImageCrew from "../../assets/images/crew_bg.jpg";
+// import backgroundImageCaptain from "../../assets/images/captain_login_bg.jpg";
+// import backgroundImageCrew from "../../assets/images/crew_bg.jpg";
 import logo from "../../assets/images/logo-login.png";
 import LoginForm from "../../components/login";
 import { useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/crew/back.png";
 
 const Login = () => {
-  const title = "Explore the story behind Yacht Crew Center's journey.";
+  // const title = "Explore the story behind Yacht Crew Center's journey.";
   const location = useLocation();
   const role = location.state?.role || "Guest"; // Default to 'Guest' if no role is passed
 
-  const getBackgroundImage = (role) => {
-    switch (role) {
-      case "Captain":
-        return backgroundImageCaptain;
-      case "Crew Member":
-        return backgroundImageCrew;
-      default:
-        return backgroundImageCaptain; // Default image
-    }
-  };
+  // const getBackgroundImage = (role) => {
+  //   switch (role) {
+  //     case "Captain":
+  //       return backgroundImageCaptain;
+  //     case "Crew Member":
+  //       return backgroundImageCrew;
+  //     default:
+  //       return backgroundImageCaptain; // Default image
+  //   }
+  // };
 
   // const backgroundImage = getBackgroundImage(role);
 
@@ -46,7 +46,7 @@ const Login = () => {
           <div className="login-heading">
             <h2 className="font-medium mb-1">Sign in</h2>
             <p>
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <Link to="/signup" state={{ role }}>
                 Create new!
               </Link>

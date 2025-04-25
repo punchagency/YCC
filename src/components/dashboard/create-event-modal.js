@@ -1,20 +1,11 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import { Box, Typography, TextField, Button, Grid } from "@mui/material";
 import { Dialog } from "primereact/dialog";
 import { useCalendar } from "../../context/calendar/calendarContext";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Calendar as PrimeCalendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+
 const CreateEventModal = ({ open, handleClose }) => {
   const { addEvent } = useCalendar();
   const locationOptions = [
@@ -56,16 +47,21 @@ const CreateEventModal = ({ open, handleClose }) => {
   };
 
   return (
-    <Dialog 
-    visible={open} 
-    onHide={handleClose}
-    header="Create Event"
-    style={{ width: "500px" }}
+    <Dialog
+      visible={open}
+      onHide={handleClose}
+      header="Create Event"
+      style={{ width: "500px" }}
     >
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Box sx={{ width: "100%" }}>
-            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Event Title *</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "14px", color: "#000000" }}
+            >
+              Event Title *
+            </Typography>
             <TextField
               fullWidth
               name="title"
@@ -73,12 +69,17 @@ const CreateEventModal = ({ open, handleClose }) => {
               onChange={handleChange}
               variant="outlined"
             />
-            </Box>
-          </Grid>
+          </Box>
+        </Grid>
 
-          <Grid item xs={12}>
-            <Box sx={{ width: "100%" }}>
-            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Description</Typography>
+        <Grid item xs={12}>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "14px", color: "#000000" }}
+            >
+              Description
+            </Typography>
             <TextField
               fullWidth
               multiline
@@ -88,12 +89,17 @@ const CreateEventModal = ({ open, handleClose }) => {
               onChange={handleChange}
               variant="outlined"
             />
-            </Box>
-          </Grid>
+          </Box>
+        </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ width: "100%" }}>
-              <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Start Date *</Typography>
+        <Grid item xs={12} sm={6}>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "14px", color: "#000000" }}
+            >
+              Start Date *
+            </Typography>
             <PrimeCalendar
               id="start"
               value={event.start}
@@ -103,12 +109,17 @@ const CreateEventModal = ({ open, handleClose }) => {
               placeholder="Select start date and time"
               required
             />
-            </Box>
-          </Grid>
+          </Box>
+        </Grid>
 
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ width: "100%" }}>
-              <Typography variant="body1" sx={{ fontSize: "14px", color: "#000000" }}>End Date</Typography>
+        <Grid item xs={12} sm={6}>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "14px", color: "#000000" }}
+            >
+              End Date
+            </Typography>
             <PrimeCalendar
               id="end"
               value={event.end}
@@ -117,14 +128,19 @@ const CreateEventModal = ({ open, handleClose }) => {
               showSeconds={false}
               placeholder="Select end date and time"
               required
-            />  
-            </Box>
-          </Grid>
+            />
+          </Box>
+        </Grid>
 
-          <Grid item xs={12}>
-            <Box sx={{ width: "100%" }}> 
-            <Typography variant="body1" sx={{fontSize: "14px", color: "#000000" }}>Location *</Typography>
-          <Dropdown
+        <Grid item xs={12}>
+          <Box sx={{ width: "100%" }}>
+            <Typography
+              variant="body1"
+              sx={{ fontSize: "14px", color: "#000000" }}
+            >
+              Location *
+            </Typography>
+            <Dropdown
               id="location"
               value={event.location}
               options={locationOptions}
@@ -132,9 +148,9 @@ const CreateEventModal = ({ open, handleClose }) => {
               placeholder="Select location type"
               style={{ width: "100%" }}
             />
-            </Box>
-          </Grid>
+          </Box>
         </Grid>
+      </Grid>
 
       <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
         <Button onClick={handleClose} variant="outlined">

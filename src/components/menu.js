@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
-import { useUser } from "../context/userContext";
+// import { useUser } from "../context/userContext";
 import logo from "../assets/images/logo-login.png";
 // import orderLogo from "../assets/images/crew/order1.png";
 // import financeLogo from "../assets/images/crew/financeLogo.png";
@@ -29,10 +29,9 @@ import "../styles/menu.css";
 
 const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
-  const { user } = useUser();
-  const { theme, changeTheme } = useTheme();
+  const { theme } = useTheme();
   const location = useLocation();
-  const [activeItem, setActiveItem] = useState(null);
+  // const [activeItem, setActiveItem] = useState(null);
 
   const handleLogout = () => {
     confirmDialog({

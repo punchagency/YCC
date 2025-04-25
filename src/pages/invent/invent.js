@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
+// import { useNavigate } from "react-router-dom";
+
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import {
@@ -11,20 +11,20 @@ import {
   updateInventoryItem,
   deleteInventoryItem,
 } from "../../services/inventory/inventoryService";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
+// import lone from "../../assets/images/crew/lone.png";
+// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
+// import iconexpire from "../../assets/images/crew/iconexpire.png";
+// import iconcareer from "../../assets/images/crew/iconcareer.png";
+// import { Chart as ChartJS } from "chart.js/auto";
+// import { Bar, Doughnut, Line } from "react-chartjs-2";
+// import sourceData from "../../data/sourceData.json";
+// import analyticsData from "../../data/analyticsData.json";
 import sort from "../../assets/images/crew/sort.png";
 import editLogo from "../../assets/images/crew/editLogo.png";
 import deleteLogo from "../../assets/images/crew/deleteLogo.png";
-import plus from "../../assets/images/crew/plus.png";
+// import plus from "../../assets/images/crew/plus.png";
 import eyesIn from "../../assets/images/crew/eyes-in.png";
-import { ProgressSpinner } from "primereact/progressspinner";
+// import { ProgressSpinner } from "primereact/progressspinner";
 import { useTheme } from "../../context/theme/themeContext";
 import { Paginator } from "primereact/paginator";
 import { Dropdown } from "primereact/dropdown";
@@ -65,10 +65,9 @@ const InventoryTableSkeleton = () => {
 };
 
 const Invent = () => {
-  const navigate = useNavigate();
   const toast = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -110,9 +109,9 @@ const Invent = () => {
 
   // Add pagination state
   const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
+  const [rows] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [setCurrentPage] = useState(1);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Add these state variables at the top with your other state variables
@@ -174,12 +173,12 @@ const Invent = () => {
     }
   };
 
-  const goCrewDashboardPage = () => {
-    navigate("/crew/dashboard");
-  };
-  const goInventorySummaryPage = () => {
-    navigate("/crew/inventory/summary");
-  };
+  // const goCrewDashboardPage = () => {
+  //   navigate("/crew/dashboard");
+  // };
+  // const goInventorySummaryPage = () => {
+  //   navigate("/crew/inventory/summary");
+  // };
 
   // Handle window resize
   useEffect(() => {
@@ -294,7 +293,7 @@ const Invent = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProductImage(file);
-      
+
       // Create a preview URL for the selected image
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -330,7 +329,7 @@ const Invent = () => {
       formData.append("serviceArea", newItem.serviceArea);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
-      
+
       // Append the image file if one was selected
       if (productImage) {
         formData.append("inventoryImage", productImage);
@@ -338,7 +337,7 @@ const Invent = () => {
       }
 
       console.log("Submitting inventory with image:", !!productImage);
-      
+
       const result = await createInventoryData(formData);
 
       if (result.success) {
@@ -698,14 +697,14 @@ const Invent = () => {
 
   // Add this style to your component
   const dropdownStyles = {
-    border: 'none',
-    boxShadow: 'none'
+    border: "none",
+    boxShadow: "none",
   };
 
   // Add this to your component's useEffect
   useEffect(() => {
     // Add custom styles to remove borders from dropdown
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .no-border-dropdown .p-dropdown {
         border: none !important;
@@ -729,7 +728,7 @@ const Invent = () => {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -739,9 +738,7 @@ const Invent = () => {
     <>
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
-        style={{
-          
-        }}
+        style={{}}
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
@@ -1395,15 +1392,15 @@ const Invent = () => {
             <div style={{ marginTop: "8px" }}>
               {imagePreview && (
                 <div style={{ marginBottom: "10px" }}>
-                  <img 
-                    src={imagePreview} 
-                    alt="Product preview" 
-                    style={{ 
-                      maxWidth: "100%", 
-                      maxHeight: "200px", 
+                  <img
+                    src={imagePreview}
+                    alt="Product preview"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "200px",
                       borderRadius: "4px",
-                      border: "1px solid #ced4da"
-                    }} 
+                      border: "1px solid #ced4da",
+                    }}
                   />
                   <Button
                     icon="pi pi-times"
@@ -1540,42 +1537,59 @@ const Invent = () => {
       >
         <div className="view-form">
           {/* Product Image and Name Section */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '12px',
-            marginBottom: '24px',
-            padding: '12px',
-            backgroundColor: '#F9FAFB',
-            borderRadius: '8px'
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "24px",
+              padding: "12px",
+              backgroundColor: "#F9FAFB",
+              borderRadius: "8px",
+            }}
+          >
             {viewItem.productImage ? (
-              <img 
-                src={viewItem.productImage} 
+              <img
+                src={viewItem.productImage}
                 alt={viewItem.productName}
                 style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '4px',
-                  objectFit: 'cover'
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "4px",
+                  objectFit: "cover",
                 }}
               />
             ) : (
-              <div style={{
-                width: '80px',
-                height: '80px',
-                borderRadius: '4px',
-                backgroundColor: '#E5E7EB',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <i className="pi pi-image" style={{ fontSize: '24px', color: '#9CA3AF' }}></i>
+              <div
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  borderRadius: "4px",
+                  backgroundColor: "#E5E7EB",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <i
+                  className="pi pi-image"
+                  style={{ fontSize: "24px", color: "#9CA3AF" }}
+                ></i>
               </div>
             )}
             <div>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>{viewItem.productName}</h3>
-              <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#6B7280' }}>{viewItem.category}</p>
+              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600" }}>
+                {viewItem.productName}
+              </h3>
+              <p
+                style={{
+                  margin: "4px 0 0 0",
+                  fontSize: "14px",
+                  color: "#6B7280",
+                }}
+              >
+                {viewItem.category}
+              </p>
             </div>
           </div>
 

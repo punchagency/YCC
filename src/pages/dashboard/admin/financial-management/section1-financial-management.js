@@ -9,10 +9,10 @@ import { useTheme as useMuiTheme } from "@mui/material/styles";
 import icon1 from "../../../../assets/images/icons/financial-management/Icon1.png";
 import icon2 from "../../../../assets/images/icons/financial-management/Icon2.png";
 import icon3 from "../../../../assets/images/icons/financial-management/Icon3.png";
-import { useTheme } from "../../../../context/theme/themeContext";
+// import { useTheme } from "../../../../context/theme/themeContext";
 
 const Section1FinancialManagement = ({ metrics, loading }) => {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));

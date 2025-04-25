@@ -1,5 +1,4 @@
 import { Box, Typography, styled, Grid } from "@mui/material";
-import BookingCalenderCard from "./booking-calender-card";
 import BookingSummaryInfoCard from "./booking-summary-info-card";
 import { useTheme } from "../../context/theme/themeContext";
 import UpdatedCalendar from "./updated-calendar";

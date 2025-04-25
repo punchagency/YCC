@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
+
 import manprofile from "../../assets/images/crew/manprofile.png";
 import "./profile.css";
 
 const CrewSetting = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData] = useState({
     name: "Alex",
     email: "Alexseiger@Gmail.Com",
     location: "Your Location Here",

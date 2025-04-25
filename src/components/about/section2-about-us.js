@@ -3,8 +3,6 @@ import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/ma
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import chefGalleryIcon from '../../assets/images/icons/home-page-chef.png'
-import interiorIcon from '../../assets/images/icons/home-page-interior.png'
 import { GradientText } from '../home/section1-home'
 import { ButtonTypography, linearGradient } from '../landing-page-header'
 

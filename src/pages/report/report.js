@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
-import { InputText } from "primereact/inputtext";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
-import sort from "../../assets/images/crew/sort.png";
+// import { useNavigate } from "react-router-dom";
+// import { TabView, TabPanel } from "primereact/tabview";
+// import { InputText } from "primereact/inputtext";
+// import lone from "../../assets/images/crew/lone.png";
+// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
+// import iconexpire from "../../assets/images/crew/iconexpire.png";
+// import iconcareer from "../../assets/images/crew/iconcareer.png";
+// import { Chart as ChartJS } from "chart.js/auto";
+import { Bar, Line } from "react-chartjs-2";
+// import sourceData from "../../data/sourceData.json";
+// import analyticsData from "../../data/analyticsData.json";
+// import sort from "../../assets/images/crew/sort.png";
 import lockLogo from "../../assets/images/crew/lockLogo.png";
 import dropdown from "../../assets/images/crew/dropdown.png";
-import cart from "../../assets/images/crew/cart.png";
-import iconcontainer from "../../assets/images/crew/iconContainer.png";
-import neworder from "../../assets/images/crew/neworder.png";
-import doctor from "../../assets/images/crew/doctor.png";
-import wavyline from "../../assets/images/crew/wavyline.png";
-import wavyback from "../../assets/images/crew/wavyback.png";
+// import cart from "../../assets/images/crew/cart.png";
+// import iconcontainer from "../../assets/images/crew/iconContainer.png";
+// import neworder from "../../assets/images/crew/neworder.png";
+// import doctor from "../../assets/images/crew/doctor.png";
+// import wavyline from "../../assets/images/crew/wavyline.png";
+// import wavyback from "../../assets/images/crew/wavyback.png";
 import profileReport from "../../assets/images/crew/profile-report.png";
-import profileReport2 from "../../assets/images/crew/profile-report2.png";
+// import profileReport2 from "../../assets/images/crew/profile-report2.png";
 import sortIcon from "../../assets/images/crew/sort.png";
 import {
   getInventoryHealthReport,
@@ -30,14 +30,41 @@ import {
   getSystemMetrics,
 } from "../../services/reports/reports";
 
+// Import and register Chart.js components
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+
+// Register the components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
 const Reports = () => {
-  const navigate = useNavigate();
-  const goCrewDashboardPage = () => {
-    navigate("/crew/dashboard");
-  };
-  const goInventorySummaryPage = () => {
-    navigate("/crew/inventory/summary");
-  };
+  // const navigate = useNavigate();
+  // const goCrewDashboardPage = () => {
+  //   navigate("/crew/dashboard");
+  // };
+  // const goInventorySummaryPage = () => {
+  //   navigate("/crew/inventory/summary");
+  // };
 
   const [activityData, setActivityData] = useState({
     labels: [],
@@ -71,10 +98,29 @@ const Reports = () => {
 
   const [systemMetrics, setSystemMetrics] = useState([]);
 
+  // Add refs for your charts
+  const barChartRef = useRef(null);
+  const lineChartRefs = useRef([]);
+
   useEffect(() => {
     fetchHealthReports();
     fetchSystemActivity();
     fetchSystemMetrics();
+
+    // Copy refs to local variables for proper cleanup
+    const currentBarChart = barChartRef.current;
+    const currentLineCharts = [...lineChartRefs.current];
+
+    // Cleanup function to destroy charts when component unmounts
+    return () => {
+      if (currentBarChart) {
+        currentBarChart.destroy();
+      }
+
+      currentLineCharts.forEach((chart) => {
+        if (chart) chart.destroy();
+      });
+    };
   }, []);
 
   const fetchHealthReports = async () => {
@@ -407,7 +453,7 @@ const Reports = () => {
         </div>
         <div className="report-container-bar-graph" style={{ width: "33%" }}>
           <div style={{ width: "100%", height: "100%", padding: "10px" }}>
-            <Bar data={activityData} options={chartOptions} />
+            <Bar data={activityData} options={chartOptions} ref={barChartRef} />
           </div>
         </div>
 
@@ -441,35 +487,10 @@ const Reports = () => {
               >
                 <Line
                   data={sparklineData}
-                  options={{
-                    ...sparklineOptions,
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        enabled: false,
-                      },
-                    },
-                    scales: {
-                      x: {
-                        display: false,
-                        grid: {
-                          display: false,
-                        },
-                      },
-                      y: {
-                        display: false,
-                        grid: {
-                          display: false,
-                        },
-                      },
-                    },
+                  options={sparklineOptions}
+                  ref={(el) => {
+                    if (el) lineChartRefs.current[index] = el;
                   }}
-                  height={30}
-                  width={100}
                 />
               </div>
             </div>

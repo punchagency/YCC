@@ -37,11 +37,10 @@ const formattedCountries = countryData.map((country) => ({
 const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [phone, setPhone] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [selectedCommunication, setSelectedCommunication] = useState(null);
+  const [setSelectedCommunication] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
-  const [noResults, setNoResults] = useState(false);
-  // Add to your existing state
+  const [setNoResults] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +53,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
-  // Automatically remove the error after 5s
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -71,11 +69,11 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
 
     setSuccess(true);
-    setIsSubmitting(true); // Start loading
+    setIsSubmitting(true);
 
     try {
-      await handleSubmit(); // Wait for signup completion
-      setSuccess(false); // Remove success box after successful sign-up
+      await handleSubmit();
+      setSuccess(false);
     } catch (err) {
       setError("Signup failed. Please try again.");
       setSuccess(false);
@@ -89,11 +87,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     setError(null);
 
     try {
-      // Create FormData object
-
       const formDataObj = new FormData();
 
-      // Add all form fields
       formDataObj.append("email", formData.email);
       formDataObj.append("password", formData.password);
       formDataObj.append("confirmPassword", formData.confirmPassword);
@@ -112,11 +107,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           "email",
         position: formData.position?.value || "",
         yearsOfExperience: formData.yearsOfExperience?.value || "",
-        // location: formData.location || "",
         certifications: formData.certification ? [formData.certification] : [],
-        // certificationFiles: [],
-        // cv: null,
-        // profilePicture: null,
       };
 
       console.log(
@@ -170,12 +161,9 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         throw new Error("Position and years of experience are required");
       }
 
-      // Call signup service
       const response = await signup(formDataObj);
 
-      // Handle successful signup
       if (response.status === "success") {
-        // Redirect to success page or dashboard
         navigate("/crew/inventory/dashboard");
       }
     } catch (err) {
@@ -186,11 +174,9 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
   };
 
-  // Add this function to handle file selection
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file type
       setIsProfileUploading(true);
       try {
         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -207,28 +193,20 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         return;
       }
 
-      // Check file size (e.g., max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         alert("File size should not exceed 5MB");
         return;
       }
 
-      // Replace any existing file with the new one
       setSelectedFiles([file]);
     }
   };
 
-  // Add this function to remove files
-  const removeFile = () => {
-    setSelectedFiles([]);
-  };
-
   const triggerFileInput = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
+    e.stopPropagation();
     fileInputRef.current.click();
   };
 
-  // Handle search input
   const handleCertificationSearch = (searchTerm) => {
     handleInputChange("certification", searchTerm);
 
@@ -248,7 +226,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       setShowResults(true);
     } else {
       setNoResults(false);
-      setSearchResults(filteredResults.slice(0, 20)); // Limit to 20 results
+      setSearchResults(filteredResults.slice(0, 20));
       setShowResults(true);
     }
   };
@@ -271,8 +249,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     },
   ];
 
-  // Handle input changes
-  // Update the handleInputChange function
   const handleInputChange = (name, value) => {
     setFormData({
       [name]: value,
@@ -357,38 +333,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     setStep(currentStep - 1);
   };
 
-  // Add this function to handle file validation if needed
-  const handleFileUpload = (file) => {
-    // Check file size (e.g., max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      alert("File is too large. Maximum size is 5MB");
-      return;
-    }
-
-    // Check file type
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/jpeg",
-      "image/png",
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      alert(
-        "Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG files"
-      );
-      return;
-    }
-
-    handleInputChange("certificationFile", file);
-  };
-
-  // Add these at the top with your other state declarations
-  const [selectedCV, setSelectedCV] = useState(null);
-  const cvFileInputRef = useRef(null);
-
-  // Add these handler functions
   const handleCVSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -406,7 +350,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   };
 
   const validateAndSetCV = (file) => {
-    // Check file type
     const validTypes = [
       "application/pdf",
       "application/msword",
@@ -418,7 +361,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       return;
     }
 
-    // Check file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
       alert("File size should not exceed 10MB");
       return;
@@ -456,11 +398,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     cvFileInputRef.current.click();
   };
 
-  const removeCV = () => {
-    setSelectedCV(null);
-  };
-
-  // Add these state declarations
+  const [selectedCV, setSelectedCV] = useState(null);
+  const cvFileInputRef = useRef(null);
 
   return (
     <div className="form-container">
@@ -493,6 +432,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   <div className="inputBorder">
                     <img
                       src={inputLogo}
+                      alt="Name input icon"
                       style={{ width: "12px", height: "12px" }}
                     />
                     <input
@@ -514,6 +454,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   <div className="inputBorder">
                     <img
                       src={inputLogo}
+                      alt="Name input icon"
                       style={{ width: "12px", height: "12px" }}
                     />
                     <input
@@ -538,6 +479,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   <div className="inputBorder">
                     <img
                       src={emailLogo}
+                      alt="Email icon"
                       style={{ width: "12px", height: "12px" }}
                     />
                     <input
@@ -608,17 +550,16 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         }),
                         menu: (provided) => ({
                           ...provided,
-                          width: "300%", // Match control width
-                          zIndex: 999, // Ensure dropdown appears above other elements
+                          width: "300%",
+                          zIndex: 999,
                         }),
                         menuList: (provided) => ({
                           ...provided,
-                          maxHeight: "300px", // Optional: control the height of the dropdown
+                          maxHeight: "300px",
                           "&::-webkit-scrollbar": {
-                            // For Chrome, Safari, and newer versions of Edge
                             display: "none",
                           },
-                          scrollbarWidth: "none", // For Firefox
+                          scrollbarWidth: "none",
                           msOverflowStyle: "none",
                         }),
                         dropdownIndicator: (provided) => ({
@@ -634,8 +575,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         }),
                       }}
                       components={{
-                        DropdownIndicator: () => null, // Alternative way to remove the dropdown arrow
-                        IndicatorSeparator: () => null, // This removes the separator line
+                        DropdownIndicator: () => null,
+                        IndicatorSeparator: () => null,
                       }}
                       value={selectedCountry}
                       onChange={handleChange}
@@ -675,12 +616,12 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           border: "none",
                           boxShadow: "none",
                           width: "310%",
-                          minWidth: "310%", // Add minimum width
+                          minWidth: "310%",
                         }),
                         menu: (provided) => ({
                           ...provided,
                           width: "310%",
-                          minWidth: "310%", // Add minimum width
+                          minWidth: "310%",
                           zIndex: 999,
                         }),
                         menuList: (provided) => ({
@@ -694,23 +635,23 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           display: "flex",
                           alignItems: "center",
                           width: "100%",
-                          whiteSpace: "nowrap", // Prevent text wrapping
+                          whiteSpace: "nowrap",
                         }),
                         option: (provided) => ({
                           ...provided,
                           display: "flex",
                           alignItems: "center",
-                          whiteSpace: "nowrap", // Prevent text wrapping
+                          whiteSpace: "nowrap",
                         }),
                         valueContainer: (provided) => ({
                           ...provided,
                           width: "310%",
-                          minWidth: "310%", // Add minimum width
+                          minWidth: "310%",
                         }),
                         container: (provided) => ({
                           ...provided,
                           width: "310%",
-                          minWidth: "310%", // Add minimum width
+                          minWidth: "310%",
                         }),
                         dropdownIndicator: () => null,
                       }}
@@ -723,8 +664,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            width: "100%", // Ensure full width
-                            minWidth: "100%", // Add minimum width
+                            width: "100%",
+                            minWidth: "100%",
                           }}
                         >
                           <img
@@ -747,18 +688,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              <div className="form-group5">
-                {/* <div>
-                  <input type="checkbox" />
-                </div>
-                <div>
-                  <p>
-                    By creating an account, you agree to the
-                    <a href=""> Terms of Service.</a>
-                    We'll occasionally send you account-related emails.
-                  </p>
-                </div> */}
-              </div>
+              <div className="form-group5"></div>
 
               <div className="form-group6">
                 <button className="nextbtn" onClick={handleNext}>
@@ -961,29 +891,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              {/* <div className="form-group1">
-                <div
-                  className="map-container"
-                  style={{
-                    width: "100%",
-                    height: "200px",
-                    marginTop: "10px",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                  }}
-                >
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387193.30596073366!2d-74.25986548248684!3d40.69714941932609!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sNew%20York%2C%20NY%2C%20USA!5e0!3m2!1sen!2s!4v1647043099075!5w200"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
-                </div>
-              </div> */}
-
               <div className="form-group6">
                 <button className="prevbtn" onClick={handlePrevious}>
                   Previous
@@ -1008,9 +915,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             }}
           >
             <div className="step3">
-              <h2></h2>
-              {/* Add your final step form fields here */}
-
               <div className="form-group1">
                 <div className="input-field" style={{ width: "100%" }}>
                   <div>
@@ -1080,7 +984,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       />
                     </div>
 
-                    {/* Search Results Dropdown */}
                     {showResults && searchResults.length > 0 && (
                       <div
                         style={{
@@ -1096,10 +999,9 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           overflowY: "auto",
                           zIndex: 1000,
                           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                          msOverflowStyle: "none", // IE and Edge
-                          scrollbarWidth: "none", // Firefox
+                          msOverflowStyle: "none",
+                          scrollbarWidth: "none",
                           "&::-webkit-scrollbar": {
-                            // Chrome, Safari and Opera
                             display: "none",
                           },
                         }}
@@ -1138,7 +1040,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   </div>
                 </div>
 
-                {/* Display selected file name if any */}
                 {formData.certificationFile && (
                   <div
                     style={{
@@ -1200,7 +1101,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileSelect}
-                  accept=".jpg,.jpeg,.png,.svg" // Only allow these file types
+                  accept=".jpg,.jpeg,.png,.svg"
                   className="hidden-file-input"
                 />
 
@@ -1248,6 +1149,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           src={profileLogo}
                           className="profileLogo"
                           style={{ width: "35px", height: "35px" }}
+                          alt="profile"
                         />
                       )}
                       <p
@@ -1284,7 +1186,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   className="cv-upload-box"
                   onDragOver={handleDragOver}
                   onDrop={handleCVDrop}
-                  onClick={triggerCVInput} // Add onClick to the entire box
+                  onClick={triggerCVInput}
                   style={{
                     cursor: "pointer",
                     lineHeight: "-30px",
@@ -1304,6 +1206,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <img
                       src={cvUploadLogo}
                       style={{ width: "40px", height: "40px" }}
+                      alt="cv"
                     />
                   )}
                   <input
@@ -1312,7 +1215,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     onChange={handleCVSelect}
                     accept=".pdf,.doc,.docx"
                     className="hidden-file-input"
-                    style={{ display: "none" }} // Hide the input but keep it inside for functionality
+                    style={{ display: "none" }}
                   />
 
                   <div className="upload-content">
@@ -1396,8 +1299,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </motion.div>
         )}
 
-        {/* password */}
-
         {currentStep === 5 && (
           <motion.div
             key="step5"
@@ -1407,7 +1308,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="form-groupPass">
-              {/* Password Input */}
               <div>
                 <label htmlFor="password">Password</label>
                 <div style={{ position: "relative" }}>
@@ -1435,7 +1335,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              {/* Confirm Password Input */}
               <div>
                 <label htmlFor="confirmPassword">Confirm Password</label>
                 <div style={{ position: "relative" }}>
@@ -1463,7 +1362,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              {/* Terms and Conditions */}
               <div className="form-group5">
                 <input
                   type="checkbox"
@@ -1473,12 +1371,13 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 />
                 <label htmlFor="acceptTerms">
                   By creating an account, you agree to the
-                  <a href=""> Terms of Service.</a>
+                  <a href="/privacy-policy" aria-label="Privacy Policy">
+                    Privacy Policy
+                  </a>
                   We'll occasionally send you account-related emails.
                 </label>
               </div>
 
-              {/* Button Group */}
               <div className="button-group">
                 <button
                   className="prev-button"
@@ -1504,7 +1403,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </button>
               </div>
 
-              {/* Animated Error Message */}
               <AnimatePresence>
                 {error && (
                   <motion.div
@@ -1530,7 +1428,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 )}
               </AnimatePresence>
 
-              {/* Animated Success Message with Loader */}
               <AnimatePresence>
                 {success && (
                   <motion.div
@@ -1560,7 +1457,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 )}
               </AnimatePresence>
 
-              {/* CSS for loader animation */}
               <style>
                 {`
               .loader {

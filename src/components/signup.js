@@ -27,7 +27,7 @@ const SignupForm = () => {
    
 
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [setLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');

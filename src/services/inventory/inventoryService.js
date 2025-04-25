@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useUser } from "../../context/userContext"; // Import at the top level
+// import { useUser } from "../../context/userContext"; // Import at the top level
 
 // Use the base API URL, not the auth URL
 const API_URL = process.env.REACT_APP_API_URL;
@@ -11,41 +11,41 @@ const getAuthHeader = () => {
 };
 
 // Get user ID from localStorage with debugging
-const getUserId = () => {
-  try {
-    // Log all localStorage keys to see what's available
-    console.log("All localStorage keys:");
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      console.log(`${key}: ${localStorage.getItem(key)}`);
-    }
+// const getUserId = () => {
+//   try {
+//     // Log all localStorage keys to see what's available
+//     console.log("All localStorage keys:");
+//     for (let i = 0; i < localStorage.length; i++) {
+//       const key = localStorage.key(i);
+//       console.log(`${key}: ${localStorage.getItem(key)}`);
+//     }
 
-    const id = localStorage.getItem("id");
-    console.log("ID from localStorage:", id);
+//     const id = localStorage.getItem("id");
+//     console.log("ID from localStorage:", id);
 
-    // Try other possible keys
-    const userId = localStorage.getItem("userId");
-    console.log("userId from localStorage:", userId);
+//     // Try other possible keys
+//     const userId = localStorage.getItem("userId");
+//     console.log("userId from localStorage:", userId);
 
-    const userStr = localStorage.getItem("user");
-    console.log("user string from localStorage:", userStr);
+//     const userStr = localStorage.getItem("user");
+//     console.log("user string from localStorage:", userStr);
 
-    try {
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        console.log("Parsed user object:", user);
-        if (user && user.id) return user.id;
-      }
-    } catch (e) {
-      console.error("Error parsing user JSON:", e);
-    }
+//     try {
+//       if (userStr) {
+//         const user = JSON.parse(userStr);
+//         console.log("Parsed user object:", user);
+//         if (user && user.id) return user.id;
+//       }
+//     } catch (e) {
+//       console.error("Error parsing user JSON:", e);
+//     }
 
-    return id || userId || null;
-  } catch (error) {
-    console.error("Error getting user ID from localStorage:", error);
-    return null;
-  }
-};
+//     return id || userId || null;
+//   } catch (error) {
+//     console.error("Error getting user ID from localStorage:", error);
+//     return null;
+//   }
+// };
 
 export const createInventoryData = async (inventoryData) => {
   try {

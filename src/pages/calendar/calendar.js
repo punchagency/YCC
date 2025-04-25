@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
+// import { useNavigate } from "react-router-dom";
+// import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
-import sort from "../../assets/images/crew/sort.png";
-import editLogo from "../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../assets/images/crew/deleteLogo.png";
+// import lone from "../../assets/images/crew/lone.png";
+// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
+// import iconexpire from "../../assets/images/crew/iconexpire.png";
+// import iconcareer from "../../assets/images/crew/iconcareer.png";
+// import { Chart as ChartJS } from "chart.js/auto";
+// import { Bar, Doughnut, Line } from "react-chartjs-2";
+// import sourceData from "../../data/sourceData.json";
+// import analyticsData from "../../data/analyticsData.json";
+// import sort from "../../assets/images/crew/sort.png";
+// import editLogo from "../../assets/images/crew/editLogo.png";
+// import deleteLogo from "../../assets/images/crew/deleteLogo.png";
 import plus from "../../assets/images/crew/plus.png";
 import profilenoti from "../../assets/images/crew/profilenoti.png";
-import man1 from "../../assets/images/crew/Man1.png";
+// import man1 from "../../assets/images/crew/Man1.png";
 import { Calendar as PrimeCalendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -33,7 +33,7 @@ import {
 } from "../../services/calendar/calendarService";
 import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
-import more from "../../assets/images/crew/more.png";
+// import more from "../../assets/images/crew/more.png";
 
 const EventCard = ({
   title,
@@ -682,7 +682,7 @@ export default function CalendarPage() {
   const [showAddGuestModal, setShowAddGuestModal] = useState(false);
   const [guestEmails, setGuestEmails] = useState([""]);
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     setIsLoading(true);
     try {
       const firstDay = new Date(
@@ -722,12 +722,12 @@ export default function CalendarPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentDate]);
 
   useEffect(() => {
     console.log("currentDate", currentDate);
     loadEvents();
-  }, [currentDate]);
+  }, [currentDate, loadEvents]);
 
   // Handle window resize
   useEffect(() => {
@@ -1478,10 +1478,10 @@ export default function CalendarPage() {
                       cursor: "pointer",
                       border:
                         day === selectedDay ? "1px solid #0387D9" : "none",
-                      backgroundColor:
-                        day === selectedDay
-                          ? "rgba(3, 135, 217, 0.1)"
-                          : "white",
+                      // backgroundColor:
+                      //   day === selectedDay
+                      //     ? "rgba(3, 135, 217, 0.1)"
+                      //     : "white",
                       fontSize: isMobile ? "11px" : "inherit",
                       overflow: "hidden",
                     }}
