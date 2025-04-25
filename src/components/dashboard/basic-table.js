@@ -42,24 +42,15 @@ const StyledTableRow = styled(TableRow)(({ mode }) => ({
   },
 }));
 
-function createData(orderId, customer, status, amount, date) {
-  return { orderId, customer, status, amount, date };
-}
-
-const rows = [
-  createData("#10234", "John Doe", "In Progress", 100.0, "2021-01-01"),
-  createData("#10235", "John Doe", "Completed", 100.0, "2021-01-01"),
-  createData("#10236", "John Doe", "Pending", 1200.0, "2021-01-01"),
-  createData("#10237", "John Doe", "In Progress", 180.0, "2021-01-01"),
-  createData("#10238", "John Doe", "In Progress", 12280.0, "2021-01-01"),
-];
+// function createData(orderId, customer, status, amount, date) {
+//   return { orderId, customer, status, amount, date };
+// }
 
 const statusColors = {
   in_progress: { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
   completed: { backgroundColor: "#5570F11A", color: "#3D56D8" },
   pending: { backgroundColor: "#FFF3E4", color: "#896942" },
 };
-
 
 export default function BasicTable({ orders }) {
   const { theme } = useTheme();

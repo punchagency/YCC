@@ -1,13 +1,12 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import backgroundImage from "../../assets/images/captain_login_bg.jpg";
 import logo from "../../assets/images/logo-login.png";
 import SignupForm from "../../components/signup";
 
 const Signup = () => {
   const title = "Explore the story behind Yacht Crew Center's journey.";
-  const location = useLocation();
-  const role = location.state?.role || "Guest";
+  // const role = location.state?.role || "Guest";
   return (
     <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login">
       <div
@@ -44,7 +43,10 @@ const Signup = () => {
               Already a member? <Link to="/login">Sign in!</Link>
             </p>
           </div>
-          <div className="login-form captain-login-form">
+          <div
+            className="login-form captain-login-form"
+            style={{ backgroundColor: "blue", height: "900px" }}
+          >
             <SignupForm />
           </div>
         </div>

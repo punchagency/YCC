@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import PhoneInput from "react-phone-input-2";
+// import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import inputLogo from "../assets/images/nameinput.png";
 import emailLogo from "../assets/images/emailinput.png";
@@ -15,19 +15,102 @@ import { signup } from "../services/authService";
 import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 
-const supplierTypeOptions = [
-  { value: "Food Provisions", label: "Food Provisions" },
-  { value: "Marine Equipment", label: "Marine Equipment" },
-  { value: "Cleaning Supplies", label: "Cleaning Supplies" },
-  { value: "Fuel", label: "Fuel" },
-];
+// Replace the static supplierTypeOptions with a mapping of departments to their options
+const departmentSupplierTypes = {
+  captain: [
+    { value: "Nautical Charts", label: "Nautical Charts" },
+    {
+      value: "Logbooks & Bridge Stationery",
+      label: "Logbooks & Bridge Stationery",
+    },
+    { value: "Navigation Tools", label: "Navigation Tools" },
+    { value: "Safety Signs & Notices", label: "Safety Signs & Notices" },
+    { value: "Admin Supplies", label: "Admin Supplies" },
+    { value: "Bridge Electronics", label: "Bridge Electronics" },
+    {
+      value: "Medical Kits & First Aid Supplies",
+      label: "Medical Kits & First Aid Supplies",
+    },
+  ],
+  exterior: [
+    { value: "Cleaning Products", label: "Cleaning Products" },
+    { value: "Wax & Polishes", label: "Wax & Polishes" },
+    {
+      value: "Buckets, Brushes, Mops & Handles",
+      label: "Buckets, Brushes, Mops & Handles",
+    },
+    { value: "Chamois & Microfibers", label: "Chamois & Microfibers" },
+    { value: "Ropes & Lines", label: "Ropes & Lines" },
+    { value: "Fenders & Covers", label: "Fenders & Covers" },
+    { value: "Watersports Accessories", label: "Watersports Accessories" },
+    { value: "Safety Gear", label: "Safety Gear" },
+  ],
+  engineering: [
+    { value: "Engine Oils & Lubricants", label: "Engine Oils & Lubricants" },
+    { value: "Filters", label: "Filters" },
+    {
+      value: "Belts, Gaskets & Engine Spares",
+      label: "Belts, Gaskets & Engine Spares",
+    },
+    { value: "Tools", label: "Tools" },
+    {
+      value: "Electrical Fuses, Wiring & Connectors",
+      label: "Electrical Fuses, Wiring & Connectors",
+    },
+    { value: "Batteries", label: "Batteries" },
+    { value: "HVAC Components", label: "HVAC Components" },
+    {
+      value: "Watermaker Filters & Parts",
+      label: "Watermaker Filters & Parts",
+    },
+  ],
+  interior: [
+    {
+      value: "Interior-Safe Cleaning Products",
+      label: "Interior-Safe Cleaning Products",
+    },
+    { value: "Glass & Mirror Cleaners", label: "Glass & Mirror Cleaners" },
+    {
+      value: "Fabric Sprays & Deodorizers",
+      label: "Fabric Sprays & Deodorizers",
+    },
+    { value: "Microfibers & Cloths", label: "Microfibers & Cloths" },
+    { value: "Vacuum Bags & Attachments", label: "Vacuum Bags & Attachments" },
+    { value: "Linens", label: "Linens" },
+    { value: "Guest Toiletries", label: "Guest Toiletries" },
+    { value: "Decorative Items", label: "Decorative Items" },
+  ],
+  galley: [
+    { value: "Dry Goods", label: "Dry Goods" },
+    { value: "Fresh Produce", label: "Fresh Produce" },
+    { value: "Dairy & Meats", label: "Dairy & Meats" },
+    { value: "Beverages", label: "Beverages" },
+    { value: "Specialty Diet Items", label: "Specialty Diet Items" },
+    { value: "Chef Tools", label: "Chef Tools" },
+    { value: "Kitchen Equipment", label: "Kitchen Equipment" },
+    {
+      value: "Storage Containers & Wraps",
+      label: "Storage Containers & Wraps",
+    },
+    {
+      value: "Cleaning & Sanitizing Supplies",
+      label: "Cleaning & Sanitizing Supplies",
+    },
+  ],
+  default: [
+    { value: "Food Provisions", label: "Food Provisionssss" },
+    { value: "Marine Equipment", label: "Marine Equipment" },
+    { value: "Cleaning Supplies", label: "Cleaning Supplies" },
+    { value: "Fuel", label: "Fuel" },
+  ],
+};
 
 const departmentOptions = [
-  { value: "deck", label: "Deck" },
-  { value: "engine", label: "Engine" },
+  { value: "captain", label: "Captain" },
+  { value: "exterior", label: "Exterior" },
+  { value: "engineering", label: "Engineering" },
   { value: "interior", label: "Interior" },
-  { value: "galley", label: "Galley" },
-  { value: "safety", label: "Safety" },
+  { value: "galley", label: "Galley / Chef" },
 ];
 
 const deliveryOptions = [
@@ -52,14 +135,45 @@ const SupplierSignUpForm = ({
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [fileErrors, setFileErrors] = useState({
+  const [setFileErrors] = useState({
     supplierVatTaxId: "",
     supplierLiabilityInsurance: "",
     licenseSupplierFile: "",
     spreadsheetFile: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [setSuccess] = useState(false);
+
+  // Add state to store current supplier type options
+  const [supplierTypeOptions, setSupplierTypeOptions] = useState(
+    departmentSupplierTypes.default
+  );
+
+  // Add effect to update supplier type options when department changes
+  useEffect(() => {
+    if (formData.department && formData.department.value) {
+      const departmentValue = formData.department.value;
+      if (departmentSupplierTypes[departmentValue]) {
+        setSupplierTypeOptions(departmentSupplierTypes[departmentValue]);
+
+        // Reset the selected supplier type if it's not in the new options list
+        if (formData.supplierType) {
+          const typeExists = departmentSupplierTypes[departmentValue].some(
+            (option) => option.value === formData.supplierType.value
+          );
+
+          if (!typeExists) {
+            handleInputChange("supplierType", null);
+          }
+        }
+      } else {
+        setSupplierTypeOptions(departmentSupplierTypes.default);
+      }
+    } else {
+      setSupplierTypeOptions(departmentSupplierTypes.default);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.department]); // We're disabling the lint rule to prevent excessive rerenders
 
   const handleInputChange = (name, value) => {
     setFormData({
@@ -253,6 +367,7 @@ const SupplierSignUpForm = ({
           <div className="inputBorder" style={{ border: "1px solid #DEDCDC" }}>
             <img
               src={inputLogo}
+              alt="Input icon"
               style={{
                 width: "18px",
                 height: "18px",
@@ -313,6 +428,7 @@ const SupplierSignUpForm = ({
             >
               <img
                 src={emailLogo}
+                alt="Email icon"
                 style={{
                   width: "18px",
                   height: "18px",
@@ -810,6 +926,7 @@ const SupplierSignUpForm = ({
           >
             <img
               src={emailLogo}
+              alt="Email icon"
               style={{
                 width: "18px",
                 height: "18px",
@@ -911,6 +1028,7 @@ const SupplierSignUpForm = ({
           >
             <img
               src={inputLogo}
+              alt="Input icon"
               style={{
                 width: "18px",
                 height: "18px",
@@ -1121,6 +1239,7 @@ const SupplierSignUpForm = ({
           >
             <img
               src={inputLogo}
+              alt="Input icon"
               style={{
                 width: "18px",
                 height: "18px",
@@ -1171,6 +1290,7 @@ const SupplierSignUpForm = ({
           >
             <img
               src={roleLogo}
+              alt="role"
               style={{
                 width: "18px",
                 height: "18px",

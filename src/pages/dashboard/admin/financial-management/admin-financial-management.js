@@ -3,11 +3,11 @@ import DashboardTitleBar from "../../../../components/dashboard/title-bar";
 import Section1FinancialManagement from "./section1-financial-management";
 import Section2FinancialManagement from "./section2-financial-management";
 import Section3FinancialManagement from "./section3-financial-management";
-import { useTheme } from "../../../../context/theme/themeContext";
+
 import { useTransaction } from "../../../../context/transaction/transactionContext";
 import { useEffect, useState } from "react";
 const AdminFinancialManagement = () => {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const { transactions, metrics, getTransactions, totalPages, totalItems } =
     useTransaction();
   const [search, setSearch] = useState("");
@@ -23,7 +23,7 @@ const AdminFinancialManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [limit, page, transactionStatus, search]);
+  }, [limit, page, transactionStatus, search, getTransactions]);
 
   return (
     <Box

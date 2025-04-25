@@ -1,38 +1,38 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 // import { Toast } from "primereact/toast";
-import { SwitchTransition, CSSTransition } from "react-transition-group";
+// import { SwitchTransition, CSSTransition } from "react-transition-group";
 import lockLogo from "../../assets/images/crew/lockLogo.png";
 import dropdown from "../../assets/images/crew/dropdown.png";
 import cart from "../../assets/images/crew/cart.png";
-import iconContainer from "../../assets/images/crew/iconContainer.png";
+// import iconContainer from "../../assets/images/crew/iconContainer.png";
 import neworder from "../../assets/images/crew/neworder.png";
 import "./order.css"; // We'll create this CSS file for transitions
-import { getInventoryData } from "../../services/inventory/inventoryService"; // Add this import
+// import { getInventoryData } from "../../services/inventory/inventoryService";
 import {
   createOrder,
   getOrders,
   deleteOrder,
   bulkDeleteOrders,
 } from "../../services/order/orderService"; // Add this import
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+// import { DataTable } from "primereact/datatable";
+// import { Column } from "primereact/column";
 import { formatCurrency, formatDate } from "../../utils/formatters";
 import { useToast } from "../../components/Toast";
-import { TableSkeleton } from "../../components/TableSkeleton"; // Add this import
+// import { TableSkeleton } from "../../components/TableSkeleton"; // Add this import
 import { useTheme } from "../../context/theme/themeContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
-import { Skeleton } from "primereact/skeleton";
+// import { Skeleton } from "primereact/skeleton";
 
 const Order = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
-  const [showOrderForm, setShowOrderForm] = useState(false);
+  const [setShowOrderForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -55,11 +55,11 @@ const Order = () => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  let allSuppliersMap = new Map();
-  let allProductsMap = new Map();
+  // let allSuppliersMap = new Map();
+  // let allProductsMap = new Map();
 
-  let allSupplierOptions = [];
-  let allProductOptions = [];
+  // let allSupplierOptions = [];
+  // let allProductOptions = [];
 
   // Add back the status options
   const statusOptions = [
@@ -89,19 +89,6 @@ const Order = () => {
   });
 
   const runCount = useRef(0);
-
-  // Add useEffect to fetch inventory data when component mounts
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
-      await fetchOrders(); // if needed
-    };
-
-    if (runCount.current < 1) {
-      runCount.current += 1;
-      fetchData();
-    }
-  }, []);
 
   useEffect(() => {
     if (!allInventoryItems || allInventoryItems.length === 0) return;
@@ -142,10 +129,11 @@ const Order = () => {
         setSelectedSupplier(match.supplier._id);
       }
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, allInventoryItems]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setOrderForm({
       ...orderForm,
       [name]: value,
@@ -157,6 +145,9 @@ const Order = () => {
       const selectedProduct = productOptions.find((p) => p.value === e.value);
       setOrderForm({
         ...orderForm,
+        allInventoryItems: allInventoryItems.find(
+          (item) => item.product?._id === e.value
+        ),
         products: [
           {
             id: selectedProduct.productId, // Use the product ID instead of inventory ID
@@ -252,13 +243,13 @@ const Order = () => {
     }
   };
 
-  const goCrewDashboardPage = () => {
-    navigate("/crew/dashboard");
-  };
+  // const goCrewDashboardPage = () => {
+  //   navigate("/crew/dashboard");
+  // };
 
-  const goInventorySummaryPage = () => {
-    navigate("/crew/inventory/summary");
-  };
+  // const goInventorySummaryPage = () => {
+  //   navigate("/crew/inventory/summary");
+  // };
 
   // Render mobile summary boxes
   const renderMobileSummaryBoxes = () => {
@@ -603,37 +594,37 @@ const Order = () => {
   // end of mobile view
 
   // Add functions to handle multiple products
-  const handleProductChange = (index, field, value) => {
-    const updatedProducts = [...orderForm.products];
-    updatedProducts[index][field] =
-      field === "quantity" ? parseInt(value) : value;
+  // const handleProductChange = (index, field, value) => {
+  //   const updatedProducts = [...orderForm.products];
+  //   updatedProducts[index][field] =
+  //     field === "quantity" ? parseInt(value) : value;
 
-    setOrderForm({
-      ...orderForm,
-      products: updatedProducts,
-    });
-  };
+  //   setOrderForm({
+  //     ...orderForm,
+  //     products: updatedProducts,
+  //   });
+  // };
 
   // Add function to add more products
-  const addProduct = () => {
-    setOrderForm({
-      ...orderForm,
-      products: [...orderForm.products, { id: null, quantity: 1 }],
-    });
-  };
+  // const addProduct = () => {
+  //   setOrderForm({
+  //     ...orderForm,
+  //     products: [...orderForm.products, { id: null, quantity: 1 }],
+  //   });
+  // };
 
   // Add function to remove products
-  const removeProduct = (index) => {
-    if (orderForm.products.length > 1) {
-      const updatedProducts = orderForm.products.filter((_, i) => i !== index);
-      setOrderForm({
-        ...orderForm,
-        products: updatedProducts,
-      });
-    }
-  };
+  // const removeProduct = (index) => {
+  //   if (orderForm.products.length > 1) {
+  //     const updatedProducts = orderForm.products.filter((_, i) => i !== index);
+  //     setOrderForm({
+  //       ...orderForm,
+  //       products: updatedProducts,
+  //     });
+  //   }
+  // };
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const response = await getOrders();
       if (response.success) {
@@ -645,7 +636,7 @@ const Order = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const calculateSummary = (orders) => {
     const summary = orders.reduce(
@@ -666,25 +657,38 @@ const Order = () => {
     setSummaryData(summary);
   };
 
-  const statusBodyTemplate = (rowData) => {
-    return (
-      <span className={`status-badge status-${rowData.status.toLowerCase()}`}>
-        {rowData.status}
-      </span>
-    );
-  };
+  // Add useEffect to fetch inventory data when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
+      await fetchOrders(); // if needed
+    };
 
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <div className="action-buttons">
-        <Button icon="pi pi-eye" className="p-button-rounded p-button-text" />
-        <Button
-          icon="pi pi-pencil"
-          className="p-button-rounded p-button-text"
-        />
-      </div>
-    );
-  };
+    if (runCount.current < 1) {
+      runCount.current += 1;
+      fetchData();
+    }
+  }, [fetchAllInventoryItems, fetchOrders]);
+
+  // const statusBodyTemplate = (rowData) => {
+  //   return (
+  //     <span className={`status-badge status-${rowData.status.toLowerCase()}`}>
+  //       {rowData.status}
+  //     </span>
+  //   );
+  // };
+
+  // const actionBodyTemplate = (rowData) => {
+  //   return (
+  //     <div className="action-buttons">
+  //       <Button icon="pi pi-eye" className="p-button-rounded p-button-text" />
+  //       <Button
+  //         icon="pi pi-pencil"
+  //         className="p-button-rounded p-button-text"
+  //       />
+  //     </div>
+  //   );
+  // };
 
   const [selectAll, setSelectAll] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -831,8 +835,8 @@ const Order = () => {
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                       width: "100%",
                       marginRight: "10px",
-                      backgroundColor:
-                        theme === "light" ? "#FFFFFF" : "#03141F",
+                      // backgroundColor:
+                      //   theme === "light" ? "#FFFFFF" : "#03141F",
                       color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
@@ -943,8 +947,8 @@ const Order = () => {
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                       width: "100%",
                       marginLeft: "10px",
-                      backgroundColor:
-                        theme === "light" ? "#FFFFFF" : "#03141F",
+                      // backgroundColor:
+                      //   theme === "light" ? "#FFFFFF" : "#03141F",
                       color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >
@@ -1055,8 +1059,8 @@ const Order = () => {
                       boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                       width: "100%",
                       marginLeft: "10px",
-                      backgroundColor:
-                        theme === "light" ? "#FFFFFF" : "#03141F",
+                      // backgroundColor:
+                      //   theme === "light" ? "#FFFFFF" : "#03141F",
                       color: theme === "light" ? "#103B57" : "#FFFFFF",
                     }}
                   >

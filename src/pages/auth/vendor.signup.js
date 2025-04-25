@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+// import { Link, useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/water.jpg";
 import check from "../../assets/images/check1.png";
 import yachtCrew from "../../assets/images/yacht.png"; // Add appropriate vendor image
@@ -30,9 +30,7 @@ const StepInfo = ({ currentStep }) => {
     6: {
       step: "Success",
       info: "Application Submitted",
-
     },
-   
   };
 
   return (
@@ -70,7 +68,7 @@ const VendorSignup = () => {
     // Documents
     licenseFile: null,
     liabilityInsurance: null,
-    role:"",
+    role: "",
 
     // Contact Person
     contactPerson: {
@@ -113,7 +111,15 @@ const VendorSignup = () => {
             >
               <StepInfo currentStep={step} />
             </div>
-            <div className="login-form vendor-login-form">
+            <div
+              className="login-form vendor-login-form"
+              style={{
+               
+                minHeight: "700px",
+                height: "auto",
+                padding: "0px",
+              }}
+            >
               <VendorSignUpForm
                 setStep={setStep}
                 currentStep={step}

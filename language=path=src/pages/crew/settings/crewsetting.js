@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 // import { Checkbox } from "primereact/checkbox";
-
+import { Dropdown } from "primereact/dropdown";
 import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
 import { useNotifications } from "../../../context/notificationsContext";
@@ -27,8 +27,63 @@ const CrewSetting = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [language, setLanguage] = useState(null);
+  const [timezone, setTimezone] = useState(null);
   const [accountVisibility, setAccountVisibility] = useState(true);
   const [theme, setTheme] = useState("light");
+
+  // Language options
+  const languages = [
+    { name: "English", code: "en" },
+    { name: "Spanish", code: "es" },
+    { name: "French", code: "fr" },
+    { name: "German", code: "de" },
+    { name: "Italian", code: "it" },
+    { name: "Portuguese", code: "pt" },
+    { name: "Russian", code: "ru" },
+    { name: "Chinese", code: "zh" },
+    { name: "Japanese", code: "ja" },
+    { name: "Arabic", code: "ar" },
+  ];
+
+  // Timezone options
+  const timezones = [
+    { name: "(GMT-12:00) International Date Line West", code: "Etc/GMT+12" },
+    { name: "(GMT-11:00) Midway Island, Samoa", code: "Pacific/Midway" },
+    { name: "(GMT-10:00) Hawaii", code: "Pacific/Honolulu" },
+    { name: "(GMT-09:00) Alaska", code: "America/Anchorage" },
+    {
+      name: "(GMT-08:00) Pacific Time (US & Canada)",
+      code: "America/Los_Angeles",
+    },
+    { name: "(GMT-07:00) Mountain Time (US & Canada)", code: "America/Denver" },
+    { name: "(GMT-06:00) Central Time (US & Canada)", code: "America/Chicago" },
+    {
+      name: "(GMT-05:00) Eastern Time (US & Canada)",
+      code: "America/New_York",
+    },
+    { name: "(GMT-04:00) Atlantic Time (Canada)", code: "America/Halifax" },
+    { name: "(GMT-03:00) Brasilia", code: "America/Sao_Paulo" },
+    { name: "(GMT-02:00) Mid-Atlantic", code: "Atlantic/South_Georgia" },
+    { name: "(GMT-01:00) Azores", code: "Atlantic/Azores" },
+    { name: "(GMT+00:00) London, Dublin, Edinburgh", code: "Europe/London" },
+    { name: "(GMT+01:00) Paris, Berlin, Rome, Madrid", code: "Europe/Paris" },
+    { name: "(GMT+02:00) Athens, Istanbul, Cairo", code: "Europe/Athens" },
+    { name: "(GMT+03:00) Moscow, Kuwait, Riyadh", code: "Europe/Moscow" },
+    { name: "(GMT+04:00) Dubai, Baku", code: "Asia/Dubai" },
+    { name: "(GMT+05:00) Karachi, Tashkent", code: "Asia/Karachi" },
+    { name: "(GMT+05:30) Kolkata, Chennai, Mumbai", code: "Asia/Kolkata" },
+    { name: "(GMT+06:00) Dhaka, Almaty", code: "Asia/Dhaka" },
+    { name: "(GMT+07:00) Bangkok, Jakarta", code: "Asia/Bangkok" },
+    {
+      name: "(GMT+08:00) Beijing, Hong Kong, Singapore",
+      code: "Asia/Shanghai",
+    },
+    { name: "(GMT+09:00) Tokyo, Seoul", code: "Asia/Tokyo" },
+    { name: "(GMT+10:00) Sydney, Melbourne", code: "Australia/Sydney" },
+    { name: "(GMT+11:00) Solomon Islands", code: "Pacific/Guadalcanal" },
+    { name: "(GMT+12:00) Auckland, Wellington", code: "Pacific/Auckland" },
+  ];
 
   useEffect(() => {
     // Populate form with user data when available
@@ -49,10 +104,28 @@ const CrewSetting = () => {
       // Set two-factor authentication status if available
       setTwoFactorEnabled(user.twoFactorEnabled || false);
 
+      // Set language if available
+      if (user.language) {
+        const userLanguage = languages.find(
+          (lang) => lang.code === user.language
+        );
+        setLanguage(userLanguage || languages[0]);
+      } else {
+        setLanguage(languages[0]); // Default to English
+      }
+
+      // Set timezone if available
+      if (user.timezone) {
+        const userTimezone = timezones.find((tz) => tz.code === user.timezone);
+        setTimezone(userTimezone || timezones[7]); // Default to Eastern Time
+      } else {
+        setTimezone(timezones[7]); // Default to Eastern Time
+      }
+
       // Set account visibility if available
       setAccountVisibility(user.accountVisibility !== false);
     }
-  }, [user]);
+  }, [user, languages, timezones]);
 
   const handleSaveChanges = () => {
     console.log("Saving changes:", {
@@ -62,6 +135,8 @@ const CrewSetting = () => {
       confirmPassword,
       phone,
       twoFactorEnabled,
+      language: language?.code,
+      timezone: timezone?.code,
       notificationsEnabled,
     });
 
@@ -188,6 +263,28 @@ const CrewSetting = () => {
             </div>
 
             <div className="settings-form-group">
+              <label>Language</label>
+              <Dropdown
+                value={language}
+                options={languages}
+                onChange={(e) => setLanguage(e.value)}
+                optionLabel="name"
+                placeholder="Select Language"
+              />
+            </div>
+
+            <div className="settings-form-group">
+              <label>Time Zone</label>
+              <Dropdown
+                value={timezone}
+                options={timezones}
+                onChange={(e) => setTimezone(e.value)}
+                optionLabel="name"
+                placeholder="Set Time Zone"
+              />
+            </div>
+
+            <div className="settings-form-group">
               <label>Notifications</label>
               <div className="toggle-container">
                 <span>Turn On</span>
@@ -252,4 +349,4 @@ const CrewSetting = () => {
   );
 };
 
-export default CrewSetting;
+export default CrewSetting; 
