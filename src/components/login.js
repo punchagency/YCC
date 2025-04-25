@@ -72,7 +72,13 @@ const LoginForm = () => {
         // Store user data
         loginUser(response.data.user);
 
-        navigate("/admin/dashboard");
+        if (response.data.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (response.data.user.role === "supplier") {
+          navigate("/supplier/onboarding");
+        } else if (response.data.user.role === "service_provider") {
+          navigate("/vendor/onboarding");
+        }
       } else {
         setError(response.message || "Login failed. Please try again.");
       }

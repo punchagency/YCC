@@ -45,7 +45,11 @@ import { ToastProvider } from "./components/Toast";
 import AdminFinancialManagement from "./pages/dashboard/admin/financial-management/admin-financial-management";
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 import Profile from "./pages/profile/profile";
-
+import SupplierOnboarding from "./pages/onboarding/supplier-onboarding";
+import OnboardingPageLayout from "./layout/onboarding-page-layout";
+import SupplierOnboardingStep2 from "./components/onboarding/supplier/supplier-onboarding-step2";
+import VendorOnboarding from "./pages/onboarding/vendor-onboarding";
+import VendorOnboardingStep2 from "./components/onboarding/vendor/vendor-onboarding-step2";
 function App() {
   return (
     <ToastProvider>
@@ -102,6 +106,16 @@ function App() {
             <Route path="/admin/reports" element={<Reports />} />
             <Route path="/admin/settings" element={<CrewSetting />} />
           </Route>
+
+          {/* Onboarding Routes */}
+          <Route element={<OnboardingPageLayout />}>
+            <Route path="/supplier/onboarding" element={<SupplierOnboarding />} />
+            <Route path="/supplier/onboarding/refresh-stripe-account" element={<SupplierOnboardingStep2 />} />
+            <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
+            <Route path="/vendor/onboarding/refresh-stripe-account" element={<VendorOnboardingStep2 />} />
+          </Route>
+
+
         </Routes>
       </NotificationsProvider>
     </ToastProvider>

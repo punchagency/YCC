@@ -18,6 +18,7 @@ export const UserProvider = ({ children }) => {
     }
   });
   const [userProfile, setUserProfile] = useState(null);
+  const [stripeAccount, setStripeAccount] = useState(null);
 
   // Load user from localStorage (useful for page refreshes)
   useEffect(() => {
@@ -52,6 +53,149 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+
+
+  const getStripeAccount = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
+      headers: getAuthHeader(),
+    });
+    const data = await response.json();
+    if (!data.status) {
+      setStripeAccount(null);
+    } else {
+      setStripeAccount(data.data);
+    }
+  };
+
+const createStripeAccount = async () => {
+  const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`,{
+    headers: getAuthHeader()
+  });
+  const data = await response.json();
+  if(data.status){
+    window.location.href = data.data.url;
+  }
+}
+
+
+  const refreshStripeAccountLink = async () => {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`,{
+      headers: getAuthHeader()
+    });
+    const data = await response.json();
+    if(data.status){
+      window.location.href = data.data.url;
+    }
+  }
+
+
+  const uploadInventoryData = async ( selectedFile ) =>{
+    const formData = new FormData();
+      formData.append("file", selectedFile); // "file" should match the field name expected by multer
+  
+      try {
+        const response = await fetch("http://localhost:7000/api/inventory/upload", {
+          method: "POST",
+          body: formData,
+          headers: {
+            ...getAuthHeader()
+          },
+        });
+        const data = await response.json();
+  
+        if (!data.status) {
+          const error = data.message;
+          throw new Error(error);
+        }
+  
+        console.log("Upload successful:", data);
+        return data.status
+        
+      } catch (err) {
+        console.error("Upload failed:", err.message);
+      }
+  }
+
+  
+  const uploadServicesData = async ( selectedFile ) =>{
+    const formData = new FormData();
+      formData.append("file", selectedFile); // "file" should match the field name expected by multer
+  
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
+          method: "POST",
+          body: formData,
+          headers: {
+            ...getAuthHeader()
+          },
+        });
+        const data = await response.json();
+  
+        if (!data.status) {
+          const error = data.message;
+          throw new Error(error);
+        }
+  
+        console.log("Upload successful:", data);
+        return data.status
+        
+      } catch (err) {
+        console.error("Upload failed:", err.message);
+      }
+  }
+  const verifyOnboardingStep1 = async () => {
+    if(user.role === "supplier"){
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {
+        headers: getAuthHeader()
+      });
+      const data = await response.json();
+      return data;
+    }else if(user.role === "service_provider"){
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`, {
+        headers: getAuthHeader()
+      });
+      const data = await response.json();
+      return data;
+    }
+  }
+
+
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const completeOnboarding = async () => {
+  if(user.role === "supplier"){
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
+      headers: getAuthHeader()
+    });
+    const data = await response.json();
+    return data.status;
+  }else if(user.role === "service_provider"){
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
+      headers: getAuthHeader()
+    });
+    const data = await response.json();
+    return data.status;
+  }
+}
+
+const checkOnboardingStatus = async () => {
+  if(user.role === "supplier"){
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
+      headers: getAuthHeader()
+    });
+    const data = await response.json();
+    return data.data;
+  }else if(user.role === "service_provider"){
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
+      headers: getAuthHeader()
+    });
+    const data = await response.json();
+    return data.data;
+  }
+}
   return (
     <UserContext.Provider
       value={{
@@ -62,6 +206,15 @@ export const UserProvider = ({ children }) => {
         setUser,
         userProfile,
         setUserProfile,
+        stripeAccount,
+        getStripeAccount,
+        createStripeAccount,
+        refreshStripeAccountLink,
+        uploadInventoryData,
+        uploadServicesData,
+        verifyOnboardingStep1,
+        completeOnboarding,
+        checkOnboardingStatus
       }}
     >
       {children}
