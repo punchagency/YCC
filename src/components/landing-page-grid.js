@@ -80,7 +80,7 @@ const LandingPageGrid = ({gridData}) => {
   )
 }
 
-const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
+
 const SecondarySubTextBlack = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 400,

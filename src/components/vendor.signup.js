@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Select from "react-select";
 import PhoneInput from "react-phone-input-2";
@@ -9,12 +8,7 @@ import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
 import departmentLogo from "../assets/images/departmentLogo.png";
 import websiteLogo from "../assets/images/websiteLogo.png";
-import uploadVat from "../assets/images/uploadVat.png";
-import uploadLicense from "../assets/images/uploadLicense.png";
-import crewDepartmentLogo from "../assets/images/crewDepartmentLogo.png";
-import hourlyLogo from "../assets/images/hourlyLogo.png";
 import availabilityLogo from "../assets/images/availablityLogo.png";
-import prefferedLogo from "../assets/images/preferredLogo.png";
 import areaLogo from "../assets/images/areaLogo.png";
 import roleLogo from "../assets/images/roleLogo.png";
 import uploadfileLogo from "../assets/images/uploadfileLogo.png";
@@ -23,10 +17,10 @@ import { signup } from "../services/authService";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 
 const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [setSuccess] = useState(false);
 
   const handleSignup = async () => {
     if (!formData.acceptFees) {
@@ -130,14 +124,14 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     { value: "usa", label: "USA" },
   ];
 
-  const departmentOptions = [
-    { value: "captain", label: "Captain" },
-    { value: "crew", label: "Crew" },
-    { value: "exterior", label: "Exterior" },
-    { value: "engineering", label: "Engineering" },
-    { value: "interior", label: "Interior" },
-    { value: "galley", label: "Galley" },
-  ];
+  // const departmentOptions = [
+  //   { value: "captain", label: "Captain" },
+  //   { value: "crew", label: "Crew" },
+  //   { value: "exterior", label: "Exterior" },
+  //   { value: "engineering", label: "Engineering" },
+  //   { value: "interior", label: "Interior" },
+  //   { value: "galley", label: "Galley" },
+  // ];
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -145,29 +139,29 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     });
   };
 
-  const handleContactPersonChange = (field, value) => {
-    setFormData({
-      ...formData,
-      contactPerson: {
-        ...formData.contactPerson,
-        [field]: value,
-      },
-    });
-  };
+  // const handleContactPersonChange = (field, value) => {
+  //   setFormData({
+  //     ...formData,
+  //     contactPerson: {
+  //       ...formData.contactPerson,
+  //       [field]: value,
+  //     },
+  //   });
+  // };
 
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(null);
+  const [setIsUploading] = useState(null);
   const [pricingFile, setPricingFile] = useState(null);
-  const [fileUploading, setFileUploading] = useState({
+  const [setFileUploading] = useState({
     licenseFile: false,
     taxIdFile: false,
     insuranceFile: false,
     pricingFile: false,
   });
 
-  const [fileErrors, setFileErrors] = useState({
+  const [setFileErrors] = useState({
     licenseFile: "",
     taxIdFile: "",
     insuranceFile: "",
@@ -232,6 +226,300 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
   };
 
+  // Define department-specific service options
+  const departmentServiceOptions = {
+    captain: [
+      {
+        value: "Vessel Management & Administration",
+        label: "Vessel Management & Administration",
+      },
+      {
+        value: "Maritime Legal & Compliance Assistance",
+        label: "Maritime Legal & Compliance Assistance",
+      },
+      {
+        value: "Crew Recruitment & Placement Services",
+        label: "Crew Recruitment & Placement Services",
+      },
+      {
+        value: "Customs & Immigration Assistance",
+        label: "Customs & Immigration Assistance",
+      },
+      {
+        value: "Insurance & Risk Management",
+        label: "Insurance & Risk Management",
+      },
+      {
+        value: "Security & Anti-Piracy Training",
+        label: "Security & Anti-Piracy Training",
+      },
+      {
+        value: "Safety Equipment Inspections & Compliance",
+        label: "Safety Equipment Inspections & Compliance",
+      },
+      {
+        value: "IT & Cybersecurity Services for Yachts",
+        label: "IT & Cybersecurity Services for Yachts",
+      },
+      {
+        value: "Charter & Itinerary Planning Assistance",
+        label: "Charter & Itinerary Planning Assistance",
+      },
+      {
+        value: "Satellite & Internet Connectivity Solutions",
+        label: "Satellite & Internet Connectivity Solutions",
+      },
+    ],
+    galley: [
+      {
+        value: "Fresh Produce & Gourmet Food Provisioning",
+        label: "Fresh Produce & Gourmet Food Provisioning",
+      },
+      {
+        value: "Butcher & Seafood Supply Services",
+        label: "Butcher & Seafood Supply Services",
+      },
+      {
+        value: "Specialty Ingredient Sourcing",
+        label: "Specialty Ingredient Sourcing",
+      },
+      {
+        value: "Custom Catering & Onboard Chef Services",
+        label: "Custom Catering & Onboard Chef Services",
+      },
+      {
+        value: "Galley Equipment Maintenance & Repair",
+        label: "Galley Equipment Maintenance & Repair",
+      },
+      {
+        value: "Wine, Spirits & Specialty Beverages Supply",
+        label: "Wine, Spirits & Specialty Beverages Supply",
+      },
+      {
+        value: "Specialty Coffee & Tea Provisioning",
+        label: "Specialty Coffee & Tea Provisioning",
+      },
+      {
+        value: "Dry & Frozen Goods Supply",
+        label: "Dry & Frozen Goods Supply",
+      },
+      {
+        value: "Galley Deep Cleaning & Sanitation Services",
+        label: "Galley Deep Cleaning & Sanitation Services",
+      },
+      {
+        value: "Kitchenware & Culinary Equipment Supply",
+        label: "Kitchenware & Culinary Equipment Supply",
+      },
+    ],
+    engineering: [
+      {
+        value: "Marine Engine Servicing & Repairs",
+        label: "Marine Engine Servicing & Repairs",
+      },
+      {
+        value: "Generator Installation & Maintenance",
+        label: "Generator Installation & Maintenance",
+      },
+      {
+        value: "HVAC & Refrigeration Services",
+        label: "HVAC & Refrigeration Services",
+      },
+      {
+        value: "Watermaker Installation & Repairs",
+        label: "Watermaker Installation & Repairs",
+      },
+      {
+        value: "Fuel System Cleaning & Maintenance",
+        label: "Fuel System Cleaning & Maintenance",
+      },
+      {
+        value: "Electrical System Troubleshooting",
+        label: "Electrical System Troubleshooting",
+      },
+      {
+        value: "Navigation & Communication System Setup",
+        label: "Navigation & Communication System Setup",
+      },
+      {
+        value: "Hydraulic System Servicing",
+        label: "Hydraulic System Servicing",
+      },
+      {
+        value: "Welding & Metal Fabrication Services",
+        label: "Welding & Metal Fabrication Services",
+      },
+      {
+        value: "Spare Parts Sourcing & Logistics",
+        label: "Spare Parts Sourcing & Logistics",
+      },
+    ],
+    interior: [
+      {
+        value: "Yacht Interior Cleaning & Housekeeping",
+        label: "Yacht Interior Cleaning & Housekeeping",
+      },
+      {
+        value: "Laundry & Dry Cleaning Services",
+        label: "Laundry & Dry Cleaning Services",
+      },
+      {
+        value: "Custom Interior Design & Refurbishment",
+        label: "Custom Interior Design & Refurbishment",
+      },
+      {
+        value: "Florist & Fresh Flower Arrangements",
+        label: "Florist & Fresh Flower Arrangements",
+      },
+      {
+        value: "Carpet & Upholstery Cleaning",
+        label: "Carpet & Upholstery Cleaning",
+      },
+      {
+        value: "Event & Party Planning Services",
+        label: "Event & Party Planning Services",
+      },
+      {
+        value: "Provisioning for Guest Supplies",
+        label: "Provisioning for Guest Supplies",
+      },
+      {
+        value: "Bar & Beverage Supply Services",
+        label: "Bar & Beverage Supply Services",
+      },
+      {
+        value: "AV & Entertainment System Installation",
+        label: "AV & Entertainment System Installation",
+      },
+      {
+        value: "Crew Uniform Tailoring & Embroidery",
+        label: "Crew Uniform Tailoring & Embroidery",
+      },
+    ],
+    exterior: [
+      {
+        value: "Yacht Detailing & Washdowns",
+        label: "Yacht Detailing & Washdowns",
+      },
+      {
+        value: "Teak Deck Sanding & Restoration",
+        label: "Teak Deck Sanding & Restoration",
+      },
+      {
+        value: "Varnishing & Paintwork Services",
+        label: "Varnishing & Paintwork Services",
+      },
+      {
+        value: "Fiberglass & Gelcoat Repairs",
+        label: "Fiberglass & Gelcoat Repairs",
+      },
+      {
+        value: "Docking & Line Handling Assistance",
+        label: "Docking & Line Handling Assistance",
+      },
+      {
+        value: "Diving & Underwater Hull Cleaning",
+        label: "Diving & Underwater Hull Cleaning",
+      },
+      {
+        value: "Fender & Rope Supply & Maintenance",
+        label: "Fender & Rope Supply & Maintenance",
+      },
+      {
+        value: "Tender & Jet Ski Servicing",
+        label: "Tender & Jet Ski Servicing",
+      },
+      {
+        value: "Watersports Equipment Rental & Repairs",
+        label: "Watersports Equipment Rental & Repairs",
+      },
+      {
+        value: "Exterior Upholstery & Canvas Work",
+        label: "Exterior Upholstery & Canvas Work",
+      },
+    ],
+    // Add options for other departments as needed
+    default: [
+      { value: "Mental Health Support", label: "Mental Health Support" },
+      { value: "Confidential Therapy", label: "Confidential Therapy" },
+      { value: "Career Guidance", label: "Career Guidance" },
+      { value: "Legal Consultation", label: "Legal Consultation" },
+      { value: "Financial Advisory", label: "Financial Advisory" },
+    ],
+  };
+
+  // State to hold current service options
+  const [serviceOptions, setServiceOptions] = useState(
+    departmentServiceOptions.default
+  );
+
+  // Update service options when department changes
+  useEffect(() => {
+    if (formData.departments && formData.departments.length > 0) {
+      // Combine service options from all selected departments
+      let combinedOptions = [];
+      const selectedDepartmentValues = formData.departments.map(
+        (dept) => dept.value
+      );
+
+      selectedDepartmentValues.forEach((deptValue) => {
+        if (departmentServiceOptions[deptValue]) {
+          // Add services from this department if they're not already in the combined list
+          departmentServiceOptions[deptValue].forEach((service) => {
+            if (
+              !combinedOptions.some((option) => option.value === service.value)
+            ) {
+              combinedOptions.push(service);
+            }
+          });
+        }
+      });
+
+      if (combinedOptions.length > 0) {
+        setServiceOptions(combinedOptions);
+      } else {
+        setServiceOptions(departmentServiceOptions.default);
+      }
+
+      // Reset the selected service if it's not in the new options list
+      if (formData.services) {
+        const serviceExists = combinedOptions.some(
+          (option) => option.value === formData.services.value
+        );
+
+        if (!serviceExists) {
+          handleInputChange("services", null);
+        }
+      }
+    } else {
+      setServiceOptions(departmentServiceOptions.default);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.departments]); // We're disabling the lint rule for clarity
+
+  // Add a function to handle service selection with validation
+  const handleServiceChange = (selectedOptions) => {
+    // If user tries to select more than 4 services
+    if (selectedOptions && selectedOptions.length > 4) {
+      // Show error message
+      setError("You can select a maximum of 4 services");
+
+      // If there were previously selected services, keep them
+      // Otherwise, just don't update the selection
+      if (formData.services && formData.services.length > 0) {
+        return; // Don't update the selection
+      }
+    } else {
+      // Clear any existing error related to service selection
+      if (error && error.includes("maximum of 4 services")) {
+        setError(null);
+      }
+
+      // Update the services in formData
+      handleInputChange("services", selectedOptions);
+    }
+  };
+
   const renderStep1 = () => (
     <motion.div
       key="step1"
@@ -241,13 +529,18 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {/* Business Name */}
+
       <div className="form-group1">
         <div className="input-field">
           <div>
             <label htmlFor="businessName">Business Name</label>
           </div>
           <div className="inputBorder">
-            <img src={inputLogo} style={{ width: "12px", height: "12px" }} />
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="business name"
+            />
             <input
               type="text"
               id="businessName"
@@ -268,7 +561,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <label htmlFor="businessAddress">Business Address</label>
           </div>
           <div className="inputBorder">
-            <img src={location} style={{ width: "12px", height: "12px" }} />
+            <img
+              src={location}
+              style={{ width: "12px", height: "12px" }}
+              alt="business address"
+            />
             <input
               type="text"
               id="businessAddress"
@@ -283,7 +580,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       </div>
 
       {/* Department */}
-      {/* Department */}
       <div className="form-group-department">
         <div className="input-field">
           <div>
@@ -293,14 +589,14 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <Select
               options={[
                 { label: "Captain", value: "captain" },
-                { label: "Crew", value: "crew" },
+                // { label: "Crew", value: "crew" },
                 { label: "Exterior", value: "exterior" },
                 { label: "Interior", value: "interior" },
                 { label: "Engineering", value: "engineering" },
                 { label: "Galley", value: "galley" },
               ]}
-              value={formData.department}
-              onChange={(option) => handleInputChange("department", option)}
+              value={formData.departments}
+              onChange={(options) => handleInputChange("departments", options)}
               placeholder={
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <img
@@ -312,9 +608,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       marginRight: "8px",
                     }}
                   />
-                  <span>Select Department</span>
+                  <span>Select Departments</span>
                 </div>
               }
+              isMulti={true}
               classNamePrefix="select"
               styles={{
                 control: (provided) => ({
@@ -352,6 +649,24 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 valueContainer: (provided) => ({
                   ...provided,
                   width: "100%",
+                }),
+                multiValue: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#f0f7ff",
+                  borderRadius: "4px",
+                }),
+                multiValueLabel: (provided) => ({
+                  ...provided,
+                  color: "#0387d9",
+                  fontSize: "12px",
+                }),
+                multiValueRemove: (provided) => ({
+                  ...provided,
+                  color: "#0387d9",
+                  ":hover": {
+                    backgroundColor: "#d8e6f7",
+                    color: "#0387d9",
+                  },
                 }),
               }}
             />
@@ -429,6 +744,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             >
               <img
                 src={emailLogo}
+                alt="email"
                 style={{ width: "16px", height: "16px", marginRight: "8px" }}
               />
               <input
@@ -478,7 +794,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <label htmlFor="businessWebsite">Business Website</label>
           </div>
           <div className="website-input">
-            <img src={websiteLogo} style={{ width: "12px", height: "12px" }} />
+            <img
+              src={websiteLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="business website"
+            />
             <input
               type="url"
               id="businessWebsite"
@@ -664,27 +984,13 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </div>
           <div className="inputBorder">
             <Select
-              options={[
-                {
-                  value: "Mental Health Support",
-                  label: "Mental Health Support",
-                },
-                {
-                  value: "Confidential Therapy",
-                  label: "Confidential Therapy",
-                },
-                { value: "Career Guidance", label: "Career Guidance" },
-                { value: "Legal Consultation", label: "Legal Consultation" },
-                { value: "Financial Advisory", label: "Financial Advisory" },
-              ]}
+              options={serviceOptions}
               value={formData.services}
-              onChange={(selectedOption) =>
-                handleInputChange("services", selectedOption)
-              }
+              onChange={handleServiceChange}
               placeholder={
                 <div style={{ display: "flex", alignItems: "center" }}>
                   <img
-                    src={serviceLogo} // Use the correct service icon here
+                    src={serviceLogo}
                     alt="Service Icon"
                     style={{
                       width: "12px",
@@ -692,11 +998,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       marginRight: "8px",
                     }}
                   />
-                  <span>Select a Service</span>
+                  <span>Select Services (max 4)</span>
                 </div>
               }
+              isMulti={true}
               classNamePrefix="select"
-              isSearchable={false}
               styles={{
                 control: (provided) => ({
                   ...provided,
@@ -733,6 +1039,24 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 valueContainer: (provided) => ({
                   ...provided,
                   width: "100%",
+                }),
+                multiValue: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#f0f7ff",
+                  borderRadius: "4px",
+                }),
+                multiValueLabel: (provided) => ({
+                  ...provided,
+                  color: "#0387d9",
+                  fontSize: "12px",
+                }),
+                multiValueRemove: (provided) => ({
+                  ...provided,
+                  color: "#0387d9",
+                  ":hover": {
+                    backgroundColor: "#d8e6f7",
+                    color: "#0387d9",
+                  },
                 }),
               }}
             />
@@ -779,6 +1103,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <img
               src={availabilityLogo}
               style={{ width: "12px", height: "12px" }}
+              alt="availability"
             />
             <input
               type="text"

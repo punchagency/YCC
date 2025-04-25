@@ -3,13 +3,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from '../../assets/images/chatbot/send-icon.png'
 import RemoveIcon from '@mui/icons-material/Remove';
 import OptionsIcon from '@mui/icons-material/MoreVert';
-import BotIcon from '../../assets/images/chatbot/chatbot-profile-icon.png'
+
 import BotModalIcon from '../../assets/images/chatbot/chatbot-modal-icon.png'
 import BotOnlineIcon from '../../assets/images/chatbot/chatbot-online-icon.png'
 import chatbotTypingLoader from '../../assets/images/chatbot/chatbot-typing-state.png'
 import SimpleBar from 'simplebar-react'
 import "simplebar-react/dist/simplebar.min.css";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { DoneAll } from "@mui/icons-material";
 import { useDashboardAI } from '../../context/AIAssistant/dashboardAIContext';
 import ReactMarkdown from "react-markdown";
@@ -19,57 +19,65 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; 
 import { useUser } from "../../context/userContext";
 
-
-
 const ChatbotDashboard = () => {
-
     const { user } = useUser();
-    const role = user.role.split('_')[0]
+    const role = user.role.split('_')[0];
 
     const {
         isAIAssistantOpen,
         setIsAIAssistantOpen,
         chatData,
-        setChatData,
         typingState,
-        setTypingState,
-    message,
-    setMessage,
-    sendMessage,
-    getResponse,
-    preDefinedMessages
+        message,
+        setMessage,
+        sendMessage,
+        preDefinedMessages
     } = useDashboardAI();
 
+    const chatContainerRef = useRef(null);
 
-  const chatContainerRef = useRef(null);
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: "smooth", // Adds smooth scrolling
+            });
+        }
+    }, [chatData]);
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth", // Adds smooth scrolling
-      });
+    function formatUtcTo12Hour(utcTimestamp) {
+        const date = new Date(utcTimestamp);
+
+        // Extract hours, minutes, and determine AM/PM
+        let hours = date.getUTCHours();
+        const minutes = date.getUTCMinutes();
+        const amPm = hours >= 12 ? "PM" : "AM";
+
+        // Convert to 12-hour format
+        hours = hours % 12 || 12;
+
+        // Format minutes to always be two digits
+        const formattedMinutes = minutes.toString().padStart(2, "0");
+
+        return `${hours}:${formattedMinutes} ${amPm}`;
     }
-  }, [chatData]);
 
-  function formatUtcTo12Hour(utcTimestamp) {
-    const date = new Date(utcTimestamp);
-
-    // Extract hours, minutes, and determine AM/PM
-    let hours = date.getUTCHours();
-    const minutes = date.getUTCMinutes();
-    const amPm = hours >= 12 ? "PM" : "AM";
-
-    // Convert to 12-hour format
-    hours = hours % 12 || 12;
-
-    // Format minutes to always be two digits
-    const formattedMinutes = minutes.toString().padStart(2, "0");
-
-    return `${hours}:${formattedMinutes} ${amPm}`;
-  }
-
-
+    const parseAIMessage = (message) => {
+        return (
+            <ReactMarkdown
+                children={message} 
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+                components={{
+                    p: ({ node, ...props }) => <Typography variant="body1" {...props} />,
+                    ul: ({ node, ...props }) => <ul style={{ paddingLeft: "20px" }} {...props} />, 
+                    ol: ({ node, ...props }) => <ol style={{ paddingLeft: "20px" }} {...props} />,
+                    li: ({ node, ...props }) => <li {...props} />, 
+                    a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" {...props}>{props.children}</a>,
+                }}
+            />
+        );
+    };
 
     return (
         <>
@@ -77,7 +85,6 @@ const ChatbotDashboard = () => {
             <Fab
                 onClick={() => setIsAIAssistantOpen(true)}
                 disableRipple
-               
                 sx={{
                     position: "fixed",
                     bottom: 19,
@@ -90,7 +97,7 @@ const ChatbotDashboard = () => {
                     }
                 }}
             >
-                <img src={BotModalIcon} alt="user" style={{ width: '80px', height: '80px' }} />
+                <img src={BotModalIcon} alt="Chat Bot" style={{ width: '80px', height: '80px' }} />
             </Fab>
 
             {/* Modal */}
@@ -104,27 +111,19 @@ const ChatbotDashboard = () => {
                 }}
             >
                 <>
-
                 <Box sx={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                     display: role !== 'service' ? 'none' : 'flex',
+                    display: role !== 'service' ? 'none' : 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '900px',
                     maxHeight: '40vh',
                 }}>
 
-
-
-
-
-
-
                     {/* Chat section */}
-
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -132,9 +131,7 @@ const ChatbotDashboard = () => {
                         flexDirection: 'column',
                     }}>
 
-
                         {/* Header section */}
-
                         <Box
                             sx={{
                                 display: "flex",
@@ -157,8 +154,6 @@ const ChatbotDashboard = () => {
                                 gap: '10px',
                                 justifyContent: 'center',
                                 textAlign: 'center',
-
-
                             }}>
                                 <IconButton onClick={() => setIsAIAssistantOpen(false)} sx={{ color: "white" }}>
                                     <RemoveIcon />
@@ -169,9 +164,7 @@ const ChatbotDashboard = () => {
                             </Box>
                         </Box>
 
-
                         {/* subheader section */}
-
                         <Box
                             sx={{
                                 display: "flex",
@@ -189,7 +182,7 @@ const ChatbotDashboard = () => {
                                 alignItems: 'center',
                                 gap: '10px',
                             }}>
-                                <img src={BotOnlineIcon} alt="user" />
+                                <img src={BotOnlineIcon} alt="Bot Online" />
                                 <Box sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
@@ -207,11 +200,7 @@ const ChatbotDashboard = () => {
                             </Box>
                         </Box>
 
-
-
-
                         {/* List of buttons options */}
-
                         <Box sx={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -241,12 +230,7 @@ const ChatbotDashboard = () => {
                             </CustomOptionButton>
                         </Box>
 
-
-
-
-
                         {/* Main chat section */}
-
                         <Box sx={{
                             display: 'flex',
                             height: '250px',
@@ -281,7 +265,7 @@ const ChatbotDashboard = () => {
                                             }}>
                                                 {item.role === 'assistant' && <>
                                                     <Box>
-                                                        {/* <img src={BotIcon} alt="user" /> */}
+                                                        {/* Bot icon would go here if needed */}
                                                     </Box>
                                                     <ChatbotTime>Chatbot {formatUtcTo12Hour(item.createdAt ? item.createdAt : new Date().toISOString())}</ChatbotTime>
                                                 </>}
@@ -294,7 +278,7 @@ const ChatbotDashboard = () => {
                                             <Box sx={{
                                                 width: '100%',
                                             }}>
-                                                    {item.role === 'assistant' ? (
+                                                {item.role === 'assistant' ? (
                                                     <BotChatMessage>
                                                         <Typography>{parseAIMessage(item.content)}</Typography>
                                                     </BotChatMessage>
@@ -320,7 +304,7 @@ const ChatbotDashboard = () => {
                                                         <Box>
                                                             <img
                                                                 src={SendIcon}
-                                                                alt="Send"
+                                                                alt="Send Icon"
                                                                 style={{
                                                                     width: "10px",
                                                                     height: "10px",
@@ -335,22 +319,13 @@ const ChatbotDashboard = () => {
                                                     <ChatbotTime><DoneAll sx={{ height: '13px', width: '13px' }} />Read</ChatbotTime>
                                                 </>}
                                             </Box>
-
-
-
                                         </Box>
                                     ))}
-
                                 </Box>
-
                             </SimpleBar>
-
                         </Box>
 
-
-
                         {/* Typing state */}
-
                         {typingState && <Box sx={{
                             display: 'flex',
                             width: '100%',
@@ -359,9 +334,8 @@ const ChatbotDashboard = () => {
                             borderRight: '1px solid #A6C2D4',
                             backgroundColor: '#F3F3F3'
                         }}>
-                            <Typography>Typing <img src={chatbotTypingLoader} /> </Typography>
+                            <Typography>Typing <img src={chatbotTypingLoader} alt="Typing indicator" /> </Typography>
                         </Box>}
-
 
                         {/* Chat input */}
                         <Box sx={{
@@ -376,14 +350,14 @@ const ChatbotDashboard = () => {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value || '')}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey || message.trim() === '') {
-                                        sendMessage()
+                                    if ((e.key === 'Enter' && !e.shiftKey) || message.trim() === '') {
+                                        sendMessage();
                                     }
                                 }}
                                 InputProps={{
                                     endAdornment: (
                                         <InputAdornment position="end">
-                                            <IconButton disabled={!(message.trim())} onClick={sendMessage}>
+                                            <IconButton disabled={!message.trim()} onClick={sendMessage}>
                                                 <img
                                                     src={SendIcon}
                                                     alt="Send"
@@ -397,9 +371,7 @@ const ChatbotDashboard = () => {
                                     ),
                                 }}
                             />
-
                         </Box>
-
 
                         {/* Footer text */}
                         <Box sx={{
@@ -412,48 +384,29 @@ const ChatbotDashboard = () => {
                             borderBottomRightRadius: '24px',
                             padding: '10px',
                         }}>
-
-                            <ChatbotFooterText>By chatting, you agree to our privacy_policy.</ChatbotFooterText>
-
-
-
+                            <ChatbotFooterText>
+                                By chatting, you agree to our <a href="/privacy-policy" style={{ color: 'inherit' }}>Privacy Policy</a>.
+                            </ChatbotFooterText>
                         </Box>
-
-
-
-
-
                     </Box>
-
-
-
-
-
-
-
-
-
-
-
-
                 </Box>
 
                 <Box
-                sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                     display: role !== 'service' ? 'flex' : 'none',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: '900px',
-                    maxHeight: '40vh',
-                    backgroundColor: 'white',
-                    borderRadius: '24px',
-                    border: '1px solid #E3E3E3',
-                    padding: '20px',
-                }}
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        display: role !== 'service' ? 'flex' : 'none',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '900px',
+                        maxHeight: '40vh',
+                        backgroundColor: 'white',
+                        borderRadius: '24px',
+                        border: '1px solid #E3E3E3',
+                        padding: '20px',
+                    }}
                 >
                     <Typography sx={{
                         fontFamily: 'Inter',
@@ -464,29 +417,11 @@ const ChatbotDashboard = () => {
                         color: 'red',
                     }}>Only Available to Vendors</Typography>
                 </Box>
-
                 </>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             </Modal>
         </>
     );
 };
-
-
 
 const ChatInput = styled(TextField)(() => ({
     width: '100%',
@@ -536,7 +471,7 @@ const CustomOptionButton = styled(Button)({
     '&:hover': {
         backgroundColor: '#f0f0f0',
     },
-})
+});
 
 const CustomOPtionText = styled(Typography)({
     fontFamily: 'Inter',
@@ -550,7 +485,7 @@ const CustomOPtionText = styled(Typography)({
     overflow: 'visible',
     textOverflow: 'clip',
     whiteSpace: 'nowrap',
-})
+});
 
 const BotChatMessage = styled(Box)({
     display: 'flex',
@@ -561,8 +496,7 @@ const BotChatMessage = styled(Box)({
     padding: "16px 10px",
     borderRadius: '14px',
     border: '1px solid #E3E3E3',
-})
-
+});
 
 const UserChatMessage = styled(Box)({
     display: 'flex',
@@ -573,7 +507,7 @@ const UserChatMessage = styled(Box)({
     padding: "16px 10px",
     borderRadius: '14px',
     border: '1px solid #E3E3E3',
-})
+});
 
 const ChatbotTime = styled(Typography)({
     fontFamily: 'Inter',
@@ -582,7 +516,7 @@ const ChatbotTime = styled(Typography)({
     lineHeight: '30px',
     letterSpacing: '0%',
     color: '#646464',
-})
+});
 
 const ChatHeadingText = styled(Typography)({
     fontFamily: 'Inter',
@@ -591,8 +525,7 @@ const ChatHeadingText = styled(Typography)({
     lineHeight: '30px',
     letterSpacing: '0%',
     color: 'white',
-
-})
+});
 
 const ChatbotFooterText = styled(Typography)({
     fontFamily: 'Inter',
@@ -601,24 +534,6 @@ const ChatbotFooterText = styled(Typography)({
     lineHeight: '30px',
     letterSpacing: '0%',
     color: '#667085',
-})
-
-const parseAIMessage = (message) => {
-    return (
-        <ReactMarkdown
-            children={message} 
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-            components={{
-                p: ({ node, ...props }) => <Typography variant="body1" {...props} />,
-                ul: ({ node, ...props }) => <ul style={{ paddingLeft: "20px" }} {...props} />, 
-                ol: ({ node, ...props }) => <ol style={{ paddingLeft: "20px" }} {...props} />,
-                li: ({ node, ...props }) => <li {...props} />, 
-                a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" {...props} />,
-            }}
-        />
-    );
-};
-
+});
 
 export default ChatbotDashboard;

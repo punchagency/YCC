@@ -1,19 +1,19 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tooltip } from "primereact/tooltip";
+// import { Tooltip } from "primereact/tooltip";
 import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { Box, Typography, Card, CardContent, Chip } from "@mui/material";
 import NotificationDetailsModal from "../../components/NotificationDetailsModal";
-import sortNotification from "../../assets/images/crew/sortnotification.png";
+// import sortNotification from "../../assets/images/crew/sortnotification.png";
 import {
   getNotifications,
-  updateNotificationStatus,
+  // updateNotificationStatus,
   updateComplaintStatus,
 } from "../../services/notification/notificationService";
 import { TableSkeleton } from "../../components/TableSkeleton";
@@ -268,10 +268,10 @@ export default function Notifications({ role }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
-  const statusMenu = useRef(null);
+  // const statusMenu = useRef(null);
   const toast = useRef(null);
   const { showSuccess, showError } = useToast();
-  const menuRefs = useRef({});
+  // const menuRefs = useRef({});
 
   // Add responsive detection
   const muiTheme = useMuiTheme();
@@ -279,11 +279,21 @@ export default function Notifications({ role }) {
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
   const { theme } = useMuiTheme();
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+  const showToast = useCallback(
+    (severity, summary, detail) => {
+      if (toast.current) {
+        toast.current.show({ severity, summary, detail, life: 3000 });
+      }
 
-  const fetchNotifications = async () => {
+      if (severity === "success" && showSuccess) {
+        showSuccess(detail);
+      } else if (severity === "error" && showError) {
+        showError(detail);
+      }
+    },
+    [showSuccess, showError]
+  );
+  const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getNotifications();
@@ -316,19 +326,11 @@ export default function Notifications({ role }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showToast]);
 
-  const showToast = (severity, summary, detail) => {
-    if (toast.current) {
-      toast.current.show({ severity, summary, detail, life: 3000 });
-    }
-
-    if (severity === "success" && showSuccess) {
-      showSuccess(detail);
-    } else if (severity === "error" && showError) {
-      showError(detail);
-    }
-  };
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const filteredNotifications = notifications.filter((notification) =>
     activeFilter === "all"

@@ -4,14 +4,13 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Message } from "primereact/message";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
 
 const LoginForm = () => {
   // Define the options for the user roles
   const navigate = useNavigate(); // Add useNavigate hook
-  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -27,7 +26,6 @@ const LoginForm = () => {
   };
 
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const { loginUser } = useUser(); // Get loginUser function from context
@@ -60,8 +58,6 @@ const LoginForm = () => {
     console.log("Role before submission:", formData.role);
     if (!validateForm()) return;
 
-    setLoading(true);
-
     try {
       const response = await login(formData);
       console.log("Login response:", response);
@@ -76,15 +72,19 @@ const LoginForm = () => {
         // Store user data
         loginUser(response.data.user);
 
-        navigate("/admin/dashboard");
+        if (response.data.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (response.data.user.role === "supplier") {
+          navigate("/supplier/onboarding");
+        } else if (response.data.user.role === "service_provider") {
+          navigate("/vendor/onboarding");
+        }
       } else {
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.log("Error during login:", error);
       setError(error.message || "An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 

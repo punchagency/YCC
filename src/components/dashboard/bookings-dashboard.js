@@ -17,7 +17,7 @@ import { useInvoice } from "../../context/invoice/invoiceContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { red } from "@mui/material/colors";
+
 const Dashboard1 = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
@@ -32,6 +32,7 @@ const Dashboard1 = () => {
     fetchOrderSummary();
     fetchInvoices();
     fetchLowInventory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   console.log("lowInventory", lowInventory);

@@ -3,9 +3,8 @@ import { Box, Typography, Container, Button, styled, Grid, TextField } from '@mu
 import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
 import yatch from '../../assets/images/YCC-yatch.png'
 import banner from '../../assets/images/water-wide.png'
-import playIcon from '../../assets/images/icons/play-button.png'
 import { Link } from 'react-router-dom'
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
 const Section4Home = () => {
     const [isEditing, setIsEditing] = useState(false);

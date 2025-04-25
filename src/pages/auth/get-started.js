@@ -1,16 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/images/crew/back.png";
-import logo from "../../assets/images/start-logo.svg";
 import captain from "../../assets/images/captain1.svg";
-import hod from "../../assets/images/HOD.svg";
 import crew from "../../assets/images/mechanic1.svg";
 
 const GetStarted = ({ name }) => {
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
-  const title = "Explore the story behind Yacht Crew Center's journey.";
-  const description =
-    "The Vessel Compliance and Maintenance Management System is designed to digitize and automate the management of vessel compliance, maintenance, and financial operations. Tailored for captains, managers, and crew members, it aims to enhance operational efficiency and ensure regulatory compliance.";
+  // const title = "Explore the story behind Yacht Crew Center's journey.";
+  // const description =
+  //   "The Vessel Compliance and Maintenance Management System is designed to digitize and automate the management of vessel compliance, maintenance, and financial operations. Tailored for captains, managers, and crew members, it aims to enhance operational efficiency and ensure regulatory compliance.";
 
   // Define the options for the user roles
   const roles = [

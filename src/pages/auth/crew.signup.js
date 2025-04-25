@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/water.jpg";
 import check from "../../assets/images/check1.png";
 // import logo from "../../assets/images/logo-login.png";
@@ -45,8 +45,8 @@ const StepInfo = ({ currentStep }) => {
 };
 
 const Signup = () => {
-  const location = useLocation();
-  const role = location.state?.role || "Guest";
+  // const location = useLocation();
+  // const role = location.state?.role || "Guest";
   const [step, setStep] = useState(1);
 
   // Add formData state here in the parent

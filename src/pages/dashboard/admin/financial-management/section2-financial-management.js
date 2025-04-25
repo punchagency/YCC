@@ -2,7 +2,7 @@ import {
   Box,
   Typography,
   Button,
-  styled,
+
   Menu,
   MenuItem,
   InputBase,
@@ -49,7 +49,7 @@ const Section2FinancialManagement = ({
     }, 300);
 
     return () => clearTimeout(debounce);
-  }, [query]);
+  }, [query, setSearch]);
 
   const handleSelect = (option) => {
     if (option === "all") {

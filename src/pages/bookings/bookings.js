@@ -1,35 +1,35 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { TabView, TabPanel } from "primereact/tabview";
+// import { useNavigate } from "react-router-dom";
+// import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
-import lone from "../../assets/images/crew/lone.png";
-import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-import iconexpire from "../../assets/images/crew/iconexpire.png";
-import iconcareer from "../../assets/images/crew/iconcareer.png";
-import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Doughnut, Line } from "react-chartjs-2";
-import sourceData from "../../data/sourceData.json";
-import analyticsData from "../../data/analyticsData.json";
-import sort from "../../assets/images/crew/sort.png";
+// import lone from "../../assets/images/crew/lone.png";
+// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
+// import iconexpire from "../../assets/images/crew/iconexpire.png";
+// import iconcareer from "../../assets/images/crew/iconcareer.png";
+// import { Chart as ChartJS } from "chart.js/auto";
+// import { Bar, Doughnut, Line } from "react-chartjs-2";
+// import sourceData from "../../data/sourceData.json";
+// import analyticsData from "../../data/analyticsData.json";
+// import sort from "../../assets/images/crew/sort.png";
 import editLogo from "../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../assets/images/crew/deleteLogo.png";
+// import deleteLogo from "../../assets/images/crew/deleteLogo.png";
 import plus from "../../assets/images/crew/plus.png";
-import eyesIn from "../../assets/images/crew/eyes-in.png";
+// import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { InputTextarea } from "primereact/inputtextarea";
+// import { InputTextarea } from "primereact/inputtextarea";
 import uploadBooking from "../../assets/images/crew/uploadBooking.png";
-import downloadIcon from "../../assets/images/crew/downloadIcon.png";
-import times from "../../assets/images/crew/times.png";
+// import downloadIcon from "../../assets/images/crew/downloadIcon.png";
+// import times from "../../assets/images/crew/times.png";
 import check from "../../assets/images/crew/check.png";
 import eyeblock from "../../assets/images/crew/eyeblock.png";
 import sortIcon from "../../assets/images/crew/sort.png";
 import deleteIcon from "../../assets/images/crew/delete.png";
-import axios from "axios";
+// import axios from "axios";
 import "./bookings.css";
 import {
   getAllBookingService,
@@ -44,25 +44,25 @@ import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
 import { useTheme } from "../../context/theme/themeContext";
 import { useToast } from "../../components/Toast";
-import { formGroupClasses } from "@mui/material";
+// import { formGroupClasses } from "@mui/material";
 
 const Bookings = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Context
   const {
     bookings,
-    deleteBooking,
+    // deleteBooking,
     fetchBookings,
     updateBooking,
-    updateBookingStatus,
+    // updateBookingStatus,
   } = useBooking();
   const { services, fetchServices } = useService();
   const { theme } = useTheme();
   const { showSuccess, showError } = useToast();
 
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedReview, setSelectedReview] = useState("");
+  const [selectedReview] = useState("");
   const statusMenuRef = useRef(null);
   const [selectedBookingForStatus, setSelectedBookingForStatus] =
     useState(null);
@@ -74,7 +74,7 @@ const Bookings = () => {
   const [selectedBookingForUpload, setSelectedBookingForUpload] =
     useState(null);
   // fetching of services
-  const [getServices, setGetServices] = useState([]);
+  // const [getServices, setGetServices] = useState([]);
   const [bookingData, setBookingData] = useState([]);
 
   const [uploadForm, setUploadForm] = useState({
@@ -117,12 +117,12 @@ const Bookings = () => {
     fetchServices();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [fetchBookings, fetchServices]);
 
-  const handleViewReview = (review) => {
-    setSelectedReview(review);
-    setShowReviewModal(true);
-  };
+    // const handleViewReview = (review) => {
+    //   setSelectedReview(review);
+    //   setShowReviewModal(true);
+    // };
 
   // Update the handleStatusChange function to ensure real-time updates
   const handleStatusChange = async (booking, newStatus) => {
@@ -187,7 +187,7 @@ const Bookings = () => {
   };
 
   const handleEditServiceChange = (e) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     const service = services.find((service) => service._id === value);
     setEditingBooking({
       ...editingBooking,
@@ -202,12 +202,12 @@ const Bookings = () => {
     });
   };
 
-  const handleEditStatusChange = (e) => {
-    setEditingBooking({
-      ...editingBooking,
-      status: e.value,
-    });
-  };
+  // const handleEditStatusChange = (e) => {
+  //   setEditingBooking({
+  //     ...editingBooking,
+  //     status: e.value,
+  //   });
+  // };
 
   const handleSaveBooking = () => {
     try {
@@ -375,11 +375,8 @@ const Bookings = () => {
     }
   };
 
-  useEffect(() => {
-    fetchBookingsData();
-  }, [currentPage, pageSize]);
-
-  const fetchBookingsData = async () => {
+  // Use useCallback to define the function
+  const fetchBookingsData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getAllBookingService(currentPage, pageSize);
@@ -408,7 +405,12 @@ const Bookings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize, showError]);
+
+  // Now use the function in useEffect
+  useEffect(() => {
+    fetchBookingsData();
+  }, [fetchBookingsData]); // Now it's safe to include in dependencies
 
   // Update the getFormattedServices function
   const getFormattedServices = () => {

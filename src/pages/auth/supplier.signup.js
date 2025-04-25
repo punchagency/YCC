@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+// import { Link, useLocation } from "react-router-dom";
 import backgroundImage from "../../assets/images/water.jpg";
 import check from "../../assets/images/check1.png";
 import yachtCrew from "../../assets/images/yacht.png"; // Add appropriate vendor image

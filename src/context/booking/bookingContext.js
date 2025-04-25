@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState, useRef } from "react";
+import React, { createContext, useContext, useState} from "react";
 import {
-  getBookingService,
+  // getBookingService,
   updateBookingService,
-  deleteBookingService,
+  // deleteBookingService,
   updateBookingStatusService,
   getAllBookingService,
 } from "../../services/bookings/bookingService";
-import { useUser } from "../userContext";
+// import { useUser } from "../userContext";
 import { useToast } from "../toast/toastContext";
 const BookingContext = createContext();
 
@@ -20,12 +20,12 @@ export const useBooking = () => {
 
 export const BookingProvider = ({ children }) => {
   const { toast } = useToast();
-  const { user } = useUser();
+  // const { user } = useUser();
 
   const [bookings, setBookings] = useState([]);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
+  // const [page, setPage] = useState(1);
+  // const [limit, setLimit] = useState(10);
+  // const [totalPages, setTotalPages] = useState(0);
 
   const fetchBookings = async () => {
     try {
@@ -33,8 +33,8 @@ export const BookingProvider = ({ children }) => {
 
       if (result.status) {
         setBookings(result.data);
-        setTotalPages(result.data.totalPages);
-        setLimit(result.data.limit);
+        // setTotalPages(result.data.totalPages);
+        // setLimit(result.data.limit);
         return true;
       } else {
         console.error("Error fetching bookings:", result.message);
@@ -141,7 +141,7 @@ export const BookingProvider = ({ children }) => {
 
   const deleteBooking = async (bookingId) => {
     try {
-      const response = await deleteBookingService(bookingId);
+      // const response = await deleteBookingService(bookingId);
       setBookings(bookings.filter((booking) => booking._id !== bookingId));
       toast.current.show({
         severity: "success",

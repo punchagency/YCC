@@ -15,10 +15,8 @@ const BookingCalenderCard = () => {
   const { theme } = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
 
   const [selectedDate, setSelectedDate] = useState(13);
-  const [viewingDate, setViewingDate] = useState(11);
 
   // Calendar data for March 2025
   const calendarData = [
@@ -182,7 +180,7 @@ const BookingCalenderCard = () => {
               fontFamily: "Plus Jakarta Sans",
             }}
           >
-            Tasks for March {viewingDate}th, 2025:
+            Tasks for March {selectedDate}th, 2025:
           </Typography>
           <Typography
             sx={{
