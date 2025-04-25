@@ -21,8 +21,6 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   const { uploadServicesData, verifyOnboardingStep1 } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadMethod, setUploadMethod] = useState(null);
-  const [apiEndpoint, setApiEndpoint] = useState("");
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null)
@@ -36,12 +34,6 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   });
   
   // Sample template structure - you can modify this based on your requirements
-  const templateStructure = `
-Required Fields:
-- Service Name
-- Description
-- Price
-`;
 
   const requiredHeaders = ["service name", "description", "price"];
 
@@ -80,6 +72,7 @@ Required Fields:
     };
 
     verifyInventoryUpload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -92,7 +85,6 @@ Required Fields:
     setShowDialog(false);
     setDialogType(null);
     setSelectedFile(null);
-    setApiEndpoint("");
   };
 
   const handleFileUpload = (e, dialogType) => {
@@ -336,7 +328,6 @@ const StyledButton = styled(Button)(() => ({
 
 const StyledSecondaryButton = styled(Button)(() => ({
   position: "relative",
-  border: "none",
   borderRadius: "8px",
   textTransform: "none",
   background: "white",

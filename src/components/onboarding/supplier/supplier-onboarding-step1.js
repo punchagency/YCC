@@ -21,23 +21,13 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const { uploadInventoryData, verifyOnboardingStep1 } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadMethod, setUploadMethod] = useState(null);
-  const [apiEndpoint, setApiEndpoint] = useState("");
+  const [apiEndpoint, setApiEndpoint] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false);
   const hasRunRef = useRef(false);
   
-  // Sample template structure - you can modify this based on your requirements
-  const templateStructure = `
-Required Fields:
-- Product Name
-- Product Description
-- Product Price
-- Product Image
-- Product Stock
-`;
 
   const requiredHeaders = ["product name"]//, "product description", "product price", "product image", "product stock"];
 
@@ -76,7 +66,7 @@ Required Fields:
     };
 
     verifyInventoryUpload();
-  }, []);
+  }, [handleNext, verifyOnboardingStep1]);
 
 
   const handleOpenDialog = (type) => {
@@ -119,7 +109,7 @@ Required Fields:
   };
   const handleSubmit = async () => {
     setIsLoading(true);
-    if (uploadMethod === "api" && apiEndpoint) {
+    if (apiEndpoint) {
       console.log("Submitting API endpoint:", apiEndpoint);
     } else if (selectedFile) {
       console.log("Submitting file:", selectedFile);
@@ -268,7 +258,6 @@ const StyledButton = styled(Button)(() => ({
 
 const StyledSecondaryButton = styled(Button)(() => ({
   position: "relative",
-  border: "none",
   borderRadius: "8px",
   textTransform: "none",
   background: "white",

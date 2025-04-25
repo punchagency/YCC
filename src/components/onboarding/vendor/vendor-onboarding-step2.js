@@ -11,6 +11,7 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
 
   useEffect(() => {
     getStripeAccount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
     }else if(stripeAccount){
       setShowContinueButton(true);    
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stripeAccount]);
 
   const handleCreateStripeAccount = async () => {

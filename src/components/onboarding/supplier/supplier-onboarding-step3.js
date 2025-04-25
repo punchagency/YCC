@@ -4,7 +4,7 @@ import { useUser } from "../../../context/userContext";
 import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 const SupplierOnboardingStep3 = ({ handleNext }) => {
-  const { user, verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
+  const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
   const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [inventoryData, setInventoryData] = useState(null);
@@ -27,7 +27,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
     };
 
     verifyInventoryUpload();
-  }, []);
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1]);
 
   const handleFinish = async () => {
     const status = await completeOnboarding();

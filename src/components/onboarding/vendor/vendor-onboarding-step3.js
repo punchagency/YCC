@@ -4,17 +4,18 @@ import { useUser } from "../../../context/userContext";
 import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 const VendorOnboardingStep3 = ({ handleNext }) => {
-  const { user, verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
+  const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
   const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [servicesData, setServicesData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    if (hasRunRef.current) return; // prevent second run
-    hasRunRef.current = true;
 
+  useEffect(() => {
     const verifyInventoryUpload = async () => {
-      //check onboardiing status
+      if (hasRunRef.current) return;
+      hasRunRef.current = true;
+
+      //check onboarding status
       const status = await checkOnboardingStatus();
       if(status === true){
         handleNext();
@@ -28,7 +29,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
     };
 
     verifyInventoryUpload();
-  }, []);
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1]); // Add dependencies
 
   const handleFinish = async () => {
     const status = await completeOnboarding();

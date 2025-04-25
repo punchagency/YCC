@@ -20,31 +20,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import VendorOnboardingStep1 from "../../components/onboarding/vendor/vendor-onboarding-step1";
 import VendorOnboardingStep2 from "../../components/onboarding/vendor/vendor-onboarding-step2";
 import VendorOnboardingStep3 from "../../components/onboarding/vendor/vendor-onboarding-step3";
-const QontoConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 10,
-    left: "calc(-50% + 16px)",
-    right: "calc(50% + 16px)",
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor: "#eaeaf0",
-    borderTopWidth: 3,
-    borderRadius: 1,
-    ...theme.applyStyles("dark", {
-      borderColor: theme.palette.grey[800],
-    }),
-  },
-}));
 
 const QontoStepIconRoot = styled("div")(({ theme }) => ({
   color: "#eaeaf0",
@@ -212,10 +187,6 @@ const VendorOnboarding = () => {
 
   const handleNext = () => {
     setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevStep) => Math.max(prevStep - 1, 0));
   };
 
   const handleReset = () => {
