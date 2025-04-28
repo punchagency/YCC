@@ -75,9 +75,9 @@ const LoginForm = () => {
         if (response.data.user.role === "admin") {
           navigate("/admin/dashboard");
         } else if (response.data.user.role === "supplier") {
-          navigate("/supplier/onboarding");
+          navigate("/supplier-vendor/onboarding");
         } else if (response.data.user.role === "service_provider") {
-          navigate("/vendor/onboarding");
+          navigate("/service-provider/onboarding");
         }
       } else {
         setError(response.message || "Login failed. Please try again.");

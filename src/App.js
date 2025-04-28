@@ -109,10 +109,10 @@ function App() {
 
           {/* Onboarding Routes */}
           <Route element={<OnboardingPageLayout />}>
-            <Route path="/supplier/onboarding" element={<SupplierOnboarding />} />
-            <Route path="/supplier/onboarding/refresh-stripe-account" element={<SupplierOnboardingStep2 />} />
-            <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
-            <Route path="/vendor/onboarding/refresh-stripe-account" element={<VendorOnboardingStep2 />} />
+            <Route path="/supplier-vendor/onboarding" element={<SupplierOnboarding />} />
+            <Route path="/supplier-vendor/onboarding/refresh-stripe-account" element={<SupplierOnboardingStep2 />} />
+            <Route path="/service-provider/onboarding" element={<VendorOnboarding />} />
+            <Route path="/service-provider/onboarding/refresh-stripe-account" element={<VendorOnboardingStep2 />} />
           </Route>
 
 
