@@ -5,7 +5,7 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 
 // Add authentication token to requests
-const getAuthHeader = () => {
+export const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
