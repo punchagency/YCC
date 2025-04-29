@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState} from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import {
   // getBookingService,
   updateBookingService,
@@ -27,7 +27,7 @@ export const BookingProvider = ({ children }) => {
   // const [limit, setLimit] = useState(10);
   // const [totalPages, setTotalPages] = useState(0);
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     try {
       const result = await getAllBookingService();
 
@@ -44,9 +44,9 @@ export const BookingProvider = ({ children }) => {
       console.error("Error fetching bookings:", error);
       return false;
     }
-  };
+  }, []);
 
-  const updateBooking = async (bookingId, bookingData) => {
+  const updateBooking = useCallback(async (bookingId, bookingData) => {
     try {
       console.log("Updating booking with ID:", bookingId);
       console.log("Booking data being sent to API:", bookingData);
@@ -92,9 +92,9 @@ export const BookingProvider = ({ children }) => {
       });
       return false;
     }
-  };
+  }, [toast]);
 
-  const updateBookingStatus = async (bookingId, status) => {
+  const updateBookingStatus = useCallback(async (bookingId, status) => {
     try {
       const response = await updateBookingStatusService(bookingId, status);
 
@@ -137,9 +137,9 @@ export const BookingProvider = ({ children }) => {
 
       return false;
     }
-  };
+  }, [bookings, toast]);
 
-  const deleteBooking = async (bookingId) => {
+  const deleteBooking = useCallback(async (bookingId) => {
     try {
       // const response = await deleteBookingService(bookingId);
       setBookings(bookings.filter((booking) => booking._id !== bookingId));
@@ -159,7 +159,7 @@ export const BookingProvider = ({ children }) => {
       });
       return false;
     }
-  };
+  }, [bookings, toast]);
 
   return (
     <BookingContext.Provider
