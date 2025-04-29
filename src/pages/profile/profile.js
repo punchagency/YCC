@@ -55,7 +55,7 @@ const CrewSetting = () => {
               <button onClick={handleEdit}>Edit</button>
             </div>
           </div>
-          <div>
+          {/* <div>
             <div>
               <p className="profile-about-title">About</p>
               <p>
@@ -67,7 +67,7 @@ const CrewSetting = () => {
                 Etiam Donec Tellus Nunc Gravida.
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="personal-information-section">

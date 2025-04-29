@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
 import { InputText } from "primereact/inputtext";
@@ -10,6 +11,7 @@ import {
   getInventoryData,
   updateInventoryItem,
   deleteInventoryItem,
+  getInventoryItemById,
 } from "../../services/inventory/inventoryService";
 // import lone from "../../assets/images/crew/lone.png";
 // import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
@@ -66,6 +68,9 @@ const InventoryTableSkeleton = () => {
 
 const Invent = () => {
   const toast = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { inventoryId } = useParams(); // Get inventory ID from URL params
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -111,7 +116,7 @@ const Invent = () => {
   const [first, setFirst] = useState(0);
   const [rows] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Add these state variables at the top with your other state variables
@@ -122,6 +127,9 @@ const Invent = () => {
   const [productImage, setProductImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
+  // Add a state to track whether we should update the URL
+  const [shouldUpdateURL, setShouldUpdateURL] = useState(true);
+
   // Inside your component, define the service area options
   const serviceAreaOptions = [
     { label: "Caribbean", value: "caribbean" },
@@ -129,9 +137,18 @@ const Invent = () => {
     { label: "USA", value: "usa" },
   ];
 
+  // Add this useEffect to handle URL parameters
+  useEffect(() => {
+    // Check if we have an inventory ID in the URL
+    if (inventoryId) {
+      fetchInventoryItemById(inventoryId);
+    }
+  }, [inventoryId]);
+
   // Fetch inventory data when component mounts
   useEffect(() => {
-    fetchInventoryData();
+    fetchInventoryData(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Function to fetch inventory data from API
@@ -407,26 +424,63 @@ const Invent = () => {
     }
   };
 
-  const handleView = (index) => {
-    const item = inventoryItems[index];
-    setViewItem({
-      id: item.id,
-      productName: item.productName,
-      category: item.category,
-      serviceArea: item.serviceArea,
-      stockQuantity: item.stockQuantity,
-      price: item.price,
-      productImage: item.productImage,
-    });
+  // Update the view item handler
+  const handleViewItem = (item) => {
+    setViewItem(item);
     setShowViewModal(true);
+    
+    // Only update URL if we should
+    if (shouldUpdateURL) {
+      navigate(`/admin/inventory-management/${item.id}`);
+    }
   };
 
-  // Add pagination change handler
+  // Simplified modal close handler
+  const handleCloseViewModal = () => {
+    // Disable URL updates temporarily to prevent race conditions
+    setShouldUpdateURL(false);
+    
+    // Close the modal
+    setShowViewModal(false);
+    
+    // Navigate after a short delay
+    setTimeout(() => {
+      navigate('/admin/inventory-management', { replace: true });
+      
+      // Re-enable URL updates after navigation
+      setTimeout(() => {
+        setShouldUpdateURL(true);
+      }, 50);
+    }, 50);
+  };
+
+  // Effect to handle URL parameters
+  useEffect(() => {
+    // If we have an ID in the URL and should update
+    if (inventoryId && shouldUpdateURL) {
+      fetchInventoryItemById(inventoryId);
+    }
+  }, [inventoryId, shouldUpdateURL]);
+  
+  // Effect to handle browser navigation
+  useEffect(() => {
+    // If we navigate away and the modal is open
+    if (!inventoryId && showViewModal && shouldUpdateURL) {
+      setShowViewModal(false);
+    }
+  }, [inventoryId, showViewModal, shouldUpdateURL]);
+
+  // Update the onPageChange function to actually fetch data for the new page
   const onPageChange = (event) => {
+    const newPage = Math.floor(event.first / rows) + 1;
+    setCurrentPage(newPage);
     setFirst(event.first);
-    const page = Math.floor(event.first / rows) + 1;
-    setCurrentPage(page);
-    fetchInventoryData(page);
+    
+    // Show loading state
+    setIsPageLoading(true);
+    
+    // Fetch data for the new page
+    fetchInventoryData(newPage);
   };
 
   // Handle select all checkbox
@@ -530,6 +584,46 @@ const Invent = () => {
     }
   };
 
+  // Function to fetch a single inventory item by ID
+  const fetchInventoryItemById = async (id) => {
+    try {
+      setIsLoading(true);
+      const result = await getInventoryItemById(id);
+      
+      if (result.success) {
+        const item = {
+          id: result.data._id,
+          productName: result.data.product?.name || "Unknown Product",
+          category: result.data.product?.category || "Uncategorized",
+          serviceArea: result.data.product?.serviceArea || "Not specified",
+          stockQuantity: result.data.quantity || 0,
+          price: result.data.price || 0,
+          productImage: result.data.productImage || null,
+        };
+        
+        setViewItem(item);
+        setShowViewModal(true);
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to load inventory item",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching inventory item:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error loading inventory item",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Render mobile card view for inventory items
   const renderMobileInventoryCards = () => {
     return (
@@ -598,7 +692,7 @@ const Invent = () => {
                     height: "18px",
                     cursor: "pointer",
                   }}
-                  onClick={() => handleView(index)}
+                  onClick={() => handleViewItem(item)}
                 />
                 <img
                   src={editLogo}
@@ -742,7 +836,7 @@ const Invent = () => {
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Inventory</h3>
+            <h3 style={{ margin: "0 0 10px 20px" }}>Inventory</h3>
           </div>
         </div>
       </div>
@@ -1082,7 +1176,7 @@ const Invent = () => {
                                       height: "18px",
                                       cursor: "pointer",
                                     }}
-                                    onClick={() => handleView(index)}
+                                    onClick={() => handleViewItem(item)}
                                   />
                                   <img
                                     src={editLogo}
@@ -1524,16 +1618,12 @@ const Invent = () => {
 
       <Dialog
         visible={showViewModal}
-        onHide={() => setShowViewModal(false)}
+        onHide={handleCloseViewModal}
         header="Inventory Summary"
         className="view-inventory-modal"
+        style={{ width: '80%', maxWidth: '800px' }}
         modal
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "35vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
-        }}
+        blockScroll
       >
         <div className="view-form">
           {/* Product Image and Name Section */}

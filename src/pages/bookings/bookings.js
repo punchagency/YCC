@@ -107,22 +107,30 @@ const Bookings = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState(null);
 
+  const runCount = useRef(0);
+
   // Add this useEffect to handle window resizing
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
       setIsTablet(window.innerWidth > 768 && window.innerWidth <= 1024);
     };
-    fetchBookings();
-    fetchServices();
+
+    // Add reference counting to prevent multiple fetches
+    if (runCount.current < 1) {
+      runCount.current += 1;
+      fetchBookings();
+      fetchServices();
+    }
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [fetchBookings, fetchServices]);
+  }, []); // Empty dependency array to run only once
 
-    // const handleViewReview = (review) => {
-    //   setSelectedReview(review);
-    //   setShowReviewModal(true);
-    // };
+  // const handleViewReview = (review) => {
+  //   setSelectedReview(review);
+  //   setShowReviewModal(true);
+  // };
 
   // Update the handleStatusChange function to ensure real-time updates
   const handleStatusChange = async (booking, newStatus) => {
@@ -710,7 +718,10 @@ const Bookings = () => {
   };
 
   return (
-    <>
+    <div
+      className="bookings-management"
+      style={{ width: "100%", padding: 0, margin: 0 }}
+    >
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{
@@ -723,7 +734,7 @@ const Bookings = () => {
             <h3
               style={{
                 fontSize: isMobile ? "16px" : isTablet ? "18px" : "20px",
-                margin: "0 0 10px 0",
+                margin: "0 0 10px 20px",
               }}
             >
               Bookings
@@ -2316,7 +2327,7 @@ const Bookings = () => {
           </span>
         </div>
       </Dialog>
-    </>
+    </div>
   );
 };
 

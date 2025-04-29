@@ -249,3 +249,23 @@ export const updateProductInventoryStatus = async (
     };
   }
 };
+
+export const getInventoryItemById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory/${id}`, {
+      headers: getAuthHeader(),
+    });
+    
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error(`Error fetching inventory item ${id}:`, error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch inventory item",
+    };
+  }
+};

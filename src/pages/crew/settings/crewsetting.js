@@ -9,9 +9,24 @@ import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
 import { useNotifications } from "../../../context/notificationsContext";
 import { Toast } from "primereact/toast";
+import { updateUserSettings } from "../../../services/crewSettings/crewsettings";
 
 // import { Menu } from "primereact/menu";
 // import { confirmDialog } from "primereact/confirmdialog";
+
+// Define these arrays outside the component to prevent infinite loops
+const LANGUAGES = [
+  { name: "English", code: "en" },
+  { name: "Spanish", code: "es" },
+  { name: "French", code: "fr" },
+  { name: "German", code: "de" },
+  { name: "Italian", code: "it" },
+  { name: "Portuguese", code: "pt" },
+  { name: "Russian", code: "ru" },
+  { name: "Chinese", code: "zh" },
+  { name: "Japanese", code: "ja" },
+  { name: "Arabic", code: "ar" },
+];
 
 const CrewSetting = () => {
   const navigate = useNavigate();
@@ -23,12 +38,14 @@ const CrewSetting = () => {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [accountVisibility, setAccountVisibility] = useState(true);
   const [theme, setTheme] = useState("light");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Populate form with user data when available
@@ -54,25 +71,81 @@ const CrewSetting = () => {
     }
   }, [user]);
 
-  const handleSaveChanges = () => {
-    console.log("Saving changes:", {
-      name,
-      email,
-      password,
-      confirmPassword,
-      phone,
-      twoFactorEnabled,
-      notificationsEnabled,
-    });
+  const handleSaveChanges = async () => {
+    setLoading(true);
 
-    // Show success message
-    if (toast.current) {
+    // Validate form
+    if (password && password !== confirmPassword) {
       toast.current.show({
-        severity: "success",
-        summary: "Settings Saved",
-        detail: "Your settings have been updated successfully",
+        severity: "error",
+        summary: "Error",
+        detail: "New password and confirm password do not match",
         life: 3000,
       });
+      setLoading(false);
+      return;
+    }
+
+    // Prepare data for API
+    const settingsData = {
+      name,
+      email,
+      phone,
+    };
+
+    // Add password fields if changing password
+    if (password) {
+      if (!currentPassword) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Current password is required to change password",
+          life: 3000,
+        });
+        setLoading(false);
+        return;
+      }
+
+      settingsData.currentPassword = currentPassword;
+      settingsData.newPassword = password;
+      settingsData.confirmPassword = confirmPassword;
+    }
+
+    try {
+      const response = await updateUserSettings(settingsData);
+
+      if (response.status) {
+        // Clear password fields
+        setCurrentPassword("");
+        setPassword("");
+        setConfirmPassword("");
+
+        // Show success message
+        toast.current.show({
+          severity: "success",
+          summary: "Settings Saved",
+          detail: "Your settings have been updated successfully",
+          life: 3000,
+        });
+      } else {
+        // Show error message
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: response.message || "Failed to update settings",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An unexpected error occurred",
+        life: 3000,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -120,7 +193,12 @@ const CrewSetting = () => {
         <div className="flex align-items-center justify-content-between sub-header-panel">
           <div className="sub-header-left sub-header-left-with-arrow">
             <div className="content">
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <h3
+                style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  paddingLeft: "20px",
+                }}
+              >
                 Settings
               </h3>
             </div>
@@ -129,15 +207,16 @@ const CrewSetting = () => {
 
         <div className="settings-container">
           <div className="settings-grid">
-            <div className="settings-form-group">
+            {/* <div className="settings-form-group">
               <label>Username</label>
               <InputText
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Name"
                 style={{ width: "100%" }}
+                disabled={loading}
               />
-            </div>
+            </div> */}
 
             <div className="settings-form-group">
               <label>Email</label>
@@ -146,18 +225,33 @@ const CrewSetting = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter Email Address"
                 style={{ width: "100%" }}
+                disabled={loading}
               />
             </div>
 
             <div className="settings-form-group">
-              <label>Password</label>
+              <label>Current Password</label>
               <Password
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Current Password (required for password change)"
                 feedback={false}
                 style={{ width: "100%" }}
                 toggleMask
+                disabled={loading}
+              />
+            </div>
+
+            <div className="settings-form-group">
+              <label>New Password</label>
+              <Password
+                value={password}
+                onChange={(e) => setPassword(e.target.value)} 
+                placeholder="New Password"
+                feedback={true}
+                style={{ width: "100%" }}
+                toggleMask
+                disabled={loading}
               />
             </div>
 
@@ -170,19 +264,21 @@ const CrewSetting = () => {
                 feedback={false}
                 toggleMask
                 style={{ width: "100%" }}
+                disabled={loading}
               />
             </div>
 
-            <div className="settings-form-group">
+            {/* <div className="settings-form-group">
               <label>Phone Number</label>
               <InputText
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Add Phone Number"
+                disabled={loading}
               />
-            </div>
+            </div> */}
 
-            <div className="settings-form-group">
+            {/* <div className="settings-form-group">
               <label>Two-Factor Authentication</label>
               <InputText placeholder="Verify Your Two-Factor Authentication" />
             </div>
@@ -208,9 +304,9 @@ const CrewSetting = () => {
                   style={{ width: "100%" }}
                 />
               </div>
-            </div>
+            </div> */}
 
-            <div className="settings-form-group">
+            {/* <div className="settings-form-group">
               <label>Account Visibility</label>
               <div className="toggle-container">
                 <span>Visible Now</span>
@@ -219,7 +315,7 @@ const CrewSetting = () => {
                   onChange={(e) => setAccountVisibility(e.value)}
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* <div className="settings-form-group delete-account">
               <label>Delete Accounts</label>
@@ -239,11 +335,14 @@ const CrewSetting = () => {
               label="Cancel"
               className="p-button-danger"
               onClick={() => navigate(-1)}
+              disabled={loading}
             />
             <Button
-              label="Save"
+              label={loading ? "Saving..." : "Save"}
               className="p-button-primary"
               onClick={handleSaveChanges}
+              disabled={loading}
+              loading={loading}
             />
           </div>
         </div>

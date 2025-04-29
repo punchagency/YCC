@@ -97,6 +97,7 @@ function App() {
             <Route path="/admin/bookings-management" element={<Bookings />} />
             <Route path="/admin/orders-management" element={<Order />} />
             <Route path="/admin/inventory-management" element={<Invent />} />
+            <Route path="/admin/inventory-management/:inventoryId" element={<Invent />} />
             <Route
               path="/admin/financial-management"
               element={<AdminFinancialManagement />}
