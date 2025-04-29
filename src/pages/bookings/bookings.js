@@ -125,7 +125,7 @@ const Bookings = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []); // Empty dependency array to run only once
+  }, [fetchBookings, fetchServices]); // Empty dependency array to run only once
 
   // const handleViewReview = (review) => {
   //   setSelectedReview(review);
