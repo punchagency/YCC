@@ -5,7 +5,7 @@ import axios from "axios";
 const API_URL = process.env.REACT_APP_API_URL;
 
 // Add authentication token to requests
-const getAuthHeader = () => {
+export const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
@@ -246,6 +246,26 @@ export const updateProductInventoryStatus = async (
       error:
         error.response?.data?.message ||
         "Failed to update product inventory status",
+    };
+  }
+};
+
+export const getInventoryItemById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory/${id}`, {
+      headers: getAuthHeader(),
+    });
+    
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error(`Error fetching inventory item ${id}:`, error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch inventory item",
     };
   }
 };

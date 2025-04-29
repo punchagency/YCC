@@ -52,6 +52,14 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const [showExcelModal, setShowExcelModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
 
+  // Update your searchFilters state to include sorting preferences
+  const [searchFilters, setSearchFilters] = useState({
+    type: "all",
+    status: "all",
+    sortField: "relevance",
+    sortDirection: "desc"
+  });
+
   useEffect(() => {
     fetchNotifications();
   }, []);
@@ -85,65 +93,112 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const filterMenuRef = useRef(null);
   const sortMenuRef = useRef(null);
 
+  // Update your sort menu items
+  const sortItems = [
+    {
+      label: "Relevance",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "relevance", sortDirection: "desc"});
+        if (showSearchModal) {
+          setShowSearchModal(false);
+          setTimeout(() => setShowSearchModal(true), 0);
+        } else {
+          setShowSearchModal(true);
+        }
+      }
+    },
+    {
+      label: "Date (Newest)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "date", sortDirection: "desc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Date (Oldest)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "date", sortDirection: "asc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Name (A-Z)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "name", sortDirection: "asc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Name (Z-A)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "name", sortDirection: "desc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Status",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "status", sortDirection: "asc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Price (High to Low)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "price", sortDirection: "desc"});
+        setShowSearchModal(true);
+      }
+    },
+    {
+      label: "Price (Low to High)",
+      command: () => {
+        setSearchFilters({...searchFilters, sortField: "price", sortDirection: "asc"});
+        setShowSearchModal(true);
+      }
+    }
+  ];
+
   // Define menu items for Filter and Sort
   const filterItems = [
     {
+      label: "All Items",
+      command: () => {
+        setSearchFilters({...searchFilters, type: "all"});
+        if (showSearchModal) {
+          // If modal is already open, this will apply the filter
+          setShowSearchModal(false);
+          setTimeout(() => setShowSearchModal(true), 0);
+        }
+      }
+    },
+    {
       label: "Vendors",
       command: () => {
-        console.log("Filter by Vendor");
-      },
+        setSearchFilters({...searchFilters, type: "vendors"});
+        setShowSearchModal(true);
+      }
     },
     {
-      label: "Yacht",
+      label: "Orders",
       command: () => {
-        console.log("Filter by Yacht");
-      },
+        setSearchFilters({...searchFilters, type: "orders"});
+        setShowSearchModal(true);
+      }
     },
     {
-      label: "Order Status",
+      label: "Bookings",
       command: () => {
-        console.log("Filter by Order Status");
-      },
+        setSearchFilters({...searchFilters, type: "bookings"});
+        setShowSearchModal(true);
+      }
     },
     {
-      label: "Priority",
+      label: "Inventory",
       command: () => {
-        console.log("Filter by Priority");
-      },
-    },
-    {
-      label: "Delivery Date",
-      command: () => {
-        console.log("Filter by Delivery Date");
-      },
-    },
-  ];
-
-  const sortItems = [
-    {
-      label: "Date Placed",
-      command: () => {
-        console.log("Sort by Date Placed");
-      },
-    },
-    {
-      label: "Order Value",
-      command: () => {
-        console.log("Sort by Order Value");
-      },
-    },
-    {
-      label: "Urgency",
-      command: () => {
-        console.log("Sort by Urgency");
-      },
-    },
-    {
-      label: "Fulfillment Status",
-      command: () => {
-        console.log("Sort by Fulfillment Status");
-      },
-    },
+        setSearchFilters({...searchFilters, type: "inventories"});
+        setShowSearchModal(true);
+      }
+    }
   ];
 
   // Share menu items
@@ -864,6 +919,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         visible={showSearchModal}
         onHide={() => setShowSearchModal(false)}
         initialQuery={searchValue}
+        initialFilters={searchFilters}
       />
     </>
   );
