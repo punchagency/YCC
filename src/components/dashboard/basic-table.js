@@ -11,7 +11,7 @@ import Paper from "@mui/material/Paper";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../../context/theme/themeContext";
-
+import { useToast } from "../../context/toast/toastContext";
 const StyledTableCell = styled(TableCell)(({ mode }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: mode === "light" ? "white" : "#7A7A7A",
@@ -49,6 +49,8 @@ const StyledTableRow = styled(TableRow)(({ mode }) => ({
 const statusColors = {
   in_progress: { backgroundColor: "#E2F9F0", color: "#1A9E6D" },
   completed: { backgroundColor: "#5570F11A", color: "#3D56D8" },
+  flagged: { backgroundColor: "#FFE5E5", color: "#896942" },
+  confirmed: { backgroundColor: "#5570F11A", color: "#3D56D8" },
   pending: { backgroundColor: "#FFF3E4", color: "#896942" },
 };
 
@@ -56,7 +58,16 @@ export default function BasicTable({ orders }) {
   const { theme } = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-
+  const { toast } = useToast();
+  const copyOrderId = (orderId) => {
+    navigator.clipboard.writeText(orderId);
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Order ID copied to clipboard",
+      life: 2000,
+    });
+  };
   return (
     <TableContainer
       component={Paper}
@@ -126,20 +137,28 @@ export default function BasicTable({ orders }) {
                       {isMobile ? order.orderId.substring(0, 6) : order.orderId}
                     </TableBodyText>
                     <FileCopyOutlinedIcon
+                      onClick={() => copyOrderId(order.orderId)}
                       sx={{
                         fontSize: isMobile ? "14px" : "16px",
                         color: theme === "light" ? "#6E7079" : "white",
+                        cursor: "pointer",
                       }}
                     />
                   </span>
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <TableBodyText mode={theme}>
-                    {isMobile
-                      ? (order.customerName || order.customer.name).split(
-                          " "
-                        )[0]
-                      : order.customerName || order.customer.name}
+                    <span style={{ 
+                      textOverflow: "ellipsis", 
+                      overflow: "hidden", 
+                      whiteSpace: "nowrap", 
+                      maxWidth: "100px",
+                      display: "block"
+                    }}>
+                      {isMobile
+                        ? (order.customerName || order.customer.name).split(" ")[0]
+                        : order.customerName || order.customer.name}
+                    </span>
                   </TableBodyText>
                 </StyledTableCell>
                 {order.status && (

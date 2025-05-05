@@ -17,7 +17,7 @@ export const DashboardAIProvider = ({ children }) => {
         _id: '',
         userId: userId,
         messages: [],   
-        chatSuggestions: ["my bookings for this month", "my account", "supplier profile", "contractors"]
+        chatSuggestions: []
     });
     const [typingState, setTypingState] = useState(false)
     const [message, setMessage] = useState('')

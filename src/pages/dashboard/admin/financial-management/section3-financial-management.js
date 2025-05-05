@@ -23,9 +23,10 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import Pagination from "./pagination";
 import { useTheme } from "../../../../context/theme/themeContext";
 import ReportIcon from '@mui/icons-material/Report';
+import { useToast } from "../../../../context/toast/toastContext";
 
 // Mobile Transaction Card Component
-const MobileTransactionCard = ({ row, theme }) => {
+const MobileTransactionCard = ({ row, theme, copyTransactionId }) => {
   return (
     <Box
       sx={{
@@ -60,6 +61,7 @@ const MobileTransactionCard = ({ row, theme }) => {
               color: "#6E7079",
               cursor: "pointer",
             }}
+            onClick={() => copyTransactionId(row.transaction)}
           />
         </Typography>
         <Box
@@ -187,9 +189,20 @@ const Section3FinancialManagement = ({
   totalItems,
 }) => {
   const { theme } = useTheme();
+  const { toast } = useToast();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
+
+  const copyTransactionId = (transactionId) => {
+    navigator.clipboard.writeText(transactionId);
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Transaction ID copied to clipboard",
+      life: 2000,
+    });
+  };
 
   function createData(transaction, status, amount, invoicePdfUrl, invoiceUrl) {
     return { transaction, status, amount, invoicePdfUrl, invoiceUrl };
@@ -268,7 +281,7 @@ const Section3FinancialManagement = ({
         {isMobile && (
           <Box sx={{ marginTop: "10px" }}>
             {rows.map((row, index) => (
-              <MobileTransactionCard key={index} row={row} theme={theme} />
+              <MobileTransactionCard key={index} row={row} theme={theme} copyTransactionId={copyTransactionId} />
             ))}
 
             {/* Mobile Pagination */}
@@ -581,6 +594,7 @@ const Section3FinancialManagement = ({
                               color: "#6E7079",
                               cursor: "pointer",
                             }}
+                            onClick={() => copyTransactionId(row.transaction)}
                           />
                         </Typography>
                       </TableCell>
@@ -747,11 +761,12 @@ const Section3FinancialManagement = ({
                               }}
                               
                             >
-                              {row.invoiceUrl? (
-                                "Pay Now"
-                              ) : (
-                                "No Invoice"
-                              )}
+                              {!row.invoiceUrl 
+                                ? "No Invoice"
+                                : row.status === "pending"
+                                  ? "Pay Now"
+                                  : "View"
+                              }
                             </Button>
                           </Box>
                         </Typography>

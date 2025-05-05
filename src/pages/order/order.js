@@ -32,7 +32,6 @@ import { useInventory } from "../../context/inventory/inventoryContext";
 const Order = () => {
   // const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
-  const [setShowOrderForm] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -83,6 +82,7 @@ const Order = () => {
   const [orderForm, setOrderForm] = useState({
     supplier: null,
     customerName: "",
+    customerEmail: "",
     products: [{ id: null, quantity: 1 }],
     deliveryDate: null,
     additionalNotes: "",
@@ -188,6 +188,7 @@ const Order = () => {
       !selectedSupplier ||
       !selectedProduct ||
       !orderForm.customerName ||
+      !orderForm.customerEmail ||
       !orderForm.deliveryDate
     ) {
       showError("Please fill in all required fields");
@@ -206,6 +207,7 @@ const Order = () => {
       const orderData = {
         supplierId: selectedSupplier, // Replace with actual supplier ID
         customerName: orderForm.customerName,
+        customerEmail: orderForm.customerEmail,
         products: [
           {
             id: selectedProduct, // This is now the product ID
@@ -226,12 +228,11 @@ const Order = () => {
         // Reset form
         setOrderForm({
           customerName: "",
+          customerEmail: "",
           products: [{ id: null, quantity: 1 }],
           deliveryDate: null,
           additionalNotes: "",
         });
-
-        setShowOrderForm(false);
         fetchOrders();
       } else {
         showError(response.error || "Failed to create order");
@@ -1343,6 +1344,19 @@ const Order = () => {
                     placeholder="Enter customer name"
                   />
                 </div>
+                <div className="p-field">
+                  <label htmlFor="customerEmail">Customer Email*</label>
+                  <InputText
+                    id="customerEmail"
+                    name="customerEmail"
+                    value={orderForm.customerEmail}
+                    onChange={handleInputChange}
+                    placeholder="Enter customer email"
+                  />
+                </div>
+              </div>
+
+              <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="selectedProduct">Supplier Name*</label>
                   <Dropdown

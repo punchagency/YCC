@@ -79,6 +79,21 @@ const ChatbotDashboard = () => {
         );
     };
 
+    const chatSuggestions = {
+        "admin": [
+            "available vendors",
+            "recent bookings",
+            "recent orders",
+            "recent complaints"
+        ],
+        "crew_member": [
+            "my bookings for this month",
+            "my account",
+            "crew profile",
+            "contractors"
+        ]
+}
+
     return (
         <>
             {/* Floating Chat Button */}
@@ -110,13 +125,12 @@ const ChatbotDashboard = () => {
                     border: 'none',
                 }}
             >
-                <>
                 <Box sx={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    display: role !== 'service' ? 'none' : 'flex',
+                    display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '900px',
@@ -146,7 +160,7 @@ const ChatbotDashboard = () => {
                                 paddingLeft: '20px',
                             }}
                         >
-                            <ChatHeadingText>Vendor Profile</ChatHeadingText>
+                            <ChatHeadingText>{(role).charAt(0).toUpperCase() + role.slice(1)} Profile</ChatHeadingText>
                             <Box sx={{
                                 display: 'flex',
                                 flexDirection: 'row',
@@ -217,16 +231,16 @@ const ChatbotDashboard = () => {
                             },
                         }}>
                             <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[0] || 'my bookings for this month')}  >
-                                <CustomOPtionText>{chatData.chatSuggestions[0] || 'my bookings for this month'}</CustomOPtionText>
+                                <CustomOPtionText>{chatData.chatSuggestions[0] || chatSuggestions[role][0]}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || 'my account')}>
-                                <CustomOPtionText>{chatData.chatSuggestions[1] || 'my account'}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || chatSuggestions[role][1])}>
+                                <CustomOPtionText>{chatData.chatSuggestions[1] || chatSuggestions[role][1]}</CustomOPtionText>
                             </CustomOptionButton>   
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || 'supplier profile')}>
-                                <CustomOPtionText> {chatData.chatSuggestions[2] || 'supplier profile'}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || chatSuggestions[role][2])}>
+                                <CustomOPtionText> {chatData.chatSuggestions[2] || chatSuggestions[role][2]}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || 'contractors')}>
-                                <CustomOPtionText> {chatData.chatSuggestions[3] || 'contractors'}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || chatSuggestions[role][3])}>
+                                <CustomOPtionText> {chatData.chatSuggestions[3] || chatSuggestions[role][3]}</CustomOPtionText>
                             </CustomOptionButton>
                         </Box>
 
@@ -391,33 +405,6 @@ const ChatbotDashboard = () => {
                     </Box>
                 </Box>
 
-                <Box
-                    sx={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        display: role !== 'service' ? 'flex' : 'none',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: '900px',
-                        maxHeight: '40vh',
-                        backgroundColor: 'white',
-                        borderRadius: '24px',
-                        border: '1px solid #E3E3E3',
-                        padding: '20px',
-                    }}
-                >
-                    <Typography sx={{
-                        fontFamily: 'Inter',
-                        fontWeight: '500',
-                        fontSize: '20px',
-                        lineHeight: '30px',
-                        letterSpacing: '0%',
-                        color: 'red',
-                    }}>Only Available to Vendors</Typography>
-                </Box>
-                </>
             </Modal>
         </>
     );
