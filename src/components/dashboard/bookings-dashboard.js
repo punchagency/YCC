@@ -13,7 +13,7 @@ import CurrentOrderSummary from "./current-order-summary";
 import BookingSummary from "./booking-summary";
 import { useTheme } from "../../context/theme/themeContext";
 import { useOrder } from "../../context/order/orderContext";
-import { useInvoice } from "../../context/invoice/invoiceContext";
+import { useTransaction } from "../../context/transaction/transactionContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -23,19 +23,18 @@ const Dashboard1 = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("monthly");
   const { orderSummary, fetchOrderSummary } = useOrder();
-  const { invoices, fetchInvoices } = useInvoice();
+  const { transactions, getTransactions  } = useTransaction();
   const { lowInventory, fetchLowInventory } = useInventory();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   useEffect(() => {
     fetchOrderSummary();
-    fetchInvoices();
+    getTransactions({page: 1, limit: 3});
     fetchLowInventory();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log("lowInventory", lowInventory);
   const menuItems = [
     {
       label: "Monthly",
@@ -320,7 +319,7 @@ const Dashboard1 = () => {
 
         <Grid item xs={12} md={6} lg={6}>
           {/* Financial Summary */}
-          {invoices && (
+          {transactions && (
             <Box
               sx={{
                 backgroundColor: theme === "light" ? "white" : "#03141F",
@@ -367,7 +366,7 @@ const Dashboard1 = () => {
                   marginTop: "10px",
                 }}
               >
-                {invoices.map((item, index) => (
+                {transactions.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -389,13 +388,13 @@ const Dashboard1 = () => {
                       }}
                     >
                       <FinancialSummaryDescriptionText mode={theme}>
-                        Invoice {item.invoiceId}
+                        Invoice {item?.stripeInvoiceId}
                       </FinancialSummaryDescriptionText>
                       <FinancialSummaryDescriptionText mode={theme}>
-                        Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} -
-                        Due:{" "}
+                        Amount: ${parseFloat(item?.netAmount).toFixed(2)} -
+                        Date Created:{" "}
                         {
-                          new Date(item.invoiceDueDate)
+                          new Date(item?.transactionDate)
                             .toISOString()
                             .split("T")[0]
                         }
@@ -403,7 +402,12 @@ const Dashboard1 = () => {
                     </Box>
 
                     <Box>
-                      <FinancialSummaryButton mode={theme}>
+                      <FinancialSummaryButton 
+                      mode={theme}
+                      onClick={() => {
+                        window.open(item?.invoiceUrl, "_blank");
+                      }}
+                      >
                         <ViewButtonText mode={theme}>View</ViewButtonText>
                       </FinancialSummaryButton>
                     </Box>

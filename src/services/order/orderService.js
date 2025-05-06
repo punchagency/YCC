@@ -13,7 +13,7 @@ const getAuthHeader = () => {
 
 // Create a new order
 export const createOrder = async (orderData) => {
-  const { supplierId, products, customerName, deliveryDate, additionalNotes } =
+  const { supplierId, products, customerName, customerEmail, deliveryDate, additionalNotes } =
     orderData;
   try {
     const response = await axios.post(
@@ -22,6 +22,7 @@ export const createOrder = async (orderData) => {
         supplierId,
         products,
         customerName,
+        customerEmail,
         deliveryDate,
         additionalNotes,
       },
