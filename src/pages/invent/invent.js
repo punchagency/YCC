@@ -721,6 +721,7 @@ const Invent = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
+                  
                 gap: "8px",
                 fontSize: "14px",
               }}

@@ -30,6 +30,9 @@ const LoginForm = () => {
   const [passwordError, setPasswordError] = useState("");
   const { loginUser } = useUser(); // Get loginUser function from context
 
+  // Add this useState hook for loading state
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(null), 10000);
@@ -59,6 +62,7 @@ const LoginForm = () => {
     if (!validateForm()) return;
 
     try {
+      setLoading(true);
       const response = await login(formData);
       console.log("Login response:", response);
 
@@ -72,7 +76,9 @@ const LoginForm = () => {
         // Store user data
         loginUser(response.data.user);
 
-        if (response.data.user.role === "admin") {
+        if (response.data.user.role === "crew_member") {
+          navigate("/crew/dashboard");
+        } else if (response.data.user.role === "admin") {
           navigate("/admin/dashboard");
         } else if (response.data.user.role === "supplier") {
           navigate("/supplier/onboarding");
@@ -85,6 +91,8 @@ const LoginForm = () => {
     } catch (error) {
       console.log("Error during login:", error);
       setError(error.message || "An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,8 +143,9 @@ const LoginForm = () => {
         </div>
         <Button
           type="submit"
-          label="Sign In"
+          label={loading ? "Logging in..." : "Sign In"}
           className="p-mt-2 p-button-primary w-full"
+          disabled={loading}
         />
       </form>
     </div>
