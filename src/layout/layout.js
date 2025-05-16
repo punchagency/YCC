@@ -19,43 +19,43 @@ const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <ThemeProvider>
-    <ToastProvider>
-    <SupplierProvider>
-    <TransactionProvider>
-    <DashboardAIProvider>
-    <InventoryProvider>
-    <OrderProvider>
-    <InvoiceProvider>
-      <BookingProvider>
-          <ServiceProvider>
-            <CalendarProvider>
-        <main className="flex page relative wrapper">
-          <LeftMenu
-            role={role}
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-      />
-      <div className="w-full right-panel-component overflow-x-hidden">
-        <AdminHeader
-          isCollapsed={isCollapsed}
-          setIsCollapsed={setIsCollapsed}
-          role={role}
-        />
-        <Outlet />
+      <ToastProvider>
+        <SupplierProvider>
+          <TransactionProvider>
+            <DashboardAIProvider>
+              <InventoryProvider>
+                <OrderProvider>
+                  <InvoiceProvider>
+                    <BookingProvider>
+                      <ServiceProvider>
+                        <CalendarProvider>
+                          <main className="flex page relative wrapper">
+                            <LeftMenu
+                              role={role}
+                              isCollapsed={isCollapsed}
+                              setIsCollapsed={setIsCollapsed}
+                            />
+                            <div className="w-full right-panel-component overflow-x-hidden">
+                              <AdminHeader
+                                isCollapsed={isCollapsed}
+                                setIsCollapsed={setIsCollapsed}
+                                role={role}
+                              />
+                              <Outlet />
 
-        <ChatbotDashboard />
-      </div>
-    </main>
-    </CalendarProvider>
-    </ServiceProvider>
-    </BookingProvider>
-    </InvoiceProvider>
-    </OrderProvider>
-    </InventoryProvider>
-    </DashboardAIProvider>
-    </TransactionProvider>
-    </SupplierProvider>
-    </ToastProvider>
+                              <ChatbotDashboard />
+                            </div>
+                          </main>
+                        </CalendarProvider>
+                      </ServiceProvider>
+                    </BookingProvider>
+                  </InvoiceProvider>
+                </OrderProvider>
+              </InventoryProvider>
+            </DashboardAIProvider>
+          </TransactionProvider>
+        </SupplierProvider>
+      </ToastProvider>
     </ThemeProvider>
   );
 };

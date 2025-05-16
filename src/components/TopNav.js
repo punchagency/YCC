@@ -14,11 +14,14 @@ import settingsLogo from "../assets/images/crew/settings-icon.png";
 import notificationLogo from "../assets/images/crew/notification-icon.png";
 import reportLogo from "../assets/images/crew/report-icon.png";
 import logoutLogo from "../assets/images/crew/logout.png";
+import { useUser } from "../context/userContext";
 
 const TopNav = ({ isOpen, onClose, role = "admin" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
+  const { user } = useUser();
+  const isCrewMember = user?.role === "crew_member";
 
   // Prevent scrolling when menu is open
   useEffect(() => {
@@ -51,16 +54,17 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
     });
   };
 
-  const menuItems = [
+  // Create role-specific menu items
+  const crewMenuItems = [
     {
       label: "Dashboard",
       icon: dashboardLogo,
-      path: "/admin/dashboard",
+      path: "/crew/dashboard",
     },
     {
       label: "Calendar",
       icon: calendarLogo,
-      path: "/admin/calendar-management",
+      path: "/crew/calendar",
     },
     {
       label: "Inventory Management",
@@ -104,6 +108,58 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       divider: true,
     },
   ];
+
+  const adminMenuItems = [
+    {
+      label: "Dashboard",
+      icon: dashboardLogo,
+      path: "/admin/dashboard",
+    },
+    {
+      label: "Inventory Management",
+      icon: inventoryLogo,
+      path: "/admin/inventory-management",
+    },
+    {
+      label: "Orders",
+      icon: orderLogo,
+      path: "/admin/orders-management",
+    },
+    {
+      label: "Bookings",
+      icon: bookingLogo,
+      path: "/admin/bookings-management",
+    },
+    {
+      label: "Financial Management",
+      icon: financeLogo,
+      path: "/admin/financial-management",
+    },
+    {
+      label: "Notifications",
+      icon: notificationLogo,
+      path: "/admin/notifications",
+    },
+    {
+      label: "Reports",
+      icon: reportLogo,
+      path: "/admin/reports",
+    },
+    {
+      label: "Settings",
+      icon: settingsLogo,
+      path: "/admin/settings",
+    },
+    {
+      label: "Log Out",
+      icon: logoutLogo,
+      onClick: handleLogout,
+      divider: true,
+    },
+  ];
+
+  // Choose menu items based on user role
+  const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
 
   const handleNavigation = (path, onClick) => {
     if (onClick) {
