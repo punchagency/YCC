@@ -17,6 +17,7 @@ const CurrentOrderSummary = ({ orderSummary }) => {
       value: orderSummary.completedOrders,
     },
   ];
+
   return (
     <Box
       sx={{

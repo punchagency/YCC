@@ -3,6 +3,10 @@
 
 const API_URL = `${process.env.REACT_APP_API_URL}/transactions`;
 
+const getAuthHeader = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 export const getTransactionsService = async ({page, limit, transactionStatus, search}) => {
     const queryParams = new URLSearchParams();
     if (page) queryParams.append('page', page);
@@ -14,7 +18,9 @@ export const getTransactionsService = async ({page, limit, transactionStatus, se
     if (search) {
         queryParams.append('search', search);
     }
-    const response = await fetch(`${API_URL}?${queryParams.toString()}`);
+    const response = await fetch(`${API_URL}?${queryParams.toString()}`, {
+        headers: getAuthHeader(),
+    });
     return response.json();
 };
 
