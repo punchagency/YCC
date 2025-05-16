@@ -13,8 +13,11 @@ const CrewSettings = () => {
   const handleSaveChanges = async (settingsData) => {
     setLoading(true);
 
+    // Add console log
+    console.log("Data received from form:", settingsData);
+
     // Check if there are validation errors from the form
-    if (!settingsData.success === false) {
+    if (settingsData.success === false) {
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -25,8 +28,16 @@ const CrewSettings = () => {
       return;
     }
 
+    // Remove the success flag before sending to API
+    const { success, ...dataToSend } = settingsData;
+
     try {
-      const response = await updateUserSettings(settingsData);
+      // Add console log before API call
+      console.log("Sending to API:", dataToSend);
+      const response = await updateUserSettings(dataToSend);
+      
+      // Add console log after API response
+      console.log("API response:", response);
 
       if (response.status) {
         // Show success message
@@ -36,6 +47,9 @@ const CrewSettings = () => {
           detail: "Your settings have been updated successfully",
           life: 3000,
         });
+        
+        // Optional: Redirect after successful update
+        // setTimeout(() => navigate('/crew/dashboard'), 2000);
       } else {
         // Show error message
         toast.current.show({
