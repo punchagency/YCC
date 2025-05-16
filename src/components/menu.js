@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { PanelMenu } from "primereact/panelmenu";
 import { Button } from "primereact/button";
-// import { useUser } from "../context/userContext";
+import { useUser } from "../context/userContext";
 import logo from "../assets/images/logo-login.png";
 // import orderLogo from "../assets/images/crew/order1.png";
 // import financeLogo from "../assets/images/crew/financeLogo.png";
@@ -27,11 +27,12 @@ import { confirmDialog } from "primereact/confirmdialog";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import "../styles/menu.css";
 
-const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
+const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const location = useLocation();
-  // const [activeItem, setActiveItem] = useState(null);
+  const { user } = useUser();
+  const isCrewMember = user?.role === "crew_member";
 
   const handleLogout = () => {
     confirmDialog({
@@ -66,7 +67,199 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     });
   };
 
-  const menuItems = [
+  const crewMenuItems = [
+    {
+      label: "Dashboard",
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/dashboard"),
+    },
+    {
+      label: "Crew",
+      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
+      className:
+        location.pathname.startsWith("/crew/") &&
+        [
+          "/crew/legal-resources",
+          "/crew/training",
+          "/crew/accomodation",
+          "/crew/document-management",
+        ].some((path) => location.pathname === path)
+          ? "active-menu-item menu-red-background"
+          : "",
+      items: [
+        {
+          label: "Legal Resources",
+          icon: (
+            <img
+              src={reportLogo}
+              alt="Legal Resources"
+              width={15}
+              height={15}
+            />
+          ),
+          className:
+            location.pathname === "/crew/legal-resources"
+              ? "active-menu-item menu-red-background"
+              : "",
+          command: () => navigate("/crew/legal-resources"),
+        },
+        {
+          label: "Training & Certifications",
+          icon: (
+            <img src={calendarLogo} alt="Training" width={15} height={15} />
+          ),
+          className:
+            location.pathname === "/crew/training"
+              ? "active-menu-item menu-red-background"
+              : "",
+          command: () => navigate("/crew/training"),
+        },
+        {
+          label: "Accommodation",
+          icon: (
+            <img
+              src={settingsLogo}
+              alt="Accommodation"
+              width={15}
+              height={15}
+            />
+          ),
+          className:
+            location.pathname === "/crew/accommodation"
+              ? "active-menu-item menu-red-background"
+              : "",
+          command: () => navigate("/crew/accomodation"),
+        },
+        {
+          label: "Document Management",
+          icon: (
+            <img
+              src={notificationLogo}
+              alt="Documents"
+              width={15}
+              height={15}
+            />
+          ),
+          className:
+            location.pathname === "/crew/document-management"
+              ? "active-menu-item menu-red-background"
+              : "",
+          command: () => navigate("/crew/document-management"),
+        },
+      ],
+    },
+    {
+      label: "Calendar",
+      icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/calendar"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/calendar"),
+    },
+    {
+      label: "Financial Management",
+      icon: (
+        <img
+          src={financeLogo}
+          alt="Financial Management"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/crew/financial-management"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/financial-management"),
+    },
+    {
+      label: "Bookings",
+      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/booking"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/booking"),
+    },
+    {
+      label: "Inventory Management",
+      icon: (
+        <img
+          src={inventoryLogo}
+          alt="Inventory Management"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/crew/inventory-management"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/inventory-management"),
+    },
+    {
+      label: "Orders",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/orders-management"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/orders-management"),
+    },
+    {
+      label: "Notifications",
+      icon: (
+        <img
+          src={notificationLogo}
+          alt="Notifications"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/crew/notifications"
+          ? "active-menu-item menu-red-background"
+          : "",
+
+      command: () => navigate("/crew/notifications"),
+    },
+
+    {
+      label: "Reports",
+      icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/reports"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/reports"),
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/settings"),
+    },
+    {
+      separator: true,
+      style: { margin: "15px 0" },
+    },
+    {
+      label: "Log Out",
+      icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,
+      command: handleLogout,
+      style: { color: "#FF4B4B" },
+    },
+  ];
+
+  const adminMenuItems = [
     {
       label: "Dashboard",
       icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
@@ -77,7 +270,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/admin/dashboard");
       },
-      style:{color:"red"}
+      style: { color: "red" },
     },
     {
       label: "Calendar",
@@ -193,6 +386,8 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
     },
   ];
 
+  const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
+
   menuItems.forEach((item) => {
     if (item.label) {
       item.style = {
@@ -200,12 +395,11 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
         color: theme === "light" ? "#103B57" : "#FFFFFF",
       };
       item.className = `${item.className || ""} menu-item`;
-      
     }
   });
 
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .p-panelmenu .p-menuitem-text {
         transition: color 0.2s;
@@ -216,7 +410,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       }
     `;
     document.head.appendChild(style);
-    
+
     return () => {
       document.head.removeChild(style);
     };
@@ -233,7 +427,7 @@ const LeftMenu = ({ role, isCollapsed, setIsCollapsed }) => {
       >
         <div className="flex justify-content-center align-items-center logo-wraper">
           <div className="logo relative">
-            <a href="/admin/dashboard">
+            <a href={isCrewMember ? "/crew/dashboard" : "/admin/dashboard"}>
               <img src={logo} alt="Company logo" className="image-full" />
             </a>
           </div>

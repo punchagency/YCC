@@ -1,0 +1,64 @@
+/* Inventory Table Styles */
+.inventory-skeleton {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.inventory-skeleton > div:last-child {
+  border-bottom: none;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.custom-pagination {
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #eaecf0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Customize Paginator styles */
+.p-paginator {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+}
+
+.inventory-container {
+  position: relative;
+  padding-bottom: 70px; /* Make room for pagination */
+}
+
+/* Add this to your inventory.css file */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
