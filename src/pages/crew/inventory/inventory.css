@@ -52,13 +52,3 @@
   position: relative;
   padding-bottom: 70px; /* Make room for pagination */
 }
-
-/* Add this to your inventory.css file */
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
-}

@@ -1278,6 +1278,81 @@ export default function CalendarPage() {
                     onDelete={handleEventDelete}
                     onAddGuest={handleAddGuest}
                   />
+                  <div>
+                    <h4>Upcoming Reminders</h4>
+                    <div>
+                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
+                        <div className="flex items-center justify-center">
+                          <div>
+                            <h3 className="text-2xl font-bold">17</h3>
+                          </div>
+                          <div className="mt-3 ml-3">
+                            <p>April 17</p>
+                            <p>Service Book</p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="flex items-center justify-flex-end">
+                            <img
+                              src={three}
+                              alt="menu"
+                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
+                            />
+                          </div>
+                          <span>
+                            <span>9:00AM</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
+                        <div className="flex items-center justify-center">
+                          <div>
+                            <h3 className="text-2xl font-bold">18</h3>
+                          </div>
+                          <div className="mt-3 ml-3">
+                            <p>April 17</p>
+                            <p>Custome Event</p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="flex items-center justify-flex-end">
+                            <img
+                              src={three}
+                              alt="menu"
+                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
+                            />
+                          </div>
+                          <span>
+                            <span>9:00AM</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
+                        <div className="flex items-center justify-center">
+                          <div>
+                            <h3 className="text-2xl font-bold">19</h3>
+                          </div>
+                          <div className="mt-3 ml-3">
+                            <p>April 17</p>
+                            <p>Truing</p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="flex items-center justify-flex-end">
+                            <img
+                              src={three}
+                              alt="menu"
+                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
+
+                            />
+                          </div>
+                          <span className="mt-5">
+                            <span className="text-gray-500 mt-5">9:00AM</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </React.Fragment>
               ))}
 
@@ -1285,11 +1360,7 @@ export default function CalendarPage() {
               {calendarEvents.data.length > 2 && (
                 <div
                   className="see-more-container"
-                  style={{
-                    marginTop: "20px",
-                    textAlign: "center",
-                    marginBottom: "20px",
-                  }}
+                  style={{ marginTop: "20px", textAlign: "center" }}
                 >
                   <button
                     className="see-more-button"
@@ -1309,82 +1380,6 @@ export default function CalendarPage() {
                   </button>
                 </div>
               )}
-
-              {/* Upcoming Reminders section */}
-              <div
-                className="mt-6 pt-4"
-                style={{ borderTop: "1px solid #E4E7EC" }}
-              >
-                <h4 className="mb-3">Upcoming Reminders</h4>
-                <div>
-                  {calendarEvents.data
-                    // Sort events by start date (ascending)
-                    .sort((a, b) => new Date(a.start) - new Date(b.start))
-                    // Get only future events
-                    .filter((event) => new Date(event.start) >= new Date())
-                    // Take the first 3 upcoming events
-                    .slice(0, 3)
-                    .map((event, index) => {
-                      // Format the date parts
-                      const eventDate = new Date(event.start);
-                      const day = eventDate.getDate();
-                      const month = eventDate.toLocaleString("default", {
-                        month: "long",
-                      });
-                      const time = eventDate.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      });
-
-                      return (
-                        <div
-                          key={event._id || index}
-                          className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
-                          style={{
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                          }}
-                        >
-                          <div className="flex items-center justify-center">
-                            <div>
-                              <h3 className="text-2xl font-bold">{day}</h3>
-                            </div>
-                            <div className="mt-3 ml-3">
-                              <p>
-                                {month} {day}
-                              </p>
-                              <p>{event.title}</p>
-                            </div>
-                          </div>
-                          <div className="mt-3">
-                            <div className="flex items-center justify-flex-end">
-                              <img
-                                src={three}
-                                alt="menu"
-                                style={{
-                                  cursor: "pointer",
-                                  marginBottom: "10px",
-                                  marginLeft: "55px",
-                                }}
-                              />
-                            </div>
-                            <span>
-                              <span>{time}</span>
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                  {/* Fallback message if no upcoming events */}
-                  {calendarEvents.data.filter(
-                    (event) => new Date(event.start) >= new Date()
-                  ).length === 0 && (
-                    <div className="text-center p-4 text-gray-500">
-                      No upcoming events
-                    </div>
-                  )}
-                </div>
-              </div>
             </>
           )}
         </div>
@@ -1399,7 +1394,7 @@ export default function CalendarPage() {
             display: isMobile && activeView !== "calendar" ? "none" : "block",
           }}
         >
-          <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>Calendar</h3>
+          <h3 style={{ fontSize: "18px", margin: "0 0 15px 0",  }}>Calendar</h3>
 
           {/* Large Calendar Component */}
           <div

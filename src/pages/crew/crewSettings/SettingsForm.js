@@ -47,11 +47,10 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
   const handleSubmit = () => {
     // Validate form
     if (password && password !== confirmPassword) {
-      onSave({
+      return {
         success: false,
         message: "New password and confirm password do not match",
-      });
-      return;
+      };
     }
 
     // Prepare data for API
@@ -64,11 +63,10 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
     // Add password fields if changing password
     if (password) {
       if (!currentPassword) {
-        onSave({
+        return {
           success: false,
           message: "Current password is required to change password",
-        });
-        return;
+        };
       }
 
       settingsData.currentPassword = currentPassword;
@@ -76,24 +74,11 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
       settingsData.confirmPassword = confirmPassword;
     }
 
-    // Add console log to check form data
-    console.log("Form data being submitted:", settingsData);
-    
-    // Successful validation - pass the validated data to parent component
-    onSave({
-      ...settingsData,
-      success: true
-    });
-  };
-
-  const changeTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
+    onSave(settingsData);
   };
 
   return (
     <div className="settings-grid">
-      
-      
       <div className="settings-form-group">
         <label>Email</label>
         <InputText
@@ -117,7 +102,7 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
           disabled={loading}
         />
       </div>
-      
+
       <div className="settings-form-group">
         <label>New Password</label>
         <Password
@@ -144,7 +129,6 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
         />
       </div>
 
-      
       <div className="settings-actions">
         <Button
           label="Cancel"
