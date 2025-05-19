@@ -533,10 +533,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep1 = () => (
     <motion.div
       key="step1"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* Business Name */}
 
@@ -684,20 +684,21 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Phone Number */}
+      {/* Phone Number & Contact Email - Centralized and Balanced */}
       <div
-        className="form-row"
+        className="form-row centralized-contact-row"
         style={{
           display: "flex",
-          gap: "16px",
+          gap: "24px",
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
-          paddingLeft: "10px",
+          margin: "0 auto 27px auto",
+          maxWidth: "600px"
         }}
       >
         {/* Phone Number */}
-        <div className="form-group4" style={{ flex: "1" }}>
+        <div className="form-group4" style={{ flex: 1, minWidth: 0 }}>
           <div className="input-field">
             <div>
               <label htmlFor="phone">Phone Number</label>
@@ -723,7 +724,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   height: "100%",
                   background: "transparent",
                   border: "none",
-                  fontSize: "16px", // Same size for consistency
+                  fontSize: "16px",
                 }}
                 containerStyle={{ width: "100%" }}
               />
@@ -731,11 +732,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </div>
         </div>
 
-        {/* Email */}
-        <div
-          className="form-group5"
-          style={{ flex: "1", marginBottom: "27px" }}
-        >
+        {/* Contact Email */}
+        <div className="form-group5" style={{ flex: 1, minWidth: 0 }}>
           <div className="input-field">
             <div>
               <label htmlFor="email">Contact Email</label>
@@ -768,7 +766,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   height: "100%",
                   background: "transparent",
                   border: "none",
-                  fontSize: "16px", // Same as phone input
+                  fontSize: "16px",
                   outline: "none",
                 }}
               />
@@ -841,10 +839,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep2 = () => (
     <motion.div
       key="step2"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* <div className="login-heading" style={{ marginTop: "0px" }}>
         <h2 className="font-medium mb-10">Document Upload</h2>
@@ -974,10 +972,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep3 = () => (
     <motion.div
       key="step3"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* <div className="login-heading" style={{ marginTop: "0px" }}>
         <h2 className="font-medium mb-10">Service Details</h2>
@@ -1235,6 +1233,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 container: (provided) => ({
                   ...provided,
                   width: "100%",
+                  position: "relative",
+                  zIndex: 2
                 }),
                 menu: (provided) => ({
                   ...provided,
@@ -1242,6 +1242,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   zIndex: 9999,
                   backgroundColor: "white",
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  position: "absolute"
                 }),
                 menuList: (provided) => ({
                   ...provided,
@@ -1316,10 +1317,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep4 = () => (
     <motion.div
       key="step4"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* Contact Person Name */}
       <div className="form-group1">
@@ -1483,10 +1484,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep5 = () => (
     <motion.div
       key="step5"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
       className="platform-fee-container"
     >
       <div>
@@ -1601,10 +1602,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep6 = () => (
     <motion.div
       key="step7"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
       className="success-container"
     >
       <div
