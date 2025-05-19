@@ -2,43 +2,45 @@ import { createContext, useContext, useState } from "react";
 import { getResponseFromAI } from "../../services/AIAssistant/dashboardPageAIService";
 import { useUser } from "../userContext";
 
+
 const DashboardAIContext = createContext();
 
 export const useDashboardAI = () => {
-  return useContext(DashboardAIContext);
-};
+    return useContext(DashboardAIContext);
+}
 
 export const DashboardAIProvider = ({ children }) => {
-  const { user } = useUser();
-  const userId = user.id;
-  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-  const [chatData, setChatData] = useState({
-    _id: "",
-    userId: userId,
-    messages: [],
-    chatSuggestions: [],
-  });
-  const [typingState, setTypingState] = useState(false);
-  const [message, setMessage] = useState("");
+    const { user } = useUser();
+    const userId = user.id
+    const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
+    const [chatData, setChatData] = useState({
+        _id: '',
+        userId: userId,
+        messages: [],   
+        chatSuggestions: []
+    });
+    const [typingState, setTypingState] = useState(false)
+    const [message, setMessage] = useState('')
 
-  const sendMessage = () => {
-    if (!message.trim()) return;
-    if (!isAIAssistantOpen) {
-      setIsAIAssistantOpen(true);
+    const sendMessage = () => {
+        if (!(message.trim())) return;
+        if (!isAIAssistantOpen) {
+            setIsAIAssistantOpen(true)
+        }
+        setTypingState(true)
+        console.log(' message being sent', message)
+        let previousChatData = chatData
+        console.log('previousChatData', previousChatData)
+        previousChatData.messages.push({ role: 'user', content: message })
+        setChatData(previousChatData)
+        console.log('chatData on sending message', previousChatData)
+        getResponse(previousChatData)
+        setMessage("");
     }
-    setTypingState(true);
-    console.log(" message being sent", message);
-    let previousChatData = chatData;
-    console.log("previousChatData", previousChatData);
-    previousChatData.messages.push({ role: "user", content: message });
-    setChatData(previousChatData);
-    console.log("chatData on sending message", previousChatData);
-    getResponse(previousChatData);
-    setMessage("");
-  };
 
-  const getResponse = async (previousChatData) => {
-    /*  setTimeout(() => {
+
+    const getResponse = async (previousChatData) => {
+        /*  setTimeout(() => {
       
       
             setChatData((prevChatData) => [
@@ -52,48 +54,50 @@ export const DashboardAIProvider = ({ children }) => {
             setTypingState(false);
           }, 2000);
           */
-    console.log("chatData on getting response", previousChatData);
-    const response = await getResponseFromAI(previousChatData);
-    console.log("response from AI", response);
-    setChatData(response);
-    setTypingState(false);
-  };
-
-  const preDefinedMessages = (predefinedMessage) => {
-    console.log("message sent", predefinedMessage);
-    if (!predefinedMessage.trim()) return;
-    if (!isAIAssistantOpen) {
-      setIsAIAssistantOpen(true);
+        console.log('chatData on getting response', previousChatData)
+        const response = await getResponseFromAI(previousChatData)
+        console.log('response from AI', response)
+        setChatData(response)
+        setTypingState(false);
     }
-    setTypingState(true);
-    let previousChatData = chatData;
-    previousChatData.messages.push({
-      role: "user",
-      content: predefinedMessage,
-    });
-    setChatData(previousChatData);
-    getResponse(previousChatData);
-  };
 
-  return (
-    <DashboardAIContext.Provider
-      value={{
-        isAIAssistantOpen,
-        setIsAIAssistantOpen,
-        chatData,
-        setChatData,
-        typingState,
-        setTypingState,
-        message,
-        setMessage,
-        sendMessage,
-        getResponse,
-        preDefinedMessages,
-      }}
-    >
-      {children}
-    </DashboardAIContext.Provider>
-  );
+
+    const preDefinedMessages = (predefinedMessage) => {
+        console.log('message sent', predefinedMessage)
+        if (!(predefinedMessage.trim())) return;
+        if (!isAIAssistantOpen) {
+            setIsAIAssistantOpen(true)
+        }
+        setTypingState(true)
+        let previousChatData = chatData
+        previousChatData.messages.push({ role: 'user', content: predefinedMessage })
+        setChatData(previousChatData)
+        getResponse(previousChatData)
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    return (
+        <DashboardAIContext.Provider value={{ isAIAssistantOpen, setIsAIAssistantOpen, chatData, setChatData, typingState, setTypingState, message, setMessage, sendMessage, getResponse, preDefinedMessages }}>
+            {children}
+        </DashboardAIContext.Provider>
+    );
 };
 
 export default DashboardAIContext;
