@@ -11,22 +11,22 @@ const StepInfo = ({ currentStep }) => {
       step: "Step 1",
       info: "Business Information",
     },
-    2: {
-      step: "Step 2",
-      info: "Company Verification",
-    },
+    // 2: {
+    //   step: "Step 2",
+    //   info: "Company Verification",
+    // },
     3: {
-      step: "Step 3",
+      step: "Step 2",
       info: "Service & Pricing Information",
     },
     4: {
-      step: "Step 4",
-      info: "Company Representative Information",
+      step: "Step 3",
+      info: "Company Representative Information & Terms",
     },
-    5: {
-      step: "Step 5",
-      info: "Platform Fees",
-    },
+    // 5: {
+    //   step: "Step 5",
+    //   info: "Platform Fees",
+    // },
     6: {
       step: "Success",
       info: "Application Submitted",
@@ -39,8 +39,8 @@ const StepInfo = ({ currentStep }) => {
         <img src={check} className="checkImg" alt="" />
       </div>
       <div>
-        <p>{stepData[currentStep].step}</p>
-        <p className="personal_info">{stepData[currentStep].info}</p>
+        <p>{stepData[currentStep]?.step || ""}</p>
+        <p className="personal_info">{stepData[currentStep]?.info || ""}</p>
       </div>
     </div>
   );

@@ -22,9 +22,33 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [setSuccess] = useState(false);
 
+  // Add stepData object
+  const stepData = {
+    1: {
+      step: "Step 1",
+      info: "Business Information",
+    },
+    2: {
+      step: "Step 2",
+      info: "Service & Pricing Information",
+    },
+    3: {
+      step: "Step 3",
+      info: "Company Representative Information & Terms",
+    },
+    4: {
+      step: "Step 4",
+      info: "Submit Application",
+    },
+    6: {
+      step: "Success",
+      info: "Application Submitted",
+    },
+  };
+
   const handleSignup = async () => {
-    if (!formData.acceptFees) {
-      setError("Please accept the platform fees to continue.");
+    if (!formData.acceptTerms) {
+      setError("Please accept the Terms and Conditions to continue.");
       return;
     }
 
@@ -70,7 +94,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         phone: formData.phone,
         businessWebsite: formData.businessWebsite,
         department: formData.department?.value,
-        services: formData.services?.value,
+        services: formData.services?.map(service => service.value),
         availability: formData.availability,
         bookingMethod: formData.bookingMethod?.value,
         serviceArea: formData.serviceArea?.value,
@@ -113,25 +137,26 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
   };
   const bookingMethodOptions = [
-    { value: "instant meeting", label: "Instant Meeting" },
+    { value: "instant booking", label: "Instant Booking" },
     { value: "request to book", label: "Request to Book" },
     { value: "quote request", label: "Quote Request" },
   ];
 
   const serviceAreaOptions = [
-    { value: "caribbean", label: "Caribbean" },
+    { value: "usa", label: "United States" },
     { value: "mediterranean", label: "Mediterranean" },
-    { value: "usa", label: "USA" },
+    { value: "both", label: "Both Areas" },
   ];
 
-  // const departmentOptions = [
-  //   { value: "captain", label: "Captain" },
-  //   { value: "crew", label: "Crew" },
-  //   { value: "exterior", label: "Exterior" },
-  //   { value: "engineering", label: "Engineering" },
-  //   { value: "interior", label: "Interior" },
-  //   { value: "galley", label: "Galley" },
-  // ];
+  const departmentOptions = [
+    { value: "captain", label: "Captain" },
+    { value: "crew", label: "Crew" },
+    { value: "exterior", label: "Exterior" },
+    { value: "engineering", label: "Engineering" },
+    { value: "interior", label: "Interior" },
+    { value: "galley", label: "Galley" },
+  ];
+
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -499,25 +524,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
   // Add a function to handle service selection with validation
   const handleServiceChange = (selectedOptions) => {
-    // If user tries to select more than 4 services
-    if (selectedOptions && selectedOptions.length > 4) {
-      // Show error message
-      setError("You can select a maximum of 4 services");
-
-      // If there were previously selected services, keep them
-      // Otherwise, just don't update the selection
-      if (formData.services && formData.services.length > 0) {
-        return; // Don't update the selection
-      }
-    } else {
-      // Clear any existing error related to service selection
-      if (error && error.includes("maximum of 4 services")) {
-        setError(null);
-      }
-
-      // Update the services in formData
-      handleInputChange("services", selectedOptions);
-    }
+    setFormData({
+      ...formData,
+      services: selectedOptions,
+    });
   };
 
   const renderStep1 = () => (
@@ -589,7 +599,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <Select
               options={[
                 { label: "Captain", value: "captain" },
-                // { label: "Crew", value: "crew" },
+                { label: "Crew", value: "crew" },
                 { label: "Exterior", value: "exterior" },
                 { label: "Interior", value: "interior" },
                 { label: "Engineering", value: "engineering" },
@@ -728,7 +738,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         >
           <div className="input-field">
             <div>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Contact Email</label>
             </div>
             <div
               className="inputBorder"
@@ -812,11 +822,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Next Button */}
+      {/* Update Next Button to go to Step 3 */}
       <div className="button-group">
         <button
           className="next-button"
-          onClick={() => setStep(2)}
+          onClick={() => setStep(3)}
           style={{
             width: "100%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
@@ -998,7 +1008,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       marginRight: "8px",
                     }}
                   />
-                  <span>Select Services (max 4)</span>
+                  <span>Select Services</span>
                 </div>
               }
               isMulti={true}
@@ -1256,11 +1266,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Update Navigation Buttons */}
       <div className="button-group">
         <button
           className="prev-button"
-          onClick={() => setStep(2)}
+          onClick={() => setStep(1)}
           style={{ width: "48%", background: "#f0f0f0" }}
         >
           Previous
@@ -1286,65 +1296,62 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       exit={{ x: "-100%", opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      {/* Full Name */}
-      <div className="form-group1">
-        <div className="input-field">
-          <div>
-            <label htmlFor="fullName">Full Name</label>
-          </div>
-          <div className="inputBorder">
-            <img
-              src={inputLogo}
-              alt="Input Icon"
-              style={{ width: "12px", height: "12px", marginRight: "8px" }}
-            />
-            <input
-              type="text"
-              id="fullName"
-              placeholder="Enter Full Name"
-              value={formData.contactPerson?.fullName || ""}
-              onChange={(e) =>
-                handleInputChange("contactPerson", {
-                  ...formData.contactPerson,
-                  fullName: e.target.value,
-                })
-              }
-            />
-          </div>
+      <div className="form-group">
+        <div>
+          <label htmlFor="contactPersonName">Contact Person Name</label>
+        </div>
+        <div className="input-container">
+          <img src={inputLogo} alt="Name Icon" className="input-icon" />
+          <input
+            type="text"
+            id="contactPersonName"
+            value={formData.contactPerson?.fullName || ""}
+            onChange={(e) =>
+              handleInputChange("contactPerson", {
+                ...formData.contactPerson,
+                fullName: e.target.value,
+              })
+            }
+            placeholder="Enter contact person name"
+          />
         </div>
       </div>
 
-      {/* Role */}
-      <div className="form-group1">
-        <div className="input-field">
-          <div>
-            <label htmlFor="role">Role/Position</label>
-          </div>
-          <div className="inputBorder">
-            <img
-              src={roleLogo}
-              alt="Role Icon"
-              style={{ width: "12px", height: "12px", marginRight: "8px" }}
-            />
-            <input
-              type="text"
-              id="role"
-              placeholder="Enter Role/Position"
-              value={formData.contactPerson?.role || ""}
-              onChange={(e) =>
-                handleInputChange("contactPerson", {
-                  ...formData.contactPerson,
-                  role: e.target.value,
-                })
-              }
-            />
-          </div>
+      <div className="form-group">
+        <div>
+          <label htmlFor="contactPersonRole">Contact Person Role</label>
+        </div>
+        <div className="input-container">
+          <img src={roleLogo} alt="Role Icon" className="input-icon" />
+          <input
+            type="text"
+            id="contactPersonRole"
+            value={formData.contactPerson?.role || ""}
+            onChange={(e) =>
+              handleInputChange("contactPerson", {
+                ...formData.contactPerson,
+                role: e.target.value,
+              })
+            }
+            placeholder="Enter contact person role"
+          />
         </div>
       </div>
 
-      {/* Email */}
+      {/* Add Terms and Conditions checkbox */}
+      <div className="form-group">
+        <div className="checkbox-field" style={{ marginTop: "20px" }}>
+          <input
+            type="checkbox"
+            id="terms"
+            checked={formData.acceptTerms}
+            onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
+            style={{ marginRight: "10px" }}
+          />
+          <label htmlFor="terms">I agree to the Terms and Conditions</label>
+        </div>
+      </div>
 
-      {/* Navigation Buttons */}
       <div className="button-group">
         <button
           className="prev-button"
@@ -1355,13 +1362,13 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </button>
         <button
           className="next-button"
-          onClick={() => setStep(5)}
+          onClick={handleSignup}
           style={{
             width: "48%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
           }}
         >
-          Next
+          Submit Application
         </button>
       </div>
     </motion.div>
@@ -1520,12 +1527,9 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     <div className="form-container">
       <AnimatePresence mode="wait" initial={false}>
         {currentStep === 1 && renderStep1()}
-        {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
         {currentStep === 4 && renderStep4()}
-        {currentStep === 5 && renderStep5()}
         {currentStep === 6 && renderStep6()}
-        {/* Other steps will be added here */}
       </AnimatePresence>
       <AnimatePresence>
         {error && (
