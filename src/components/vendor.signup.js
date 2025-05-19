@@ -145,7 +145,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const serviceAreaOptions = [
     { value: "usa", label: "United States" },
     { value: "mediterranean", label: "Mediterranean" },
-    { value: "both", label: "Both Areas" },
+    { value: "both", label: "United States & Mediterranean" },
   ];
 
   const departmentOptions = [
@@ -1239,27 +1239,52 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 menu: (provided) => ({
                   ...provided,
                   width: "100%",
+                  zIndex: 9999,
+                  backgroundColor: "white",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }),
                 menuList: (provided) => ({
                   ...provided,
-                  "&::-webkit-scrollbar": { display: "none" },
-                  scrollbarWidth: "none",
-                  msOverflowStyle: "none",
+                  maxHeight: "200px",
+                  padding: "8px 0",
+                  "&::-webkit-scrollbar": { 
+                    width: "8px",
+                    display: "block"
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "#f1f1f1",
+                    borderRadius: "4px"
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "#888",
+                    borderRadius: "4px"
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                    background: "#555"
+                  }
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected ? "#f0f7ff" : "white",
+                  color: state.isSelected ? "#0387d9" : "#333",
+                  padding: "10px 12px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "#f0f7ff",
+                    color: "#0387d9"
+                  }
                 }),
                 singleValue: (provided) => ({
                   ...provided,
                   display: "flex",
                   alignItems: "center",
-                }),
-                option: (provided) => ({
-                  ...provided,
-                  display: "flex",
-                  alignItems: "center",
+                  color: "#333"
                 }),
                 valueContainer: (provided) => ({
                   ...provided,
                   width: "100%",
-                }),
+                  padding: "0 8px"
+                })
               }}
             />
           </div>
@@ -1296,62 +1321,143 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       exit={{ x: "-100%", opacity: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      <div className="form-group">
-        <div>
-          <label htmlFor="contactPersonName">Contact Person Name</label>
-        </div>
-        <div className="input-container">
-          <img src={inputLogo} alt="Name Icon" className="input-icon" />
-          <input
-            type="text"
-            id="contactPersonName"
-            value={formData.contactPerson?.fullName || ""}
-            onChange={(e) =>
-              handleInputChange("contactPerson", {
-                ...formData.contactPerson,
-                fullName: e.target.value,
-              })
-            }
-            placeholder="Enter contact person name"
-          />
-        </div>
-      </div>
-
-      <div className="form-group">
-        <div>
-          <label htmlFor="contactPersonRole">Contact Person Role</label>
-        </div>
-        <div className="input-container">
-          <img src={roleLogo} alt="Role Icon" className="input-icon" />
-          <input
-            type="text"
-            id="contactPersonRole"
-            value={formData.contactPerson?.role || ""}
-            onChange={(e) =>
-              handleInputChange("contactPerson", {
-                ...formData.contactPerson,
-                role: e.target.value,
-              })
-            }
-            placeholder="Enter contact person role"
-          />
+      {/* Contact Person Name */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="contactPersonName">Contact Person Name</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="name"
+            />
+            <input
+              type="text"
+              id="contactPersonName"
+              value={formData.contactPerson?.fullName || ""}
+              onChange={(e) =>
+                handleInputChange("contactPerson", {
+                  ...formData.contactPerson,
+                  fullName: e.target.value,
+                })
+              }
+              placeholder="Enter contact person name"
+            />
+          </div>
         </div>
       </div>
 
-      {/* Add Terms and Conditions checkbox */}
-      <div className="form-group">
-        <div className="checkbox-field" style={{ marginTop: "20px" }}>
-          <input
-            type="checkbox"
-            id="terms"
-            checked={formData.acceptTerms}
-            onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
-            style={{ marginRight: "10px" }}
-          />
-          <label htmlFor="terms">I agree to the Terms and Conditions</label>
+      {/* Contact Person Role */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="contactPersonRole">Contact Person Role</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={roleLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="role"
+            />
+            <input
+              type="text"
+              id="contactPersonRole"
+              value={formData.contactPerson?.role || ""}
+              onChange={(e) =>
+                handleInputChange("contactPerson", {
+                  ...formData.contactPerson,
+                  role: e.target.value,
+                })
+              }
+              placeholder="Enter contact person role"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Platform Fees Information */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div style={{ 
+            
+            padding: "15px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #e9ecef"
+          }}>
+            <h4 style={{ 
+              fontSize: "16px", 
+              color: "#333", 
+              marginBottom: "10px",
+              fontWeight: "500"
+            }}>
+              Platform Fees
+            </h4>
+            <ul style={{ 
+              listStyle: "none", 
+              padding: 0, 
+              margin: 0,
+              fontSize: "14px",
+              color: "#666",
+              lineHeight: "1.6"
+            }}>
+              <li style={{ marginBottom: "8px" }}>
+                • Vendors may be charged either a 2% transaction fee per invoice or 5% per invoice fee for premium visibility
+              </li>
+              <li style={{ marginBottom: "8px" }}>
+                • Your fee structure will be finalized during onboarding
+              </li>
+              <li>
+                • Bookings and your order are processed through our AI-powered system
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Terms and Conditions checkbox */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div 
+            className="checkbox-field" 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px 0"
+            }}
+          >
+            <input
+              type="checkbox"
+              id="terms"
+              checked={formData.acceptTerms}
+              onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
+              style={{ 
+                width: "18px",
+                height: "18px",
+                margin: "0",
+                cursor: "pointer"
+              }}
+            />
+            <label 
+              htmlFor="terms" 
+              style={{ 
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#333",
+                margin: "0",
+                lineHeight: "1.4"
+              }}
+            >
+              I agree to the Terms and Conditions
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
       <div className="button-group">
         <button
           className="prev-button"
@@ -1406,7 +1512,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         <div
           className="terms-checkbox"
           style={{
-            marginBottom: "20px",
+            marginBottom: "10px",
             display: "flex",
             alignItems: "center",
             gap: "10px",
