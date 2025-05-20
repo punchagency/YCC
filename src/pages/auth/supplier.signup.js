@@ -35,9 +35,9 @@ const StepInfo = ({ currentStep }) => {
 
   return (
     <div className="logo_crew">
-      <div>
+      {/* <div>
         <img src={check} className="checkImg" alt="" />
-      </div>
+      </div> */}
       <div>
         <p>{stepData[currentStep].step}</p>
         <p className="personal_info">{stepData[currentStep].info}</p>

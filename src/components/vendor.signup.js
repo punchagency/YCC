@@ -1379,44 +1379,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       </div>
 
       {/* Platform Fees Information */}
-      <div className="form-group1">
-        <div className="input-field">
-          <div style={{ 
-            
-            padding: "15px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e9ecef"
-          }}>
-            <h4 style={{ 
-              fontSize: "16px", 
-              color: "#333", 
-              marginBottom: "10px",
-              fontWeight: "500"
-            }}>
-              Platform Fees
-            </h4>
-            <ul style={{ 
-              listStyle: "none", 
-              padding: 0, 
-              margin: 0,
-              fontSize: "14px",
-              color: "#666",
-              lineHeight: "1.6"
-            }}>
-              <li style={{ marginBottom: "8px" }}>
-                • Vendors may be charged either a 2% transaction fee per invoice or 5% per invoice fee for premium visibility
-              </li>
-              <li style={{ marginBottom: "8px" }}>
-                • Your fee structure will be finalized during onboarding
-              </li>
-              <li>
-                • Bookings and your order are processed through our AI-powered system
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      {/* // Platform fees note and related UI removed as per client request */}
 
       {/* Terms and Conditions checkbox */}
       <div className="form-group1">

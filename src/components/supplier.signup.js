@@ -120,9 +120,9 @@ const deliveryOptions = [
 ];
 
 const serviceAreaOptions = [
-  { value: "Caribbean", label: "Caribbean" },
+  { value: "United States", label: "United States" },
   { value: "Mediterranean", label: "Mediterranean" },
-  { value: "USA", label: "USA" },
+  { value: "Both", label: "Both" },
 ];
 
 const SupplierSignUpForm = ({
@@ -242,8 +242,8 @@ const SupplierSignUpForm = ({
   };
 
   const handleSignup = async () => {
-    if (!formData.acceptFees) {
-      setError("Please accept the platform fees to continue.");
+    if (!formData.acceptTerms || !formData.acceptPrivacy) {
+      setError("Please accept both Terms and Conditions and Privacy Policy to continue.");
       return;
     }
 
@@ -260,91 +260,27 @@ const SupplierSignUpForm = ({
       // Add supplier details
       const supplierDetails = {
         businessName: formData.businessName || "",
-        businessType: formData.supplierType?.value || "",
+        departments: formData.departments?.map(dept => dept.value) || [],
         phone: formData.phone || "",
         address: formData.address || "",
         website: formData.website || "",
-        inventorySource: formData.apiEndpoint
-          ? "API"
-          : formData.spreadsheetFile
-          ? "Spreadsheet"
-          : "Manual",
-        deliveryOptions: formData.deliveryPreference
-          ? [formData.deliveryPreference.value]
-          : [],
-        serviceAreas: formData.serviceArea ? [formData.serviceArea.value] : [],
-        licenseSupplierFile: formData.licenseSupplierFile
-          ? formData.licenseSupplierFile.name
-          : "",
-        supplierVatTaxId: formData.supplierVatTaxId
-          ? formData.supplierVatTaxId.name
-          : "",
-        supplierLiabilityInsurance: formData.supplierLiabilityInsurance
-          ? formData.supplierLiabilityInsurance.name
-          : "",
-        spreadsheetFile: formData.spreadsheetFile
-          ? formData.spreadsheetFile.name
-          : "",
+        serviceArea: formData.serviceArea ? formData.serviceArea.value : "",
         contactPerson: {
           fullName: formData.contactPerson?.fullName || "",
           role: formData.contactPerson?.role || "",
         },
       };
 
-      // Add files if they exist
-      if (formData.licenseSupplierFile instanceof File) {
-        formDataObj.append("licenseSupplierFile", formData.licenseSupplierFile);
-        console.log("Added license file:", formData.licenseSupplierFile.name);
-      }
-
-      if (formData.supplierVatTaxId instanceof File) {
-        formDataObj.append("supplierVatTaxId", formData.supplierVatTaxId);
-        console.log("Added tax ID file:", formData.supplierVatTaxId.name);
-      }
-
-      if (formData.supplierLiabilityInsurance instanceof File) {
-        formDataObj.append(
-          "supplierLiabilityInsurance",
-          formData.supplierLiabilityInsurance
-        );
-        console.log(
-          "Added insurance file:",
-          formData.supplierLiabilityInsurance.name
-        );
-      }
-
-      if (formData.spreadsheetFile instanceof File) {
-        formDataObj.append("spreadsheetFile", formData.spreadsheetFile);
-        console.log("Added spreadsheet file:", formData.spreadsheetFile.name);
-      }
-
       formDataObj.append("supplierDetails", JSON.stringify(supplierDetails));
 
-      for (let pair of formDataObj.entries()) {
-        console.log(
-          pair[0],
-          ":",
-          pair[1] instanceof File ? pair[1].name : pair[1]
-        );
-      }
-
       const response = await signup(formDataObj);
-      console.log("Signup response:", response);
-
-      if (response.status === "success") {
-        setSuccess(true);
-        if (response.data?.token) {
-          localStorage.setItem("token", response.data.token);
-        }
-        setTimeout(() => {
-          setStep(6);
-        }, 2000);
+      if (response.status) {
+        setStep(5); // Go to success page
       } else {
-        throw new Error(response.message || "Failed to sign up");
+        setError(response.message || "An error occurred during signup");
       }
-    } catch (error) {
-      console.error("Signup error:", error);
-      setError(error.message || "Failed to sign up. Please try again.");
+    } catch (err) {
+      setError(err.message || "An error occurred during signup");
     } finally {
       setIsSubmitting(false);
     }
@@ -353,10 +289,10 @@ const SupplierSignUpForm = ({
   const renderStep1 = () => (
     <motion.div
       key="step1"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* Business Name */}
       <div className="form-group1">
@@ -364,343 +300,73 @@ const SupplierSignUpForm = ({
           <div>
             <label htmlFor="businessName">Business Name</label>
           </div>
-          <div className="inputBorder" style={{ border: "1px solid #DEDCDC" }}>
+          <div className="inputBorder">
             <img
               src={inputLogo}
-              alt="Input icon"
-              style={{
-                width: "18px",
-                height: "18px",
-                objectFit: "contain",
-                border: "1px solid #DEDCDC",
-              }}
+              style={{ width: "12px", height: "12px" }}
+              alt="name"
             />
             <input
               type="text"
               id="businessName"
-              placeholder="Enter Business Name"
               value={formData.businessName || ""}
-              onChange={(e) =>
-                handleInputChange("businessName", e.target.value)
-              }
+              onChange={(e) => handleInputChange("businessName", e.target.value)}
+              placeholder="Enter your business name"
             />
           </div>
         </div>
       </div>
 
-      {/* Business Address */}
-
-      {/* Phone Number and Email Row */}
-      <div
-        className="form-row"
-        style={{
-          display: "flex",
-          gap: "16px",
-          width: "100%",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingLeft: "10px",
-        }}
-      >
-        {/* Phone Number */}
-
-        {/* Email */}
-        <div
-          className="form-group5"
-          style={{ flex: "1", marginBottom: "27px" }}
-        >
-          <div className="input-field">
-            <div>
-              <label htmlFor="email">Business Email</label>
-            </div>
-            <div
-              className="inputBorder"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                padding: "8px 12px",
-                backgroundColor: "#F8F8F8",
-                borderRadius: "5px",
-                width: "100%",
-                height: "40px",
-                border: "1px solid #DEDCDC",
-              }}
-            >
-              <img
-                src={emailLogo}
-                alt="Email icon"
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  marginRight: "8px",
-                  objectFit: "contain",
-                }}
-              />
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter Business Email"
-                value={formData.email || ""}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  background: "transparent",
-                  border: "none",
-
-                  outline: "none",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="form-group" style={{ paddingLeft: "9px" }}>
-        <div className="input-row">
-          {/* Type of Supplier */}
-          <div className="input-field">
-            <label>Type of Supplier</label>
-            <div
-              className="inputBorder"
-              style={{
-                height: "40px",
-                backgroundColor: "#F8F8F8",
-                border: "1px solid #DEDCDC",
-              }}
-            >
-              <Select
-                options={supplierTypeOptions}
-                value={formData.supplierType}
-                onChange={(selectedOption) =>
-                  handleInputChange("supplierType", selectedOption)
-                }
-                placeholder={
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={serviceLogo}
-                      alt="Service Icon"
-                      style={{
-                        width: "18px",
-                        height: "18px",
-                        marginRight: "8px",
-                        objectFit: "contain",
-                      }}
-                    />
-                    <span style={{ fontSize: "13.5px" }}>
-                      Select Supplier Type
-                    </span>
-                  </div>
-                }
-                styles={{
-                  control: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                    background: "transparent",
-                    border: "none",
-                    boxShadow: "none",
-                    minHeight: "35px",
-                  }),
-                  container: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                  }),
-                  menu: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                  }),
-                  option: (base) => ({
-                    ...base,
-                    padding: "8px 12px",
-                  }),
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Department */}
-          <div className="input-field">
-            <label>Department</label>
-            <div
-              className="inputBorder"
-              style={{
-                height: "40px",
-                backgroundColor: "#F8F8F8",
-                border: "1px solid #DEDCDC",
-              }}
-            >
-              <Select
-                options={departmentOptions}
-                value={formData.department}
-                onChange={(selectedOption) =>
-                  handleInputChange("department", selectedOption)
-                }
-                placeholder={
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={departmentLogo}
-                      alt="Department Icon"
-                      style={{
-                        width: "18px",
-                        height: "18px",
-                        marginRight: "8px",
-                        objectFit: "contain",
-                      }}
-                    />
-                    <span style={{ fontSize: "13.5px" }}>
-                      Select Department
-                    </span>
-                  </div>
-                }
-                styles={{
-                  control: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                    background: "transparent",
-                    border: "none",
-                    boxShadow: "none",
-                    minHeight: "35px",
-                  }),
-                  container: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                  }),
-                  menu: (provided) => ({
-                    ...provided,
-                    width: "100%",
-                  }),
-                  option: (base) => ({
-                    ...base,
-                    padding: "8px 12px",
-                  }),
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Phone and Address */}
-      <div className="form-group" style={{ paddingLeft: "9px" }}>
-        <div className="input-row">
-          <div className="input-field">
-            <label>Phone Number</label>
-            <div
-              className="inputBorder"
-              style={{
-                height: "40px",
-                backgroundColor: "#F8F8F8",
-                border: "1px solid #DEDCDC",
-              }}
-            >
-              <img
-                src={phone}
-                alt="phone icon"
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  objectFit: "contain",
-                  flexShrink: 0,
-                }}
-              />
-              <input
-                type="text"
-                placeholder="(+1) 1122-334-567"
-                value={formData.phone || ""}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                style={{
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  padding: "8px 12px",
-                }}
-                specialLabel=""
-                enableAreaCodes={true}
-                onlyCountries={["us", "ca"]}
-                masks={{ us: "... ... ....", ca: "... ... ...." }}
-              />
-            </div>
-          </div>
-
-          <div className="input-field">
-            <label>Address</label>
-            <div
-              className="inputBorder"
-              style={{
-                height: "40px",
-                backgroundColor: "#F8F8F8",
-                border: "1px solid #DEDCDC",
-              }}
-            >
-              <img
-                src={location}
-                alt="location icon"
-                style={{
-                  width: "16px",
-                  height: "16px",
-                  flexShrink: 0,
-                }}
-              />
-              <input
-                type="text"
-                placeholder="1234 Elm Street, Suite 567"
-                value={formData.address || ""}
-                onChange={(e) => handleInputChange("address", e.target.value)}
-                style={{
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  outline: "none",
-                  padding: "8px 12px",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Website Input */}
-      <div className="form-group" style={{ paddingLeft: "9px" }}>
+      {/* Email */}
+      <div className="form-group1">
         <div className="input-field">
-          <label>Business Website</label>
-          <div
-            className="inputBorder"
-            style={{
-              height: "40px",
-              backgroundColor: "#F8F8F8",
-              border: "1px solid #DEDCDC",
-              paddingLeft: "10px",
-            }}
-          >
+          <div>
+            <label htmlFor="email">Contact Email</label>
+          </div>
+          <div className="inputBorder">
             <img
-              src={websiteLogo}
-              alt="website icon"
-              style={{
-                width: "18px",
-                height: "18px",
-                objectFit: "contain",
-                flexShrink: 0,
-              }}
+              src={emailLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="email"
             />
             <input
-              type="url"
-              placeholder="www.example.com"
-              value={formData.website || ""}
-              onChange={(e) => handleInputChange("website", e.target.value)}
-              style={{
-                width: "100%",
-                background: "transparent",
-                border: "none",
-                outline: "none",
-                padding: "8px 12px",
-              }}
+              type="email"
+              id="email"
+              value={formData.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              placeholder="Enter your email"
             />
           </div>
         </div>
       </div>
 
-      {/* Next Button */}
+      {/* Departments */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="departments">Departments Served</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={departmentLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="department"
+            />
+            <Select
+              isMulti
+              name="departments"
+              options={departmentOptions}
+              value={formData.departments}
+              onChange={(selected) => handleInputChange("departments", selected)}
+              className="basic-multi-select"
+              classNamePrefix="select"
+              placeholder="Select departments"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
       <div className="button-group">
         <button
           className="next-button"
@@ -719,156 +385,75 @@ const SupplierSignUpForm = ({
   const renderStep2 = () => (
     <motion.div
       key="step2"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
-      {/* License Upload */}
-      <div className="upload-group">
+      {/* Phone */}
+      <div className="form-group1">
         <div className="input-field">
-          <label>Business License</label>
-          <div
-            className="upload-input"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              border: "1px solid #DEDCDC",
-              height: "40px",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Upload Business License"
-              value={licenseFile ? licenseFile.name : ""}
-              readOnly
-              style={{
-                flex: 1,
-                border: "none",
-                background: "transparent",
-                outline: "none",
-              }}
-            />
+          <div>
+            <label htmlFor="phone">Phone Number</label>
+          </div>
+          <div className="inputBorder">
             <img
-              src={uploadfileLogo}
-              alt="Upload"
-              style={{
-                width: "18px",
-                height: "18px",
-                cursor: "pointer",
-                objectFit: "contain",
-              }}
-              onClick={() => document.getElementById("licenseInput").click()}
+              src={phone}
+              style={{ width: "12px", height: "12px" }}
+              alt="phone"
             />
             <input
-              type="file"
-              id="licenseInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "license")}
-              style={{ display: "none" }}
+              type="tel"
+              id="phone"
+              value={formData.phone || ""}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              placeholder="Enter your phone number"
             />
           </div>
         </div>
       </div>
 
-      {/* Tax ID Upload */}
-      <div className="upload-group">
+      {/* Address */}
+      <div className="form-group1">
         <div className="input-field">
-          <label>Tax ID Document</label>
-          <div
-            className="upload-input"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              border: "1px solid #DEDCDC",
-              height: "40px",
-            }}
-          >
+          <div>
+            <label htmlFor="address">Business Address</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={location}
+              style={{ width: "12px", height: "12px" }}
+              alt="location"
+            />
             <input
               type="text"
-              placeholder="Upload Tax ID Document"
-              value={taxIdFile ? taxIdFile.name : ""}
-              readOnly
-              style={{
-                flex: 1,
-                border: "none",
-                background: "transparent",
-                outline: "none",
-              }}
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              style={{
-                width: "18px",
-                height: "18px",
-                cursor: "pointer",
-                objectFit: "contain",
-              }}
-              onClick={() => document.getElementById("taxIdInput").click()}
-            />
-            <input
-              type="file"
-              id="taxIdInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "taxId")}
-              style={{ display: "none" }}
+              id="address"
+              value={formData.address || ""}
+              onChange={(e) => handleInputChange("address", e.target.value)}
+              placeholder="Enter your business address"
             />
           </div>
         </div>
       </div>
 
-      {/* Liability Insurance Upload */}
-      <div className="upload-group">
+      {/* Website */}
+      <div className="form-group1">
         <div className="input-field">
-          <label>Liability Insurance</label>
-          <div
-            className="upload-input"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              border: "1px solid #DEDCDC",
-              height: "40px",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Upload Liability Insurance"
-              value={insuranceFile ? insuranceFile.name : ""}
-              readOnly
-              style={{
-                flex: 1,
-                border: "none",
-                background: "transparent",
-                outline: "none",
-              }}
-            />
+          <div>
+            <label htmlFor="website">Website</label>
+          </div>
+          <div className="inputBorder">
             <img
-              src={uploadfileLogo}
-              alt="Upload"
-              style={{
-                width: "18px",
-                height: "18px",
-                cursor: "pointer",
-                objectFit: "contain",
-              }}
-              onClick={() => document.getElementById("insuranceInput").click()}
+              src={websiteLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="website"
             />
             <input
-              type="file"
-              id="insuranceInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "insurance")}
-              style={{ display: "none" }}
+              type="url"
+              id="website"
+              value={formData.website || ""}
+              onChange={(e) => handleInputChange("website", e.target.value)}
+              placeholder="Enter your website URL"
             />
           </div>
         </div>
@@ -900,279 +485,168 @@ const SupplierSignUpForm = ({
   const renderStep3 = () => (
     <motion.div
       key="step3"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
-      {/* API Connection */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
+      {/* Contact Person Name */}
+      <div className="form-group1">
         <div className="input-field">
           <div>
-            <label>API Connection</label>
+            <label htmlFor="contactPersonName">Contact Person Name</label>
           </div>
-          <div
-            className="inputBorder"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              width: "100%",
-              height: "40px",
-              border: "1px solid #DEDCDC",
-            }}
-          >
-            <img
-              src={emailLogo}
-              alt="Email icon"
-              style={{
-                width: "18px",
-                height: "18px",
-                marginRight: "8px",
-                objectFit: "contain",
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Enter API Endpoint"
-              value={formData.apiEndpoint || ""}
-              onChange={(e) => handleInputChange("apiEndpoint", e.target.value)}
-              style={{
-                width: "100%",
-                height: "100%",
-                background: "transparent",
-                border: "none",
-                outline: "none",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Spreadsheet Upload */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Upload Product Spreadsheet</label>
-          <div
-            className="upload-input"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              border: "1px solid #DEDCDC",
-              height: "40px",
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Upload Product Spreadsheet"
-              value={
-                formData.spreadsheetFile ? formData.spreadsheetFile.name : ""
-              }
-              readOnly
-              style={{
-                flex: 1,
-                border: "none",
-                background: "transparent",
-                outline: "none",
-              }}
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              style={{
-                width: "18px",
-                height: "18px",
-                cursor: "pointer",
-                objectFit: "contain",
-              }}
-              onClick={() =>
-                document.getElementById("spreadsheetInput").click()
-              }
-            />
-            <input
-              type="file"
-              id="spreadsheetInput"
-              accept=".xlsx,.xls,.csv"
-              onChange={(e) =>
-                handleFileUpload(e.target.files[0], "spreadsheet")
-              }
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Manual Entry */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
-        <div className="input-field">
-          <div>
-            <label>Manual Entry</label>
-          </div>
-          <div
-            className="inputBorder"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              width: "100%",
-              height: "40px",
-              border: "1px solid #DEDCDC",
-            }}
-          >
+          <div className="inputBorder">
             <img
               src={inputLogo}
-              alt="Input icon"
-              style={{
-                width: "18px",
-                height: "18px",
-                marginRight: "8px",
-                objectFit: "contain",
-              }}
+              style={{ width: "12px", height: "12px" }}
+              alt="name"
             />
             <input
               type="text"
-              placeholder="Enter Product Details"
-              value={formData.manualEntry || ""}
-              onChange={(e) => handleInputChange("manualEntry", e.target.value)}
-              style={{
-                width: "100%",
-                height: "100%",
-                background: "transparent",
-                border: "none",
-                outline: "none",
-              }}
+              id="contactPersonName"
+              value={formData.contactPerson?.fullName || ""}
+              onChange={(e) =>
+                handleInputChange("contactPerson", {
+                  ...formData.contactPerson,
+                  fullName: e.target.value,
+                })
+              }
+              placeholder="Enter contact person name"
             />
           </div>
         </div>
       </div>
 
-      {/* Shipping & Delivery Preference */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
+      {/* Contact Person Role */}
+      <div className="form-group1">
         <div className="input-field">
-          <label>Shipping & Delivery Preference</label>
-          <div
-            className="inputBorder"
-            style={{
-              height: "40px",
-              backgroundColor: "#F8F8F8",
-              border: "1px solid #DEDCDC",
-            }}
-          >
-            <Select
-              options={deliveryOptions}
-              value={formData.deliveryPreference}
-              onChange={(selectedOption) =>
-                handleInputChange("deliveryPreference", selectedOption)
+          <div>
+            <label htmlFor="contactPersonRole">Contact Person Role</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={roleLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="role"
+            />
+            <input
+              type="text"
+              id="contactPersonRole"
+              value={formData.contactPerson?.role || ""}
+              onChange={(e) =>
+                handleInputChange("contactPerson", {
+                  ...formData.contactPerson,
+                  role: e.target.value,
+                })
               }
-              placeholder={
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={serviceLogo}
-                    alt="Delivery Icon"
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      marginRight: "8px",
-                      objectFit: "contain",
-                    }}
-                  />
-                  <span style={{ fontSize: "13.5px" }}>
-                    Select Delivery Preference
-                  </span>
-                </div>
-              }
-              styles={{
-                control: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  boxShadow: "none",
-                  minHeight: "35px",
-                }),
-                container: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                }),
-                option: (base) => ({
-                  ...base,
-                  padding: "8px 12px",
-                }),
-              }}
+              placeholder="Enter contact person role"
             />
           </div>
         </div>
       </div>
 
       {/* Service Area */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
+      <div className="form-group1">
         <div className="input-field">
-          <label>Service Area</label>
-          <div
-            className="inputBorder"
-            style={{
-              height: "40px",
-              backgroundColor: "#F8F8F8",
-              border: "1px solid #DEDCDC",
-            }}
-          >
+          <div>
+            <label htmlFor="serviceArea">Service Area</label>
+          </div>
+          <div className="inputBorder">
+            <img
+              src={location}
+              style={{ width: "12px", height: "12px" }}
+              alt="location"
+            />
             <Select
+              name="serviceArea"
               options={serviceAreaOptions}
               value={formData.serviceArea}
-              onChange={(selectedOption) =>
-                handleInputChange("serviceArea", selectedOption)
-              }
-              placeholder={
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={location}
-                    alt="Location Icon"
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      marginRight: "8px",
-                      objectFit: "contain",
-                    }}
-                  />
-                  <span style={{ fontSize: "13.5px" }}>
-                    Select Service Area
-                  </span>
-                </div>
-              }
-              styles={{
-                control: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                  background: "transparent",
-                  border: "none",
-                  boxShadow: "none",
-                  minHeight: "35px",
-                }),
-                container: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  width: "100%",
-                }),
-                option: (base) => ({
-                  ...base,
-                  padding: "8px 12px",
-                }),
+              onChange={(selected) => handleInputChange("serviceArea", selected)}
+              className="basic-select"
+              classNamePrefix="select"
+              placeholder="Select service area"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Terms and Conditions */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div 
+            className="checkbox-field" 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px 0"
+            }}
+          >
+            <input
+              type="checkbox"
+              id="terms"
+              checked={formData.acceptTerms}
+              onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
+              style={{ 
+                width: "18px",
+                height: "18px",
+                margin: "0",
+                cursor: "pointer"
               }}
             />
+            <label 
+              htmlFor="terms" 
+              style={{ 
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#333",
+                margin: "0",
+                lineHeight: "1.4"
+              }}
+            >
+              I agree to the Terms and Conditions
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Privacy Policy */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div 
+            className="checkbox-field" 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px 0"
+            }}
+          >
+            <input
+              type="checkbox"
+              id="privacy"
+              checked={formData.acceptPrivacy}
+              onChange={(e) => handleInputChange("acceptPrivacy", e.target.checked)}
+              style={{ 
+                width: "18px",
+                height: "18px",
+                margin: "0",
+                cursor: "pointer"
+              }}
+            />
+            <label 
+              htmlFor="privacy" 
+              style={{ 
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#333",
+                margin: "0",
+                lineHeight: "1.4"
+              }}
+            >
+              I agree to the Privacy Policy
+            </label>
           </div>
         </div>
       </div>
@@ -1188,263 +662,31 @@ const SupplierSignUpForm = ({
         </button>
         <button
           className="next-button"
-          onClick={() => setStep(4)}
+          onClick={handleSignup}
+          disabled={isSubmitting}
           style={{
             width: "48%",
-            background: "linear-gradient(to right, #034d92, #0487d9)",
+            background: !isSubmitting
+              ? "linear-gradient(to right, #034d92, #0487d9)"
+              : "#ccc",
+            cursor: !isSubmitting ? "pointer" : "not-allowed",
+            opacity: !isSubmitting ? 1 : 0.7,
+            transition: "all 0.3s ease",
           }}
         >
-          Next
+          {isSubmitting ? "Submitting..." : "Submit Application"}
         </button>
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div
-          className="error-message"
-          style={{ color: "red", marginTop: "10px" }}
-        >
-          {error}
-        </div>
-      )}
     </motion.div>
   );
 
   const renderStep4 = () => (
     <motion.div
       key="step4"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-    >
-      {/* Full Name Input */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
-        <div className="input-field">
-          <div>
-            <label>Full Name</label>
-          </div>
-          <div
-            className="inputBorder"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              width: "100%",
-              height: "40px",
-              border: "1px solid #DEDCDC",
-            }}
-          >
-            <img
-              src={inputLogo}
-              alt="Input icon"
-              style={{
-                width: "18px",
-                height: "18px",
-                marginRight: "8px",
-                objectFit: "contain",
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Enter Full Name"
-              value={formData.contactPerson?.fullName || ""}
-              onChange={(e) =>
-                handleInputChange("contactPerson", {
-                  ...formData.contactPerson,
-                  fullName: e.target.value,
-                })
-              }
-              style={{
-                width: "100%",
-                height: "100%",
-                background: "transparent",
-                border: "none",
-                outline: "none",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Role Input */}
-      <div className="form-group5" style={{ marginBottom: "20px" }}>
-        <div className="input-field">
-          <div>
-            <label>Role/Position</label>
-          </div>
-          <div
-            className="inputBorder"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "8px 12px",
-              backgroundColor: "#F8F8F8",
-              borderRadius: "5px",
-              width: "100%",
-              height: "40px",
-              border: "1px solid #DEDCDC",
-            }}
-          >
-            <img
-              src={roleLogo}
-              alt="role"
-              style={{
-                width: "18px",
-                height: "18px",
-                marginRight: "8px",
-                objectFit: "contain",
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Enter Role/Position"
-              value={formData.contactPerson?.role || ""}
-              onChange={(e) =>
-                handleInputChange("contactPerson", {
-                  ...formData.contactPerson,
-                  role: e.target.value,
-                })
-              }
-              style={{
-                width: "100%",
-                height: "100%",
-                background: "transparent",
-                border: "none",
-                outline: "none",
-              }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="button-group">
-        <button
-          className="prev-button"
-          onClick={() => setStep(3)}
-          style={{ width: "48%", background: "#f0f0f0" }}
-        >
-          Previous
-        </button>
-        <button
-          className="next-button"
-          onClick={() => setStep(5)}
-          style={{
-            width: "48%",
-            background: "linear-gradient(to right, #034d92, #0487d9)",
-          }}
-        >
-          Next
-        </button>
-      </div>
-    </motion.div>
-  );
-
-  const renderStep5 = () => (
-    <motion.div
-      key="step5"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="platform-fee-container"
-    >
-      <div>
-        <div>
-          <h3>Platform Fees</h3>
-        </div>
-
-        <div className="fees">
-          <ul>
-            <li>Suppliers do not any platform fees.</li>
-            <li>Consumers are charged a 2% transaction fee per order.</li>
-            <li>
-              Orders placed through the chatbot will automatically sync with
-              your inventory.
-            </li>
-            <li>
-              Your inventory & logistics details will be verified by our team
-              before approval.
-            </li>
-          </ul>
-        </div>
-
-        {/* Added Checkbox */}
-        <div
-          className="terms-checkbox"
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <input
-            type="checkbox"
-            id="acceptFees"
-            checked={formData.acceptFees}
-            onChange={(e) => handleInputChange("acceptFees", e.target.checked)}
-            style={{
-              width: "16px",
-              height: "16px",
-              cursor: "pointer",
-            }}
-          />
-          <label
-            htmlFor="acceptFees"
-            style={{
-              cursor: "pointer",
-              fontSize: "14px",
-              color: "#666",
-            }}
-          >
-            I understand and accept the platform fees structure
-          </label>
-        </div>
-
-        <div className="button-group">
-          <button
-            className="prev-button"
-            onClick={() => setStep(4)}
-            style={{ width: "48%", background: "#f0f0f0" }}
-          >
-            Previous
-          </button>
-          <button
-            className="next-button"
-            onClick={handleSignup}
-            disabled={!formData.acceptFees || isSubmitting}
-            style={{
-              width: "48%",
-              background:
-                formData.acceptFees && !isSubmitting
-                  ? "linear-gradient(to right, #034d92, #0487d9)"
-                  : "#ccc",
-              cursor:
-                formData.acceptFees && !isSubmitting
-                  ? "pointer"
-                  : "not-allowed",
-              opacity: formData.acceptFees && !isSubmitting ? 1 : 0.7,
-              transition: "all 0.3s ease",
-            }}
-          >
-            {isSubmitting ? "Submitting..." : "Accept & Continue"}
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  const renderStep6 = () => (
-    <motion.div
-      key="step6"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
       className="success-container"
     >
       <div
@@ -1476,8 +718,6 @@ const SupplierSignUpForm = ({
         {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
         {currentStep === 4 && renderStep4()}
-        {currentStep === 5 && renderStep5()}
-        {currentStep === 6 && renderStep6()}
       </AnimatePresence>
       <AnimatePresence>
         {error && (
