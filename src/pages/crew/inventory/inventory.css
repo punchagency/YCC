@@ -1,0 +1,106 @@
+/* Inventory Table Styles */
+.inventory-skeleton {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.inventory-skeleton > div:last-child {
+  border-bottom: none;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.custom-pagination {
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #eaecf0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Customize Paginator styles */
+.p-paginator {
+  border: none !important;
+  padding: 0 !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: #0ea5e9 !important;
+  color: #ffffff !important;
+}
+
+.inventory-container {
+  position: relative;
+  padding-bottom: 70px; /* Make room for pagination */
+}
+
+/* View Item Modal Styles */
+.view-item-container {
+  padding: 0;
+}
+
+.view-item-header {
+  margin-bottom: 20px;
+}
+
+.view-item-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.view-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.view-item-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.view-item-label {
+  flex: 0 0 40%;
+  font-weight: 600;
+  color: #555;
+}
+
+.view-item-value {
+  flex: 0 0 60%;
+}
+
+/* Dialog overrides */
+.view-item-dialog .p-dialog-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.view-item-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.view-item-dialog .p-dialog-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem;
+}

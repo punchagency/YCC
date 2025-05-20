@@ -5,9 +5,9 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 // import { Checkbox } from "primereact/checkbox";
 
-// import { InputSwitch } from "primereact/inputswitch";
+import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
-// import { useNotifications } from "../../../context/notificationsContext";
+import { useNotifications } from "../../../context/notificationsContext";
 import { Toast } from "primereact/toast";
 import { updateUserSettings } from "../../../services/crewSettings/crewsettings";
 
@@ -15,23 +15,23 @@ import { updateUserSettings } from "../../../services/crewSettings/crewsettings"
 // import { confirmDialog } from "primereact/confirmdialog";
 
 // Define these arrays outside the component to prevent infinite loops
-// const LANGUAGES = [
-//   { name: "English", code: "en" },
-//   { name: "Spanish", code: "es" },
-//   { name: "French", code: "fr" },
-//   { name: "German", code: "de" },
-//   { name: "Italian", code: "it" },
-//   { name: "Portuguese", code: "pt" },
-//   { name: "Russian", code: "ru" },
-//   { name: "Chinese", code: "zh" },
-//   { name: "Japanese", code: "ja" },
-//   { name: "Arabic", code: "ar" },
-// ];
+const LANGUAGES = [
+  { name: "English", code: "en" },
+  { name: "Spanish", code: "es" },
+  { name: "French", code: "fr" },
+  { name: "German", code: "de" },
+  { name: "Italian", code: "it" },
+  { name: "Portuguese", code: "pt" },
+  { name: "Russian", code: "ru" },
+  { name: "Chinese", code: "zh" },
+  { name: "Japanese", code: "ja" },
+  { name: "Arabic", code: "ar" },
+];
 
 const CrewSetting = () => {
   const navigate = useNavigate();
   const { user } = useUser();
-  // const { notificationsEnabled, toggleNotifications } = useNotifications();
+  const { notificationsEnabled, toggleNotifications } = useNotifications();
 
   const toast = React.useRef(null);
   // const deleteMenuRef = useRef(null);
@@ -42,9 +42,9 @@ const CrewSetting = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
-  // const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  // const [accountVisibility, setAccountVisibility] = useState(true);
-  // const [theme, setTheme] = useState("light");
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [accountVisibility, setAccountVisibility] = useState(true);
+  const [theme, setTheme] = useState("light");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -63,6 +63,11 @@ const CrewSetting = () => {
       setEmail(user.email || "");
       // Set phone
       setPhone(user.phone || user?.profile?.phone || "");
+      // Set two-factor authentication status if available
+      setTwoFactorEnabled(user.twoFactorEnabled || false);
+
+      // Set account visibility if available
+      setAccountVisibility(user.accountVisibility !== false);
     }
   }, [user]);
 
@@ -176,10 +181,10 @@ const CrewSetting = () => {
   //   }, 3000);
   // };
 
-  // const changeTheme = () => {
-  //   // Implement theme change logic here
-  //   setTheme(theme === "light" ? "dark" : "light");
-  // };
+  const changeTheme = () => {
+    // Implement theme change logic here
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
     <>
@@ -287,9 +292,9 @@ const CrewSetting = () => {
                   onChange={toggleNotifications}
                 />
               </div>
-            </div> */}
+            </div>
 
-            {/* <div className="settings-form-group">
+            <div className="settings-form-group">
               <label>Theme (Light/Dark Mode)</label>
               <div className="toggle-container">
                 <span>Light Mode</span>

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-// import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { useNavigate, useParams, } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
 import { InputText } from "primereact/inputtext";
@@ -70,7 +69,7 @@ const InventoryTableSkeleton = () => {
 const Invent = () => {
   const toast = useRef(null);
   const navigate = useNavigate();
-  // const location = useLocation();
+  const location = useLocation();
   const { inventoryId } = useParams(); // Get inventory ID from URL params
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
@@ -722,6 +721,7 @@ const Invent = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
+                  
                 gap: "8px",
                 fontSize: "14px",
               }}

@@ -1,12 +1,12 @@
-import { Dialog, } from "primereact/dialog";
-import { Button, } from "primereact/button";
-import { Dropdown, } from "primereact/dropdown";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "primereact/skeleton";
-import { InputText } from "primereact/inputtext";
 import { searchAll } from "../services/search/searchService";
-import React, { useState, useEffect, useMemo, useCallback, } from "react";
-
+import searchIcon from "../assets/images/crew/searchLogo.png";
 
 const GlobalSearchModal = ({
   visible,

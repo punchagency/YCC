@@ -13,6 +13,7 @@ export const getAllServices = async () => {
     const response = await axios.get(`${API_URL}/all/services`, {
       headers: getAuthHeader(),
     });
+    console.log("Services fetched successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching services:", error);
@@ -27,39 +28,6 @@ export const getAllVendorServices = async () => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const updateOneService = async (serviceId, updatedService) => {
-  try {
-    const response = await axios.patch(`${API_URL}/${serviceId}`, updatedService, {
-      headers: getAuthHeader(),
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const deleteOneService = async (serviceId) => {
-  try {
-    const response = await axios.delete(`${API_URL}/${serviceId}`, {
-      headers: getAuthHeader(),
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const createOneService = async (newService) => {
-  try {
-    const response = await axios.post(`${API_URL}`, newService, {
-      headers: getAuthHeader(),
     });
     return response.data;
   } catch (error) {

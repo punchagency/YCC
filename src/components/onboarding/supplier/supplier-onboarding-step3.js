@@ -60,7 +60,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
       </Box>
       {inventoryData && inventoryData.length > 0 && (
         <Box sx={{ height: "100%", maxHeight: "60vh", overflowY: "auto" }}>
-          <InventoryWrapper inventoryData={inventoryData} setInventoryData={setInventoryData} />
+          <InventoryWrapper inventoryData={inventoryData} />
         </Box>
       )}
       {isLoading && (
