@@ -1278,83 +1278,105 @@ export default function CalendarPage() {
                     onDelete={handleEventDelete}
                     onAddGuest={handleAddGuest}
                   />
-                  <div>
-                    <h4>Upcoming Reminders</h4>
-                    <div>
-                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
-                        <div className="flex items-center justify-center">
-                          <div>
-                            <h3 className="text-2xl font-bold">17</h3>
-                          </div>
-                          <div className="mt-3 ml-3">
-                            <p>April 17</p>
-                            <p>Service Book</p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex items-center justify-flex-end">
-                            <img
-                              src={three}
-                              alt="menu"
-                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
-                            />
-                          </div>
-                          <span>
-                            <span>9:00AM</span>
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
-                        <div className="flex items-center justify-center">
-                          <div>
-                            <h3 className="text-2xl font-bold">18</h3>
-                          </div>
-                          <div className="mt-3 ml-3">
-                            <p>April 17</p>
-                            <p>Custome Event</p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex items-center justify-flex-end">
-                            <img
-                              src={three}
-                              alt="menu"
-                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
-                            />
-                          </div>
-                          <span>
-                            <span>9:00AM</span>
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2" style={{boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)"}}>
-                        <div className="flex items-center justify-center">
-                          <div>
-                            <h3 className="text-2xl font-bold">19</h3>
-                          </div>
-                          <div className="mt-3 ml-3">
-                            <p>April 17</p>
-                            <p>Truing</p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex items-center justify-flex-end">
-                            <img
-                              src={three}
-                              alt="menu"
-                              style={{ cursor: "pointer", marginBottom: "10px", marginLeft: "55px" }}
-
-                            />
-                          </div>
-                          <span className="mt-5">
-                            <span className="text-gray-500 mt-5">9:00AM</span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </React.Fragment>
               ))}
+
+              {/* Move the Upcoming Reminders section outside the map function */}
+              <div>
+                <h4>Upcoming Reminders</h4>
+                <div>
+                  <div
+                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div>
+                        <h3 className="text-2xl font-bold">17</h3>
+                      </div>
+                      <div className="mt-3 ml-3">
+                        <p>April 17</p>
+                        <p>Service Book</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-flex-end">
+                        <img
+                          src={three}
+                          alt="menu"
+                          style={{
+                            cursor: "pointer",
+                            marginBottom: "10px",
+                            marginLeft: "55px",
+                          }}
+                        />
+                      </div>
+                      <span>
+                        <span>9:00AM</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div>
+                        <h3 className="text-2xl font-bold">18</h3>
+                      </div>
+                      <div className="mt-3 ml-3">
+                        <p>April 17</p>
+                        <p>Custome Event</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-flex-end">
+                        <img
+                          src={three}
+                          alt="menu"
+                          style={{
+                            cursor: "pointer",
+                            marginBottom: "10px",
+                            marginLeft: "55px",
+                          }}
+                        />
+                      </div>
+                      <span>
+                        <span>9:00AM</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div
+                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
+                  >
+                    <div className="flex items-center justify-center">
+                      <div>
+                        <h3 className="text-2xl font-bold">19</h3>
+                      </div>
+                      <div className="mt-3 ml-3">
+                        <p>April 17</p>
+                        <p>Truing</p>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <div className="flex items-center justify-flex-end">
+                        <img
+                          src={three}
+                          alt="menu"
+                          style={{
+                            cursor: "pointer",
+                            marginBottom: "10px",
+                            marginLeft: "55px",
+                          }}
+                        />
+                      </div>
+                      <span className="mt-5">
+                        <span className="text-gray-500 mt-5">9:00AM</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Show See More button if there are more than 2 events */}
               {calendarEvents.data.length > 2 && (
@@ -1394,7 +1416,7 @@ export default function CalendarPage() {
             display: isMobile && activeView !== "calendar" ? "none" : "block",
           }}
         >
-          <h3 style={{ fontSize: "18px", margin: "0 0 15px 0",  }}>Calendar</h3>
+          <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>Calendar</h3>
 
           {/* Large Calendar Component */}
           <div

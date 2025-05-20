@@ -65,203 +65,206 @@ import CrewTraining from "./pages/crew/training/training";
 import CrewAccomodation from "./pages/crew/accomodation/accomo";
 import CrewDocument from "./pages/crew/document/document";
 import BookingDetails from "./pages/crew/booking/details";
+import { UserProvider } from './context/userContext';
 
 function App() {
   return (
-    <ToastProvider>
-      <NotificationsProvider>
-        <Routes>
-          <Route path="/get-started" element={<GetStarted />} />
-          <Route path="/apply" element={<VendorStarted />} />
+    <UserProvider>
+      <ToastProvider>
+        <NotificationsProvider>
+          <Routes>
+            <Route path="/get-started" element={<GetStarted />} />
+            <Route path="/apply" element={<VendorStarted />} />
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-          {/* new route start */}
+            {/* new route start */}
 
-          <Route path="/crew/signup" element={<CrewSignup />} />
-          <Route path="/vendor/signup" element={<VendorSignup />} />
-          <Route path="/supplier/signup" element={<SupplierSignup />} />
+            <Route path="/crew/signup" element={<CrewSignup />} />
+            <Route path="/vendor/signup" element={<VendorSignup />} />
+            <Route path="/supplier/signup" element={<SupplierSignup />} />
 
-          {/* end of route */}
+            {/* end of route */}
 
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/coming-soon" element={<ComingSoon />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/coming-soon" element={<ComingSoon />} />
 
-          {/* Landing Page Routes */}
+            {/* Landing Page Routes */}
 
-          <Route element={<LandingPageLayout />}>
-            <Route path="/" element={<HomeLandingPage />} />
-            <Route path="/captain" element={<CaptainLandingPage />} />
-            <Route path="/crew" element={<CrewLandingPage />} />
-            <Route path="/exterior" element={<ExteriorLandingPage />} />
-            <Route path="/interior" element={<InteriorLandingPage />} />
+            <Route element={<LandingPageLayout />}>
+              <Route path="/" element={<HomeLandingPage />} />
+              <Route path="/captain" element={<CaptainLandingPage />} />
+              <Route path="/crew" element={<CrewLandingPage />} />
+              <Route path="/exterior" element={<ExteriorLandingPage />} />
+              <Route path="/interior" element={<InteriorLandingPage />} />
 
-            <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
+              <Route path="/chef-galley" element={<ChefGalleryLandingPage />} />
 
-            <Route path="/engineering" element={<EngineeringLandingPage />} />
-            <Route path="/vendor-services" element={<VendorAndServices />} />
-            <Route path="/about-us" element={<AboutUs />} />
-            <Route path="/resource-center" element={<ResourceCenter />} />
-            <Route path="/contact-us" element={<ContactUs />} />
-          </Route>
+              <Route path="/engineering" element={<EngineeringLandingPage />} />
+              <Route path="/vendor-services" element={<VendorAndServices />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/resource-center" element={<ResourceCenter />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+            </Route>
 
-          {/* Admin Routes */}
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/profile" element={<Profile />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute requiredRoles={["admin"]}>
-                  <AdminDashboard1 />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/admin/bookings-management" element={<Bookings />} />
-            <Route path="/admin/orders-management" element={<Order />} />
-            <Route path="/admin/inventory-management" element={<Invent />} />
-            <Route
-              path="/admin/inventory-management/:inventoryId"
-              element={<Invent />}
-            />
-            <Route
-              path="/admin/financial-management"
-              element={<AdminFinancialManagement />}
-            />
-            <Route path="/admin/calendar-management" element={<Calendar />} />
-            <Route path="/admin/notifications" element={<Notifications />} />
-            <Route path="/admin/reports" element={<Reports />} />
-            <Route path="/admin/settings" element={<CrewSetting />} />
-          </Route>
-
-          {/* Crew Routes - now using AdminLayout */}
-          <Route element={<AdminLayout />}>
-            <Route
-              path="/crew/dashboard"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/calendar"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewCalendar />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/financial-management"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewFinancialManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/inventory-management"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <Inventory />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/orders-management"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewOrder />
-                </ProtectedRoute>
-              }
+            {/* Admin Routes */}
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/profile" element={<Profile />} />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute requiredRoles={["admin"]}>
+                    <AdminDashboard1 />
+                  </ProtectedRoute>
+                }
               />
-            <Route
-              path="/crew/notifications"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewNotification />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/settings"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewSettings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/reports"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewReports />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/booking/*"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewBooking />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/legal-resources"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewLegal />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/training"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewTraining />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/accomodation"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewAccomodation />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/crew/document-management"
-              element={
-                <ProtectedRoute requiredRoles={["crew_member"]}>
-                  <CrewDocument />
-                </ProtectedRoute>
-              }
-            />
-          </Route>
+              <Route path="/admin/bookings-management" element={<Bookings />} />
+              <Route path="/admin/orders-management" element={<Order />} />
+              <Route path="/admin/inventory-management" element={<Invent />} />
+              <Route
+                path="/admin/inventory-management/:inventoryId"
+                element={<Invent />}
+              />
+              <Route
+                path="/admin/financial-management"
+                element={<AdminFinancialManagement />}
+              />
+              <Route path="/admin/calendar-management" element={<Calendar />} />
+              <Route path="/admin/notifications" element={<Notifications />} />
+              <Route path="/admin/reports" element={<Reports />} />
+              <Route path="/admin/settings" element={<CrewSetting />} />
+            </Route>
 
-          {/* Onboarding Routes */}
-          <Route element={<OnboardingPageLayout />}>
-            <Route
-              path="/supplier/onboarding"
-              element={<SupplierOnboarding />}
-            />
-            <Route
-              path="/supplier/onboarding/refresh-stripe-account"
-              element={<SupplierOnboardingStep2 />}
-            />
-            <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
-            <Route
-              path="/vendor/onboarding/refresh-stripe-account"
-              element={<VendorOnboardingStep2 />}
-            />
-            <Route path="/crew/settings" element={<CrewSettings />} />
-          </Route>
-        </Routes>
-      </NotificationsProvider>
-    </ToastProvider>
+            {/* Crew Routes - now using AdminLayout */}
+            <Route element={<AdminLayout />}>
+              <Route
+                path="/crew/dashboard"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/calendar"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewCalendar />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/financial-management"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewFinancialManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/inventory-management"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <Inventory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/orders-management"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewOrder />
+                  </ProtectedRoute>
+                }
+                />
+              <Route
+                path="/crew/notifications"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewNotification />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/settings"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/reports"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewReports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/booking/*"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewBooking />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/legal-resources"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewLegal />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/training"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewTraining />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/accomodation"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewAccomodation />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/crew/document-management"
+                element={
+                  <ProtectedRoute requiredRoles={["crew_member"]}>
+                    <CrewDocument />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            {/* Onboarding Routes */}
+            <Route element={<OnboardingPageLayout />}>
+              <Route
+                path="/supplier/onboarding"
+                element={<SupplierOnboarding />}
+              />
+              <Route
+                path="/supplier/onboarding/refresh-stripe-account"
+                element={<SupplierOnboardingStep2 />}
+              />
+              <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
+              <Route
+                path="/vendor/onboarding/refresh-stripe-account"
+                element={<VendorOnboardingStep2 />}
+              />
+              <Route path="/crew/settings" element={<CrewSettings />} />
+            </Route>
+          </Routes>
+        </NotificationsProvider>
+      </ToastProvider>
+    </UserProvider>
   );
 }
 
