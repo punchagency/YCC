@@ -22,11 +22,9 @@ import downloadIcon from "../../../../assets/images/icons/financial-management/d
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Pagination from "./pagination";
 import { useTheme } from "../../../../context/theme/themeContext";
-import ReportIcon from '@mui/icons-material/Report';
-import { useToast } from "../../../../context/toast/toastContext";
 
 // Mobile Transaction Card Component
-const MobileTransactionCard = ({ row, theme, copyTransactionId }) => {
+const MobileTransactionCard = ({ row, theme }) => {
   return (
     <Box
       sx={{
@@ -61,7 +59,6 @@ const MobileTransactionCard = ({ row, theme, copyTransactionId }) => {
               color: "#6E7079",
               cursor: "pointer",
             }}
-            onClick={() => copyTransactionId(row.transaction)}
           />
         </Typography>
         <Box
@@ -119,27 +116,12 @@ const MobileTransactionCard = ({ row, theme, copyTransactionId }) => {
             alignItems: "center",
             gap: "4px",
           }}
-          onClick={() => {
-            const link = document.createElement('a');
-            link.href = row.invoicePdfUrl;
-            link.download = `invoice-${row.transaction}.pdf`; // Set desired filename
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-          }}
-          disabled={!row.invoicePdfUrl}
         >
-         {row.invoicePdfUrl? (
           <img
             src={downloadIcon}
             alt="download"
             style={{ width: "14px", height: "14px" }}
           />
-        ) : (
-          <ReportIcon
-            sx={{ fontSize: "14px", color: "#6E7079" }}
-          />
-        )}
         </Button>
         <Button
           sx={{
@@ -151,12 +133,8 @@ const MobileTransactionCard = ({ row, theme, copyTransactionId }) => {
             textTransform: "none",
             fontSize: "12px",
           }}
-          onClick={() => {
-            window.open(row.invoiceUrl, "_blank");
-          }}
-          disabled={!row.invoiceUrl}
         >
-          {row.invoiceUrl ? "Pay Now" : "No Invoice"}
+          Pay Now
         </Button>
       </Box>
     </Box>
@@ -189,23 +167,12 @@ const Section3FinancialManagement = ({
   totalItems,
 }) => {
   const { theme } = useTheme();
-  const { toast } = useToast();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
 
-  const copyTransactionId = (transactionId) => {
-    navigator.clipboard.writeText(transactionId);
-    toast.current.show({
-      severity: "success",
-      summary: "Success",
-      detail: "Transaction ID copied to clipboard",
-      life: 2000,
-    });
-  };
-
-  function createData(transaction, status, amount, invoicePdfUrl, invoiceUrl) {
-    return { transaction, status, amount, invoicePdfUrl, invoiceUrl };
+  function createData(transaction, status, amount) {
+    return { transaction, status, amount };
   }
 
   const rows = useMemo(() => {
@@ -213,9 +180,7 @@ const Section3FinancialManagement = ({
       createData(
         transaction.transactionId,
         transaction.transactionStatus,
-        transaction.transactionAmount,
-        transaction.invoicePdfUrl || null,
-        transaction.invoiceUrl || null
+        transaction.transactionAmount
       )
     );
   }, [transactions]);
@@ -281,7 +246,7 @@ const Section3FinancialManagement = ({
         {isMobile && (
           <Box sx={{ marginTop: "10px" }}>
             {rows.map((row, index) => (
-              <MobileTransactionCard key={index} row={row} theme={theme} copyTransactionId={copyTransactionId} />
+              <MobileTransactionCard key={index} row={row} theme={theme} />
             ))}
 
             {/* Mobile Pagination */}
@@ -594,7 +559,6 @@ const Section3FinancialManagement = ({
                               color: "#6E7079",
                               cursor: "pointer",
                             }}
-                            onClick={() => copyTransactionId(row.transaction)}
                           />
                         </Typography>
                       </TableCell>
@@ -713,38 +677,16 @@ const Section3FinancialManagement = ({
                                 minWidth: "auto",
                               }}
                             >
-                              {row.invoicePdfUrl? (
-                                <img
-                                  src={downloadIcon}
-                                  alt="download"
+                              <img
+                                src={downloadIcon}
+                                alt="download"
                                 style={{
                                   display: "block",
                                   width: isTablet ? "14px" : "auto",
                                 }}
-                                disabled={!row.invoicePdfUrl}
-                                onClick={() => {
-                                  const link = document.createElement('a');
-                                  link.href = row.invoicePdfUrl;
-                                  link.download = `invoice-${row.transaction}.pdf`; // Set desired filename
-                                  document.body.appendChild(link);
-                                  link.click();
-                                  document.body.removeChild(link);
-                                }}
                               />
-                              ) : (
-                                <ReportIcon
-                                  sx={{
-                                    fontSize: isTablet ? "14px" : "16px",
-                                    color: "#6E7079",
-                                  }}
-                                />
-                              )}
                             </Button>
                             <Button
-                              onClick={() => {
-                                window.open(row.invoiceUrl, "_blank");
-                              }}
-                              disabled={!row.invoiceUrl}
                               sx={{
                                 borderRadius: "5.21px",
                                 borderWidth: "0.87px",
@@ -757,16 +699,9 @@ const Section3FinancialManagement = ({
                                 border: "0.87px solid #E5E7EB",
                                 textTransform: "none",
                                 fontSize: isTablet ? "11px" : "inherit",
-                                
                               }}
-                              
                             >
-                              {!row.invoiceUrl 
-                                ? "No Invoice"
-                                : row.status === "pending"
-                                  ? "Pay Now"
-                                  : "View"
-                              }
+                              Pay Now
                             </Button>
                           </Box>
                         </Typography>

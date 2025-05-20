@@ -53,12 +53,54 @@
   padding-bottom: 70px; /* Make room for pagination */
 }
 
-/* Add this to your inventory.css file */
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+/* View Item Modal Styles */
+.view-item-container {
+  padding: 0;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+.view-item-header {
+  margin-bottom: 20px;
+}
+
+.view-item-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.view-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.view-item-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+.view-item-label {
+  flex: 0 0 40%;
+  font-weight: 600;
+  color: #555;
+}
+
+.view-item-value {
+  flex: 0 0 60%;
+}
+
+/* Dialog overrides */
+.view-item-dialog .p-dialog-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.view-item-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.view-item-dialog .p-dialog-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem;
 }
