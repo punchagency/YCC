@@ -64,7 +64,7 @@ function App() {
           {/* new route start */}
 
           <Route path="/crew/signup" element={<CrewSignup />} />
-          <Route path="/vendor/signup" element={<VendorSignup />} />
+          <Route path="/service/signup" element={<VendorSignup />} />
           <Route path="/supplier/signup" element={<SupplierSignup />} />
 
           {/* end of route */}
