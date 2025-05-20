@@ -1,9 +1,6 @@
 import { createContext, useContext, useState} from "react";
 import { getLowInventory, getAllInventoryItems } from "../../services/inventory/inventoryService";
-import { getAuthHeader } from "../../services/inventory/inventoryService";
-
 const InventoryContext = createContext();
-const API_URL = `${process.env.REACT_APP_API_URL}/inventory`;
 
 
 
@@ -37,79 +34,6 @@ export const InventoryProvider = ({ children }) => {
         const response = await getAllInventoryItems();
         setAllInventoryItems(response);
     };
-
-    
-    const updateInventoryItem = async (inventoryId, updatedInventoryItem) => {
-        try {
-            const { quantity, price, serviceArea, category, name } = updatedInventoryItem;
-            const response = await fetch(`${API_URL}/${inventoryId}`, {
-                method: 'PATCH',
-                headers: {
-                    ...getAuthHeader(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    quantity,
-                    price,
-                    serviceArea,
-                    category,
-                    productName: name
-                }),
-            });
-            const data = await response.json();
-            console.log(data);
-            return data;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const deleteInventoryItem = async (inventoryId) => {
-        try {
-            const response = await fetch(`${API_URL}/${inventoryId}`, {
-                method: 'DELETE',
-                headers: {
-                    ...getAuthHeader(),
-                    'Content-Type': 'application/json'
-                },
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const createInventoryItem = async (newInventoryItem) => {
-        try {
-            const { quantity, price, serviceArea, category, name } = newInventoryItem;
-            const response = await fetch(`${API_URL}`, {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeader(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    quantity,
-                    price,
-                    serviceArea,
-                    category,
-                    productName: name
-                })
-            });
-            const data = await response.json();
-            return data;
-        } catch (error) {
-          console.log(error);
-        }
-    }
-
-
-
-
-
-
-
     const value = {
         lowInventory,
         loading,
@@ -117,9 +41,6 @@ export const InventoryProvider = ({ children }) => {
         fetchLowInventory,
         allInventoryItems,
         fetchAllInventoryItems,
-        updateInventoryItem,
-        deleteInventoryItem,
-        createInventoryItem,
     };
 
     return (

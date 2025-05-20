@@ -86,7 +86,7 @@ const ChatbotDashboard = () => {
             "recent orders",
             "recent complaints"
         ],
-        "crew_member": [
+        "crew": [
             "my bookings for this month",
             "my account",
             "crew profile",
