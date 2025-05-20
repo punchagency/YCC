@@ -62,7 +62,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
       </Box>
       {servicesData && servicesData.length > 0 && (
         <Box sx={{ height: "100%", maxHeight: "60vh", overflowY: "auto" }}>
-          <ServicesWrapper servicesData={servicesData} setServicesData={setServicesData}/>
+          <ServicesWrapper servicesData={servicesData} />
         </Box>
       )}
       {isLoading && (

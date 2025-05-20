@@ -228,16 +228,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
 
       command: () => navigate("/crew/notifications"),
     },
-
-    {
-      label: "Reports",
-      icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
-      className:
-        location.pathname === "/crew/reports"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/reports"),
-    },
     {
       label: "Settings",
       icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
@@ -246,6 +236,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           ? "active-menu-item menu-red-background"
           : "",
       command: () => navigate("/crew/settings"),
+    },
+    {
+      label: "Reports",
+      icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/reports"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/reports"),
     },
     {
       separator: true,
@@ -404,9 +403,48 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       .p-panelmenu .p-menuitem-text {
         transition: color 0.2s;
       }
+      
+      /* Make all menu items white background, including on hover */
+      .p-panelmenu .p-panelmenu-header > a,
+      .p-panelmenu .p-panelmenu-header > a:hover,
+      .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link,
+      .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:hover,
+      .p-panelmenu .p-menuitem .p-menuitem-link:focus,
+      .p-panelmenu-content,
+      .p-submenu-list {
+        background-color: #FFFFFF !important;
+      }
+      
+      /* For dark mode compatibility */
+      .dark .p-panelmenu .p-panelmenu-header > a,
+      .dark .p-panelmenu .p-panelmenu-header > a:hover,
+      .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link,
+      .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:hover {
+        background-color: #03141F !important;
+      }
+      
+      /* Only change text color on hover */
       .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text,
       .p-panelmenu .p-menuitem-link:hover .p-menuitem-text {
-        color: white !important;
+        color: #103B57 !important;
+      }
+      
+      /* Remove any hover effects or transitions */
+      .p-panelmenu .p-panelmenu-header > a .p-panelmenu-icon,
+      .p-panelmenu .p-panelmenu-header > a:hover .p-panelmenu-icon {
+        color: #103B57 !important;
+      }
+      
+      /* Remove any hover borders or outlines */
+      .p-panelmenu .p-panelmenu-header > a:focus,
+      .p-panelmenu .p-menuitem .p-menuitem-link:focus {
+        box-shadow: none !important;
+        outline: none !important;
+      }
+      
+      /* Remove background ripple effect */
+      .p-ink {
+        display: none !important;
       }
     `;
     document.head.appendChild(style);
