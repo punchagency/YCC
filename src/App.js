@@ -65,7 +65,7 @@ import CrewTraining from "./pages/crew/training/training";
 import CrewAccomodation from "./pages/crew/accomodation/accomo";
 import CrewDocument from "./pages/crew/document/document";
 import BookingDetails from "./pages/crew/booking/details";
-import { UserProvider } from './context/userContext';
+import { UserProvider } from "./context/userContext";
 
 function App() {
   return (
@@ -177,7 +177,7 @@ function App() {
                     <CrewOrder />
                   </ProtectedRoute>
                 }
-                />
+              />
               <Route
                 path="/crew/notifications"
                 element={

@@ -199,7 +199,8 @@ export const getOrderStats = async () => {
     console.error("Error fetching order statistics:", error);
     return {
       status: false,
-      error: error.response?.data?.message || "Failed to fetch order statistics",
+      error:
+        error.response?.data?.message || "Failed to fetch order statistics",
     };
   }
-}; 
+};
