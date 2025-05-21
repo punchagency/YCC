@@ -317,23 +317,23 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-      {/* Email */}
+        {/* Email */}
       <div className="form-group1">
-        <div className="input-field">
-          <div>
+          <div className="input-field">
+            <div>
             <label htmlFor="email">Contact Email</label>
-          </div>
+            </div>
           <div className="inputBorder">
-            <img
-              src={emailLogo}
+              <img
+                src={emailLogo}
               style={{ width: "12px", height: "12px" }}
               alt="email"
-            />
-            <input
-              type="email"
-              id="email"
-              value={formData.email || ""}
-              onChange={(e) => handleInputChange("email", e.target.value)}
+              />
+              <input
+                type="email"
+                id="email"
+                value={formData.email || ""}
+                onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="Enter your email"
             />
           </div>
@@ -343,25 +343,30 @@ const SupplierSignUpForm = ({
       {/* Departments */}
       <div className="form-group1">
         <div className="input-field">
-          <div>
-            <label htmlFor="departments">Departments Served</label>
-          </div>
-          <div className="inputBorder">
+          <label htmlFor="departments">Departments Served</label>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f8f8", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", marginBottom: "8px" }}>
             <img
               src={departmentLogo}
-              style={{ width: "12px", height: "12px" }}
+              style={{ width: "18px", height: "18px", flexShrink: 0, marginRight: "6px" }}
               alt="department"
             />
-            <Select
-              isMulti
-              name="departments"
-              options={departmentOptions}
-              value={formData.departments}
-              onChange={(selected) => handleInputChange("departments", selected)}
-              className="basic-multi-select"
-              classNamePrefix="select"
-              placeholder="Select departments"
-            />
+            <div style={{ flex: 1 }}>
+              <Select
+                isMulti
+                name="departments"
+                options={departmentOptions}
+                value={formData.departments}
+                onChange={(selected) => handleInputChange("departments", selected)}
+                classNamePrefix="select"
+                placeholder="Select departments"
+                styles={{
+                  control: (base) => ({ ...base, border: "none", boxShadow: "none", background: "transparent" }),
+                  valueContainer: (base) => ({ ...base, padding: 0 }),
+                  input: (base) => ({ ...base, margin: 0 }),
+                  indicatorsContainer: (base) => ({ ...base, height: "32px" }),
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -549,24 +554,29 @@ const SupplierSignUpForm = ({
       {/* Service Area */}
       <div className="form-group1">
         <div className="input-field">
-          <div>
-            <label htmlFor="serviceArea">Service Area</label>
-          </div>
-          <div className="inputBorder">
+          <label htmlFor="serviceArea">Service Area</label>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f8f8", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", marginBottom: "8px" }}>
             <img
               src={location}
-              style={{ width: "12px", height: "12px" }}
+              style={{ width: "18px", height: "18px", flexShrink: 0, marginRight: "6px" }}
               alt="location"
             />
-            <Select
-              name="serviceArea"
-              options={serviceAreaOptions}
-              value={formData.serviceArea}
-              onChange={(selected) => handleInputChange("serviceArea", selected)}
-              className="basic-select"
-              classNamePrefix="select"
-              placeholder="Select service area"
-            />
+            <div style={{ flex: 1 }}>
+              <Select
+                name="serviceArea"
+                options={serviceAreaOptions}
+                value={formData.serviceArea}
+                onChange={(selected) => handleInputChange("serviceArea", selected)}
+                classNamePrefix="select"
+                placeholder="Select service area"
+                styles={{
+                  control: (base) => ({ ...base, border: "none", boxShadow: "none", background: "transparent" }),
+                  valueContainer: (base) => ({ ...base, padding: 0 }),
+                  input: (base) => ({ ...base, margin: 0 }),
+                  indicatorsContainer: (base) => ({ ...base, height: "32px" }),
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -574,9 +584,9 @@ const SupplierSignUpForm = ({
       {/* Terms and Conditions */}
       <div className="form-group1">
         <div className="input-field">
-          <div 
+          <div
             className="checkbox-field" 
-            style={{ 
+            style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
@@ -588,7 +598,7 @@ const SupplierSignUpForm = ({
               id="terms"
               checked={formData.acceptTerms}
               onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
-              style={{ 
+              style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
@@ -597,7 +607,7 @@ const SupplierSignUpForm = ({
             />
             <label 
               htmlFor="terms" 
-              style={{ 
+              style={{
                 cursor: "pointer",
                 fontSize: "14px",
                 color: "#333",
@@ -607,75 +617,75 @@ const SupplierSignUpForm = ({
             >
               I agree to the Terms and Conditions
             </label>
-          </div>
-        </div>
       </div>
+        </div>
+        </div>
 
       {/* Privacy Policy */}
       <div className="form-group1">
         <div className="input-field">
-          <div 
+        <div
             className="checkbox-field" 
-            style={{ 
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
               padding: "10px 0"
-            }}
-          >
-            <input
-              type="checkbox"
+          }}
+        >
+          <input
+            type="checkbox"
               id="privacy"
               checked={formData.acceptPrivacy}
               onChange={(e) => handleInputChange("acceptPrivacy", e.target.checked)}
-              style={{ 
+            style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
                 cursor: "pointer"
-              }}
-            />
-            <label 
+            }}
+          />
+          <label
               htmlFor="privacy" 
-              style={{ 
-                cursor: "pointer",
-                fontSize: "14px",
+            style={{
+              cursor: "pointer",
+              fontSize: "14px",
                 color: "#333",
                 margin: "0",
                 lineHeight: "1.4"
-              }}
-            >
+            }}
+          >
               I agree to the Privacy Policy
-            </label>
+          </label>
           </div>
         </div>
-      </div>
+        </div>
 
       {/* Navigation Buttons */}
-      <div className="button-group">
-        <button
-          className="prev-button"
+        <div className="button-group">
+          <button
+            className="prev-button"
           onClick={() => setStep(2)}
-          style={{ width: "48%", background: "#f0f0f0" }}
-        >
-          Previous
-        </button>
-        <button
-          className="next-button"
-          onClick={handleSignup}
+            style={{ width: "48%", background: "#f0f0f0" }}
+          >
+            Previous
+          </button>
+          <button
+            className="next-button"
+            onClick={handleSignup}
           disabled={isSubmitting}
-          style={{
-            width: "48%",
+            style={{
+              width: "48%",
             background: !isSubmitting
-              ? "linear-gradient(to right, #034d92, #0487d9)"
-              : "#ccc",
+                  ? "linear-gradient(to right, #034d92, #0487d9)"
+                  : "#ccc",
             cursor: !isSubmitting ? "pointer" : "not-allowed",
             opacity: !isSubmitting ? 1 : 0.7,
-            transition: "all 0.3s ease",
-          }}
-        >
+              transition: "all 0.3s ease",
+            }}
+          >
           {isSubmitting ? "Submitting..." : "Submit Application"}
-        </button>
+          </button>
       </div>
     </motion.div>
   );
