@@ -24,7 +24,7 @@ const GetStarted = ({ name }) => {
     //   alt: "service providers",
     //   newText: "Service Provider",
     //   text: "service_provider",
-    //   path: "/vendor/signup",
+    //   path: "/service/signup",
     // },
     // {
     //   image: crew,
