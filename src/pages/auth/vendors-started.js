@@ -26,14 +26,14 @@ const VendorStarted = ({ name }) => {
       alt: "service providers",
       newText: "Service Provider",
       text: "service_provider",
-      path: "/vendor/signup",
+      path: "/service/signup",
     },
     {
       image: crew,
       alt: "suppliers",
       newText: "Supplier",
       text: "supplier",
-      path: "/supplier/signup",
+      path: "/vendor/signup",
     },
     // {
     //   image: crew,

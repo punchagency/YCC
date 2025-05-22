@@ -20,17 +20,53 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   // const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [setSuccess] = useState(false);
+
+  // Add stepData object
+  const stepData = {
+    1: {
+      step: "Step 1",
+      info: "Business Information",
+    },
+    2: {
+      step: "Step 2",
+      info: "Service & Pricing Information",
+    },
+    3: {
+      step: "Step 3",
+      info: "Company Representative Information & Terms",
+    },
+    4: {
+      step: "Step 4",
+      info: "Submit Application",
+    },
+    6: {
+      step: "Success",
+      info: "Application Submitted",
+    },
+  };
+
+  // Ensure email is always initialized in formData
+  useEffect(() => {
+    if (formData.email === undefined) {
+      setFormData({ ...formData, email: "" });
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const handleSignup = async () => {
-    if (!formData.acceptFees) {
-      setError("Please accept the platform fees to continue.");
+    if (!formData.acceptTerms) {
+      setError("Please accept the Terms and Conditions to continue.");
+      return;
+    }
+
+    if (!formData.email || formData.email.trim() === "") {
+      setError("Please enter a valid business contact email address.");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address.");
+      setError("Please enter a valid business contact email address.");
       return;
     }
 
@@ -43,7 +79,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       formDataObj.append("role", "service_provider");
       formDataObj.append("businessName", formData.businessName);
       formDataObj.append("businessAddress", formData.businessAddress);
-      formDataObj.append("department", formData.department);
       formDataObj.append("phone", formData.phone);
 
       const tempPassword = Math.random().toString(36).slice(-8);
@@ -69,11 +104,15 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         businessAddress: formData.businessAddress,
         phone: formData.phone,
         businessWebsite: formData.businessWebsite,
-        department: formData.department?.value,
-        services: formData.services?.value,
+        departments: formData.departments?.map(dept => dept.value) || [],
+        services: formData.services?.map(service => service.value),
         availability: formData.availability,
         bookingMethod: formData.bookingMethod?.value,
-        serviceArea: formData.serviceArea?.value,
+        serviceArea: formData.serviceArea?.value === "both" 
+          ? ["United States", "Mediterranean"]
+          : formData.serviceArea?.value 
+            ? [formData.serviceArea.value === "usa" ? "United States" : "Mediterranean"]
+            : [],
         contactPerson: {
           fullName: formData.contactPerson?.fullName,
           role: formData.contactPerson?.role,
@@ -96,12 +135,9 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       const response = await signup(formDataObj);
 
       if (response.status === "success") {
-        setSuccess(true);
         setIsSubmitting(false);
         // Move to step 6 after successful signup
-        setTimeout(() => {
-          setStep(6);
-        }, 2000);
+        setStep(6);
       } else {
         setError("Failed to sign up. Please try again.");
       }
@@ -113,25 +149,26 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
   };
   const bookingMethodOptions = [
-    { value: "instant meeting", label: "Instant Meeting" },
+    { value: "instant booking", label: "Instant Booking" },
     { value: "request to book", label: "Request to Book" },
     { value: "quote request", label: "Quote Request" },
   ];
 
   const serviceAreaOptions = [
-    { value: "caribbean", label: "Caribbean" },
+    { value: "usa", label: "United States" },
     { value: "mediterranean", label: "Mediterranean" },
-    { value: "usa", label: "USA" },
+    { value: "both", label: "Both" },
   ];
 
-  // const departmentOptions = [
-  //   { value: "captain", label: "Captain" },
-  //   { value: "crew", label: "Crew" },
-  //   { value: "exterior", label: "Exterior" },
-  //   { value: "engineering", label: "Engineering" },
-  //   { value: "interior", label: "Interior" },
-  //   { value: "galley", label: "Galley" },
-  // ];
+  const departmentOptions = [
+    { value: "captain", label: "Captain" },
+    { value: "crew", label: "Crew" },
+    { value: "exterior", label: "Exterior" },
+    { value: "engineering", label: "Engineering" },
+    { value: "interior", label: "Interior" },
+    { value: "galley", label: "Galley" },
+  ];
+
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -152,16 +189,16 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [setIsUploading] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [pricingFile, setPricingFile] = useState(null);
-  const [setFileUploading] = useState({
+  const [fileUploading, setFileUploading] = useState({
     licenseFile: false,
     taxIdFile: false,
     insuranceFile: false,
     pricingFile: false,
   });
 
-  const [setFileErrors] = useState({
+  const [fileErrors, setFileErrors] = useState({
     licenseFile: "",
     taxIdFile: "",
     insuranceFile: "",
@@ -499,34 +536,19 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
   // Add a function to handle service selection with validation
   const handleServiceChange = (selectedOptions) => {
-    // If user tries to select more than 4 services
-    if (selectedOptions && selectedOptions.length > 4) {
-      // Show error message
-      setError("You can select a maximum of 4 services");
-
-      // If there were previously selected services, keep them
-      // Otherwise, just don't update the selection
-      if (formData.services && formData.services.length > 0) {
-        return; // Don't update the selection
-      }
-    } else {
-      // Clear any existing error related to service selection
-      if (error && error.includes("maximum of 4 services")) {
-        setError(null);
-      }
-
-      // Update the services in formData
-      handleInputChange("services", selectedOptions);
-    }
+    setFormData({
+      ...formData,
+      services: selectedOptions,
+    });
   };
 
   const renderStep1 = () => (
     <motion.div
       key="step1"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* Business Name */}
 
@@ -583,13 +605,13 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       <div className="form-group-department">
         <div className="input-field">
           <div>
-            <label>Department</label>
+            <label>Department served</label>
           </div>
           <div className="inputBorder">
             <Select
               options={[
                 { label: "Captain", value: "captain" },
-                // { label: "Crew", value: "crew" },
+                { label: "Crew", value: "crew" },
                 { label: "Exterior", value: "exterior" },
                 { label: "Interior", value: "interior" },
                 { label: "Engineering", value: "engineering" },
@@ -674,20 +696,21 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Phone Number */}
+      {/* Phone Number & Contact Email - Centralized and Balanced */}
       <div
-        className="form-row"
+        className="form-row centralized-contact-row"
         style={{
           display: "flex",
-          gap: "16px",
+          gap: "24px",
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
-          paddingLeft: "10px",
+          margin: "0 auto 27px auto",
+          maxWidth: "600px"
         }}
       >
         {/* Phone Number */}
-        <div className="form-group4" style={{ flex: "1" }}>
+        <div className="form-group4" style={{ flex: 1, minWidth: 0 }}>
           <div className="input-field">
             <div>
               <label htmlFor="phone">Phone Number</label>
@@ -713,7 +736,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   height: "100%",
                   background: "transparent",
                   border: "none",
-                  fontSize: "16px", // Same size for consistency
+                  fontSize: "16px",
                 }}
                 containerStyle={{ width: "100%" }}
               />
@@ -721,14 +744,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </div>
         </div>
 
-        {/* Email */}
-        <div
-          className="form-group5"
-          style={{ flex: "1", marginBottom: "27px" }}
-        >
+        {/* Contact Email */}
+        <div className="form-group5" style={{ flex: 1, minWidth: 0 }}>
           <div className="input-field">
             <div>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Contact Email</label>
             </div>
             <div
               className="inputBorder"
@@ -750,7 +770,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               <input
                 type="email"
                 id="email"
-                placeholder="Enter Business Email"
+                required
+                placeholder="Enter Business Contact Email"
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 style={{
@@ -758,7 +779,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   height: "100%",
                   background: "transparent",
                   border: "none",
-                  fontSize: "16px", // Same as phone input
+                  fontSize: "16px",
                   outline: "none",
                 }}
               />
@@ -812,11 +833,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Next Button */}
+      {/* Update Next Button to go to Step 3 */}
       <div className="button-group">
         <button
           className="next-button"
-          onClick={() => setStep(2)}
+          onClick={() => setStep(3)}
           style={{
             width: "100%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
@@ -831,10 +852,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep2 = () => (
     <motion.div
       key="step2"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* <div className="login-heading" style={{ marginTop: "0px" }}>
         <h2 className="font-medium mb-10">Document Upload</h2>
@@ -964,10 +985,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep3 = () => (
     <motion.div
       key="step3"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
       {/* <div className="login-heading" style={{ marginTop: "0px" }}>
         <h2 className="font-medium mb-10">Service Details</h2>
@@ -998,7 +1019,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       marginRight: "8px",
                     }}
                   />
-                  <span>Select Services (max 4)</span>
+                  <span>Select Services</span>
                 </div>
               }
               isMulti={true}
@@ -1225,42 +1246,70 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 container: (provided) => ({
                   ...provided,
                   width: "100%",
+                  position: "relative",
+                  zIndex: 2
                 }),
                 menu: (provided) => ({
                   ...provided,
                   width: "100%",
+                  zIndex: 9999,
+                  backgroundColor: "white",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  position: "absolute"
                 }),
                 menuList: (provided) => ({
                   ...provided,
-                  "&::-webkit-scrollbar": { display: "none" },
-                  scrollbarWidth: "none",
-                  msOverflowStyle: "none",
+                  maxHeight: "200px",
+                  padding: "8px 0",
+                  "&::-webkit-scrollbar": { 
+                    width: "8px",
+                    display: "block"
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "#f1f1f1",
+                    borderRadius: "4px"
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "#888",
+                    borderRadius: "4px"
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                    background: "#555"
+                  }
+                }),
+                option: (provided, state) => ({
+                  ...provided,
+                  backgroundColor: state.isSelected ? "#f0f7ff" : "white",
+                  color: state.isSelected ? "#0387d9" : "#333",
+                  padding: "10px 12px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "#f0f7ff",
+                    color: "#0387d9"
+                  }
                 }),
                 singleValue: (provided) => ({
                   ...provided,
                   display: "flex",
                   alignItems: "center",
-                }),
-                option: (provided) => ({
-                  ...provided,
-                  display: "flex",
-                  alignItems: "center",
+                  color: "#333"
                 }),
                 valueContainer: (provided) => ({
                   ...provided,
                   width: "100%",
-                }),
+                  padding: "0 8px"
+                })
               }}
             />
           </div>
         </div>
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Update Navigation Buttons */}
       <div className="button-group">
         <button
           className="prev-button"
-          onClick={() => setStep(2)}
+          onClick={() => setStep(1)}
           style={{ width: "48%", background: "#f0f0f0" }}
         >
           Previous
@@ -1281,27 +1330,26 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep4 = () => (
     <motion.div
       key="step4"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
     >
-      {/* Full Name */}
+      {/* Contact Person Name */}
       <div className="form-group1">
         <div className="input-field">
           <div>
-            <label htmlFor="fullName">Full Name</label>
+            <label htmlFor="contactPersonName">Contact Person Name</label>
           </div>
           <div className="inputBorder">
             <img
               src={inputLogo}
-              alt="Input Icon"
-              style={{ width: "12px", height: "12px", marginRight: "8px" }}
+              style={{ width: "12px", height: "12px" }}
+              alt="name"
             />
             <input
               type="text"
-              id="fullName"
-              placeholder="Enter Full Name"
+              id="contactPersonName"
               value={formData.contactPerson?.fullName || ""}
               onChange={(e) =>
                 handleInputChange("contactPerson", {
@@ -1309,27 +1357,27 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   fullName: e.target.value,
                 })
               }
+              placeholder="Enter contact person name"
             />
           </div>
         </div>
       </div>
 
-      {/* Role */}
+      {/* Contact Person Role */}
       <div className="form-group1">
         <div className="input-field">
           <div>
-            <label htmlFor="role">Role/Position</label>
+            <label htmlFor="contactPersonRole">Contact Person Role</label>
           </div>
           <div className="inputBorder">
             <img
               src={roleLogo}
-              alt="Role Icon"
-              style={{ width: "12px", height: "12px", marginRight: "8px" }}
+              style={{ width: "12px", height: "12px" }}
+              alt="role"
             />
             <input
               type="text"
-              id="role"
-              placeholder="Enter Role/Position"
+              id="contactPersonRole"
               value={formData.contactPerson?.role || ""}
               onChange={(e) =>
                 handleInputChange("contactPerson", {
@@ -1337,12 +1385,54 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   role: e.target.value,
                 })
               }
+              placeholder="Enter contact person role"
             />
           </div>
         </div>
       </div>
 
-      {/* Email */}
+      {/* Platform Fees Information */}
+      {/* // Platform fees note and related UI removed as per client request */}
+
+      {/* Terms and Conditions checkbox */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div 
+            className="checkbox-field" 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "10px 0"
+            }}
+          >
+            <input
+              type="checkbox"
+              id="terms"
+              checked={formData.acceptTerms}
+              onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
+              style={{ 
+                width: "18px",
+                height: "18px",
+                margin: "0",
+                cursor: "pointer"
+              }}
+            />
+            <label 
+              htmlFor="terms" 
+              style={{ 
+                cursor: "pointer",
+                fontSize: "14px",
+                color: "#333",
+                margin: "0",
+                lineHeight: "1.4"
+              }}
+            >
+              I agree to the Terms and Conditions
+            </label>
+          </div>
+        </div>
+      </div>
 
       {/* Navigation Buttons */}
       <div className="button-group">
@@ -1355,13 +1445,17 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </button>
         <button
           className="next-button"
-          onClick={() => setStep(5)}
+          onClick={handleSignup}
+          disabled={isSubmitting}
           style={{
             width: "48%",
-            background: "linear-gradient(to right, #034d92, #0487d9)",
+            background: isSubmitting ? "#ccc" : "linear-gradient(to right, #034d92, #0487d9)",
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+            opacity: isSubmitting ? 0.7 : 1,
+            transition: "all 0.3s ease",
           }}
         >
-          Next
+          {isSubmitting ? "Submitting..." : "Submit Application"}
         </button>
       </div>
     </motion.div>
@@ -1370,10 +1464,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep5 = () => (
     <motion.div
       key="step5"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
       className="platform-fee-container"
     >
       <div>
@@ -1399,7 +1493,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         <div
           className="terms-checkbox"
           style={{
-            marginBottom: "20px",
+            marginBottom: "10px",
             display: "flex",
             alignItems: "center",
             gap: "10px",
@@ -1488,10 +1582,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const renderStep6 = () => (
     <motion.div
       key="step7"
-      initial={{ x: "100%", opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: "-100%", opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -40 }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
       className="success-container"
     >
       <div
@@ -1520,12 +1614,9 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     <div className="form-container">
       <AnimatePresence mode="wait" initial={false}>
         {currentStep === 1 && renderStep1()}
-        {currentStep === 2 && renderStep2()}
         {currentStep === 3 && renderStep3()}
         {currentStep === 4 && renderStep4()}
-        {currentStep === 5 && renderStep5()}
         {currentStep === 6 && renderStep6()}
-        {/* Other steps will be added here */}
       </AnimatePresence>
       <AnimatePresence>
         {error && (
