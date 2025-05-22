@@ -24,10 +24,6 @@ const StepInfo = ({ currentStep }) => {
       info: "Contact Person",
     },
     5: {
-      step: "Step 5",
-      info: "Fee Transparency & Confirmation Before Submission",
-    },
-    6: {
       step: "Success",
       info: "Submission",
     },
@@ -123,7 +119,7 @@ const SupplierSignup = () => {
               className="logo-wraper"
               style={{ marginBottom: "5px", paddingTop: "30px" }}
             >
-              <StepInfo currentStep={step} />
+              {step !== 4 && <StepInfo currentStep={step} />}
             </div>
             <div className="login-form vendor-login-form">
               <SupplierSignUpForm

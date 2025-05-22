@@ -107,10 +107,11 @@ const departmentSupplierTypes = {
 
 const departmentOptions = [
   { value: "captain", label: "Captain" },
+  { value: "crew", label: "Crew" },
   { value: "exterior", label: "Exterior" },
   { value: "engineering", label: "Engineering" },
   { value: "interior", label: "Interior" },
-  { value: "galley", label: "Galley / Chef" },
+  { value: "galley", label: "Galley" },
 ];
 
 const deliveryOptions = [
@@ -149,6 +150,12 @@ const SupplierSignUpForm = ({
     departmentSupplierTypes.default
   );
 
+  // Ensure formData includes departments as an array
+  const [localFormData, setLocalFormData] = useState({
+    ...formData,
+    departments: formData.departments || [],
+  });
+
   // Add effect to update supplier type options when department changes
   useEffect(() => {
     if (formData.department && formData.department.value) {
@@ -175,11 +182,14 @@ const SupplierSignUpForm = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.department]); // We're disabling the lint rule to prevent excessive rerenders
 
+  // Update handleInputChange to use localFormData and propagate to parent
   const handleInputChange = (name, value) => {
-    setFormData({
-      ...formData,
+    const updated = {
+      ...localFormData,
       [name]: value,
-    });
+    };
+    setLocalFormData(updated);
+    setFormData(updated);
   };
 
   const handleFileUpload = async (file, type) => {
@@ -258,13 +268,20 @@ const SupplierSignUpForm = ({
       formDataObj.append("role", "supplier");
 
       // Add supplier details
+      const getServiceAreaArray = () => {
+        if (!formData.serviceArea) return [];
+        if (formData.serviceArea.value === "Both") {
+          return ["United States", "Mediterranean"];
+        }
+        return [formData.serviceArea.value];
+      };
       const supplierDetails = {
         businessName: formData.businessName || "",
         departments: formData.departments?.map(dept => dept.value) || [],
         phone: formData.phone || "",
         address: formData.address || "",
         website: formData.website || "",
-        serviceArea: formData.serviceArea ? formData.serviceArea.value : "",
+        serviceArea: getServiceAreaArray(),
         contactPerson: {
           fullName: formData.contactPerson?.fullName || "",
           role: formData.contactPerson?.role || "",
@@ -275,7 +292,7 @@ const SupplierSignUpForm = ({
 
       const response = await signup(formDataObj);
       if (response.status) {
-        setStep(5); // Go to success page
+        setStep(4); // Go to success page
       } else {
         setError(response.message || "An error occurred during signup");
       }
@@ -355,7 +372,7 @@ const SupplierSignUpForm = ({
                 isMulti
                 name="departments"
                 options={departmentOptions}
-                value={formData.departments}
+                value={localFormData.departments}
                 onChange={(selected) => handleInputChange("departments", selected)}
                 classNamePrefix="select"
                 placeholder="Select departments"

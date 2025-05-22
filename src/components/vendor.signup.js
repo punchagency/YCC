@@ -20,7 +20,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   // const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [setSuccess] = useState(false);
 
   // Add stepData object
   const stepData = {
@@ -46,15 +45,28 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     },
   };
 
+  // Ensure email is always initialized in formData
+  useEffect(() => {
+    if (formData.email === undefined) {
+      setFormData({ ...formData, email: "" });
+    }
+    // eslint-disable-next-line
+  }, []);
+
   const handleSignup = async () => {
     if (!formData.acceptTerms) {
       setError("Please accept the Terms and Conditions to continue.");
       return;
     }
 
+    if (!formData.email || formData.email.trim() === "") {
+      setError("Please enter a valid business contact email address.");
+      return;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address.");
+      setError("Please enter a valid business contact email address.");
       return;
     }
 
@@ -67,7 +79,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       formDataObj.append("role", "service_provider");
       formDataObj.append("businessName", formData.businessName);
       formDataObj.append("businessAddress", formData.businessAddress);
-      formDataObj.append("department", formData.department);
       formDataObj.append("phone", formData.phone);
 
       const tempPassword = Math.random().toString(36).slice(-8);
@@ -93,11 +104,15 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         businessAddress: formData.businessAddress,
         phone: formData.phone,
         businessWebsite: formData.businessWebsite,
-        department: formData.department?.value,
+        departments: formData.departments?.map(dept => dept.value) || [],
         services: formData.services?.map(service => service.value),
         availability: formData.availability,
         bookingMethod: formData.bookingMethod?.value,
-        serviceArea: formData.serviceArea?.value,
+        serviceArea: formData.serviceArea?.value === "both" 
+          ? ["United States", "Mediterranean"]
+          : formData.serviceArea?.value 
+            ? [formData.serviceArea.value === "usa" ? "United States" : "Mediterranean"]
+            : [],
         contactPerson: {
           fullName: formData.contactPerson?.fullName,
           role: formData.contactPerson?.role,
@@ -120,12 +135,9 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       const response = await signup(formDataObj);
 
       if (response.status === "success") {
-        setSuccess(true);
         setIsSubmitting(false);
         // Move to step 6 after successful signup
-        setTimeout(() => {
-          setStep(6);
-        }, 2000);
+        setStep(6);
       } else {
         setError("Failed to sign up. Please try again.");
       }
@@ -145,7 +157,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const serviceAreaOptions = [
     { value: "usa", label: "United States" },
     { value: "mediterranean", label: "Mediterranean" },
-    { value: "both", label: "United States & Mediterranean" },
+    { value: "both", label: "Both" },
   ];
 
   const departmentOptions = [
@@ -177,16 +189,16 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [setIsUploading] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [pricingFile, setPricingFile] = useState(null);
-  const [setFileUploading] = useState({
+  const [fileUploading, setFileUploading] = useState({
     licenseFile: false,
     taxIdFile: false,
     insuranceFile: false,
     pricingFile: false,
   });
 
-  const [setFileErrors] = useState({
+  const [fileErrors, setFileErrors] = useState({
     licenseFile: "",
     taxIdFile: "",
     insuranceFile: "",
@@ -593,7 +605,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       <div className="form-group-department">
         <div className="input-field">
           <div>
-            <label>Department</label>
+            <label>Department served</label>
           </div>
           <div className="inputBorder">
             <Select
@@ -758,7 +770,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               <input
                 type="email"
                 id="email"
-                placeholder="Enter Business Email"
+                required
+                placeholder="Enter Business Contact Email"
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 style={{
@@ -1433,12 +1446,16 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         <button
           className="next-button"
           onClick={handleSignup}
+          disabled={isSubmitting}
           style={{
             width: "48%",
-            background: "linear-gradient(to right, #034d92, #0487d9)",
+            background: isSubmitting ? "#ccc" : "linear-gradient(to right, #034d92, #0487d9)",
+            cursor: isSubmitting ? "not-allowed" : "pointer",
+            opacity: isSubmitting ? 0.7 : 1,
+            transition: "all 0.3s ease",
           }}
         >
-          Submit Application
+          {isSubmitting ? "Submitting..." : "Submit Application"}
         </button>
       </div>
     </motion.div>
