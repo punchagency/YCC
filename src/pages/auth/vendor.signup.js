@@ -11,22 +11,22 @@ const StepInfo = ({ currentStep }) => {
       step: "Step 1",
       info: "Business Information",
     },
-    2: {
-      step: "Step 2",
-      info: "Company Verification",
-    },
+    // 2: {
+    //   step: "Step 2",
+    //   info: "Company Verification",
+    // },
     3: {
-      step: "Step 3",
+      step: "Step 2",
       info: "Service & Pricing Information",
     },
     4: {
-      step: "Step 4",
-      info: "Company Representative Information",
+      step: "Step 3",
+      info: "Company Representative Information & Terms",
     },
-    5: {
-      step: "Step 5",
-      info: "Platform Fees",
-    },
+    // 5: {
+    //   step: "Step 5",
+    //   info: "Platform Fees",
+    // },
     6: {
       step: "Success",
       info: "Application Submitted",
@@ -34,13 +34,33 @@ const StepInfo = ({ currentStep }) => {
   };
 
   return (
-    <div className="logo_crew">
-      <div>
-        <img src={check} className="checkImg" alt="" />
+    <div className="logo_crew" style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "15px",
+      marginBottom: "18px"
+    }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "39px",
+        height: "39px"
+      }}>
+        <img src={check} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
       <div>
-        <p>{stepData[currentStep].step}</p>
-        <p className="personal_info">{stepData[currentStep].info}</p>
+        <p style={{ 
+          margin: 0,
+          fontSize: "15px",
+          color: "#034D92"
+        }}>{stepData[currentStep]?.step || ""}</p>
+        <p className="personal_info" style={{ 
+          margin: "0",
+          fontSize: "14px",
+          fontWeight: "bold",
+          color: "#666"
+        }}>{stepData[currentStep]?.info || ""}</p>
       </div>
     </div>
   );

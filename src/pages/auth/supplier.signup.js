@@ -24,23 +24,39 @@ const StepInfo = ({ currentStep }) => {
       info: "Contact Person",
     },
     5: {
-      step: "Step 5",
-      info: "Fee Transparency & Confirmation Before Submission",
-    },
-    6: {
       step: "Success",
       info: "Submission",
     },
   };
 
   return (
-    <div className="logo_crew">
-      <div>
-        <img src={check} className="checkImg" alt="" />
+    <div className="logo_crew" style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "15px",
+      marginBottom: "18px"
+    }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "39px",
+        height: "39px"
+      }}>
+        <img src={check} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
       </div>
       <div>
-        <p>{stepData[currentStep].step}</p>
-        <p className="personal_info">{stepData[currentStep].info}</p>
+        <p style={{ 
+          margin: 0,
+          fontSize: "15px",
+          color: "#034D92"
+        }}>{stepData[currentStep]?.step || ""}</p>
+        <p className="personal_info" style={{ 
+          margin: "0",
+          fontSize: "14px",
+          fontWeight: "bold",
+          color: "#666"
+        }}>{stepData[currentStep]?.info || ""}</p>
       </div>
     </div>
   );
@@ -103,7 +119,7 @@ const SupplierSignup = () => {
               className="logo-wraper"
               style={{ marginBottom: "5px", paddingTop: "30px" }}
             >
-              <StepInfo currentStep={step} />
+              {step !== 4 && <StepInfo currentStep={step} />}
             </div>
             <div className="login-form vendor-login-form">
               <SupplierSignUpForm
