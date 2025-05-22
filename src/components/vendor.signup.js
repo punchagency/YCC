@@ -1475,7 +1475,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           <h3>Platform Fees</h3>
         </div>
 
-        <div className="fees">
+        {/* <div className="fees">
           <ul>
             <li>
               Vendors may be charged either a 2% transaction fee per invoice or
@@ -1487,7 +1487,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               system.
             </li>
           </ul>
-        </div>
+        </div> */}
 
         {/* Added Checkbox */}
         <div
