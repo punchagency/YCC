@@ -37,10 +37,10 @@ const formattedCountries = countryData.map((country) => ({
 const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [phone, setPhone] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [setSelectedCommunication] = useState(null);
+  const [selectedCommunication, setSelectedCommunication] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
-  const [setNoResults] = useState(false);
+  const [noResults, setNoResults] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -606,7 +606,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <Select
                       id="preferredCommunication"
                       options={communicationOptions}
-                      value={formData.selectedCommunication}
+                      value={selectedCommunication}
                       onChange={handleCommunicationChange}
                       placeholder="Preferred Communication"
                       styles={{
