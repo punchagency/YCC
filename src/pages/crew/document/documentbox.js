@@ -6,7 +6,7 @@ const DocumentBox = () => {
     {
       icon: card,
       alert: "2 Expiring soon",
-      title: "Identification Documents",
+      title: "Identification",
       description: "Passport, Visas, seafarer IDs",
       count: "12 Documents",
     },
@@ -19,29 +19,29 @@ const DocumentBox = () => {
     },
     {
       icon: card,
-      alert: "No alerts",
-      title: "Medical Documents",
+      alert: "2 Expiring soon",
+      title: "Medical",
       description: "ENG1, vaccinations, medical certs",
       count: "5 Documents",
     },
     {
       icon: card,
-      alert: "All valid",
-      title: "Employment Documents",
+      alert: "6 Expiring soon",
+      title: "Employment",
       description: "Contracts, references, CV",
       count: "6 Documents",
     },
     {
       icon: card,
-      alert: "3 Missing",
-      title: "Yacht Documents",
+      alert: "2 Expiring soon",
+      title: "Yacht ",
       description: "Ship registry, safety certificates",
       count: "9 Documents",
     },
     {
       icon: card,
-      alert: "All valid",
-      title: "Insurance Documents",
+      alert: "1 Expiring soon",
+      title: "Insurance",
       description: "Health, travel, personal insurance",
       count: "4 Documents",
     },
@@ -112,25 +112,24 @@ const DocumentBox = () => {
                 View All
               </p>
             </div>
+            <div
+              className="flex align-items-center justify-content-flex-end"
+              style={{ width: "100%", marginTop: "16px" }}
+            >
+              <button
+                className="bg-primary text-white "
+                style={{
+                  borderRadius: "10px",
+                  padding: "10px 20px",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Add document
+              </button>
+            </div>
           </div>
         ))}
-
-        <div
-          className="flex align-items-center justify-content-flex-end"
-          style={{ width: "100%" }}
-        >
-          <button
-            className="bg-primary text-white "
-            style={{
-              borderRadius: "10px",
-              padding: "10px 20px",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Add document
-          </button>
-        </div>
       </div>
     </>
   );

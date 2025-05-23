@@ -34,7 +34,7 @@ const Stock = () => {
               >
                 Stock Level <FaChevronDown style={{ marginLeft: "5px" }} />
               </button>
-              <button
+              {/* <button
                 className="mr-2 p-2 bg-transparent"
                 style={{
                   border: "1px solid #e0e0e0",
@@ -45,7 +45,7 @@ const Stock = () => {
                 }}
               >
                 Vendors <FaChevronDown style={{ marginLeft: "5px" }} />
-              </button>
+              </button> */}
             </div>
           </div>
         

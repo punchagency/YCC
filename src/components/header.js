@@ -301,7 +301,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             />
             <input
               type="text"
-              placeholder="Search Reports"
+              placeholder="Search..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onClick={() => setShowSearchModal(true)}

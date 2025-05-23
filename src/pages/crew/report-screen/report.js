@@ -1,36 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-
-import { Button } from "primereact/button";
-// import { useNavigate } from "react-router-dom";
-// import { TabView, TabPanel } from "primereact/tabview";
-// import { InputText } from "primereact/inputtext";
-// import lone from "../../assets/images/crew/lone.png";
-// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-// import iconexpire from "../../assets/images/crew/iconexpire.png";
-// import iconcareer from "../../assets/images/crew/iconcareer.png";
-// import { Chart as ChartJS } from "chart.js/auto";
-import { Bar, Line } from "react-chartjs-2";
-// import sourceData from "../../data/sourceData.json";
-// import analyticsData from "../../data/analyticsData.json";
-// import sort from "../../assets/images/crew/sort.png";
 import lockLogo from "../../../assets/images/crew/lockLogo.png";
 import dropdown from "../../../assets/images/crew/dropdown.png";
-// import cart from "../../assets/images/crew/cart.png";
-// import iconcontainer from "../../assets/images/crew/iconContainer.png";
-// import neworder from "../../assets/images/crew/neworder.png";
-// import doctor from "../../assets/images/crew/doctor.png";
-// import wavyline from "../../assets/images/crew/wavyline.png";
-// import wavyback from "../../assets/images/crew/wavyback.png";
 import profileReport from "../../../assets/images/crew/profile-report.png";
 import downloadIcon from "../../../assets/images/crew/downloadIcon.png";
-// import profileReport2 from "../../assets/images/crew/profile-report2.png";
 import sortIcon from "../../../assets/images/crew/sort.png";
 import {
   getInventoryHealthReport,
   getSystemChartData,
   getSystemMetrics,
 } from "../../../services/reports/reports";
-
 // Import and register Chart.js components
 import {
   Chart as ChartJS,
@@ -44,6 +22,8 @@ import {
   Legend,
   Filler,
 } from "chart.js";
+
+import { getDashboardSummary } from "../../../services/crew/crewReport";
 
 // Register the components
 ChartJS.register(
@@ -59,13 +39,51 @@ ChartJS.register(
 );
 
 const Reports = () => {
-  // const navigate = useNavigate();
-  // const goCrewDashboardPage = () => {
-  //   navigate("/crew/dashboard");
-  // };
-  // const goInventorySummaryPage = () => {
-  //   navigate("/crew/inventory/summary");
-  // };
+  // Move all state hooks and functions inside the component
+  const [dashboardSummary, setDashboardSummary] = useState({
+    inventory: {
+      inProgress: 0,
+      pending: 0,
+      completed: 0,
+    },
+    bookings: {
+      inProgress: 0,
+      pending: 0,
+      completed: 0,
+    },
+    orders: {
+      inProgress: 0,
+      pending: 0,
+      completed: 0,
+    },
+    financial: {
+      revenue: 0,
+      expenses: 0,
+      profit: 0,
+    },
+    customerSatisfaction: 0,
+  });
+
+  const fetchDashboardSummary = async () => {
+    try {
+      console.log("Fetching summary dashboard summary...");
+      const response = await getDashboardSummary();
+      console.log("Dashboard Response:", response);
+
+      // The response has a nested structure, so we need to navigate to the correct data
+      if (response.status && response.data && response.data.data) {
+        console.log("Setting dashboard data:", response.data.data);
+        setDashboardSummary(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard summary:", error);
+    }
+  };
+
+  // All useEffect hooks must be inside the component
+  useEffect(() => {
+    fetchDashboardSummary();
+  }, []);
 
   const [activityData, setActivityData] = useState({
     labels: [],
@@ -334,6 +352,94 @@ const Reports = () => {
   const [reportType, setReportType] = useState("Inventory");
   const [frequency, setFrequency] = useState("One-Time");
 
+  // Add the renderInventoryStats function
+  const renderInventoryStats = () => {
+    if (!dashboardSummary || !dashboardSummary.inventory) {
+      return (
+        <div className="pending-order-container">
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Low Stock</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Total Items</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Total value</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+        </div>
+      );
+    }
+
+    const { lowStockItems, totalItems, totalValue } =
+      dashboardSummary.inventory;
+
+    return (
+      <div className="pending-order-container">
+        <div style={{ marginRight: "5px" }}>
+          <p
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              minWidth: "50px",
+              fontSize: "13px",
+            }}
+          >
+            Low Stock
+          </p>
+          <p style={{ fontSize: "12px" }}>{lowStockItems || 0}</p>
+        </div>
+        <div style={{ marginRight: "5px" }}>
+          <p style={{ fontSize: "13px" }}>Total Items</p>
+          <p style={{ fontSize: "12px" }}>{totalItems || 0}</p>
+        </div>
+        <div style={{ marginRight: "5px" }}>
+          <p style={{ fontSize: "13px" }}>Total value</p>
+          <p style={{ fontSize: "12px" }}>
+            ${totalValue ? totalValue.toLocaleString() : 0}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  // Add this function to format the recent activity data for the table
+  const formatRecentActivity = () => {
+    if (!dashboardSummary || !dashboardSummary.recentActivity) {
+      return [];
+    }
+
+    // Combine orders and bookings into one array
+    const orders = dashboardSummary.recentActivity.orders?.map(order => ({
+      type: 'Order',
+      id: order._id,
+      name: order.products?.[0]?.name || 'Product',
+      vendor: order.vendorName,
+      total: order.totalPrice || 0,
+      status: order.status || 'Pending',
+      date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
+      tracking: order.trackingId || 'N/A'
+    })) || [];
+
+    const bookings = dashboardSummary.recentActivity.bookings?.map(booking => ({
+      type: 'Booking',
+      id: booking._id,
+      name: booking.services?.[0]?.name || 'Service',
+      vendor: booking.vendorName,
+      total: booking.totalAmount || 0,
+      status: booking.status || 'Pending',
+      date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
+      tracking: 'N/A'
+    })) || [];
+
+    // Combine and sort by date (newest first)
+    return [...orders, ...bookings]
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+
   return (
     <div
       style={{
@@ -372,7 +478,10 @@ const Reports = () => {
           <div className="flex items-center justify-between">
             <div className="mr-3">
               <h3>Date Range</h3>
-              <div className="border-1 border-gray-200 p-2 rounded-lg" style={{borderRadius:"10px"}}>
+              <div
+                className="border-1 border-gray-200 p-2 rounded-lg"
+                style={{ borderRadius: "10px" }}
+              >
                 <input
                   type="date"
                   value={startDate}
@@ -390,7 +499,10 @@ const Reports = () => {
             </div>
             <div className="mr-3">
               <h3>Report Type</h3>
-              <div className="border-1 border-gray-200 p-2 rounded-lg" style={{width:"300px", borderRadius:"10px"}}>
+              <div
+                className="border-1 border-gray-200 p-2 rounded-lg"
+                style={{ width: "300px", borderRadius: "10px" }}
+              >
                 <select
                   value={reportType}
                   onChange={(e) => setReportType(e.target.value)}
@@ -404,7 +516,10 @@ const Reports = () => {
             </div>
             <div className="mr-3">
               <h3>Frequency</h3>
-              <div className="border-1 border-gray-200 p-2 rounded-lg" style={{width:"300px", borderRadius:"10px"}}>
+              <div
+                className="border-1 border-gray-200 p-2 rounded-lg"
+                style={{ width: "300px", borderRadius: "10px" }}
+              >
                 <select
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value)}
@@ -503,17 +618,29 @@ const Reports = () => {
                   fontSize: "13px",
                 }}
               >
-                In progress
+                Confirmed
               </p>
-              <p style={{ fontSize: "12px" }}>885</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.orders.confirmed}
+              </p>
             </div>
             <div style={{ marginRight: "5px" }}>
               <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>579</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.orders.pending}
+              </p>
             </div>
             <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>9981</p>
+              <p style={{ fontSize: "13px" }}>Total</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.orders.total}
+              </p>
             </div>
           </div>
         </div>
@@ -539,30 +666,7 @@ const Reports = () => {
               />
             </div>
           </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>885</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>5</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>22</p>
-            </div>
-          </div>
+          {renderInventoryStats()}
         </div>
         <div className="box1-order" style={{ minWidth: "180px" }}>
           <div
@@ -597,17 +701,29 @@ const Reports = () => {
                   fontSize: "13px",
                 }}
               >
-                In progress
+                Comfirmed
               </p>
-              <p style={{ fontSize: "12px" }}>457</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.bookings.confirmed}
+              </p>
             </div>
             <div style={{ marginRight: "5px" }}>
               <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.bookings.pending}
+              </p>
             </div>
             <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
+              <p style={{ fontSize: "13px" }}>Total</p>
+              <p style={{ fontSize: "12px" }}>
+                {dashboardSummary.loading
+                  ? "Loading..."
+                  : dashboardSummary.bookings.total}
+              </p>
             </div>
           </div>
         </div>
@@ -646,15 +762,15 @@ const Reports = () => {
               >
                 In progress
               </p>
-              <p style={{ fontSize: "12px" }}>457</p>
+              <p style={{ fontSize: "12px" }}>0</p>
             </div>
             <div style={{ marginRight: "5px" }}>
               <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
+              <p style={{ fontSize: "12px" }}>0</p>
             </div>
             <div style={{ marginRight: "5px" }}>
               <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
+              <p style={{ fontSize: "12px" }}>0</p>
             </div>
           </div>
         </div>
@@ -662,104 +778,54 @@ const Reports = () => {
 
       <div className="selling-products-container">
         <div className="selling-products-header">
-          <h2>Weekly & Monthly Reports </h2>
-          {/* <Button
-            label="AI Report Generate"
-            icon="pi pi-file"
-            className="p-button-primary"
-          /> */}
+          <h2>Weekly & Monthly Reports</h2>
         </div>
 
         <table className="selling-products-table">
           <thead>
             <tr>
-              <th>
-                Product Name <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Sales <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Type <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Tracking ID <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Total <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Profit <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                1500 <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Status <img src={sortIcon} alt="sortIcon" />
-              </th>
+              <th>Type <img src={sortIcon} alt="sortIcon" /></th>
+              <th>Name <img src={sortIcon} alt="sortIcon" /></th>
+              <th>Vendor <img src={sortIcon} alt="sortIcon" /></th>
+              <th>Date <img src={sortIcon} alt="sortIcon" /></th>
+              <th>Total <img src={sortIcon} alt="sortIcon" /></th>
+              <th>Status <img src={sortIcon} alt="sortIcon" /></th>
+              <th>ID <img src={sortIcon} alt="sortIcon" /></th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Fuel</td>
-              <td>Sold</td>
-              <td>Earned</td>
-              <td>Placed</td>
-              <td>Processed</td>
-              <td>Net</td>
-              <td>Widgets Pro</td>
-              <td>
-                <span className="status-confirmed">Confirmed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Energy</td>
-              <td>Delivered</td>
-              <td>Generated</td>
-              <td>Allocated</td>
-              <td>Completed</td>
-              <td>Gross</td>
-              <td>Widgets Plus</td>
-              <td>
-                <span className="status-in-progress">In Progress</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Power</td>
-              <td>Distributed</td>
-              <td>Produced</td>
-              <td>Assigned</td>
-              <td>Finalized</td>
-              <td>Total</td>
-              <td>Widgets Max</td>
-              <td>
-                <span className="status-pending">Pending</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Electricity</td>
-              <td>Supplied</td>
-              <td>Achieved</td>
-              <td>Settled</td>
-              <td>Executed</td>
-              <td>Balance</td>
-              <td>Widgets Elite</td>
-              <td>
-                <span className="status-completed">Completed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Gas</td>
-              <td>Rendered</td>
-              <td>Accumulated</td>
-              <td>Distributed</td>
-              <td>Confirmed</td>
-              <td>Surplus</td>
-              <td>Widgets Standard</td>
-              <td>
-                <span className="status-flagged">Flagged</span>
-              </td>
-            </tr>
+            {dashboardSummary && dashboardSummary.recentActivity ? (
+              formatRecentActivity().map((activity, index) => (
+                <tr key={activity.id || index}>
+                  <td>{activity.type}</td>
+                  <td className="product-cell">{activity.name}</td>
+                  <td>{activity.vendor}</td>
+                  <td>{activity.date}</td>
+                  <td>${activity.total.toFixed(2)}</td>
+                  <td>
+                    <span className={`status-${activity.status.toLowerCase()}`}>
+                      {activity.status}
+                    </span>
+                  </td>
+                  <td>{activity.id.substring(0, 8)}...</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  Loading data...
+                </td>
+              </tr>
+            )}
+            {dashboardSummary && 
+             dashboardSummary.recentActivity &&
+             formatRecentActivity().length === 0 && (
+              <tr>
+                <td colSpan="7" style={{ textAlign: "center" }}>
+                  No recent activity found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

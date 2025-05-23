@@ -67,6 +67,7 @@ import CrewDocument from "./pages/crew/document/document";
 import BookingDetails from "./pages/crew/booking/details";
 import { UserProvider } from "./context/userContext";
 
+
 function App() {
   return (
     <UserProvider>
@@ -210,6 +211,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              
               <Route
                 path="/crew/legal-resources"
                 element={
