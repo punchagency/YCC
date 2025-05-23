@@ -18,7 +18,7 @@ const Document = () => {
           </div>
         </div>
       </div>
-      <DocumentSearch />
+      {/* <DocumentSearch /> */}
       <DocumentBox />
     </>
   );

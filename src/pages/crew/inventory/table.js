@@ -54,7 +54,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   const [editFormData, setEditFormData] = useState({
     productName: "",
     category: "",
-    serviceArea: "",
     stockQuantity: 0,
     price: 0,
     warehouseLocation: "",
@@ -67,12 +66,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
     { label: "Safety Equipment", value: "Safety Equipment" },
     { label: "Nautical Equipment", value: "Nautical Equipment" },
     { label: "Decor & Furnishings", value: "Decor & Furnishings" },
-  ];
-
-  const serviceAreaOptions = [
-    { label: "Caribbean", value: "caribbean" },
-    { label: "Mediterranean", value: "mediterranean" },
-    { label: "USA", value: "usa" },
   ];
 
   const dropdownStyles = {
@@ -273,7 +266,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
     setEditFormData({
       productName: item.product?.name || "",
       category: item.product?.category || "",
-      serviceArea: item.product?.serviceArea || "",
       stockQuantity: item.quantity || 0,
       price: item.price || 0,
       warehouseLocation: item.warehouseLocation || "",
@@ -401,15 +393,11 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
     if (!itemToEdit) return;
 
     // Validate required fields
-    if (
-      !editFormData.productName ||
-      !editFormData.category ||
-      !editFormData.serviceArea
-    ) {
+    if (!editFormData.productName || !editFormData.category) {
       toast.current.show({
         severity: "error",
         summary: "Required Fields",
-        detail: "Product name, category, and service area are required",
+        detail: "Product name and category are required",
         life: 3000,
       });
       return;
@@ -422,7 +410,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         product: {
           name: editFormData.productName,
           category: editFormData.category,
-          serviceArea: editFormData.serviceArea,
         },
         quantity: Number(editFormData.stockQuantity) || 0,
         price: Number(editFormData.price) || 0,
@@ -474,7 +461,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
     setEditFormData({
       productName: "",
       category: "",
-      serviceArea: "",
       stockQuantity: 0,
       price: 0,
       warehouseLocation: "",
@@ -491,7 +477,7 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
               <div className="mt-4">
                 <div className="flex justify-content-between mb-4">
                   <div>
-                    <button
+                    {/* <button
                       className="mr-2 p-2 bg-transparent"
                       style={{
                         border: "1px solid #e0e0e0",
@@ -508,7 +494,7 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
                         className="mr-2"
                       />
                       Sort
-                    </button>
+                    </button> */}
                   </div>
                   <div>
                     <button
@@ -577,20 +563,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
                       >
                         <div className="flex items-center">
                           Category {getSortIcon("category")}
-                        </div>
-                      </th>
-                      <th
-                        style={{
-                          width: "20%",
-                          padding: "10px",
-                          textAlign: "left",
-                          cursor: "pointer",
-                          fontSize: "13px",
-                        }}
-                        onClick={() => handleSort("serviceArea")}
-                      >
-                        <div className="flex items-center">
-                          Service Area {getSortIcon("serviceArea")}
                         </div>
                       </th>
                       <th
@@ -673,16 +645,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
                             }}
                           >
                             {item.product?.category || "Uncategorized"}
-                          </td>
-                          <td
-                            style={{
-                              width: "20%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                              fontSize: "9px",
-                            }}
-                          >
-                            {item.product?.serviceArea || "Not specified"}
                           </td>
                           <td
                             style={{
@@ -965,13 +927,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
               </div>
 
               <div className="view-item-row">
-                <div className="view-item-label">Service Area:</div>
-                <div className="view-item-value">
-                  {itemToView.product?.serviceArea || "Not specified"}
-                </div>
-              </div>
-
-              <div className="view-item-row">
                 <div className="view-item-label">Quantity:</div>
                 <div className="view-item-value">
                   {itemToView.quantity || 0} units
@@ -1061,33 +1016,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
             </div>
 
             <div className="form-row">
-              <div
-                className="form-group-1"
-                style={{
-                  display: "block",
-                  marginBottom: "15px",
-                  border: "none",
-                }}
-              >
-                <label htmlFor="serviceArea">Service Area</label>
-                <Dropdown
-                  id="serviceArea"
-                  value={editFormData.serviceArea}
-                  options={serviceAreaOptions}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, serviceArea: e.value })
-                  }
-                  placeholder="Select a service area"
-                  style={{
-                    width: "100%",
-                    height: "45px",
-                    alignContent: "center",
-                  }}
-                  inputStyle={dropdownStyles}
-                  className="no-border-dropdown"
-                />
-              </div>
-
               <div
                 className="form-group"
                 style={{ display: "block", marginBottom: "15px" }}

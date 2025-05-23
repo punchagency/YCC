@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaSortAmountDown,
   FaSortAmountUp,
@@ -11,15 +11,16 @@ import deleteLogo from "../../../assets/images/crew/deleteLogo.png";
 import "../inventory/inventory.css"; // Reuse the inventory CSS
 import { Dialog } from "primereact/dialog";
 
-const Table = () => {
+const Table = ({ activeFilter = "all", searchQuery = "" }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
 
-  // Sample invoice data matching the screenshot
+  // Sample invoice data
   const invoices = [
     {
       id: "INV-001",
@@ -142,6 +143,45 @@ const Table = () => {
       },
     },
   ];
+
+  // Initialize filteredInvoices with invoices data
+  useEffect(() => {
+    setFilteredInvoices(invoices);
+  }, []);
+
+  // Filter invoices when activeFilter or searchQuery changes
+  useEffect(() => {
+    let filtered = [...invoices];
+
+    // Apply status filter
+    if (activeFilter !== "all") {
+      filtered = filtered.filter((invoice) => {
+        switch (activeFilter) {
+          case "pending":
+            return invoice.status === "Pending";
+          case "completed":
+            return invoice.status === "Completed";
+          case "upcoming":
+            return invoice.status === "In Progress";
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (invoice) =>
+          invoice.id.toLowerCase().includes(query) ||
+          invoice.vendor.toLowerCase().includes(query) ||
+          invoice.details?.serviceName.toLowerCase().includes(query)
+      );
+    }
+
+    setFilteredInvoices(filtered);
+  }, [activeFilter, searchQuery]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -455,7 +495,7 @@ const Table = () => {
             }}
           >
             <tbody>
-              {invoices.map((invoice, index) => (
+              {filteredInvoices.map((invoice, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td
                     style={{
@@ -587,8 +627,7 @@ const Table = () => {
             className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4"
             style={{ height: "50px" }}
           >
-          <div>
-          </div>
+            <div></div>
             <div className="flex flex-1 justify-between sm:hidden">
               <div className="text-xs text-gray-700">
                 Page <span className="font-medium">1</span> of{" "}
@@ -600,8 +639,10 @@ const Table = () => {
               <div>
                 <p className="text-sm text-gray-700">
                   Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">{invoices.length}</span> of{" "}
-                  <span className="font-medium">{invoices.length}</span> results
+                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
+                  of{" "}
+                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
+                  results
                 </p>
               </div>
               <div>
@@ -623,10 +664,7 @@ const Table = () => {
                 </nav>
               </div>
             </div>
-            
           </div>
-
-          
         </div>
 
         {/* Invoice Details Modal */}

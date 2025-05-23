@@ -16,7 +16,7 @@ const getAuthHeader = () => {
  */
 export const createOrder = async (orderData) => {
   try {
-    const response = await axios.post(`${API_URL}/crew-orders`, orderData, {
+    const response = await axios.post(`${API_URL}/crew-orders/`, orderData, {
       headers: {
         "Content-Type": "application/json",
         ...getAuthHeader(),
@@ -201,6 +201,31 @@ export const getOrderStats = async () => {
       status: false,
       error:
         error.response?.data?.message || "Failed to fetch order statistics",
+    };
+  }
+};
+
+export const getProductsWithVendors = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/crew-orders/products-with-creators`,
+      {
+        headers: {
+          ...getAuthHeader(),
+        },
+      }
+    );
+    return {
+      status: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching products with vendors:", error);
+    return {
+      status: false,
+      error:
+        error.response?.data?.message ||
+        "Failed to fetch products with vendors",
     };
   }
 };

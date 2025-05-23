@@ -1,8 +1,10 @@
-import { React } from "react";
+import React, { useState } from "react";
 import LegalSearch from "./legalsearch";
 import LegalBoxes from "./legalboxes";
 
 const Inventory = () => {
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [searchText, setSearchText] = useState("");
   return (
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
@@ -19,8 +21,13 @@ const Inventory = () => {
           </div>
         </div>
       </div>
-      <LegalSearch />
-      <LegalBoxes />
+      <LegalSearch
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry}
+        searchText={searchText}
+        setSearchText={setSearchText}
+      />
+      <LegalBoxes selectedCountry={selectedCountry} searchText={searchText} />
     </>
   );
 };

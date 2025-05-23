@@ -1,9 +1,11 @@
-import { React } from "react";
+import { React, useState } from "react";
 import location from "../../../assets/images/crew/location.png";
 import building from "../../../assets/images/crew/building.png";
 import calendar from "../../../assets/images/crew/crewcalendar.png";
 
 const TrainingBoxes = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null);
   // Sample data for 6 training courses
   const trainingCourses = [
     {
@@ -56,6 +58,16 @@ const TrainingBoxes = () => {
     },
   ];
 
+  const handleViewDetails = (course) => {
+    setModalData(course);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalData(null);
+  };
+
   return (
     <div className="container mx-auto">
       <div
@@ -73,7 +85,10 @@ const TrainingBoxes = () => {
               height: "300px",
             }}
           >
-            <div className="bg-white rounded-lg p-4" style={{ height: "100%", borderRadius:"10px"}}>
+            <div
+              className="bg-white rounded-lg p-4"
+              style={{ height: "100%", borderRadius: "10px" }}
+            >
               <div className="flex justify-content-between align-items-center mb-5">
                 <h2>{course.title}</h2>
                 <button
@@ -128,7 +143,9 @@ const TrainingBoxes = () => {
                     outline: "none",
                     borderRadius: "5px",
                     padding: "5px 10px",
+                    cursor: "pointer",
                   }}
+                  onClick={() => handleViewDetails(course)}
                 >
                   View Details
                 </button>
@@ -137,6 +154,67 @@ const TrainingBoxes = () => {
           </div>
         ))}
       </div>
+      {/* Modal */}
+      {modalOpen && modalData && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.4)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "10px",
+              padding: "32px 24px",
+              minWidth: "340px",
+              maxWidth: "90vw",
+              boxShadow: "0 2px 16px rgba(0,0,0,0.2)",
+              position: "relative",
+            }}
+          >
+            <button
+              onClick={closeModal}
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 16,
+                background: "transparent",
+                border: "none",
+                fontSize: 24,
+                cursor: "pointer",
+              }}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <h2 style={{ marginBottom: 16 }}>{modalData.title}</h2>
+            <div style={{ marginBottom: 12 }}>
+              <strong>Status:</strong> {modalData.status}
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <strong>Location:</strong> {modalData.location}
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <strong>Duration:</strong> {modalData.duration}
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <strong>Provider:</strong> {modalData.provider}
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <strong>Price:</strong> {modalData.price}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
