@@ -120,7 +120,7 @@ const Outstanding = () => {
               <img src={manprofile} alt="manprofile" className="mr-2" />
             </div>
             <div>
-              <p>Outstanding Invoices</p>
+              <p>Completed Payments</p>
               <p className="text-2xl font-bold">$4,000</p>
             </div>
           </div>
@@ -134,7 +134,7 @@ const Outstanding = () => {
               <img src={manprofile} alt="manprofile" className="mr-2" />
             </div>
             <div>
-              <p>Outstanding Invoices</p>
+              <p>Upcoming Expenses</p>
               <p className="text-2xl font-bold">$4,000</p>
             </div>
           </div>

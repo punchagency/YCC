@@ -1,6 +1,6 @@
 import { LineWeight } from "@mui/icons-material";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import vector from "../../../assets/images/crew/Vector 5.png";
 import calendar from "../../../assets/images/crew/crewcalendar.png";
 import location from "../../../assets/images/crew/location.png";
@@ -13,11 +13,44 @@ import { Dialog } from "primereact/dialog";
 import { FiClock, FiCheck } from "react-icons/fi";
 
 const BookingDetails = () => {
-  const [showModificationHistory, setShowModificationHistory] = useState(false);
+  const { bookingId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
+  // Get booking details from location state or initialize empty object
+  const [bookingDetails, setBookingDetails] = useState(
+    location.state?.bookingDetails || {}
+  );
+
+  const [showModificationHistory, setShowModificationHistory] = useState(false);
+
+  // If no booking details in state, fetch them using the ID
+  useEffect(() => {
+    if (!location.state?.bookingDetails && bookingId) {
+      // You would implement a function to fetch booking by ID
+      fetchBookingById(bookingId);
+    }
+  }, [bookingId, location.state]);
+
+  // Function to fetch booking by ID (implement this with your API)
+  const fetchBookingById = async (id) => {
+    console.log("Fetching booking details for ID:", id);
+    try {
+      // Call your API service to get booking details
+      // const response = await getBookingById(id);
+      // if (response.success) {
+      //   setBookingDetails(response.data);
+      // }
+    } catch (error) {
+      console.error("Error fetching booking details:", error);
+    }
+  };
+
+  // Function to navigate to modify service page
   const handleNavigateToModifyService = () => {
-    navigate(`/crew/booking/modify-service/983400`);
+    navigate(`/crew/booking/modify/${bookingId}`, {
+      state: { bookingDetails },
+    });
   };
 
   // Simple function to go back
@@ -47,8 +80,11 @@ const BookingDetails = () => {
             style={{ width: "55%", borderRadius: "10px" }}
           >
             <div className="mb-5">
-              <h2>Booking #983400</h2>
-              <p>Service scheduled for April 31, 2025</p>
+              <h2>
+                Booking{" "}
+                {bookingDetails.bookingId || bookingDetails._id || "N/A"}
+              </h2>
+              <p>Payment Status: {bookingDetails.paymentStatus || "N/A"}</p>
             </div>
             <div className="flex justify-content-between mb-5">
               <div>
@@ -61,7 +97,11 @@ const BookingDetails = () => {
                     height="15px"
                     className="mr-2"
                   />
-                  <p>Cleaning Service - Premium</p>
+                  <p>
+                    {(bookingDetails.services &&
+                      bookingDetails.services[0]?.service?.name) ||
+                      "N/A"}
+                  </p>
                 </div>
 
                 <div className="flex align-items-center mb-3">
@@ -72,7 +112,11 @@ const BookingDetails = () => {
                     height="15px"
                     className="mr-2"
                   />
-                  <p>2:00pm - 4:00pm</p>
+                  <p>
+                    {bookingDetails.dateTime
+                      ? new Date(bookingDetails.dateTime).toLocaleString()
+                      : "N/A"}
+                  </p>
                 </div>
                 <div className="flex align-items-center mb-3">
                   <img
@@ -82,7 +126,11 @@ const BookingDetails = () => {
                     height="15px"
                     className="mr-2"
                   />
-                  <p>123 Main St, Anytown, USA</p>
+                  <p>
+                    {bookingDetails.serviceLocation ||
+                      bookingDetails.vendorLocation ||
+                      "N/A"}
+                  </p>
                 </div>
                 <div className="flex align-items-center mb-3">
                   <img
@@ -92,13 +140,18 @@ const BookingDetails = () => {
                     height="15px"
                     className="mr-2"
                   />
-                  <p>$100</p>
+                  <p>
+                    $
+                    {(bookingDetails.services &&
+                      bookingDetails.services[0]?.service?.price) ||
+                      "N/A"}
+                  </p>
                 </div>
               </div>
               <div>
                 <h3>Vendor Information</h3>
-                <p>John Doe Marine Services</p>
-                <p>Premium Service Provider</p>
+                <p>{bookingDetails.vendorName || "N/A"}</p>
+                <p>{bookingDetails.vendorDescription || "Service Provider"}</p>
                 <div
                   className="mt-4 flex justify-content-between"
                   style={{ width: "400px" }}
@@ -268,10 +321,14 @@ const BookingDetails = () => {
             >
               <div style={{ lineHeight: "1.5" }}>
                 <span className="font-bold mb-6">
-                  Cleaning Service - Premium
+                  {bookingDetails.vendorName || "N/A"}
                 </span>
                 <br />
-                <span>March 1, 2025</span>
+                <span>
+                  {bookingDetails.dateTime
+                    ? new Date(bookingDetails.dateTime).toLocaleString()
+                    : "N/A"}
+                </span>
               </div>
               <div
                 style={{
@@ -280,57 +337,7 @@ const BookingDetails = () => {
                   borderRadius: "5px",
                 }}
               >
-                <p>Completed</p>
-              </div>
-            </div>
-            <div
-              className="flex justify-content-between align-items-center"
-              style={{
-                border: "1px solid #D5D5D54D",
-                borderRadius: "10px",
-                padding: "5px 15px",
-                alignContent: "center",
-                marginBottom: "20px",
-              }}
-            >
-              <div style={{ lineHeight: "1.5" }}>
-                <span className="font-bold mb-6">Maintenance Service</span>
-                <br />
-                <span>March 1, 2025</span>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#5570F11A",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                }}
-              >
-                <p>Completed</p>
-              </div>
-            </div>
-            <div
-              className="flex justify-content-between align-items-center"
-              style={{
-                border: "1px solid #D5D5D54D",
-                borderRadius: "10px",
-                padding: "5px 15px",
-                alignContent: "center",
-                marginBottom: "20px",
-              }}
-            >
-              <div style={{ lineHeight: "1.5" }}>
-                <span className="font-bold mb-6">Supply Delivery</span>
-                <br />
-                <span>March 1, 2025</span>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#5570F11A",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                }}
-              >
-                <p>Completed</p>
+                <p>{bookingDetails.bookingStatus || "N/A"}</p>
               </div>
             </div>
           </div>
@@ -403,10 +410,11 @@ const BookingDetails = () => {
                 color: "#212121",
               }}
             >
-              Fresh Water Delivery
+              {bookingDetails.vendorName || "N/A"}
             </h2>
             <p style={{ color: "#6B7280", margin: "4px 0 0 0" }}>
-              Booking #FW-2025-0414
+              Booking #
+              {bookingDetails.bookingId || bookingDetails._id || "N/A"}
             </p>
           </div>
 
@@ -421,7 +429,8 @@ const BookingDetails = () => {
                 fontWeight: "500",
               }}
             >
-              Modification In Progress
+              Modification In{" "}
+              {bookingDetails.bookingStatus || "N/A"}
             </span>
           </div>
 
@@ -481,10 +490,12 @@ const BookingDetails = () => {
                 Requested:
               </div>
               <div style={{ color: "#111827", fontWeight: "500" }}>
-                April 14, 2025, 16:05 PM (PKT)
+                {bookingDetails.dateTime
+                  ? new Date(bookingDetails.dateTime).toLocaleString()
+                  : "N/A"}
               </div>
               <div style={{ color: "#111827", fontWeight: "500" }}>
-                Change delivery time to 11:00 AM
+                
               </div>
             </div>
 
