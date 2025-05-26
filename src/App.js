@@ -66,6 +66,8 @@ import CrewAccomodation from "./pages/crew/accomodation/accomo";
 import CrewDocument from "./pages/crew/document/document";
 import BookingDetails from "./pages/crew/booking/details";
 import { UserProvider } from "./context/userContext";
+import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
+import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 
 function App() {
   return (
@@ -84,6 +86,9 @@ function App() {
           <Route path="/crew/signup" element={<CrewSignup />} />
           <Route path="/service/signup" element={<VendorSignup />} />
           <Route path="/vendor/signup" element={<SupplierSignup />} />
+
+          {/* Respond to Quote Route (not protected) */}
+          <Route path="/service/quotes/respond/:quoteId" element={<RespondToQuote />} />
 
             {/* end of route */}
 
@@ -242,6 +247,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/crew/quotes/:quoteId" element={<QuoteDetails />} />
             </Route>
 
             {/* Onboarding Routes */}
