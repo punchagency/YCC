@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
-import { FiEye, FiEdit, FiDownload, FiChevronLeft, FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { FiEye, FiEdit, FiCreditCard, FiChevronLeft, FiChevronRight, FiChevronDown } from "react-icons/fi";
 
 const QuotesTable = () => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [hoveredAction, setHoveredAction] = useState({}); // { rowIdx: { view: bool, edit: bool, download: bool } }
+  const [hoveredAction, setHoveredAction] = useState({}); // { rowIdx: { view: bool, edit: bool, pay: bool } }
   const pageSize = 10;
 
   // Dummy quote data
@@ -258,7 +258,7 @@ const QuotesTable = () => {
                       >
                         <FiEdit size={18} color={hoveredAction[idx]?.edit ? "#0387d9" : undefined} />
                       </div>
-                      {/* Download Button */}
+                      {/* Pay Button */}
                       <div
                         style={{
                           border: "1px solid lightgrey",
@@ -269,11 +269,11 @@ const QuotesTable = () => {
                           alignItems: "center",
                           cursor: "pointer",
                         }}
-                        title="Download"
-                        onMouseEnter={() => handleActionHover(idx, "download", true)}
-                        onMouseLeave={() => handleActionHover(idx, "download", false)}
+                        title="Pay"
+                        onMouseEnter={() => handleActionHover(idx, "pay", true)}
+                        onMouseLeave={() => handleActionHover(idx, "pay", false)}
                       >
-                        <FiDownload size={18} color={hoveredAction[idx]?.download ? "#0387d9" : undefined} />
+                        <FiCreditCard size={18} color={hoveredAction[idx]?.pay ? "#0387d9" : undefined} />
                       </div>
                     </div>
                   </td>
