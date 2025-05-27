@@ -55,7 +55,7 @@ const CrewBookingsAndQuotes = () => {
         </button>
       </div>
       {/* Table Content */}
-      <div style={{ width: "100%", maxWidth: 1200, margin: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", boxSizing: "border-box", padding: 0 }}>
+      <div style={{ width: "100%", maxWidth: "100%", margin: 0, flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", boxSizing: "border-box", padding: "0 10px" }}>
         {view === "bookings" ? <BookingTable /> : <QuotesTable />}
       </div>
     </div>
