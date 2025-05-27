@@ -187,14 +187,14 @@ const Inventory = () => {
             <h3
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "10px",
+                marginLeft: "40px",
               }}
             >
               Inventory Management
             </h3>
             <div className="mr-5">
               <button
-                className="flex align-items-center justify-content-center"
+                className="flex align-items-center justify-content-center mr-4"
                 style={{
                   borderRadius: "4px",
                   padding: "5px 10px",

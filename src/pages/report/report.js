@@ -344,7 +344,7 @@ const Reports = () => {
         style={{ marginBottom: "30px" }}
       >
         <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
+          <div className="content" style={{marginLeft:"40px"}}>
             <h3>Reports</h3>
           </div>
         </div>

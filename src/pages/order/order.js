@@ -780,7 +780,7 @@ const Order = () => {
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Orders</h3>
+            <h3 style={{marginLeft:"40px"}}>Orders</h3>
           </div>
         </div>
       </div>

@@ -169,3 +169,48 @@ export const exportReportCSV = async (reportType, params = {}) => {
     };
   }
 };
+
+
+/**
+ * Generate and download report as PDF
+ * @param {Object} params - Report parameters (reportType, startDate, endDate, frequency)
+ * @returns {Promise<Object>} - Report data and PDF download
+ */
+export const generateReport = async (params = {}) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/crew-reports/generate`,
+      params,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        responseType: "blob", // Important for PDF download
+      }
+    );
+
+    // Create a download link for the PDF file
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${params.reportType}_report.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    return {
+      status: true,
+      message: `${params.reportType} report generated and downloaded successfully`,
+    };
+  } catch (error) {
+    console.error(`Error generating ${params.reportType} report:`, error);
+    return {
+      status: false,
+      message:
+        error.response?.data?.message ||
+        `Failed to generate ${params.reportType} report`,
+      error: error.response?.data || error.message,
+    };
+  }
+};
+

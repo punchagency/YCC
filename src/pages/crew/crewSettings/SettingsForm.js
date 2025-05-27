@@ -5,6 +5,7 @@ import { Password } from "primereact/password";
 import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
 import { useNotifications } from "../../../context/notificationsContext";
+import { Dialog } from "primereact/dialog";
 
 const SettingsForm = ({ onSave, onCancel, loading }) => {
   const { user } = useUser();
@@ -19,6 +20,8 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [accountVisibility, setAccountVisibility] = useState(true);
   const [theme, setTheme] = useState("light");
+  const [deleteAccountEnabled, setDeleteAccountEnabled] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     // Populate form with user data when available
@@ -128,7 +131,95 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
           disabled={loading}
         />
       </div>
-
+      <div className="settings-form-group">
+        <label>Notifications</label>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            minHeight: 44,
+          }}
+        >
+          <span style={{ color: "#444", fontSize: 14 }}>Turn On</span>
+          <InputSwitch
+            checked={notificationsEnabled}
+            onChange={(e) => toggleNotifications(e.value)}
+            style={{ marginLeft: 8 }}
+          />
+        </div>
+      </div>
+      <div className="settings-form-group">
+        <label>Delete Account</label>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            padding: "8px 16px",
+            minHeight: 44,
+          }}
+        >
+          <span style={{ color: "#444", fontSize: 14 }}>Turn On</span>
+          <InputSwitch
+            checked={deleteAccountEnabled}
+            onChange={(e) => {
+              if (e.value) {
+                setShowDeleteModal(true);
+              } else {
+                setDeleteAccountEnabled(false);
+              }
+            }}
+            style={{ marginLeft: 8 }}
+          />
+        </div>
+      </div>
+      <Dialog
+        visible={showDeleteModal}
+        onHide={() => {
+          setShowDeleteModal(false);
+          setDeleteAccountEnabled(false);
+        }}
+        header="Confirm Delete Account"
+        style={{ width: "400px" }}
+        modal
+        footer={
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+          >
+            <Button
+              label="Cancel"
+              className="p-button-text"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeleteAccountEnabled(false);
+              }}
+            />
+            <Button
+              label="Yes"
+              className="p-button-danger"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeleteAccountEnabled(true);
+                // Place your delete logic here if needed
+              }}
+            />
+          </div>
+        }
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ fontSize: "2rem", color: "#dc3545" }}
+          />
+          <span>Are you sure you want to delete your account?</span>
+        </div>
+      </Dialog>
       <div className="settings-actions">
         <Button
           label="Cancel"

@@ -837,7 +837,7 @@ const Invent = () => {
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3 style={{ margin: "0 0 10px 20px" }}>Inventory</h3>
+            <h3 style={{ margin: "0 0 10px 40px" }}>Inventory</h3>
           </div>
         </div>
       </div>
