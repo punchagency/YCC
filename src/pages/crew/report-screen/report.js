@@ -374,12 +374,12 @@ const Reports = () => {
   const generatePDFReport = (data) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
+    const margin = 15;
     let yPosition = 20;
 
     // Add company logo or header
     doc.setFontSize(24);
-    doc.setTextColor(3, 135, 217); // Using the theme blue color
+    doc.setTextColor(3, 135, 217);
     doc.text("YCC Reports", pageWidth / 2, yPosition, { align: "center" });
     yPosition += 15;
 
@@ -412,13 +412,13 @@ const Reports = () => {
     // Add summary data based on report type
     switch (reportType.toLowerCase()) {
       case "orders":
-        generateOrdersPDF(doc, data, margin, yPosition);
+        generateOrdersPDF(doc, data, margin, yPosition, pageWidth);
         break;
       case "bookings":
-        generateBookingsPDF(doc, data, margin, yPosition);
+        generateBookingsPDF(doc, data, margin, yPosition, pageWidth);
         break;
       case "inventory":
-        generateInventoryPDF(doc, data, margin, yPosition);
+        generateInventoryPDF(doc, data, margin, yPosition, pageWidth);
         break;
     }
 
@@ -429,7 +429,7 @@ const Reports = () => {
     doc.save(filename);
   };
 
-  const generateOrdersPDF = (doc, data, margin, yPosition) => {
+  const generateOrdersPDF = (doc, data, margin, yPosition, pageWidth) => {
     // Add summary statistics
     const summaryData = [
       ["Metric", "Value"],
@@ -443,22 +443,27 @@ const Reports = () => {
     doc.text("Summary Statistics", margin, yPosition);
     yPosition += 10;
 
+    // Calculate column widths for wider table
+    const colWidth1 = (pageWidth - margin * 2) * 0.6;
+    const colWidth2 = (pageWidth - margin * 2) * 0.4;
+
     // Draw table header
     doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, 80, 10, "F");
-    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.rect(margin, yPosition, colWidth1, 10, "F");
+    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
     doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
     doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + 85, yPosition + 7);
+    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
     yPosition += 10;
 
     // Draw table rows
     doc.setTextColor(0, 0, 0);
     summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, 80, 10);
-      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.rect(margin, yPosition, colWidth1, 10);
+      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
       doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
       yPosition += 10;
     });
 
@@ -471,48 +476,70 @@ const Reports = () => {
       doc.text("Recent Orders", margin, yPosition);
       yPosition += 15;
 
+      // Calculate column widths for wider table
+      const colWidths = [
+        (pageWidth - margin * 2) * 0.15, // ID
+        (pageWidth - margin * 2) * 0.25, // Product
+        (pageWidth - margin * 2) * 0.25, // Vendor
+        (pageWidth - margin * 2) * 0.15, // Date
+        (pageWidth - margin * 2) * 0.2, // Total
+      ];
+
       // Draw table header
       doc.setFillColor(3, 135, 217);
-      doc.rect(margin, yPosition, 30, 10, "F");
-      doc.rect(margin + 30, yPosition, 40, 10, "F");
-      doc.rect(margin + 70, yPosition, 40, 10, "F");
-      doc.rect(margin + 110, yPosition, 30, 10, "F");
-      doc.rect(margin + 140, yPosition, 30, 10, "F");
+      let currentX = margin;
+      colWidths.forEach((width) => {
+        doc.rect(currentX, yPosition, width, 10, "F");
+        currentX += width;
+      });
+
       doc.setTextColor(255, 255, 255);
-      doc.text("ID", margin + 5, yPosition + 7);
-      doc.text("Product", margin + 35, yPosition + 7);
-      doc.text("Vendor", margin + 75, yPosition + 7);
-      doc.text("Date", margin + 115, yPosition + 7);
-      doc.text("Total", margin + 145, yPosition + 7);
+      doc.setFontSize(10);
+      currentX = margin;
+      doc.text("ID", currentX + 5, yPosition + 7);
+      currentX += colWidths[0];
+      doc.text("Product", currentX + 5, yPosition + 7);
+      currentX += colWidths[1];
+      doc.text("Vendor", currentX + 5, yPosition + 7);
+      currentX += colWidths[2];
+      doc.text("Date", currentX + 5, yPosition + 7);
+      currentX += colWidths[3];
+      doc.text("Total", currentX + 5, yPosition + 7);
       yPosition += 10;
 
       // Draw table rows
       doc.setTextColor(0, 0, 0);
       recentOrders.forEach((order) => {
-        doc.rect(margin, yPosition, 30, 10);
-        doc.rect(margin + 30, yPosition, 40, 10);
-        doc.rect(margin + 70, yPosition, 40, 10);
-        doc.rect(margin + 110, yPosition, 30, 10);
-        doc.rect(margin + 140, yPosition, 30, 10);
-        doc.text(order._id.substring(0, 8), margin + 5, yPosition + 7);
+        currentX = margin;
+        colWidths.forEach((width) => {
+          doc.rect(currentX, yPosition, width, 10);
+          currentX += width;
+        });
+
+        currentX = margin;
+        doc.text(order._id.substring(0, 8), currentX + 5, yPosition + 7);
+        currentX += colWidths[0];
         doc.text(
           order.products?.[0]?.name || "Product",
-          margin + 35,
+          currentX + 5,
           yPosition + 7
         );
-        doc.text(order.vendorName, margin + 75, yPosition + 7);
+        currentX += colWidths[1];
+        doc.text(order.vendorName, currentX + 5, yPosition + 7);
+        currentX += colWidths[2];
         doc.text(
           new Date(order.createdAt).toLocaleDateString(),
-          margin + 115,
+          currentX + 5,
           yPosition + 7
         );
-        doc.text(`$${order.totalPrice || 0}`, margin + 145, yPosition + 7);
+        currentX += colWidths[3];
+        doc.text(`$${order.totalPrice || 0}`, currentX + 5, yPosition + 7);
         yPosition += 10;
       });
     }
   };
 
-  const generateBookingsPDF = (doc, data, margin, yPosition) => {
+  const generateBookingsPDF = (doc, data, margin, yPosition, pageWidth) => {
     // Add summary statistics
     const summaryData = [
       ["Metric", "Value"],
@@ -526,22 +553,27 @@ const Reports = () => {
     doc.text("Summary Statistics", margin, yPosition);
     yPosition += 10;
 
+    // Calculate column widths for wider table
+    const colWidth1 = (pageWidth - margin * 2) * 0.6;
+    const colWidth2 = (pageWidth - margin * 2) * 0.4;
+
     // Draw table header
     doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, 80, 10, "F");
-    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.rect(margin, yPosition, colWidth1, 10, "F");
+    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
     doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
     doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + 85, yPosition + 7);
+    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
     yPosition += 10;
 
     // Draw table rows
     doc.setTextColor(0, 0, 0);
     summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, 80, 10);
-      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.rect(margin, yPosition, colWidth1, 10);
+      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
       doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
       yPosition += 10;
     });
 
@@ -550,52 +582,74 @@ const Reports = () => {
     if (recentBookings.length > 0) {
       doc.addPage();
       yPosition = 20;
-      doc.setFontSize(16);
+      doc.setFontSize(10);
       doc.text("Recent Bookings", margin, yPosition);
       yPosition += 15;
 
+      // Calculate column widths for wider table
+      const colWidths = [
+        (pageWidth - margin * 2) * 0.15, // ID
+        (pageWidth - margin * 2) * 0.25, // Service
+        (pageWidth - margin * 2) * 0.25, // Vendor
+        (pageWidth - margin * 2) * 0.15, // Date
+        (pageWidth - margin * 2) * 0.2, // Total
+      ];
+
       // Draw table header
       doc.setFillColor(3, 135, 217);
-      doc.rect(margin, yPosition, 30, 10, "F");
-      doc.rect(margin + 30, yPosition, 40, 10, "F");
-      doc.rect(margin + 70, yPosition, 40, 10, "F");
-      doc.rect(margin + 110, yPosition, 30, 10, "F");
-      doc.rect(margin + 140, yPosition, 30, 10, "F");
+      let currentX = margin;
+      colWidths.forEach((width) => {
+        doc.rect(currentX, yPosition, width, 10, "F");
+        currentX += width;
+      });
+
       doc.setTextColor(255, 255, 255);
-      doc.text("ID", margin + 5, yPosition + 7);
-      doc.text("Service", margin + 35, yPosition + 7);
-      doc.text("Vendor", margin + 75, yPosition + 7);
-      doc.text("Date", margin + 115, yPosition + 7);
-      doc.text("Total", margin + 145, yPosition + 7);
+      doc.setFontSize(10);
+      currentX = margin;
+      doc.text("ID", currentX + 5, yPosition + 7);
+      currentX += colWidths[0];
+      doc.text("Service", currentX + 5, yPosition + 7);
+      currentX += colWidths[1];
+      doc.text("Vendor", currentX + 5, yPosition + 7);
+      currentX += colWidths[2];
+      doc.text("Date", currentX + 5, yPosition + 7);
+      currentX += colWidths[3];
+      doc.text("Total", currentX + 5, yPosition + 7);
       yPosition += 10;
 
       // Draw table rows
       doc.setTextColor(0, 0, 0);
       recentBookings.forEach((booking) => {
-        doc.rect(margin, yPosition, 30, 10);
-        doc.rect(margin + 30, yPosition, 40, 10);
-        doc.rect(margin + 70, yPosition, 40, 10);
-        doc.rect(margin + 110, yPosition, 30, 10);
-        doc.rect(margin + 140, yPosition, 30, 10);
-        doc.text(booking._id.substring(0, 8), margin + 5, yPosition + 7);
+        currentX = margin;
+        colWidths.forEach((width) => {
+          doc.rect(currentX, yPosition, width, 10);
+          currentX += width;
+        });
+
+        currentX = margin;
+        doc.text(booking._id.substring(0, 8), currentX + 5, yPosition + 7);
+        currentX += colWidths[0];
         doc.text(
           booking.services?.[0]?.name || "Service",
-          margin + 35,
+          currentX + 5,
           yPosition + 7
         );
-        doc.text(booking.vendorName, margin + 75, yPosition + 7);
+        currentX += colWidths[1];
+        doc.text(booking.vendorName, currentX + 5, yPosition + 7);
+        currentX += colWidths[2];
         doc.text(
           new Date(booking.createdAt).toLocaleDateString(),
-          margin + 115,
+          currentX + 5,
           yPosition + 7
         );
-        doc.text(`$${booking.totalAmount || 0}`, margin + 145, yPosition + 7);
+        currentX += colWidths[3];
+        doc.text(`$${booking.totalAmount || 0}`, currentX + 5, yPosition + 7);
         yPosition += 10;
       });
     }
   };
 
-  const generateInventoryPDF = (doc, data, margin, yPosition) => {
+  const generateInventoryPDF = (doc, data, margin, yPosition, pageWidth) => {
     // Add summary statistics
     const summaryData = [
       ["Metric", "Value"],
@@ -605,26 +659,31 @@ const Reports = () => {
     ];
 
     // Create table manually
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.text("Summary Statistics", margin, yPosition);
     yPosition += 10;
 
+    // Calculate column widths for wider table
+    const colWidth1 = (pageWidth - margin * 2) * 0.6;
+    const colWidth2 = (pageWidth - margin * 2) * 0.4;
+
     // Draw table header
     doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, 80, 10, "F");
-    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.rect(margin, yPosition, colWidth1, 10, "F");
+    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
     doc.setTextColor(255, 255, 255);
+    doc.setFontSize(10);
     doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + 85, yPosition + 7);
+    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
     yPosition += 10;
 
     // Draw table rows
     doc.setTextColor(0, 0, 0);
     summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, 80, 10);
-      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.rect(margin, yPosition, colWidth1, 10);
+      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
       doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
       yPosition += 10;
     });
 
@@ -632,17 +691,18 @@ const Reports = () => {
     if (data.healthReports) {
       doc.addPage();
       yPosition = 20;
-      doc.setFontSize(16);
+      doc.setFontSize(10);
       doc.text("Inventory Health Metrics", margin, yPosition);
       yPosition += 15;
 
       // Draw table header
       doc.setFillColor(3, 135, 217);
-      doc.rect(margin, yPosition, 80, 10, "F");
-      doc.rect(margin + 80, yPosition, 80, 10, "F");
+      doc.rect(margin, yPosition, colWidth1, 10, "F");
+      doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
       doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
       doc.text("Metric", margin + 5, yPosition + 7);
-      doc.text("Rate", margin + 85, yPosition + 7);
+      doc.text("Rate", margin + colWidth1 + 5, yPosition + 7);
       yPosition += 10;
 
       // Draw table rows
@@ -660,10 +720,10 @@ const Reports = () => {
       ];
 
       healthData.forEach((row) => {
-        doc.rect(margin, yPosition, 80, 10);
-        doc.rect(margin + 80, yPosition, 80, 10);
+        doc.rect(margin, yPosition, colWidth1, 10);
+        doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
         doc.text(row[0], margin + 5, yPosition + 7);
-        doc.text(row[1], margin + 85, yPosition + 7);
+        doc.text(row[1], margin + colWidth1 + 5, yPosition + 7);
         yPosition += 10;
       });
     }
@@ -700,8 +760,58 @@ const Reports = () => {
       return;
     }
 
-    // Generate PDF using the dashboard data
-    generatePDFReport(dashboardSummary);
+    // Filter data based on date range
+    const filteredData = {
+      ...dashboardSummary,
+      recentActivity: {
+        orders:
+          dashboardSummary.recentActivity?.orders?.filter((order) => {
+            const orderDate = new Date(order.createdAt);
+            return orderDate >= startDate && orderDate <= endDate;
+          }) || [],
+        bookings:
+          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
+            const bookingDate = new Date(booking.createdAt);
+            return bookingDate >= startDate && bookingDate <= endDate;
+          }) || [],
+      },
+    };
+
+    // Calculate summary statistics for the filtered data
+    switch (reportType.toLowerCase()) {
+      case "orders":
+        filteredData.orders = {
+          total: filteredData.recentActivity.orders.length,
+          confirmed: filteredData.recentActivity.orders.filter(
+            (order) => order.status === "Confirmed"
+          ).length,
+          pending: filteredData.recentActivity.orders.filter(
+            (order) => order.status === "Pending"
+          ).length,
+        };
+        break;
+      case "bookings":
+        filteredData.bookings = {
+          total: filteredData.recentActivity.bookings.length,
+          confirmed: filteredData.recentActivity.bookings.filter(
+            (booking) => booking.status === "Confirmed"
+          ).length,
+          pending: filteredData.recentActivity.bookings.filter(
+            (booking) => booking.status === "Pending"
+          ).length,
+        };
+        break;
+      case "inventory":
+        // For inventory, we'll keep the current stats but you might want to filter these based on your business logic
+        filteredData.inventory = {
+          ...dashboardSummary.inventory,
+          // Add any date-based filtering for inventory if needed
+        };
+        break;
+    }
+
+    // Generate PDF using the filtered data
+    generatePDFReport(filteredData);
   };
 
   const handleExport = () => {
@@ -715,8 +825,57 @@ const Reports = () => {
       return;
     }
 
-    // Generate PDF using the dashboard data
-    generatePDFReport(dashboardSummary);
+    // Use the same filtering logic as handleGenerateReport
+    const filteredData = {
+      ...dashboardSummary,
+      recentActivity: {
+        orders:
+          dashboardSummary.recentActivity?.orders?.filter((order) => {
+            const orderDate = new Date(order.createdAt);
+            return orderDate >= startDate && orderDate <= endDate;
+          }) || [],
+        bookings:
+          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
+            const bookingDate = new Date(booking.createdAt);
+            return bookingDate >= startDate && bookingDate <= endDate;
+          }) || [],
+      },
+    };
+
+    // Calculate summary statistics for the filtered data
+    switch (reportType.toLowerCase()) {
+      case "orders":
+        filteredData.orders = {
+          total: filteredData.recentActivity.orders.length,
+          confirmed: filteredData.recentActivity.orders.filter(
+            (order) => order.status === "Confirmed"
+          ).length,
+          pending: filteredData.recentActivity.orders.filter(
+            (order) => order.status === "Pending"
+          ).length,
+        };
+        break;
+      case "bookings":
+        filteredData.bookings = {
+          total: filteredData.recentActivity.bookings.length,
+          confirmed: filteredData.recentActivity.bookings.filter(
+            (booking) => booking.status === "Confirmed"
+          ).length,
+          pending: filteredData.recentActivity.bookings.filter(
+            (booking) => booking.status === "Pending"
+          ).length,
+        };
+        break;
+      case "inventory":
+        filteredData.inventory = {
+          ...dashboardSummary.inventory,
+          // Add any date-based filtering for inventory if needed
+        };
+        break;
+    }
+
+    // Generate PDF using the filtered data
+    generatePDFReport(filteredData);
   };
 
   // Add the renderInventoryStats function
