@@ -45,25 +45,40 @@ const QuotesTable = () => {
         },
       });
 
+      const data = await response.json();
+
+      // Handle error responses
       if (!response.ok) {
+        // If the response has a specific error message, use it
+        if (data.message) {
+          throw new Error(data.message);
+        }
         throw new Error('Failed to fetch quotes');
       }
 
-      const data = await response.json();
-      // Support both wrapped and unwrapped paginated responses
-      const paginated = data.data || data;
-      console.log("Paginated is:", paginated);
-      console.log("Paginated.result is:", paginated.result);
-      if (Array.isArray(paginated.result)) {
-        setQuotes(paginated.result);
-        setTotalPages(paginated.totalPages || 1);
-        setTotalItems(paginated.totalData || 0);
-      } else {
-        throw new Error('Invalid response format');
+      // Handle successful response with no data
+      if (!data.status) {
+        setQuotes([]);
+        setTotalPages(1);
+        setTotalItems(0);
+        return;
       }
+
+      // Handle successful response with data
+      const paginatedData = data.data;
+      if (!paginatedData || !paginatedData.result) {
+        setQuotes([]);
+        setTotalPages(1);
+        setTotalItems(0);
+        return;
+      }
+
+      setQuotes(paginatedData.result);
+      setTotalPages(paginatedData.totalPages || 1);
+      setTotalItems(paginatedData.totalData || 0);
     } catch (err) {
       console.error('Error fetching quotes:', err);
-      setError(err.message);
+      setError(err.message || 'Failed to fetch quotes');
     } finally {
       setLoading(false);
     }
@@ -320,24 +335,26 @@ const QuotesTable = () => {
                       >
                         <FiEdit size={18} color={hoveredAction[idx]?.edit ? "#0387d9" : undefined} />
                       </div>
-                      {/* Pay Button */}
-                      <div
-                        style={{
-                          border: "1px solid lightgrey",
-                          padding: 5,
-                          borderRadius: 6,
-                          transition: "background 0.15s, border 0.15s",
-                          display: "flex",
-                          alignItems: "center",
-                          cursor: "pointer",
-                        }}
-                        title="Pay"
-                        onMouseEnter={() => handleActionHover(idx, "pay", true)}
-                        onMouseLeave={() => handleActionHover(idx, "pay", false)}
-                        onClick={() => navigate(`/crew/quotes/${quote._id}/pay`)}
-                      >
-                        <FiCreditCard size={18} color={hoveredAction[idx]?.pay ? "#0387d9" : undefined} />
-                      </div>
+                      {/* Payment Button - Show only for accepted quotes */}
+                      {quote.status === 'accepted' && (
+                        <div
+                          style={{
+                            border: "1px solid lightgrey",
+                            padding: 5,
+                            cursor: "pointer",
+                            borderRadius: 6,
+                            transition: "background 0.15s, border 0.15s",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                          title="Make Payment"
+                          onMouseEnter={() => handleActionHover(idx, "payment", true)}
+                          onMouseLeave={() => handleActionHover(idx, "payment", false)}
+                          onClick={() => navigate(`/crew/quotes/${quote._id}/payment`)}
+                        >
+                          <FiCreditCard size={18} color={hoveredAction[idx]?.payment ? "#0387d9" : undefined} />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>

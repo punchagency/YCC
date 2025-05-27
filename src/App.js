@@ -68,7 +68,7 @@ import BookingDetails from "./pages/crew/booking/details";
 import { UserProvider } from "./context/userContext";
 import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
-import QuotePaymentPage from "./pages/quote-related-pages/customers/QuotePaymentPage";
+import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
 
 function App() {
   return (
@@ -249,14 +249,7 @@ function App() {
                 }
               />
               <Route path="/crew/quotes/:quoteId" element={<QuoteDetails />} />
-              <Route
-                path="/crew/quotes/:quoteId/pay"
-                element={
-                  <ProtectedRoute requiredRoles={["crew_member"]}>
-                    <QuotePaymentPage />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/crew/quotes/:quoteId/payment" element={<QuotePayment />} />
             </Route>
 
             {/* Onboarding Routes */}

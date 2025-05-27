@@ -58,6 +58,8 @@ const QuoteDetails = () => {
   const handleQuoteResponse = async (responseType) => {
     try {
       setResponding(true);
+      setError(null);
+
       const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/${quoteId}/respond`, {
         method: 'PUT',
         headers: {
@@ -67,20 +69,22 @@ const QuoteDetails = () => {
         body: JSON.stringify({ response: responseType })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to respond to quote');
+        throw new Error(data.message || "Failed to respond to quote");
       }
 
-      const data = await response.json();
       if (data.status) {
-        // Check the response state to determine navigation
-        if (data.data.responseState === 'accept') {
-          navigate(`/crew/quotes/${quoteId}/pay`);
+        if (responseType === 'accept') {
+          // Navigate to payment page
+          navigate(`/crew/quotes/${quoteId}/payment`);
         } else {
+          // Navigate back to quotes list
           navigate('/crew/quotes');
         }
       } else {
-        throw new Error(data.message || 'Failed to respond to quote');
+        throw new Error(data.message || "Failed to respond to quote");
       }
     } catch (err) {
       setError(err.message);
