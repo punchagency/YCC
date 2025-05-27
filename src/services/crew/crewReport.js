@@ -170,6 +170,7 @@ export const exportReportCSV = async (reportType, params = {}) => {
   }
 };
 
+
 /**
  * Generate and download report as PDF
  * @param {Object} params - Report parameters (reportType, startDate, endDate, frequency)
@@ -212,3 +213,4 @@ export const generateReport = async (params = {}) => {
     };
   }
 };
+
