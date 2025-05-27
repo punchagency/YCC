@@ -204,7 +204,7 @@ const BookingTable = () => {
   // Show error state
   if (error) {
     return (
-      <div className="bg-white p-4 m-4">
+      <div className="bg-white p-4 m-4 w-full">
         <div className="p-4 bg-red-100 text-red-700 rounded-md">
           <p>Error: {error}</p>
           <button
@@ -220,9 +220,9 @@ const BookingTable = () => {
 
   return (
     <>
-      <div className="bg-white p-4 m-4">
+      <div className="p-4 mt-2 ml-4 mr-4 mb-2 w-full">
         {/* Booking Table */}
-        <div className="p-2 bg-white rounded-xl shadow-sm mt-5">
+        <div className="pl-2 pr-2 pt-6 pb-2 rounded-xl shadow-sm mt-1 bg-white" style={{borderRadius:"10px"}}>
           {bookings.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               No bookings found.
