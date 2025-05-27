@@ -13,7 +13,7 @@ const Inventory = () => {
             <h3
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "10px",
+                marginLeft: "40px",
               }}
             >
               Crew Portal

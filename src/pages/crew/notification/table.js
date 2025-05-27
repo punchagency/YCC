@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "primereact/button";
 import { Badge } from "primereact/badge";
 import { DataTable } from "primereact/datatable";
@@ -13,6 +13,7 @@ import "../inventory/inventory.css"; // Reuse the inventory CSS
 
 // Mobile notification card component
 const MobileNotificationCard = ({ notification, handleViewDetails }) => {
+  console.log("Rendering mobile card for notification:", notification);
   return (
     <Card
       sx={{
@@ -60,13 +61,13 @@ const MobileNotificationCard = ({ notification, handleViewDetails }) => {
             size="small"
             sx={{
               backgroundColor:
-                notification.status === "Resolved"
+                notification.status === "Read"
                   ? "#ECFDF3"
                   : notification.status === "In Progress"
                   ? "#F8F9FC"
                   : "#FEF3F2",
               color:
-                notification.status === "Resolved"
+                notification.status === "Read"
                   ? "#027A48"
                   : notification.status === "In Progress"
                   ? "#363F72"
@@ -133,13 +134,14 @@ const MobileNotificationCard = ({ notification, handleViewDetails }) => {
 
 // Status Cell component
 const StatusCell = ({ rowData }) => {
+  console.log("Rendering status cell for:", rowData);
   const getStatusStyle = (status) => {
     switch (status) {
-      case "Resolved":
+      case "Read":
         return { bg: "#ECFDF3", color: "#027A48" };
       case "In Progress":
         return { bg: "#F8F9FC", color: "#363F72" };
-      case "Pending":
+      case "Unread":
         return { bg: "#FEF3F2", color: "#B42318" };
       default:
         return { bg: "#F2F4F7", color: "#344054" };
@@ -160,6 +162,7 @@ const StatusCell = ({ rowData }) => {
           display: "inline-flex",
           alignItems: "center",
           gap: "4px",
+          transition: "all 0.3s ease",
         }}
       >
         {rowData.status}
@@ -169,12 +172,16 @@ const StatusCell = ({ rowData }) => {
 };
 
 const NotificationTable = ({
+  notifications,
   handleViewDetails,
   isMobile,
   isTablet,
-  filteredNotifications,
+  loading,
 }) => {
+  console.log("Rendering table with notifications:", notifications);
+
   const priorityTemplate = (rowData) => {
+    console.log("Rendering priority for:", rowData);
     const bgColors = {
       high: { bg: "#ECFDF3", color: "#027A48" },
       medium: { bg: "#FFFAEB", color: "#B54708" },
@@ -228,8 +235,8 @@ const NotificationTable = ({
       {/* Mobile View */}
       {isMobile && (
         <Box sx={{ padding: "15px" }}>
-          {filteredNotifications.length > 0 ? (
-            filteredNotifications.map((notification) => (
+          {notifications.length > 0 ? (
+            notifications.map((notification) => (
               <MobileNotificationCard
                 key={notification._id}
                 notification={notification}
@@ -256,12 +263,14 @@ const NotificationTable = ({
           className="notification-table"
           style={{
             padding: isTablet ? "15px" : "20px",
-            overflowX: "hidden", // Hide scrollbar
+            overflowX: "hidden",
           }}
         >
           <DataTable
-            value={filteredNotifications}
+            value={notifications}
+            loading={loading}
             responsiveLayout="scroll"
+            emptyMessage="No notifications found"
             style={{
               border: "1px solid #EAECF0",
               borderRadius: "8px",

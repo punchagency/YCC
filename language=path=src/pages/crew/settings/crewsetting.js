@@ -150,7 +150,7 @@ const CrewSetting = () => {
       });
     }
   };
-
+  
   // const confirmDeleteAccount = () => {
   //   confirmDialog({
   //     message:

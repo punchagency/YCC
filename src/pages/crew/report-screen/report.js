@@ -24,6 +24,11 @@ import {
 } from "chart.js";
 
 import { getDashboardSummary } from "../../../services/crew/crewReport";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { Toast } from "primereact/toast";
 
 // Register the components
 ChartJS.register(
@@ -347,10 +352,372 @@ const Reports = () => {
     ],
   };
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [reportType, setReportType] = useState("Inventory");
-  const [frequency, setFrequency] = useState("One-Time");
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [reportType, setReportType] = useState(null);
+  const [frequency, setFrequency] = useState(null);
+  const toast = useRef(null);
+
+  const reportTypeOptions = [
+    { label: "Inventory", value: "Inventory" },
+    { label: "Bookings", value: "Bookings" },
+    { label: "Orders", value: "Orders" },
+  ];
+
+  const frequencyOptions = [
+    { label: "One-Time", value: "One-Time" },
+    { label: "Daily", value: "Daily" },
+    { label: "Weekly", value: "Weekly" },
+    { label: "Monthly", value: "Monthly" },
+  ];
+
+  const generatePDFReport = (data) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    let yPosition = 20;
+
+    // Add company logo or header
+    doc.setFontSize(24);
+    doc.setTextColor(3, 135, 217); // Using the theme blue color
+    doc.text("YCC Reports", pageWidth / 2, yPosition, { align: "center" });
+    yPosition += 15;
+
+    // Add report title
+    doc.setFontSize(20);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`${reportType.toUpperCase()} REPORT`, pageWidth / 2, yPosition, {
+      align: "center",
+    });
+    yPosition += 15;
+
+    // Add report details
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, yPosition);
+    yPosition += 10;
+    doc.text(
+      `Date Range: ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
+      margin,
+      yPosition
+    );
+    yPosition += 10;
+    doc.text(`Frequency: ${frequency}`, margin, yPosition);
+    yPosition += 20;
+
+    // Add summary section
+    doc.setFontSize(16);
+    doc.text("Summary", margin, yPosition);
+    yPosition += 10;
+
+    // Add summary data based on report type
+    switch (reportType.toLowerCase()) {
+      case "orders":
+        generateOrdersPDF(doc, data, margin, yPosition);
+        break;
+      case "bookings":
+        generateBookingsPDF(doc, data, margin, yPosition);
+        break;
+      case "inventory":
+        generateInventoryPDF(doc, data, margin, yPosition);
+        break;
+    }
+
+    // Save the PDF
+    const filename = `${reportType}_Report_${
+      startDate.toISOString().split("T")[0]
+    }_to_${endDate.toISOString().split("T")[0]}.pdf`;
+    doc.save(filename);
+  };
+
+  const generateOrdersPDF = (doc, data, margin, yPosition) => {
+    // Add summary statistics
+    const summaryData = [
+      ["Metric", "Value"],
+      ["Total Orders", data.orders?.total || 0],
+      ["Confirmed Orders", data.orders?.confirmed || 0],
+      ["Pending Orders", data.orders?.pending || 0],
+    ];
+
+    // Create table manually
+    doc.setFontSize(12);
+    doc.text("Summary Statistics", margin, yPosition);
+    yPosition += 10;
+
+    // Draw table header
+    doc.setFillColor(3, 135, 217);
+    doc.rect(margin, yPosition, 80, 10, "F");
+    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.text("Metric", margin + 5, yPosition + 7);
+    doc.text("Value", margin + 85, yPosition + 7);
+    yPosition += 10;
+
+    // Draw table rows
+    doc.setTextColor(0, 0, 0);
+    summaryData.slice(1).forEach((row) => {
+      doc.rect(margin, yPosition, 80, 10);
+      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.text(row[0], margin + 5, yPosition + 7);
+      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      yPosition += 10;
+    });
+
+    // Add recent orders if available
+    const recentOrders = data.recentActivity?.orders || [];
+    if (recentOrders.length > 0) {
+      doc.addPage();
+      yPosition = 20;
+      doc.setFontSize(16);
+      doc.text("Recent Orders", margin, yPosition);
+      yPosition += 15;
+
+      // Draw table header
+      doc.setFillColor(3, 135, 217);
+      doc.rect(margin, yPosition, 30, 10, "F");
+      doc.rect(margin + 30, yPosition, 40, 10, "F");
+      doc.rect(margin + 70, yPosition, 40, 10, "F");
+      doc.rect(margin + 110, yPosition, 30, 10, "F");
+      doc.rect(margin + 140, yPosition, 30, 10, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.text("ID", margin + 5, yPosition + 7);
+      doc.text("Product", margin + 35, yPosition + 7);
+      doc.text("Vendor", margin + 75, yPosition + 7);
+      doc.text("Date", margin + 115, yPosition + 7);
+      doc.text("Total", margin + 145, yPosition + 7);
+      yPosition += 10;
+
+      // Draw table rows
+      doc.setTextColor(0, 0, 0);
+      recentOrders.forEach((order) => {
+        doc.rect(margin, yPosition, 30, 10);
+        doc.rect(margin + 30, yPosition, 40, 10);
+        doc.rect(margin + 70, yPosition, 40, 10);
+        doc.rect(margin + 110, yPosition, 30, 10);
+        doc.rect(margin + 140, yPosition, 30, 10);
+        doc.text(order._id.substring(0, 8), margin + 5, yPosition + 7);
+        doc.text(
+          order.products?.[0]?.name || "Product",
+          margin + 35,
+          yPosition + 7
+        );
+        doc.text(order.vendorName, margin + 75, yPosition + 7);
+        doc.text(
+          new Date(order.createdAt).toLocaleDateString(),
+          margin + 115,
+          yPosition + 7
+        );
+        doc.text(`$${order.totalPrice || 0}`, margin + 145, yPosition + 7);
+        yPosition += 10;
+      });
+    }
+  };
+
+  const generateBookingsPDF = (doc, data, margin, yPosition) => {
+    // Add summary statistics
+    const summaryData = [
+      ["Metric", "Value"],
+      ["Total Bookings", data.bookings?.total || 0],
+      ["Confirmed Bookings", data.bookings?.confirmed || 0],
+      ["Pending Bookings", data.bookings?.pending || 0],
+    ];
+
+    // Create table manually
+    doc.setFontSize(12);
+    doc.text("Summary Statistics", margin, yPosition);
+    yPosition += 10;
+
+    // Draw table header
+    doc.setFillColor(3, 135, 217);
+    doc.rect(margin, yPosition, 80, 10, "F");
+    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.text("Metric", margin + 5, yPosition + 7);
+    doc.text("Value", margin + 85, yPosition + 7);
+    yPosition += 10;
+
+    // Draw table rows
+    doc.setTextColor(0, 0, 0);
+    summaryData.slice(1).forEach((row) => {
+      doc.rect(margin, yPosition, 80, 10);
+      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.text(row[0], margin + 5, yPosition + 7);
+      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      yPosition += 10;
+    });
+
+    // Add recent bookings if available
+    const recentBookings = data.recentActivity?.bookings || [];
+    if (recentBookings.length > 0) {
+      doc.addPage();
+      yPosition = 20;
+      doc.setFontSize(16);
+      doc.text("Recent Bookings", margin, yPosition);
+      yPosition += 15;
+
+      // Draw table header
+      doc.setFillColor(3, 135, 217);
+      doc.rect(margin, yPosition, 30, 10, "F");
+      doc.rect(margin + 30, yPosition, 40, 10, "F");
+      doc.rect(margin + 70, yPosition, 40, 10, "F");
+      doc.rect(margin + 110, yPosition, 30, 10, "F");
+      doc.rect(margin + 140, yPosition, 30, 10, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.text("ID", margin + 5, yPosition + 7);
+      doc.text("Service", margin + 35, yPosition + 7);
+      doc.text("Vendor", margin + 75, yPosition + 7);
+      doc.text("Date", margin + 115, yPosition + 7);
+      doc.text("Total", margin + 145, yPosition + 7);
+      yPosition += 10;
+
+      // Draw table rows
+      doc.setTextColor(0, 0, 0);
+      recentBookings.forEach((booking) => {
+        doc.rect(margin, yPosition, 30, 10);
+        doc.rect(margin + 30, yPosition, 40, 10);
+        doc.rect(margin + 70, yPosition, 40, 10);
+        doc.rect(margin + 110, yPosition, 30, 10);
+        doc.rect(margin + 140, yPosition, 30, 10);
+        doc.text(booking._id.substring(0, 8), margin + 5, yPosition + 7);
+        doc.text(
+          booking.services?.[0]?.name || "Service",
+          margin + 35,
+          yPosition + 7
+        );
+        doc.text(booking.vendorName, margin + 75, yPosition + 7);
+        doc.text(
+          new Date(booking.createdAt).toLocaleDateString(),
+          margin + 115,
+          yPosition + 7
+        );
+        doc.text(`$${booking.totalAmount || 0}`, margin + 145, yPosition + 7);
+        yPosition += 10;
+      });
+    }
+  };
+
+  const generateInventoryPDF = (doc, data, margin, yPosition) => {
+    // Add summary statistics
+    const summaryData = [
+      ["Metric", "Value"],
+      ["Low Stock Items", data.inventory?.lowStockItems || 0],
+      ["Total Items", data.inventory?.totalItems || 0],
+      ["Total Value", `$${data.inventory?.totalValue || 0}`],
+    ];
+
+    // Create table manually
+    doc.setFontSize(12);
+    doc.text("Summary Statistics", margin, yPosition);
+    yPosition += 10;
+
+    // Draw table header
+    doc.setFillColor(3, 135, 217);
+    doc.rect(margin, yPosition, 80, 10, "F");
+    doc.rect(margin + 80, yPosition, 80, 10, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.text("Metric", margin + 5, yPosition + 7);
+    doc.text("Value", margin + 85, yPosition + 7);
+    yPosition += 10;
+
+    // Draw table rows
+    doc.setTextColor(0, 0, 0);
+    summaryData.slice(1).forEach((row) => {
+      doc.rect(margin, yPosition, 80, 10);
+      doc.rect(margin + 80, yPosition, 80, 10);
+      doc.text(row[0], margin + 5, yPosition + 7);
+      doc.text(row[1].toString(), margin + 85, yPosition + 7);
+      yPosition += 10;
+    });
+
+    // Add health metrics if available
+    if (data.healthReports) {
+      doc.addPage();
+      yPosition = 20;
+      doc.setFontSize(16);
+      doc.text("Inventory Health Metrics", margin, yPosition);
+      yPosition += 15;
+
+      // Draw table header
+      doc.setFillColor(3, 135, 217);
+      doc.rect(margin, yPosition, 80, 10, "F");
+      doc.rect(margin + 80, yPosition, 80, 10, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.text("Metric", margin + 5, yPosition + 7);
+      doc.text("Rate", margin + 85, yPosition + 7);
+      yPosition += 10;
+
+      // Draw table rows
+      doc.setTextColor(0, 0, 0);
+      const healthData = [
+        ["Stock Levels", `${data.healthReports.stockLevels?.rate || 0}%`],
+        [
+          "Supplier Availability",
+          `${data.healthReports.supplierAvailability?.rate || 0}%`,
+        ],
+        [
+          "Customer Satisfaction",
+          `${data.healthReports.customerSatisfaction?.rate || 0}%`,
+        ],
+      ];
+
+      healthData.forEach((row) => {
+        doc.rect(margin, yPosition, 80, 10);
+        doc.rect(margin + 80, yPosition, 80, 10);
+        doc.text(row[0], margin + 5, yPosition + 7);
+        doc.text(row[1], margin + 85, yPosition + 7);
+        yPosition += 10;
+      });
+    }
+  };
+
+  const handleGenerateReport = () => {
+    if (!startDate || !endDate) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please select both start and end dates",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!reportType) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please select a report type",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!frequency) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please select a frequency",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Generate PDF using the dashboard data
+    generatePDFReport(dashboardSummary);
+  };
+
+  const handleExport = () => {
+    if (!startDate || !endDate) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please select both start and end dates",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Generate PDF using the dashboard data
+    generatePDFReport(dashboardSummary);
+  };
 
   // Add the renderInventoryStats function
   const renderInventoryStats = () => {
@@ -413,31 +780,34 @@ const Reports = () => {
     }
 
     // Combine orders and bookings into one array
-    const orders = dashboardSummary.recentActivity.orders?.map(order => ({
-      type: 'Order',
-      id: order._id,
-      name: order.products?.[0]?.name || 'Product',
-      vendor: order.vendorName,
-      total: order.totalPrice || 0,
-      status: order.status || 'Pending',
-      date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
-      tracking: order.trackingId || 'N/A'
-    })) || [];
+    const orders =
+      dashboardSummary.recentActivity.orders?.map((order) => ({
+        type: "Order",
+        id: order._id,
+        name: order.products?.[0]?.name || "Product",
+        vendor: order.vendorName,
+        total: order.totalPrice || 0,
+        status: order.status || "Pending",
+        date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
+        tracking: order.trackingId || "N/A",
+      })) || [];
 
-    const bookings = dashboardSummary.recentActivity.bookings?.map(booking => ({
-      type: 'Booking',
-      id: booking._id,
-      name: booking.services?.[0]?.name || 'Service',
-      vendor: booking.vendorName,
-      total: booking.totalAmount || 0,
-      status: booking.status || 'Pending',
-      date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
-      tracking: 'N/A'
-    })) || [];
+    const bookings =
+      dashboardSummary.recentActivity.bookings?.map((booking) => ({
+        type: "Booking",
+        id: booking._id,
+        name: booking.services?.[0]?.name || "Service",
+        vendor: booking.vendorName,
+        total: booking.totalAmount || 0,
+        status: booking.status || "Pending",
+        date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
+        tracking: "N/A",
+      })) || [];
 
     // Combine and sort by date (newest first)
-    return [...orders, ...bookings]
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    return [...orders, ...bookings].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
   };
 
   return (
@@ -451,13 +821,14 @@ const Reports = () => {
         flexDirection: "column",
       }}
     >
+      <Toast ref={toast} />
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{ marginBottom: "30px" }}
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Reports</h3>
+            <h3 style={{ marginLeft: "40px" }}>Reports</h3>
           </div>
         </div>
       </div>
@@ -479,22 +850,38 @@ const Reports = () => {
             <div className="mr-3">
               <h3>Date Range</h3>
               <div
-                className="border-1 border-gray-200 p-2 rounded-lg"
-                style={{ borderRadius: "10px" }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
               >
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="border-none mr-2"
-                />
-                <span className="mr-2 font-bold">to</span>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="border-none "
-                />
+                <div className="flex align-items-center gap-2">
+                  <Calendar
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.value)}
+                    dateFormat="yy-mm-dd"
+                    placeholder="Start Date"
+                    showIcon
+                    className="p-inputtext-sm"
+                    minDate={new Date(2000, 0, 1)}
+                    maxDate={endDate || new Date(2100, 11, 31)}
+                  />
+                  <span className="font-bold">to</span>
+                  <Calendar
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.value)}
+                    dateFormat="yy-mm-dd"
+                    placeholder="End Date"
+                    showIcon
+                    className="p-inputtext-sm"
+                    minDate={startDate || new Date(2000, 0, 1)}
+                    maxDate={new Date(2100, 11, 31)}
+                  />
+                </div>
+                <small style={{ color: "#666", fontSize: "12px" }}>
+                  Select both start and end dates to generate report
+                </small>
               </div>
             </div>
             <div className="mr-3">
@@ -503,15 +890,14 @@ const Reports = () => {
                 className="border-1 border-gray-200 p-2 rounded-lg"
                 style={{ width: "300px", borderRadius: "10px" }}
               >
-                <select
+                <Dropdown
                   value={reportType}
-                  onChange={(e) => setReportType(e.target.value)}
-                  className="border-none w-full outline-none"
+                  onChange={(e) => setReportType(e.value)}
+                  options={reportTypeOptions}
+                  placeholder="Select Report Type"
+                  className="w-full"
                   style={{ width: "100%" }}
-                >
-                  <option value="Inventory">Inventory</option>
-                  <option value="Bookings">Bookings</option>
-                </select>
+                />
               </div>
             </div>
             <div className="mr-3">
@@ -520,15 +906,14 @@ const Reports = () => {
                 className="border-1 border-gray-200 p-2 rounded-lg"
                 style={{ width: "300px", borderRadius: "10px" }}
               >
-                <select
+                <Dropdown
                   value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
-                  className="border-none w-full outline-none"
+                  onChange={(e) => setFrequency(e.value)}
+                  options={frequencyOptions}
+                  placeholder="Select Frequency"
+                  className="w-full"
                   style={{ width: "100%" }}
-                >
-                  <option value="One-Time">One-Time</option>
-                  <option value="Daily">Daily</option>
-                </select>
+                />
               </div>
             </div>
           </div>
@@ -555,6 +940,7 @@ const Reports = () => {
                   justifyContent: "center",
                   width: "120px",
                 }}
+                onClick={handleExport}
               >
                 <img
                   src={downloadIcon}
@@ -573,6 +959,7 @@ const Reports = () => {
                   borderRadius: "3px",
                   marginLeft: "10px",
                 }}
+                onClick={handleGenerateReport}
               >
                 Generate Report
               </button>
@@ -784,13 +1171,27 @@ const Reports = () => {
         <table className="selling-products-table">
           <thead>
             <tr>
-              <th>Type <img src={sortIcon} alt="sortIcon" /></th>
-              <th>Name <img src={sortIcon} alt="sortIcon" /></th>
-              <th>Vendor <img src={sortIcon} alt="sortIcon" /></th>
-              <th>Date <img src={sortIcon} alt="sortIcon" /></th>
-              <th>Total <img src={sortIcon} alt="sortIcon" /></th>
-              <th>Status <img src={sortIcon} alt="sortIcon" /></th>
-              <th>ID <img src={sortIcon} alt="sortIcon" /></th>
+              <th>
+                Type <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Name <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Vendor <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Date <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Total <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                Status <img src={sortIcon} alt="sortIcon" />
+              </th>
+              <th>
+                ID <img src={sortIcon} alt="sortIcon" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -817,15 +1218,15 @@ const Reports = () => {
                 </td>
               </tr>
             )}
-            {dashboardSummary && 
-             dashboardSummary.recentActivity &&
-             formatRecentActivity().length === 0 && (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
-                  No recent activity found.
-                </td>
-              </tr>
-            )}
+            {dashboardSummary &&
+              dashboardSummary.recentActivity &&
+              formatRecentActivity().length === 0 && (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    No recent activity found.
+                  </td>
+                </tr>
+              )}
           </tbody>
         </table>
       </div>
