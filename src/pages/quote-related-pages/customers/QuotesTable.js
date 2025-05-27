@@ -1,137 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
-import { FiEye, FiEdit, FiCreditCard, FiChevronLeft, FiChevronRight, FiChevronDown } from "react-icons/fi";
+import { FiEye, FiEdit, FiCreditCard, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+
+// Dummy data for fallback (commented out but kept for reference)
+/*
+const dummyQuotes = [
+  {
+    _id: "QTE-2024-001",
+    quoteId: "QTE-2024-001",
+    service: { name: "Maintenance" },
+    vendor: { businessName: "Marine Services Inc." },
+    requestDetails: { location: "Port A, Dock 3" },
+    createdAt: "2025-02-15T10:00:00",
+    status: "pending",
+  },
+  // ... other dummy data
+];
+*/
 
 const QuotesTable = () => {
+  const [quotes, setQuotes] = useState([]);
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const [hoveredAction, setHoveredAction] = useState({}); // { rowIdx: { view: bool, edit: bool, pay: bool } }
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hoveredAction, setHoveredAction] = useState({});
   const pageSize = 10;
+  const navigate = useNavigate();
 
-  // Dummy quote data
-  const quoteItems = [
-    {
-      quoteId: "QTE-2024-001",
-      serviceType: "Maintenance",
-      vendorName: "Marine Services Inc.",
-      location: "Port A, Dock 3",
-      dateTime: "02/15/2025 10:00 AM",
-      status: "Pending",
-    },
-    {
-      quoteId: "QTE-2024-002",
-      serviceType: "Cleaning",
-      vendorName: "CleanSeas Co.",
-      location: "Port B, Dock 7",
-      dateTime: "02/17/2025 2:30 PM",
-      status: "Confirmed",
-    },
-    {
-      quoteId: "QTE-2024-003",
-      serviceType: "Repair",
-      vendorName: "FixIt Marine",
-      location: "Port A, Dock 5",
-      dateTime: "02/18/2025 9:15 AM",
-      status: "Declined",
-    },
-    {
-      quoteId: "QTE-2024-004",
-      serviceType: "Inspection",
-      vendorName: "SafeSeas Inspectors",
-      location: "Port C, Dock 2",
-      dateTime: "02/20/2025 11:45 AM",
-      status: "Accepted",
-    },
-    {
-      quoteId: "QTE-2024-005",
-      serviceType: "Refueling",
-      vendorName: "Marine Fuels Ltd.",
-      location: "Port B, Dock 1",
-      dateTime: "02/21/2025 8:00 AM",
-      status: "Pending",
-    },
-    {
-      quoteId: "QTE-2024-006",
-      serviceType: "Maintenance",
-      vendorName: "Marine Services Inc.",
-      location: "Port A, Dock 3",
-      dateTime: "02/22/2025 10:00 AM",
-      status: "Pending",
-    },
-    {
-      quoteId: "QTE-2024-007",
-      serviceType: "Cleaning",
-      vendorName: "CleanSeas Co.",
-      location: "Port B, Dock 7",
-      dateTime: "02/23/2025 2:30 PM",
-      status: "Confirmed",
-    },
-    {
-      quoteId: "QTE-2024-008",
-      serviceType: "Repair",
-      vendorName: "FixIt Marine",
-      location: "Port A, Dock 5",
-      dateTime: "02/24/2025 9:15 AM",
-      status: "Declined",
-    },
-    {
-      quoteId: "QTE-2024-009",
-      serviceType: "Inspection",
-      vendorName: "SafeSeas Inspectors",
-      location: "Port C, Dock 2",
-      dateTime: "02/25/2025 11:45 AM",
-      status: "Accepted",
-    },
-    {
-      quoteId: "QTE-2024-010",
-      serviceType: "Refueling",
-      vendorName: "Marine Fuels Ltd.",
-      location: "Port B, Dock 1",
-      dateTime: "02/26/2025 8:00 AM",
-      status: "Pending",
-    },
-    {
-      quoteId: "QTE-2024-011",
-      serviceType: "Maintenance",
-      vendorName: "Marine Services Inc.",
-      location: "Port A, Dock 3",
-      dateTime: "02/27/2025 10:00 AM",
-      status: "Pending",
-    },
-    {
-      quoteId: "QTE-2024-012",
-      serviceType: "Cleaning",
-      vendorName: "CleanSeas Co.",
-      location: "Port B, Dock 7",
-      dateTime: "02/28/2025 2:30 PM",
-      status: "Confirmed",
-    },
-    {
-      quoteId: "QTE-2024-013",
-      serviceType: "Repair",
-      vendorName: "FixIt Marine",
-      location: "Port A, Dock 5",
-      dateTime: "03/01/2025 9:15 AM",
-      status: "Declined",
-    },
-    {
-      quoteId: "QTE-2024-014",
-      serviceType: "Inspection",
-      vendorName: "SafeSeas Inspectors",
-      location: "Port C, Dock 2",
-      dateTime: "03/02/2025 11:45 AM",
-      status: "Accepted",
-    },
-    {
-      quoteId: "QTE-2024-015",
-      serviceType: "Refueling",
-      vendorName: "Marine Fuels Ltd.",
-      location: "Port B, Dock 1",
-      dateTime: "03/03/2025 8:00 AM",
-      status: "Pending",
-    },
-  ];
+  // Fetch quotes from API
+  const fetchQuotes = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/customer?page=${currentPage}&limit=${pageSize}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch quotes');
+      }
+
+      const data = await response.json();
+      // Support both wrapped and unwrapped paginated responses
+      const paginated = data.data || data;
+      console.log("Paginated is:", paginated);
+      console.log("Paginated.result is:", paginated.result);
+      if (Array.isArray(paginated.result)) {
+        setQuotes(paginated.result);
+        setTotalPages(paginated.totalPages || 1);
+        setTotalItems(paginated.totalData || 0);
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (err) {
+      console.error('Error fetching quotes:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuotes();
+  }, [currentPage]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -154,33 +94,43 @@ const QuotesTable = () => {
   };
 
   const getStatusBadgeStyle = (status) => {
-    switch (status) {
-      case "Pending":
+    switch (status?.toLowerCase()) {
+      case "pending":
         return { background: "#fff8e6", color: "#b98900" };
-      case "Confirmed":
+      case "quoted":
         return { background: "#e6f7ee", color: "#1d9d74" };
-      case "Accepted":
+      case "accepted":
         return { background: "#e6f0ff", color: "#3366ff" };
-      case "Declined":
+      case "declined":
+        return { background: "#ffebeb", color: "#ff4d4f" };
+      case "deposit_paid":
+        return { background: "#e6f7ee", color: "#1d9d74" };
+      case "final_payment_due":
+        return { background: "#fff8e6", color: "#b98900" };
+      case "completed":
+        return { background: "#e6f7ee", color: "#1d9d74" };
+      case "cancelled":
         return { background: "#ffebeb", color: "#ff4d4f" };
       default:
         return { background: "#f3f4f6", color: "#64748b" };
     }
   };
 
-  // Optionally sort the data
-  const sortedQuotes = [...quoteItems].sort((a, b) => {
+  // Sort quotes
+  const sortedQuotes = [...quotes].sort((a, b) => {
     if (!sortField) return 0;
-    if (a[sortField] < b[sortField]) return sortDirection === "asc" ? -1 : 1;
-    if (a[sortField] > b[sortField]) return sortDirection === "asc" ? 1 : -1;
+    const aValue = sortField.includes('.') 
+      ? sortField.split('.').reduce((obj, key) => obj?.[key], a)
+      : a[sortField];
+    const bValue = sortField.includes('.')
+      ? sortField.split('.').reduce((obj, key) => obj?.[key], b)
+      : b[sortField];
+    
+    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
-  // Pagination logic
-  const totalPages = Math.ceil(sortedQuotes.length / pageSize);
-  const paginatedQuotes = sortedQuotes.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-  // Helper for action button hover
   const handleActionHover = (rowIdx, action, isHover) => {
     setHoveredAction((prev) => ({
       ...prev,
@@ -191,6 +141,117 @@ const QuotesTable = () => {
     }));
   };
 
+  // Loading UI
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: 420, 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center", 
+        width: "100%",
+        background: "#fff",
+        borderRadius: 12,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ 
+            margin: "0 auto 12px", 
+            border: "4px solid #e5e7eb", 
+            borderTop: "4px solid #0387d9", 
+            borderRadius: "50%", 
+            width: 40, 
+            height: 40, 
+            animation: "spin 1s linear infinite" 
+          }} />
+          <div style={{ color: "#64748b", fontSize: 16 }}>Loading quotes...</div>
+        </div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }`}</style>
+      </div>
+    );
+  }
+
+  // Error UI
+  if (error) {
+    return (
+      <div style={{ 
+        minHeight: 420, 
+        display: "flex", 
+        flexDirection: "column",
+        alignItems: "center", 
+        justifyContent: "center", 
+        width: "100%",
+        background: "#fff",
+        borderRadius: 12,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        padding: 24
+      }}>
+        <div style={{ 
+          color: "#ff4d4f", 
+          fontSize: 16, 
+          background: "#fff0f0", 
+          padding: 24, 
+          borderRadius: 8, 
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          marginBottom: 16
+        }}>
+          {error}
+        </div>
+        <button
+          onClick={fetchQuotes}
+          style={{
+            background: "#0387d9",
+            color: "#fff",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: 6,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 14
+          }}
+        >
+          <FiRefreshCw size={16} />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  // No data UI
+  if (!sortedQuotes.length) {
+    return (
+      <div style={{ 
+        minHeight: 420, 
+        display: "flex", 
+        flexDirection: "column",
+        alignItems: "center", 
+        justifyContent: "center", 
+        width: "100%",
+        background: "#fff",
+        borderRadius: 12,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        padding: 24
+      }}>
+        <div style={{ 
+          color: "#64748b", 
+          fontSize: 16, 
+          background: "#f8fafc", 
+          padding: 24, 
+          borderRadius: 8,
+          marginBottom: 16,
+          textAlign: "center"
+        }}>
+          <h3 style={{ margin: "0 0 8px 0", color: "#1e293b" }}>No Quotes Found</h3>
+          <p style={{ margin: 0, color: "#64748b" }}>
+            You haven't made any quote requests yet.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: 0, margin: 0, width: "100%", minWidth: 900, maxWidth: "100%", minHeight: 420, display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
       <div style={{ padding: 24, background: "#fff", borderRadius: 12, marginTop: 0, width: "100%", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
@@ -198,11 +259,11 @@ const QuotesTable = () => {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
             <thead>
               <tr style={{ background: "#f8fafc" }}>
-                <th style={{ width: "12%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("quoteId")}>Quote ID {getSortIcon("quoteId")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("serviceType")}>Service Type {getSortIcon("serviceType")}</th>
-                <th style={{ width: "20%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("vendorName")}>Vendor Name {getSortIcon("vendorName")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("location")}>Location {getSortIcon("location")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("dateTime")}>Date & Time {getSortIcon("dateTime")}</th>
+                <th style={{ width: "12%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("_id")}>Quote ID {getSortIcon("_id")}</th>
+                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("service.name")}>Service Type {getSortIcon("service.name")}</th>
+                <th style={{ width: "20%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("vendor.businessName")}>Service Provider {getSortIcon("vendor.businessName")}</th>
+                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("requestDetails")}>Location {getSortIcon("requestDetails")}</th>
+                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("createdAt")}>Date & Time {getSortIcon("createdAt")}</th>
                 <th style={{ width: "10%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("status")}>Status {getSortIcon("status")}</th>
                 <th style={{ width: "13%", textAlign: "right", padding: "10px", borderBottom: "1px solid #eee" }}>
                   <div style={{ display: "flex", justifyContent: "flex-end" }}>Actions</div>
@@ -210,20 +271,20 @@ const QuotesTable = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedQuotes.map((quote, idx) => (
-                <tr key={quote.quoteId} style={{ borderBottom: "1px solid #eee", background: idx % 2 === 1 ? "#fafbfc" : "#fff" }}>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.quoteId}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.serviceType}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.vendorName}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.location}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.dateTime}</td>
+              {sortedQuotes.map((quote, idx) => (
+                <tr key={quote._id} style={{ borderBottom: "1px solid #eee", background: idx % 2 === 1 ? "#fafbfc" : "#fff" }}>
+                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote._id}</td>
+                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.service?.name || "-"}</td>
+                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.vendor?.businessName || "-"}</td>
+                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.requestDetails || "-"}</td>
+                  <td style={{ padding: "10px", color: "#1e293b" }}>{new Date(quote.createdAt).toLocaleString()}</td>
                   <td style={{ padding: "10px" }}>
                     <span style={{ ...getStatusBadgeStyle(quote.status), padding: "4px 12px", borderRadius: 20, fontWeight: 500, fontSize: 12 }}>
                       {quote.status}
                     </span>
                   </td>
                   <td style={{ padding: "10px" }}>
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
+                    <div style={{ display: "flex", gap: "3px", justifyContent: "flex-end" }}>
                       {/* View Button */}
                       <div
                         style={{
@@ -238,6 +299,7 @@ const QuotesTable = () => {
                         title="View Details"
                         onMouseEnter={() => handleActionHover(idx, "view", true)}
                         onMouseLeave={() => handleActionHover(idx, "view", false)}
+                        onClick={() => navigate(`/crew/quotes/${quote._id}`)}
                       >
                         <FiEye size={18} color={hoveredAction[idx]?.view ? "#0387d9" : undefined} />
                       </div>
@@ -272,6 +334,7 @@ const QuotesTable = () => {
                         title="Pay"
                         onMouseEnter={() => handleActionHover(idx, "pay", true)}
                         onMouseLeave={() => handleActionHover(idx, "pay", false)}
+                        onClick={() => navigate(`/crew/quotes/${quote._id}/pay`)}
                       >
                         <FiCreditCard size={18} color={hoveredAction[idx]?.pay ? "#0387d9" : undefined} />
                       </div>
@@ -286,10 +349,10 @@ const QuotesTable = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #e5e7eb", background: "#fff", padding: "8px 16px", marginTop: 8, height: 50 }}>
           {/* Left: Items per page and count */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ color: "#6b7280", fontSize: 13, padding: 6 }}>10</span>
+            <span style={{ color: "#6b7280", fontSize: 13, padding: 6 }}>{pageSize}</span>
             <FiChevronDown style={{ fontSize: 13, color: "#6b7280" }} />
             <span style={{ color: "#6b7280", fontSize: 13 }}>Items Per Page</span>
-            <span style={{ color: "#6b7280", fontSize: 13 }}>{(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, sortedQuotes.length)} Of {sortedQuotes.length} Items</span>
+            <span style={{ color: "#6b7280", fontSize: 13 }}>{(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalItems)} Of {totalItems} Items</span>
           </div>
           {/* Right: Page navigation */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
