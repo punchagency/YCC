@@ -24,11 +24,13 @@ import {
 } from "chart.js";
 
 import { getDashboardSummary } from "../../../services/crew/crewReport";
+
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
+
 
 // Register the components
 ChartJS.register(
@@ -969,6 +971,94 @@ const Reports = () => {
     );
   };
 
+  // Add the renderInventoryStats function
+  const renderInventoryStats = () => {
+    if (!dashboardSummary || !dashboardSummary.inventory) {
+      return (
+        <div className="pending-order-container">
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Low Stock</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Total Items</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+          <div style={{ marginRight: "5px" }}>
+            <p style={{ fontSize: "13px" }}>Total value</p>
+            <p style={{ fontSize: "12px" }}>--</p>
+          </div>
+        </div>
+      );
+    }
+
+    const { lowStockItems, totalItems, totalValue } =
+      dashboardSummary.inventory;
+
+    return (
+      <div className="pending-order-container">
+        <div style={{ marginRight: "5px" }}>
+          <p
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              minWidth: "50px",
+              fontSize: "13px",
+            }}
+          >
+            Low Stock
+          </p>
+          <p style={{ fontSize: "12px" }}>{lowStockItems || 0}</p>
+        </div>
+        <div style={{ marginRight: "5px" }}>
+          <p style={{ fontSize: "13px" }}>Total Items</p>
+          <p style={{ fontSize: "12px" }}>{totalItems || 0}</p>
+        </div>
+        <div style={{ marginRight: "5px" }}>
+          <p style={{ fontSize: "13px" }}>Total value</p>
+          <p style={{ fontSize: "12px" }}>
+            ${totalValue ? totalValue.toLocaleString() : 0}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  // Add this function to format the recent activity data for the table
+  const formatRecentActivity = () => {
+    if (!dashboardSummary || !dashboardSummary.recentActivity) {
+      return [];
+    }
+
+    // Combine orders and bookings into one array
+    const orders = dashboardSummary.recentActivity.orders?.map(order => ({
+      type: 'Order',
+      id: order._id,
+      name: order.products?.[0]?.name || 'Product',
+      vendor: order.vendorName,
+      total: order.totalPrice || 0,
+      status: order.status || 'Pending',
+      date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
+      tracking: order.trackingId || 'N/A'
+    })) || [];
+
+    const bookings = dashboardSummary.recentActivity.bookings?.map(booking => ({
+      type: 'Booking',
+      id: booking._id,
+      name: booking.services?.[0]?.name || 'Service',
+      vendor: booking.vendorName,
+      total: booking.totalAmount || 0,
+      status: booking.status || 'Pending',
+      date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
+      tracking: 'N/A'
+    })) || [];
+
+    // Combine and sort by date (newest first)
+    return [...orders, ...bookings]
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+
   return (
     <div
       style={{
@@ -1009,6 +1099,7 @@ const Reports = () => {
             <div className="mr-3">
               <h3>Date Range</h3>
               <div
+
                 style={{
                   display: "flex",
                   flexDirection: "column",
@@ -1041,6 +1132,7 @@ const Reports = () => {
                 <small style={{ color: "#666", fontSize: "12px" }}>
                   Select both start and end dates to generate report
                 </small>
+
               </div>
             </div>
             <div className="mr-3">
@@ -1049,7 +1141,9 @@ const Reports = () => {
                 className="border-1 border-gray-200 p-2 rounded-lg"
                 style={{ width: "300px", borderRadius: "10px" }}
               >
+
                 <Dropdown
+
                   value={reportType}
                   onChange={(e) => setReportType(e.value)}
                   options={reportTypeOptions}
@@ -1065,7 +1159,9 @@ const Reports = () => {
                 className="border-1 border-gray-200 p-2 rounded-lg"
                 style={{ width: "300px", borderRadius: "10px" }}
               >
+
                 <Dropdown
+
                   value={frequency}
                   onChange={(e) => setFrequency(e.value)}
                   options={frequencyOptions}
@@ -1330,6 +1426,7 @@ const Reports = () => {
         <table className="selling-products-table">
           <thead>
             <tr>
+
               <th>
                 Type <img src={sortIcon} alt="sortIcon" />
               </th>
@@ -1351,6 +1448,7 @@ const Reports = () => {
               <th>
                 ID <img src={sortIcon} alt="sortIcon" />
               </th>
+
             </tr>
           </thead>
           <tbody>
@@ -1377,6 +1475,7 @@ const Reports = () => {
                 </td>
               </tr>
             )}
+
             {dashboardSummary &&
               dashboardSummary.recentActivity &&
               formatRecentActivity().length === 0 && (
@@ -1386,6 +1485,7 @@ const Reports = () => {
                   </td>
                 </tr>
               )}
+
           </tbody>
         </table>
       </div>
