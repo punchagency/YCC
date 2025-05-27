@@ -734,7 +734,7 @@ const Bookings = () => {
             <h3
               style={{
                 fontSize: isMobile ? "16px" : isTablet ? "18px" : "20px",
-                margin: "0 0 10px 20px",
+                margin: "0 0 10px 40px",
               }}
             >
               Bookings

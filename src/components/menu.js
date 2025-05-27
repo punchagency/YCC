@@ -224,15 +224,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
 
       command: () => navigate("/crew/notifications"),
     },
-    {
-      label: "Settings",
-      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
-      className:
-        location.pathname === "/crew/settings"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/settings"),
-    },
+
     {
       label: "Reports",
       icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
@@ -241,6 +233,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           ? "active-menu-item menu-red-background"
           : "",
       command: () => navigate("/crew/reports"),
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/settings"),
     },
     {
       separator: true,

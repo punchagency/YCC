@@ -4,17 +4,7 @@ import { Button } from "primereact/button";
 // import { useNavigate } from "react-router-dom";
 // import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
-// import lone from "../../assets/images/crew/lone.png";
-// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-// import iconexpire from "../../assets/images/crew/iconexpire.png";
-// import iconcareer from "../../assets/images/crew/iconcareer.png";
-// import { Chart as ChartJS } from "chart.js/auto";
-// import { Bar, Doughnut, Line } from "react-chartjs-2";
-// import sourceData from "../../data/sourceData.json";
-// import analyticsData from "../../data/analyticsData.json";
-// import sort from "../../assets/images/crew/sort.png";
-// import editLogo from "../../assets/images/crew/editLogo.png";
-// import deleteLogo from "../../assets/images/crew/deleteLogo.png";
+
 import plus from "../../../assets/images/crew/plus.png";
 import profilenoti from "../../../assets/images/crew/profilenoti.png";
 // import man1 from "../../assets/images/crew/Man1.png";
@@ -1294,10 +1284,10 @@ export default function CalendarPage() {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Calendar</h3>
+            <h3 style={{marginLeft:"40px"}}>Calendar</h3>
           </div>
         </div>
-        <div className="sub-header-right">
+        <div className="sub-header-right mr-4" >
           <Button
             label="Add Event"
             className="p-button-primary"

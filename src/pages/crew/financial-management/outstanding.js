@@ -73,19 +73,20 @@ const Outstanding = () => {
             <h3
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "10px",
+                marginLeft: "40px",
               }}
             >
               Financial Management
             </h3>
             <div style={{ marginRight: "10px" }}>
               <button
-                className="text-white px-4 py-2 rounded-md"
+                className="text-white px-4 py-2 rounded-md mr-4"
                 style={{
                   borderRadius: "4px",
                   border: "none",
                   backgroundColor: "#0387D9",
                   cursor: "pointer",
+                  
                 }}
                 onClick={() => setShowExpenseModal(true)}
               >

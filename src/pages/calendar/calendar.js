@@ -1169,10 +1169,10 @@ export default function CalendarPage() {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Calendar</h3>
+            <h3 style={{ marginLeft: "40px" }}>Calendar</h3>
           </div>
         </div>
-        <div className="sub-header-right">
+        <div className="sub-header-right mr-4">
           <Button
             label="Add Event"
             className="p-button-primary"
@@ -1243,9 +1243,9 @@ export default function CalendarPage() {
               />
               Add New Event
             </button>
-            <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>
+            {/* <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>
               You Are Going To
-            </h3>
+            </h3> */}
           </div>
 
           {isLoading ? (
@@ -1279,6 +1279,69 @@ export default function CalendarPage() {
                   />
                 </React.Fragment>
               ))}
+
+              {/* Upcoming Reminders: show the three soonest upcoming events */}
+              <div>
+                <h4>Upcoming Reminders</h4>
+                <div>
+                  {calendarEvents?.data &&
+                    calendarEvents.data.length > 0 &&
+                    calendarEvents.data
+                      .filter((event) => new Date(event.start) > new Date())
+                      .sort((a, b) => new Date(a.start) - new Date(b.start))
+                      .slice(0, 3)
+                      .map((event, idx) => (
+                        <div
+                          key={event._id || idx}
+                          className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                          style={{
+                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                          }}
+                        >
+                          <div className="flex items-center justify-center">
+                            <div>
+                              <h3 className="text-2xl font-bold">
+                                {new Date(event.start).getDate()}
+                              </h3>
+                            </div>
+                            <div className="mt-3 ml-3">
+                              <p>
+                                {new Date(event.start).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </p>
+                              <p>{event.title}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="flex items-center justify-flex-end">
+                              <img
+                                src={three}
+                                alt="menu"
+                                style={{
+                                  cursor: "pointer",
+                                  marginBottom: "10px",
+                                  marginLeft: "55px",
+                                }}
+                              />
+                            </div>
+                            <span>
+                              <span>
+                                {new Date(event.start).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                </div>
+              </div>
 
               {/* Show See More button if there are more than 2 events */}
               {calendarEvents.data.length > 2 && (
@@ -1529,7 +1592,7 @@ export default function CalendarPage() {
                                   ? "#7F56D9"
                                   : event.type === "workshop"
                                   ? "#F79009"
-                                  : "#F04438",
+                                  : "#0387D9",
                             }}
                           >
                             {event.title}
@@ -1616,7 +1679,7 @@ export default function CalendarPage() {
                             ? "#7F56D9"
                             : type === "workshop"
                             ? "#F79009"
-                            : "#F04438",
+                            : "#0387D9",
                       }}
                     ></span>
                     <span style={{ textTransform: "capitalize" }}>{type}</span>

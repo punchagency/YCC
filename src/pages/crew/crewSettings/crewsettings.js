@@ -65,21 +65,9 @@ const CrewSettings = () => {
   return (
     <>
       <Toast ref={toast} />
-      <div className="settings-page">
-        <div className="settings-header">
-          <div className="settings-header-content">
-            <div className="settings-title">
-              <h3
-                style={{
-                  fontSize: "24px",
-                  fontWeight: "600",
-                  paddingLeft: "20px",
-                }}
-              >
-                Settings
-              </h3>
-            </div>
-          </div>
+      <div className=" mb-4">
+        <div className="mb-6 bg-white p-2 rounded-lg shadow-md">
+          <h3 style={{marginLeft:"40px"}}>Settings</h3>
         </div>
 
         <div className="settings-container">
