@@ -108,14 +108,12 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           command: () => navigate("/crew/legal-resources"),
         },
         {
-          label: "Training & Certifications",
+          label: "Crew Training",
           icon: (
             <img src={calendarLogo} alt="Training" width={15} height={15} />
           ),
-          className:
-            location.pathname === "/crew/training"
-              ? "active-menu-item menu-red-background"
-              : "",
+          className: location.pathname === "/crew/training",
+
           command: () => navigate("/crew/training"),
         },
         {
@@ -128,10 +126,8 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
               height={15}
             />
           ),
-          className:
-            location.pathname === "/crew/accommodation"
-              ? "active-menu-item menu-red-background"
-              : "",
+          className: location.pathname === "/crew/accommodation",
+
           command: () => navigate("/crew/accomodation"),
         },
         {
@@ -228,15 +224,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
 
       command: () => navigate("/crew/notifications"),
     },
-    {
-      label: "Settings",
-      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
-      className:
-        location.pathname === "/crew/settings"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/settings"),
-    },
+
     {
       label: "Reports",
       icon: <img src={reportLogo} alt="Reports" width={15} height={15} />,
@@ -245,6 +233,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           ? "active-menu-item menu-red-background"
           : "",
       command: () => navigate("/crew/reports"),
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/settings"),
     },
     {
       separator: true,
@@ -401,7 +398,8 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
     const style = document.createElement("style");
     style.textContent = `
       .p-panelmenu .p-menuitem-text {
-        transition: color 0.2s;
+        transition: none; /* Remove transition */
+        color: #000000 !important; /* Force black text color */
       }
       
       /* Make all menu items white background, including on hover */
@@ -415,7 +413,13 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         background-color: #FFFFFF !important;
       }
       
-      /* For dark mode compatibility */
+      /* Make all text black explicitly */
+      .p-panelmenu .p-panelmenu-header > a .p-menuitem-text,
+      .p-panelmenu .p-menuitem-link .p-menuitem-text {
+        color: #000000 !important;
+      }
+      
+      /* For dark mode compatibility - keep dark mode with black text */
       .dark .p-panelmenu .p-panelmenu-header > a,
       .dark .p-panelmenu .p-panelmenu-header > a:hover,
       .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link,
@@ -423,16 +427,26 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         background-color: #03141F !important;
       }
       
-      /* Only change text color on hover */
-      .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text,
-      .p-panelmenu .p-menuitem-link:hover .p-menuitem-text {
-        color: #103B57 !important;
+      /* Even in dark mode, keep text black */
+      .dark .p-panelmenu .p-panelmenu-header > a .p-menuitem-text,
+      .dark .p-panelmenu .p-menuitem-link .p-menuitem-text {
+        color: #000000 !important;
       }
       
-      /* Remove any hover effects or transitions */
-      .p-panelmenu .p-panelmenu-header > a .p-panelmenu-icon,
+      /* Remove hover effects for all menu items but keep black text */
+      .p-panelmenu .p-menuitem-link:hover .p-menuitem-text,
+      .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-text {
+        color: #000000 !important;
+        transform: none !important;
+        text-decoration: none !important;
+      }
+      
+      /* Fix any icon hover effects */
+      .p-panelmenu .p-menuitem-link:hover .p-menuitem-icon,
+      .p-panelmenu .p-panelmenu-header > a:hover .p-menuitem-icon,
       .p-panelmenu .p-panelmenu-header > a:hover .p-panelmenu-icon {
-        color: #103B57 !important;
+        color: inherit !important;
+        transform: none !important;
       }
       
       /* Remove any hover borders or outlines */

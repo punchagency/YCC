@@ -780,7 +780,7 @@ const Order = () => {
       >
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Orders</h3>
+            <h3 style={{marginLeft:"40px"}}>Orders</h3>
           </div>
         </div>
       </div>
@@ -1330,7 +1330,7 @@ const Order = () => {
             header="New Order"
             className="order-modal"
           >
-            <div className="p-fluid">
+            <div className="p-fluid" style={{ padding: "40px" }}>
               {/*  Customer Name and Supplier Name */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">

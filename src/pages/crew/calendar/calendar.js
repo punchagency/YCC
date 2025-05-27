@@ -4,17 +4,7 @@ import { Button } from "primereact/button";
 // import { useNavigate } from "react-router-dom";
 // import { TabView, TabPanel } from "primereact/tabview";
 import { InputText } from "primereact/inputtext";
-// import lone from "../../assets/images/crew/lone.png";
-// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-// import iconexpire from "../../assets/images/crew/iconexpire.png";
-// import iconcareer from "../../assets/images/crew/iconcareer.png";
-// import { Chart as ChartJS } from "chart.js/auto";
-// import { Bar, Doughnut, Line } from "react-chartjs-2";
-// import sourceData from "../../data/sourceData.json";
-// import analyticsData from "../../data/analyticsData.json";
-// import sort from "../../assets/images/crew/sort.png";
-// import editLogo from "../../assets/images/crew/editLogo.png";
-// import deleteLogo from "../../assets/images/crew/deleteLogo.png";
+
 import plus from "../../../assets/images/crew/plus.png";
 import profilenoti from "../../../assets/images/crew/profilenoti.png";
 // import man1 from "../../assets/images/crew/Man1.png";
@@ -180,7 +170,36 @@ const EventCard = ({
   );
 };
 
-const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
+const DayEventsModal = ({
+  visible,
+  onHide,
+  events,
+  selectedDate,
+  onUpdate,
+  onDelete,
+  onAddGuest,
+}) => {
+  // Track which menu is open
+  const menuRefs = useRef([]);
+
+  const getEventMenuItems = (event) => [
+    {
+      label: "Update Event",
+      icon: "pi pi-pencil",
+      command: () => onUpdate(event),
+    },
+    {
+      label: "Delete Event",
+      icon: "pi pi-trash",
+      command: () => onDelete(event),
+    },
+    {
+      label: "Add Guest",
+      icon: "pi pi-user-plus",
+      command: () => onAddGuest(event),
+    },
+  ];
+
   return (
     <Dialog
       visible={visible}
@@ -198,7 +217,34 @@ const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
           <p>No events scheduled for this day.</p>
         ) : (
           events.map((event, index) => (
-            <div key={event._id} className="event-item">
+            <div
+              key={event._id}
+              className="event-item"
+              style={{
+                position: "relative",
+                marginBottom: 24,
+                borderBottom: "1px solid #eee",
+                paddingBottom: 16,
+              }}
+            >
+              {/* Three-dot image at top right with menu */}
+              <img
+                src={three}
+                alt="menu"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  cursor: "pointer",
+                }}
+                onClick={(e) => menuRefs.current[index].toggle(e)}
+              />
+              <Menu
+                model={getEventMenuItems(event)}
+                popup
+                ref={(el) => (menuRefs.current[index] = el)}
+                style={{ width: "150px" }}
+              />
               <h3
                 style={{
                   margin: "0 0 10px 0",
@@ -365,7 +411,7 @@ const AllEventsModal = ({
     setShowDeleteEventModal(true);
   };
 
-  const handleUpdateEvent = async () => {
+  const handleEventUpdate = async () => {
     try {
       const result = await updateEvent(selectedEvent._id, {
         title: selectedEvent.title,
@@ -401,7 +447,7 @@ const AllEventsModal = ({
     }
   };
 
-  const handleDeleteEvent = async () => {
+  const handleEventDelete = async () => {
     try {
       const result = await deleteEvent(selectedEvent._id);
 
@@ -611,7 +657,7 @@ const AllEventsModal = ({
                 onClick={() => setShowUpdateEventModal(false)}
                 className="p-button-text"
               />
-              <Button label="Update" onClick={handleUpdateEvent} />
+              <Button label="Update" onClick={handleEventUpdate} />
             </div>
           </div>
         )}
@@ -646,7 +692,7 @@ const AllEventsModal = ({
           />
           <Button
             label="Yes"
-            onClick={handleDeleteEvent}
+            onClick={handleEventDelete}
             className="p-button-danger"
           />
         </div>
@@ -1151,6 +1197,74 @@ export default function CalendarPage() {
     }
   };
 
+  // Confirm update event from main modal
+  const handleUpdateEventConfirm = async () => {
+    try {
+      const result = await updateEvent(selectedEvent._id, {
+        title: selectedEvent.title,
+        start: selectedEvent.start,
+        end: selectedEvent.end,
+        location: selectedEvent.location,
+        description: selectedEvent.description,
+        type: selectedEvent.type,
+      });
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Event updated successfully",
+        });
+        setShowUpdateEventModal(false);
+        setSelectedEvent(null);
+        await loadEvents();
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to update event",
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while updating the event",
+      });
+    }
+  };
+
+  // Confirm delete event from main modal
+  const handleDeleteEventConfirm = async () => {
+    try {
+      const result = await deleteEvent(selectedEvent._id);
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Event deleted successfully",
+        });
+        setShowDeleteEventModal(false);
+        setSelectedEvent(null);
+        // Close the parent modal (DayEventsModal or AllEventsModal)
+        setShowDayEventsModal(false);
+        setShowAllEventsModal(false);
+        await loadEvents();
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to delete event",
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while deleting the event",
+      });
+    }
+  };
+
   return (
     <div
       style={{
@@ -1170,10 +1284,10 @@ export default function CalendarPage() {
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left sub-header-left-with-arrow">
           <div className="content">
-            <h3>Calendar</h3>
+            <h3 style={{marginLeft:"40px"}}>Calendar</h3>
           </div>
         </div>
-        <div className="sub-header-right">
+        <div className="sub-header-right mr-4" >
           <Button
             label="Add Event"
             className="p-button-primary"
@@ -1244,9 +1358,9 @@ export default function CalendarPage() {
               />
               Add New Event
             </button>
-            <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>
+            {/* <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>
               You Are Going To
-            </h3>
+            </h3> */}
           </div>
 
           {isLoading ? (
@@ -1281,100 +1395,66 @@ export default function CalendarPage() {
                 </React.Fragment>
               ))}
 
-              {/* Move the Upcoming Reminders section outside the map function */}
+              {/* Upcoming Reminders: show the three soonest upcoming events */}
               <div>
                 <h4>Upcoming Reminders</h4>
                 <div>
-                  <div
-                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
-                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <div>
-                        <h3 className="text-2xl font-bold">17</h3>
-                      </div>
-                      <div className="mt-3 ml-3">
-                        <p>April 17</p>
-                        <p>Service Book</p>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="flex items-center justify-flex-end">
-                        <img
-                          src={three}
-                          alt="menu"
+                  {calendarEvents?.data &&
+                    calendarEvents.data.length > 0 &&
+                    calendarEvents.data
+                      .filter((event) => new Date(event.start) > new Date())
+                      .sort((a, b) => new Date(a.start) - new Date(b.start))
+                      .slice(0, 3)
+                      .map((event, idx) => (
+                        <div
+                          key={event._id || idx}
+                          className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
                           style={{
-                            cursor: "pointer",
-                            marginBottom: "10px",
-                            marginLeft: "55px",
+                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
                           }}
-                        />
-                      </div>
-                      <span>
-                        <span>9:00AM</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
-                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <div>
-                        <h3 className="text-2xl font-bold">18</h3>
-                      </div>
-                      <div className="mt-3 ml-3">
-                        <p>April 17</p>
-                        <p>Custome Event</p>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="flex items-center justify-flex-end">
-                        <img
-                          src={three}
-                          alt="menu"
-                          style={{
-                            cursor: "pointer",
-                            marginBottom: "10px",
-                            marginLeft: "55px",
-                          }}
-                        />
-                      </div>
-                      <span>
-                        <span>9:00AM</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div
-                    className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
-                    style={{ boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)" }}
-                  >
-                    <div className="flex items-center justify-center">
-                      <div>
-                        <h3 className="text-2xl font-bold">19</h3>
-                      </div>
-                      <div className="mt-3 ml-3">
-                        <p>April 17</p>
-                        <p>Truing</p>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <div className="flex items-center justify-flex-end">
-                        <img
-                          src={three}
-                          alt="menu"
-                          style={{
-                            cursor: "pointer",
-                            marginBottom: "10px",
-                            marginLeft: "55px",
-                          }}
-                        />
-                      </div>
-                      <span className="mt-5">
-                        <span className="text-gray-500 mt-5">9:00AM</span>
-                      </span>
-                    </div>
-                  </div>
+                        >
+                          <div className="flex items-center justify-center">
+                            <div>
+                              <h3 className="text-2xl font-bold">
+                                {new Date(event.start).getDate()}
+                              </h3>
+                            </div>
+                            <div className="mt-3 ml-3">
+                              <p>
+                                {new Date(event.start).toLocaleDateString(
+                                  undefined,
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </p>
+                              <p>{event.title}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="flex items-center justify-flex-end">
+                              <img
+                                src={three}
+                                alt="menu"
+                                style={{
+                                  cursor: "pointer",
+                                  marginBottom: "10px",
+                                  marginLeft: "55px",
+                                }}
+                              />
+                            </div>
+                            <span>
+                              <span>
+                                {new Date(event.start).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                 </div>
               </div>
 
@@ -1733,6 +1813,9 @@ export default function CalendarPage() {
         onHide={() => setShowDayEventsModal(false)}
         events={selectedDateEvents}
         selectedDate={selectedModalDate}
+        onUpdate={handleEventUpdate}
+        onDelete={handleEventDelete}
+        onAddGuest={handleAddGuest}
       />
 
       <AllEventsModal
@@ -1887,30 +1970,7 @@ export default function CalendarPage() {
                 onClick={() => setShowUpdateEventModal(false)}
                 className="p-button-text"
               />
-              <Button
-                label="Update"
-                onClick={async () => {
-                  const result = await updateEvent(
-                    selectedEvent._id,
-                    selectedEvent
-                  );
-                  if (result.success) {
-                    toast.current.show({
-                      severity: "success",
-                      summary: "Success",
-                      detail: "Event updated successfully",
-                    });
-                    setShowUpdateEventModal(false);
-                    loadEvents();
-                  } else {
-                    toast.current.show({
-                      severity: "error",
-                      summary: "Error",
-                      detail: result.error || "Failed to update event",
-                    });
-                  }
-                }}
-              />
+              <Button label="Update" onClick={handleUpdateEventConfirm} />
             </div>
           </div>
         )}
@@ -1944,24 +2004,7 @@ export default function CalendarPage() {
           />
           <Button
             label="Yes"
-            onClick={async () => {
-              const result = await deleteEvent(selectedEvent._id);
-              if (result.success) {
-                toast.current.show({
-                  severity: "success",
-                  summary: "Success",
-                  detail: "Event deleted successfully",
-                });
-                setShowDeleteEventModal(false);
-                loadEvents();
-              } else {
-                toast.current.show({
-                  severity: "error",
-                  summary: "Error",
-                  detail: result.error || "Failed to delete event",
-                });
-              }
-            }}
+            onClick={handleDeleteEventConfirm}
             className="p-button-danger"
           />
         </div>

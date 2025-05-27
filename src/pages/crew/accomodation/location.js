@@ -6,7 +6,7 @@ const Location = () => {
       <div className="p-3">
         <div className="flex justify-content-between align-items-center">
           <div>
-            <h2>Crew Accomodation</h2>
+            <h2 style={{marginLeft:"20px"}}>Crew Accomodation</h2>
           </div>
           <div>
             <select

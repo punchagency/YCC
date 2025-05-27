@@ -70,6 +70,7 @@ import RespondToQuote from "./pages/quote-related-pages/service-providers/respon
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
 
+
 function App() {
   return (
     <UserProvider>
@@ -216,6 +217,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              
               <Route
                 path="/crew/legal-resources"
                 element={

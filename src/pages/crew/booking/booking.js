@@ -3,10 +3,11 @@ import { Routes, Route } from "react-router-dom";
 import CrewBookingsAndQuotes from "./CrewBookingsAndQuotes";
 import BookingDetails from "./details";
 import ModifyService from "./modifyservice";
-
+import CreateBooking from "./createBooking";
 const Booking = () => {
   return (
     <div>
+      <CreateBooking />
       <Routes>
         <Route index element={<CrewBookingsAndQuotes />} />
         <Route path="details/:bookingId" element={<BookingDetails />} />
