@@ -30,9 +30,9 @@ const VendorStarted = ({ name }) => {
     },
     {
       image: crew,
-      alt: "suppliers",
-      newText: "Supplier",
-      text: "supplier",
+      alt: "vendor",
+      newText: "Vendor",
+      text: "vendor",
       path: "/vendor/signup",
     },
     // {

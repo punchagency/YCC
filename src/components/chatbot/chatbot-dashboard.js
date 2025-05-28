@@ -208,9 +208,9 @@ const ChatbotDashboard = () => {
                             </Box>
 
                             <Box>
-                                <IconButton onClick={() => setIsAIAssistantOpen(false)} sx={{ color: "white" }}>
+                                {/* <IconButton onClick={() => setIsAIAssistantOpen(false)} sx={{ color: "white" }}>
                                     <OptionsIcon />
-                                </IconButton>
+                                </IconButton> */}
                             </Box>
                         </Box>
 

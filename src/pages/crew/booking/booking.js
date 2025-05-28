@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import BookingTable from "./table";
+import CrewBookingsAndQuotes from "./CrewBookingsAndQuotes";
 import BookingDetails from "./details";
 import ModifyService from "./modifyservice";
 import CreateBooking from "./createBooking";
@@ -9,7 +9,7 @@ const Booking = () => {
     <div>
       <CreateBooking />
       <Routes>
-        <Route index element={<BookingTable />} />
+        <Route index element={<CrewBookingsAndQuotes />} />
         <Route path="details/:bookingId" element={<BookingDetails />} />
         <Route path="modify-service/:bookingId" element={<ModifyService />} />
       </Routes>

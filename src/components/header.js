@@ -332,7 +332,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           }}
         >
           {/* Filter By Button and Menu */}
-          <Menu model={filterItems} popup ref={filterMenuRef} />
+          {/* <Menu model={filterItems} popup ref={filterMenuRef} />
           <Button
             label="Filter By"
             icon={
@@ -362,10 +362,10 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               justifyContent: "center",
               gap: "4px",
             }}
-          />
+          /> */}
 
           {/* Sort By Button and Menu */}
-          <Menu model={sortItems} popup ref={sortMenuRef} />
+          {/* <Menu model={sortItems} popup ref={sortMenuRef} />
           <Button
             label="Sort By"
             icon={
@@ -394,7 +394,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               justifyContent: "center",
               gap: "4px",
             }}
-          />
+          /> */}
 
           {/* Share Button and Menu */}
           <Menu model={shareItems} popup ref={shareMenuRef} />
@@ -676,13 +676,13 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             <p>{userName}</p>
             <p>Admin</p>
           </div>
-          <div style={{ marginTop: "-20px" }}>
+          {/* <div style={{ marginTop: "-20px" }}>
             <img
               src={more}
               alt="more"
               style={{ width: "15px", height: "15px" }}
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </>
