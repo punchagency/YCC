@@ -15,6 +15,7 @@ import csvTemplate from '../../../assets/csv-template.csv';
 import excelTemplate from '../../../assets/excel-template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
+import * as XLSX from 'xlsx';
 
 const SupplierOnboardingStep1 = ({ handleNext }) => {
   
@@ -28,8 +29,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const [isLoading, setIsLoading] = useState(false);
   const hasRunRef = useRef(false);
   
-
-  const requiredHeaders = ["product name"]//, "product description", "product price", "product image", "product stock"];
+  const requiredHeaders = ["product name"];
 
   const downloadTemplate = (fileType) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
@@ -52,8 +52,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
     }
   }, [error]);
 
-
-
   useEffect(() => {
     if (hasRunRef.current) return; // prevent second run
     hasRunRef.current = true;
@@ -68,7 +66,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
     verifyInventoryUpload();
   }, [handleNext, verifyOnboardingStep1]);
 
-
   const handleOpenDialog = (type) => {
     setDialogType(type);
     setShowDialog(true);
@@ -79,6 +76,15 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
     setDialogType(null);
     setSelectedFile(null);
     setApiEndpoint("");
+  };
+
+  const validateExcelHeaders = (headers) => {
+    const missing = requiredHeaders.filter(req => !headers.includes(req.toLowerCase()));
+    if (missing.length > 0) {
+      setError(`Missing required fields: ${missing.join(', ')}`);
+      return false;
+    }
+    return true;
   };
 
   const handleFileUpload = (e, dialogType) => {
@@ -103,24 +109,55 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       };
   
       reader.readAsText(file);
-    } else {
-      // Handle Excel separately
+    } else if (dialogType === 'excel') {
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        try {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          
+          if (jsonData.length === 0) {
+            setError('Excel file is empty');
+            return;
+          }
+
+          const headers = jsonData[0].map(header => header.toLowerCase());
+          if (!validateExcelHeaders(headers)) {
+            return;
+          }
+
+          setSelectedFile(file); // Valid file
+        } catch (error) {
+          setError('Error reading Excel file. Please ensure it is a valid Excel file.');
+          console.error('Excel parsing error:', error);
+        }
+      };
+
+      reader.onerror = () => {
+        setError('Error reading file');
+      };
+
+      reader.readAsArrayBuffer(file);
     }
   };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     if (apiEndpoint) {
       console.log("Submitting API endpoint:", apiEndpoint);
     } else if (selectedFile) {
       console.log("Submitting file:", selectedFile);
-    const status = await uploadInventoryData(selectedFile);
-    if (status) {
+      const status = await uploadInventoryData(selectedFile);
+      if (status) {
         handleNext();
         handleCloseDialog();
       }
       setIsLoading(false);
       console.log("Upload status:", status);
-      }
+    }
   };
   
   return (
@@ -134,7 +171,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         <StyledButton variant="contained" onClick={() => handleOpenDialog("csv")}>
           Upload from CSV
         </StyledButton>
-        <StyledButton variant="contained"  disabled={true} onClick={() => handleOpenDialog("excel")}>
+        <StyledButton variant="contained" onClick={() => handleOpenDialog("excel")}>
           Upload from Excel
         </StyledButton>
         <StyledButton variant="contained" disabled={true} onClick={() => handleOpenDialog("api")}>
@@ -155,7 +192,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
               <DescriptionText><InfoOutlined/> Please download the template below that shows how the file should be formatted before uploading</DescriptionText>
             </Box>
 
-                
               {/* Hidden File Input */}
               <input
                 type="file"
@@ -177,7 +213,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
                 <CloudDownloadOutlined/> &nbsp; Download Template
               </StyledSecondaryButton>
           
-
               {/* Button Labeling the Hidden Input */}
               <label htmlFor={`${dialogType}-upload`}>
                 <StyledButton
@@ -189,8 +224,8 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
               </label>
 
               </Box>
-                   {/* Show Selected File */}
-                   {selectedFile && (
+              {/* Show Selected File */}
+              {selectedFile && (
                 <Typography sx={{ mb: 2, fontSize: "14px", fontWeight: "400", color: "#000000" }}>
                   Selected file: {selectedFile.name}
                 </Typography>
@@ -236,50 +271,29 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   );
 };
 
-
-const linearGradient = "linear-gradient(90deg, #034D92, #0487D9)";
-
-const StyledButton = styled(Button)(() => ({
-  position: "relative",
-  border: "none",
-  borderRadius: "8px",
-  textTransform: "none",
-  background: linearGradient, // Set gradient as background
-  color: "white", // Ensure text is readable
-  padding: "10px 20px",
-  fontSize: "14px",
-  fontWeight: "500",
-
+const StyledButton = styled(Button)({
+  backgroundColor: "#1976d2",
+  color: "white",
   "&:hover": {
-      opacity: 0.9, // Slight transparency effect on hover
+    backgroundColor: "#1565c0",
   },
-}));
+});
 
-
-const StyledSecondaryButton = styled(Button)(() => ({
-  position: "relative",
-  borderRadius: "8px",
-  textTransform: "none",
-  background: "white",
-  color: "#034D92",
-  border: "1px solid #034D92",
-  padding: "10px 20px",
-  fontSize: "14px",
-  fontWeight: "500",
+const StyledSecondaryButton = styled(Button)({
+  borderColor: "#1976d2",
+  color: "#1976d2",
   "&:hover": {
-    background: "white",
-    color: "#034D92",
+    borderColor: "#1565c0",
+    backgroundColor: "rgba(25, 118, 210, 0.04)",
   },
-}));
+});
 
-const DescriptionText = styled(Typography)(() => ({
-  fontSize: "14px",
-  fontWeight: "400",
-  color: "#000000",
+const DescriptionText = styled(Typography)({
   display: "flex",
-  flexDirection: "row",
   alignItems: "center",
-  gap: "10px",
-}));
+  gap: "8px",
+  fontSize: "14px",
+  color: "#666",
+});
 
 export default SupplierOnboardingStep1;
