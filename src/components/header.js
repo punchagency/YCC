@@ -34,10 +34,18 @@ import "./header.css";
 import GlobalSearchModal from "./GlobalSearchModal";
 import { Store } from 'lucide-react';
 import { Menu as LucideMenu } from 'lucide-react';
+import { useUser } from "../context/userContext";
+import { checkPendingVendors } from '../services/admin/adminService';
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
   // const location = useLocation();
+  const { user } = useUser();
+
+  if (!role) {
+    role = user.role;
+    console.log(role);
+  }
 
   const overlayPanelRef = useRef(null);
   // const { user } = useUser(); // Get user data from context
@@ -62,9 +70,31 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     sortDirection: "desc"
   });
 
+  const [hasPendingVendors, setHasPendingVendors] = useState(false);
+
   useEffect(() => {
     fetchNotifications();
-  }, []);
+    const checkVendors = async () => {
+      if (role === 'admin') {
+        try {
+          const response = await checkPendingVendors();
+          if (response.status === 'success') {
+            setHasPendingVendors(response.data.hasPendingVendors);
+          }
+        } catch (error) {
+          console.error('Error checking pending vendors:', error);
+        }
+      }
+    };
+
+    // Check immediately
+    checkVendors();
+
+    // Then check every 5 minutes
+    const interval = setInterval(checkVendors, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [role]);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -632,33 +662,50 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         </div> */}
 
         {/* Supplier and Vendor Management Button */}
-        <button
-          onClick={() => navigate('/admin/approve')}
-          className="supplier-management-btn"
-          aria-label="Supplier and Vendor Management"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '40px',
-            height: '40px',
-            background: 'transparent',
-            border: 'none',
-            borderRadius: '50%',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            marginRight: '16px',
-            padding: '8px'
-          }}
-        >
-          <Store 
-            style={{ 
-              width: "24px", 
-              height: "24px", 
-              color: "#0387D9"
-            }} 
-          />
-        </button>
+        {role === "admin" && (
+          <button
+            onClick={() => navigate('/admin/approve')}
+            className="supplier-management-btn"
+            aria-label="Supplier and Vendor Management"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              marginRight: '16px',
+              padding: '8px',
+              position: 'relative'
+            }}
+          >
+            <Store 
+              style={{ 
+                width: "24px", 
+                height: "24px", 
+                color: "#0387D9"
+              }} 
+            />
+            {hasPendingVendors && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '4px',
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#FF4B4B',
+                  borderRadius: '50%',
+                  border: '2px solid #fff'
+                }}
+              />
+            )}
+          </button>
+        )}
 
         {/* Notification Bell */}
         <Button

@@ -418,7 +418,7 @@ const ApprovePage = () => {
   return (
     <div className="approve-page">
       <div className="page-header">
-        <h2>Approve {activeTab === 'suppliers' ? 'Suppliers' : 'Service Providers'}</h2>
+        <h2>Approve New {activeTab === 'suppliers' ? 'Suppliers' : 'Services'}</h2>
         <div className="tab-buttons">
           <Button 
             label="Suppliers" 
