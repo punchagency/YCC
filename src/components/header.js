@@ -690,7 +690,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 color: "#0387D9"
               }} 
             />
-            {hasPendingVendors && (
+            {/* {hasPendingVendors && ( */}
               <div
                 style={{
                   position: 'absolute',
@@ -703,7 +703,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   border: '2px solid #fff'
                 }}
               />
-            )}
+            {/* )} */}
           </button>
         )}
 
