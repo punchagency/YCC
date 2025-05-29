@@ -9,4 +9,56 @@
   .hamburger-container {
     display: none !important; /* Use !important to override inline styles */
   }
+}
+
+.supplier-management-btn {
+  position: relative;
+}
+
+.supplier-management-btn:hover {
+  background: rgba(3, 135, 217, 0.1) !important;
+}
+
+.supplier-management-btn::before {
+  content: "Approve new vendors and services";
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1F2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.supplier-management-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #1F2937 transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.supplier-management-btn:hover::before,
+.supplier-management-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.supplier-management-btn:hover span,
+.supplier-management-btn:hover svg {
+  color: white !important;
 } 
