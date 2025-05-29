@@ -15,7 +15,7 @@ const ApprovePage = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [emailSubject, setEmailSubject] = useState('');
   const [emailContent, setEmailContent] = useState('');
-  const { showToast } = useToast();
+  const { showToast } = useToast(); 
 
   // Dummy data for suppliers
   const suppliers = [
