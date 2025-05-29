@@ -165,7 +165,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
     >
       <Toast ref={toast} />
-      <Typography variant="h6">Choose Upload Method</Typography>
+      <Typography sx={{ fontWeight: "600", textAlign: "center" }} variant="h6">Choose Upload Method</Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <StyledButton variant="contained" onClick={() => handleOpenDialog("csv")}>
@@ -179,20 +179,50 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         </StyledButton>
       </Box>
 
-      <Dialog open={showDialog} onClose={handleCloseDialog}>
-        <DialogTitle>
-          {dialogType === "api"
-            ? "Enter API Endpoint"
-            : `Upload ${dialogType?.toUpperCase()} File`}
-        </DialogTitle>
-        <DialogContent>
+      <Dialog 
+        open={showDialog} 
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: { xs: '95%', sm: '600px', md: '800px' },
+            margin: { xs: '10px', sm: '20px' }
+          }
+        }}
+      >
+        <DialogContent sx={{ 
+          p: { xs: 2, sm: 3 },
+          '&.MuiDialogContent-root': {
+            paddingTop: { xs: 2, sm: 3 }
+          }
+        }}>
+          <DialogTitle sx={{ 
+            p: { xs: 1, sm: 2 },
+            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+          }}>
+            {dialogType === "api"
+              ? "Enter API Endpoint"
+              : `Upload ${dialogType?.toUpperCase()} File`}
+          </DialogTitle>
+
           {(dialogType === "csv" || dialogType === "excel") && (
             <>
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-start", backgroundColor: "#F5F5F5", padding: "20px", borderRadius: "8px" }}>
-              <DescriptionText><InfoOutlined/> Please download the template below that shows how the file should be formatted before uploading</DescriptionText>
-            </Box>
+              <Box sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: 2, 
+                alignItems: "flex-start", 
+                backgroundColor: "#F5F5F5", 
+                padding: { xs: "15px", sm: "20px" }, 
+                borderRadius: "8px" 
+              }}>
+                <DescriptionText>
+                  <InfoOutlined/> Please download the template below that shows how the file should be formatted before uploading
+                </DescriptionText>
+              </Box>
 
-              {/* Hidden File Input */}
               <input
                 type="file"
                 accept={dialogType === "csv" ? ".csv" : ".xlsx,.xls"}
@@ -201,32 +231,69 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
                 id={`${dialogType}-upload`}
               />
 
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 2, alignItems: "flex-start", paddingY: "10px"}}>
-            
-              {/* Download Template */}
-              <StyledSecondaryButton
-                variant="outlined"
-                onClick={() =>
-                  downloadTemplate(dialogType === "csv" ? "csv" : "xlsx")
-                }
-              >
-                <CloudDownloadOutlined/> &nbsp; Download Template
-              </StyledSecondaryButton>
-          
-              {/* Button Labeling the Hidden Input */}
-              <label htmlFor={`${dialogType}-upload`}>
-                <StyledButton
-                  variant="contained"
-                  component="span"
+              <Box sx={{ 
+                display: "flex", 
+                flexDirection: { xs: "column", sm: "row" }, 
+                gap: 2, 
+                alignItems: { xs: "stretch", sm: "flex-start" }, 
+                paddingY: "10px",
+                width: '100%'
+              }}>
+                <StyledSecondaryButton
+                  variant="outlined"
+                  onClick={() => downloadTemplate(dialogType === "csv" ? "csv" : "xlsx")}
+                  fullWidth={true}
+                  sx={{ 
+                    width: { xs: '100%', sm: 'auto' },
+                    minWidth: { xs: '100%', sm: '220px' },
+                    whiteSpace: 'nowrap',
+                    '& .MuiButton-label': {
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    },
+                    '& .MuiSvgIcon-root': {
+                      marginRight: '8px'
+                    }
+                  }}
                 >
-                  <CloudUploadOutlined/> &nbsp; Upload File
-                </StyledButton>
-              </label>
+                  <CloudDownloadOutlined/> Download Template
+                </StyledSecondaryButton>
 
+                <label htmlFor={`${dialogType}-upload`} style={{ width: '100%' }}>
+                  <StyledButton
+                    variant="contained"
+                    component="span"
+                    fullWidth={true}
+                    sx={{ 
+                      width: { xs: '100%', sm: 'auto' },
+                      minWidth: { xs: '100%', sm: '220px' },
+                      whiteSpace: 'nowrap',
+                      '& .MuiButton-label': {
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px'
+                      },
+                      '& .MuiSvgIcon-root': {
+                        marginRight: '8px'
+                      }
+                    }}
+                  >
+                    <CloudUploadOutlined/> Upload File
+                  </StyledButton>
+                </label>
               </Box>
-              {/* Show Selected File */}
+
               {selectedFile && (
-                <Typography sx={{ mb: 2, fontSize: "14px", fontWeight: "400", color: "#000000" }}>
+                <Typography sx={{ 
+                  mb: 2, 
+                  fontSize: { xs: "13px", sm: "14px" }, 
+                  fontWeight: "400", 
+                  color: "#000000",
+                  wordBreak: 'break-word'
+                }}>
                   Selected file: {selectedFile.name}
                 </Typography>
               )}
@@ -241,17 +308,40 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
               onChange={(e) => setApiEndpoint(e.target.value)}
               margin="normal"
               placeholder="https://api.example.com/products"
+              size="small"
             />
           )}
 
           <Typography variant="body2" sx={{ mt: 2, mb: 2 }}>
-            {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+            {error && (
+              <Typography sx={{ 
+                color: "red",
+                fontSize: { xs: "13px", sm: "14px" },
+                wordBreak: 'break-word'
+              }}>
+                {error}
+              </Typography>
+            )}
           </Typography>
 
-          <Box
-            sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}
-          >
-            <Button variant="outlined" onClick={handleCloseDialog} disabled={isLoading}>
+          <Box sx={{ 
+            display: "flex", 
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2, 
+            justifyContent: "flex-end", 
+            mt: 2,
+            width: '100%'
+          }}>
+            <Button 
+              variant="outlined" 
+              onClick={handleCloseDialog} 
+              disabled={isLoading}
+              fullWidth={true}
+              sx={{ 
+                width: { xs: '100%', sm: 'auto' },
+                minWidth: { xs: '100%', sm: '120px' }
+              }}
+            >
               Cancel
             </Button>
             <Button
@@ -261,6 +351,11 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
                 (dialogType === "api" && !apiEndpoint) ||
                 (dialogType !== "api" && !selectedFile)
               }
+              fullWidth={true}
+              sx={{ 
+                width: { xs: '100%', sm: 'auto' },
+                minWidth: { xs: '100%', sm: '120px' }
+              }}
             >
               {isLoading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : "Submit"}
             </Button>

@@ -94,7 +94,7 @@ const createStripeAccount = async () => {
       formData.append("file", selectedFile); // "file" should match the field name expected by multer
   
       try {
-        const response = await fetch("http://localhost:7000/api/inventory/upload", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
           method: "POST",
           body: formData,
           headers: {
