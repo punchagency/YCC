@@ -32,6 +32,8 @@ import {
 } from "../services/reports/reports";
 import "./header.css";
 import GlobalSearchModal from "./GlobalSearchModal";
+import { Store } from 'lucide-react';
+import { Menu as LucideMenu } from 'lucide-react';
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -555,7 +557,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
         {/* <div
           style={{
             display: "flex",
@@ -628,6 +630,35 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             }}
           />
         </div> */}
+
+        {/* Supplier and Vendor Management Button */}
+        <button
+          onClick={() => navigate('/admin/approve')}
+          className="supplier-management-btn"
+          aria-label="Supplier and Vendor Management"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '40px',
+            height: '40px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            marginRight: '16px',
+            padding: '8px'
+          }}
+        >
+          <Store 
+            style={{ 
+              width: "24px", 
+              height: "24px", 
+              color: "#0387D9"
+            }} 
+          />
+        </button>
 
         {/* Notification Bell */}
         <Button
