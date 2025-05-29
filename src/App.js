@@ -69,6 +69,7 @@ import { UserProvider } from "./context/userContext";
 import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
+import ApprovePage from './pages/dashboard/admin/approve';
 
 
 
@@ -127,6 +128,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/admin/approve" element={<ApprovePage />} />
               <Route path="/admin/bookings-management" element={<Bookings />} />
               <Route path="/admin/orders-management" element={<Order />} />
               <Route path="/admin/inventory-management" element={<Invent />} />
