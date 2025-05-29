@@ -10,8 +10,9 @@ const OnboardingPageLayout = () => {
   return (
     <Box component="main" sx={{ maxWidth: "100vw" }}>
       <Container maxWidth="xl">
-        {(user?.role === "service_provider" || user?.role === "supplier") && <Outlet />}
+        {/* {(user?.role === "service_provider" || user?.role === "supplier") && <Outlet />} */}
         {user?.role === "admin" && <Navigate to="/admin/dashboard" />}
+        <Outlet />
       </Container>
     </Box>
   );
