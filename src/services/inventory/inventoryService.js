@@ -255,7 +255,7 @@ export const getInventoryItemById = async (id) => {
     const response = await axios.get(`${API_URL}/inventory/${id}`, {
       headers: getAuthHeader(),
     });
-    
+
     return {
       success: true,
       data: response.data.data,
@@ -266,6 +266,76 @@ export const getInventoryItemById = async (id) => {
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch inventory item",
+    };
+  }
+};
+
+export const getAllInventories = async (page = 1, limit = 10) => {
+  try {
+    console.log("Fetching inventories with params:", { page, limit });
+    const url = `${API_URL}/inventory/all-inventories?page=${page}&limit=${limit}`;
+    console.log("Request URL:", url);
+
+    const response = await axios.get(url, {
+      headers: getAuthHeader(),
+    });
+
+    console.log("Raw API Response:", response);
+    console.log("Response Data:", response.data);
+
+    // Check if the response has the expected structure
+    if (response.data && response.data.status) {
+      return {
+        success: true,
+        data: response.data.data,
+        pagination: response.data.pagination,
+        message: response.data.message,
+      };
+    } else {
+      console.warn("API returned unexpected structure:", response.data);
+      return {
+        success: false,
+        error: "Invalid response structure from server",
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching all inventories:", error);
+    console.error("Error details:", {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status,
+    });
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch inventories",
+    };
+  }
+};
+
+export const sendInventoryEmail = async (to, subject, message) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/inventory/send-email`,
+      {
+        to,
+        subject,
+        message,
+      },
+      {
+        headers: getAuthHeader(),
+      }
+    );
+
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error("Error sending inventory email:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to send email",
     };
   }
 };

@@ -27,6 +27,7 @@ import { useToast } from "../../components/Toast";
 // import { TableSkeleton } from "../../components/TableSkeleton"; // Add this import
 import { useTheme } from "../../context/theme/themeContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
+import { getProductsWithVendors } from "../../services/crew/crewOrderService";
 // import { Skeleton } from "primereact/skeleton";
 
 const Order = () => {
@@ -37,6 +38,8 @@ const Order = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchingProducts, setFetchingProducts] = useState(false);
+  const [productsWithVendors, setProductsWithVendors] = useState([]);
   const [summaryData, setSummaryData] = useState({
     allOrders: 0,
     pending: 0,
@@ -50,8 +53,8 @@ const Order = () => {
   const { theme } = useTheme();
   const { allInventoryItems, fetchAllInventoryItems } = useInventory();
 
-  const [supplierOptions, setSupplierOptions] = useState(null);
-  const [productOptions, setProductOptions] = useState(null);
+  const [supplierOptions, setSupplierOptions] = useState([]);
+  const [productOptions, setProductOptions] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -81,12 +84,26 @@ const Order = () => {
   }, []);
 
   const [orderForm, setOrderForm] = useState({
-    supplier: null,
+    supplierId: null,
     customerName: "",
-    products: [{ id: null, quantity: 1 }],
+    deliveryAddress: "",
+    products: [{ id: null, quantity: 1, price: 0 }],
     deliveryDate: null,
     additionalNotes: "",
   });
+
+  const resetForm = () => {
+    setOrderForm({
+      supplierId: null,
+      customerName: "",
+      deliveryAddress: "",
+      products: [{ id: null, quantity: 1, price: 0 }],
+      deliveryDate: null,
+      additionalNotes: "",
+    });
+    setSelectedProduct(null);
+    setSelectedSupplier(null);
+  };
 
   const runCount = useRef(0);
 
@@ -184,59 +201,91 @@ const Order = () => {
   };
 
   const handleSubmit = async () => {
+    console.log("Starting order submission...");
+
+    // Validate required fields
     if (
       !selectedSupplier ||
       !selectedProduct ||
-      !orderForm.customerName ||
+      !orderForm.deliveryAddress ||
       !orderForm.deliveryDate
     ) {
+      console.log("Missing required fields:", {
+        supplier: selectedSupplier,
+        product: selectedProduct,
+        address: orderForm.deliveryAddress,
+        date: orderForm.deliveryDate,
+      });
       showError("Please fill in all required fields");
       return;
     }
 
-    if (orderForm.products[0].quantity === 0) {
-      showError("Quantity cannot be 0");
+    if (orderForm.products[0].quantity <= 0) {
+      console.log("Invalid quantity:", orderForm.products[0].quantity);
+      showError("Quantity must be greater than 0");
       return;
     }
 
     try {
       setIsLoading(true);
+      console.log("Fetching product data...");
+
+      // Get the selected product data
+      const selectedProductData = productsWithVendors.find(
+        (p) => p._id === selectedProduct || p.id === selectedProduct
+      );
+
+      if (!selectedProductData) {
+        console.error("Selected product not found in productsWithVendors");
+        showError("Selected product not found");
+        return;
+      }
+
+      console.log("Selected product data:", selectedProductData);
+
+      // Get price from the correct field
+      const productPrice =
+        selectedProductData.price ||
+        selectedProductData.product?.price ||
+        selectedProductData.stripePriceId
+          ? 100
+          : 0; // Default price if using Stripe
+
+      console.log("Using product price:", productPrice);
 
       // Format the data for the API
       const orderData = {
-        supplierId: selectedSupplier, // Replace with actual supplier ID
-        customerName: orderForm.customerName,
+        supplierId: selectedSupplier,
+        customerName: orderForm.customerName || null,
+        deliveryAddress: orderForm.deliveryAddress,
         products: [
           {
-            id: selectedProduct, // This is now the product ID
+            id: selectedProduct,
             quantity: parseInt(orderForm.products[0].quantity),
+            price: productPrice,
           },
         ],
         deliveryDate: orderForm.deliveryDate,
         additionalNotes: orderForm.additionalNotes || "",
       };
 
-      console.log("Sending order data:", orderData);
+      console.log("Sending order data to API:", orderData);
+
       const response = await createOrder(orderData);
-      console.log("Order response:", response);
+      console.log("Order creation response:", response);
 
       if (response.status) {
+        console.log("Order created successfully");
         showSuccess("Order created successfully");
-
-        // Reset form
-        setOrderForm({
-          customerName: "",
-          products: [{ id: null, quantity: 1 }],
-          deliveryDate: null,
-          additionalNotes: "",
-        });
-
-        setShowOrderForm(false);
+        resetForm();
+        setShowOrderModal(false);
         fetchOrders();
       } else {
+        console.error("Failed to create order:", response.error);
         showError(response.error || "Failed to create order");
       }
     } catch (error) {
+      console.error("Error in handleSubmit:", error);
       showError(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -580,7 +629,7 @@ const Order = () => {
                     className="create-order-button"
                   >
                     <img src={neworder} alt="neworder" />
-                    <span>Create New Order</span>
+                    <span>Create New Orders</span>
                   </button>
                 </td>
               </tr>
@@ -765,6 +814,143 @@ const Order = () => {
     setShowOrderDetailsModal(true);
   };
 
+  // Fetch products with vendors
+  const fetchProductsWithVendors = useCallback(async () => {
+    try {
+      setFetchingProducts(true);
+      console.log("Fetching products with vendors...");
+
+      const response = await getProductsWithVendors();
+      console.log("Products with vendors response:", response);
+
+      if (response.status) {
+        let products = [];
+        if (response.data?.products) {
+          products = response.data.products;
+        } else if (Array.isArray(response.data)) {
+          products = response.data;
+        } else if (typeof response.data === "object") {
+          const possibleArrays = Object.values(response.data).filter((val) =>
+            Array.isArray(val)
+          );
+          if (possibleArrays.length > 0) {
+            products = possibleArrays[0];
+          }
+        }
+
+        if (products.length === 0) {
+          console.warn("No products found in the response");
+          showError("No products available");
+          return;
+        }
+
+        setProductsWithVendors(products);
+
+        // Transform products into dropdown options
+        const productOpts = products.map((product) => {
+          const label =
+            product.name ||
+            product.productName ||
+            (product.product ? product.product.name : "Unknown Product");
+          const value = product._id || product.id;
+          return {
+            label,
+            value,
+            data: product,
+          };
+        });
+
+        setProductOptions(productOpts);
+
+        // Extract unique suppliers from products
+        const uniqueSuppliers = new Map();
+        products.forEach((product) => {
+          const creator = product.creator || product.supplier || product.vendor;
+          if (creator && (creator._id || creator.id)) {
+            const creatorId = creator._id || creator.id;
+            uniqueSuppliers.set(creatorId, {
+              label:
+                creator.businessName ||
+                creator.name ||
+                creator.companyName ||
+                "Unknown Supplier",
+              value: creatorId,
+              data: creator,
+            });
+          }
+        });
+
+        const supplierOpts = Array.from(uniqueSuppliers.values());
+        setSupplierOptions(supplierOpts);
+      } else {
+        console.error("Failed to fetch products with vendors:", response.error);
+        showError("Failed to load products");
+      }
+    } catch (error) {
+      console.error("Error fetching products with vendors:", error);
+      showError("An error occurred while loading products");
+    } finally {
+      setFetchingProducts(false);
+    }
+  }, []);
+
+  // Fetch products when modal opens
+  useEffect(() => {
+    if (showOrderModal) {
+      fetchProductsWithVendors();
+    }
+  }, [showOrderModal, fetchProductsWithVendors]);
+
+  // Update product selection when selectedProduct changes
+  useEffect(() => {
+    if (selectedProduct) {
+      console.log("Product selected:", selectedProduct);
+
+      const updatedProducts = [...orderForm.products];
+      updatedProducts[0].id = selectedProduct;
+
+      // Find the selected product to get its price and auto-select supplier
+      const selectedProductData = productsWithVendors.find(
+        (p) => p._id === selectedProduct || p.id === selectedProduct
+      );
+
+      console.log("Found product data:", selectedProductData);
+
+      if (selectedProductData) {
+        // Get price from the correct field
+        const productPrice =
+          selectedProductData.price ||
+          selectedProductData.product?.price ||
+          selectedProductData.stripePriceId
+            ? 100
+            : 0; // Default price if using Stripe
+
+        console.log("Product price:", productPrice);
+        updatedProducts[0].price = productPrice;
+
+        // Auto-select the supplier based on the product's creator/vendor
+        const creator =
+          selectedProductData.creator ||
+          selectedProductData.supplier ||
+          selectedProductData.vendor;
+        if (creator) {
+          const creatorId = creator._id || creator.id;
+          if (creatorId) {
+            console.log("Auto-selecting supplier:", creatorId);
+            setSelectedSupplier(creatorId);
+          }
+        }
+
+        setOrderForm((prev) => ({
+          ...prev,
+          products: updatedProducts,
+        }));
+      } else {
+        console.warn("Product data not found for selected product");
+      }
+    }
+  }, [selectedProduct, productsWithVendors]);
+
   return loading ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
@@ -778,9 +964,18 @@ const Order = () => {
           color: theme === "light" ? "#103B57" : "#FFFFFF",
         }}
       >
-        <div className="sub-header-left sub-header-left-with-arrow">
+        <div className="sub-header-left sub-header-left-with-arrow flex justify-content-between align-items-center">
           <div className="content">
-            <h3 style={{marginLeft:"40px"}}>Orders</h3>
+            <h3 style={{ marginLeft: "40px" }}>Orders</h3>
+          </div>
+          <div className="mr-3">
+            <button
+              onClick={() => setShowOrderModal(true)}
+              className="create-order-button"
+            >
+              <img src={neworder} alt="neworder" />
+              <span>Create New Order</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1307,15 +1502,7 @@ const Order = () => {
                           border: "none",
                           padding: "16px 0",
                         }}
-                      >
-                        <button
-                          onClick={() => setShowOrderModal(true)}
-                          className="create-order-button"
-                        >
-                          <img src={neworder} alt="neworder" />
-                          <span>Create New Order</span>
-                        </button>
-                      </td>
+                      ></td>
                     </tr>
                   </tbody>
                 </table>
@@ -1325,42 +1512,79 @@ const Order = () => {
 
           <Dialog
             visible={showOrderModal}
-            onHide={() => setShowOrderModal(false)}
+            onHide={() => {
+              setShowOrderModal(false);
+              resetForm();
+            }}
             style={{ width: isMobile ? "95vw" : "70vw" }}
             header="New Order"
             className="order-modal"
+            dismissableMask={true}
           >
             <div className="p-fluid" style={{ padding: "40px" }}>
-              {/*  Customer Name and Supplier Name */}
+              {/* Customer Name and Delivery Address */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
-                  <label htmlFor="customerName">Customer Name*</label>
+                  <label htmlFor="customerName">Customer Name</label>
                   <InputText
                     id="customerName"
                     name="customerName"
                     value={orderForm.customerName}
                     onChange={handleInputChange}
-                    placeholder="Enter customer name"
+                    placeholder="Enter customer name (optional)"
                   />
                 </div>
                 <div className="p-field">
-                  <label htmlFor="selectedProduct">Supplier Name*</label>
-                  <Dropdown
-                    id="selectedProduct"
-                    disabled={true}
-                    value={selectedSupplier}
-                    options={supplierOptions.map((option) => ({
-                      label: option.label,
-                      value: option.value,
-                    }))}
-                    style={{ height: "45px" }}
-                    onChange={(e) => setSelectedSupplier(e.target.value)}
-                    placeholder="supplier generated automatically"
+                  <label htmlFor="deliveryAddress">Delivery Address*</label>
+                  <InputText
+                    id="deliveryAddress"
+                    name="deliveryAddress"
+                    value={orderForm.deliveryAddress}
+                    onChange={handleInputChange}
+                    placeholder="Enter delivery address"
                   />
                 </div>
               </div>
 
-              {/* Stock Quantity and Select Product */}
+              {/* Supplier and Product Selection */}
+              <div className="p-grid p-formgrid form-row">
+                <div className="p-field">
+                  <label htmlFor="supplierId">Supplier Name*</label>
+                  <Dropdown
+                    id="supplierId"
+                    value={selectedSupplier}
+                    options={supplierOptions}
+                    style={{ height: "45px" }}
+                    onChange={(e) => setSelectedSupplier(e.value)}
+                    placeholder={
+                      fetchingProducts
+                        ? "Loading suppliers..."
+                        : "Select a supplier"
+                    }
+                    disabled={fetchingProducts || selectedProduct !== null}
+                    optionLabel="label"
+                  />
+                </div>
+                <div className="p-field">
+                  <label htmlFor="productId">Select Product*</label>
+                  <Dropdown
+                    id="productId"
+                    value={selectedProduct}
+                    options={productOptions}
+                    style={{ height: "45px" }}
+                    onChange={(e) => setSelectedProduct(e.value)}
+                    placeholder={
+                      fetchingProducts
+                        ? "Loading products..."
+                        : "Select a product"
+                    }
+                    disabled={fetchingProducts}
+                    optionLabel="label"
+                  />
+                </div>
+              </div>
+
+              {/* Quantity and Delivery Date */}
               <div className="p-grid p-formgrid form-row">
                 <div className="p-field">
                   <label htmlFor="quantity">Quantity*</label>
@@ -1371,35 +1595,6 @@ const Order = () => {
                     onChange={handleQuantityChange}
                     placeholder="Enter quantity"
                     keyfilter="pint"
-                  />
-                </div>
-                <div className="p-field">
-                  <label htmlFor="selectedProduct">Select Product*</label>
-                  <Dropdown
-                    id="selectedProduct"
-                    value={selectedProduct}
-                    options={productOptions.map((option) => ({
-                      label: option.label,
-                      value: option.value,
-                    }))}
-                    style={{ height: "45px" }}
-                    onChange={(e) => setSelectedProduct(e.target.value)}
-                    placeholder="Select a product"
-                  />
-                </div>
-              </div>
-
-              {/* Order Status and Delivery Date */}
-              <div className="p-grid p-formgrid form-row">
-                <div className="p-field">
-                  <label htmlFor="orderStatus">Order Status*</label>
-                  <Dropdown
-                    id="orderStatus"
-                    value={orderForm.orderStatus}
-                    options={statusOptions}
-                    style={{ height: "45px" }}
-                    onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                    placeholder="Select status"
                   />
                 </div>
                 <div className="p-field">
@@ -1414,13 +1609,13 @@ const Order = () => {
                 </div>
               </div>
 
-              {/* Notes */}
+              {/* Additional Notes */}
               <div className="p-field">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="additionalNotes">Additional Notes</label>
                 <InputText
-                  id="notes"
-                  name="notes"
-                  value={orderForm.notes}
+                  id="additionalNotes"
+                  name="additionalNotes"
+                  value={orderForm.additionalNotes}
                   onChange={handleInputChange}
                   placeholder="Add notes (optional)"
                 />
@@ -1429,18 +1624,19 @@ const Order = () => {
               <div className="dialog-footer">
                 <Button
                   label="Cancel"
-                  onClick={() => setShowOrderModal(false)}
+                  onClick={() => {
+                    setShowOrderModal(false);
+                    resetForm();
+                  }}
                   className="p-button-danger"
                   style={{ width: "200px", padding: "10px" }}
                 />
                 <Button
                   label="Create Order"
-                  onClick={() => {
-                    handleSubmit();
-                    setShowOrderModal(false);
-                  }}
+                  onClick={handleSubmit}
                   style={{ width: "200px", padding: "10px" }}
                   className="p-button-primary"
+                  loading={isLoading}
                 />
               </div>
             </div>
@@ -1451,6 +1647,7 @@ const Order = () => {
           visible={showDeleteConfirmation}
           onHide={() => setShowDeleteConfirmation(false)}
           header="Confirm Deletion"
+          dismissableMask={true}
           footer={
             <div
               style={{
@@ -1498,6 +1695,7 @@ const Order = () => {
           header="Order Details"
           style={{ width: isMobile ? "95vw" : "50vw" }}
           className="order-details-modal"
+          dismissableMask={true}
         >
           {selectedOrder && (
             <div className="order-details-container">

@@ -12,31 +12,55 @@ const getAuthHeader = () => {
 };
 
 // Create a new order
+
 export const createOrder = async (orderData) => {
-  const { supplierId, products, customerName, deliveryDate, additionalNotes } =
-    orderData;
   try {
-    const response = await axios.post(
-      `${API_URL}/orders`,
-      {
-        supplierId,
-        products,
-        customerName,
-        deliveryDate,
-        additionalNotes,
+    const response = await axios.post(`${API_URL}/orders/create`, orderData, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
       },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response.data;
+    });
+
+    return {
+      status: true,
+      data: response.data,
+    };
   } catch (error) {
-    throw error.response?.data || error;
+    console.error("Error creating order:", error);
+    return {
+      status: false,
+      error: error.response?.data?.message || "Failed to create order",
+    };
   }
 };
+
+
+// export const createOrder = async (orderData) => {
+//   const { supplierId, products, customerName, deliveryDate, additionalNotes } =
+//     orderData;
+//   try {
+//     const response = await axios.post(
+//       `${API_URL}/orders`,
+//       {
+//         supplierId,
+//         products,
+//         customerName,
+//         deliveryDate,
+//         additionalNotes,
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("token")}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw error.response?.data || error;
+//   }
+// };
 
 // Get all orders
 export const getOrders = async (params = {}) => {
