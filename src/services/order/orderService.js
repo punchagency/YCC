@@ -80,31 +80,7 @@ export const createOrder = async (orderData) => {
   }
 };
 
-// export const createOrder = async (orderData) => {
-//   const { supplierId, products, customerName, deliveryDate, additionalNotes } =
-//     orderData;
-//   try {
-//     const response = await axios.post(
-//       `${API_URL}/orders`,
-//       {
-//         supplierId,
-//         products,
-//         customerName,
-//         deliveryDate,
-//         additionalNotes,
-//       },
-//       {
-//         headers: {
-//           Authorization: `Bearer ${localStorage.getItem("token")}`,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     throw error.response?.data || error;
-//   }
-// };
+
 
 // Get all orders
 export const getOrders = async (params = {}) => {
