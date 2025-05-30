@@ -19,7 +19,8 @@ import {
   getOrders,
   deleteOrder,
   bulkDeleteOrders,
-} from "../../services/order/orderService"; // Add this import
+} from "../../services/order/orderService";
+import { getUserOrders } from "../../services/supplier/supplierService"; // Add this import
 // import { DataTable } from "primereact/datatable";
 // import { Column } from "primereact/column";
 import { formatCurrency, formatDate } from "../../utils/formatters";
@@ -28,6 +29,7 @@ import { useToast } from "../../components/Toast";
 import { useTheme } from "../../context/theme/themeContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
 import { getProductsWithVendors } from "../../services/crew/crewOrderService";
+import { getSuppliersWithInventories } from "../../services/supplier/supplierService";
 // import { Skeleton } from "primereact/skeleton";
 
 const Order = () => {
@@ -531,21 +533,50 @@ const Order = () => {
                   backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
                 }}
               >
-                <th>Select</th>
-                <th>Customer Name</th>
-                <th>Order Date</th>
-                <th>Order Type</th>
-                <th>Tracking ID</th>
-                <th>Order Total</th>
+                <th style={{ width: "5%" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      style={{
+                        margin: 0,
+                        width: "16px",
+                        height: "16px",
+                      }}
+                    />
+                    {selectedOrders.length > 0 && (
+                      <i
+                        className="pi pi-trash"
+                        style={{
+                          cursor: "pointer",
+                          color: "#ff4d4f",
+                          marginLeft: "8px",
+                        }}
+                        onClick={handleBulkDelete}
+                      />
+                    )}
+                  </div>
+                </th>
+                <th>Supplier Name</th>
+                <th>Quantity</th>
+                <th>Delivery Address</th>
+                <th>Delivery Date</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Total Price</th>
               </tr>
             </thead>
             <tbody>
               {orders &&
                 orders.map((order) => (
                   <tr
-                    key={order.id}
+                    key={order._id}
                     style={{
                       backgroundColor:
                         theme === "light" ? "#FFFFFF" : "#03141F",
@@ -570,26 +601,26 @@ const Order = () => {
                                 )
                           );
 
-                          // If we're unchecking an item, also uncheck the "select all" checkbox
                           if (!selected && selectAll) {
                             setSelectAll(false);
                           }
                         }}
                       />
                     </td>
-                    <td data-label="Customer Name">{order.customerName}</td>
-                    <td data-label="Order Date">
-                      {formatDate(order.orderDate)}
+                    <td data-label="Supplier Name">
+                      {order.supplier?.businessName || "N/A"}
                     </td>
-                    <td data-label="Order Type">{order.orderType}</td>
-                    <td data-label="Tracking ID">
-                      <div className="tracking-id">
-                        <span>{order.orderId}</span>
-                        <i className="pi pi-copy" />
-                      </div>
+                    <td data-label="Quantity">
+                      {order.products?.reduce(
+                        (sum, product) => sum + product.quantity,
+                        0
+                      ) || 0}
                     </td>
-                    <td data-label="Order Total">
-                      {formatCurrency(order.totalPrice)}
+                    <td data-label="Delivery Address">
+                      {order.deliveryAddress}
+                    </td>
+                    <td data-label="Delivery Date">
+                      {formatDate(order.deliveryDate)}
                     </td>
                     <td data-label="Status">
                       <span
@@ -598,36 +629,11 @@ const Order = () => {
                         {order.status}
                       </span>
                     </td>
-                    <td data-label="Actions">
-                      <div className="action-buttons">
-                        <button className="action-btn" title="View Details">
-                          <i className="pi pi-eye" />
-                        </button>
-                        <button className="action-btn" title="Edit Order">
-                          <i className="pi pi-pencil" />
-                        </button>
-                      </div>
+                    <td data-label="Total Price">
+                      {formatCurrency(order.totalPrice)}
                     </td>
                   </tr>
                 ))}
-              <tr>
-                <td
-                  colSpan="8"
-                  style={{
-                    textAlign: "right",
-                    border: "none",
-                    padding: "16px 0",
-                  }}
-                >
-                  <button
-                    onClick={() => setShowOrderModal(true)}
-                    className="create-order-button"
-                  >
-                    <img src={neworder} alt="neworder" />
-                    <span>Create New Orders</span>
-                  </button>
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -670,13 +676,17 @@ const Order = () => {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await getOrders();
-      if (response.success) {
-        setOrders(response.data.data.result);
-        calculateSummary(response.data.data.result);
+      const response = await getUserOrders();
+      if (response.status) {
+        console.log("Orders data received:", response.data);
+        setOrders(response.data);
+        calculateSummary(response.data);
+      } else {
+        showError(response.error || "Failed to fetch orders");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
+      showError("Failed to fetch orders");
     } finally {
       setLoading(false);
     }
@@ -946,12 +956,308 @@ const Order = () => {
     }
   }, [selectedProduct, productsWithVendors]);
 
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(false);
+  const [supplierPagination, setSupplierPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+  });
+
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef();
+
+  // Add this function to handle infinite scroll
+  const lastSupplierElementRef = useCallback(
+    (node) => {
+      if (loadingSuppliers) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchSuppliers(supplierPagination.currentPage + 1, true);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loadingSuppliers, hasMore]
+  );
+
+  // Modify the fetchSuppliers function to support infinite scroll
+  const fetchSuppliers = async (page = 1, append = false) => {
+    try {
+      setLoadingSuppliers(true);
+      const response = await getSuppliersWithInventories({
+        page,
+        limit: supplierPagination.pageSize,
+      });
+
+      if (response.status) {
+        console.log("Received suppliers data:", response.data);
+        const validatedSuppliers = response.data.map((supplier) => {
+          console.log("Processing supplier:", supplier);
+          return {
+            _id: supplier?._id,
+            businessName: supplier?.businessName || "Unnamed Business",
+            user: {
+              email: supplier?.user?.email || "No email available",
+            },
+            serviceAreas: supplier?.serviceAreas || [],
+            department: supplier?.department || "No department",
+            totalProducts: supplier?.totalProducts || 0,
+            totalStock: supplier?.totalStock || 0,
+            inventories:
+              supplier?.inventories?.map((inv) => ({
+                _id: inv?._id,
+                product: {
+                  name: inv?.product?.name || "Unnamed Product",
+                  category: inv?.product?.category || "No category",
+                  sku: inv?.product?.sku || "No SKU",
+                  description: inv?.product?.description,
+                },
+                price: inv?.price || 0,
+                quantity: inv?.quantity || 0,
+              })) || [],
+          };
+        });
+
+        setSuppliers((prev) =>
+          append ? [...prev, ...validatedSuppliers] : validatedSuppliers
+        );
+        setSupplierPagination(response.pagination);
+        setHasMore(
+          response.pagination.currentPage < response.pagination.totalPages
+        );
+      } else {
+        showError(response.error || "Failed to fetch suppliers");
+      }
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      showError("Failed to fetch suppliers");
+    } finally {
+      setLoadingSuppliers(false);
+    }
+  };
+
+  // Add the Skeleton component
+  const SupplierSkeleton = () => (
+    <div
+      className="supplier-card"
+      style={{
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        marginBottom: "15px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        backgroundColor: "#f5f5f5",
+        animation: "pulse 1.5s infinite",
+      }}
+    >
+      <div className="supplier-info">
+        <div
+          style={{
+            height: "24px",
+            width: "70%",
+            backgroundColor: "#e0e0e0",
+            marginBottom: "15px",
+            borderRadius: "4px",
+          }}
+        />
+        <div
+          style={{
+            height: "16px",
+            width: "90%",
+            backgroundColor: "#e0e0e0",
+            marginBottom: "10px",
+            borderRadius: "4px",
+          }}
+        />
+        <div
+          style={{
+            height: "16px",
+            width: "80%",
+            backgroundColor: "#e0e0e0",
+            marginBottom: "10px",
+            borderRadius: "4px",
+          }}
+        />
+        <div
+          style={{
+            height: "16px",
+            width: "85%",
+            backgroundColor: "#e0e0e0",
+            marginBottom: "10px",
+            borderRadius: "4px",
+          }}
+        />
+        <div
+          style={{
+            height: "16px",
+            width: "75%",
+            backgroundColor: "#e0e0e0",
+            marginBottom: "10px",
+            borderRadius: "4px",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          height: "40px",
+          width: "100%",
+          backgroundColor: "#e0e0e0",
+          marginTop: "20px",
+          borderRadius: "4px",
+        }}
+      />
+    </div>
+  );
+
+  // Add this style to your component
+  const skeletonStyle = `
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 0.8; }
+      100% { opacity: 0.6; }
+    }
+  `;
+
+  // Handle supplier selection
+  const handleSupplierSelect = (supplier) => {
+    setSelectedSupplier(supplier);
+    setShowInventoryModal(true);
+  };
+
+  // Add useEffect to fetch suppliers when modal opens
+  useEffect(() => {
+    if (showSupplierModal) {
+      fetchSuppliers();
+    }
+  }, [showSupplierModal]);
+
+  // Update the Create Order button click handler
+  const handleCreateOrderClick = () => {
+    setShowSupplierModal(true);
+  };
+
+  // Add these state variables at the top with other state declarations
+  const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [quickOrderForm, setQuickOrderForm] = useState({
+    quantity: 1,
+    deliveryAddress: "",
+    deliveryDate: null,
+  });
+
+  // Add this function to handle quick order submission
+  const handleQuickOrderSubmit = async () => {
+    // Debug logs for all required fields
+    console.log("Form Validation Check:", {
+      quantity: quickOrderForm.quantity,
+      deliveryAddress: quickOrderForm.deliveryAddress,
+      deliveryDate: quickOrderForm.deliveryDate,
+      inventoryId: selectedInventory?._id,
+      selectedInventory: selectedInventory,
+    });
+
+    // Check each field individually and log which one is missing
+    if (!quickOrderForm.quantity) {
+      console.log("Missing: quantity");
+      showError("Please enter quantity");
+      return;
+    }
+    if (!quickOrderForm.deliveryAddress) {
+      console.log("Missing: delivery address");
+      showError("Please enter delivery address");
+      return;
+    }
+    if (!quickOrderForm.deliveryDate) {
+      console.log("Missing: delivery date");
+      showError("Please select delivery date");
+      return;
+    }
+    if (!selectedInventory?._id) {
+      console.log("Missing: inventory ID");
+      console.log("Selected Inventory:", selectedInventory);
+      showError("Product information is missing");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showError("Please login to place an order");
+        return;
+      }
+
+      // Format the order data according to the API requirements
+      const orderData = {
+        quantity: parseInt(quickOrderForm.quantity),
+        deliveryAddress: quickOrderForm.deliveryAddress,
+        deliveryDate: quickOrderForm.deliveryDate.toISOString().split("T")[0],
+      };
+
+      console.log("Selected Inventory:", selectedInventory);
+      console.log("Quick Order Form:", quickOrderForm);
+      console.log("Inventory ID:", selectedInventory._id);
+      console.log("Sending order data:", orderData);
+
+      // Make the API call with the inventory ID in the URL and auth token
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/suppliers/inventory/${selectedInventory._id}/order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Add the authorization token
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.status) {
+        showSuccess("Order created successfully");
+        // Close all modals
+        setShowQuickOrderModal(false);
+        setShowInventoryModal(false);
+        setShowSupplierModal(false);
+        // Reset the form
+        setQuickOrderForm({
+          quantity: 1,
+          deliveryAddress: "",
+          deliveryDate: null,
+        });
+        // Clear selected inventory and supplier
+        setSelectedInventory(null);
+        setSelectedSupplier(null);
+        // Refresh orders list
+        fetchOrders();
+      } else {
+        showError(result.message || "Failed to create order");
+      }
+    } catch (error) {
+      console.error("Error in quick order submission:", error);
+      showError(error.message || "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return loading ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
     </div>
   ) : (
     <>
+      <style>{skeletonStyle}</style>
       <div
         className="flex align-items-center justify-content-between sub-header-panel"
         style={{
@@ -965,7 +1271,7 @@ const Order = () => {
           </div>
           <div className="mr-3">
             <button
-              onClick={() => setShowOrderModal(true)}
+              onClick={handleCreateOrderClick}
               className="create-order-button"
             >
               <img src={neworder} alt="neworder" />
@@ -987,7 +1293,7 @@ const Order = () => {
         }}
       >
         <div>
-          <div>
+          {/* <div>
             <h4
               style={{
                 textAlign: "left",
@@ -997,7 +1303,7 @@ const Order = () => {
             >
               Order Summary
             </h4>
-          </div>
+          </div> */}
 
           {isMobile ? (
             // Mobile view for summary boxes
@@ -1387,53 +1693,19 @@ const Order = () => {
                           )}
                         </div>
                       </th>
-                      <th
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                        }}
-                      >
-                        Customer Name
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                        }}
-                      >
-                        Order Date
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                        }}
-                      >
-                        Tracking ID
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                        }}
-                      >
-                        Order Total
-                      </th>
-                      <th
-                        style={{
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                        }}
-                      >
-                        Status
-                      </th>
+                      <th>Supplier Name</th>
+                      <th>Quantity</th>
+                      <th>Delivery Address</th>
+                      <th>Delivery Date</th>
+                      <th>Status</th>
+                      <th>Total Price</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders &&
                       orders.map((order) => (
                         <tr
-                          key={order.id}
+                          key={order._id}
                           style={{
                             backgroundColor:
                               theme === "light" ? "#FFFFFF" : "#03141F",
@@ -1458,27 +1730,26 @@ const Order = () => {
                                       )
                                 );
 
-                                // If we're unchecking an item, also uncheck the "select all" checkbox
                                 if (!selected && selectAll) {
                                   setSelectAll(false);
                                 }
                               }}
                             />
                           </td>
-                          <td data-label="Customer Name">
-                            {order.customerName}
+                          <td data-label="Supplier Name">
+                            {order.supplier?.businessName || "N/A"}
                           </td>
-                          <td data-label="Order Date">
-                            {formatDate(order.orderDate)}
+                          <td data-label="Quantity">
+                            {order.products?.reduce(
+                              (sum, product) => sum + product.quantity,
+                              0
+                            ) || 0}
                           </td>
-                          <td data-label="Tracking ID">
-                            <div className="tracking-id">
-                              <span>{order.orderId}</span>
-                              <i className="pi pi-copy" />
-                            </div>
+                          <td data-label="Delivery Address">
+                            {order.deliveryAddress}
                           </td>
-                          <td data-label="Order Total">
-                            {formatCurrency(order.totalPrice)}
+                          <td data-label="Delivery Date">
+                            {formatDate(order.deliveryDate)}
                           </td>
                           <td data-label="Status">
                             <span
@@ -1487,18 +1758,11 @@ const Order = () => {
                               {order.status}
                             </span>
                           </td>
+                          <td data-label="Total Price">
+                            {formatCurrency(order.totalPrice)}
+                          </td>
                         </tr>
                       ))}
-                    <tr style={{ marginRight: "20px" }}>
-                      <td
-                        colSpan="6"
-                        style={{
-                          textAlign: "right",
-                          border: "none",
-                          padding: "16px 0",
-                        }}
-                      ></td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -1851,6 +2115,290 @@ const Order = () => {
               )}
             </div>
           )}
+        </Dialog>
+
+        {/* Supplier Modal */}
+        <Dialog
+          visible={showSupplierModal}
+          onHide={() => setShowSupplierModal(false)}
+          style={{ width: "80vw" }}
+          header="Select Supplier"
+          className="supplier-modal"
+          dismissableMask={true}
+        >
+          <div className="p-fluid" style={{ padding: "20px" }}>
+            <div
+              className="suppliers-grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "20px",
+                padding: "20px",
+              }}
+            >
+              {suppliers.map((supplier, index) => (
+                <div
+                  key={supplier?._id || Math.random()}
+                  ref={
+                    index === suppliers.length - 1
+                      ? lastSupplierElementRef
+                      : null
+                  }
+                  className="supplier-card"
+                  style={{
+                    padding: "20px",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    marginBottom: "15px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div className="supplier-info">
+                    <h3>{supplier?.businessName || "Unnamed Business"}</h3>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Email:</span>{" "}
+                      {supplier?.user?.email || "No email available"}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Service Areas:</span>{" "}
+                      {supplier?.serviceAreas?.join(", ") || "No service areas"}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Department:</span>{" "}
+                      {supplier?.department || "No department"}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>
+                        Total Products:
+                      </span>{" "}
+                      {supplier?.totalProducts || 0}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Total Stock:</span>{" "}
+                      {supplier?.totalStock || 0}
+                    </p>
+                  </div>
+                  <Button
+                    label="See All Inventories"
+                    onClick={() => handleSupplierSelect(supplier)}
+                    className="p-button-primary"
+                    style={{ width: "300px", marginTop: "20px" }}
+                  />
+                </div>
+              ))}
+              {loadingSuppliers && (
+                <>
+                  <SupplierSkeleton />
+                  <SupplierSkeleton />
+                  <SupplierSkeleton />
+                </>
+              )}
+            </div>
+          </div>
+        </Dialog>
+
+        {/* Inventory Modal */}
+        <Dialog
+          visible={showInventoryModal}
+          onHide={() => setShowInventoryModal(false)}
+          style={{ width: "80vw" }}
+          header={`${selectedSupplier?.businessName || "Supplier"}'s Inventory`}
+          className="inventory-modal"
+          dismissableMask={true}
+        >
+          <div className="p-fluid" style={{ padding: "20px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "20px",
+                padding: "20px",
+              }}
+            >
+              {selectedSupplier?.inventories?.map((inventory) => (
+                <div
+                  key={inventory?._id || Math.random()}
+                  className="inventory-item"
+                  style={{
+                    padding: "20px",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div className="inventory-info">
+                    <h3 style={{ marginBottom: "15px" }}>
+                      {inventory?.product?.name || "Unnamed Product"}
+                    </h3>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Category:</span>{" "}
+                      {inventory?.product?.category || "No category"}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Price:</span> $
+                      {inventory?.price || 0}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>
+                        Quantity Available:
+                      </span>{" "}
+                      {inventory?.quantity || 0}
+                    </p>
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>SKU:</span>{" "}
+                      {inventory?.product?.sku || "No SKU"}
+                    </p>
+                    {inventory?.product?.description && (
+                      <p className="mb-3">
+                        <span style={{ fontWeight: "bold" }}>Description:</span>{" "}
+                        {inventory.product.description}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    label="Order Now"
+                    onClick={() => {
+                      console.log("Inventory item being selected:", inventory);
+                      console.log("Product data:", inventory?.product);
+                      setSelectedInventory(inventory);
+                      setQuickOrderForm({
+                        quantity: 1,
+                        deliveryAddress: "",
+                        deliveryDate: null,
+                      });
+                      setShowQuickOrderModal(true);
+                    }}
+                    className="p-button-primary"
+                    style={{ width: "100%", marginTop: "20px" }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </Dialog>
+
+        {/* Quick Order Modal */}
+        <Dialog
+          visible={showQuickOrderModal}
+          onHide={() => setShowQuickOrderModal(false)}
+          style={{ width: isMobile ? "95vw" : "50vw" }}
+          header="Quick Order"
+          className="quick-order-modal"
+          dismissableMask={true}
+        >
+          <div className="p-fluid" style={{ padding: "20px" }}>
+            {/* Product Info */}
+            <div className="product-info" style={{ marginBottom: "20px" }}>
+              <h3 style={{ margin: "0 0 10px 0" }}>
+                {selectedInventory?.product?.name || "Product"}
+              </h3>
+              <p style={{ margin: "0", color: "#666" }}>
+                Price: ${selectedInventory?.price || 0}
+              </p>
+            </div>
+
+            {/* Quantity */}
+            <div className="p-field" style={{ marginBottom: "20px" }}>
+              <label htmlFor="quickOrderQuantity">Quantity*</label>
+              <InputText
+                id="quickOrderQuantity"
+                type="number"
+                value={quickOrderForm.quantity}
+                onChange={(e) =>
+                  setQuickOrderForm({
+                    ...quickOrderForm,
+                    quantity: parseInt(e.target.value) || 0,
+                  })
+                }
+                min="1"
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            {/* Delivery Address */}
+            <div className="p-field" style={{ marginBottom: "20px" }}>
+              <label htmlFor="quickOrderAddress">Delivery Address*</label>
+              <InputText
+                id="quickOrderAddress"
+                value={quickOrderForm.deliveryAddress}
+                onChange={(e) =>
+                  setQuickOrderForm({
+                    ...quickOrderForm,
+                    deliveryAddress: e.target.value,
+                  })
+                }
+                placeholder="Enter delivery address"
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            {/* Delivery Date */}
+            <div className="p-field" style={{ marginBottom: "20px" }}>
+              <label htmlFor="quickOrderDate">Delivery Date*</label>
+              <Calendar
+                id="quickOrderDate"
+                value={quickOrderForm.deliveryDate}
+                onChange={(e) =>
+                  setQuickOrderForm({
+                    ...quickOrderForm,
+                    deliveryDate: e.value,
+                  })
+                }
+                showIcon
+                placeholder="Select delivery date"
+                style={{ width: "100%" }}
+              />
+            </div>
+
+            {/* Order Summary */}
+            <div
+              className="order-summary"
+              style={{
+                backgroundColor: "#f8f9fa",
+                padding: "15px",
+                borderRadius: "8px",
+                marginBottom: "20px",
+              }}
+            >
+              <h4 style={{ margin: "0 0 10px 0" }}>Order Summary</h4>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Subtotal:</span>
+                <span>
+                  $
+                  {(
+                    selectedInventory?.price * quickOrderForm.quantity || 0
+                  ).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div
+              className="dialog-footer"
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+              }}
+            >
+              <Button
+                label="Cancel"
+                onClick={() => setShowQuickOrderModal(false)}
+                className="p-button-text"
+              />
+              <Button
+                label="Place Order"
+                onClick={handleQuickOrderSubmit}
+                className="p-button-primary"
+                loading={isLoading}
+              />
+            </div>
+          </div>
         </Dialog>
       </div>
     </>

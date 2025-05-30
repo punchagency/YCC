@@ -7,138 +7,37 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
-
-import {
-  createOrder,
-  getProductsWithVendors,
-} from "../../../services/crew/crewOrderService";
+import { getSuppliersWithInventories } from "../../../services/supplier/supplierService";
+import { createOrder } from "../../../services/crew/crewOrderService";
 import "./order.css";
 
 const Order = () => {
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [showInventoryModal, setShowInventoryModal] = useState(false);
+  const [showQuickOrderModal, setShowQuickOrderModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const toast = useRef(null);
-  const [fetchingProducts, setFetchingProducts] = useState(false);
-
-  // State variables
+  const [loadingSuppliers, setLoadingSuppliers] = useState(false);
+  const [suppliers, setSuppliers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [supplierOptions, setSupplierOptions] = useState([]);
-  const [productOptions, setProductOptions] = useState([]);
-  const [productsWithVendors, setProductsWithVendors] = useState([]);
-
-  // State for order form
-  const [orderForm, setOrderForm] = useState({
-    customerName: "",
-    supplierId: null,
-    products: [{ id: null, quantity: 1 }],
-    deliveryDate: null,
-    orderStatus: "Pending",
-    notes: "",
+  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [supplierPagination, setSupplierPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
   });
 
-  // Status options
-  const statusOptions = [
-    { label: "Pending", value: "Pending" },
-    { label: "Processing", value: "Processing" },
-    { label: "Shipped", value: "Shipped" },
-    { label: "Delivered", value: "Delivered" },
-    { label: "Cancelled", value: "Cancelled" },
-  ];
+  // State for quick order form
+  const [quickOrderForm, setQuickOrderForm] = useState({
+    quantity: 1,
+    deliveryAddress: "",
+    deliveryDate: null,
+  });
 
   // Add a new state for order filters
   const [orderFilters, setOrderFilters] = useState({});
-
-  // Fetch products with vendors
-  const fetchProductsWithVendors = useCallback(async () => {
-    try {
-      setFetchingProducts(true);
-      console.log("Fetching products with vendors...");
-
-      const response = await getProductsWithVendors();
-      console.log("Products with vendors response:", response);
-
-      if (response.status) {
-        // Check the exact structure of the response data
-        console.log("Response data structure:", JSON.stringify(response.data));
-
-        // Try different possible paths to the products array
-        let products = [];
-        if (response.data?.products) {
-          products = response.data.products;
-        } else if (Array.isArray(response.data)) {
-          products = response.data;
-        } else if (typeof response.data === "object") {
-          // If it's an object but not an array, look for any array property
-          const possibleArrays = Object.values(response.data).filter((val) =>
-            Array.isArray(val)
-          );
-          if (possibleArrays.length > 0) {
-            products = possibleArrays[0];
-          }
-        }
-
-        console.log("Extracted products:", products);
-
-        if (products.length === 0) {
-          console.warn("No products found in the response");
-          showError("No products available");
-          return;
-        }
-
-        setProductsWithVendors(products);
-
-        // Transform products into dropdown options with more detailed logging
-        const productOpts = products.map((product, index) => {
-          console.log(`Product ${index}:`, product);
-          const label =
-            product.name ||
-            product.productName ||
-            (product.product ? product.product.name : "Unknown Product");
-          const value = product._id || product.id;
-          return {
-            label,
-            value,
-            data: product,
-          };
-        });
-
-        console.log("Final product options:", productOpts);
-        setProductOptions(productOpts);
-
-        // Extract unique suppliers from products
-        const uniqueSuppliers = new Map();
-        products.forEach((product) => {
-          const creator = product.creator || product.supplier || product.vendor;
-          if (creator && (creator._id || creator.id)) {
-            const creatorId = creator._id || creator.id;
-            uniqueSuppliers.set(creatorId, {
-              label:
-                creator.businessName ||
-                creator.name ||
-                creator.companyName ||
-                "Unknown Supplier",
-              value: creatorId,
-              data: creator,
-            });
-          }
-        });
-
-        const supplierOpts = Array.from(uniqueSuppliers.values());
-        console.log("Supplier options:", supplierOpts);
-        setSupplierOptions(supplierOpts);
-      } else {
-        console.error("Failed to fetch products with vendors:", response.error);
-        showError("Failed to load products");
-      }
-    } catch (error) {
-      console.error("Error fetching products with vendors:", error);
-      showError("An error occurred while loading products");
-    } finally {
-      setFetchingProducts(false);
-    }
-  }, []);
 
   // Handle window resize for mobile detection
   useEffect(() => {
@@ -150,112 +49,54 @@ const Order = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch products when modal opens
-  useEffect(() => {
-    if (showOrderModal) {
-      fetchProductsWithVendors();
-    }
-  }, [showOrderModal, fetchProductsWithVendors]);
+  // Fetch suppliers with inventories
+  const fetchSuppliers = async (page = 1, append = false) => {
+    try {
+      setLoadingSuppliers(true);
+      const response = await getSuppliersWithInventories({
+        page,
+        limit: supplierPagination.pageSize,
+      });
 
-  // Update product selection when selectedProduct changes
-  useEffect(() => {
-    if (selectedProduct) {
-      const updatedProducts = [...orderForm.products];
-      updatedProducts[0].id = selectedProduct;
-
-      // Find the selected product to get its price and auto-select supplier
-      const selectedProductData = productsWithVendors.find(
-        (p) => p._id === selectedProduct || p.id === selectedProduct
-      );
-      console.log("Selected product data:", selectedProductData);
-
-      if (selectedProductData) {
-        // Set product price if available
-        updatedProducts[0].price = selectedProductData.price || 0;
-
-        // Auto-select the supplier based on the product's creator/vendor
-        const creator =
-          selectedProductData.creator ||
-          selectedProductData.supplier ||
-          selectedProductData.vendor;
-
-        console.log("Product creator/supplier:", creator);
-
-        if (creator) {
-          const creatorId = creator._id || creator.id;
-          if (creatorId) {
-            const supplierName =
-              creator.businessName || creator.name || creator.companyName;
-            console.log("Setting supplier to:", creatorId);
-            console.log("Supplier name:", supplierName);
-            setSelectedSupplier(creatorId);
-
-            // If the supplier isn't in our options yet, add it
-            if (!supplierOptions.some((s) => s.value === creatorId)) {
-              setSupplierOptions((prev) => [
-                ...prev,
-                {
-                  label: supplierName || "Unknown Supplier",
-                  value: creatorId,
-                  data: creator,
-                },
-              ]);
-            }
-          }
-        }
-
-        setOrderForm((prev) => ({
-          ...prev,
-          products: updatedProducts,
+      if (response.status) {
+        console.log("Received suppliers data:", response.data);
+        const validatedSuppliers = response.data.map((supplier) => ({
+          _id: supplier?._id,
+          businessName: supplier?.businessName || "Unnamed Business",
+          user: {
+            email: supplier?.user?.email || "No email available",
+          },
+          serviceAreas: supplier?.serviceAreas || [],
+          department: supplier?.department || "No department",
+          totalProducts: supplier?.totalProducts || 0,
+          totalStock: supplier?.totalStock || 0,
+          inventories:
+            supplier?.inventories?.map((inv) => ({
+              _id: inv?._id,
+              product: {
+                name: inv?.product?.name || "Unnamed Product",
+                category: inv?.product?.category || "No category",
+                sku: inv?.product?.sku || "No SKU",
+                description: inv?.product?.description,
+              },
+              price: inv?.price || 0,
+              quantity: inv?.quantity || 0,
+            })) || [],
         }));
+
+        setSuppliers((prev) =>
+          append ? [...prev, ...validatedSuppliers] : validatedSuppliers
+        );
+        setSupplierPagination(response.pagination);
+      } else {
+        showError(response.error || "Failed to fetch suppliers");
       }
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      showError("Failed to fetch suppliers");
+    } finally {
+      setLoadingSuppliers(false);
     }
-  }, [selectedProduct, productsWithVendors, supplierOptions]);
-
-  // Update supplier ID when selectedSupplier changes
-  useEffect(() => {
-    if (selectedSupplier) {
-      setOrderForm((prev) => ({
-        ...prev,
-        supplierId: selectedSupplier,
-      }));
-    }
-  }, [selectedSupplier]);
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setOrderForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Handle dropdown changes
-  const handleDropdownChange = (e, field) => {
-    setOrderForm((prev) => ({
-      ...prev,
-      [field]: e.value,
-    }));
-  };
-
-  // Update handleQuantityChange to work with the form
-  const handleQuantityChange = (e) => {
-    const quantity = parseInt(e.target.value) || 0;
-    const updatedProducts = [...orderForm.products];
-    updatedProducts[0].quantity = quantity;
-    setOrderForm((prev) => ({
-      ...prev,
-      products: updatedProducts,
-    }));
-  };
-
-  // Handle date change
-  const handleDateChange = (e) => {
-    setOrderForm((prev) => ({
-      ...prev,
-      deliveryDate: e.value,
-    }));
   };
 
   // Show success toast
@@ -278,107 +119,106 @@ const Order = () => {
     });
   };
 
-  // Reset form
-  const resetForm = () => {
-    setOrderForm({
-      customerName: "",
-      supplierId: null,
-      products: [{ id: null, quantity: 1 }],
-      deliveryDate: null,
-      orderStatus: "Pending",
-      notes: "",
-    });
-    setSelectedProduct(null);
-    setSelectedSupplier(null);
+  // Handle supplier selection
+  const handleSupplierSelect = (supplier) => {
+    setSelectedSupplier(supplier);
+    setShowInventoryModal(true);
   };
 
-  // Handle form submission
-  const handleSubmit = async () => {
+  // Handle quick order submission
+  const handleQuickOrderSubmit = async () => {
+    // Debug logs for all required fields
+    console.log("Form Validation Check:", {
+      quantity: quickOrderForm.quantity,
+      deliveryAddress: quickOrderForm.deliveryAddress,
+      deliveryDate: quickOrderForm.deliveryDate,
+      inventoryId: selectedInventory?._id,
+      selectedInventory: selectedInventory,
+    });
+
+    // Check each field individually and log which one is missing
+    if (!quickOrderForm.quantity) {
+      console.log("Missing: quantity");
+      showError("Please enter quantity");
+      return;
+    }
+    if (!quickOrderForm.deliveryAddress) {
+      console.log("Missing: delivery address");
+      showError("Please enter delivery address");
+      return;
+    }
+    if (!quickOrderForm.deliveryDate) {
+      console.log("Missing: delivery date");
+      showError("Please select delivery date");
+      return;
+    }
+    if (!selectedInventory?._id) {
+      console.log("Missing: inventory ID");
+      console.log("Selected Inventory:", selectedInventory);
+      showError("Product information is missing");
+      return;
+    }
+
     try {
-      // Validate form
-      if (!orderForm.customerName) {
-        showError("Customer name is required");
-        return;
-      }
-
-      if (!selectedSupplier) {
-        showError("Supplier is required");
-        return;
-      }
-
-      if (!selectedProduct) {
-        showError("Product is required");
-        return;
-      }
-
-      if (
-        !orderForm.products[0].quantity ||
-        orderForm.products[0].quantity <= 0
-      ) {
-        showError("Quantity must be greater than 0");
-        return;
-      }
-
-      if (!orderForm.deliveryDate) {
-        showError("Delivery date is required");
-        return;
-      }
-
       setIsLoading(true);
 
-      // Find the selected product to get its price
-      const selectedProductData = productsWithVendors.find(
-        (p) => p._id === selectedProduct || p.id === selectedProduct
-      );
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        showError("Please login to place an order");
+        return;
+      }
 
-      // Find the selected supplier to get the vendor name
-      const selectedSupplierData = supplierOptions.find(
-        (s) => s.value === selectedSupplier
-      )?.data;
-
-      console.log("Selected supplier data:", selectedSupplierData);
-
-      // Format data for API - EXACTLY matching the expected format
+      // Format the order data according to the API requirements
       const orderData = {
-        vendorName:
-          selectedSupplierData?.businessName ||
-          selectedSupplierData?.name ||
-          "Unknown Vendor",
-        products: [
-          {
-            id: selectedProduct,
-            quantity: parseInt(orderForm.products[0].quantity),
-            price: selectedProductData?.price || 29.99, // Default price if not available
-          },
-        ],
-        estimatedDeliveryDate: orderForm.deliveryDate.toISOString(), // Format as ISO string
-        deliveryAddress: orderForm.customerName, // Using customer name as delivery address
+        quantity: parseInt(quickOrderForm.quantity),
+        deliveryAddress: quickOrderForm.deliveryAddress,
+        deliveryDate: quickOrderForm.deliveryDate.toISOString().split("T")[0],
       };
 
-      // Add optional fields only if they have values
-      if (orderForm.notes) {
-        orderData.notes = orderForm.notes;
-      }
+      console.log("Selected Inventory:", selectedInventory);
+      console.log("Quick Order Form:", quickOrderForm);
+      console.log("Inventory ID:", selectedInventory._id);
+      console.log("Sending order data:", orderData);
 
-      if (orderForm.orderStatus) {
-        orderData.status = orderForm.orderStatus;
-      }
+      // Make the API call with the inventory ID in the URL and auth token
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/suppliers/inventory/${selectedInventory._id}/order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(orderData),
+        }
+      );
 
-      console.log("Submitting order data:", orderData);
+      const result = await response.json();
 
-      const response = await createOrder(orderData);
-      console.log("Order creation response:", response);
-
-      if (response.status) {
+      if (result.status) {
         showSuccess("Order created successfully");
-        resetForm();
-        setShowOrderModal(false);
+        // Close all modals
+        setShowQuickOrderModal(false);
+        setShowInventoryModal(false);
+        setShowSupplierModal(false);
+        // Reset the form
+        setQuickOrderForm({
+          quantity: 1,
+          deliveryAddress: "",
+          deliveryDate: null,
+        });
+        // Clear selected inventory and supplier
+        setSelectedInventory(null);
+        setSelectedSupplier(null);
+        // Refresh orders list
+        // fetchOrders(); // You'll need to implement this
       } else {
-        showError(response.error || "Failed to create order");
+        showError(result.message || "Failed to create order");
       }
     } catch (error) {
-      console.error("Error creating order:", error);
-      showError("An unexpected error occurred");
+      console.error("Error in quick order submission:", error);
+      showError(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -389,6 +229,13 @@ const Order = () => {
     console.log("Filter criteria changed:", filterCriteria);
     setOrderFilters(filterCriteria);
   };
+
+  // Add useEffect to fetch suppliers when modal opens
+  useEffect(() => {
+    if (showSupplierModal) {
+      fetchSuppliers();
+    }
+  }, [showSupplierModal]);
 
   return (
     <>
@@ -411,7 +258,7 @@ const Order = () => {
               cursor: "pointer",
               border: "1px solid #0387D9",
             }}
-            onClick={() => setShowOrderModal(true)}
+            onClick={() => setShowSupplierModal(true)}
           >
             Create Order
           </button>
@@ -424,132 +271,278 @@ const Order = () => {
         <OrderTable filters={orderFilters} />
       </div>
 
-      {/* Order creation modal */}
+      {/* Supplier Modal */}
       <Dialog
-        visible={showOrderModal}
-        onHide={() => {
-          setShowOrderModal(false);
-          resetForm();
-        }}
-        style={{ width: isMobile ? "95vw" : "70vw" }}
-        header="New Order"
-        className="order-modal"
+        visible={showSupplierModal}
+        onHide={() => setShowSupplierModal(false)}
+        style={{ width: "80vw" }}
+        header="Select Supplier"
+        className="supplier-modal"
+        dismissableMask={true}
       >
-        <div className="p-fluid" style={{ padding: "40px" }}>
-          {/*  Customer Name and Supplier Name */}
-          <div className="p-grid p-formgrid form-row">
-            <div className="p-field">
-              <label htmlFor="customerName">Delivery Address*</label>
-              <InputText
-                id="customerName"
-                name="customerName"
-                value={orderForm.customerName}
-                onChange={handleInputChange}
-                placeholder="Enter delivery address"
-              />
-            </div>
-            <div className="p-field">
-              <label htmlFor="supplierId">Supplier Name*</label>
-              <Dropdown
-                id="supplierId"
-                value={selectedSupplier}
-                options={supplierOptions}
-                style={{ height: "45px" }}
-                onChange={(e) => setSelectedSupplier(e.value)}
-                placeholder={
-                  fetchingProducts
-                    ? "Loading suppliers..."
-                    : "Select a supplier"
-                }
-                disabled={fetchingProducts || selectedProduct !== null}
-                optionLabel="label"
-              />
-            </div>
+        <div className="p-fluid" style={{ padding: "20px" }}>
+          <div
+            className="suppliers-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "20px",
+              padding: "20px",
+            }}
+          >
+            {suppliers.map((supplier) => (
+              <div
+                key={supplier?._id}
+                className="supplier-card"
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "15px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div className="supplier-info">
+                  <h3>{supplier?.businessName || "Unnamed Business"}</h3>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Email:</span>{" "}
+                    {supplier?.user?.email || "No email available"}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Service Areas:</span>{" "}
+                    {supplier?.serviceAreas?.join(", ") || "No service areas"}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Department:</span>{" "}
+                    {supplier?.department || "No department"}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Total Products:</span>{" "}
+                    {supplier?.totalProducts || 0}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Total Stock:</span>{" "}
+                    {supplier?.totalStock || 0}
+                  </p>
+                </div>
+                <Button
+                  label="See All Inventories"
+                  onClick={() => handleSupplierSelect(supplier)}
+                  className="p-button-primary"
+                  style={{ width: "300px", marginTop: "20px" }}
+                />
+              </div>
+            ))}
+            {loadingSuppliers && (
+              <>
+                <div className="supplier-card skeleton" />
+                <div className="supplier-card skeleton" />
+                <div className="supplier-card skeleton" />
+              </>
+            )}
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Inventory Modal */}
+      <Dialog
+        visible={showInventoryModal}
+        onHide={() => setShowInventoryModal(false)}
+        style={{ width: "80vw" }}
+        header={`${selectedSupplier?.businessName || "Supplier"}'s Inventory`}
+        className="inventory-modal"
+        dismissableMask={true}
+      >
+        <div className="p-fluid" style={{ padding: "20px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: "20px",
+              padding: "20px",
+            }}
+          >
+            {selectedSupplier?.inventories?.map((inventory) => (
+              <div
+                key={inventory?._id}
+                className="inventory-item"
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div className="inventory-info">
+                  <h3 style={{ marginBottom: "15px" }}>
+                    {inventory?.product?.name || "Unnamed Product"}
+                  </h3>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Category:</span>{" "}
+                    {inventory?.product?.category || "No category"}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>Price:</span> $
+                    {inventory?.price || 0}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>
+                      Quantity Available:
+                    </span>{" "}
+                    {inventory?.quantity || 0}
+                  </p>
+                  <p className="mb-3">
+                    <span style={{ fontWeight: "bold" }}>SKU:</span>{" "}
+                    {inventory?.product?.sku || "No SKU"}
+                  </p>
+                  {inventory?.product?.description && (
+                    <p className="mb-3">
+                      <span style={{ fontWeight: "bold" }}>Description:</span>{" "}
+                      {inventory.product.description}
+                    </p>
+                  )}
+                </div>
+                <Button
+                  label="Order Now"
+                  onClick={() => {
+                    console.log("Inventory item being selected:", inventory);
+                    console.log("Product data:", inventory?.product);
+                    setSelectedInventory(inventory);
+                    setQuickOrderForm({
+                      quantity: 1,
+                      deliveryAddress: "",
+                      deliveryDate: null,
+                    });
+                    setShowQuickOrderModal(true);
+                  }}
+                  className="p-button-primary"
+                  style={{ width: "100%", marginTop: "20px" }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Quick Order Modal */}
+      <Dialog
+        visible={showQuickOrderModal}
+        onHide={() => setShowQuickOrderModal(false)}
+        style={{ width: isMobile ? "95vw" : "50vw" }}
+        header="Quick Order"
+        className="quick-order-modal"
+        dismissableMask={true}
+      >
+        <div className="p-fluid" style={{ padding: "20px" }}>
+          {/* Product Info */}
+          <div className="product-info" style={{ marginBottom: "20px" }}>
+            <h3 style={{ margin: "0 0 10px 0" }}>
+              {selectedInventory?.product?.name || "Product"}
+            </h3>
+            <p style={{ margin: "0", color: "#666" }}>
+              Price: ${selectedInventory?.price || 0}
+            </p>
           </div>
 
-          {/* Stock Quantity and Select Product */}
-          <div className="p-grid p-formgrid form-row">
-            <div className="p-field">
-              <label htmlFor="quantity">Quantity*</label>
-              <InputText
-                id="quantity"
-                name="quantity"
-                value={orderForm.products[0].quantity}
-                onChange={handleQuantityChange}
-                placeholder="Enter quantity"
-                keyfilter="pint"
-              />
-            </div>
-            <div className="p-field">
-              <label htmlFor="productId">Select Product*</label>
-              <Dropdown
-                id="productId"
-                value={selectedProduct}
-                options={productOptions}
-                style={{ height: "45px" }}
-                onChange={(e) => setSelectedProduct(e.value)}
-                placeholder={
-                  fetchingProducts ? "Loading products..." : "Select a product"
-                }
-                disabled={fetchingProducts}
-                optionLabel="label"
-              />
-            </div>
-          </div>
-
-          {/* Order Status and Delivery Date */}
-          <div className="p-grid p-formgrid form-row">
-            <div className="p-field">
-              <label htmlFor="orderStatus">Order Status*</label>
-              <Dropdown
-                id="orderStatus"
-                value={orderForm.orderStatus}
-                options={statusOptions}
-                style={{ height: "45px" }}
-                onChange={(e) => handleDropdownChange(e, "orderStatus")}
-                placeholder="Select status"
-              />
-            </div>
-            <div className="p-field">
-              <label htmlFor="deliveryDate">Delivery Date*</label>
-              <Calendar
-                id="deliveryDate"
-                value={orderForm.deliveryDate}
-                onChange={handleDateChange}
-                showIcon
-                placeholder="Select date"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="p-field">
-            <label htmlFor="notes">Notes</label>
+          {/* Quantity */}
+          <div className="p-field" style={{ marginBottom: "20px" }}>
+            <label htmlFor="quickOrderQuantity">Quantity*</label>
             <InputText
-              id="notes"
-              name="notes"
-              value={orderForm.notes}
-              onChange={handleInputChange}
-              placeholder="Add notes (optional)"
+              id="quickOrderQuantity"
+              type="number"
+              value={quickOrderForm.quantity}
+              onChange={(e) =>
+                setQuickOrderForm({
+                  ...quickOrderForm,
+                  quantity: parseInt(e.target.value) || 0,
+                })
+              }
+              min="1"
+              style={{ width: "100%" }}
             />
           </div>
 
-          <div className="dialog-footer">
+          {/* Delivery Address */}
+          <div className="p-field" style={{ marginBottom: "20px" }}>
+            <label htmlFor="quickOrderAddress">Delivery Address*</label>
+            <InputText
+              id="quickOrderAddress"
+              value={quickOrderForm.deliveryAddress}
+              onChange={(e) =>
+                setQuickOrderForm({
+                  ...quickOrderForm,
+                  deliveryAddress: e.target.value,
+                })
+              }
+              placeholder="Enter delivery address"
+              style={{ width: "100%" }}
+            />
+          </div>
+
+          {/* Delivery Date */}
+          <div className="p-field" style={{ marginBottom: "20px" }}>
+            <label htmlFor="quickOrderDate">Delivery Date*</label>
+            <Calendar
+              id="quickOrderDate"
+              value={quickOrderForm.deliveryDate}
+              onChange={(e) =>
+                setQuickOrderForm({
+                  ...quickOrderForm,
+                  deliveryDate: e.value,
+                })
+              }
+              showIcon
+              placeholder="Select delivery date"
+              style={{ width: "100%" }}
+            />
+          </div>
+
+          {/* Order Summary */}
+          <div
+            className="order-summary"
+            style={{
+              backgroundColor: "#f8f9fa",
+              padding: "15px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            <h4 style={{ margin: "0 0 10px 0" }}>Order Summary</h4>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Subtotal:</span>
+              <span>
+                $
+                {(
+                  selectedInventory?.price * quickOrderForm.quantity || 0
+                ).toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div
+            className="dialog-footer"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "10px",
+            }}
+          >
             <Button
               label="Cancel"
-              onClick={() => {
-                setShowOrderModal(false);
-                resetForm();
-              }}
-              className="p-button-danger"
-              style={{ width: "200px", padding: "10px" }}
+              onClick={() => setShowQuickOrderModal(false)}
+              className="p-button-text"
             />
             <Button
-              label={isLoading ? "Creating..." : "Create Order"}
-              onClick={handleSubmit}
-              disabled={isLoading || fetchingProducts}
-              style={{ width: "200px", padding: "10px" }}
+              label="Place Order"
+              onClick={handleQuickOrderSubmit}
               className="p-button-primary"
+              loading={isLoading}
             />
           </div>
         </div>
