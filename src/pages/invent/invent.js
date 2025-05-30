@@ -8,19 +8,13 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import {
   createInventoryData,
-  getInventoryData,
+  getAllInventories,
   updateInventoryItem,
   deleteInventoryItem,
   getInventoryItemById,
+  sendInventoryEmail,
 } from "../../services/inventory/inventoryService";
-// import lone from "../../assets/images/crew/lone.png";
-// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-// import iconexpire from "../../assets/images/crew/iconexpire.png";
-// import iconcareer from "../../assets/images/crew/iconcareer.png";
-// import { Chart as ChartJS } from "chart.js/auto";
-// import { Bar, Doughnut, Line } from "react-chartjs-2";
-// import sourceData from "../../data/sourceData.json";
-// import analyticsData from "../../data/analyticsData.json";
+
 import sort from "../../assets/images/crew/sort.png";
 import editLogo from "../../assets/images/crew/editLogo.png";
 import deleteLogo from "../../assets/images/crew/deleteLogo.png";
@@ -112,17 +106,6 @@ const Invent = () => {
 
   const { theme } = useTheme();
 
-  // Add pagination state
-  const [first, setFirst] = useState(0);
-  const [rows] = useState(10);
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isPageLoading, setIsPageLoading] = useState(false);
-
-  // Add these state variables at the top with your other state variables
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [selectAll, setSelectAll] = useState(false);
-
   // Add this state variable with your other state variables
   const [productImage, setProductImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -130,12 +113,32 @@ const Invent = () => {
   // Add a state to track whether we should update the URL
   const [shouldUpdateURL, setShouldUpdateURL] = useState(true);
 
+  // Add these state variables with your other state declarations
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // Add these state variables
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   // Inside your component, define the service area options
   const serviceAreaOptions = [
     { label: "Caribbean", value: "caribbean" },
     { label: "Mediterranean", value: "mediterranean" },
     { label: "USA", value: "usa" },
   ];
+
+  // Add new state for email modal
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailData, setEmailData] = useState({
+    to: "",
+    subject: "",
+    message: "",
+    productName: "",
+  });
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Add this useEffect to handle URL parameters
   useEffect(() => {
@@ -145,22 +148,41 @@ const Invent = () => {
     }
   }, [inventoryId]);
 
-  // Fetch inventory data when component mounts
+  // Add scroll event handler
   useEffect(() => {
-    fetchInventoryData(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop ===
+        document.documentElement.offsetHeight
+      ) {
+        if (hasMore && !isLoadingMore) {
+          loadMoreData();
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasMore, isLoadingMore]);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchInventoryData(1);
   }, []);
 
-  // Function to fetch inventory data from API
-  const fetchInventoryData = async (page = 1) => {
-    setIsPageLoading(true);
+  const fetchInventoryData = async (pageNum = 1) => {
+    if (pageNum === 1) {
+      setIsLoading(true);
+    } else {
+      setIsLoadingMore(true);
+    }
+
     try {
-      const result = await getInventoryData({ page });
-      console.log(result);
+      console.log("Fetching page:", pageNum);
+      const result = await getAllInventories(pageNum, 10);
 
       if (result.success) {
-        const inventoryData = result.data || [];
-        const formattedItems = inventoryData.map((item) => ({
+        const formattedItems = result.data.map((item) => ({
           id: item._id,
           productName: item.product?.name || "Unknown Product",
           category: item.product?.category || "Uncategorized",
@@ -168,10 +190,25 @@ const Invent = () => {
           stockQuantity: item.quantity || 0,
           price: item.price || 0,
           productImage: item.productImage || null,
+          supplier: item.supplier,
+          userInfo: item.userInfo,
         }));
 
-        setInventoryItems(formattedItems);
-        setTotalRecords(result.pagination?.totalItems || 0);
+        console.log("Formatted Items:", formattedItems); // Debug log
+
+        if (pageNum === 1) {
+          setInventoryItems(formattedItems);
+        } else {
+          setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
+        }
+
+        // Check if we have more items to load
+        setHasMore(formattedItems.length === 10);
+        setPage(pageNum);
+
+        console.log("Updated state:", {
+          items: formattedItems.length,
+        });
       } else {
         console.error("Failed to load inventory data:", result.error);
         if (toast.current) {
@@ -185,9 +222,42 @@ const Invent = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
+      if (toast.current) {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "An error occurred while fetching inventory data",
+          life: 3000,
+        });
+      }
     } finally {
-      setIsPageLoading(false);
+      setIsLoading(false);
+      setIsLoadingMore(false);
     }
+  };
+
+  const loadMoreData = async () => {
+    if (!hasMore || isLoadingMore) return;
+    const nextPage = page + 1;
+    await fetchInventoryData(nextPage);
+  };
+
+  // Add loading indicator component
+  const renderLoadingIndicator = () => {
+    if (!isLoadingMore) return null;
+
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: "1rem",
+          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+        }}
+      >
+        <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
+        <p style={{ marginTop: "0.5rem" }}>Loading more items...</p>
+      </div>
+    );
   };
 
   // const goCrewDashboardPage = () => {
@@ -299,6 +369,47 @@ const Invent = () => {
       index: index,
     });
     setShowDeleteConfirmation(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    setIsLoading(true);
+    try {
+      const result = await deleteInventoryItem(itemToDelete.id);
+      if (result.success) {
+        // Remove the deleted item from the state
+        setInventoryItems((prevItems) =>
+          prevItems.filter((_, index) => index !== itemToDelete.index)
+        );
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Product deleted successfully",
+          life: 3000,
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to delete product",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while deleting the product",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+      setShowDeleteConfirmation(false);
+      setItemToDelete(null);
+    }
   };
 
   const handleAddProduct = () => {
@@ -428,7 +539,7 @@ const Invent = () => {
   const handleViewItem = (item) => {
     setViewItem(item);
     setShowViewModal(true);
-    
+
     // Only update URL if we should
     if (shouldUpdateURL) {
       navigate(`/admin/inventory-management/${item.id}`);
@@ -439,14 +550,14 @@ const Invent = () => {
   const handleCloseViewModal = () => {
     // Disable URL updates temporarily to prevent race conditions
     setShouldUpdateURL(false);
-    
+
     // Close the modal
     setShowViewModal(false);
-    
+
     // Navigate after a short delay
     setTimeout(() => {
-      navigate('/admin/inventory-management', { replace: true });
-      
+      navigate("/admin/inventory-management", { replace: true });
+
       // Re-enable URL updates after navigation
       setTimeout(() => {
         setShouldUpdateURL(true);
@@ -461,7 +572,7 @@ const Invent = () => {
       fetchInventoryItemById(inventoryId);
     }
   }, [inventoryId, shouldUpdateURL]);
-  
+
   // Effect to handle browser navigation
   useEffect(() => {
     // If we navigate away and the modal is open
@@ -470,126 +581,12 @@ const Invent = () => {
     }
   }, [inventoryId, showViewModal, shouldUpdateURL]);
 
-  // Update the onPageChange function to actually fetch data for the new page
-  const onPageChange = (event) => {
-    const newPage = Math.floor(event.first / rows) + 1;
-    setCurrentPage(newPage);
-    setFirst(event.first);
-    
-    // Show loading state
-    setIsPageLoading(true);
-    
-    // Fetch data for the new page
-    fetchInventoryData(newPage);
-  };
-
-  // Handle select all checkbox
-  const handleSelectAll = (e) => {
-    const checked = e.target.checked;
-    setSelectAll(checked);
-
-    if (checked) {
-      // Select all items
-      const allItemIds = inventoryItems.map((item) => item.id);
-      setSelectedItems(allItemIds);
-    } else {
-      // Deselect all
-      setSelectedItems([]);
-    }
-  };
-
-  // Handle individual item selection
-  const handleSelectItem = (e, itemId) => {
-    const checked = e.target.checked;
-
-    if (checked) {
-      setSelectedItems((prev) => [...prev, itemId]);
-    } else {
-      setSelectedItems((prev) => prev.filter((id) => id !== itemId));
-
-      // If we're unchecking an item, also uncheck the "select all" checkbox
-      if (selectAll) {
-        setSelectAll(false);
-      }
-    }
-  };
-
-  // Add bulk delete function
-  const handleBulkDelete = () => {
-    if (selectedItems.length === 0) return;
-
-    setItemToDelete({
-      multiple: true,
-      ids: selectedItems,
-    });
-    setShowDeleteConfirmation(true);
-  };
-
-  // Modify the existing confirmDelete function to handle bulk deletion
-  const confirmDelete = async () => {
-    setIsLoading(true);
-    try {
-      if (itemToDelete.multiple) {
-        // Here you would call your API to delete multiple items
-        // For example:
-        // const result = await deleteMultipleInventoryItems(itemToDelete.ids);
-
-        // For now, let's just delete them one by one
-        let successCount = 0;
-        for (const id of itemToDelete.ids) {
-          const result = await deleteInventoryItem(id);
-          if (result.success) {
-            successCount++;
-          }
-        }
-
-        // Refresh the inventory list
-        fetchInventoryData();
-        setSelectedItems([]);
-        setSelectAll(false);
-
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: `Successfully deleted ${successCount} items`,
-          life: 3000,
-        });
-      } else {
-        // Original single item deletion logic
-        const result = await deleteInventoryItem(itemToDelete.id);
-        if (result.success) {
-          const updatedItems = inventoryItems.filter(
-            (_, index) => index !== itemToDelete.index
-          );
-          setInventoryItems(updatedItems);
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product deleted successfully",
-            life: 3000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error deleting items:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while deleting",
-        life: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-      setShowDeleteConfirmation(false);
-    }
-  };
-
   // Function to fetch a single inventory item by ID
   const fetchInventoryItemById = async (id) => {
     try {
       setIsLoading(true);
       const result = await getInventoryItemById(id);
-      
+
       if (result.success) {
         const item = {
           id: result.data._id,
@@ -600,7 +597,7 @@ const Invent = () => {
           price: result.data.price || 0,
           productImage: result.data.productImage || null,
         };
-        
+
         setViewItem(item);
         setShowViewModal(true);
       } else {
@@ -624,11 +621,92 @@ const Invent = () => {
     }
   };
 
+  // Add email handling functions
+  const handleSendEmail = (item) => {
+    // Get email from either supplier.user.email or userInfo.email
+    const supplierEmail =
+      item.supplier?.user?.email || item.userInfo?.email || "";
+
+    console.log("Clicked Item Data:", item);
+    console.log("Supplier Email:", supplierEmail);
+    console.log("Product Name:", item.productName);
+
+    setEmailData({
+      to: supplierEmail,
+      subject: `Regarding your product: ${item.productName}`,
+      message: "",
+      productName: item.productName,
+    });
+
+    console.log("Email Modal Data:", {
+      to: supplierEmail,
+      subject: `Regarding your product: ${item.productName}`,
+      message: "",
+      productName: item.productName,
+    });
+
+    setShowEmailModal(true);
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!emailData.to || !emailData.subject || !emailData.message) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please fill in all required fields",
+        life: 3000,
+      });
+      return;
+    }
+
+    setIsSendingEmail(true);
+    try {
+      const result = await sendInventoryEmail(
+        emailData.to,
+        emailData.subject,
+        emailData.message
+      );
+
+      if (result.success) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Email sent successfully",
+          life: 3000,
+        });
+        setShowEmailModal(false);
+        setEmailData({
+          to: "",
+          subject: "",
+          message: "",
+          productName: "",
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to send email",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An error occurred while sending the email",
+        life: 3000,
+      });
+    } finally {
+      setIsSendingEmail(false);
+    }
+  };
+
   // Render mobile card view for inventory items
   const renderMobileInventoryCards = () => {
     return (
       <div style={{ padding: "0 10px" }}>
-        <div
+        {/* <div
           style={{
             display: "flex",
             justifyContent: "center",
@@ -649,7 +727,7 @@ const Invent = () => {
               maxWidth: "250px",
             }}
           />
-        </div>
+        </div> */}
 
         {inventoryItems.map((item, index) => (
           <div
@@ -721,7 +799,7 @@ const Invent = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-                  
+
                 gap: "8px",
                 fontSize: "14px",
               }}
@@ -885,45 +963,6 @@ const Invent = () => {
                       <tr>
                         <th
                           style={{
-                            width: "5%",
-                            textAlign: "center",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              gap: "8px",
-                            }}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectAll}
-                              onChange={handleSelectAll}
-                              style={{
-                                margin: 0,
-                                width: "17px",
-                                height: "17px",
-                              }}
-                            />
-                            {selectedItems.length > 0 && (
-                              <i
-                                className="pi pi-trash"
-                                style={{
-                                  cursor: "pointer",
-                                  color: "#ff4d4f",
-                                  marginLeft: "8px",
-                                }}
-                                onClick={handleBulkDelete}
-                              />
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          style={{
                             width: "20%",
                             textAlign: "left",
                             padding: "10px",
@@ -1076,180 +1115,110 @@ const Invent = () => {
                     </thead>
                   </table>
 
-                  {isPageLoading ? (
-                    <InventoryTableSkeleton />
-                  ) : (
-                    <>
-                      <table
-                        className="inventory-table"
-                        style={{
-                          width: "100%",
-                          tableLayout: "fixed",
-                          borderCollapse: "collapse",
-                          marginTop: "0",
-                        }}
-                      >
-                        <tbody>
-                          {inventoryItems.map((item, index) => (
-                            <tr key={index}>
-                              <td
-                                style={{
-                                  width: "5%",
-                                  padding: "10px",
-                                  textAlign: "center",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedItems.includes(item.id)}
-                                  onChange={(e) => handleSelectItem(e, item.id)}
-                                  style={{
-                                    width: "16px",
-                                    height: "16px",
-                                  }}
-                                />
-                              </td>
-                              <td
-                                style={{
-                                  width: "20%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {item.productName}
-                              </td>
-                              <td
-                                style={{
-                                  width: "15%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {item.category}
-                              </td>
-                              <td
-                                style={{
-                                  width: "15%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {item.serviceArea}
-                              </td>
-                              <td
-                                style={{
-                                  width: "15%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                {item.stockQuantity} units
-                              </td>
-                              <td
-                                style={{
-                                  width: "15%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                ${item.price.toFixed(2)}
-                              </td>
-                              <td
-                                style={{
-                                  width: "15%",
-                                  padding: "10px",
-                                  borderBottom: "1px solid #eee",
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "10px",
-                                  }}
-                                >
-                                  <img
-                                    src={eyesIn}
-                                    alt="view"
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() => handleViewItem(item)}
-                                  />
-                                  <img
-                                    src={editLogo}
-                                    alt="edit"
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() => handleEdit(index)}
-                                  />
-                                  <img
-                                    src={deleteLogo}
-                                    alt="delete"
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      cursor: "pointer",
-                                    }}
-                                    onClick={() => handleDelete(index)}
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          marginTop: "20px",
-                        }}
-                      >
-                        <Button
-                          label="Add New Product"
-                          icon="pi pi-plus"
-                          onClick={handleAddProduct}
-                          style={{
-                            backgroundColor: "#0387D9",
-                            border: "none",
-                            borderRadius: "5px",
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {/* Add pagination after the table */}
-                  <div
-                    className="custom-pagination"
+                  <table
+                    className="inventory-table"
                     style={{
-                      padding: "1rem",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      borderTop: "1px solid #eaecf0",
-                      marginTop: "1rem",
+                      width: "100%",
+                      tableLayout: "fixed",
+                      borderCollapse: "collapse",
+                      marginTop: "0",
                     }}
                   >
-                    <Paginator
-                      first={first}
-                      rows={rows}
-                      totalRecords={totalRecords}
-                      onPageChange={onPageChange}
-                      template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                      style={{
-                        backgroundColor:
-                          theme === "light" ? "#FFFFFF" : "#03141F",
-                        color: theme === "light" ? "#103B57" : "grey",
-                      }}
-                    />
-                  </div>
+                    <tbody>
+                      {inventoryItems.map((item, index) => (
+                        <tr key={index}>
+                          <td
+                            style={{
+                              width: "20%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            {item.productName}
+                          </td>
+                          <td
+                            style={{
+                              width: "15%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            {item.category}
+                          </td>
+                          <td
+                            style={{
+                              width: "15%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            {item.serviceArea}
+                          </td>
+                          <td
+                            style={{
+                              width: "15%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            {item.stockQuantity} units
+                          </td>
+                          <td
+                            style={{
+                              width: "15%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            ${item.price.toFixed(2)}
+                          </td>
+                          <td
+                            style={{
+                              width: "15%",
+                              padding: "10px",
+                              borderBottom: "1px solid #eee",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                              }}
+                            >
+                              <img
+                                src={eyesIn}
+                                alt="view"
+                                style={{
+                                  width: "22px",
+                                  height: "22px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handleViewItem(item)}
+                              />
+                              <button
+                                style={{
+                                  padding: "10px 16px",
+                                  borderRadius: "5px",
+                                  backgroundColor: "#0387D9",
+                                  color: "#fff",
+                                  border: "none",
+                                  cursor: "pointer",
+                                  fontSize: "12px",
+                                  fontWeight: "bold",
+                                  marginLeft: "10px",
+                                }}
+                                onClick={() => handleSendEmail(item)}
+                              >
+                                Send Email
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {renderLoadingIndicator()}
                 </div>
               )}
             </>
@@ -1267,6 +1236,7 @@ const Invent = () => {
         header="Update Stock"
         className="edit-inventory-modal"
         modal
+        dismissableMask
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
         style={{ width: "35vw" }}
         maskStyle={{
@@ -1379,6 +1349,7 @@ const Invent = () => {
         header="Add New Product"
         className="add-inventory-modal"
         modal
+        dismissableMask
         breakpoints={{ "960px": "75vw", "641px": "90vw" }}
         style={{ width: "35vw" }}
         contentStyle={{ overflow: "visible" }}
@@ -1567,6 +1538,7 @@ const Invent = () => {
         onHide={() => setShowDeleteConfirmation(false)}
         header="Confirm Deletion"
         modal
+        dismissableMask
         maskStyle={{
           backgroundColor: "rgba(0, 0, 0, 0.9)",
           backdropFilter: "blur(4px)",
@@ -1609,11 +1581,7 @@ const Invent = () => {
             className="pi pi-exclamation-triangle"
             style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
           ></i>
-          <span>
-            {itemToDelete?.multiple
-              ? `Are you sure you want to delete ${selectedItems.length} selected items? This action cannot be undone.`
-              : "Are you sure you want to delete this product?"}
-          </span>
+          <span>Are you sure you want to delete this product?</span>
         </div>
       </Dialog>
 
@@ -1622,8 +1590,9 @@ const Invent = () => {
         onHide={handleCloseViewModal}
         header="Inventory Summary"
         className="view-inventory-modal"
-        style={{ width: '80%', maxWidth: '800px' }}
+        style={{ width: "80%", maxWidth: "800px" }}
         modal
+        dismissableMask
         blockScroll
       >
         <div className="view-form">
@@ -1773,6 +1742,124 @@ const Invent = () => {
                 {viewItem.serviceArea}
               </span>
             </div>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Add Email Modal */}
+      <Dialog
+        visible={showEmailModal}
+        onHide={() => setShowEmailModal(false)}
+        header="Send Email"
+        className="email-modal"
+        modal
+        dismissableMask
+        style={{ width: "50vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        maskStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.9)",
+          backdropFilter: "blur(4px)",
+        }}
+      >
+        <div className="email-form" style={{ padding: "20px" }}>
+          <div className="form-group" style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="to"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "500",
+              }}
+            >
+              To
+            </label>
+            <InputText
+              id="to"
+              value={emailData.to}
+              onChange={(e) =>
+                setEmailData({ ...emailData, to: e.target.value })
+              }
+              style={{ width: "100%", padding: "8px" }}
+              placeholder="Enter recipient email"
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="subject"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "500",
+              }}
+            >
+              Subject
+            </label>
+            <InputText
+              id="subject"
+              value={emailData.subject}
+              onChange={(e) =>
+                setEmailData({ ...emailData, subject: e.target.value })
+              }
+              style={{ width: "100%", padding: "8px" }}
+              placeholder="Enter email subject"
+            />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: "20px" }}>
+            <label
+              htmlFor="message"
+              style={{
+                display: "block",
+                marginBottom: "8px",
+                fontWeight: "500",
+              }}
+            >
+              Message
+            </label>
+            <textarea
+              id="message"
+              value={emailData.message}
+              onChange={(e) =>
+                setEmailData({ ...emailData, message: e.target.value })
+              }
+              style={{
+                width: "100%",
+                minHeight: "200px",
+                padding: "8px",
+                borderRadius: "4px",
+                border: "1px solid #ced4da",
+                resize: "vertical",
+              }}
+              placeholder="Enter your message"
+            />
+          </div>
+
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+          >
+            <Button
+              label="Cancel"
+              onClick={() => setShowEmailModal(false)}
+              className="p-button-text"
+              style={{
+                backgroundColor: "#EF4444",
+                color: "#fff",
+                border: "1px solid #EF4444",
+                width: "100px",
+              }}
+            />
+            <Button
+              label={isSendingEmail ? "Sending..." : "Send Email"}
+              onClick={handleEmailSubmit}
+              disabled={isSendingEmail}
+              style={{
+                backgroundColor: "#0387D9",
+                color: "#fff",
+                border: "1px solid #0387D9",
+                width: "100px",
+              }}
+            />
           </div>
         </div>
       </Dialog>
