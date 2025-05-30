@@ -85,9 +85,8 @@ const Order = () => {
 
   const [orderForm, setOrderForm] = useState({
     supplierId: null,
-    customerName: "",
     deliveryAddress: "",
-    products: [{ id: null, quantity: 1, price: 0 }],
+    products: [{ id: null, quantity: 1 }],
     deliveryDate: null,
     additionalNotes: "",
   });
@@ -95,9 +94,8 @@ const Order = () => {
   const resetForm = () => {
     setOrderForm({
       supplierId: null,
-      customerName: "",
       deliveryAddress: "",
-      products: [{ id: null, quantity: 1, price: 0 }],
+      products: [{ id: null, quantity: 1 }],
       deliveryDate: null,
       additionalNotes: "",
     });
@@ -247,16 +245,13 @@ const Order = () => {
       const productPrice =
         selectedProductData.price ||
         selectedProductData.product?.price ||
-        selectedProductData.stripePriceId
-          ? 100
-          : 0; // Default price if using Stripe
+        (selectedProductData.stripePriceId ? 100 : 0); // Default price if using Stripe
 
       console.log("Using product price:", productPrice);
 
       // Format the data for the API
       const orderData = {
         supplierId: selectedSupplier,
-        customerName: orderForm.customerName || null,
         deliveryAddress: orderForm.deliveryAddress,
         products: [
           {
@@ -265,7 +260,7 @@ const Order = () => {
             price: productPrice,
           },
         ],
-        deliveryDate: orderForm.deliveryDate,
+        deliveryDate: orderForm.deliveryDate.toISOString().split("T")[0], // Format date as YYYY-MM-DD
         additionalNotes: orderForm.additionalNotes || "",
       };
 
@@ -1522,18 +1517,8 @@ const Order = () => {
             dismissableMask={true}
           >
             <div className="p-fluid" style={{ padding: "40px" }}>
-              {/* Customer Name and Delivery Address */}
+              {/* Delivery Address */}
               <div className="p-grid p-formgrid form-row">
-                <div className="p-field">
-                  <label htmlFor="customerName">Customer Name</label>
-                  <InputText
-                    id="customerName"
-                    name="customerName"
-                    value={orderForm.customerName}
-                    onChange={handleInputChange}
-                    placeholder="Enter customer name (optional)"
-                  />
-                </div>
                 <div className="p-field">
                   <label htmlFor="deliveryAddress">Delivery Address*</label>
                   <InputText

@@ -15,6 +15,50 @@ const getAuthHeader = () => {
 
 export const createOrder = async (orderData) => {
   try {
+    console.log(
+      "Creating order with data:",
+      JSON.stringify(orderData, null, 2)
+    );
+
+    // Validate required fields
+    if (
+      !orderData.supplierId ||
+      !orderData.products ||
+      !orderData.deliveryAddress ||
+      !orderData.deliveryDate
+    ) {
+      console.error("Missing required fields:", {
+        supplierId: !orderData.supplierId,
+        products: !orderData.products,
+        deliveryAddress: !orderData.deliveryAddress,
+        deliveryDate: !orderData.deliveryDate,
+      });
+      return {
+        status: false,
+        error: "Missing required fields",
+      };
+    }
+
+    // Validate products array
+    if (!Array.isArray(orderData.products) || orderData.products.length === 0) {
+      console.error("Invalid products array:", orderData.products);
+      return {
+        status: false,
+        error: "Products must be a non-empty array",
+      };
+    }
+
+    // Validate each product
+    for (const product of orderData.products) {
+      if (!product.id || !product.quantity || !product.price) {
+        console.error("Invalid product data:", product);
+        return {
+          status: false,
+          error: "Each product must have id, quantity, and price",
+        };
+      }
+    }
+
     const response = await axios.post(`${API_URL}/orders/create`, orderData, {
       headers: {
         "Content-Type": "application/json",
@@ -22,19 +66,19 @@ export const createOrder = async (orderData) => {
       },
     });
 
+    console.log("Order creation response:", response.data);
     return {
       status: true,
       data: response.data,
     };
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error("Error creating order:", error.response?.data || error);
     return {
       status: false,
       error: error.response?.data?.message || "Failed to create order",
     };
   }
 };
-
 
 // export const createOrder = async (orderData) => {
 //   const { supplierId, products, customerName, deliveryDate, additionalNotes } =
