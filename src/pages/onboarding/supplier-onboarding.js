@@ -16,6 +16,7 @@ import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
+import { useParams } from "react-router-dom";
 import SupplierOnboardingStep1 from "../../components/onboarding/supplier/supplier-onboarding-step1";
 import SupplierOnboardingStep2 from "../../components/onboarding/supplier/supplier-onboarding-step2";
 import SupplierOnboardingStep3 from "../../components/onboarding/supplier/supplier-onboarding-step3";
@@ -183,6 +184,7 @@ const steps = [
 ];
 
 const SupplierOnboarding = () => {
+  const { id } = useParams();
   const [activeStep, setActiveStep] = React.useState(0);
 
   const handleNext = () => {
@@ -234,15 +236,15 @@ const SupplierOnboarding = () => {
         ) : (
           <>
             {activeStep === 0 && (
-              <SupplierOnboardingStep1 handleNext={handleNext} />
+              <SupplierOnboardingStep1 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 1 && (
-              <SupplierOnboardingStep2 handleNext={handleNext} />
+              <SupplierOnboardingStep2 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 2 && (
-              <SupplierOnboardingStep3 handleNext={handleNext} />
+              <SupplierOnboardingStep3 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 3 && (

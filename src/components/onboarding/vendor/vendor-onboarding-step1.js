@@ -18,7 +18,7 @@ import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
 
 const VendorOnboardingStep1 = ({ handleNext }) => {
-  const { uploadServicesData, verifyOnboardingStep1 } = useUser();
+  const { uploadServicesData, verifyOnboardingStep1, user } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -171,7 +171,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     setIsLoading(true);
     try {
       if (selectedFile) {
-        const status = await uploadServicesData(selectedFile);
+        const status = await uploadServicesData(selectedFile, user.id);
         if (status) {
           handleNext();
           handleCloseDialog();
