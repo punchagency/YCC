@@ -89,60 +89,62 @@ const createStripeAccount = async () => {
   }
 
 
-  const uploadInventoryData = async ( selectedFile ) =>{
+  const uploadInventoryData = async (selectedFile, userId) => {
     const formData = new FormData();
-      formData.append("file", selectedFile); // "file" should match the field name expected by multer
-  
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
-          method: "POST",
-          body: formData,
-          headers: {
-            ...getAuthHeader()
-          },
-        });
-        const data = await response.json();
-  
-        if (!data.status) {
-          const error = data.message;
-          throw new Error(error);
-        }
-  
-        console.log("Upload successful:", data);
-        return data.status
-        
-      } catch (err) {
-        console.error("Upload failed:", err.message);
+    formData.append("file", selectedFile);
+    formData.append("userId", userId);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          ...getAuthHeader()
+        },
+      });
+      const data = await response.json();
+
+      if (!data.status) {
+        const error = data.message;
+        throw new Error(error);
       }
-  }
+
+      console.log("Upload successful:", data);
+      return data.status;
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+      throw err;
+    }
+  };
 
   
-  const uploadServicesData = async ( selectedFile ) =>{
+  const uploadServicesData = async (selectedFile, userId) => {
     const formData = new FormData();
-      formData.append("file", selectedFile); // "file" should match the field name expected by multer
-  
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
-          method: "POST",
-          body: formData,
-          headers: {
-            ...getAuthHeader()
-          },
-        });
-        const data = await response.json();
-  
-        if (!data.status) {
-          const error = data.message;
-          throw new Error(error);
-        }
-  
-        console.log("Upload successful:", data);
-        return data.status
-        
-      } catch (err) {
-        console.error("Upload failed:", err.message);
+    formData.append("file", selectedFile);
+    formData.append("userId", userId);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          ...getAuthHeader()
+        },
+      });
+      const data = await response.json();
+
+      if (!data.status) {
+        const error = data.message;
+        throw new Error(error);
       }
-  }
+
+      console.log("Upload successful:", data);
+      return data.status;
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+      throw err;
+    }
+  };
   const verifyOnboardingStep1 = async () => {
     if(user.role === "supplier"){
       const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {

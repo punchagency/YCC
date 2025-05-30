@@ -17,7 +17,7 @@ import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
 
-const SupplierOnboardingStep1 = ({ handleNext }) => {
+const SupplierOnboardingStep1 = ({ handleNext, userId }) => {
   
   const { uploadInventoryData, verifyOnboardingStep1 } = useUser();
   const toast = useRef(null);
@@ -29,7 +29,8 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const [isLoading, setIsLoading] = useState(false);
   const hasRunRef = useRef(false);
   
-  const requiredHeaders = ["product name"];
+  // const requiredHeaders = ["product name", "product category", "product description", "product price", "product stock level", "delivery region"];
+const requiredHeaders = ["product name"];
 
   const downloadTemplate = (fileType) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
@@ -90,22 +91,60 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const handleFileUpload = (e, dialogType) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // File size validation (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('File size exceeds 5MB limit. Please choose a smaller file.');
+      return;
+    }
+
+    // File type validation
+    const validTypes = {
+      csv: ['text/csv', 'application/vnd.ms-excel'],
+      excel: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
+    };
+
+    if (!validTypes[dialogType].includes(file.type)) {
+      setError(`Invalid file type. Please upload a valid ${dialogType.toUpperCase()} file.`);
+      return;
+    }
   
     if (dialogType === 'csv') {
       const reader = new FileReader();
   
       reader.onload = (event) => {
-        const text = event.target.result;
-        const firstLine = text.split('\n')[0].trim();
-        const headers = firstLine.split(',').map(h => h.trim().toLowerCase());
+        try {
+          const text = event.target.result;
+          if (!text.trim()) {
+            setError('The CSV file is empty.');
+            return;
+          }
+
+          const lines = text.split('\n');
+          if (lines.length < 2) {
+            setError('The CSV file must contain at least a header row and one data row.');
+            return;
+          }
+
+          const firstLine = lines[0].trim();
+          const headers = firstLine.split(',').map(h => h.trim().toLowerCase());
   
-        const missing = requiredHeaders.filter(req => !headers.includes(req));
-        if (missing.length > 0) {
-          setError(`Missing required fields: ${missing.join(', ')}`);
-          return;
+          const missing = requiredHeaders.filter(req => !headers.includes(req));
+          if (missing.length > 0) {
+            setError(`Missing required fields: ${missing.join(', ')}. Please ensure all required fields are present in the header row.`);
+            return;
+          }
+  
+          setSelectedFile(file);
+          setError(null);
+        } catch (error) {
+          setError('Error reading CSV file. Please ensure it is properly formatted.');
+          console.error('CSV parsing error:', error);
         }
+      };
   
-        setSelectedFile(file); // Valid file
+      reader.onerror = () => {
+        setError('Error reading file. Please try again.');
       };
   
       reader.readAsText(file);
@@ -116,11 +155,22 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         try {
           const data = new Uint8Array(event.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
+          
+          if (!workbook.SheetNames.length) {
+            setError('The Excel file contains no sheets.');
+            return;
+          }
+
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
           
           if (jsonData.length === 0) {
-            setError('Excel file is empty');
+            setError('The Excel file is empty.');
+            return;
+          }
+
+          if (jsonData.length < 2) {
+            setError('The Excel file must contain at least a header row and one data row.');
             return;
           }
 
@@ -129,15 +179,16 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
             return;
           }
 
-          setSelectedFile(file); // Valid file
+          setSelectedFile(file);
+          setError(null);
         } catch (error) {
-          setError('Error reading Excel file. Please ensure it is a valid Excel file.');
+          setError('Error reading Excel file. Please ensure it is a valid Excel file and properly formatted.');
           console.error('Excel parsing error:', error);
         }
       };
 
       reader.onerror = () => {
-        setError('Error reading file');
+        setError('Error reading file. Please try again.');
       };
 
       reader.readAsArrayBuffer(file);
@@ -146,17 +197,36 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
 
   const handleSubmit = async () => {
     setIsLoading(true);
-    if (apiEndpoint) {
-      console.log("Submitting API endpoint:", apiEndpoint);
-    } else if (selectedFile) {
-      console.log("Submitting file:", selectedFile);
-      const status = await uploadInventoryData(selectedFile);
-      if (status) {
-        handleNext();
-        handleCloseDialog();
+    try {
+      if (apiEndpoint) {
+        console.log("Submitting API endpoint:", apiEndpoint);
+      } else if (selectedFile) {
+        console.log("Submitting file:", selectedFile);
+        const status = await uploadInventoryData(selectedFile, userId);
+        if (status) {
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "File uploaded successfully",
+          });
+          handleNext();
+          handleCloseDialog();
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Failed to upload file. Please try again.",
+          });
+        }
       }
+    } catch (err) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: err.message || "An error occurred while uploading the file",
+      });
+    } finally {
       setIsLoading(false);
-      console.log("Upload status:", status);
     }
   };
   

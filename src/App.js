@@ -89,10 +89,14 @@ function App() {
             <Route path="/vendor/signup" element={<SupplierSignup />} />
 
             {/* Respond to Quote Route (not protected) */}
+<<<<<<< HEAD
             <Route
               path="/service/quotes/respond/:quoteId"
               element={<RespondToQuote />}
             />
+=======
+            <Route path="/service/quotes/respond/:quoteId" element={<RespondToQuote />} />
+>>>>>>> d526420 (Fix: modify onboarding route for vendors to handle userId passed through url params and to properly route to the handler route on the backend)
 
             {/* end of route */}
 
@@ -261,21 +265,34 @@ function App() {
 
             {/* Onboarding Routes */}
             <Route element={<OnboardingPageLayout />}>
-              <Route
-                path="/supplier/onboarding"
+              {/* <Route
+                path="/supplier/onboarding/:id"
                 element={<SupplierOnboarding />}
               />
               <Route
                 path="/supplier/onboarding/refresh-stripe-account"
                 element={<SupplierOnboardingStep2 />}
               />
-              <Route path="/vendor/onboarding" element={<VendorOnboarding />} />
+              <Route path="/vendor/onboarding/:id" element={<VendorOnboarding />} />
               <Route
                 path="/vendor/onboarding/refresh-stripe-account"
                 element={<VendorOnboardingStep2 />}
-              />
+              /> */}
               <Route path="/crew/settings" element={<CrewSettings />} />
             </Route>
+            <Route
+              path="/supplier/onboarding/:id"
+              element={<SupplierOnboarding />}
+            />
+            <Route
+              path="/supplier/onboarding/refresh-stripe-account"
+              element={<SupplierOnboardingStep2 />}
+            />
+            <Route path="/vendor/onboarding/:id" element={<VendorOnboarding />} />
+            <Route
+              path="/vendor/onboarding/refresh-stripe-account"
+              element={<VendorOnboardingStep2 />}
+            />
           </Routes>
         </NotificationsProvider>
       </ToastProvider>
