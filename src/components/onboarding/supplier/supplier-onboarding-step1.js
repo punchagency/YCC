@@ -16,9 +16,11 @@ import excelTemplate from '../../../assets/excel-template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
+import { useParams, useLocation } from 'react-router-dom';
 
-const SupplierOnboardingStep1 = ({ handleNext, userId }) => {
-  
+const SupplierOnboardingStep1 = ({ handleNext }) => {
+  const { id: userId } = useParams();
+  const location = useLocation();
   const { uploadInventoryData, verifyOnboardingStep1 } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -27,10 +29,13 @@ const SupplierOnboardingStep1 = ({ handleNext, userId }) => {
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(false);
-  const hasRunRef = useRef(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   
   // const requiredHeaders = ["product name", "product category", "product description", "product price", "product stock level", "delivery region"];
-const requiredHeaders = ["product name"];
+  const requiredHeaders = ["product name"];
+
+  // Determine role based on URL path - more explicit check
+  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
 
   const downloadTemplate = (fileType) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
@@ -54,18 +59,34 @@ const requiredHeaders = ["product name"];
   }, [error]);
 
   useEffect(() => {
-    if (hasRunRef.current) return; // prevent second run
-    hasRunRef.current = true;
-
     const verifyInventoryUpload = async () => {
-      const data = await verifyOnboardingStep1();
-      if (data?.data?.length > 0) {
-        handleNext();
+      if (!userId) {
+        console.log('Step 1 - No userId found in URL params');
+        return;
+      }
+      
+      console.log('Step 1 - Verifying inventory for userId:', userId);
+      console.log('Step 1 - Current path:', location.pathname);
+      
+      setIsVerifying(true);
+      try {
+        const data = await verifyOnboardingStep1(userId, role);
+        console.log('Step 1 - Verification response:', data);
+        
+        if (data?.data?.length > 0) {
+          console.log('Step 1 - Inventory verified, moving to next step');
+          handleNext();
+        }
+      } catch (error) {
+        console.error('Step 1 - Verification error:', error);
+        setError('Error verifying inventory. Please try uploading again.');
+      } finally {
+        setIsVerifying(false);
       }
     };
 
     verifyInventoryUpload();
-  }, [handleNext, verifyOnboardingStep1]);
+  }, [userId, location.pathname, handleNext, verifyOnboardingStep1]);
 
   const handleOpenDialog = (type) => {
     setDialogType(type);

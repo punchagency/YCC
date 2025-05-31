@@ -3,32 +3,69 @@ import { useUser } from '../../../context/userContext';
 import { useEffect, useState } from 'react';
 import { Payments as StripeIcon } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
+import { useParams, useLocation, useSearchParams } from 'react-router-dom';
 
 const SupplierOnboardingStep2 = ({ handleNext }) => {
+  const { id: userId } = useParams();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { stripeAccount, getStripeAccount, createStripeAccount, refreshStripeAccountLink } = useUser();
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Determine role based on URL path - more explicit check
+  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
 
   useEffect(() => {
-    getStripeAccount();
+    const fetchStripeAccount = async () => {
+      try {
+        console.log('Stripe Step 2 - Current userId:', userId);
+        console.log('Stripe Step 2 - Current role:', role);
+        console.log('Stripe Step 2 - Current path:', location.pathname);
+        console.log('Stripe Step 2 - Search params:', Object.fromEntries(searchParams.entries()));
+        
+        const response = await getStripeAccount(userId, role);
+        console.log('Stripe Step 2 - getStripeAccount response:', response);
+        
+        if (!response.status) {
+          setError(response.message);
+        }
+      } catch (error) {
+        console.error('Stripe Step 2 - getStripeAccount error:', error);
+        setError(error.message);
+      }
+    };
+
+    fetchStripeAccount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId, role]);
 
   useEffect(() => {
+    console.log('Stripe Step 2 - stripeAccount updated:', stripeAccount);
     if (stripeAccount?.chargesEnabled && stripeAccount?.transfersEnabled && stripeAccount?.detailsSubmitted) {
       handleNext();
-    }else if(stripeAccount){
-      setShowContinueButton(true);    
+    } else if (stripeAccount) {
+      setShowContinueButton(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stripeAccount]);
 
   const handleCreateStripeAccount = async () => {
     setIsLoading(true);
-    if(stripeAccount){
-      await refreshStripeAccountLink();
-    }else{
-      await createStripeAccount();
+    setError(null);
+    try {
+      console.log('Stripe Step 2 - Creating/Refreshing account with:', { userId, role });
+      if (stripeAccount) {
+        await refreshStripeAccountLink(userId, role);
+      } else {
+        await createStripeAccount(userId, role);
+      }
+    } catch (error) {
+      console.error('Error handling Stripe account:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -37,6 +74,12 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
       <Typography variant="h5" sx={{ mb: 3 }}>
         Connect Your Payment Account
       </Typography>
+      
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
       
       <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
         To receive payments, you'll need to set up your Stripe account. This secure process typically takes 5-10 minutes. You'll need to provide:
@@ -55,6 +98,7 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
         size="large"
         onClick={handleCreateStripeAccount}
         startIcon={<StripeIcon />}
+        disabled={isLoading}
         sx={{ 
           minWidth: 250,
           py: 1.5,
