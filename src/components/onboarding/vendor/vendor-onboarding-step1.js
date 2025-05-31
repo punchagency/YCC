@@ -16,9 +16,12 @@ import excelTemplate from '../../../assets/vendor-onboarding-template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
+import { useParams, useLocation } from 'react-router-dom';
 
 const VendorOnboardingStep1 = ({ handleNext }) => {
-  const { uploadServicesData, verifyOnboardingStep1, user } = useUser();
+  const { id: userId } = useParams();
+  const location = useLocation();
+  const { uploadServicesData, verifyOnboardingStep1 } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -33,6 +36,9 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     description: ''
   });
   
+  // Determine role based on URL path
+  const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
+
   const requiredHeaders = ["service name", "description", "price"];
 
   const validateFile = (file, type) => {
@@ -41,18 +47,22 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
       throw new Error('File size should not exceed 5MB');
     }
 
-    if (type === 'excel') {
-      const validTypes = [
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel'
-      ];
-      if (!validTypes.includes(file.type)) {
-        throw new Error('Invalid file type. Please upload an Excel file (.xlsx or .xls)');
-      }
-    } else if (type === 'csv') {
-      if (file.type !== 'text/csv') {
-        throw new Error('Invalid file type. Please upload a CSV file');
-      }
+    // File type validation
+    const validTypes = {
+      csv: ['text/csv', 'application/vnd.ms-excel'],
+      excel: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
+    };
+
+    // Get file extension
+    const extension = file.name.split('.').pop().toLowerCase();
+    const validExtensions = {
+      csv: ['csv'],
+      excel: ['xlsx', 'xls']
+    };
+
+    // Check both MIME type and file extension
+    if (!validTypes[type].includes(file.type) && !validExtensions[type].includes(extension)) {
+      throw new Error(`Invalid file type. Please upload a valid ${type.toUpperCase()} file (${validExtensions[type].join(', ')}).`);
     }
   };
 
@@ -80,14 +90,30 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     hasRunRef.current = true;
 
     const verifyInventoryUpload = async () => {
-      const data = await verifyOnboardingStep1();
-      if (data?.data?.length > 0) {
-        handleNext();
+      try {
+        if (!userId) {
+          console.error('Missing userId:', { userId });
+          return;
+        }
+
+        const data = await verifyOnboardingStep1(userId, role);
+        console.log('Step 1 - Verification response:', data);
+        
+        if (data?.data?.length > 0) {
+          handleNext();
+        }
+      } catch (error) {
+        console.error('Step 1 - Verification error:', error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Error verifying services",
+        });
       }
     };
 
     verifyInventoryUpload();
-  }, [handleNext, verifyOnboardingStep1]);
+  }, [handleNext, verifyOnboardingStep1, userId, role]);
 
   const handleOpenDialog = (type) => {
     setDialogType(type);
@@ -171,7 +197,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     setIsLoading(true);
     try {
       if (selectedFile) {
-        const status = await uploadServicesData(selectedFile, user.id);
+        const status = await uploadServicesData(selectedFile, userId, role);
         if (status) {
           handleNext();
           handleCloseDialog();

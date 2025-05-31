@@ -9,7 +9,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   const { id: userId } = useParams();
   const location = useLocation();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
-  const hasRunRef = useRef(false);
+  //const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [inventoryData, setInventoryData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,14 +18,15 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
 
   useEffect(() => {
-    if (hasRunRef.current) return; // prevent second run
-    hasRunRef.current = true;
+    // if (hasRunRef.current) return; // prevent second run
+    // hasRunRef.current = true;
 
     const verifyInventoryUpload = async () => {
       try {
         //check onboarding status
-        const status = await checkOnboardingStatus();
+        const status = await checkOnboardingStatus(userId, role);
         if(status === true){
+          console.log('Step 3 - Onboarding status is true');
           handleNext();
           return;
         }
@@ -57,10 +58,19 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role]);
 
   const handleFinish = async () => {
-    const status = await completeOnboarding();
-    if (status) {
-      handleNext();
-    } else {
+    try {
+      const status = await completeOnboarding(userId, role);
+      if (status) {
+        handleNext();
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Error completing onboarding",
+        });
+      }
+    } catch (error) {
+      console.error('Step 3 - Complete onboarding error:', error);
       toast.current.show({
         severity: "error",
         summary: "Error",
