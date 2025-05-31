@@ -3,31 +3,58 @@ import InventoryWrapper from "./inventorywrapper";
 import { useUser } from "../../../context/userContext";
 import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
+import { useParams, useLocation } from "react-router-dom";
+
 const SupplierOnboardingStep3 = ({ handleNext }) => {
+  const { id: userId } = useParams();
+  const location = useLocation();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
   const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [inventoryData, setInventoryData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Determine role based on URL path
+  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
+
   useEffect(() => {
     if (hasRunRef.current) return; // prevent second run
     hasRunRef.current = true;
 
     const verifyInventoryUpload = async () => {
-      //check onboardiing status
-      const status = await checkOnboardingStatus();
-      if(status === true){
-        handleNext();
+      try {
+        //check onboarding status
+        const status = await checkOnboardingStatus();
+        if(status === true){
+          handleNext();
+          return;
+        }
+
+        if (!userId) {
+          console.error('Missing userId:', { userId });
+          return;
+        }
+
+        const data = await verifyOnboardingStep1(userId, role);
+        console.log('Step 3 - Verification response:', data);
+        
+        if (data?.data?.length > 0) {
+          setInventoryData(data.data);
+        }
+      } catch (error) {
+        console.error('Step 3 - Verification error:', error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Error verifying inventory",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      const data = await verifyOnboardingStep1();
-      if (data.data.length > 0) {
-        setInventoryData(data.data);
-      }
-      setIsLoading(false);
     };
 
     verifyInventoryUpload();
-  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1]);
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role]);
 
   const handleFinish = async () => {
     const status = await completeOnboarding();
