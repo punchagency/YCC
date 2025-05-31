@@ -204,35 +204,71 @@ export const UserProvider = ({ children }) => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  const completeOnboarding = async () => {
-    if(user.role === "supplier"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
-        headers: getAuthHeader()
-      });
-      const data = await response.json();
-      return data.status;
-    }else if(user.role === "service_provider"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
-        headers: getAuthHeader()
-      });
-      const data = await response.json();
-      return data.status;
+  const completeOnboarding = async (userId, role) => {
+    console.log('userContext - completeOnboarding called with:', { userId, role });
+    try {
+      if(role === "supplier"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - completeOnboarding response:', data);
+        return data.status;
+      }else if(role === "service_provider"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - completeOnboarding response:', data);
+        return data.status;
+      }
+    } catch (error) {
+      console.error('userContext - completeOnboarding error:', error);
+      throw error;
     }
   }
 
-  const checkOnboardingStatus = async () => {
-    if(user.role === "supplier"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
-        headers: getAuthHeader()
-      });
-      const data = await response.json();
-      return data.data;
-    }else if(user.role === "service_provider"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
-        headers: getAuthHeader()
-      });
-      const data = await response.json();
-      return data.data;
+  const checkOnboardingStatus = async (userId, role) => {
+    console.log('userContext - checkOnboardingStatus called with:', { userId, role });
+    try {
+      if(role === "supplier"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - checkOnboardingStatus response:', data);
+        return data.data;
+      }else if(role === "service_provider"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - checkOnboardingStatus response:', data);
+        return data.data;
+      }
+    } catch (error) {
+      console.error('userContext - checkOnboardingStatus error:', error);
+      throw error;
     }
   }
 

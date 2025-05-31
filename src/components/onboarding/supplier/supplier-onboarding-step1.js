@@ -125,8 +125,16 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       excel: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel']
     };
 
-    if (!validTypes[dialogType].includes(file.type)) {
-      setError(`Invalid file type. Please upload a valid ${dialogType.toUpperCase()} file.`);
+    // Get file extension
+    const extension = file.name.split('.').pop().toLowerCase();
+    const validExtensions = {
+      csv: ['csv'],
+      excel: ['xlsx', 'xls']
+    };
+
+    // Check both MIME type and file extension
+    if (!validTypes[dialogType].includes(file.type) && !validExtensions[dialogType].includes(extension)) {
+      setError(`Invalid file type. Please upload a valid ${dialogType.toUpperCase()} file (${validExtensions[dialogType].join(', ')}).`);
       return;
     }
   
@@ -203,7 +211,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
           setSelectedFile(file);
           setError(null);
         } catch (error) {
-          setError('Error reading Excel file. Please ensure it is a valid Excel file and properly formatted.');
+          setError('Error reading Excel file. Please ensure it is properly formatted.');
           console.error('Excel parsing error:', error);
         }
       };

@@ -3,43 +3,81 @@ import ServicesWrapper from "./serviceswrapper";
 import { useUser } from "../../../context/userContext";
 import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
+import { useParams, useLocation } from 'react-router-dom';
+
 const VendorOnboardingStep3 = ({ handleNext }) => {
+  const { id: userId } = useParams();
+  const location = useLocation();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
   const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [servicesData, setServicesData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Determine role based on URL path
+  const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
+
   useEffect(() => {
     const verifyInventoryUpload = async () => {
       if (hasRunRef.current) return;
       hasRunRef.current = true;
 
-      //check onboarding status
-      const status = await checkOnboardingStatus();
-      if(status === true){
-        handleNext();
-      }
+      try {
+        console.log('Step 3 - Current userId:', userId);
+        console.log('Step 3 - Current role:', role);
+        console.log('Step 3 - Current path:', location.pathname);
 
-      const data = await verifyOnboardingStep1();
-      if (data.data.length > 0) {
-        setServicesData(data.data);
+        //check onboarding status
+        const status = await checkOnboardingStatus(userId, role);
+        console.log('Step 3 - checkOnboardingStatus response:', status);
+        
+        if(status === true){
+          handleNext();
+          return;
+        }
+
+        const data = await verifyOnboardingStep1(userId, role);
+        console.log('Step 3 - verifyOnboardingStep1 response:', data);
+        
+        if (data.data.length > 0) {
+          setServicesData(data.data);
+        }
+      } catch (error) {
+        console.error('Step 3 - Error:', error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: error.message || "Error verifying services",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     verifyInventoryUpload();
-  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1]); // Add dependencies
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role]);
 
   const handleFinish = async () => {
-    const status = await completeOnboarding();
-    if (status) {
-      handleNext();
-    } else {
+    try {
+      console.log('Step 3 - Completing onboarding with:', { userId, role });
+      const status = await completeOnboarding(userId, role);
+      console.log('Step 3 - completeOnboarding response:', status);
+      
+      if (status) {
+        handleNext();
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Error completing onboarding",
+        });
+      }
+    } catch (error) {
+      console.error('Step 3 - Error completing onboarding:', error);
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Error completing onboarding",
+        detail: error.message || "Error completing onboarding",
       });
     }
   };
