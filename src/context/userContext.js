@@ -53,24 +53,55 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
+  // const getStripeAccount = async (userId, role) => {
+  //   console.log('userContext - getStripeAccount called with:', { userId, role });
+  //   const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...getAuthHeader()
+  //     },
+  //     body: JSON.stringify({ userId, role })
+  //   });
+  //   console.log("status code:", response);
+  //   const data = await response.json();
+  //   console.log('userContext - getStripeAccount response:', data);
+  //   if (!data.status) {
+  //     setStripeAccount(null);
+  //   } else {
+  //     setStripeAccount(data.data);
+  //   }
+  //   return data;
+  // };
   const getStripeAccount = async (userId, role) => {
     console.log('userContext - getStripeAccount called with:', { userId, role });
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      },
-      body: JSON.stringify({ userId, role })
-    });
-    const data = await response.json();
-    console.log('userContext - getStripeAccount response:', data);
-    if (!data.status) {
-      setStripeAccount(null);
-    } else {
-      setStripeAccount(data.data);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({ userId, role })
+      });
+      const data = await response.json();
+      console.log('userContext - getStripeAccount response:', data);
+      
+      if (!data.status) {
+        // Only set to null if account truly doesn't exist
+        if (response.status === 404) {
+          setStripeAccount(null);
+        }
+        // For other errors, don't change the state
+      } else {
+        setStripeAccount(data.data);
+      }
+      return data;
+    } catch (error) {
+      console.error('userContext - getStripeAccount error:', error);
+      // Don't set stripeAccount to null on network errors
+      return { status: false, message: error.message };
     }
-    return data;
   };
 
   const createStripeAccount = async (userId, role) => {
