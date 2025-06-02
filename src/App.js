@@ -70,6 +70,8 @@ import RespondToQuote from "./pages/quote-related-pages/service-providers/respon
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
 
+
+
 function App() {
   return (
     <UserProvider>
@@ -89,10 +91,7 @@ function App() {
             <Route path="/vendor/signup" element={<SupplierSignup />} />
 
             {/* Respond to Quote Route (not protected) */}
-            <Route
-              path="/service/quotes/respond/:quoteId"
-              element={<RespondToQuote />}
-            />
+            <Route path="/service/quotes/respond/:quoteId" element={<RespondToQuote />} />
 
             {/* end of route */}
 
