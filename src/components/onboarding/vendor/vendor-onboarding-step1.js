@@ -1,4 +1,4 @@
-import { InfoOutlined, CloudDownloadOutlined, CloudUploadOutlined } from "@mui/icons-material";
+import { InfoOutlined, CloudDownloadOutlined, CloudUploadOutlined, Close as CloseIcon } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -9,8 +9,13 @@ import {
   TextField,
   CircularProgress,
   styled,
+  IconButton,
+  Alert,
+  Snackbar,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import csvTemplate from '../../../assets/vendor-onboarding-template.csv';
 import excelTemplate from '../../../assets/vendor-onboarding-template.xlsx';
 import { Toast } from 'primereact/toast';
@@ -19,6 +24,10 @@ import * as XLSX from 'xlsx';
 import { useParams, useLocation } from 'react-router-dom';
 
 const VendorOnboardingStep1 = ({ handleNext }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const dialogRef = useRef(null);
+  const resizeTimeoutRef = useRef(null);
   const { id: userId } = useParams();
   const location = useLocation();
   const { uploadServicesData, verifyOnboardingStep1 } = useUser();
@@ -35,6 +44,8 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     price: '',
     description: ''
   });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   
   // Determine role based on URL path
   const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
@@ -124,6 +135,9 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     setShowDialog(false);
     setDialogType(null);
     setSelectedFile(null);
+    setServices([]);
+    setNewService({ name: '', price: '', description: '' });
+    setShowSuccess(false);
   };
 
   const validateHeaders = (headers) => {
@@ -187,16 +201,78 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   };
 
   const handleAddService = () => {
-    if (newService.name && newService.price) {
-      setServices([...services, newService]);
-      setNewService({ name: '', price: '', description: '' });
+    if (!newService.name || !newService.price) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Service name and price are required",
+      });
+      return;
     }
+
+    setServices([...services, { ...newService }]);
+    setNewService({ name: '', price: '', description: '' });
+    setShowSuccess(true);
   };
 
   const handleSubmit = async () => {
+    if (dialogType === 'manual' && services.length === 0) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please add at least one service",
+      });
+      return;
+    }
+
+    if (dialogType !== 'manual' && !selectedFile) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Please select a file to upload",
+      });
+      return;
+    }
+
+    // Show confirmation modal for both manual and file uploads
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmSubmit = async () => {
     setIsLoading(true);
+    setShowConfirmation(false);
     try {
-      if (selectedFile) {
+      if (dialogType === 'manual') {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/services/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            services: services
+          })
+        });
+        const data = await response.json();
+        
+        if (!data.status) {
+          throw new Error(data.message);
+        }
+
+        // Check if services were actually created
+        if (!data.data?.services || data.data.services.length === 0) {
+          throw new Error('No services were created');
+        }
+        
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: `Successfully added ${data.data.count} service(s)`,
+        });
+        
+        handleNext();
+        handleCloseDialog();
+      } else if (selectedFile) {
         const status = await uploadServicesData(selectedFile, userId, role);
         if (status) {
           handleNext();
@@ -205,10 +281,165 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
       }
     } catch (error) {
       setError(error.message);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: error.message,
+      });
     } finally {
       setIsLoading(false);
+      setShowConfirmation(false);
     }
   };
+
+  const renderManualUploadDialog = () => (
+    <>
+      <DialogTitle sx={{ 
+        p: { xs: 1, sm: 2 },
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        Add Services
+        <IconButton
+          edge="end"
+          color="inherit"
+          onClick={handleCloseDialog}
+          aria-label="close"
+        >
+        <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 2,
+        p: { xs: 1, sm: 2 }
+      }}>
+        <TextField
+          label="Service Name"
+          value={newService.name}
+          onChange={(e) => setNewService({...newService, name: e.target.value})}
+          fullWidth
+          required
+        />
+        <TextField
+          label="Price"
+          type="number"
+          value={newService.price}
+          onChange={(e) => setNewService({...newService, price: e.target.value})}
+          fullWidth
+          required
+        />
+        <TextField
+          label="Description"
+          value={newService.description}
+          onChange={(e) => setNewService({...newService, description: e.target.value})}
+          fullWidth
+          multiline
+          rows={2}
+        />
+
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2,
+          justifyContent: 'flex-end',
+          mt: 2
+        }}>
+          <Button 
+            onClick={handleAddService}
+            variant="contained"
+            color="primary"
+          >
+            {services.length > 0 ? 'Add Another Service' : 'Add Service'}
+          </Button>
+          
+          {services.length > 0 && (
+            <Button
+              onClick={handleSubmit}
+              variant="contained"
+              color="success"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Submit & Proceed'
+              )}
+            </Button>
+          )}
+        </Box>
+
+        {services.length > 0 && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Added Services ({services.length})
+            </Typography>
+            {services.map((service, index) => (
+              <Box 
+                key={index}
+                sx={{ 
+                  p: 1, 
+                  mb: 1, 
+                  border: '1px solid #ddd',
+                  borderRadius: 1,
+                  backgroundColor: '#f5f5f5'
+                }}
+              >
+                <Typography variant="body1">
+                  <strong>{service.name}</strong> - ${service.price}
+                </Typography>
+                {service.description && (
+                  <Typography variant="body2" color="text.secondary">
+                    {service.description}
+                  </Typography>
+                )}
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setShowSuccess(false)} 
+          severity="success"
+          sx={{ width: '100%' }}
+        >
+          Service added successfully!
+        </Alert>
+      </Snackbar>
+    </>
+  );
+
+  // Add resize handler
+  const handleResize = useCallback(() => {
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current);
+    }
+    resizeTimeoutRef.current = setTimeout(() => {
+      if (dialogRef.current) {
+        dialogRef.current.style.height = 'auto';
+      }
+    }, 100);
+  }, []);
+
+  // Add resize listener
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, [handleResize]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
@@ -232,31 +463,48 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
+        ref={dialogRef}
         PaperProps={{
           sx: {
             width: '100%',
             maxWidth: { xs: '95%', sm: '600px', md: '800px' },
-            margin: { xs: '10px', sm: '20px' }
+            margin: { xs: '10px', sm: '20px' },
+            height: 'auto',
+            maxHeight: isMobile ? '90vh' : '80vh',
+            overflow: 'auto'
           }
         }}
       >
-        <DialogContent sx={{ 
-          p: { xs: 2, sm: 3 },
-          '&.MuiDialogContent-root': {
-            paddingTop: { xs: 2, sm: 3 }
-          }
-        }}>
-          <DialogTitle sx={{ 
-            p: { xs: 1, sm: 2 },
-            fontSize: { xs: '1.1rem', sm: '1.25rem' }
-          }}>
-            {dialogType === "manual"
-              ? "Enter manually"
-              : `Upload ${dialogType?.toUpperCase()} File`}
-          </DialogTitle>
-          
-          {(dialogType === "csv" || dialogType === "excel") && (
+        <DialogContent 
+          sx={{ 
+            p: { xs: 2, sm: 3 },
+            '&.MuiDialogContent-root': {
+              paddingTop: { xs: 2, sm: 3 }
+            },
+            overflow: 'auto'
+          }}
+        >
+          {dialogType === 'manual' ? (
+            renderManualUploadDialog()
+          ) : (
             <>
+              <DialogTitle sx={{ 
+                p: { xs: 1, sm: 2 },
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                {dialogType === 'csv' ? 'CSV File Upload' : 'Excel File Upload'}
+                <IconButton
+                  edge="end"
+                  color="inherit"
+                  onClick={handleCloseDialog}
+                  aria-label="close"
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+
               <Box sx={{ 
                 display: "flex", 
                 flexDirection: "column", 
@@ -392,56 +640,68 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
               </Box>
             </>
           )}
+        </DialogContent>
+      </Dialog>
 
-          {dialogType === "manual" && (
-            <Box sx={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              gap: 2,
-              width: '100%'
-            }}>
-              <TextField
-                fullWidth
-                label="Service Name"
-                value={newService.name}
-                onChange={(e) => setNewService({ ...newService, name: e.target.value })}
-                margin="normal"
-                required
-                size="small"
-              />
-              <TextField
-                fullWidth
-                label="Price"
-                type="number"
-                value={newService.price}
-                onChange={(e) => setNewService({ ...newService, price: e.target.value })}
-                margin="normal"
-                required
-                size="small"
-              />
-              <TextField
-                fullWidth
-                label="Description"
-                multiline
-                rows={3}
-                value={newService.description}
-                onChange={(e) => setNewService({ ...newService, description: e.target.value })}
-                margin="normal"
-                size="small"
-              />
-              <Button
-                variant="contained"
-                onClick={handleAddService}
-                disabled={!newService.name || !newService.price}
-                sx={{ 
-                  alignSelf: 'flex-end',
-                  minWidth: { xs: '100%', sm: '120px' }
-                }}
-              >
-                Add Service
-              </Button>
-            </Box>
-          )}
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: { xs: '95%', sm: '400px' },
+            margin: { xs: '10px', sm: '20px' },
+            height: 'auto',
+            maxHeight: isMobile ? '90vh' : '80vh',
+            overflow: 'auto'
+          }
+        }}
+      >
+        <DialogContent 
+          sx={{ 
+            p: 3,
+            overflow: 'auto'
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
+            Confirm Submission
+          </Typography>
+          
+          <Typography sx={{ mb: 3, color: 'text.secondary' }}>
+            Please confirm that you have added all your services. You will be taken to the next step after submission.
+          </Typography>
+
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2,
+            justifyContent: 'flex-end',
+            flexWrap: 'wrap'
+          }}>
+            <Button
+              onClick={() => setShowConfirmation(false)}
+              variant="outlined"
+              disabled={isLoading}
+              fullWidth={isMobile}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmSubmit}
+              variant="contained"
+              color="primary"
+              disabled={isLoading}
+              fullWidth={isMobile}
+            >
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Submit'
+              )}
+            </Button>
+          </Box>
         </DialogContent>
       </Dialog>
     </Box>
