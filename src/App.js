@@ -89,14 +89,10 @@ function App() {
             <Route path="/vendor/signup" element={<SupplierSignup />} />
 
             {/* Respond to Quote Route (not protected) */}
-<<<<<<< HEAD
             <Route
               path="/service/quotes/respond/:quoteId"
               element={<RespondToQuote />}
             />
-=======
-            <Route path="/service/quotes/respond/:quoteId" element={<RespondToQuote />} />
->>>>>>> d526420 (Fix: modify onboarding route for vendors to handle userId passed through url params and to properly route to the handler route on the backend)
 
             {/* end of route */}
 
