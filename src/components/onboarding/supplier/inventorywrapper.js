@@ -69,7 +69,14 @@ const InventoryWrapper = ({ inventoryData }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto', gap: 2 }}>
+    <Box sx={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      height: "100%", 
+      overflow: 'auto', 
+      gap: 2,
+      px: { xs: 2, sm: 3 }
+    }}>
       <Alert 
         severity="info" 
         icon={<EditIcon />}
