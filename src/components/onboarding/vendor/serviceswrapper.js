@@ -16,8 +16,10 @@ import {
     useTheme,
     useMediaQuery,
     IconButton,
+    Typography,
+    Alert,
   } from "@mui/material";
-  import { Close as CloseIcon } from "@mui/icons-material";
+  import { Close as CloseIcon, Edit as EditIcon } from "@mui/icons-material";
   import { useState } from "react";
   import { Toast } from "primereact/toast";
   import { useRef } from "react";
@@ -109,58 +111,156 @@ import {
     };
   
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto' }}>
+      <Box sx={{ 
+        display: "flex", 
+        flexDirection: "column", 
+        height: "100%",
+        overflow: 'hidden',
+        gap: 2
+      }}>
         <Toast ref={toast} />
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: { xs: 300, sm: 650 } }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell sx={{ 
-                  fontWeight: 'bold',
-                  fontSize: { xs: '14px', sm: '16px' }
-                }}>Service Name</TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 'bold',
-                  fontSize: { xs: '14px', sm: '16px' },
-                  display: { xs: 'none', sm: 'table-cell' }
-                }}>Description</TableCell>
-                <TableCell sx={{ 
-                  fontWeight: 'bold',
-                  fontSize: { xs: '14px', sm: '16px' }
-                }}>Price</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {servicesData.map((item) => (
-                <TableRow
-                  key={item._id}
-                  onClick={() => handleRowClick(item)}
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                      cursor: "pointer",
-                    },
-                    "&:last-child td, &:last-child th": { border: 0 },
-                  }}
-                >
+        
+        <Alert 
+          severity="info" 
+          icon={<EditIcon />}
+          sx={{ 
+            flexShrink: 0,
+            '& .MuiAlert-message': {
+              fontSize: { xs: '14px', sm: '16px' }
+            }
+          }}
+        >
+          <Typography variant="body1">
+            Click on any service row to edit its details. You can modify the name, price, and description.
+          </Typography>
+        </Alert>
+
+        <Box sx={{ 
+          height: 'calc(100% - 72px)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          <TableContainer 
+            component={Paper}
+            sx={{
+              height: '100%',
+              overflow: 'auto',
+              '&::-webkit-scrollbar': {
+                width: '6px',
+                height: '6px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: '#f1f1f1',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#888',
+                borderRadius: '4px',
+                '&:hover': {
+                  background: '#666',
+                },
+              },
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#888 #f1f1f1',
+            }}
+          >
+            <Table 
+              sx={{ 
+                minWidth: { xs: 300, sm: 650 }, 
+                width: "100%",
+                borderCollapse: 'separate',
+                borderSpacing: 0,
+              }}
+            >
+              <TableHead>
+                <TableRow sx={{ 
+                  backgroundColor: "#f5f5f5",
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
+                  '& th': {
+                    backgroundColor: "#f5f5f5",
+                    borderBottom: '2px solid',
+                    borderColor: 'divider'
+                  }
+                }}>
                   <TableCell sx={{ 
+                    fontWeight: 'bold',
                     fontSize: { xs: '14px', sm: '16px' },
-                    py: { xs: 1, sm: 2 }
-                  }}>{item.name}</TableCell>
+                    width: { xs: '60%', sm: '35%' }
+                  }}>Service Name</TableCell>
                   <TableCell sx={{ 
+                    fontWeight: 'bold',
                     fontSize: { xs: '14px', sm: '16px' },
                     display: { xs: 'none', sm: 'table-cell' },
-                    py: { xs: 1, sm: 2 }
-                  }}>{item.description}</TableCell>
+                    width: { sm: '45%' }
+                  }}>Description</TableCell>
                   <TableCell sx={{ 
+                    fontWeight: 'bold',
                     fontSize: { xs: '14px', sm: '16px' },
-                    py: { xs: 1, sm: 2 }
-                  }}>${item.price}</TableCell>
+                    width: { xs: '40%', sm: '20%' }
+                  }}>Price</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {servicesData.map((item) => (
+                  <TableRow
+                    key={item._id}
+                    onClick={() => handleRowClick(item)}
+                    sx={{
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.04)",
+                        cursor: "pointer",
+                      },
+                      "&:last-child td, &:last-child th": { border: 0 },
+                      transition: 'background-color 0.2s ease'
+                    }}
+                  >
+                    <TableCell 
+                      sx={{ 
+                        fontSize: { xs: '14px', sm: '16px' },
+                        py: { xs: 1, sm: 2 },
+                        maxWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        width: { xs: '60%', sm: '35%' }
+                      }}
+                      title={item.name}
+                    >
+                      {item.name}
+                    </TableCell>
+                    <TableCell 
+                      sx={{ 
+                        fontSize: { xs: '14px', sm: '16px' },
+                        display: { xs: 'none', sm: 'table-cell' },
+                        py: { xs: 1, sm: 2 },
+                        maxWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        width: { sm: '45%' }
+                      }}
+                      title={item.description}
+                    >
+                      {item.description}
+                    </TableCell>
+                    <TableCell 
+                      sx={{ 
+                        fontSize: { xs: '14px', sm: '16px' },
+                        py: { xs: 1, sm: 2 },
+                        width: { xs: '40%', sm: '20%' }
+                      }}
+                    >
+                      ${item.price}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
   
         <Dialog 
           open={open} 

@@ -13,7 +13,10 @@ import {
   DialogActions,
   Button,
   TextField,
+  Typography,
+  Alert,
 } from "@mui/material";
+import { Edit as EditIcon } from "@mui/icons-material";
 import { useState } from "react";
 
 const InventoryWrapper = ({ inventoryData }) => {
@@ -67,17 +70,52 @@ const InventoryWrapper = ({ inventoryData }) => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto' }}>
+      <Alert 
+        severity="info" 
+        icon={<EditIcon />}
+        sx={{ 
+          flexShrink: 0,
+          '& .MuiAlert-message': {
+            fontSize: { xs: '14px', sm: '16px' }
+          }
+        }}
+      >
+        <Typography variant="body1">
+          Click on any product row to see the full details or to edit its content.
+        </Typography>
+      </Alert>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }}>
+      <TableContainer 
+        component={Paper}
+        sx={{ 
+          height: '100%',
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '4px',
+            '&:hover': {
+              background: '#555',
+            },
+          },
+        }}
+      >
+        <Table stickyHeader>
           <TableHead>
-            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell>Product Name</TableCell>
-              <TableCell>Product Category</TableCell>
-              <TableCell>Service Area</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>SKU</TableCell>
-              <TableCell>Price</TableCell>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Product Name</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Product Category</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Service Area</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Quantity</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>SKU</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Price</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
