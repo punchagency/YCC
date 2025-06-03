@@ -19,13 +19,19 @@ import {
   } from "@mui/material";
   import { Close as CloseIcon } from "@mui/icons-material";
   import { useState } from "react";
+  import { Toast } from "primereact/toast";
+  import { useRef } from "react";
+  import { useParams } from 'react-router-dom';
   
-  const ServicesWrapper = ({ servicesData }) => {
+  const ServicesWrapper = ({ servicesData, onServiceUpdate }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [editedItem, setEditedItem] = useState(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const toast = useRef(null);
+    const { id: userId } = useParams(); // Get userId from URL params
   
     // Sample data - replace with your actual data source
     const handleRowClick = (serviceItem) => {
@@ -44,18 +50,55 @@ import {
       setEditedItem(null);
     };
   
-    const handleSave = () => {
-      console.log('Saving updated item:', {
-        ...selectedItem,
-        service: {
-          ...selectedItem,
-          name: editedItem.name,
-          description: editedItem.description,
-          price: editedItem.price,
-        },
-      });
-      // Add your save logic here
-      handleClose();
+    const handleSave = async () => {
+      try {
+        setIsUpdating(true);
+        
+        if (!userId) {
+          throw new Error('User ID not found');
+        }
+
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/services/update/${selectedItem._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            name: editedItem.name,
+            price: editedItem.price,
+            description: editedItem.description
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!data.status) {
+          throw new Error(data.message || 'Failed to update service');
+        }
+
+        // Call the callback to update the parent component's state
+        if (onServiceUpdate) {
+          onServiceUpdate(data.data);
+        }
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Service updated successfully",
+        });
+
+        handleClose();
+      } catch (error) {
+        console.error('Error updating service:', error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: error.message || "Failed to update service",
+        });
+      } finally {
+        setIsUpdating(false);
+      }
     };
   
     const handleChange = (field) => (event) => {
@@ -67,7 +110,7 @@ import {
   
     return (
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto' }}>
-  
+        <Toast ref={toast} />
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: { xs: 300, sm: 650 } }}>
             <TableHead>
@@ -188,6 +231,7 @@ import {
               onClick={handleClose}
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
+              disabled={isUpdating}
             >
               Cancel
             </Button>
@@ -196,8 +240,9 @@ import {
               variant="contained"
               fullWidth={isMobile}
               size={isMobile ? "small" : "medium"}
+              disabled={isUpdating}
             >
-              Save
+              {isUpdating ? "Saving..." : "Save"}
             </Button>
           </DialogActions>
         </Dialog>

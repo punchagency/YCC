@@ -84,6 +84,14 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
     }
   };
 
+  const handleServiceUpdate = (updatedService) => {
+    setServicesData(prevData => 
+      prevData.map(service => 
+        service._id === updatedService._id ? updatedService : service
+      )
+    );
+  };
+
   return (
     <Box sx={{ 
       maxHeight: "100%", 
@@ -140,7 +148,10 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
             borderRadius: 1
           }
         }}>
-          <ServicesWrapper servicesData={servicesData} />
+          <ServicesWrapper 
+            servicesData={servicesData} 
+            onServiceUpdate={handleServiceUpdate}
+          />
         </Box>
       )}
       {isLoading && (
