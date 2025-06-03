@@ -38,6 +38,7 @@ import {
   bulkDeleteBookings,
   updateBookingStatusService,
 } from "../../services/bookings/bookingService";
+import { getAllServices } from "../../services/service/serviceService";
 
 // Context
 import { useBooking } from "../../context/booking/bookingContext";
@@ -108,6 +109,19 @@ const Bookings = () => {
   const [bookingToDelete, setBookingToDelete] = useState(null);
 
   const runCount = useRef(0);
+
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [showServicesModal, setShowServicesModal] = useState(false);
+  const [vendors, setVendors] = useState([]);
+
+  const [showBookingDetailsModal, setShowBookingDetailsModal] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState({
+    deliveryAddress: "",
+    phoneNumber: "",
+    deliveryDate: null,
+  });
 
   // Add this useEffect to handle window resizing
   useEffect(() => {
@@ -296,92 +310,125 @@ const Bookings = () => {
     }));
   };
 
-  // Update the handleCreateBooking function
+  // Add this function to fetch vendors
+  const fetchVendors = async () => {
+    try {
+      const response = await getAllServices();
+      if (response.status) {
+        // Extract unique vendors from services
+        const uniqueVendors = response.data.reduce((acc, service) => {
+          const vendor = service.vendor;
+          if (vendor && !acc.find((v) => v._id === vendor._id)) {
+            acc.push({
+              _id: vendor._id,
+              businessName: vendor.businessName,
+              businessAddress: vendor.serviceAreas || "Not specified",
+              email: vendor.email,
+              phoneNumber: vendor.phoneNumber,
+              businessType: vendor.businessType,
+              services: [service], // Add the current service
+              user: vendor.user, // Include user details
+            });
+          } else if (vendor) {
+            // If vendor exists, add the service to their services array
+            const existingVendor = acc.find((v) => v._id === vendor._id);
+            if (existingVendor) {
+              existingVendor.services.push(service);
+            }
+          }
+          return acc;
+        }, []);
+        setVendors(uniqueVendors);
+      }
+    } catch (error) {
+      console.error("Error fetching vendors:", error);
+      showError("Failed to fetch vendors");
+    }
+  };
+
+  // Add this function to handle vendor selection
+  const handleVendorSelect = (vendor) => {
+    setSelectedVendor(vendor);
+    setShowVendorModal(false);
+    setShowServicesModal(true);
+  };
+
+  // Add this function to handle service booking
+  const handleServiceBook = (service) => {
+    setSelectedService(service);
+    setShowServicesModal(false);
+    setShowBookingDetailsModal(true);
+  };
+
+  // Add this function to handle booking details change
+  const handleBookingDetailsChange = (field, value) => {
+    setBookingDetails((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Add this function to handle closing the services modal
+  const handleCloseServicesModal = () => {
+    setShowServicesModal(false);
+    setShowVendorModal(true); // Show the vendor modal again
+  };
+
+  // Update handleCreateBooking function
   const handleCreateBooking = async () => {
     try {
-      const selectedService = getFormattedServices().find(
-        (s) => s.value === newBooking.serviceType
-      );
+      setLoading(true);
 
-      if (!selectedService) {
-        showError("Please select a service");
+      // Validate required fields
+      if (
+        !selectedService ||
+        !bookingDetails.deliveryAddress ||
+        !bookingDetails.phoneNumber ||
+        !bookingDetails.deliveryDate
+      ) {
+        showError("Please fill in all required fields");
         return;
       }
 
+      // Create booking data object
       const bookingData = {
-        services: [
-          {
-            service: selectedService.value,
-            quantity: 1,
-          },
-        ],
-        vendorAssigned: selectedService.vendorId,
-        vendorLocation: newBooking.vesselLocation,
-        dateTime: newBooking.dateTime,
-        bookingStatus: newBooking.bookingStatus || "pending",
-        internalNotes: newBooking.internalNotes,
+        serviceId: selectedService._id,
+        deliveryAddress: bookingDetails.deliveryAddress,
+        phoneNumber: bookingDetails.phoneNumber,
+        deliveryDate: bookingDetails.deliveryDate,
       };
 
-      console.log("Creating booking with data:", bookingData);
-
+      // Call the create booking service
       const response = await createBookingService(bookingData);
-      console.log("Create Booking Response:", response);
 
       if (response.status) {
         showSuccess("Booking created successfully");
-
-        // Format the new booking to match the existing structure using response.booking
-        const newBookingEntry = {
-          _id: response.booking._id,
-          bookingId: response.booking.bookingId,
-          services: [
-            {
-              service: {
-                name: selectedService.label,
-                _id: selectedService.value,
-              },
-              quantity: response.booking.services[0].quantity,
-              _id: response.booking.services[0]._id,
-            },
-          ],
-          vendorAssigned: {
-            businessName: selectedService.vendorName,
-            businessAddress: selectedService.businessAddress,
-            _id: response.booking.vendorAssigned,
-          },
-          dateTime: response.booking.dateTime,
-          bookingStatus: response.booking.bookingStatus,
-          paymentStatus: response.booking.paymentStatus,
-          vendorName: selectedService.vendorName,
-          vesselLocation: newBooking.vesselLocation,
-          internalNotes: response.booking.internalNotes,
-          createdAt: response.booking.createdAt,
-          updatedAt: response.booking.updatedAt,
-        };
-
-        console.log("New Booking Entry:", newBookingEntry);
-
-        // Add the new booking to the start of the list
-        setBookingData((prevBookings) => [newBookingEntry, ...prevBookings]);
-
-        // Close modal and reset form
-        setShowAddBookingModal(false);
-        setNewBooking({
-          serviceType: "",
-          vendorAssigned: "",
-          vesselLocation: "",
-          dateTime: null,
-          bookingStatus: "pending",
-          internalNotes: "",
+        setShowBookingDetailsModal(false);
+        setSelectedService(null);
+        setBookingDetails({
+          deliveryAddress: "",
+          phoneNumber: "",
+          deliveryDate: null,
         });
+        // Refresh the bookings list
+        fetchBookingsData();
       } else {
         showError(response.message || "Failed to create booking");
       }
     } catch (error) {
       console.error("Error creating booking:", error);
-      showError(error.response?.data?.message || "Failed to create booking");
+      showError("An error occurred while creating the booking");
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Modify the useEffect to fetch vendors when the vendor modal opens
+  useEffect(() => {
+    if (showVendorModal) {
+      fetchVendors();
+    }
+  }, [showVendorModal]);
 
   // Use useCallback to define the function
   const fetchBookingsData = useCallback(async () => {
@@ -393,16 +440,26 @@ const Bookings = () => {
       if (response.status) {
         const formattedBookings = response.data.map((booking) => ({
           ...booking,
-          vendorName: booking.vendorAssigned?.businessName || "Not Assigned",
-          vesselLocation: booking.vendorLocation || "Not Available",
+          // Standardize all field names
+          status: booking.bookingStatus || booking.status || "pending",
+          dateTime: booking.deliveryDate || booking.dateTime,
+          location:
+            booking.vesselLocation ||
+            booking.deliveryAddress ||
+            "Not Available",
+          serviceName:
+            booking.services?.[0]?.service?.name ||
+            booking.service?.name ||
+            "N/A",
+          vendorName:
+            booking.vendorAssigned?.businessName ||
+            booking.vendor?.businessName ||
+            "Not Assigned",
+          totalAmount: booking.totalAmount || 0,
         }));
 
         setBookingData(formattedBookings);
-
-        // Set total records from pagination info
-        const total = response.pagination?.total || formattedBookings.length;
-        console.log("Setting total records:", total);
-        setTotalRecords(total);
+        setTotalRecords(response.pagination?.total || formattedBookings.length);
       } else {
         console.error("Error fetching bookings data:", response.message);
         showError(response.message || "Failed to fetch bookings");
@@ -437,42 +494,33 @@ const Bookings = () => {
     });
   };
 
-  // Update the renderResponsiveBookingRow function to match the backend data structure
+  // Update the renderResponsiveBookingRow function
   const renderResponsiveBookingRow = (booking) => {
-    const status = booking.bookingStatus || "pending";
+    const status = booking.status || "pending";
 
     return (
       <div className="mobile-booking-card">
         <div className="mobile-booking-header">
-          <span className="booking-id">
-            {booking._id ? booking._id.substring(0, 8) : "N/A"}
-          </span>
+          <span className="booking-id">{booking.bookingId || "N/A"}</span>
           <span className={`booking-status status-${status.toLowerCase()}`}>
-            {status}
+            {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>
         </div>
 
         <div className="mobile-booking-details">
           <div className="detail-row">
             <span className="detail-label">Service:</span>
-            <span className="detail-value">
-              {(booking.services && booking.services[0]?.service?.name) ||
-                "N/A"}
-            </span>
+            <span className="detail-value">{booking.serviceName}</span>
           </div>
 
           <div className="detail-row">
             <span className="detail-label">Vendor:</span>
-            <span className="detail-value">
-              {booking.vendorAssigned?.businessName || "Not Assigned"}
-            </span>
+            <span className="detail-value">{booking.vendorName}</span>
           </div>
 
           <div className="detail-row">
             <span className="detail-label">Location:</span>
-            <span className="detail-value">
-              {booking.vesselLocation || "N/A"}
-            </span>
+            <span className="detail-value">{booking.location}</span>
           </div>
 
           <div className="detail-row">
@@ -487,6 +535,13 @@ const Bookings = () => {
                     minute: "2-digit",
                   })
                 : "N/A"}
+            </span>
+          </div>
+
+          <div className="detail-row">
+            <span className="detail-label">Amount:</span>
+            <span className="detail-value">
+              ${booking.totalAmount?.toFixed(2) || "0.00"}
             </span>
           </div>
 
@@ -506,35 +561,6 @@ const Bookings = () => {
             tooltip="View"
             tooltipOptions={{ position: "top" }}
           />
-          <Button
-            icon="pi pi-pencil"
-            className="p-button-rounded p-button-text p-button-success"
-            onClick={() => handleEditBooking(booking)}
-            tooltip="Edit"
-            tooltipOptions={{ position: "top" }}
-          />
-          <Button
-            icon="pi pi-ellipsis-v"
-            className="p-button-rounded p-button-text"
-            onClick={(e) => {
-              setSelectedBookingForStatus(booking);
-              statusMenuRef.current.toggle(e);
-            }}
-            tooltip="Change Status"
-            tooltipOptions={{ position: "top" }}
-          />
-          <Button
-            className="p-button-rounded p-button-text"
-            onClick={() => handleUploadBooking(booking)}
-            tooltip="Upload Booking"
-            tooltipOptions={{ position: "top" }}
-          >
-            <img
-              src={uploadBooking}
-              alt="Upload"
-              style={{ width: "16px", height: "16px" }}
-            />
-          </Button>
         </div>
       </div>
     );
@@ -1047,7 +1073,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Service Type
+                                Service
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1066,7 +1092,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Vendor Assigned
+                                Vendor
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1085,7 +1111,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Vessel Location
+                                Status
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1104,7 +1130,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Date & Time
+                                Total Amount
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1123,7 +1149,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Booking Status
+                                Delivery Date
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1142,7 +1168,7 @@ const Bookings = () => {
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                Actions
+                                Delivery Address
                                 <img
                                   src={sortIcon}
                                   alt="sort"
@@ -1198,8 +1224,7 @@ const Bookings = () => {
                                         fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
-                                      {booking.services?.[0]?.service?.name ||
-                                        "N/A"}
+                                      {booking.serviceName}
                                     </td>
                                     <td
                                       style={{
@@ -1207,8 +1232,7 @@ const Bookings = () => {
                                         fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
-                                      {booking.vendorAssigned?.businessName ||
-                                        "Not Assigned"}
+                                      {booking.vendorName}
                                     </td>
                                     <td
                                       style={{
@@ -1216,7 +1240,46 @@ const Bookings = () => {
                                         fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
-                                      {booking.vesselLocation}
+                                      <span
+                                        style={{
+                                          backgroundColor:
+                                            booking.status === "confirmed"
+                                              ? "#e6f7ee"
+                                              : booking.status === "pending"
+                                              ? "#fff8e6"
+                                              : booking.status === "completed"
+                                              ? "#e6f0ff"
+                                              : booking.status === "declined"
+                                              ? "#ffebeb"
+                                              : "#ffebeb",
+                                          color:
+                                            booking.status === "confirmed"
+                                              ? "#1d9d74"
+                                              : booking.status === "pending"
+                                              ? "#ff9800"
+                                              : booking.status === "completed"
+                                              ? "#3366ff"
+                                              : "#ff4d4f",
+                                          padding: "2px 6px",
+                                          borderRadius: "4px",
+                                          fontSize: "10px",
+                                        }}
+                                      >
+                                        {booking.status
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                          booking.status.slice(1)}
+                                      </span>
+                                    </td>
+                                    <td
+                                      style={{
+                                        padding: "8px",
+                                        fontSize: isMobile ? "11px" : "10px",
+                                      }}
+                                    >
+                                      $
+                                      {booking.totalAmount?.toFixed(2) ||
+                                        "0.00"}
                                     </td>
                                     <td
                                       style={{
@@ -1240,203 +1303,7 @@ const Bookings = () => {
                                         fontSize: isMobile ? "11px" : "10px",
                                       }}
                                     >
-                                      <span
-                                        style={{
-                                          backgroundColor:
-                                            booking.bookingStatus ===
-                                            "confirmed"
-                                              ? "#e6f7ee"
-                                              : booking.bookingStatus ===
-                                                "pending"
-                                              ? "#fff8e6"
-                                              : booking.bookingStatus ===
-                                                "completed"
-                                              ? "#e6f0ff"
-                                              : booking.bookingStatus ===
-                                                "declined"
-                                              ? "#ffebeb"
-                                              : "#ffebeb",
-                                          color:
-                                            booking.bookingStatus ===
-                                            "confirmed"
-                                              ? "#1d9d74"
-                                              : booking.bookingStatus ===
-                                                "pending"
-                                              ? "#ff9800"
-                                              : booking.bookingStatus ===
-                                                "completed"
-                                              ? "#3366ff"
-                                              : "#ff4d4f",
-                                          padding: "2px 6px",
-                                          borderRadius: "4px",
-                                          fontSize: "10px",
-                                        }}
-                                      >
-                                        {/* Capitalize first letter for display */}
-                                        {booking.bookingStatus
-                                          .charAt(0)
-                                          .toUpperCase() +
-                                          booking.bookingStatus.slice(1)}
-                                      </span>
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "6px",
-                                        borderBottom: "1px solid #eee",
-                                      }}
-                                    >
-                                      <div
-                                        style={{ display: "flex", gap: "3px" }}
-                                      >
-                                        {/* View button */}
-                                        <Button
-                                          className="p-button-text p-button-sm"
-                                          style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            padding: "1px",
-                                          }}
-                                          tooltip="View Details"
-                                          tooltipOptions={{ position: "top" }}
-                                          onClick={() =>
-                                            handleViewBooking(booking)
-                                          }
-                                        >
-                                          <div
-                                            style={{ backgroundColor: "white" }}
-                                          >
-                                            <img
-                                              src={eyeblock}
-                                              alt="View"
-                                              style={{
-                                                width: isMobile
-                                                  ? "24px"
-                                                  : "20px",
-                                                height: isMobile
-                                                  ? "24px"
-                                                  : "20px",
-                                              }}
-                                            />
-                                          </div>
-                                        </Button>
-
-                                        {/* Edit button */}
-                                        <Button
-                                          className="p-button-text p-button-sm"
-                                          style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            padding: "1px",
-                                          }}
-                                          tooltip="Edit"
-                                          tooltipOptions={{ position: "top" }}
-                                          onClick={() =>
-                                            handleEditBooking(booking)
-                                          }
-                                        >
-                                          <img
-                                            src={editLogo}
-                                            alt="Edit"
-                                            style={{
-                                              width: isMobile ? "20px" : "20px",
-                                              height: isMobile
-                                                ? "20px"
-                                                : "20px",
-                                            }}
-                                          />
-                                        </Button>
-                                        <Button
-                                          className="p-button-text p-button-sm"
-                                          style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            padding: "1px",
-                                          }}
-                                          tooltip="Delete"
-                                          tooltipOptions={{ position: "top" }}
-                                          onClick={() =>
-                                            handleDeleteClick(booking)
-                                          }
-                                        >
-                                          <img
-                                            src={deleteIcon}
-                                            alt="times"
-                                            style={{
-                                              width: isMobile ? "20px" : "10px",
-                                              height: isMobile
-                                                ? "20px"
-                                                : "10px",
-                                            }}
-                                          />
-                                        </Button>
-
-                                        {/* Status button */}
-                                        <Button
-                                          className="p-button-text p-button-sm"
-                                          style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            padding: "1px",
-                                          }}
-                                          tooltip="Change Status"
-                                          tooltipOptions={{ position: "top" }}
-                                          onClick={(e) => {
-                                            setSelectedBookingForStatus(
-                                              booking
-                                            );
-                                            statusMenuRef.current.toggle(e);
-                                          }}
-                                        >
-                                          {/* <i
-                                className="pi pi-check-circle"
-                                style={{
-                                  fontSize: "14px",
-                                  color: "#4880FF",
-                                  border: "1px solid #4880FF",
-                                  borderRadius: "50%",
-                                  padding: "1px",
-                                }}
-                              ></i> */}
-                                          <img
-                                            src={check}
-                                            alt="Download"
-                                            style={{
-                                              width: isMobile ? "20px" : "20px",
-                                              height: isMobile
-                                                ? "20px"
-                                                : "20px",
-                                            }}
-                                          />
-                                        </Button>
-
-                                        {/* Upload button */}
-                                        <Button
-                                          className="p-button-text p-button-sm"
-                                          style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            padding: "1px",
-                                            border: "1px solid #ddd",
-                                            borderRadius: "50%",
-                                          }}
-                                          tooltip="Upload Invoice"
-                                          tooltipOptions={{ position: "top" }}
-                                          onClick={() =>
-                                            handleUploadBooking(booking)
-                                          }
-                                        >
-                                          <img
-                                            src={uploadBooking}
-                                            alt="Upload"
-                                            style={{
-                                              width: isMobile ? "20px" : "20px",
-                                              height: isMobile
-                                                ? "20px"
-                                                : "20px",
-                                            }}
-                                          />
-                                        </Button>
-                                      </div>
+                                      {booking.location}
                                     </td>
                                   </tr>
                                 ))}
@@ -1454,7 +1321,7 @@ const Bookings = () => {
                       >
                         <button
                           className="p-button-text p-button-sm"
-                          onClick={() => setShowAddBookingModal(true)}
+                          onClick={() => setShowVendorModal(true)}
                           style={{
                             backgroundColor: "#0387D9",
                             color: "white",
@@ -1529,7 +1396,8 @@ const Bookings = () => {
                                 currentPage >=
                                 Math.ceil(totalRecords / pageSize)
                               }
-                              className="p-button-text"
+                              className="p-button-rounded p-button-outlined"
+                              style={{ minWidth: "40px" }}
                             />
                             <span
                               className="text-sm"
@@ -1558,7 +1426,7 @@ const Bookings = () => {
                     >
                       <button
                         className="p-button-text p-button-sm"
-                        onClick={() => setShowAddBookingModal(true)}
+                        onClick={() => setShowVendorModal(true)}
                         style={{
                           backgroundColor: "#0387D9",
                           color: "white",
@@ -1578,8 +1446,21 @@ const Bookings = () => {
                         Add Booking
                       </button>
                     </div>
-                    {bookings && bookings.length > 0 ? (
-                      bookings.map((booking, index) => (
+                    {loading ? (
+                      <div className="mobile-skeleton-loader">
+                        {Array(3)
+                          .fill(0)
+                          .map((_, index) => (
+                            <div key={index} className="mobile-booking-card">
+                              <div
+                                className="skeleton-loader"
+                                style={{ height: "100px" }}
+                              ></div>
+                            </div>
+                          ))}
+                      </div>
+                    ) : bookingData && bookingData.length > 0 ? (
+                      bookingData.map((booking, index) => (
                         <div
                           key={booking._id || index}
                           className="mobile-booking-wrapper"
@@ -1595,9 +1476,10 @@ const Bookings = () => {
                           color: "#6b7280",
                         }}
                       >
-                        {loading ? "Loading bookings..." : "No bookings found"}
+                        No bookings found
                       </div>
                     )}
+
                     {/* Mobile Pagination */}
                     {bookingData && bookingData.length > 0 && (
                       <div
@@ -1810,7 +1692,7 @@ const Bookings = () => {
                   Service Type
                 </span>
                 <span style={{ fontWeight: "400" }}>
-                  {viewBooking.services[0]?.service?.name || "Yachting"}
+                  {viewBooking.serviceName}
                 </span>
               </div>
 
@@ -1825,7 +1707,7 @@ const Bookings = () => {
                   Vendor Assigned
                 </span>
                 <span style={{ fontWeight: "400" }}>
-                  {viewBooking.vendorAssigned?.businessName || "John Doe"}
+                  {viewBooking.vendorName}
                 </span>
               </div>
 
@@ -1840,7 +1722,7 @@ const Bookings = () => {
                   Vessel Location
                 </span>
                 <span style={{ fontWeight: "400" }}>
-                  {viewBooking.vesselLocation}
+                  {viewBooking.location}
                 </span>
               </div>
 
@@ -1881,19 +1763,19 @@ const Bookings = () => {
                 <span
                   style={{
                     backgroundColor:
-                      viewBooking.bookingStatus === "confirmed"
+                      viewBooking.status === "confirmed"
                         ? "#fff8e6"
-                        : viewBooking.bookingStatus === "completed"
+                        : viewBooking.status === "completed"
                         ? "#e6f0ff"
-                        : viewBooking.bookingStatus === "pending"
+                        : viewBooking.status === "pending"
                         ? "#fff8e6"
                         : "#ffebeb",
                     color:
-                      viewBooking.bookingStatus === "confirmed"
+                      viewBooking.status === "confirmed"
                         ? "#ff9800"
-                        : viewBooking.bookingStatus === "completed"
+                        : viewBooking.status === "completed"
                         ? "#3366ff"
-                        : viewBooking.bookingStatus === "pending"
+                        : viewBooking.status === "pending"
                         ? "#ff9800"
                         : "#ff4d4f",
                     padding: "2px 10px",
@@ -1902,8 +1784,8 @@ const Bookings = () => {
                     fontWeight: "500",
                   }}
                 >
-                  {viewBooking.bookingStatus.charAt(0).toUpperCase() +
-                    viewBooking.bookingStatus.slice(1)}
+                  {viewBooking.status.charAt(0).toUpperCase() +
+                    viewBooking.status.slice(1)}
                 </span>
               </div>
 
@@ -2325,6 +2207,180 @@ const Bookings = () => {
               ? `Are you sure you want to delete ${bookingToDelete.ids.length} selected bookings? This action cannot be undone.`
               : "Are you sure you want to delete this booking?"}
           </span>
+        </div>
+      </Dialog>
+
+      {/* Vendor Selection Modal */}
+      <Dialog
+        visible={showVendorModal}
+        onHide={() => setShowVendorModal(false)}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header="Select Vendor"
+        className="vendor-dialog"
+      >
+        <div className="p-fluid grid">
+          {vendors.map((vendor) => (
+            <div key={vendor._id} className="col-12 md:col-6 lg:col-4">
+              <div
+                className="vendor-card"
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "15px",
+                  backgroundColor: "white",
+                }}
+              >
+                <h3 style={{ marginBottom: "10px" }}>{vendor.businessName}</h3>
+                <p style={{ marginBottom: "5px", color: "#666" }}>
+                  <strong>Type:</strong> {vendor.businessType}
+                </p>
+                <p style={{ marginBottom: "5px", color: "#666" }}>
+                  <strong>Location:</strong> {vendor.businessAddress}
+                </p>
+                <p style={{ marginBottom: "5px", color: "#666" }}>
+                  <strong>Contact:</strong> {vendor.email}
+                </p>
+                <p style={{ marginBottom: "15px", color: "#666" }}>
+                  <strong>Phone:</strong> {vendor.phoneNumber}
+                </p>
+                <Button
+                  label="See Services"
+                  onClick={() => handleVendorSelect(vendor)}
+                  className="p-button-primary"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Dialog>
+
+      {/* Services Modal */}
+      <Dialog
+        visible={showServicesModal}
+        onHide={handleCloseServicesModal}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header={`${selectedVendor?.businessName}'s Services`}
+        className="services-dialog"
+      >
+        <div className="p-fluid grid">
+          {selectedVendor?.services?.map((service) => (
+            <div key={service._id} className="col-12 md:col-6 lg:col-4">
+              <div
+                className="service-card"
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "15px",
+                  backgroundColor: "white",
+                }}
+              >
+                <h3 style={{ marginBottom: "10px" }}>{service.name}</h3>
+                <p style={{ marginBottom: "15px", color: "#666" }}>
+                  {service.description || "No description available"}
+                </p>
+                <Button
+                  label="Book Now"
+                  onClick={() => handleServiceBook(service)}
+                  className="p-button-primary"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Dialog>
+
+      {/* Booking Details Modal */}
+      <Dialog
+        visible={showBookingDetailsModal}
+        onHide={() => setShowBookingDetailsModal(false)}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header="Booking Details"
+        className="booking-details-dialog"
+      >
+        <div className="p-fluid grid formgrid">
+          <div className="col-12 field">
+            <label htmlFor="serviceName">Service</label>
+            <InputText
+              id="serviceName"
+              value={selectedService?.name || ""}
+              disabled
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="vendorName">Vendor</label>
+            <InputText
+              id="vendorName"
+              value={selectedVendor?.businessName || ""}
+              disabled
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="deliveryAddress">Delivery Address*</label>
+            <InputText
+              id="deliveryAddress"
+              value={bookingDetails.deliveryAddress}
+              onChange={(e) =>
+                handleBookingDetailsChange("deliveryAddress", e.target.value)
+              }
+              placeholder="Enter delivery address"
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="phoneNumber">Phone Number*</label>
+            <InputText
+              id="phoneNumber"
+              value={bookingDetails.phoneNumber}
+              onChange={(e) =>
+                handleBookingDetailsChange("phoneNumber", e.target.value)
+              }
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="deliveryDate">Delivery Date*</label>
+            <Calendar
+              id="deliveryDate"
+              value={bookingDetails.deliveryDate}
+              onChange={(e) =>
+                handleBookingDetailsChange("deliveryDate", e.value)
+              }
+              showTime
+              placeholder="Select delivery date and time"
+            />
+          </div>
+        </div>
+
+        <div
+          className="dialog-footer"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "1rem",
+            marginTop: "2rem",
+          }}
+        >
+          <Button
+            label="Cancel"
+            icon="pi pi-times"
+            onClick={() => setShowBookingDetailsModal(false)}
+            className="p-button-danger"
+            style={{ backgroundColor: "#EF4444", border: "none" }}
+          />
+          <Button
+            label="Create Booking"
+            icon="pi pi-check"
+            onClick={handleCreateBooking}
+            loading={loading}
+            style={{ backgroundColor: "#0387D9", border: "none" }}
+          />
         </div>
       </Dialog>
     </div>

@@ -31,33 +31,14 @@ const MobileNotificationCard = ({
   const cellStatusMenu = useRef(null);
 
   const statusStyles = {
-    "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
-    flagged: { bg: "#EFF8FF", color: "#175CD3" },
-    "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
-    "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
-    pending: { bg: "#FEF3F2", color: "#B42318" },
-    "in-progress": { bg: "#FFFAEB", color: "#B54708" },
-    resolved: { bg: "#ECFDF3", color: "#027A48" },
-    dismissed: { bg: "#F2F4F7", color: "#344054" },
+    read: { bg: "#ECFDF3", color: "#027A48" },
+    unread: { bg: "#FEF3F2", color: "#B42318" },
   };
 
-  const style = statusStyles[notification.status.toLowerCase()] || {
+  const style = statusStyles[notification?.read ? "read" : "unread"] || {
     bg: "#F2F4F7",
     color: "#344054",
   };
-
-  const statusOptions = [
-    { label: "Pending", value: "pending" },
-    { label: "In Progress", value: "in-progress" },
-    { label: "Resolved", value: "resolved" },
-    { label: "Dismissed", value: "dismissed" },
-    { label: "Flagged", value: "flagged" },
-  ];
-
-  const statusMenuItems = statusOptions.map((option) => ({
-    label: option.label,
-    command: () => handleStatusChange(notification._id, option.value),
-  }));
 
   const priorityStyles = {
     high: { bg: "#ECFDF3", color: "#027A48" },
@@ -65,7 +46,9 @@ const MobileNotificationCard = ({
     low: { bg: "#FEF3F2", color: "#B42318" },
   };
 
-  const priorityStyle = priorityStyles[notification.priority.toLowerCase()] || {
+  const priorityStyle = priorityStyles[
+    (notification?.priority || "").toLowerCase()
+  ] || {
     bg: "#F2F4F7",
     color: "#344054",
   };
@@ -91,7 +74,7 @@ const MobileNotificationCard = ({
           }}
         >
           <Chip
-            label={notification.priority}
+            label={notification?.priority || "N/A"}
             size="small"
             sx={{
               backgroundColor: priorityStyle.bg,
@@ -101,7 +84,7 @@ const MobileNotificationCard = ({
             }}
           />
           <Chip
-            label={notification.status}
+            label={notification?.read ? "Read" : "Unread"}
             size="small"
             sx={{
               backgroundColor: style.bg,
@@ -121,7 +104,7 @@ const MobileNotificationCard = ({
             color: "#101828",
           }}
         >
-          {notification.type}
+          {notification?.type || "N/A"}
         </Typography>
 
         <Typography
@@ -137,7 +120,7 @@ const MobileNotificationCard = ({
             textOverflow: "ellipsis",
           }}
         >
-          {notification.description}
+          {notification?.message || "No message available"}
         </Typography>
 
         <Box
@@ -154,7 +137,9 @@ const MobileNotificationCard = ({
               color: "#667085",
             }}
           >
-            {new Date(notification.createdAt).toLocaleDateString()}
+            {notification?.createdAt
+              ? new Date(notification.createdAt).toLocaleDateString()
+              : "N/A"}
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -168,10 +153,19 @@ const MobileNotificationCard = ({
               style={{ padding: "6px" }}
             />
             <Menu
-              model={statusMenuItems}
+              model={[
+                {
+                  label: "Mark as Read",
+                  command: () => handleStatusChange(notification._id, "read"),
+                },
+                {
+                  label: "Mark as Unread",
+                  command: () => handleStatusChange(notification._id, "unread"),
+                },
+              ]}
               popup
               ref={cellStatusMenu}
-              id={`status-menu-${notification._id}`}
+              id={`status-menu-${notification?._id || Math.random()}`}
             />
 
             <Button
@@ -268,10 +262,13 @@ export default function Notifications({ role }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
-  // const statusMenu = useRef(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   const toast = useRef(null);
   const { showSuccess, showError } = useToast();
-  // const menuRefs = useRef({});
 
   // Add responsive detection
   const muiTheme = useMuiTheme();
@@ -279,69 +276,57 @@ export default function Notifications({ role }) {
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
   const { theme } = useMuiTheme();
 
-  const showToast = useCallback(
-    (severity, summary, detail) => {
-      if (toast.current) {
-        toast.current.show({ severity, summary, detail, life: 3000 });
-      }
-
-      if (severity === "success" && showSuccess) {
-        showSuccess(detail);
-      } else if (severity === "error" && showError) {
-        showError(detail);
-      }
-    },
-    [showSuccess, showError]
-  );
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await getNotifications();
+      console.log(
+        "Fetching notifications with page:",
+        page,
+        "limit:",
+        limit,
+        "filter:",
+        activeFilter
+      );
+
+      const response = await getNotifications({
+        page,
+        limit,
+        priority: activeFilter !== "all" ? activeFilter : undefined,
+      });
+
+      console.log("Notifications response:", response);
+
       if (response.success) {
-        const transformedData = response.data.map((item) => ({
-          priority: item.priority || "Low",
-          type: item.type || "General Issue",
-          description: item.message || item.description,
-          status: item.status || "Pending",
-          createdAt: item.create_at || item.createdAt,
-          _id: item._id,
-        }));
-        setNotifications(transformedData);
+        setNotifications(response.data);
+        setTotalPages(response.pagination.pages);
+        setTotalItems(response.pagination.total);
         setError(null);
       } else {
         setError(response.error);
-        showToast(
-          "error",
-          "Error",
-          response.error || "Failed to fetch notifications"
-        );
+        showError(response.error || "Failed to fetch notifications");
       }
     } catch (err) {
+      console.error("Error loading notifications:", err);
       setError("Failed to fetch notifications");
-      showToast(
-        "error",
-        "Error",
-        "An error occurred while fetching notifications"
-      );
+      showError("Failed to fetch notifications");
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [page, limit, activeFilter, showError]);
 
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
 
-  const filteredNotifications = notifications.filter((notification) =>
-    activeFilter === "all"
-      ? true
-      : notification.priority.toLowerCase() === activeFilter.toLowerCase()
-  );
+  const handleFilterClick = (filter) => {
+    console.log("Filter clicked:", filter);
+    setActiveFilter(filter);
+    setPage(1); // Reset to first page when filter changes
+  };
 
-  const handleFilterClick = (filter) => setActiveFilter(filter);
-
-  const handleViewDetails = (row) => {
-    setSelectedNotification(row);
+  const handleViewDetails = (notification) => {
+    console.log("Viewing details for notification:", notification);
+    setSelectedNotification(notification);
     setShowModal(true);
   };
 
@@ -354,25 +339,17 @@ export default function Notifications({ role }) {
         setNotifications(
           notifications.map((notification) =>
             notification._id === notificationId
-              ? { ...notification, status: newStatus }
+              ? { ...notification, read: newStatus === "read" }
               : notification
           )
         );
 
-        showToast(
-          "success",
-          "Success",
-          `Notification status changed to ${newStatus}`
-        );
+        showSuccess(`Notification marked as ${newStatus}`);
       } else {
-        showToast(
-          "error",
-          "Error",
-          response.error || "Failed to update status"
-        );
+        showError(response.error || "Failed to update status");
       }
     } catch (error) {
-      showToast("error", "Error", "An error occurred while updating status");
+      showError("An error occurred while updating status");
     } finally {
       setStatusLoading(false);
     }
@@ -407,11 +384,22 @@ export default function Notifications({ role }) {
 
   const statusTemplate = (rowData) => {
     return (
-      <StatusCell
-        rowData={rowData}
-        handleStatusChange={handleStatusChange}
-        statusLoading={statusLoading}
-      />
+      <div style={{ position: "relative" }}>
+        <span
+          style={{
+            backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
+            color: rowData.read ? "#027A48" : "#B42318",
+            padding: "2px 8px",
+            borderRadius: "16px",
+            fontSize: "12px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          {rowData.read ? "Read" : "Unread"}
+        </span>
+      </div>
     );
   };
 
@@ -561,34 +549,6 @@ export default function Notifications({ role }) {
           ))}
         </div>
 
-        {/* Mobile View */}
-        {isMobile && (
-          <Box sx={{ padding: "15px" }}>
-            {filteredNotifications.length > 0 ? (
-              filteredNotifications.map((notification) => (
-                <MobileNotificationCard
-                  key={notification._id}
-                  notification={notification}
-                  handleViewDetails={handleViewDetails}
-                  handleStatusChange={handleStatusChange}
-                  statusLoading={statusLoading}
-                  theme={theme}
-                />
-              ))
-            ) : (
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  color: "#667085",
-                  padding: "20px 0",
-                }}
-              >
-                No notifications found
-              </Typography>
-            )}
-          </Box>
-        )}
-
         {/* Desktop/Tablet View */}
         {!isMobile && (
           <div
@@ -599,7 +559,7 @@ export default function Notifications({ role }) {
             }}
           >
             <DataTable
-              value={filteredNotifications}
+              value={notifications}
               responsiveLayout="scroll"
               style={{
                 border: "1px solid #EAECF0",
@@ -635,8 +595,8 @@ export default function Notifications({ role }) {
                 }}
               />
               <Column
-                field="description"
-                header="Description"
+                field="message"
+                header="Message"
                 style={{
                   padding: isTablet ? "12px 16px" : "16px 24px",
                   maxWidth: isTablet ? "200px" : "300px",
@@ -654,7 +614,7 @@ export default function Notifications({ role }) {
                 }}
               />
               <Column
-                field="status"
+                field="read"
                 header="Status"
                 body={statusTemplate}
                 style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
@@ -681,7 +641,67 @@ export default function Notifications({ role }) {
                 }}
               />
             </DataTable>
+
+            {/* Pagination */}
+            <div
+              className="pagination"
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <span style={{ color: "#667085" }}>
+                  Showing {(page - 1) * limit + 1} to{" "}
+                  {Math.min(page * limit, totalItems)} of {totalItems} items
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <Button
+                  icon="pi pi-chevron-left"
+                  className="p-button-text"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                />
+                <Button
+                  icon="pi pi-chevron-right"
+                  className="p-button-text"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(page + 1)}
+                />
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* Mobile View */}
+        {isMobile && (
+          <Box sx={{ padding: "15px" }}>
+            {notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <MobileNotificationCard
+                  key={notification._id}
+                  notification={notification}
+                  handleViewDetails={handleViewDetails}
+                  handleStatusChange={handleStatusChange}
+                  statusLoading={statusLoading}
+                  theme={theme}
+                />
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  color: "#667085",
+                  padding: "20px 0",
+                }}
+              >
+                No notifications found
+              </Typography>
+            )}
+          </Box>
         )}
       </div>
 
@@ -689,7 +709,6 @@ export default function Notifications({ role }) {
         visible={showModal}
         onHide={() => {
           setShowModal(false);
-          // Refresh notifications after modal is closed to get updated status
           fetchNotifications();
         }}
         notificationData={selectedNotification}

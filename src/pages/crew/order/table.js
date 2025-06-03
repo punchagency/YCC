@@ -9,14 +9,14 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getOrders } from "../../../services/crew/crewOrderService";
+import { getUserOrders } from "../../../services/supplier/supplierService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
-const OrderTable = ({ filters = {} }) => {
+const OrderTable = ({ filters = {}, onRef }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [orders, setOrders] = useState([]);
@@ -41,87 +41,50 @@ const OrderTable = ({ filters = {} }) => {
       setLoading(true);
       console.log("Fetching orders with filters:", filters);
 
-      // Prepare API parameters including filters
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        sortBy: sortField,
-        sortOrder: sortDirection,
-      };
-
-      // Add status filter if provided
-      if (filters.status && filters.status.length > 0) {
-        params.status = filters.status.join(",");
-      }
-
-      console.log("Request params:", params);
-
-      const response = await getOrders(params);
-      console.log("Orders API response:", response);
+      const response = await getUserOrders();
+      console.log("Raw API response:", response);
 
       if (response.status) {
-        // Check the structure of the response
-        console.log("Response data structure:", JSON.stringify(response.data));
-
         let ordersData = [];
-        let paginationData = { ...pagination };
 
-        // Based on the console output, the structure is response.data.data
-        if (response.data?.data && Array.isArray(response.data.data)) {
+        // Handle the API response structure
+        if (response.data?.data) {
+          // If data is nested under data.data
           ordersData = response.data.data;
-
-          // Update pagination if available
-          if (response.data.pagination) {
-            console.log("Pagination data from API:", response.data.pagination);
-            paginationData = {
-              page: parseInt(response.data.pagination.currentPage) || 1,
-              limit: parseInt(response.data.pagination.pageSize) || 10,
-              total: parseInt(response.data.pagination.totalItems) || 0,
-              totalPages: parseInt(response.data.pagination.totalPages) || 1,
-            };
-          }
-        } else if (
-          response.data?.data?.data &&
-          Array.isArray(response.data.data.data)
-        ) {
-          // Alternative nested structure
-          ordersData = response.data.data.data;
-
-          // Update pagination if available
-          if (response.data.data.pagination) {
-            console.log(
-              "Pagination data from API:",
-              response.data.data.pagination
-            );
-            paginationData = {
-              page: parseInt(response.data.data.pagination.currentPage) || 1,
-              limit: parseInt(response.data.data.pagination.pageSize) || 10,
-              total: parseInt(response.data.data.pagination.totalItems) || 0,
-              totalPages:
-                parseInt(response.data.data.pagination.totalPages) || 1,
-            };
-          }
-        } else if (Array.isArray(response.data)) {
-          // Direct array response
+          console.log("Orders data from response.data.data:", ordersData);
+        } else if (response.data) {
+          // If data is directly in response.data
           ordersData = response.data;
+          console.log("Orders data from response.data:", ordersData);
+        }
+
+        // Sort orders by createdAt in descending order (newest first)
+        ordersData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        // Log the first order to verify structure
+        if (ordersData.length > 0) {
+          console.log("First order structure:", {
+            supplier: ordersData[0].supplier,
+            deliveryDate: ordersData[0].deliveryDate,
+            products: ordersData[0].products,
+          });
         }
 
         // Apply client-side filtering for criteria that can't be sent to the API
         if (filters.futureDelivery) {
           const currentDate = new Date();
           ordersData = ordersData.filter((order) => {
-            const estimatedDelivery = order.estimatedDeliveryDate
-              ? new Date(order.estimatedDeliveryDate)
+            const deliveryDate = order.deliveryDate
+              ? new Date(order.deliveryDate)
               : null;
-            return estimatedDelivery && estimatedDelivery > currentDate;
+            return deliveryDate && deliveryDate > currentDate;
           });
         }
 
-        console.log("Filtered orders data:", ordersData);
-        console.log("Pagination data:", paginationData);
-
+        console.log("Final orders data:", ordersData);
         setOrders(ordersData);
-        setPagination(paginationData);
       } else {
         console.error("Failed to fetch orders:", response.error);
         setError("Failed to load orders");
@@ -132,29 +95,44 @@ const OrderTable = ({ filters = {} }) => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, sortField, sortDirection, filters]);
+  }, [filters]);
 
-  // Fetch orders when component mounts or when sort/pagination changes
+  // Expose fetchOrders to parent component
+  useEffect(() => {
+    if (onRef) {
+      onRef({ fetchOrders });
+    }
+  }, [onRef, fetchOrders]);
+
+  // Fetch orders when component mounts and when filters change
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
-  // Format date for display without date-fns
+  // Format date for display
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    console.log("Formatting date:", dateString);
+    if (!dateString) {
+      console.log("No date string provided");
+      return "N/A";
+    }
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return "Invalid Date";
-
-      // Format as MM/DD/YYYY
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
-      const year = date.getFullYear();
-
-      return `${month}/${day}/${year}`;
+      console.log("Parsed date:", date);
+      if (isNaN(date.getTime())) {
+        console.log("Invalid date");
+        return "Invalid Date";
+      }
+      const formattedDate = date.toLocaleDateString("en-GB", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      console.log("Formatted date:", formattedDate);
+      return formattedDate;
     } catch (error) {
       console.error("Error formatting date:", error);
-      return dateString;
+      return "Invalid Date";
     }
   };
 
@@ -397,10 +375,23 @@ const OrderTable = ({ filters = {} }) => {
                         padding: "10px",
                         borderBottom: "1px solid #eee",
                       }}
-                      onClick={() => handleSort("orderId")}
+                      onClick={() => handleSort("vendorName")}
                     >
                       <div className="flex items-center">
-                        Order ID {getSortIcon("orderId")}
+                        Supplier Name {getSortIcon("vendorName")}
+                      </div>
+                    </th>
+                    <th
+                      style={{
+                        width: "15%",
+                        textAlign: "left",
+                        padding: "10px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                      onClick={() => handleSort("quantity")}
+                    >
+                      <div className="flex items-center">
+                        Quantity {getSortIcon("quantity")}
                       </div>
                     </th>
                     <th
@@ -410,10 +401,10 @@ const OrderTable = ({ filters = {} }) => {
                         padding: "10px",
                         borderBottom: "1px solid #eee",
                       }}
-                      onClick={() => handleSort("vendorName")}
+                      onClick={() => handleSort("deliveryAddress")}
                     >
                       <div className="flex items-center">
-                        Vendor Name {getSortIcon("vendorName")}
+                        Delivery Address {getSortIcon("deliveryAddress")}
                       </div>
                     </th>
                     <th
@@ -423,23 +414,10 @@ const OrderTable = ({ filters = {} }) => {
                         padding: "10px",
                         borderBottom: "1px solid #eee",
                       }}
-                      onClick={() => handleSort("createdAt")}
+                      onClick={() => handleSort("orderDate")}
                     >
                       <div className="flex items-center">
-                        Date Placed {getSortIcon("createdAt")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("estimatedDeliveryDate")}
-                    >
-                      <div className="flex items-center">
-                        Est. Delivery {getSortIcon("estimatedDeliveryDate")}
+                        Order Date {getSortIcon("orderDate")}
                       </div>
                     </th>
                     <th
@@ -462,11 +440,21 @@ const OrderTable = ({ filters = {} }) => {
                         padding: "10px",
                         borderBottom: "1px solid #eee",
                       }}
-                      onClick={() => handleSort("status")}
+                      onClick={() => handleSort("totalPrice")}
                     >
                       <div className="flex items-center">
-                        Actions {getSortIcon("status")}
+                        Total Price {getSortIcon("totalPrice")}
                       </div>
+                    </th>
+                    <th
+                      style={{
+                        width: "15%",
+                        textAlign: "left",
+                        padding: "10px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      <div className="flex items-center">Actions</div>
                     </th>
                   </tr>
                 </thead>
@@ -474,7 +462,7 @@ const OrderTable = ({ filters = {} }) => {
                   {orders.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="5"
+                        colSpan="7"
                         className="text-center py-4 text-gray-500"
                       >
                         No orders found
@@ -489,7 +477,11 @@ const OrderTable = ({ filters = {} }) => {
                             borderBottom: "1px solid #eee",
                           }}
                         >
-                          {order.orderId || order._id || `ORD-${index}`}
+                          {(() => {
+                            console.log("Order data:", order);
+                            console.log("Supplier data:", order?.supplier);
+                            return order?.supplier?.businessName || "N/A";
+                          })()}
                         </td>
                         <td
                           style={{
@@ -497,7 +489,10 @@ const OrderTable = ({ filters = {} }) => {
                             borderBottom: "1px solid #eee",
                           }}
                         >
-                          {order.vendorName || "N/A"}
+                          {order.products?.reduce(
+                            (sum, product) => sum + (product.quantity || 0),
+                            0
+                          ) || 0}
                         </td>
                         <td
                           style={{
@@ -505,7 +500,7 @@ const OrderTable = ({ filters = {} }) => {
                             borderBottom: "1px solid #eee",
                           }}
                         >
-                          {formatDate(order.createdAt || order.orderDate)}
+                          {order.deliveryAddress || "N/A"}
                         </td>
                         <td
                           style={{
@@ -513,7 +508,7 @@ const OrderTable = ({ filters = {} }) => {
                             borderBottom: "1px solid #eee",
                           }}
                         >
-                          {formatDate(order.estimatedDeliveryDate)}
+                          {formatDate(order.orderDate)}
                         </td>
                         <td
                           style={{
@@ -528,6 +523,14 @@ const OrderTable = ({ filters = {} }) => {
                           >
                             {order.status || "Pending"}
                           </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: "10px",
+                            borderBottom: "1px solid #eee",
+                          }}
+                        >
+                          ${order.totalPrice?.toFixed(2) || "0.00"}
                         </td>
                         <td
                           style={{
@@ -929,7 +932,9 @@ const OrderTable = ({ filters = {} }) => {
               }}
             >
               <h3 className="mb-2">Vendor Information</h3>
-              <p className="mb-2">Vendor Name: {selectedOrder?.vendorName || "N/A"}</p>
+              <p className="mb-2">
+                Vendor Name: {selectedOrder?.vendorName || "N/A"}
+              </p>
               {/* <p className="mb-2">
                 {selectedOrder?.vendorAddress || "N/A"}
               </p>

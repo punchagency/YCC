@@ -136,13 +136,15 @@ export default function BasicTable({ orders }) {
                 <StyledTableCell align="right">
                   <TableBodyText mode={theme}>
                     {isMobile
-                      ? (order.customerName || order.customer.name).split(
-                          " "
-                        )[0]
-                      : order.customerName || order.customer.name}
+                      ? (
+                          order?.customerName ||
+                          order?.customer?.name ||
+                          "N/A"
+                        ).split(" ")[0]
+                      : order?.customerName || order?.customer?.name || "N/A"}
                   </TableBodyText>
                 </StyledTableCell>
-                {order.status && (
+                {order?.status && (
                   <StyledTableCell align="right">
                     <TableBodyText mode={theme} padding="0px">
                       <StatusBox
@@ -157,13 +159,15 @@ export default function BasicTable({ orders }) {
                 )}
                 <StyledTableCell align="right">
                   <TableBodyText mode={theme}>
-                    ${parseFloat(order.totalPrice).toFixed(2)}
+                    ${parseFloat(order?.totalPrice || 0).toFixed(2)}
                   </TableBodyText>
                 </StyledTableCell>
                 {!isMobile && (
                   <StyledTableCell align="right">
                     <TableBodyText mode={theme}>
-                      {new Date(order.orderDate).toISOString().split("T")[0]}
+                      {order?.orderDate
+                        ? new Date(order.orderDate).toISOString().split("T")[0]
+                        : "N/A"}
                     </TableBodyText>
                   </StyledTableCell>
                 )}

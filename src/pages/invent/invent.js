@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
@@ -122,6 +122,31 @@ const Invent = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observer = useRef();
+  const [totalItems, setTotalItems] = useState(0);
+
+  // Add this function to handle infinite scroll
+  const lastInventoryElementRef = useCallback(
+    (node) => {
+      if (isLoadingMore) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            console.log("Loading more items...");
+            loadMoreData();
+          }
+        },
+        {
+          root: null,
+          rootMargin: "20px",
+          threshold: 1.0,
+        }
+      );
+      if (node) observer.current.observe(node);
+    },
+    [isLoadingMore, hasMore]
+  );
 
   // Inside your component, define the service area options
   const serviceAreaOptions = [
@@ -194,7 +219,7 @@ const Invent = () => {
           userInfo: item.userInfo,
         }));
 
-        console.log("Formatted Items:", formattedItems); // Debug log
+        console.log("Formatted Items:", formattedItems);
 
         if (pageNum === 1) {
           setInventoryItems(formattedItems);
@@ -202,12 +227,20 @@ const Invent = () => {
           setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
         }
 
+        // Update total items count
+        setTotalItems(result.total || 0);
+
         // Check if we have more items to load
-        setHasMore(formattedItems.length === 10);
+        const hasMoreItems =
+          formattedItems.length === 10 && pageNum * 10 < (result.total || 0);
+        setHasMore(hasMoreItems);
         setPage(pageNum);
 
         console.log("Updated state:", {
           items: formattedItems.length,
+          total: result.total,
+          hasMore: hasMoreItems,
+          currentPage: pageNum,
         });
       } else {
         console.error("Failed to load inventory data:", result.error);
@@ -252,6 +285,10 @@ const Invent = () => {
           textAlign: "center",
           padding: "1rem",
           backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+          position: "sticky",
+          bottom: 0,
+          width: "100%",
+          zIndex: 1,
         }}
       >
         <i className="pi pi-spin pi-spinner" style={{ fontSize: "2rem" }}></i>
@@ -706,32 +743,14 @@ const Invent = () => {
   const renderMobileInventoryCards = () => {
     return (
       <div style={{ padding: "0 10px" }}>
-        {/* <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "15px",
-            marginTop: "10px",
-          }}
-        >
-          <Button
-            label="Add New Product"
-            icon="pi pi-plus"
-            onClick={handleAddProduct}
-            style={{
-              backgroundColor: "#0387D9",
-              border: "none",
-              borderRadius: "5px",
-              color: "#fff",
-              width: "100%",
-              maxWidth: "250px",
-            }}
-          />
-        </div> */}
-
         {inventoryItems.map((item, index) => (
           <div
             key={index}
+            ref={
+              index === inventoryItems.length - 1
+                ? lastInventoryElementRef
+                : null
+            }
             style={{
               backgroundColor: "white",
               borderRadius: "8px",
@@ -799,7 +818,6 @@ const Invent = () => {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr",
-
                 gap: "8px",
                 fontSize: "14px",
               }}
@@ -821,8 +839,29 @@ const Invent = () => {
                 <span>${item.price.toFixed(2)}</span>
               </div>
             </div>
+
+            {/* Add Send Email button */}
+            <div style={{ marginTop: "10px" }}>
+              <button
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "5px",
+                  backgroundColor: "#0387D9",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  width: "100%",
+                }}
+                onClick={() => handleSendEmail(item)}
+              >
+                Send Email
+              </button>
+            </div>
           </div>
         ))}
+        {renderLoadingIndicator()}
       </div>
     );
   };
@@ -907,6 +946,258 @@ const Invent = () => {
     };
   }, []);
 
+  // Modify the desktop view to include the loading indicator
+  const renderDesktopView = () => {
+    return (
+      <div className="inventory-summary">
+        <table className="inventory-header-table">
+          <thead>
+            <tr>
+              <th
+                style={{
+                  width: "20%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                    Product Name
+                  </p>
+                </div>
+              </th>
+              <th
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                    Category
+                  </p>
+                </div>
+              </th>
+              <th
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                    Service Area
+                  </p>
+                </div>
+              </th>
+              <th
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                    Stock Quantity
+                  </p>
+                </div>
+              </th>
+              <th
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Price</p>
+                </div>
+              </th>
+              <th
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  padding: "10px",
+                  borderBottom: "1px solid #eee",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <img
+                    src={sort}
+                    alt="sort"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      marginRight: "5px",
+                    }}
+                  />
+                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Manage</p>
+                </div>
+              </th>
+            </tr>
+          </thead>
+        </table>
+
+        <table className="inventory-table">
+          <tbody>
+            {inventoryItems.map((item, index) => (
+              <tr
+                key={index}
+                ref={
+                  index === inventoryItems.length - 1
+                    ? lastInventoryElementRef
+                    : null
+                }
+              >
+                <td
+                  style={{
+                    width: "20%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {item.productName}
+                </td>
+                <td
+                  style={{
+                    width: "15%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {item.category}
+                </td>
+                <td
+                  style={{
+                    width: "15%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {item.serviceArea}
+                </td>
+                <td
+                  style={{
+                    width: "15%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  {item.stockQuantity} units
+                </td>
+                <td
+                  style={{
+                    width: "15%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  ${item.price.toFixed(2)}
+                </td>
+                <td
+                  style={{
+                    width: "15%",
+                    padding: "10px",
+                    borderBottom: "1px solid #eee",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <img
+                      src={eyesIn}
+                      alt="view"
+                      style={{
+                        width: "22px",
+                        height: "22px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleViewItem(item)}
+                    />
+                    <button
+                      style={{
+                        padding: "10px 16px",
+                        borderRadius: "5px",
+                        backgroundColor: "#0387D9",
+                        color: "#fff",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                        marginLeft: "10px",
+                      }}
+                      onClick={() => handleSendEmail(item)}
+                    >
+                      Send Email
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {renderLoadingIndicator()}
+      </div>
+    );
+  };
+
   return (
     <>
       <div
@@ -937,290 +1228,11 @@ const Invent = () => {
             <TableSkeleton showSummary={false} />
           ) : (
             <>
-              {isMobile ? (
-                // Mobile view
-                renderMobileInventoryCards()
-              ) : (
-                // Desktop view
-                <div
-                  className="inventory-summary"
-                  style={{
-                    backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-                    color: theme === "light" ? "#103B57" : "grey",
-                  }}
-                >
-                  <table
-                    className="inventory-header-table"
-                    style={{
-                      width: "100%",
-                      tableLayout: "fixed",
-                      borderCollapse: "collapse",
-                      marginBottom: "0",
-                      color: theme === "light" ? "#103B57" : "#F8FBFF",
-                    }}
-                  >
-                    <thead>
-                      <tr>
-                        <th
-                          style={{
-                            width: "20%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Product Name
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Category
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Service Area
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Stock Quantity
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Price
-                            </p>
-                          </div>
-                        </th>
-                        <th
-                          style={{
-                            width: "15%",
-                            textAlign: "left",
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <img
-                              src={sort}
-                              alt="sort"
-                              style={{
-                                width: "15px",
-                                height: "15px",
-                                marginRight: "5px",
-                              }}
-                            />
-                            <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                              Manage
-                            </p>
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                  </table>
-
-                  <table
-                    className="inventory-table"
-                    style={{
-                      width: "100%",
-                      tableLayout: "fixed",
-                      borderCollapse: "collapse",
-                      marginTop: "0",
-                    }}
-                  >
-                    <tbody>
-                      {inventoryItems.map((item, index) => (
-                        <tr key={index}>
-                          <td
-                            style={{
-                              width: "20%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.productName}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.category}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.serviceArea}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            {item.stockQuantity} units
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            ${item.price.toFixed(2)}
-                          </td>
-                          <td
-                            style={{
-                              width: "15%",
-                              padding: "10px",
-                              borderBottom: "1px solid #eee",
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "10px",
-                              }}
-                            >
-                              <img
-                                src={eyesIn}
-                                alt="view"
-                                style={{
-                                  width: "22px",
-                                  height: "22px",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => handleViewItem(item)}
-                              />
-                              <button
-                                style={{
-                                  padding: "10px 16px",
-                                  borderRadius: "5px",
-                                  backgroundColor: "#0387D9",
-                                  color: "#fff",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  fontSize: "12px",
-                                  fontWeight: "bold",
-                                  marginLeft: "10px",
-                                }}
-                                onClick={() => handleSendEmail(item)}
-                              >
-                                Send Email
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {renderLoadingIndicator()}
-                </div>
-              )}
+              {isMobile
+                ? // Mobile view
+                  renderMobileInventoryCards()
+                : // Desktop view
+                  renderDesktopView()}
             </>
           )}
         </div>

@@ -160,7 +160,7 @@
 .table-container {
   overflow-x: auto;
   background: white;
-  
+
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin: 20px 0;
@@ -289,7 +289,7 @@
   border-radius: 12px;
   padding: 16px;
   margin-top: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .skeleton-row {
@@ -343,7 +343,7 @@
 }
 
 .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
-  background: #0387D9;
+  background: #0387d9;
   color: white;
 }
 
@@ -369,13 +369,14 @@
   padding: 16px 24px;
   display: flex;
   justify-content: flex-end;
+  width: 100%;
 }
 
 .create-order-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #0387D9;
+  background: #0387d9;
   color: white;
   border: none;
   border-radius: 4px;
@@ -389,6 +390,33 @@
 .create-order-button img {
   width: 16px;
   height: 16px;
+}
+
+/* Mobile and tablet adjustments */
+@media screen and (max-width: 768px) {
+  .create-order-button-container {
+    padding: 12px 16px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .create-order-button {
+    width: auto;
+    margin: 0;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* Add padding to the bottom of the content to account for fixed button on mobile */
+@media screen and (max-width: 768px) {
+  .orders-summary {
+    padding-bottom: 80px; /* Add space for the fixed button */
+  }
 }
 
 /* Main content transitions */
@@ -491,34 +519,7 @@
   width: 100%;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Create order button */
-.create-order-button-container {
-  padding: 16px 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.create-order-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: #0387D9;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1.5rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
-  margin-left: auto;
-}
-
-.create-order-button img {
-  width: 16px;
-  height: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Form styles */
@@ -573,7 +574,7 @@
 
 /* Dropdown styles */
 .p-dropdown {
-  background: #F5F6FA;
+  background: #f5f6fa;
 }
 
 .p-dropdown .p-dropdown-label {
@@ -679,13 +680,13 @@
 
 /* Profile section styles */
 .profile-container {
-  background: #F5F6FA;
+  background: #f5f6fa;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .profile-container:hover {
-  background: #E9ECEF;
+  background: #e9ecef;
 }
 
 .profile-name {
@@ -697,7 +698,7 @@
 }
 
 .profile-role {
-  color: #6C757D;
+  color: #6c757d;
   font-size: 12px;
   line-height: 1.2;
   margin: 0;
@@ -721,7 +722,7 @@
 /* Theme toggle styles */
 .theme-toggle {
   position: relative;
-  background: #F5F6FA;
+  background: #f5f6fa;
   border-radius: 30px;
   width: 64px;
   height: 32px;
@@ -736,7 +737,7 @@
   background: #fff;
   border-radius: 28px;
   transition: transform 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .theme-toggle-icon {
@@ -751,11 +752,11 @@
 }
 
 .theme-toggle-icon.active svg {
-  fill: #0F172A;
+  fill: #0f172a;
 }
 
 .theme-toggle-icon.inactive svg {
-  fill: #94A3B8;
+  fill: #94a3b8;
 }
 
 /* Notification filter styles */
@@ -771,29 +772,29 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 14px;
-  color: #6C757D;
+  color: #6c757d;
 }
 
 .notification-filter .filter-item:hover {
-  background-color: #F5F6FA;
+  background-color: #f5f6fa;
 }
 
 .notification-filter .filter-item.active {
-  background-color: #0387D9;
+  background-color: #0387d9;
   color: white;
 }
 
 /* Update existing priority styles to match filter colors */
 .priority-high {
-  color: #EF4444 !important;
+  color: #ef4444 !important;
 }
 
 .priority-medium {
-  color: #F59E0B !important;
+  color: #f59e0b !important;
 }
 
 .priority-low {
-  color: #10B981 !important;
+  color: #10b981 !important;
 }
 
 .order-modal {
@@ -816,7 +817,7 @@
       color: #1e293b;
     }
 
-    input, 
+    input,
     .p-dropdown,
     .p-calendar {
       width: 100%;
@@ -843,7 +844,7 @@
 
     .dialog-footer {
       flex-direction: column;
-      
+
       .p-button {
         width: 100%;
       }
@@ -855,7 +856,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #0387D9;
+  background: #0387d9;
   color: white;
   border: none;
   border-radius: 4px;
@@ -869,4 +870,30 @@
 /* Remove any existing margin/padding that might affect alignment */
 .bookings-table td:last-child {
   padding-right: 16px;
+}
+
+/* Supplier Modal Grid Styles */
+.suppliers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Tablet View */
+@media screen and (max-width: 1024px) {
+  .suppliers-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile View */
+@media screen and (max-width: 768px) {
+  .suppliers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .supplier-card {
+    width: 100%;
+  }
 }

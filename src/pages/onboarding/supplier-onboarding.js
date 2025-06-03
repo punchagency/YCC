@@ -1,3 +1,4 @@
+// export default SupplierOnboarding;
 import * as React from "react";
 import PropTypes from "prop-types";
 import { styled } from "@mui/material/styles";
@@ -16,10 +17,12 @@ import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
+import { useParams } from "react-router-dom";
 import SupplierOnboardingStep1 from "../../components/onboarding/supplier/supplier-onboarding-step1";
 import SupplierOnboardingStep2 from "../../components/onboarding/supplier/supplier-onboarding-step2";
 import SupplierOnboardingStep3 from "../../components/onboarding/supplier/supplier-onboarding-step3";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useUser } from "../../context/userContext"; // Added this import
 
 const QontoStepIconRoot = styled("div")(({ theme }) => ({
   color: "#eaeaf0",
@@ -183,15 +186,64 @@ const steps = [
 ];
 
 const SupplierOnboarding = () => {
+  const { id } = useParams();
+  const { stripeAccount } = useUser(); // Added this to access Stripe account state
   const [activeStep, setActiveStep] = React.useState(0);
 
+  // Add step validation logic
+  const canAdvanceToStep = (stepIndex) => {
+    console.log('SupplierOnboarding - canAdvanceToStep called with:', stepIndex);
+    console.log('SupplierOnboarding - Current stripeAccount:', stripeAccount);
+    
+    switch (stepIndex) {
+      case 0: // Step 1 - Always accessible
+        return true;
+      case 1: // Step 2 - Always accessible after step 1
+        return true;
+      case 2: // Step 3 - Only if Stripe account is fully set up
+        const canAdvance = stripeAccount && 
+                          stripeAccount?.chargesEnabled && 
+                          stripeAccount?.transfersEnabled && 
+                          stripeAccount?.detailsSubmitted;
+        console.log('SupplierOnboarding - Can advance to Step 3:', canAdvance);
+        return canAdvance;
+      case 3: // Final step
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const handleNext = () => {
-    setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+    console.log('SupplierOnboarding - handleNext called, current step:', activeStep);
+    
+    const nextStep = activeStep + 1;
+    
+    // Check if we can advance to the next step
+    if (canAdvanceToStep(nextStep)) {
+      console.log('SupplierOnboarding - Advancing to step:', nextStep);
+      setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+    } else {
+      console.log('SupplierOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
+      // Optionally show a message to user that requirements aren't met
+    }
   };
 
   const handleReset = () => {
     setActiveStep(0);
   };
+
+  // Add effect to monitor step validation changes
+  React.useEffect(() => {
+    console.log('SupplierOnboarding - Step validation check, activeStep:', activeStep);
+    console.log('SupplierOnboarding - stripeAccount state:', stripeAccount);
+    
+    // If we're on step 3 but no longer meet requirements, go back to step 2
+    if (activeStep === 2 && !canAdvanceToStep(2)) {
+      console.log('SupplierOnboarding - Step 3 requirements no longer met, going back to Step 2');
+      setActiveStep(1);
+    }
+  }, [stripeAccount, activeStep]);
 
   return (
     <Box
@@ -234,15 +286,15 @@ const SupplierOnboarding = () => {
         ) : (
           <>
             {activeStep === 0 && (
-              <SupplierOnboardingStep1 handleNext={handleNext} />
+              <SupplierOnboardingStep1 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 1 && (
-              <SupplierOnboardingStep2 handleNext={handleNext} />
+              <SupplierOnboardingStep2 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 2 && (
-              <SupplierOnboardingStep3 handleNext={handleNext} />
+              <SupplierOnboardingStep3 handleNext={handleNext} userId={id} />
             )}
 
             {activeStep === 3 && (

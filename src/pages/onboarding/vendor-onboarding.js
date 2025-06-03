@@ -20,6 +20,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import VendorOnboardingStep1 from "../../components/onboarding/vendor/vendor-onboarding-step1";
 import VendorOnboardingStep2 from "../../components/onboarding/vendor/vendor-onboarding-step2";
 import VendorOnboardingStep3 from "../../components/onboarding/vendor/vendor-onboarding-step3";
+import { useUser } from "../../context/userContext";
 
 const QontoStepIconRoot = styled("div")(({ theme }) => ({
   color: "#eaeaf0",
@@ -183,15 +184,58 @@ const steps = [
 ];
 
 const VendorOnboarding = () => {
+  const { stripeAccount } = useUser();
   const [activeStep, setActiveStep] = React.useState(0);
 
+  const canAdvanceToStep = (stepIndex) => {
+    console.log('VendorOnboarding - canAdvanceToStep called with:', stepIndex);
+    console.log('VendorOnboarding - Current stripeAccount:', stripeAccount);
+    
+    switch (stepIndex) {
+      case 0: // Step 1 - Always accessible
+        return true;
+      case 1: // Step 2 - Always accessible after step 1
+        return true;
+      case 2: // Step 3 - Only if Stripe account is fully set up
+        const canAdvance = stripeAccount && 
+                          stripeAccount?.chargesEnabled && 
+                          stripeAccount?.transfersEnabled && 
+                          stripeAccount?.detailsSubmitted;
+        console.log('VendorOnboarding - Can advance to Step 3:', canAdvance);
+        return canAdvance;
+      case 3: // Final step
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const handleNext = () => {
-    setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+    console.log('VendorOnboarding - handleNext called, current step:', activeStep);
+    
+    const nextStep = activeStep + 1;
+    
+    if (canAdvanceToStep(nextStep)) {
+      console.log('VendorOnboarding - Advancing to step:', nextStep);
+      setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+    } else {
+      console.log('VendorOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
+    }
   };
 
   const handleReset = () => {
     setActiveStep(0);
   };
+
+  React.useEffect(() => {
+    console.log('VendorOnboarding - Step validation check, activeStep:', activeStep);
+    console.log('VendorOnboarding - stripeAccount state:', stripeAccount);
+    
+    if (activeStep === 2 && !canAdvanceToStep(2)) {
+      console.log('VendorOnboarding - Step 3 requirements no longer met, going back to Step 2');
+      setActiveStep(1);
+    }
+  }, [stripeAccount, activeStep]);
 
   return (
     <Box

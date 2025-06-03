@@ -78,7 +78,9 @@ export const deleteBookingService = async (bookingId) => {
 
 export const createBookingService = async (bookingData) => {
   try {
-    const response = await axios.post(API_URL, bookingData);
+    const response = await axios.post(API_URL, bookingData, {
+      headers: getAuthHeader(),
+    });
     return response.data;
   } catch (error) {
     throw error;
@@ -87,8 +89,8 @@ export const createBookingService = async (bookingData) => {
 
 export const getAllBookingService = async (page = 1, limit = 10) => {
   try {
-    console.log("Fetching bookings with:", { page, limit });
-    const response = await axios.get(`${API_URL}/bookings`, {
+    console.log("Fetching user bookings with:", { page, limit });
+    const response = await axios.get(`${API_URL}/user/bookings`, {
       headers: getAuthHeader(),
       params: {
         page,
@@ -96,21 +98,34 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
       },
     });
 
-    // Log the response to check the structure
-    console.log("Bookings API Response:", response.data);
+    console.log("User Bookings API Response:", response.data);
 
-    // Make sure we're returning both the data and pagination info
-    return {
-      status: true,
-      data: response.data.data || response.data, // Handle both structures
-      pagination: {
-        total: response.data.total || response.data.length,
-        page: response.data.page || page,
-        limit: response.data.limit || limit,
-      },
-    };
+    if (response.data.status) {
+      return {
+        status: true,
+        data: response.data.data,
+        pagination: {
+          total: response.data.data.length,
+          page: page,
+          limit: limit,
+        },
+      };
+    } else {
+      console.error("Error in API response:", response.data.message);
+      return {
+        status: false,
+        message: response.data.message || "Failed to fetch bookings",
+        data: [],
+        pagination: {
+          total: 0,
+          page: page,
+          limit: limit,
+        },
+      };
+    }
   } catch (error) {
     console.error("Error in getAllBookingService:", error);
+    console.error("Error response:", error.response?.data);
     return {
       status: false,
       message: error.response?.data?.message || "Failed to fetch bookings",

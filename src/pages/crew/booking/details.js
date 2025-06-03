@@ -1,5 +1,5 @@
 import { LineWeight } from "@mui/icons-material";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import vector from "../../../assets/images/crew/Vector 5.png";
 import calendar from "../../../assets/images/crew/crewcalendar.png";
@@ -11,52 +11,88 @@ import call from "../../../assets/images/crew/call.png";
 import editLogo from "../../../assets/images/crew/editLogo.png";
 import { Dialog } from "primereact/dialog";
 import { FiClock, FiCheck } from "react-icons/fi";
+import { getBookingById } from "../../../services/crew/crewBookingService";
+import { useToast } from "../../../components/Toast";
 
 const BookingDetails = () => {
   const { bookingId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { showError } = useToast();
 
   // Get booking details from location state or initialize empty object
   const [bookingDetails, setBookingDetails] = useState(
     location.state?.bookingDetails || {}
   );
-
+  const [loading, setLoading] = useState(!location.state?.bookingDetails);
+  const [error, setError] = useState(null);
   const [showModificationHistory, setShowModificationHistory] = useState(false);
+
+  // Function to fetch booking by ID
+  const fetchBookingById = useCallback(
+    async (id) => {
+      console.log("Fetching booking details for ID:", id);
+      try {
+        const response = await getBookingById(id);
+        console.log("Fetched booking details:", response);
+
+        if (response.status) {
+          setBookingDetails(response.data);
+        } else {
+          setError(response.error || "Failed to fetch booking details");
+          showError(response.error || "Failed to fetch booking details");
+        }
+      } catch (error) {
+        console.error("Error fetching booking details:", error);
+        setError("An unexpected error occurred");
+        showError("An unexpected error occurred");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showError]
+  );
 
   // If no booking details in state, fetch them using the ID
   useEffect(() => {
     if (!location.state?.bookingDetails && bookingId) {
-      // You would implement a function to fetch booking by ID
       fetchBookingById(bookingId);
     }
-  }, [bookingId, location.state]);
-
-  // Function to fetch booking by ID (implement this with your API)
-  const fetchBookingById = async (id) => {
-    console.log("Fetching booking details for ID:", id);
-    try {
-      // Call your API service to get booking details
-      // const response = await getBookingById(id);
-      // if (response.success) {
-      //   setBookingDetails(response.data);
-      // }
-    } catch (error) {
-      console.error("Error fetching booking details:", error);
-    }
-  };
+  }, [bookingId, location.state, fetchBookingById]);
 
   // Function to navigate to modify service page
-  const handleNavigateToModifyService = () => {
+  const handleNavigateToModifyService = useCallback(() => {
     navigate(`/crew/booking/modify/${bookingId}`, {
       state: { bookingDetails },
     });
-  };
+  }, [bookingId, bookingDetails, navigate]);
 
   // Simple function to go back
-  const handleGoBack = () => {
+  const handleGoBack = useCallback(() => {
     navigate(-1);
-  };
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <div className="text-red-500 text-xl mb-4">{error}</div>
+        <button
+          onClick={handleGoBack}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Back to Bookings
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -413,8 +449,7 @@ const BookingDetails = () => {
               {bookingDetails.vendorName || "N/A"}
             </h2>
             <p style={{ color: "#6B7280", margin: "4px 0 0 0" }}>
-              Booking #
-              {bookingDetails.bookingId || bookingDetails._id || "N/A"}
+              Booking #{bookingDetails.bookingId || bookingDetails._id || "N/A"}
             </p>
           </div>
 
@@ -429,8 +464,7 @@ const BookingDetails = () => {
                 fontWeight: "500",
               }}
             >
-              Modification In{" "}
-              {bookingDetails.bookingStatus || "N/A"}
+              Modification In {bookingDetails.bookingStatus || "N/A"}
             </span>
           </div>
 
@@ -494,9 +528,7 @@ const BookingDetails = () => {
                   ? new Date(bookingDetails.dateTime).toLocaleString()
                   : "N/A"}
               </div>
-              <div style={{ color: "#111827", fontWeight: "500" }}>
-                
-              </div>
+              <div style={{ color: "#111827", fontWeight: "500" }}></div>
             </div>
 
             <div style={{ marginBottom: "16px" }}>
