@@ -84,30 +84,41 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
     }
   };
 
+  const handleServiceUpdate = (updatedService) => {
+    setServicesData(prevData => 
+      prevData.map(service => 
+        service._id === updatedService._id ? updatedService : service
+      )
+    );
+  };
+
   return (
     <Box sx={{ 
-      maxHeight: "100%", 
-      overflow: "auto",
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
       p: { xs: 2, sm: 3 },
-      width: '100%'
+      overflow: 'hidden',
+      gap: 2
     }}>
       <Toast ref={toast} />
       <Box
         display="flex"
         flexDirection={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
+        justifyContent={{ xs: 'flex-start', sm: 'space-between' }}
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         gap={{ xs: 2, sm: 0 }}
         sx={{ 
-          width: { xs: '100%', sm: '80%', md: '60%' },
-          mb: 3
+          width: '100%',
+          px: { sm: 2 },
+          flexShrink: 0
         }}
       >
         <Typography 
           sx={{ 
             fontSize: { xs: "20px", sm: "24px" }, 
             fontWeight: "bold",
-            width: { xs: '100%', sm: 'auto' }
+            width: { xs: '100%', sm: 'auto' },
           }}
         >
           Confirm Services Data
@@ -121,7 +132,11 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
           sx={{ 
             minWidth: { xs: '100%', sm: '120px' },
             height: { xs: '48px', sm: '40px' },
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            boxShadow: 2,
+            '&:hover': {
+              boxShadow: 4
+            }
           }}
         >
           {isLoading ? <CircularProgress size={20} color="inherit"/> : "Finish"}
@@ -129,29 +144,34 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
       </Box>
       {servicesData && servicesData.length > 0 && (
         <Box sx={{ 
-          height: "100%", 
-          maxHeight: { xs: "calc(100vh - 200px)", sm: "60vh" }, 
-          overflowY: "auto",
-          width: '100%',
+          minHeight: '100px',
+          maxHeight: { xs: '350px', sm: '450px' },
+          overflow: 'hidden',
+          borderRadius: 1,
           '& .MuiTableContainer-root': {
             boxShadow: 'none',
             border: '1px solid',
             borderColor: 'divider',
-            borderRadius: 1
+            borderRadius: 1,
+            height: '100%'
           }
         }}>
-          <ServicesWrapper servicesData={servicesData} />
+          <ServicesWrapper 
+            servicesData={servicesData} 
+            onServiceUpdate={handleServiceUpdate}
+          />
         </Box>
       )}
       {isLoading && (
         <Box
           sx={{
+            minHeight: '100px',
+            maxHeight: { xs: '350px', sm: '450px' },
             display: "flex",
-            height: "100%",
-            maxHeight: { xs: "calc(100vh - 200px)", sm: "60vh" },
             flexDirection: "column",
             gap: 2,
-            width: '100%'
+            width: '100%',
+            borderRadius: 1
           }}
         >
           <Skeleton variant="rectangular" height="30px" width="100%" />

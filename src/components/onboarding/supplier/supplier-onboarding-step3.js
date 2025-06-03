@@ -83,20 +83,46 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
     <Box sx={{ maxHeight: "100%", overflow: "auto" }}>
       <Toast ref={toast} />
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ width: "50vw", mb: 3 }}
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", sm: "center" },
+          gap: { xs: 2, sm: 0 },
+          mb: 3,
+          width: "100%",
+          maxWidth: "1200px",
+          mx: "auto",
+          px: { xs: 2, sm: 3 }
+        }}
       >
-        <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
+        <Typography 
+          sx={{ 
+            fontSize: { xs: "20px", sm: "24px" },
+            fontWeight: "bold"
+          }}
+        >
           Confirm Inventory Data
         </Typography>
-        <Button variant="contained" color="primary" onClick={handleFinish}>
-          finish
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleFinish}
+          sx={{
+            minWidth: { xs: "100%", sm: "120px" },
+            height: "40px"
+          }}
+        >
+          Finish
         </Button>
       </Box>
       {inventoryData && inventoryData.length > 0 && (
-        <Box sx={{ height: "100%", maxHeight: "60vh", overflowY: "auto" }}>
+        <Box sx={{ 
+          height: "100%", 
+          maxHeight: { xs: "50vh", sm: "60vh" }, 
+          overflowY: "auto",
+          mb: { xs: 2, sm: 0 }
+        }}>
           <InventoryWrapper inventoryData={inventoryData} />
         </Box>
       )}
@@ -105,9 +131,10 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
           sx={{
             display: "flex",
             height: "100%",
-            maxHeight: "60vh",
+            maxHeight: { xs: "50vh", sm: "60vh" },
             flexDirection: "column",
             gap: 2,
+            mb: { xs: 0, sm: 0 }
           }}
         >
           <Skeleton variant="rectangular" height="30px" width="100%" />
