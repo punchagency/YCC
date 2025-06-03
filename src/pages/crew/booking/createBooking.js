@@ -1,211 +1,160 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
 import { createBooking } from "../../../services/crew/crewBookingService";
-import { getServices } from "../../../services/crew/crewServiceService";
+import { getAllServices } from "../../../services/service/serviceService";
+import { useToast } from "../../../components/Toast";
 
 const CreateBooking = () => {
-  const [showAddBookingModal, setShowAddBookingModal] = useState(false);
+  const { showSuccess, showError } = useToast();
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [showServicesModal, setShowServicesModal] = useState(false);
+  const [showBookingDetailsModal, setShowBookingDetailsModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [services, setServices] = useState([]);
-  const [fetchingServices, setFetchingServices] = useState(false);
-  const toast = useRef(null);
-
-  // State for new booking form
-  const [newBooking, setNewBooking] = useState({
-    serviceType: "",
-    vendorAssigned: "",
-    vesselLocation: "",
-    dateTime: null,
-    bookingStatus: "pending",
-    internalNotes: "",
+  const [vendors, setVendors] = useState([]);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
+  const [bookingDetails, setBookingDetails] = useState({
+    deliveryAddress: "",
+    phoneNumber: "",
+    deliveryDate: null,
   });
 
-  // Fetch services when modal opens
-  const fetchServices = async () => {
+  // Fetch vendors when modal opens
+  const fetchVendors = useCallback(async () => {
     try {
-      setFetchingServices(true);
-      console.log("Fetching services...");
-
-      const response = await getServices();
-      console.log("Services response:", response);
-
-      if (response.status) {
-        const allServices = [];
-
-        const vendors = response.data.data;
-        console.log("Vendors array:", vendors);
-
-        if (Array.isArray(vendors)) {
-          vendors.forEach((vendor) => {
-            if (vendor.services && vendor.services.length > 0) {
-              console.log(
-                `Vendor "${vendor.businessName}" has ${vendor.services.length} services`
-              );
-              vendor.services.forEach((service) => {
-                allServices.push({
-                  ...service,
-                  vendorName: vendor.businessName,
-                  vendorId: vendor._id,
-                });
-              });
-            } else {
-              console.log(`Vendor "${vendor.businessName}" has no services`);
-            }
-          });
-
-          console.log("Processed services:", allServices);
-          setServices(allServices);
-        } else {
-          console.error("Vendors is not an array:", vendors);
-          showError("Failed to load services: Invalid data format");
-        }
-      } else {
-        showError("Failed to load services");
-      }
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      showError("An error occurred while loading services");
-    } finally {
-      setFetchingServices(false);
-    }
-  };
-
-  // Format services for dropdown
-  // Format services for dropdown
-  const getFormattedServices = () => {
-    console.log("Formatting services for dropdown:", services);
-    return services.map((service) => ({
-      label: service.name || "Unknown Service",
-      value: service._id,
-      vendorName: service.vendorName || "Unknown Vendor",
-      vendorId: service.vendorId,
-      price: service.price || 0,
-    }));
-  };
-
-  // Handle input changes for new booking form
-  const handleNewBookingChange = (field, value) => {
-    setNewBooking((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Show success toast
-  const showSuccess = (message) => {
-    toast.current?.show({
-      severity: "success",
-      summary: "Success",
-      detail: message,
-      life: 3000,
-    });
-  };
-
-  // Show error toast
-  const showError = (message) => {
-    toast.current?.show({
-      severity: "error",
-      summary: "Error",
-      detail: message,
-      life: 3000,
-    });
-  };
-
-  // Handle create booking
-  const handleCreateBooking = async () => {
-    try {
-      // Validate form
-      if (!newBooking.serviceType) {
-        showError("Please select a service");
-        return;
-      }
-
-      if (!newBooking.vesselLocation) {
-        showError("Please enter vessel location");
-        return;
-      }
-
-      if (!newBooking.dateTime) {
-        showError("Please select a date and time");
-        return;
-      }
-
       setLoading(true);
-
-      // Get selected service details
-      const selectedService = getFormattedServices().find(
-        (s) => s.value === newBooking.serviceType
-      );
-
-      console.log("Selected service for booking:", selectedService);
-
-      // Prepare booking data in the format that matches Postman
-      const bookingData = {
-        services: [
-          {
-            service: newBooking.serviceType, // This is the service ID
-            notes: newBooking.internalNotes || "No notes provided",
-          },
-        ],
-        vendorAssigned: selectedService?.vendorId,
-        vendorName: selectedService?.vendorName || "Unknown Vendor",
-        vendorLocation: "Vendor's Business Address", // Change this from empty string to a valid value
-        dateTime: newBooking.dateTime.toISOString(),
-        internalNotes: newBooking.internalNotes || "",
-        serviceLocation: newBooking.vesselLocation, // This is what your API expects
-        contactPhone: "+1234567890", // Add a default phone or make this a form field
-        bookingStatus: newBooking.bookingStatus || "pending",
-      };
-
-      console.log(
-        "Creating booking with data:",
-        JSON.stringify(bookingData, null, 2)
-      );
-
-      const response = await createBooking(bookingData);
-      console.log("Create booking response:", response);
-
+      const response = await getAllServices();
       if (response.status) {
-        showSuccess("Booking created successfully");
-        console.log("Booking created successfully:", response.data);
-
-        // Close modal and reset form
-        setShowAddBookingModal(false);
-        setNewBooking({
-          serviceType: "",
-          vendorAssigned: "",
-          vesselLocation: "",
-          dateTime: null,
-          bookingStatus: "pending",
-          internalNotes: "",
-        });
-      } else {
-        console.error("Failed to create booking:", response.error);
-        showError(response.error || "Failed to create booking");
+        // Extract unique vendors from services
+        const uniqueVendors = response.data.reduce((acc, service) => {
+          const vendor = service.vendor;
+          if (vendor && !acc.find((v) => v._id === vendor._id)) {
+            acc.push({
+              _id: vendor._id,
+              businessName: vendor.businessName,
+              businessAddress: vendor.serviceAreas || "Not specified",
+              email: vendor.email,
+              phoneNumber: vendor.phoneNumber,
+              businessType: vendor.businessType,
+              services: [service],
+              user: vendor.user,
+            });
+          } else if (vendor) {
+            const existingVendor = acc.find((v) => v._id === vendor._id);
+            if (existingVendor) {
+              existingVendor.services.push(service);
+            }
+          }
+          return acc;
+        }, []);
+        setVendors(uniqueVendors);
       }
     } catch (error) {
-      console.error("Error in handleCreateBooking:", error);
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-        response: error.response?.data,
-      });
-      showError(error.response?.data?.message || "Failed to create booking");
+      console.error("Error fetching vendors:", error);
+      showError("Failed to fetch vendors");
     } finally {
       setLoading(false);
     }
-  };
+  }, [showError]);
 
-  // Open modal and fetch services
-  const openBookingModal = () => {
-    setShowAddBookingModal(true);
-    fetchServices();
-  };
+  // Handle vendor selection
+  const handleVendorSelect = useCallback((vendor) => {
+    setSelectedVendor(vendor);
+    setShowVendorModal(false);
+    setShowServicesModal(true);
+  }, []);
+
+  // Handle service booking
+  const handleServiceBook = useCallback((service) => {
+    setSelectedService(service);
+    setShowServicesModal(false);
+    setShowBookingDetailsModal(true);
+  }, []);
+
+  // Handle booking details change
+  const handleBookingDetailsChange = useCallback((field, value) => {
+    setBookingDetails((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }, []);
+
+  // Handle closing services modal
+  const handleCloseServicesModal = useCallback(() => {
+    setShowServicesModal(false);
+    setShowVendorModal(true);
+  }, []);
+
+  // Handle create booking
+  const handleCreateBooking = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Validate required fields
+      if (
+        !selectedService ||
+        !bookingDetails.deliveryAddress ||
+        !bookingDetails.phoneNumber ||
+        !bookingDetails.deliveryDate
+      ) {
+        showError("Please fill in all required fields");
+        return;
+      }
+
+      // Create booking data object
+      const bookingData = {
+        services: [
+          {
+            service: selectedService._id,
+            notes: "No additional notes",
+          },
+        ],
+        vendorAssigned: selectedVendor._id,
+        vendorName: selectedVendor.businessName,
+        vendorLocation: Array.isArray(selectedVendor.businessAddress)
+          ? selectedVendor.businessAddress.join(", ")
+          : selectedVendor.businessAddress || "Not specified",
+        dateTime: bookingDetails.deliveryDate,
+        serviceLocation: bookingDetails.deliveryAddress,
+        contactPhone: bookingDetails.phoneNumber,
+        bookingStatus: "pending",
+      };
+
+      console.log("Creating booking with data:", bookingData);
+
+      const response = await createBooking(bookingData);
+
+      if (response.status) {
+        showSuccess("Booking created successfully");
+        setShowBookingDetailsModal(false);
+        setSelectedService(null);
+        setSelectedVendor(null);
+        setBookingDetails({
+          deliveryAddress: "",
+          phoneNumber: "",
+          deliveryDate: null,
+        });
+      } else {
+        showError(response.message || "Failed to create booking");
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      showError("An error occurred while creating the booking");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedService, selectedVendor, bookingDetails, showSuccess, showError]);
+
+  // Fetch vendors when vendor modal opens
+  useEffect(() => {
+    if (showVendorModal) {
+      fetchVendors();
+    }
+  }, [showVendorModal, fetchVendors]);
 
   return (
     <>
@@ -224,116 +173,165 @@ const CreateBooking = () => {
               cursor: "pointer",
               border: "1px solid #0387D9",
             }}
-            onClick={openBookingModal}
+            onClick={() => setShowVendorModal(true)}
           >
             Create Booking
           </button>
         </div>
       </div>
 
-      {/* Add Booking Modal */}
+      {/* Vendor Selection Modal */}
       <Dialog
-        visible={showAddBookingModal}
-        onHide={() => setShowAddBookingModal(false)}
+        visible={showVendorModal}
+        onHide={() => setShowVendorModal(false)}
         style={{ width: "80vw", maxWidth: "800px" }}
-        header="Add New Booking"
-        className="booking-dialog"
+        header="Select Vendor"
+        className="vendor-dialog"
+      >
+        <div className="p-fluid grid">
+          {loading ? (
+            <div className="col-12 text-center">Loading vendors...</div>
+          ) : vendors.length === 0 ? (
+            <div className="col-12 text-center">No vendors available</div>
+          ) : (
+            vendors.map((vendor) => (
+              <div key={vendor._id} className="col-12 md:col-6 lg:col-4">
+                <div
+                  className="vendor-card"
+                  style={{
+                    padding: "20px",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    marginBottom: "15px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <h3 style={{ marginBottom: "10px" }}>
+                    {vendor.businessName}
+                  </h3>
+                  <p style={{ marginBottom: "5px", color: "#666" }}>
+                    <strong>Type:</strong> {vendor.businessType}
+                  </p>
+                  <p style={{ marginBottom: "5px", color: "#666" }}>
+                    <strong>Location:</strong> {vendor.businessAddress}
+                  </p>
+                  <p style={{ marginBottom: "5px", color: "#666" }}>
+                    <strong>Contact:</strong> {vendor.email}
+                  </p>
+                  <p style={{ marginBottom: "15px", color: "#666" }}>
+                    <strong>Phone:</strong> {vendor.phoneNumber}
+                  </p>
+                  <Button
+                    label="See Services"
+                    onClick={() => handleVendorSelect(vendor)}
+                    className="p-button-primary"
+                    style={{ width: "100%" }}
+                  />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </Dialog>
+
+      {/* Services Modal */}
+      <Dialog
+        visible={showServicesModal}
+        onHide={handleCloseServicesModal}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header={`${selectedVendor?.businessName}'s Services`}
+        className="services-dialog"
+      >
+        <div className="p-fluid grid">
+          {selectedVendor?.services?.map((service) => (
+            <div key={service._id} className="col-12 md:col-6 lg:col-4">
+              <div
+                className="service-card"
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "15px",
+                  backgroundColor: "white",
+                }}
+              >
+                <h3 style={{ marginBottom: "10px" }}>{service.name}</h3>
+                <p style={{ marginBottom: "15px", color: "#666" }}>
+                  {service.description || "No description available"}
+                </p>
+                <Button
+                  label="Book Now"
+                  onClick={() => handleServiceBook(service)}
+                  className="p-button-primary"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Dialog>
+
+      {/* Booking Details Modal */}
+      <Dialog
+        visible={showBookingDetailsModal}
+        onHide={() => setShowBookingDetailsModal(false)}
+        style={{ width: "80vw", maxWidth: "800px" }}
+        header="Booking Details"
+        className="booking-details-dialog"
       >
         <div className="p-fluid grid formgrid">
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="serviceType">Service Type</label>
-            <Dropdown
-              id="serviceType"
-              value={newBooking.serviceType}
-              options={getFormattedServices()}
-              onChange={(e) => {
-                console.log("Selected Service:", e.value);
-                const selectedService = getFormattedServices().find(
-                  (s) => s.value === e.value
-                );
-                console.log("Service Details:", selectedService);
-
-                handleNewBookingChange("serviceType", e.value);
-
-                // Only auto-populate vendor, not location
-                if (selectedService) {
-                  handleNewBookingChange(
-                    "vendorAssigned",
-                    selectedService.vendorName
-                  );
-                }
-              }}
-              placeholder="Select a service"
-              optionLabel="label"
-              disabled={fetchingServices}
-              filter
-              filterBy="label"
-              emptyFilterMessage="No services found"
-            />
-            {fetchingServices && (
-              <small className="text-blue-500">Loading services...</small>
-            )}
-            {!fetchingServices && services.length === 0 && (
-              <small className="text-red-500">No services available</small>
-            )}
-          </div>
-
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="vendorAssigned">Vendor Assigned</label>
+          <div className="col-12 field">
+            <label htmlFor="serviceName">Service</label>
             <InputText
-              id="vendorAssigned"
-              value={newBooking.vendorAssigned}
+              id="serviceName"
+              value={selectedService?.name || ""}
               disabled
-              placeholder="Vendor will be auto-assigned"
             />
           </div>
 
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="vesselLocation">Vessel Location</label>
+          <div className="col-12 field">
+            <label htmlFor="vendorName">Vendor</label>
             <InputText
-              id="vesselLocation"
-              value={newBooking.vesselLocation}
-              onChange={(e) =>
-                handleNewBookingChange("vesselLocation", e.target.value)
-              }
-              placeholder="Enter vessel location"
+              id="vendorName"
+              value={selectedVendor?.businessName || ""}
+              disabled
             />
           </div>
 
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="dateTime">Date & Time</label>
+          <div className="col-12 field">
+            <label htmlFor="deliveryAddress">Delivery Address*</label>
+            <InputText
+              id="deliveryAddress"
+              value={bookingDetails.deliveryAddress}
+              onChange={(e) =>
+                handleBookingDetailsChange("deliveryAddress", e.target.value)
+              }
+              placeholder="Enter delivery address"
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="phoneNumber">Phone Number*</label>
+            <InputText
+              id="phoneNumber"
+              value={bookingDetails.phoneNumber}
+              onChange={(e) =>
+                handleBookingDetailsChange("phoneNumber", e.target.value)
+              }
+              placeholder="Enter phone number"
+            />
+          </div>
+
+          <div className="col-12 field">
+            <label htmlFor="deliveryDate">Delivery Date*</label>
             <Calendar
-              id="dateTime"
-              value={newBooking.dateTime}
-              onChange={(e) => handleNewBookingChange("dateTime", e.value)}
-              showTime
-              showIcon
-              placeholder="March-15-2025 - 10:30 Pm"
-            />
-          </div>
-
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="bookingStatus">Booking Status</label>
-            <Dropdown
-              id="bookingStatus"
-              value={newBooking.bookingStatus}
-              options={["cancel", "pending", "confirmed", "completed"]}
-              onChange={(e) => handleNewBookingChange("bookingStatus", e.value)}
-              placeholder="Select Status"
-            />
-          </div>
-
-          <div className="col-12 md:col-6 field">
-            <label htmlFor="internalNotes">
-              Internal Notes & Comments Section
-            </label>
-            <InputText
-              id="internalNotes"
-              value={newBooking.internalNotes}
+              id="deliveryDate"
+              value={bookingDetails.deliveryDate}
               onChange={(e) =>
-                handleNewBookingChange("internalNotes", e.target.value)
+                handleBookingDetailsChange("deliveryDate", e.value)
               }
-              placeholder="Leave a note here..."
+              showTime
+              placeholder="Select delivery date and time"
             />
           </div>
         </div>
@@ -350,12 +348,12 @@ const CreateBooking = () => {
           <Button
             label="Cancel"
             icon="pi pi-times"
-            onClick={() => setShowAddBookingModal(false)}
+            onClick={() => setShowBookingDetailsModal(false)}
             className="p-button-danger"
             style={{ backgroundColor: "#EF4444", border: "none" }}
           />
           <Button
-            label="Save"
+            label="Create Booking"
             icon="pi pi-check"
             onClick={handleCreateBooking}
             loading={loading}
@@ -363,8 +361,6 @@ const CreateBooking = () => {
           />
         </div>
       </Dialog>
-
-      <Toast ref={toast} position="bottom-right" />
     </>
   );
 };

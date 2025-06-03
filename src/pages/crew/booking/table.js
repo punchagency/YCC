@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getBookings } from "../../../services/crew/crewBookingService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useToast } from "../../../components/Toast";
 
 import {
   FiEye,
@@ -15,57 +16,77 @@ import {
 } from "react-icons/fi";
 
 const BookingTable = () => {
+  const { showError } = useToast();
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
 
-  // Fetch bookings when component mounts
+  // Add window resize handler
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await getBookings();
-        console.log("Fetched bookings:", response);
-
-        if (response.status) {
-          setBookings(response.data.data || []);
-        } else {
-          setError(response.error || "Failed to fetch bookings");
-        }
-      } catch (err) {
-        console.error("Error in fetching bookings:", err);
-        setError("An unexpected error occurred");
-      } finally {
-        setLoading(false);
-      }
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    fetchBookings();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
+  // Fetch bookings when component mounts
+  const fetchBookings = useCallback(async () => {
+    try {
+      const response = await getBookings();
+      console.log("Fetched bookings:", response);
 
-  const getSortIcon = (field) => {
-    if (sortField === field) {
-      return sortDirection === "asc" ? (
-        <FaSortAmountUp className="ml-1" />
-      ) : (
-        <FaSortAmountDown className="ml-1" />
-      );
+      if (response.status) {
+        setBookings(response.data.data || []);
+      } else {
+        setError(response.error || "Failed to fetch bookings");
+        showError(response.error || "Failed to fetch bookings");
+      }
+    } catch (err) {
+      console.error("Error in fetching bookings:", err);
+      setError("An unexpected error occurred");
+      showError("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
-    return <FaSortAmountUp className="ml-1 opacity-30" />;
-  };
+  }, [showError]);
 
-  const getStatusBadgeClass = (status) => {
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const handleSort = useCallback(
+    (field) => {
+      if (sortField === field) {
+        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      } else {
+        setSortField(field);
+        setSortDirection("asc");
+      }
+    },
+    [sortField, sortDirection]
+  );
+
+  const getSortIcon = useCallback(
+    (field) => {
+      if (sortField === field) {
+        return sortDirection === "asc" ? (
+          <FaSortAmountUp className="ml-1" />
+        ) : (
+          <FaSortAmountDown className="ml-1" />
+        );
+      }
+      return <FaSortAmountUp className="ml-1 opacity-30" />;
+    },
+    [sortField, sortDirection]
+  );
+
+  const getStatusBadgeClass = useCallback((status) => {
     switch (status) {
       case "Pending":
         return "bg-blue-100 text-blue-800";
@@ -78,119 +99,128 @@ const BookingTable = () => {
       default:
         return "bg-gray-100 text-gray-800";
     }
-  };
+  }, []);
 
-  const handleViewDetails = (bookingId) => {
-    console.log("Viewing details for booking:", bookingId);
+  const handleViewDetails = useCallback(
+    (bookingId) => {
+      console.log("Viewing details for booking:", bookingId);
 
-    // Find the booking object by ID
-    const bookingDetails = bookings.find(
-      (booking) => booking.bookingId === bookingId || booking._id === bookingId
-    );
+      // Find the booking object by ID
+      const bookingDetails = bookings.find(
+        (booking) =>
+          booking.bookingId === bookingId || booking._id === bookingId
+      );
 
-    if (bookingDetails) {
-      console.log("Found booking details:", bookingDetails);
+      if (bookingDetails) {
+        console.log("Found booking details:", bookingDetails);
 
-      // Navigate to details page with state containing booking information
-      navigate(`/crew/booking/details/${bookingId}`, {
-        state: { bookingDetails },
-      });
-    } else {
-      console.error("Booking not found with ID:", bookingId);
-    }
-  };
+        // Navigate to details page with state containing booking information
+        navigate(`/crew/booking/details/${bookingId}`, {
+          state: { bookingDetails },
+        });
+      } else {
+        console.error("Booking not found with ID:", bookingId);
+      }
+    },
+    [bookings, navigate]
+  );
 
   // Function to handle downloading booking details as PDF
-  const handleDownloadPDF = (booking) => {
-    console.log(
-      "Downloading PDF for booking:",
-      booking.bookingId || booking._id
-    );
-
-    try {
-      // Create a new PDF document
-      const doc = new jsPDF();
-
-      // Add title
-      doc.setFontSize(20);
-      doc.text("Booking Details", 14, 22);
-
-      // Add booking ID and date
-      doc.setFontSize(12);
-      doc.text(
-        `Booking ID: ${booking.bookingId || booking._id || "N/A"}`,
-        14,
-        32
-      );
-      doc.text(
-        `Date: ${
-          booking.dateTime ? new Date(booking.dateTime).toLocaleString() : "N/A"
-        }`,
-        14,
-        38
+  const handleDownloadPDF = useCallback(
+    (booking) => {
+      console.log(
+        "Downloading PDF for booking:",
+        booking.bookingId || booking._id
       );
 
-      // Add vendor information
-      doc.setFontSize(16);
-      doc.text("Vendor Information", 14, 48);
-      doc.setFontSize(12);
-      doc.text(`Vendor: ${booking.vendorName || "N/A"}`, 14, 54);
+      try {
+        // Create a new PDF document
+        const doc = new jsPDF();
 
-      // Add service details
-      doc.setFontSize(16);
-      doc.text("Service Details", 14, 64);
-      doc.setFontSize(12);
+        // Add title
+        doc.setFontSize(20);
+        doc.text("Booking Details", 14, 22);
 
-      const serviceName =
-        booking.services &&
-        booking.services.length > 0 &&
-        booking.services[0].service
-          ? booking.services[0].service.name
-          : "N/A";
-
-      const servicePrice =
-        booking.services &&
-        booking.services.length > 0 &&
-        booking.services[0].service
-          ? `$${booking.services[0].service.price}`
-          : "N/A";
-
-      doc.text(`Service: ${serviceName}`, 14, 70);
-      doc.text(
-        `Location: ${
-          booking.serviceLocation || booking.vendorLocation || "N/A"
-        }`,
-        14,
-        76
-      );
-      doc.text(`Price: ${servicePrice}`, 14, 82);
-      doc.text(`Status: ${booking.status || "Pending"}`, 14, 88);
-
-      // Add service description if available
-      if (
-        booking.services &&
-        booking.services.length > 0 &&
-        booking.services[0].service &&
-        booking.services[0].service.description
-      ) {
-        doc.setFontSize(16);
-        doc.text("Service Description", 14, 98);
+        // Add booking ID and date
         doc.setFontSize(12);
-        doc.text(booking.services[0].service.description, 14, 104);
+        doc.text(
+          `Booking ID: ${booking.bookingId || booking._id || "N/A"}`,
+          14,
+          32
+        );
+        doc.text(
+          `Date: ${
+            booking.dateTime
+              ? new Date(booking.dateTime).toLocaleString()
+              : "N/A"
+          }`,
+          14,
+          38
+        );
+
+        // Add vendor information
+        doc.setFontSize(16);
+        doc.text("Vendor Information", 14, 48);
+        doc.setFontSize(12);
+        doc.text(`Vendor: ${booking.vendorName || "N/A"}`, 14, 54);
+
+        // Add service details
+        doc.setFontSize(16);
+        doc.text("Service Details", 14, 64);
+        doc.setFontSize(12);
+
+        const serviceName =
+          booking.services &&
+          booking.services.length > 0 &&
+          booking.services[0].service
+            ? booking.services[0].service.name
+            : "N/A";
+
+        const servicePrice =
+          booking.services &&
+          booking.services.length > 0 &&
+          booking.services[0].service
+            ? `$${booking.services[0].service.price}`
+            : "N/A";
+
+        doc.text(`Service: ${serviceName}`, 14, 70);
+        doc.text(
+          `Location: ${
+            booking.serviceLocation || booking.deliveryAddress || "N/A"
+          }`,
+          14,
+          76
+        );
+        doc.text(`Price: ${servicePrice}`, 14, 82);
+        doc.text(`Status: ${booking.status || "Pending"}`, 14, 88);
+
+        // Add service description if available
+        if (
+          booking.services &&
+          booking.services.length > 0 &&
+          booking.services[0].service &&
+          booking.services[0].service.description
+        ) {
+          doc.setFontSize(16);
+          doc.text("Service Description", 14, 98);
+          doc.setFontSize(12);
+          doc.text(booking.services[0].service.description, 14, 104);
+        }
+
+        // Generate filename with booking ID
+        const filename = `booking-${
+          booking.bookingId || booking._id || "details"
+        }.pdf`;
+
+        // Save the PDF
+        doc.save(filename);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        showError("Failed to generate PDF. Please try again.");
       }
-
-      // Generate filename with booking ID
-      const filename = `booking-${
-        booking.bookingId || booking._id || "details"
-      }.pdf`;
-
-      // Save the PDF
-      doc.save(filename);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      alert("Failed to generate PDF. Please try again.");
-    }
-  };
+    },
+    [showError]
+  );
 
   // Show loading state
   if (loading) {
@@ -222,7 +252,10 @@ const BookingTable = () => {
     <>
       <div className="p-4 mt-2 ml-4 mr-4 mb-2 w-full">
         {/* Booking Table */}
-        <div className="pl-2 pr-2 pt-6 pb-2 rounded-xl shadow-sm mt-1 bg-white" style={{borderRadius:"10px"}}>
+        <div
+          className="pl-2 pr-2 pt-6 pb-2 rounded-xl shadow-sm mt-1 bg-white"
+          style={{ borderRadius: "10px" }}
+        >
           {bookings.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               No bookings found.
@@ -365,11 +398,11 @@ const BookingTable = () => {
                       </td>
                       <td
                         style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
+                          padding: "8px",
+                          fontSize: isMobile ? "11px" : "10px",
                         }}
                       >
-                        {item.serviceLocation || item.vendorLocation || "N/A"}
+                        {item.serviceLocation || item.deliveryAddress || "N/A"}
                       </td>
                       <td
                         style={{

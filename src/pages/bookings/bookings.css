@@ -948,3 +948,71 @@
 .flex {
   width: 100% !important;
 }
+
+/* Mobile skeleton loader */
+.mobile-skeleton-loader {
+  padding: 15px;
+}
+
+.mobile-skeleton-loader .mobile-booking-card {
+  margin-bottom: 15px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Mobile view improvements */
+@media screen and (max-width: 768px) {
+  .mobile-view {
+    padding: 0 15px;
+  }
+
+  .mobile-booking-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+  }
+
+  .mobile-booking-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-booking-details {
+    padding: 15px;
+  }
+
+  .detail-row {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .detail-label {
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .detail-value {
+    color: #111827;
+    text-align: right;
+    max-width: 60%;
+  }
+
+  .mobile-booking-actions {
+    padding: 10px 15px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .mobile-booking-actions .p-button {
+    width: 36px;
+    height: 36px;
+  }
+}

@@ -53,149 +53,256 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
-
-
-  const getStripeAccount = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
-      headers: getAuthHeader(),
-    });
-    const data = await response.json();
-    if (!data.status) {
-      setStripeAccount(null);
-    } else {
-      setStripeAccount(data.data);
+  // const getStripeAccount = async (userId, role) => {
+  //   console.log('userContext - getStripeAccount called with:', { userId, role });
+  //   const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       ...getAuthHeader()
+  //     },
+  //     body: JSON.stringify({ userId, role })
+  //   });
+  //   console.log("status code:", response);
+  //   const data = await response.json();
+  //   console.log('userContext - getStripeAccount response:', data);
+  //   if (!data.status) {
+  //     setStripeAccount(null);
+  //   } else {
+  //     setStripeAccount(data.data);
+  //   }
+  //   return data;
+  // };
+  const getStripeAccount = async (userId, role) => {
+    console.log('userContext - getStripeAccount called with:', { userId, role });
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({ userId, role })
+      });
+      const data = await response.json();
+      console.log('userContext - getStripeAccount response:', data);
+      
+      if (!data.status) {
+        // Only set to null if account truly doesn't exist
+        if (response.status === 404) {
+          setStripeAccount(null);
+        }
+        // For other errors, don't change the state
+      } else {
+        setStripeAccount(data.data);
+      }
+      return data;
+    } catch (error) {
+      console.error('userContext - getStripeAccount error:', error);
+      // Don't set stripeAccount to null on network errors
+      return { status: false, message: error.message };
     }
   };
 
-const createStripeAccount = async () => {
-  const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`,{
-    headers: getAuthHeader()
-  });
-  const data = await response.json();
-  if(data.status){
-    window.location.href = data.data.url;
-  }
-}
-
-
-  const refreshStripeAccountLink = async () => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`,{
-      headers: getAuthHeader()
+  const createStripeAccount = async (userId, role) => {
+    console.log('userContext - createStripeAccount called with:', { userId, role });
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ userId, role })
     });
     const data = await response.json();
+    console.log('userContext - createStripeAccount response:', data);
     if(data.status){
       window.location.href = data.data.url;
     }
+    return data;
   }
 
+  const refreshStripeAccountLink = async (userId, role) => {
+    console.log('userContext - refreshStripeAccountLink called with:', { userId, role });
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ userId, role })
+    });
+    const data = await response.json();
+    console.log('userContext - refreshStripeAccountLink response:', data);
+    if(data.status){
+      window.location.href = data.data.url;
+    }
+    return data;
+  }
 
-  const uploadInventoryData = async ( selectedFile ) =>{
+  const uploadInventoryData = async (selectedFile, userId) => {
     const formData = new FormData();
-      formData.append("file", selectedFile); // "file" should match the field name expected by multer
-  
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
-          method: "POST",
-          body: formData,
-          headers: {
-            ...getAuthHeader()
-          },
-        });
-        const data = await response.json();
-  
-        if (!data.status) {
-          const error = data.message;
-          throw new Error(error);
-        }
-  
-        console.log("Upload successful:", data);
-        return data.status
-        
-      } catch (err) {
-        console.error("Upload failed:", err.message);
-      }
-  }
+    formData.append("file", selectedFile);
+    formData.append("userId", userId);
 
-  
-  const uploadServicesData = async ( selectedFile ) =>{
-    const formData = new FormData();
-      formData.append("file", selectedFile); // "file" should match the field name expected by multer
-  
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
-          method: "POST",
-          body: formData,
-          headers: {
-            ...getAuthHeader()
-          },
-        });
-        const data = await response.json();
-  
-        if (!data.status) {
-          const error = data.message;
-          throw new Error(error);
-        }
-  
-        console.log("Upload successful:", data);
-        return data.status
-        
-      } catch (err) {
-        console.error("Upload failed:", err.message);
-      }
-  }
-  const verifyOnboardingStep1 = async () => {
-    if(user.role === "supplier"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {
-        headers: getAuthHeader()
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          ...getAuthHeader()
+        },
       });
       const data = await response.json();
-      return data;
-    }else if(user.role === "service_provider"){
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`, {
-        headers: getAuthHeader()
+
+      if (!data.status) {
+        const error = data.message;
+        throw new Error(error);
+      }
+
+      console.log("Upload successful:", data);
+      return data.status;
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+      throw err;
+    }
+  };
+
+  const uploadServicesData = async (selectedFile, userId) => {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("userId", userId);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          ...getAuthHeader()
+        },
       });
       const data = await response.json();
-      return data;
+
+      if (!data.status) {
+        const error = data.message;
+        throw new Error(error);
+      }
+
+      console.log("Upload successful:", data);
+      return data.status;
+    } catch (err) {
+      console.error("Upload failed:", err.message);
+      throw err;
+    }
+  };
+
+  const verifyOnboardingStep1 = async (userId, role) => {
+    console.log('userContext - verifyOnboardingStep1 called with userId:', userId);
+    try {
+      if(role === "supplier"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - verifyOnboardingStep1 response:', data);
+        return data;
+      }else if(role === "service_provider"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - verifyOnboardingStep1 response:', data);
+        return data;
+      }
+    } catch (error) {
+      console.error('userContext - verifyOnboardingStep1 error:', error);
+      throw error;
     }
   }
 
+  const getAuthHeader = () => {
+    const token = localStorage.getItem("token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-const completeOnboarding = async () => {
-  if(user.role === "supplier"){
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
-      headers: getAuthHeader()
-    });
-    const data = await response.json();
-    return data.status;
-  }else if(user.role === "service_provider"){
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
-      headers: getAuthHeader()
-    });
-    const data = await response.json();
-    return data.status;
+  const completeOnboarding = async (userId, role) => {
+    console.log('userContext - completeOnboarding called with:', { userId, role });
+    try {
+      if(role === "supplier"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - completeOnboarding response:', data);
+        return data.status;
+      }else if(role === "service_provider"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - completeOnboarding response:', data);
+        return data.status;
+      }
+    } catch (error) {
+      console.error('userContext - completeOnboarding error:', error);
+      throw error;
+    }
   }
-}
 
-const checkOnboardingStatus = async () => {
-  if(user.role === "supplier"){
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
-      headers: getAuthHeader()
-    });
-    const data = await response.json();
-    return data.data;
-  }else if(user.role === "service_provider"){
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
-      headers: getAuthHeader()
-    });
-    const data = await response.json();
-    return data.data;
+  const checkOnboardingStatus = async (userId, role) => {
+    console.log('userContext - checkOnboardingStatus called with:', { userId, role });
+    try {
+      if(role === "supplier"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - checkOnboardingStatus response:', data);
+        return data.data;
+      }else if(role === "service_provider"){
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeader()
+          },
+          body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        console.log('userContext - checkOnboardingStatus response:', data);
+        return data.data;
+      }
+    } catch (error) {
+      console.error('userContext - checkOnboardingStatus error:', error);
+      throw error;
+    }
   }
-}
+
   return (
     <UserContext.Provider
       value={{

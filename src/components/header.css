@@ -4,8 +4,8 @@
   cursor: pointer;
 }
 
-/* Hide on desktop */
-@media screen and (min-width: 768px) {
+/* Hide on desktop (1024px and above) */
+@media screen and (min-width: 1024px) {
   .hamburger-container {
     display: none !important; /* Use !important to override inline styles */
   }
@@ -62,3 +62,26 @@
 .supplier-management-btn:hover svg {
   color: white !important;
 } 
+
+@media screen and (max-width: 768px) {
+  .p-menubar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #f8fbff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Add padding to the body to account for fixed header */
+  body {
+    padding-top: 72px; /* Adjust this value based on your header height */
+  }
+}
+
+/* Ensure the header stays on top of other elements */
+.p-menubar {
+  position: relative;
+  z-index: 1000;
+}
