@@ -98,6 +98,10 @@ const AuthCheck = ({ children }) => {
     "/forgot-password",
     "/coming-soon",
     "/service/quotes/respond",
+    "/supplier/onboarding/:id",
+    "/supplier/onboarding/refresh-stripe-account",
+    "/vendor/onboarding/:id",
+    "/vendor/onboarding/refresh-stripe-account",
   ];
 
   // Check if the current path is a public route

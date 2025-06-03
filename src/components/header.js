@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
@@ -13,11 +13,12 @@ import share from "../assets/images/crew/share.png";
 import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
-import GlobalSearchModal from "./GlobalSearchModal";
 import { Store } from 'lucide-react';
 import { Menu as LucideMenu } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
+import { getNotifications } from '../services/notification/notificationService';
+
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -29,14 +30,20 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     console.log(role);
   }
 
-  const overlayPanelRef = useRef(null);
+  // const overlayPanelRef = useRef(null);
   // const { user } = useUser(); // Get user data from context
   const [searchValue, setSearchValue] = useState("");
 
-  const shareMenuRef = useRef(null);
+  // const shareMenuRef = useRef(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  // const [searchValue, setSearchValue] = useState("");
   const [showSearchModal, setShowSearchModal] = useState(false);
+  //  const [role, setRole] = useState("Captain");
+  const [notifications, setNotifications] = useState([]);
+  const [userName, setUserName] = useState("Admin User");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showExcelModal, setShowExcelModal] = useState(false);
 
   // Update your searchFilters state to include sorting preferences
   const [searchFilters, setSearchFilters] = useState({
@@ -207,10 +214,10 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         setShowSearchModal(true);
       },
     },
-  ]);
+  ]
 
   // Refs and hooks
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const theme = useTheme();
   const overlayPanelRef = useRef();
   const shareMenuRef = useRef();
@@ -546,6 +553,51 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         />
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        {/* {role === "admin" && (
+          <button
+            onClick={() => navigate('/admin/approve')}
+            className="supplier-management-btn"
+            aria-label="Supplier and Vendor Management"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              marginRight: '16px',
+              padding: '8px',
+              position: 'relative'
+            }}
+          >
+            <Store 
+              style={{ 
+                width: "24px", 
+                height: "24px", 
+                color: "#0387D9"
+              }} 
+            />
+            {hasPendingVendors && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '4px',
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#FF4B4B',
+                  borderRadius: '50%',
+                  border: '2px solid #fff'
+                }}
+              />
+            )}
+          </button>
+        )} */}
+
         {/* Notification Bell - Only show on desktop */}
         {!isMobile && (
           <Button
