@@ -69,7 +69,7 @@ const InventoryWrapper = ({ inventoryData }) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: 'auto', gap: 2 }}>
       <Alert 
         severity="info" 
         icon={<EditIcon />}
@@ -110,12 +110,63 @@ const InventoryWrapper = ({ inventoryData }) => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Product Name</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Product Category</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Service Area</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Quantity</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>SKU</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: 'background.paper' }}>Price</TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  width: { xs: '50%', sm: '30%' }
+                }}
+              >
+                Product Name
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  display: { xs: 'none', sm: 'table-cell' },
+                  width: { sm: '25%' }
+                }}
+              >
+                Product Category
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  display: { xs: 'none', sm: 'table-cell' },
+                  width: { sm: '20%' }
+                }}
+              >
+                Service Area
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  width: { xs: '25%', sm: '10%' }
+                }}
+              >
+                Quantity
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  display: { xs: 'none', sm: 'table-cell' },
+                  width: { sm: '15%' }
+                }}
+              >
+                SKU
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  width: { xs: '25%', sm: '10%' }
+                }}
+              >
+                Price
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -131,12 +182,67 @@ const InventoryWrapper = ({ inventoryData }) => {
                   "&:last-child td, &:last-child th": { border: 0 },
                 }}
               >
-                <TableCell>{item.product.name}</TableCell>
-                <TableCell>{item.product.category}</TableCell>
-                <TableCell>{item.product.serviceArea || "N/A"}</TableCell>
-                <TableCell>{item.quantity}</TableCell>
-                <TableCell>{item.product.sku}</TableCell>
-                <TableCell>${item.price}</TableCell>
+                <TableCell 
+                  sx={{ 
+                    maxWidth: { xs: '150px', sm: '200px' },
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={item.product.name}
+                >
+                  {item.product.name}
+                </TableCell>
+                <TableCell 
+                  sx={{ 
+                    display: { xs: 'none', sm: 'table-cell' },
+                    maxWidth: '150px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={item.product.category}
+                >
+                  {item.product.category}
+                </TableCell>
+                <TableCell 
+                  sx={{ 
+                    display: { xs: 'none', sm: 'table-cell' },
+                    maxWidth: '120px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={item.product.serviceArea || "N/A"}
+                >
+                  {item.product.serviceArea || "N/A"}
+                </TableCell>
+                <TableCell>
+                  {item.quantity}
+                </TableCell>
+                <TableCell 
+                  sx={{ 
+                    display: { xs: 'none', sm: 'table-cell' },
+                    maxWidth: '120px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={item.product.sku}
+                >
+                  {item.product.sku}
+                </TableCell>
+                <TableCell
+                  sx={{ 
+                    maxWidth: { xs: '150px', sm: '100px' },
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={`$${item.price}`}
+                >
+                  ${item.price}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

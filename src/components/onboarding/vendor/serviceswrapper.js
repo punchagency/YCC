@@ -131,7 +131,7 @@ import {
           }}
         >
           <Typography variant="body1">
-            Click on any service row to edit its details. You can modify the name, price, and description.
+            Click on any service row to see the full details or to edit its content.
           </Typography>
         </Alert>
 
@@ -227,7 +227,7 @@ import {
                         whiteSpace: 'nowrap',
                         width: { xs: '60%', sm: '35%' }
                       }}
-                      title={item.name}
+                      title={item.name || "N/A"}
                     >
                       {item.name}
                     </TableCell>
@@ -242,7 +242,7 @@ import {
                         whiteSpace: 'nowrap',
                         width: { sm: '45%' }
                       }}
-                      title={item.description}
+                      title={item.description || "N/A"}
                     >
                       {item.description}
                     </TableCell>
