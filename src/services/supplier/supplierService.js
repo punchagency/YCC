@@ -86,7 +86,17 @@ export const getSuppliersWithInventories = async (params = {}) => {
 // Get user orders
 export const getUserOrders = async (params = {}) => {
   try {
-    console.log("Fetching user orders, params:", params);
+    console.log("Fetching user orders with params:", params);
+
+    // Check for token
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No authentication token found");
+      return {
+        status: false,
+        error: "Authentication token not found",
+      };
+    }
 
     const response = await axios.get(`${API_URL}/suppliers/orders`, {
       headers: getAuthHeader(),
@@ -99,15 +109,35 @@ export const getUserOrders = async (params = {}) => {
       },
     });
 
-    console.log("User orders response:", response.data);
+    console.log("Raw API response:", response.data);
 
+    // Ensure we have a valid response structure
+    if (!response.data) {
+      console.error("Invalid response from server - no data");
+      throw new Error("Invalid response from server");
+    }
+
+    // Return the exact response structure from the API
     return {
-      status: true,
-      data: response.data.data || response.data,
+      status: response.data.status,
+      message: response.data.message,
+      data: response.data.data,
       pagination: response.data.pagination,
     };
   } catch (error) {
     console.error("Error fetching user orders:", error.response?.data || error);
+
+    // Handle specific error cases
+    if (error.response?.status === 401) {
+      console.error("Authentication error - token expired or invalid");
+      localStorage.removeItem("token");
+      return {
+        status: false,
+        error: "Session expired. Please login again.",
+        unauthorized: true,
+      };
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to fetch orders",

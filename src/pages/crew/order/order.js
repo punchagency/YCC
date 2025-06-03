@@ -28,6 +28,7 @@ const Order = () => {
     totalPages: 1,
     pageSize: 10,
   });
+  const tableRef = useRef(null);
 
   // State for quick order form
   const [quickOrderForm, setQuickOrderForm] = useState({
@@ -212,7 +213,9 @@ const Order = () => {
         setSelectedInventory(null);
         setSelectedSupplier(null);
         // Refresh orders list
-        // fetchOrders(); // You'll need to implement this
+        if (tableRef.current?.fetchOrders) {
+          tableRef.current.fetchOrders();
+        }
       } else {
         showError(result.message || "Failed to create order");
       }
@@ -267,8 +270,13 @@ const Order = () => {
         {/* Pass the handleFilterChange function to ActiveOrders */}
         <ActiveOrders onFilterChange={handleFilterChange} />
 
-        {/* Pass the filters to OrderTable */}
-        <OrderTable filters={orderFilters} />
+        {/* Pass the filters to OrderTable and get the ref */}
+        <OrderTable
+          filters={orderFilters}
+          onRef={(ref) => {
+            tableRef.current = ref;
+          }}
+        />
       </div>
 
       {/* Supplier Modal */}

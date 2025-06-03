@@ -33,6 +33,8 @@ import { getSuppliersWithInventories } from "../../services/supplier/supplierSer
 // import { Skeleton } from "primereact/skeleton";
 
 const Order = () => {
+  console.log("=== Order Component Mounting ===");
+
   // const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
   const [setShowOrderForm] = useState(false);
@@ -108,32 +110,98 @@ const Order = () => {
   const runCount = useRef(0);
 
   useEffect(() => {
-    if (!allInventoryItems || allInventoryItems.length === 0) return;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-    const suppliersMap = new Map();
-    const productsMap = new Map();
+        // Check for token
+        const token = localStorage.getItem("token");
+        if (!token) {
+          showError("Please login to access this page");
+          return;
+        }
 
-    allInventoryItems.forEach((item) => {
-      if (item.supplier) suppliersMap.set(item.supplier._id, item.supplier);
-      if (item.product) productsMap.set(item.product._id, item.product);
-    });
+        console.log("=== Starting fetchAllInventoryItems ===");
+        const response = await fetchAllInventoryItems();
+        console.log("Raw API response:", response);
 
-    const supplierOptions = Array.from(suppliersMap.values()).map(
-      (supplier) => ({
-        label: supplier.businessName,
-        value: supplier._id,
-      })
-    );
+        // Check if response is valid
+        if (!response) {
+          console.error("No response received from fetchAllInventoryItems");
+          showError("Failed to load inventory data");
+          setLoading(false);
+          return;
+        }
 
-    const productOptions = Array.from(productsMap.values()).map((product) => ({
-      label: product.name,
-      value: product._id,
-    }));
+        // Handle both array and object response formats
+        let inventoryData;
+        if (Array.isArray(response)) {
+          inventoryData = response;
+        } else if (response.data && Array.isArray(response.data)) {
+          inventoryData = response.data;
+        } else {
+          console.error("Invalid inventory data format:", response);
+          showError("Failed to load inventory data");
+          setLoading(false);
+          return;
+        }
 
-    setSupplierOptions(supplierOptions);
-    setProductOptions(productOptions);
-    setLoading(false);
-  }, [allInventoryItems]);
+        console.log("Inventory data:", inventoryData);
+
+        const suppliersMap = new Map();
+        const productsMap = new Map();
+
+        console.log("=== Processing inventory items ===");
+        inventoryData.forEach((item, index) => {
+          console.log(`Processing item ${index}:`, item);
+          if (item?.supplier) {
+            console.log(`Found supplier for item ${index}:`, item.supplier);
+            suppliersMap.set(item.supplier._id, item.supplier);
+          }
+          if (item?.product) {
+            console.log(`Found product for item ${index}:`, item.product);
+            productsMap.set(item.product._id, item.product);
+          }
+        });
+
+        console.log("=== Creating supplier options ===");
+        const supplierOptions = Array.from(suppliersMap.values()).map(
+          (supplier) => ({
+            label: supplier.businessName,
+            value: supplier._id,
+          })
+        );
+        console.log("Supplier options:", supplierOptions);
+
+        console.log("=== Creating product options ===");
+        const productOptions = Array.from(productsMap.values()).map(
+          (product) => ({
+            label: product.name,
+            value: product._id,
+          })
+        );
+        console.log("Product options:", productOptions);
+
+        setSupplierOptions(supplierOptions);
+        setProductOptions(productOptions);
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          response: error.response,
+        });
+        showError(error.message || "Failed to load inventory data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (runCount.current < 1) {
+      runCount.current += 1;
+      fetchData();
+    }
+  }, [fetchAllInventoryItems, showError]);
 
   useEffect(() => {
     if (selectedProduct) {
@@ -674,23 +742,136 @@ const Order = () => {
   //   }
   // };
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      const response = await getUserOrders();
-      if (response.status) {
-        console.log("Orders data received:", response.data);
-        setOrders(response.data);
-        calculateSummary(response.data);
-      } else {
-        showError(response.error || "Failed to fetch orders");
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    pageSize: 10,
+    totalItems: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
+
+  // Use a ref to track if we've already fetched data
+  const hasFetchedData = useRef(false);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchOrders = useCallback(
+    async (page = 1, limit = 10) => {
+      // Skip if already fetching or if this is a duplicate mount
+      if (isFetching || (hasFetchedData.current && page === 1)) {
+        console.log("Skipping fetch - already fetching or duplicate mount");
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      showError("Failed to fetch orders");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+
+      try {
+        setIsFetching(true);
+        setLoading(true);
+
+        const response = await getUserOrders({
+          page,
+          limit,
+        });
+
+        if (response.status) {
+          if (!Array.isArray(response.data)) {
+            console.error("Invalid orders data received:", response.data);
+            showError("Invalid orders data received from server");
+            return;
+          }
+
+          const validOrders = response.data.filter((order) => {
+            if (!order || typeof order !== "object") {
+              console.warn("Invalid order object:", order);
+              return false;
+            }
+            if (!order._id) {
+              console.warn("Order missing _id:", order);
+              return false;
+            }
+            return true;
+          });
+
+          setOrders(validOrders);
+          setPagination({
+            currentPage: response.pagination.currentPage,
+            totalPages: response.pagination.totalPages,
+            pageSize: response.pagination.pageSize,
+            totalItems: response.pagination.totalItems,
+            hasNextPage: response.pagination.hasNextPage,
+            hasPrevPage: response.pagination.hasPrevPage,
+          });
+          calculateSummary(validOrders);
+
+          // Mark that we've successfully fetched data
+          if (page === 1) {
+            hasFetchedData.current = true;
+          }
+        } else {
+          if (response.unauthorized) {
+            showError("Please login to continue");
+            return;
+          }
+          showError(response.error || "Failed to fetch orders");
+          setOrders([]);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            pageSize: 10,
+            totalItems: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+          });
+        }
+      } catch (error) {
+        console.error("Error in fetchOrders:", error);
+        showError("Failed to fetch orders");
+        setOrders([]);
+        setPagination({
+          currentPage: 1,
+          totalPages: 1,
+          pageSize: 10,
+          totalItems: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        });
+      } finally {
+        setLoading(false);
+        setIsFetching(false);
+      }
+    },
+    [showError, isFetching]
+  );
+
+  // Initial data fetch
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      // Skip if we've already fetched data
+      if (hasFetchedData.current) {
+        console.log("Skipping initial fetch - data already fetched");
+        return;
+      }
+
+      try {
+        await fetchAllInventoryItems();
+        await fetchOrders();
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      }
+    };
+
+    fetchInitialData();
+
+    // Cleanup function
+    return () => {
+      // Don't reset hasFetchedData here to prevent duplicate fetches on remount
+      setIsFetching(false);
+    };
+  }, [fetchAllInventoryItems, fetchOrders]);
+
+  // Add pagination controls
+  const handlePageChange = (newPage) => {
+    fetchOrders(newPage, pagination.pageSize);
+  };
 
   const calculateSummary = (orders) => {
     const summary = orders.reduce(
@@ -713,16 +894,61 @@ const Order = () => {
 
   // Add useEffect to fetch inventory data when component mounts
   useEffect(() => {
+    console.log("=== Initial useEffect Running ===");
+    console.log("runCount.current:", runCount.current);
+
     const fetchData = async () => {
-      await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
-      await fetchOrders(); // if needed
+      if (isFetching) {
+        console.log("Already fetching data, skipping...");
+        return;
+      }
+
+      console.log("=== fetchData Starting ===");
+      try {
+        await fetchAllInventoryItems(); // triggers setAllInventoryItems internally
+        console.log("fetchAllInventoryItems completed");
+
+        await fetchOrders(); // if needed
+        console.log("fetchOrders completed");
+      } catch (error) {
+        console.error("Error in fetchData:", error);
+      }
     };
 
-    if (runCount.current < 1) {
+    // Reset runCount if orders array is empty
+    if (orders.length === 0) {
+      console.log("Orders array is empty, resetting runCount");
+      runCount.current = 0;
+    }
+
+    // Fetch data if runCount is 0 or if orders array is empty
+    if (runCount.current < 1 || orders.length === 0) {
+      console.log(
+        "Fetching data - runCount:",
+        runCount.current,
+        "orders length:",
+        orders.length
+      );
       runCount.current += 1;
       fetchData();
+    } else {
+      console.log(
+        "Skipping fetchData - runCount:",
+        runCount.current,
+        "orders length:",
+        orders.length
+      );
     }
-  }, [fetchAllInventoryItems, fetchOrders]);
+  }, [fetchAllInventoryItems, fetchOrders, orders.length, isFetching]);
+
+  // Add a cleanup function to reset runCount when component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounting, resetting runCount");
+      runCount.current = 0;
+      setIsFetching(false);
+    };
+  }, []);
 
   // const statusBodyTemplate = (rowData) => {
   //   return (
@@ -1012,13 +1238,16 @@ const Order = () => {
               supplier?.inventories?.map((inv) => ({
                 _id: inv?._id,
                 product: {
+                  _id: inv?.product?._id,
                   name: inv?.product?.name || "Unnamed Product",
                   category: inv?.product?.category || "No category",
                   sku: inv?.product?.sku || "No SKU",
                   description: inv?.product?.description,
+                  serviceArea: inv?.product?.serviceArea,
                 },
                 price: inv?.price || 0,
                 quantity: inv?.quantity || 0,
+                productImage: inv?.productImage,
               })) || [],
           };
         });
@@ -1215,13 +1444,17 @@ const Order = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Add the authorization token
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(orderData),
         }
       );
 
       const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to create order");
+      }
 
       if (result.status) {
         showSuccess("Order created successfully");
@@ -1238,10 +1471,16 @@ const Order = () => {
         // Clear selected inventory and supplier
         setSelectedInventory(null);
         setSelectedSupplier(null);
-        // Refresh orders list
-        fetchOrders();
+
+        // Refresh orders list with the latest data
+        await fetchOrders(1); // Fetch first page of orders
+        // Reset pagination to first page
+        setPagination((prev) => ({
+          ...prev,
+          currentPage: 1,
+        }));
       } else {
-        showError(result.message || "Failed to create order");
+        throw new Error(result.message || "Failed to create order");
       }
     } catch (error) {
       console.error("Error in quick order submission:", error);
@@ -1269,15 +1508,6 @@ const Order = () => {
           <div className="content">
             <h3 style={{ marginLeft: "40px" }}>Orders</h3>
           </div>
-          <div className="mr-3">
-            <button
-              onClick={handleCreateOrderClick}
-              className="create-order-button"
-            >
-              <img src={neworder} alt="neworder" />
-              <span>Create New Order</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -1292,25 +1522,22 @@ const Order = () => {
           backgroundColor: "#F8FBFF",
         }}
       >
-        <div>
-          {/* <div>
-            <h4
-              style={{
-                textAlign: "left",
-                paddingLeft: "10px",
-                color: theme === "light" ? "#103B57" : "#FFFFFF",
-              }}
-            >
-              Order Summary
-            </h4>
-          </div> */}
+        <div className="create-order-button-container">
+          <button
+            onClick={handleCreateOrderClick}
+            className="create-order-button"
+          >
+            <img src={neworder} alt="neworder" />
+            <span>Create New Order</span>
+          </button>
+        </div>
 
+        <div>
           {isMobile ? (
             // Mobile view for summary boxes
             renderMobileSummaryBoxes()
           ) : (
             // Desktop view
-
             <div className="orders-summary">
               <div style={{ padding: "0 10px" }}>
                 {/* First summary box */}
@@ -2127,15 +2354,7 @@ const Order = () => {
           dismissableMask={true}
         >
           <div className="p-fluid" style={{ padding: "20px" }}>
-            <div
-              className="suppliers-grid"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "20px",
-                padding: "20px",
-              }}
-            >
+            <div className="suppliers-grid">
               {suppliers.map((supplier, index) => (
                 <div
                   key={supplier?._id || Math.random()}
@@ -2184,7 +2403,7 @@ const Order = () => {
                     label="See All Inventories"
                     onClick={() => handleSupplierSelect(supplier)}
                     className="p-button-primary"
-                    style={{ width: "300px", marginTop: "20px" }}
+                    style={{ width: "100%", marginTop: "20px" }}
                   />
                 </div>
               ))}
@@ -2203,82 +2422,183 @@ const Order = () => {
         <Dialog
           visible={showInventoryModal}
           onHide={() => setShowInventoryModal(false)}
-          style={{ width: "80vw" }}
-          header={`${selectedSupplier?.businessName || "Supplier"}'s Inventory`}
+          style={{ width: "90vw", maxWidth: "1200px" }}
+          header={
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <i className="pi pi-box" style={{ fontSize: "1.5rem" }} />
+              <span>{`${
+                selectedSupplier?.businessName || "Supplier"
+              }'s Inventory`}</span>
+            </div>
+          }
           className="inventory-modal"
           dismissableMask={true}
         >
           <div className="p-fluid" style={{ padding: "20px" }}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "20px",
-                padding: "20px",
-              }}
-            >
-              {selectedSupplier?.inventories?.map((inventory) => (
-                <div
-                  key={inventory?._id || Math.random()}
-                  className="inventory-item"
-                  style={{
-                    padding: "20px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div className="inventory-info">
-                    <h3 style={{ marginBottom: "15px" }}>
-                      {inventory?.product?.name || "Unnamed Product"}
-                    </h3>
-                    <p className="mb-3">
-                      <span style={{ fontWeight: "bold" }}>Category:</span>{" "}
-                      {inventory?.product?.category || "No category"}
-                    </p>
-                    <p className="mb-3">
-                      <span style={{ fontWeight: "bold" }}>Price:</span> $
-                      {inventory?.price || 0}
-                    </p>
-                    <p className="mb-3">
-                      <span style={{ fontWeight: "bold" }}>
-                        Quantity Available:
-                      </span>{" "}
-                      {inventory?.quantity || 0}
-                    </p>
-                    <p className="mb-3">
-                      <span style={{ fontWeight: "bold" }}>SKU:</span>{" "}
-                      {inventory?.product?.sku || "No SKU"}
-                    </p>
-                    {inventory?.product?.description && (
-                      <p className="mb-3">
-                        <span style={{ fontWeight: "bold" }}>Description:</span>{" "}
-                        {inventory.product.description}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    label="Order Now"
-                    onClick={() => {
-                      console.log("Inventory item being selected:", inventory);
-                      console.log("Product data:", inventory?.product);
-                      setSelectedInventory(inventory);
-                      setQuickOrderForm({
-                        quantity: 1,
-                        deliveryAddress: "",
-                        deliveryDate: null,
-                      });
-                      setShowQuickOrderModal(true);
+            {selectedSupplier?.inventories?.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <i
+                  className="pi pi-info-circle"
+                  style={{ fontSize: "3rem", color: "#666" }}
+                />
+                <h3 style={{ marginTop: "20px", color: "#666" }}>
+                  No Inventory Available
+                </h3>
+                <p style={{ color: "#666" }}>
+                  This supplier has no inventory items at the moment.
+                </p>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                  gap: "20px",
+                  padding: "20px",
+                }}
+              >
+                {selectedSupplier?.inventories?.map((inventory) => (
+                  <div
+                    key={inventory?._id || Math.random()}
+                    className="inventory-item"
+                    style={{
+                      padding: "20px",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      backgroundColor: "#fff",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                      cursor: "pointer",
+                      ":hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+                      },
                     }}
-                    className="p-button-primary"
-                    style={{ width: "100%", marginTop: "20px" }}
-                  />
-                </div>
-              ))}
-            </div>
+                  >
+                    <div className="inventory-info">
+                      <h3 style={{ marginBottom: "15px", color: "#103B57" }}>
+                        {inventory?.product?.name || "Unnamed Product"}
+                      </h3>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "10px",
+                          marginBottom: "15px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            padding: "4px 8px",
+                            backgroundColor: "#e9ecef",
+                            borderRadius: "4px",
+                            fontSize: "0.9rem",
+                            color: "#666",
+                          }}
+                        >
+                          {inventory?.product?.category || "No category"}
+                        </span>
+                        <span
+                          style={{
+                            padding: "4px 8px",
+                            backgroundColor:
+                              inventory?.quantity > 0 ? "#d4edda" : "#f8d7da",
+                            borderRadius: "4px",
+                            fontSize: "0.9rem",
+                            color:
+                              inventory?.quantity > 0 ? "#155724" : "#721c24",
+                          }}
+                        >
+                          {inventory?.quantity > 0
+                            ? "In Stock"
+                            : "Out of Stock"}
+                        </span>
+                      </div>
+                      <p className="mb-3">
+                        <span style={{ fontWeight: "bold", color: "#666" }}>
+                          Price:
+                        </span>{" "}
+                        <span style={{ color: "#28a745", fontSize: "1.2rem" }}>
+                          ${inventory?.price?.toFixed(2) || 0}
+                        </span>
+                      </p>
+                      <p className="mb-3">
+                        <span style={{ fontWeight: "bold", color: "#666" }}>
+                          Quantity Available:
+                        </span>{" "}
+                        <span
+                          style={{
+                            color:
+                              inventory?.quantity > 0 ? "#28a745" : "#dc3545",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {inventory?.quantity || 0}
+                        </span>
+                      </p>
+                      <p className="mb-3">
+                        <span style={{ fontWeight: "bold", color: "#666" }}>
+                          SKU:
+                        </span>{" "}
+                        <span style={{ fontFamily: "monospace" }}>
+                          {inventory?.product?.sku || "No SKU"}
+                        </span>
+                      </p>
+                      {inventory?.product?.serviceArea && (
+                        <p className="mb-3">
+                          <span style={{ fontWeight: "bold", color: "#666" }}>
+                            Service Area:
+                          </span>{" "}
+                          {inventory.product.serviceArea}
+                        </p>
+                      )}
+                      {inventory?.product?.description && (
+                        <p
+                          className="mb-3"
+                          style={{
+                            color: "#666",
+                            fontSize: "0.9rem",
+                            lineHeight: "1.4",
+                          }}
+                        >
+                          {inventory.product.description}
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      label="Order Now"
+                      icon="pi pi-shopping-cart"
+                      onClick={() => {
+                        console.log(
+                          "Inventory item being selected:",
+                          inventory
+                        );
+                        console.log("Product data:", inventory?.product);
+                        setSelectedInventory(inventory);
+                        setQuickOrderForm({
+                          quantity: 1,
+                          deliveryAddress: "",
+                          deliveryDate: null,
+                        });
+                        setShowQuickOrderModal(true);
+                      }}
+                      className="p-button-primary"
+                      style={{
+                        width: "100%",
+                        marginTop: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </Dialog>
 

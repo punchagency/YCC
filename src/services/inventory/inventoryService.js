@@ -123,7 +123,26 @@ export const getAllInventoryItems = async () => {
         },
         headers: getAuthHeader(),
       });
+
+      console.log("API Response:", response.data);
+
+      if (!response.data || !response.data.status) {
+        console.error("Invalid API response:", response.data);
+        return {
+          success: false,
+          error: "Invalid response from server",
+        };
+      }
+
       const inventoryItems = response.data.data;
+      if (!Array.isArray(inventoryItems)) {
+        console.error("Invalid inventory data format:", inventoryItems);
+        return {
+          success: false,
+          error: "Invalid inventory data format",
+        };
+      }
+
       allInventoryItems.push(...inventoryItems);
 
       const pagination = response.data.pagination;
@@ -141,6 +160,7 @@ export const getAllInventoryItems = async () => {
     };
   }
 };
+
 export const updateInventoryItem = async (id, itemData) => {
   try {
     const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {

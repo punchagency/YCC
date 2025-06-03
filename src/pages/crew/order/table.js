@@ -9,14 +9,14 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getOrders } from "../../../services/crew/crewOrderService";
+import { getUserOrders } from "../../../services/supplier/supplierService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
-const OrderTable = ({ filters = {} }) => {
+const OrderTable = ({ filters = {}, onRef }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [orders, setOrders] = useState([]);
@@ -41,27 +41,11 @@ const OrderTable = ({ filters = {} }) => {
       setLoading(true);
       console.log("Fetching orders with filters:", filters);
 
-      // Prepare API parameters including filters
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        sortBy: sortField,
-        sortOrder: sortDirection,
-      };
-
-      // Add status filter if provided
-      if (filters.status && filters.status.length > 0) {
-        params.status = filters.status.join(",");
-      }
-
-      console.log("Request params:", params);
-
-      const response = await getOrders(params);
+      const response = await getUserOrders();
       console.log("Raw API response:", response);
 
       if (response.status) {
         let ordersData = [];
-        let paginationData = { ...pagination };
 
         // Handle the API response structure
         if (response.data?.data) {
@@ -74,15 +58,10 @@ const OrderTable = ({ filters = {} }) => {
           console.log("Orders data from response.data:", ordersData);
         }
 
-        // Update pagination if available
-        if (response.data?.pagination) {
-          paginationData = {
-            page: parseInt(response.data.pagination.currentPage) || 1,
-            limit: parseInt(response.data.pagination.pageSize) || 10,
-            total: parseInt(response.data.pagination.totalItems) || 0,
-            totalPages: parseInt(response.data.pagination.totalPages) || 1,
-          };
-        }
+        // Sort orders by createdAt in descending order (newest first)
+        ordersData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
 
         // Log the first order to verify structure
         if (ordersData.length > 0) {
@@ -106,7 +85,6 @@ const OrderTable = ({ filters = {} }) => {
 
         console.log("Final orders data:", ordersData);
         setOrders(ordersData);
-        setPagination(paginationData);
       } else {
         console.error("Failed to fetch orders:", response.error);
         setError("Failed to load orders");
@@ -117,9 +95,16 @@ const OrderTable = ({ filters = {} }) => {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, sortField, sortDirection, filters]);
+  }, [filters]);
 
-  // Fetch orders when component mounts or when sort/pagination changes
+  // Expose fetchOrders to parent component
+  useEffect(() => {
+    if (onRef) {
+      onRef({ fetchOrders });
+    }
+  }, [onRef, fetchOrders]);
+
+  // Fetch orders when component mounts and when filters change
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
@@ -393,7 +378,7 @@ const OrderTable = ({ filters = {} }) => {
                       onClick={() => handleSort("vendorName")}
                     >
                       <div className="flex items-center">
-                        Vendor Name {getSortIcon("vendorName")}
+                        Supplier Name {getSortIcon("vendorName")}
                       </div>
                     </th>
                     <th
@@ -494,7 +479,8 @@ const OrderTable = ({ filters = {} }) => {
                         >
                           {(() => {
                             console.log("Order data:", order);
-                            return order?.vendorName || "N/A";
+                            console.log("Supplier data:", order?.supplier);
+                            return order?.supplier?.businessName || "N/A";
                           })()}
                         </td>
                         <td
