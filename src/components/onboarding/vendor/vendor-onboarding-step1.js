@@ -82,7 +82,17 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
     const link = document.createElement("a");
     link.href = templateUrl;
-    link.download = `vendor_onboarding_template.${fileType}`;
+    
+    // Set proper file extension and MIME type
+    if (fileType === "excel") {
+      link.download = "vendor_onboarding_template.xlsx";
+      // Set the correct MIME type for modern Excel files
+      link.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    } else {
+      link.download = "vendor_onboarding_template.csv";
+      link.type = "text/csv";
+    }
+    
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
@@ -529,7 +539,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                 borderRadius: "8px" 
               }}>
                 <DescriptionText>
-                  <InfoOutlined/> Please download the template below that shows how the file should be formatted before uploading
+                  <InfoOutlined/> It is important to download the template to see the required format. This ensures your data will be processed correctly.
                 </DescriptionText>
               </Box>
 

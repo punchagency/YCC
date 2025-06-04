@@ -318,7 +318,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
                 borderRadius: "8px" 
               }}>
                 <DescriptionText>
-                  <InfoOutlined/> Please download the template below that shows how the file should be formatted before uploading
+                  <InfoOutlined/> It is important to download the template to see the required format. This ensures your data will be processed correctly.
                 </DescriptionText>
               </Box>
 
