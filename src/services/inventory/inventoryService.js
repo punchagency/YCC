@@ -141,15 +141,23 @@ export const getAllInventoryItems = async () => {
     };
   }
 };
-export const updateInventoryItem = async (id, itemData) => {
+export const updateInventoryItem = async (id, itemData, userId) => {
   try {
-    const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
+    // Ensure all fields are included in the update data
+    const updateData = {
+      ...itemData,
+      userId
+    };
+
+    const response = await axios.patch(`${API_URL}/inventory/${id}`, updateData, {
       headers: {
-        ...getAuthHeader(),
         "Content-Type": "application/json",
       },
     });
-    return { success: true, data: response.data };
+    return { 
+      success: true, 
+      data: response.data 
+    };
   } catch (error) {
     console.error(`Error updating inventory item ${id}:`, error);
     return {
