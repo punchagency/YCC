@@ -24,6 +24,7 @@ import {
   import { Toast } from "primereact/toast";
   import { useRef } from "react";
   import { useParams } from 'react-router-dom';
+  import { formatAmount, unformatAmount } from '../../../utils/formatAmount';
   
   const ServicesWrapper = ({ servicesData, onServiceUpdate }) => {
     const theme = useTheme();
@@ -35,13 +36,12 @@ import {
     const toast = useRef(null);
     const { id: userId } = useParams(); // Get userId from URL params
   
-    // Sample data - replace with your actual data source
     const handleRowClick = (serviceItem) => {
       setSelectedItem(serviceItem);
       setEditedItem({
         name: serviceItem.name,
         description: serviceItem.description,
-        price: serviceItem.price,
+        price: formatAmount(serviceItem.price), // Format price for display
       });
       setOpen(true);
     };
@@ -60,6 +60,9 @@ import {
           throw new Error('User ID not found');
         }
 
+        // Unformat the price before sending to backend
+        const unformattedPrice = unformatAmount(editedItem.price);
+
         const response = await fetch(`${process.env.REACT_APP_API_URL}/services/update/${selectedItem._id}`, {
           method: 'PUT',
           headers: {
@@ -68,7 +71,7 @@ import {
           body: JSON.stringify({
             userId,
             name: editedItem.name,
-            price: editedItem.price,
+            price: unformattedPrice,
             description: editedItem.description
           }),
         });
@@ -104,10 +107,19 @@ import {
     };
   
     const handleChange = (field) => (event) => {
-      setEditedItem({
-        ...editedItem,
-        [field]: event.target.value,
-      });
+      if (field === 'price') {
+        // Format price as user types
+        const formattedValue = formatAmount(event.target.value);
+        setEditedItem({
+          ...editedItem,
+          [field]: formattedValue,
+        });
+      } else {
+        setEditedItem({
+          ...editedItem,
+          [field]: event.target.value,
+        });
+      }
     };
   
     return (
@@ -250,10 +262,15 @@ import {
                       sx={{ 
                         fontSize: { xs: '14px', sm: '16px' },
                         py: { xs: 1, sm: 2 },
-                        width: { xs: '40%', sm: '20%' }
+                        width: { xs: '40%', sm: '20%' },
+                        maxWidth: { xs: '100px', sm: '120px' },
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
                       }}
+                      title={`$${formatAmount(item.price)}`}
                     >
-                      ${item.price}
+                      ${formatAmount(item.price)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -306,11 +323,13 @@ import {
               />
               <TextField
                 label="Price"
-                type="number"
                 value={editedItem?.price || ''}
                 onChange={handleChange('price')}
                 fullWidth
                 size={isMobile ? "small" : "medium"}
+                InputProps={{
+                  startAdornment: <span>$</span>
+                }}
               />
               <TextField
                 label="Description"

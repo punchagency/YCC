@@ -79,6 +79,14 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
     }
   };
 
+  const handleInventoryUpdate = (updatedInventory) => {
+    setInventoryData(prevData => 
+      prevData.map(item => 
+        item._id === updatedInventory._id ? updatedInventory : item
+      )
+    );
+  };
+
   return (
     <Box sx={{ maxHeight: "100%", overflow: "auto" }}>
       <Toast ref={toast} />
@@ -123,7 +131,10 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
           overflowY: "auto",
           mb: { xs: 2, sm: 0 }
         }}>
-          <InventoryWrapper inventoryData={inventoryData} />
+          <InventoryWrapper 
+            inventoryData={inventoryData} 
+            onInventoryUpdate={handleInventoryUpdate}
+          />
         </Box>
       )}
       {isLoading && (
