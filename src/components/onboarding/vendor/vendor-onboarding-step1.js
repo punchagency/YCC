@@ -22,6 +22,7 @@ import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
 import { useParams, useLocation } from 'react-router-dom';
+import { formatAmount, unformatAmount } from '../../../utils/formatAmount';
 
 const VendorOnboardingStep1 = ({ handleNext }) => {
   const theme = useTheme();
@@ -210,7 +211,9 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
       return;
     }
 
-    setServices([...services, { ...newService }]);
+    // Unformat the price before adding to services array
+    const unformattedPrice = unformatAmount(newService.price);
+    setServices([...services, { ...newService, price: unformattedPrice }]);
     setNewService({ name: '', price: '', description: '' });
     setShowSuccess(true);
   };
@@ -243,6 +246,12 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     setShowConfirmation(false);
     try {
       if (dialogType === 'manual') {
+        // Ensure all prices are unformatted before sending to backend
+        const servicesWithUnformattedPrices = services.map(service => ({
+          ...service,
+          price: unformatAmount(service.price)
+        }));
+
         const response = await fetch(`${process.env.REACT_APP_API_URL}/services/create`, {
           method: 'POST',
           headers: {
@@ -250,7 +259,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           },
           body: JSON.stringify({
             userId,
-            services: services
+            services: servicesWithUnformattedPrices
           })
         });
         const data = await response.json();
@@ -326,11 +335,16 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         />
         <TextField
           label="Price"
-          type="number"
           value={newService.price}
-          onChange={(e) => setNewService({...newService, price: e.target.value})}
+          onChange={(e) => {
+            const formattedValue = formatAmount(e.target.value);
+            setNewService({...newService, price: formattedValue});
+          }}
           fullWidth
           required
+          InputProps={{
+            startAdornment: <span>$</span>
+          }}
         />
         <TextField
           label="Description"
@@ -388,7 +402,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                 }}
               >
                 <Typography variant="body1">
-                  <strong>{service.name}</strong> - ${service.price}
+                  <strong>{service.name}</strong> - ${formatAmount(service.price)}
                 </Typography>
                 {service.description && (
                   <Typography variant="body2" color="text.secondary">
