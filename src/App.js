@@ -69,7 +69,7 @@ import { UserProvider } from "./context/userContext";
 import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
-import ApprovePage from './pages/dashboard/admin/approve';
+import ApprovePage from './pages/dashboard/admin/approvalPage.js/approve';
 
 
 

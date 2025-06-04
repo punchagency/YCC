@@ -6,7 +6,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
 import { Dialog } from 'primereact/dialog';
 import { InputTextarea } from 'primereact/inputtextarea';
-import { useToast } from '../../../components/Toast';
+import { useToast } from '../../../../components/Toast';
 import './approve.css';
 
 const ApprovePage = () => {
@@ -403,7 +403,7 @@ const ApprovePage = () => {
             onClick={() => {
               setSelectedVendor(vendor);
               setEmailSubject(`Approval Confirmation - ${vendor.businessName}`);
-              setEmailContent(`Dear ${vendor.contactPerson.fullName},\n\nWe are pleased to inform you that your application for ${vendor.businessName} has been approved. Welcome to our platform!\n\nBest regards,\nThe YCC Team`);
+              setEmailContent(`We are pleased to inform you that your application has been approved.`);
               setShowEmailModal(true);
             }}
           >
@@ -455,16 +455,25 @@ const ApprovePage = () => {
       >
         <div className="email-form">
           <div className="field">
-            <label htmlFor="subject">Subject</label>
+            <label htmlFor="to">To:</label>
             <InputText 
-              id="subject" 
-              value={emailSubject} 
+              id="to" 
+              value={selectedVendor?.email || ''} 
+              disabled
+              className="w-full"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="subject">Subject:</label>
+            <InputText
+              id="subject"
+              value={emailSubject}
               onChange={(e) => setEmailSubject(e.target.value)}
               className="w-full"
             />
           </div>
           <div className="field">
-            <label htmlFor="content">Message</label>
+            <label htmlFor="content">Message:</label>
             <InputTextarea 
               id="content" 
               value={emailContent} 
@@ -472,6 +481,9 @@ const ApprovePage = () => {
               rows={5}
               className="w-full"
             />
+            <small className="message-hint">
+              Note: The email template already includes greetings and sign-off. Please add only the main message content.
+            </small>
           </div>
           <div className="dialog-footer">
             <Button 
