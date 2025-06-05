@@ -65,7 +65,6 @@ export const rejectVendor = async (vendorId, type, emailData) => {
       `${API_URL}/admin/vendors/${vendorId}/reject`,
       {
         type,
-        vendorId,
         ...emailData
       },
       {
