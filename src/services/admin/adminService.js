@@ -36,11 +36,13 @@ export const fetchPendingVendors = async (type, lastId = null, limit = 20) => {
 };
 
 export const approveVendor = async (vendorId, type, emailData) => {
+  console.log('Approving vendor:', vendorId, type, emailData);
   try {
     const response = await axios.put(
       `${API_URL}/admin/vendors/${vendorId}/approve`,
       {
         type,
+        vendorId,
         ...emailData
       },
       {

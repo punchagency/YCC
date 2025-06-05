@@ -4,7 +4,7 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
-import { useToast } from '../../../../components/Toast';
+import { useToast } from '../../../../context/toast/toastContext';
 import { fetchPendingVendors, approveVendor } from '../../../../services/admin/adminService';
 import './approve.css';
 
@@ -16,9 +16,10 @@ const ApprovePage = () => {
   const [emailContent, setEmailContent] = useState('');
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastId, setLastId] = useState(null);
-  const { showToast } = useToast();
+  const { toast } = useToast();
 
   const fetchVendors = useCallback(async (reset = false) => {
     try {
@@ -32,7 +33,7 @@ const ApprovePage = () => {
         setLastId(response.data.lastId);
       }
     } catch (error) {
-      showToast({
+      toast.current.show({
         severity: 'error',
         summary: 'Error',
         detail: 'Failed to fetch vendors',
@@ -41,7 +42,7 @@ const ApprovePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, lastId, showToast]);
+  }, [activeTab, lastId, toast]);
 
   // Initial fetch
   useEffect(() => {
@@ -63,17 +64,40 @@ const ApprovePage = () => {
 
   const handleSendEmail = async () => {
     try {
-      if (!selectedVendor) return;
+      if (!selectedVendor) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No vendor selected',
+          life: 3000
+        });
+        return;
+      }
+
+      if (!emailSubject.trim() || !emailContent.trim()) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Please fill in all required fields',
+          life: 3000
+        });
+        return;
+      }
+
+      setSendingEmail(true);
+
+      // Map activeTab to correct URL path
+      const urlPath = activeTab === 'supplier' ? 'vendors' : 'services';
 
       const emailData = {
-        subject: emailSubject,
-        emailBody: emailContent,
-        onboardingUrl: `${window.location.origin}/onboarding/${activeTab}`
+        subject: emailSubject.trim(),
+        emailBody: emailContent.trim(),
+        onboardingUrl: `${window.location.origin}/${urlPath}/onboarding/${selectedVendor.user}`
       };
 
-      await approveVendor(selectedVendor._id, activeTab, emailData);
+      await approveVendor(selectedVendor.user, activeTab, emailData);
 
-      showToast({
+      toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail: 'Vendor approved and email sent successfully',
@@ -88,12 +112,33 @@ const ApprovePage = () => {
       setEmailContent('');
       setSelectedVendor(null);
     } catch (error) {
-      showToast({
+      console.error('Approval error:', error);
+      
+      let errorMessage = 'Failed to approve vendor';
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            errorMessage = 'Vendor not found';
+            break;
+          case 400:
+            errorMessage = error.response.data.message || 'Invalid request data';
+            break;
+          case 500:
+            errorMessage = 'Server error occurred';
+            break;
+          default:
+            errorMessage = error.response.data.message || errorMessage;
+        }
+      }
+
+      toast.current.show({
         severity: 'error',
         summary: 'Error',
-        detail: error.response?.data?.message || 'Failed to approve vendor',
+        detail: errorMessage,
         life: 3000
       });
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -215,6 +260,7 @@ const ApprovePage = () => {
               value={emailSubject} 
               onChange={(e) => setEmailSubject(e.target.value)}
               className="w-full"
+              disabled={sendingEmail}
             />
           </div>
           <div className="field">
@@ -225,6 +271,7 @@ const ApprovePage = () => {
               onChange={(e) => setEmailContent(e.target.value)}
               rows={5}
               className="w-full"
+              disabled={sendingEmail}
             />
             <small className="message-hint">
               Note: The email template already includes greetings and sign-off. Please add only the main message content.
@@ -232,9 +279,10 @@ const ApprovePage = () => {
           </div>
           <div className="dialog-footer">
             <Button 
-              label="Send" 
-              icon="pi pi-send" 
+              label={sendingEmail ? "Sending..." : "Send"} 
+              icon={sendingEmail ? "pi pi-spin pi-spinner" : "pi pi-send"} 
               onClick={handleSendEmail}
+              disabled={sendingEmail}
             />
           </div>
         </div>
