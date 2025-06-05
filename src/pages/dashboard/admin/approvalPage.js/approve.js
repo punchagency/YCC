@@ -5,12 +5,13 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { useToast } from '../../../../context/toast/toastContext';
-import { fetchPendingVendors, approveVendor } from '../../../../services/admin/adminService';
+import { fetchPendingVendors, approveVendor, rejectVendor } from '../../../../services/admin/adminService';
 import './approve.css';
 
 const ApprovePage = () => {
   const [activeTab, setActiveTab] = useState('supplier');
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showDenyModal, setShowDenyModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [emailSubject, setEmailSubject] = useState('');
   const [emailContent, setEmailContent] = useState('');
@@ -19,6 +20,9 @@ const ApprovePage = () => {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [lastId, setLastId] = useState(null);
+  const [rejectionSubject, setRejectionSubject] = useState('');
+  const [rejectionContent, setRejectionContent] = useState('');
+  const [sendingRejection, setSendingRejection] = useState(false);
   const { toast } = useToast();
 
   const fetchVendors = useCallback(async (reset = false) => {
@@ -142,6 +146,82 @@ const ApprovePage = () => {
     }
   };
 
+  const handleRejectVendor = async () => {
+    try {
+      if (!selectedVendor) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No vendor selected',
+          life: 3000
+        });
+        return;
+      }
+
+      if (!rejectionSubject.trim() || !rejectionContent.trim()) {
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Please fill in all required fields',
+          life: 3000
+        });
+        return;
+      }
+
+      setSendingRejection(true);
+
+      const emailData = {
+        subject: rejectionSubject.trim(),
+        emailBody: rejectionContent.trim()
+      };
+
+      await rejectVendor(selectedVendor.user, activeTab, emailData);
+
+      toast.current.show({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Vendor rejected and email sent successfully',
+        life: 3000
+      });
+
+      // Remove the rejected vendor from the list
+      setVendors(prev => prev.filter(v => v._id !== selectedVendor._id));
+      
+      setShowDenyModal(false);
+      setRejectionSubject('');
+      setRejectionContent('');
+      setSelectedVendor(null);
+    } catch (error) {
+      console.error('Rejection error:', error);
+      
+      let errorMessage = 'Failed to reject vendor';
+      if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            errorMessage = 'Vendor not found';
+            break;
+          case 400:
+            errorMessage = error.response.data.message || 'Invalid request data';
+            break;
+          case 500:
+            errorMessage = 'Server error occurred';
+            break;
+          default:
+            errorMessage = error.response.data.message || errorMessage;
+        }
+      }
+
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage,
+        life: 3000
+      });
+    } finally {
+      setSendingRejection(false);
+    }
+  };
+
   const renderVendorCard = (vendor, index) => (
     <Card 
       key={vendor._id} 
@@ -197,6 +277,18 @@ const ApprovePage = () => {
           >
             <i className="pi pi-check text-base" />
             <span>Approve</span>
+          </button>
+          <button 
+            className="deny-button"
+            onClick={() => {
+              setSelectedVendor(vendor);
+              setRejectionSubject(`Application Status - ${vendor.businessName}`);
+              setRejectionContent(`We regret to inform you that we are unable to approve your application to offer services on our platform at this time. While we appreciate your interest in joining our network, we have decided to move forward with other vendors whose offerings better align with our current marketplace needs.`);
+              setShowDenyModal(true);
+            }}
+          >
+            <i className="pi pi-times text-base" />
+            <span>Deny</span>
           </button>
         </div>
       </div>
@@ -283,6 +375,76 @@ const ApprovePage = () => {
               icon={sendingEmail ? "pi pi-spin pi-spinner" : "pi pi-send"} 
               onClick={handleSendEmail}
               disabled={sendingEmail}
+            />
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        visible={showDenyModal}
+        onHide={() => {
+          setShowDenyModal(false);
+          setRejectionSubject('');
+          setRejectionContent('');
+          setSelectedVendor(null);
+        }}
+        header="Send Rejection Email"
+        style={{ width: '50vw' }}
+        modal
+        dismissableMask
+      >
+        <div className="email-form">
+          <div className="field">
+            <label htmlFor="to">To:</label>
+            <InputText 
+              id="to" 
+              value={selectedVendor?.email || ''} 
+              disabled
+              className="w-full"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="subject">Subject:</label>
+            <InputText 
+              id="subject" 
+              value={rejectionSubject} 
+              onChange={(e) => setRejectionSubject(e.target.value)}
+              className="w-full"
+              disabled={sendingRejection}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="content">Message:</label>
+            <InputTextarea 
+              id="content" 
+              value={rejectionContent} 
+              onChange={(e) => setRejectionContent(e.target.value)}
+              rows={5}
+              className="w-full"
+              disabled={sendingRejection}
+            />
+            <small className="message-hint">
+            Note: The email template already includes greetings and sign-off. Please add only the main message content.
+            </small>
+          </div>
+          <div className="dialog-footer">
+            <Button
+              label="Cancel"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => {
+                setShowDenyModal(false);
+                setRejectionSubject('');
+                setRejectionContent('');
+                setSelectedVendor(null);
+              }}
+            />
+            <Button
+              label={sendingRejection ? "Sending..." : "Send Rejection"}
+              icon={sendingRejection ? "pi pi-spin pi-spinner" : "pi pi-times"}
+              className="p-button-danger"
+              onClick={handleRejectVendor}
+              disabled={sendingRejection}
             />
           </div>
         </div>

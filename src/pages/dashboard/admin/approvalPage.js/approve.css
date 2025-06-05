@@ -147,28 +147,65 @@
 }
 
 .vendor-actions {
-  margin-top: auto;
-  padding-top: 1rem;
-  border-top: 1px solid var(--surface-border);
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
 
-.approve-button {
+.approve-button,
+.deny-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background-color: #22C55E;
-  color: white;
-  border: none;
   border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  width: 100%;
+  border: none;
+  flex: 1;
+  min-width: 120px;
   justify-content: center;
 }
 
+.approve-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
 .approve-button:hover {
-  background-color: #16A34A;
+  background-color: #45a049;
+}
+
+.deny-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.deny-button:hover {
+  background-color: #da190b;
+}
+
+.deny-confirmation {
+  padding: 1rem;
+}
+
+.deny-confirmation p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.deny-confirmation .warning-text {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .loading-indicator {
@@ -205,14 +242,6 @@
   margin-top: 0.25rem;
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--surface-border);
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .approve-page {
@@ -240,7 +269,8 @@
     flex-direction: column;
   }
 
-  .vendor-actions button {
+  .approve-button,
+  .deny-button {
     width: 100%;
   }
 

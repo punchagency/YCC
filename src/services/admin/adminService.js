@@ -56,4 +56,27 @@ export const approveVendor = async (vendorId, type, emailData) => {
     console.error('Error approving vendor:', error);
     throw error;
   }
+};
+
+export const rejectVendor = async (vendorId, type, emailData) => {
+  console.log('Rejecting vendor:', vendorId, type, emailData);
+  try {
+    const response = await axios.put(
+      `${API_URL}/admin/vendors/${vendorId}/reject`,
+      {
+        type,
+        vendorId,
+        ...emailData
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting vendor:', error);
+    throw error;
+  }
 }; 
