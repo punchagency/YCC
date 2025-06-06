@@ -14,7 +14,6 @@ import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
 import { Store } from 'lucide-react';
-import { Menu as LucideMenu } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 import { getNotifications } from '../services/notification/notificationService';
