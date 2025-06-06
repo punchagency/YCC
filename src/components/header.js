@@ -552,7 +552,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         />
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* {role === "admin" && (
+        {role === "admin" && (
           <button
             onClick={() => navigate('/admin/approve')}
             className="supplier-management-btn"
@@ -595,7 +595,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               />
             )}
           </button>
-        )} */}
+        )}
 
         {/* Notification Bell - Only show on desktop */}
         {!isMobile && (
