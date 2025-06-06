@@ -33,7 +33,6 @@ import {
 import "./header.css";
 import GlobalSearchModal from "./GlobalSearchModal";
 import { Store } from 'lucide-react';
-import { Menu as LucideMenu } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 
@@ -690,7 +689,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 color: "#0387D9"
               }} 
             />
-            {/* {hasPendingVendors && ( */}
+            {hasPendingVendors && (
               <div
                 style={{
                   position: 'absolute',
@@ -703,7 +702,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   border: '2px solid #fff'
                 }}
               />
-            {/* )} */}
+            )}
           </button>
         )}
 
