@@ -15,14 +15,22 @@ import {
   TextField,
   Typography,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { updateInventoryItem } from "../../../services/inventory/inventoryService";
+import { Toast } from "primereact/toast";
+import { useParams } from "react-router-dom";
+import { formatAmount, unformatAmount } from "../../../utils/formatAmount";
 
-const InventoryWrapper = ({ inventoryData }) => {
+const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [editedItem, setEditedItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useRef(null);
+  const { id: userId } = useParams();
 
   // Sample data - replace with your actual data source
   const handleRowClick = (inventoryItem) => {
@@ -33,7 +41,7 @@ const InventoryWrapper = ({ inventoryData }) => {
       serviceArea: inventoryItem.product.serviceArea || '',
       quantity: inventoryItem.quantity,
       sku: inventoryItem.product.sku,
-      price: inventoryItem.price,
+      price: formatAmount(inventoryItem.price), // Format price for display
     });
     setOpen(true);
   };
@@ -44,28 +52,74 @@ const InventoryWrapper = ({ inventoryData }) => {
     setEditedItem(null);
   };
 
-  const handleSave = () => {
-    console.log('Saving updated item:', {
-      ...selectedItem,
-      product: {
-        ...selectedItem.product,
-        name: editedItem.name,
+  const handleSave = async () => {
+    if (!selectedItem || !editedItem) return;
+
+    setIsLoading(true);
+    try {
+      const updateData = {
+        productName: editedItem.name,
         category: editedItem.category,
         serviceArea: editedItem.serviceArea,
-        sku: editedItem.sku,
-      },
-      quantity: editedItem.quantity,
-      price: editedItem.price,
-    });
-    // Add your save logic here
-    handleClose();
+        quantity: Number(editedItem.quantity),
+        price: unformatAmount(editedItem.price), // Convert formatted price back to number
+        sku: editedItem.sku || ''
+      };
+
+      const result = await updateInventoryItem(selectedItem._id, updateData, userId);
+
+      if (result.success) {
+        // Update the local inventory data with the correct data structure
+        const updatedInventory = result.data.data;
+        if (onInventoryUpdate) {
+          onInventoryUpdate(updatedInventory);
+        }
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Product updated successfully",
+          life: 3000,
+        });
+        handleClose();
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: result.error || "Failed to update product",
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Error updating inventory:', error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "An unexpected error occurred",
+        life: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (field) => (event) => {
-    setEditedItem({
-      ...editedItem,
-      [field]: event.target.value,
-    });
+    const value = event.target.value;
+    
+    if (field === 'price') {
+      // Handle price formatting
+      const formattedValue = formatAmount(value);
+      
+      setEditedItem({
+        ...editedItem,
+        [field]: formattedValue
+      });
+    } else {
+      setEditedItem({
+        ...editedItem,
+        [field]: value,
+      });
+    }
   };
 
   return (
@@ -77,6 +131,7 @@ const InventoryWrapper = ({ inventoryData }) => {
       gap: 2,
       px: { xs: 2, sm: 3 }
     }}>
+      <Toast ref={toast} />
       <Alert 
         severity="info" 
         icon={<EditIcon />}
@@ -246,9 +301,9 @@ const InventoryWrapper = ({ inventoryData }) => {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
                   }}
-                  title={`$${item.price}`}
+                  title={`$${formatAmount(item.price)}`}
                 >
-                  ${item.price}
+                  ${formatAmount(item.price)}
                 </TableCell>
               </TableRow>
             ))}
@@ -293,16 +348,25 @@ const InventoryWrapper = ({ inventoryData }) => {
             />
             <TextField
               label="Price"
-              type="number"
               value={editedItem?.price || ''}
               onChange={handleChange('price')}
               fullWidth
+              InputProps={{
+                startAdornment: <span>$</span>
+              }}
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleSave} variant="contained">Save</Button>
+          <Button onClick={handleClose} disabled={isLoading}>Cancel</Button>
+          <Button 
+            onClick={handleSave} 
+            variant="contained" 
+            disabled={isLoading}
+            startIcon={isLoading ? <CircularProgress size={20} /> : null}
+          >
+            {isLoading ? 'Saving...' : 'Save'}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

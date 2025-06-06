@@ -14,7 +14,6 @@ import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
 import { Store } from 'lucide-react';
-import { Menu as LucideMenu } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 import { getNotifications } from '../services/notification/notificationService';
@@ -553,7 +552,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         />
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* {role === "admin" && (
+        {role === "admin" && (
           <button
             onClick={() => navigate('/admin/approve')}
             className="supplier-management-btn"
@@ -596,7 +595,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               />
             )}
           </button>
-        )} */}
+        )}
 
         {/* Notification Bell - Only show on desktop */}
         {!isMobile && (
