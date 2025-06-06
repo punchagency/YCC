@@ -69,6 +69,7 @@ import { UserProvider } from "./context/userContext";
 import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
+import ApprovePage from './pages/dashboard/admin/approvalPage.js/approve';
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -203,6 +204,7 @@ function App() {
                 />
                 <Route path="/admin/reports" element={<Reports />} />
                 <Route path="/admin/settings" element={<CrewSetting />} />
+                <Route path="/admin/approve" element={<ApprovePage />} />
               </Route>
 
               {/* Crew Routes */}
