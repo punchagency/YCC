@@ -1,234 +1,127 @@
-import { Box, Typography, Grid, styled, Button } from '@mui/material'
-import image1 from '../../assets/images/resource-center/section3.1.png'
-import image2 from '../../assets/images/resource-center/section3.2.png'
-import image3 from '../../assets/images/resource-center/section3.3.png'
+import { Box, Typography, Grid, Card, CardContent, CardActions, Button, Avatar, Chip, Stack } from '@mui/material'
+import LocationOnIcon from '@mui/icons-material/LocationOn'
+import StarIcon from '@mui/icons-material/Star'
+import EmailIcon from '@mui/icons-material/Email'
+import YachtIcon from '@mui/icons-material/DirectionsBoat'
+import CaptainIcon from '@mui/icons-material/Person'
+import EngineeringIcon from '@mui/icons-material/Build'
 
-const ResourceCenterSection4 = () => {
-    const gridItems = [
-        {
-            image: image1,
-            heading: "The Best Seasons for Yachting: Finding Work as a Yacht Crew Member",
-            author: "Alex Siegars",
-        },
-        {
-            image: image2,
-            heading: "Love Couple Boats: The Soap Opera in 7 Acts",
-            author: "Alex Siegars",
-        },
-        {
-            image: image3,
-            heading: "Life After Yachting: Planning for a Secure Financial Future",
-            author: "Alex Siegars",
-        },
-        {
-            image: image1,
-            heading: "The Best Seasons for Yachting: Finding Work as a Yacht Crew Member",
-            author: "Alex Siegars",
-        },
-        {
-            image: image2,
-            heading: "Love Couple Boats: The Soap Opera in 7 Acts",
-            author: "Alex Siegars",
-        },
-        {
-            image: image3,
-            heading: "Life After Yachting: Planning for a Secure Financial Future",
-            author: "Alex Siegars",
-        },
-        {
-            image: image1,
-            heading: "The Best Seasons for Yachting: Finding Work as a Yacht Crew Member",
-            author: "Alex Siegars",
-        },
-        {
-            image: image2,
-            heading: "Love Couple Boats: The Soap Opera in 7 Acts",
-            author: "Alex Siegars",
-        },
-        {
-            image: image3,
-            heading: "Life After Yachting: Planning for a Secure Financial Future",
-            author: "Alex Siegars",
-        },
-        {
-            image: image1,
-            heading: "The Best Seasons for Yachting: Finding Work as a Yacht Crew Member",
-            author: "Alex Siegars",
-        }
+const cardData = [
+  {
+    logo: '', // Placeholder for logo image, use Avatar fallback
+    company: 'Oceanic Yacht Services',
+    categories: ['Captain', 'Engineering'],
+    description: 'Premium yacht maintenance, navigation and crew services for luxury vessels worldwide.',
+    location: 'Fort Lauderdale, FL',
+    rating: 4.9,
+    reviews: 86,
+    email: 'info@oceanic.yacht.com',
+    avatarBg: '#e3f2fd',
+    avatarIcon: <YachtIcon sx={{ color: '#0487D9', fontSize: 32 }} />,
+  },
+  {
+    logo: '',
+    company: 'Oceanic Yacht Services',
+    categories: ['Captain', 'Engineering'],
+    description: 'Premium yacht maintenance, navigation and crew services for luxury vessels worldwide.',
+    location: 'Fort Lauderdale, FL',
+    rating: 4.9,
+    reviews: 86,
+    email: 'info@oceanic.yacht.com',
+    avatarBg: '#e3f2fd',
+    avatarIcon: <CaptainIcon sx={{ color: '#0487D9', fontSize: 32 }} />,
+  },
+  {
+    logo: '',
+    company: 'Oceanic Yacht Services',
+    categories: ['Captain', 'Engineering'],
+    description: 'Premium yacht maintenance, navigation and crew services for luxury vessels worldwide.',
+    location: 'Fort Lauderdale, FL',
+    rating: 4.9,
+    reviews: 86,
+    email: 'info@oceanic.yacht.com',
+    avatarBg: '#e3f2fd',
+    avatarIcon: <EngineeringIcon sx={{ color: '#0487D9', fontSize: 32 }} />,
+  },
+  {
+    logo: '',
+    company: 'Oceanic Yacht Services',
+    categories: ['Captain', 'Engineering'],
+    description: 'Premium yacht maintenance, navigation and crew services for luxury vessels worldwide.',
+    location: 'Fort Lauderdale, FL',
+    rating: 4.9,
+    reviews: 86,
+    email: 'info@oceanic.yacht.com',
+    avatarBg: '#e3f2fd',
+    avatarIcon: <YachtIcon sx={{ color: '#0487D9', fontSize: 32 }} />,
+  },
+];
 
-    ]
+const gradientButton = {
+  background: 'linear-gradient(90deg, #0487D9 0%, #034D92 100%)',
+  color: '#fff',
+  fontWeight: 600,
+  borderRadius: 2,
+  textTransform: 'none',
+  fontSize: 16,
+  boxShadow: 'none',
+  mt: 2,
+  '&:hover': {
+    background: 'linear-gradient(90deg, #034D92 0%, #0487D9 100%)',
+    boxShadow: 'none',
+  },
+};
 
-    return (<Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          padding: { xs: 5, md: 10 },
-          color: "black",
-          gap: { xs: 5, md: 10 },
-        }}
-      >
-        <HeadingText>Recently Published Resources</HeadingText>
-      
-        <Grid container spacing={3} sx={{ overflow: "hidden" }}>
-          {gridItems.map((item, index) => (
-            <Grid
-              item
-              xs={12}
-              md={4}
-              key={index}
-              sx={{ minHeight: { md: "43vh" }, display: "flex", flexDirection: "column" }} // Use minHeight instead of height
-            >
-              <Box
-                sx={{
-                  width: "100%",
-                  borderTopLeftRadius: "20px",
-                  borderTopRightRadius: "20px",
-                  flexGrow: 1, // Ensures the card expands naturally
-                }}
-              >
-                <img
-                  src={item.image}
-                  alt="Your Description"
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    borderTopLeftRadius: "20px",
-                    borderTopRightRadius: "20px",
-                  }}
-                />
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  padding: { xs: "20px", md: "40px" },
-                  gap: "20px",
-                  textAlign: "left",
-                  justifyContent: "space-between",
-                  flexGrow: 1, // Prevents height inconsistencies
-                  border: "1px solid #E0E0E0",
-                  borderBottomLeftRadius: "20px",
-                  borderBottomRightRadius: "20px",
-                }}
-              >
-                <Box sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <Box sx={{ display: "flex", gap: "10px", justifyContent: "space-between" }}>
-                    <AuthorText>{item.author}</AuthorText>
-                    <DateText>August 11, 2024</DateText>
-                  </Box>
-                  <Box>
-                    <SubHeadingText>{item.heading}</SubHeadingText>
-                  </Box>
-                </Box>
-      
+const ResourceCenterSection4 = () => (
+  <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, py: 6 }}>
+    <Grid container spacing={4} sx={{ maxWidth: 1200 }}>
+      {cardData.map((card, idx) => (
+        <Grid item xs={12} md={6} key={idx}>
+          <Card sx={{ borderRadius: 4, boxShadow: 0, background: '#f5f8fa', p: 2 }}>
+            <CardContent sx={{ pb: 1 }}>
+              <Stack direction="row" alignItems="center" spacing={2} mb={1}>
+                <Avatar sx={{ width: 56, height: 56, bgcolor: card.avatarBg }}>
+                  {card.avatarIcon}
+                </Avatar>
                 <Box>
-                  <GradientButton variant="contained" color="white">
-                    Read More
-                  </GradientButton>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0 }}>{card.company}</Typography>
+                  <Stack direction="row" spacing={1} mt={0.5}>
+                    {card.categories.map((cat) => (
+                      <Chip
+                        key={cat}
+                        label={cat}
+                        size="small"
+                        sx={{ bgcolor: '#b3e0fc', color: '#034D92', fontWeight: 600, fontSize: 14 }}
+                      />
+                    ))}
+                  </Stack>
                 </Box>
-              </Box>
-            </Grid>
-          ))}
+              </Stack>
+              <Typography sx={{ color: '#222', fontSize: 16, mb: 2, mt: 1 }}>{card.description}</Typography>
+              <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                <LocationOnIcon sx={{ color: '#0487D9' }} />
+                <Typography sx={{ color: '#222', fontWeight: 500, fontSize: 15 }}>{card.location}</Typography>
+              </Stack>
+              <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                <StarIcon sx={{ color: '#FFD600', fontSize: 22 }} />
+                <Typography sx={{ fontWeight: 700, fontSize: 16 }}>{card.rating}</Typography>
+                <Typography sx={{ color: '#555', fontSize: 15 }}>({card.reviews} reviews)</Typography>
+              </Stack>
+              <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                <EmailIcon sx={{ color: '#0487D9' }} />
+                <Typography sx={{ color: '#222', fontSize: 15, wordBreak: 'break-all' }}>{card.email}</Typography>
+              </Stack>
+            </CardContent>
+            <CardActions sx={{ pt: 0 }}>
+              <Button fullWidth variant="contained" sx={gradientButton}>
+                Request Quote
+              </Button>
+            </CardActions>
+          </Card>
         </Grid>
-      </Box>
-      
-    )
-}
+      ))}
+    </Grid>
+  </Box>
+);
 
-const linearGradient = "linear-gradient(90deg, #034D92, #0487D9)";
-const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
-
-
-const HeadingText = styled(Typography)(({ theme }) => ({
-    color: "#000000",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "46px", // Updated base font size
-    lineHeight: "51.06px",
-    letterSpacing: "-2%",
-  
-    [theme.breakpoints.down("lg")]: {
-      fontSize: "40px",
-      lineHeight: "45px",
-    },
-    [theme.breakpoints.down("md")]: {
-      fontSize: "34px",
-      lineHeight: "40px",
-    },
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "28px",
-      lineHeight: "34px",
-    },
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "24px",
-      lineHeight: "30px",
-    },
-  }));
-const SubHeadingText = styled(Typography)(({ theme }) => ({
-    color: "#000000",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "29px", // Default for large screens
-    lineHeight: "35.09px",
-    letterSpacing: "-0.02em",
-
-  
-    [theme.breakpoints.down("lg")]: {
-      fontSize: "25px",
-      lineHeight: "25px",
-    },
-    [theme.breakpoints.down("md")]: {
-      fontSize: "22px",
-      lineHeight: "25px",
-    },
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "19px",
-      lineHeight: "25px",
-    },
-    [theme.breakpoints.down("xs")]: {
-      fontSize: "18px",
-      lineHeight: "25px",
-    },
-  }));
-
-const DateText = styled(Typography)({
-    fontFamily: "Manrope, sans-serif",
-    fontWeight: 500,
-    fontSize: "16px",
-    lineHeight: "24px",
-    letterSpacing: "0%",
-    color: "#636363",
-})
-
-const AuthorText = styled(Typography)({
-    fontFamily: "Inter, sans-serif",
-    fontWeight: 500,
-    fontSize: "16px",
-    lineHeight: "19.36px",
-    letterSpacing: "0%",
-    color: '#000000'
-})
-const GradientButton = styled(Button)(({ theme }) => ({
-    background: linearGradient,
-    fontSize: "16px", // Default for larger screens
-    fontFamily: "Inter, sans-serif",
-    textTransform: "none",
-    padding: "15px 41px", // Default padding for large screens
-    color: "#FFFFFF",
-  
-    "&:hover": {
-      background: linearGradient2,
-    },
-  
-    [theme.breakpoints.down("md")]: {
-      fontSize: "14px",
-      padding: "12px 32px",
-    },
-    
-    [theme.breakpoints.down("sm")]: {
-      fontSize: "13px",
-      padding: "10px 24px",
-    },
-  }));
 export default ResourceCenterSection4;
