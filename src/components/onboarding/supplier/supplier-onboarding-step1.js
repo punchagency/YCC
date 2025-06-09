@@ -35,7 +35,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const requiredHeaders = ["product name"];
 
   // Determine role based on URL path - more explicit check
-  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes('/vendor/onboarding/') ? 'supplier' : 'service_provider';
 
   const downloadTemplate = (fileType) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;

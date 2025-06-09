@@ -49,7 +49,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   
   // Determine role based on URL path
-  const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
+  const role = location.pathname.includes('/service/onboarding/') ? 'service_provider' : 'supplier';
 
   const requiredHeaders = ["service name", "description", "price"];
 

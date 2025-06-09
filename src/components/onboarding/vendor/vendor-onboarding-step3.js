@@ -17,7 +17,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Determine role based on URL path
-  const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
+  const role = location.pathname.includes('/service/onboarding/') ? 'service_provider' : 'supplier';
 
   useEffect(() => {
     const verifyInventoryUpload = async () => {
