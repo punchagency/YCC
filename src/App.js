@@ -99,10 +99,10 @@ const AuthCheck = ({ children }) => {
     "/forgot-password",
     "/coming-soon",
     "/service/quotes/respond",
-    "/vendor/onboarding/:id",
-    "/vendor/onboarding/refresh-stripe-account",
-    "/service/onboarding/:id",
-    "/service/onboarding/refresh-stripe-account",
+    "/vendors/onboarding/:id",
+    "/vendors/onboarding/refresh-stripe-account",
+    "/services/onboarding/:id",
+    "/services/onboarding/refresh-stripe-account",
   ];
 
   // Check if the current path is a public route
@@ -342,16 +342,16 @@ function App() {
               <Route path="/crew/settings" element={<CrewSettings />} />
             </Route>
             <Route
-              path="/vendor/onboarding/:id"
+              path="/vendors/onboarding/:id"
               element={<SupplierOnboarding />}
             />
             <Route
-              path="/vendor/onboarding/refresh-stripe-account"
+              path="/vendors/onboarding/refresh-stripe-account"
               element={<SupplierOnboardingStep2 />}
             />
-            <Route path="/service/onboarding/:id" element={<VendorOnboarding />} />
+            <Route path="/services/onboarding/:id" element={<VendorOnboarding />} />
             <Route
-              path="/service/onboarding/refresh-stripe-account"
+              path="/services/onboarding/refresh-stripe-account"
               element={<VendorOnboardingStep2 />}
             />
           </Routes>
