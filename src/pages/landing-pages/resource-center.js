@@ -6,7 +6,9 @@ import Section1ResourceCenter from '../../components/resource-center/section1-re
 import Section3ResourceCenter from '../../components/resource-center/section3-resource-center'
 import ResourceCenterSection4 from '../../components/resource-center/section4-resource-center'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { LandingPageAIProvider } from '../../context/AIAssistant/landingPageAIContext'
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 
 const ResourceCenter = () => {
     useEffect(() => {
@@ -19,23 +21,51 @@ const ResourceCenter = () => {
             <GradientText>Center</GradientText> <br /> Yacht Crew Center
         </> 
     );
-    const subtext2 = "Explore the Yacht Crew Center Resource Hub for expert yachting tips, tools and insights. To help Crew, Captains and Department Heads streamline operations and enhance guest experiences."
+
+    // LIFTED STATE
+    const [toggle, setToggle] = useState('Supplies');
+    const [category, setCategory] = useState('');
+    const [search, setSearch] = useState('');
 
     return (
+        <LandingPageAIProvider>
         <Box sx={{
             display: "flex",
             flexDirection: "column",
             gap: {xs: 3, md: 4},
+            width: { xs: '100vw', md: '100%' },
+            maxWidth: { xs: '100vw', md: 'none' },
+            margin: 0,
+            boxSizing: 'border-box',
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
                 header={header}
-                subtext2={subtext2}
             />
-            <Section1ResourceCenter />
+            <Section1ResourceCenter
+                toggle={toggle}
+                setToggle={setToggle}
+                category={category}
+                setCategory={setCategory}
+                search={search}
+                setSearch={setSearch}
+            />
             <Section3ResourceCenter />
             <Box sx={{ mt: 1 }}>
-                <ResourceCenterSection4 />
+                {toggle === 'Supplies' && (
+                  <ResourceCenterSection4
+                    type="supplies"
+                    category={category}
+                    search={search}
+                  />
+                )}
+                {toggle === 'Services' && (
+                  <ResourceCenterSection4
+                    type="services"
+                    category={category}
+                    search={search}
+                  />
+                )}
             </Box>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mb: 6 }}>
               <Paper elevation={0} sx={{
@@ -71,6 +101,8 @@ const ResourceCenter = () => {
             </Box>
             <LandingPageFooter />
         </Box>
+            <LandingPageChatbot />
+        </LandingPageAIProvider>
     )
 }
 

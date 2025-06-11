@@ -21,13 +21,15 @@ import { useUser } from "../../context/userContext";
 
 const ChatbotDashboard = () => {
     const { user } = useUser();
-    const role = user.role.split('_')[0];
+    const role = user ? user.role.split('_')[0] : 'guest';
 
     const {
         isAIAssistantOpen,
         setIsAIAssistantOpen,
         chatData,
+        setChatData,
         typingState,
+        setTypingState,
         message,
         setMessage,
         sendMessage,
@@ -91,8 +93,14 @@ const ChatbotDashboard = () => {
             "my account",
             "crew profile",
             "contractors"
+        ],
+        "guest": [
+            "how to sign up",
+            "available services",
+            "vendor information",
+            "contact support"
         ]
-}
+    }
 
     return (
         <>
@@ -105,11 +113,18 @@ const ChatbotDashboard = () => {
                     bottom: 19,
                     right: 19,
                     backgroundColor: 'transparent',
-                    boxShadow: 'none',  // Removes the shadow
+                    boxShadow: 'none',
+                    display: 'block',
+                    animation: 'chatbotPulse 1.5s infinite',
+                    transition: 'transform 0.3s ease, opacity 0.3s ease',
                     '&:hover': {
-                        backgroundColor: 'red', // Prevents background change on hover
-                        boxShadow: 'none', // Ensures no shadow on hover
-                    }
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
+                        animation: 'chatbotPulse 0.7s infinite',
+                        transform: 'scale(1.1)',
+                        opacity: 0.9,
+                    },
+                    zIndex: 1300,
                 }}
             >
                 <img src={BotModalIcon} alt="Chat Bot" style={{ width: '80px', height: '80px' }} />
@@ -133,8 +148,10 @@ const ChatbotDashboard = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: '900px',
-                    maxHeight: '40vh',
+                    width: { xs: '95vw', sm: '600px', md: '800px', lg: '900px' },
+                    maxWidth: '98vw',
+                    maxHeight: { xs: '90vh', md: '80vh', lg: '70vh' },
+                    minHeight: '350px',
                 }}>
 
                     {/* Chat section */}
@@ -522,5 +539,19 @@ const ChatbotFooterText = styled(Typography)({
     letterSpacing: '0%',
     color: '#667085',
 });
+
+// Add keyframes for chatbotPulse animation
+if (typeof window !== 'undefined' && !document.getElementById('chatbotPulseKeyframes')) {
+    const style = document.createElement('style');
+    style.id = 'chatbotPulseKeyframes';
+    style.innerHTML = `
+        @keyframes chatbotPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0.4); }
+            70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(4,135,217,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0); }
+        }
+    `;
+    document.head.appendChild(style);
+}
 
 export default ChatbotDashboard;
