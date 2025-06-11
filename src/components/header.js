@@ -13,7 +13,7 @@ import share from "../assets/images/crew/share.png";
 import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
-import { Store } from 'lucide-react';
+import { Store, Bell } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 import { getNotifications } from '../services/notification/notificationService';
@@ -346,7 +346,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "12px",
+                gap: "8px",
               }}
             >
               {/* Store Icon */}
@@ -395,25 +395,47 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               )}
 
               {/* Bell Icon */}
-              <Button
-                icon={
-                  <img
-                    src={icon}
-                    alt="notification"
-                    style={{ width: "24px", height: "24px" }}
-                  />
-                }
-                className="notifications"
+              <button
+                className="notifications-btn"
                 onClick={(event) => overlayPanelRef.current.toggle(event)}
                 aria-haspopup
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  background: "transparent",
-                  border: "none",
-                  padding: "0",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  padding: '8px',
+                  position: 'relative'
                 }}
-              />
+              >
+                <Bell 
+                  style={{ 
+                    width: "24px", 
+                    height: "24px", 
+                    color: "#0387D9"
+                  }} 
+                />
+                {notifications.length > 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '4px',
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor: '#FF4B4B',
+                      borderRadius: '50%',
+                      border: '2px solid #fff'
+                    }}
+                  />
+                )}
+              </button>
 
               {/* Profile Image Only */}
               <div
@@ -430,8 +452,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   alt="Profile"
                   className="profile-image"
                   style={{
-                    width: "30px",
-                    height: "30px",
+                    width: "32px",
+                    height: "32px",
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}
@@ -569,7 +591,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {/* Store Icon - Only show on desktop */}
         {!isMobile && role === "admin" && (
           <button
@@ -587,7 +609,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               borderRadius: '50%',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              marginRight: '16px',
               padding: '8px',
               position: 'relative'
             }}
@@ -618,24 +639,47 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
 
         {/* Notification Bell - Only show on desktop */}
         {!isMobile && (
-          <Button
-            icon={
-              <img
-                src={icon}
-                alt="notification"
-                style={{ width: "24px", height: "24px" }}
-              />
-            }
-            className="notifications"
+          <button
+            className="notifications-btn"
             onClick={(event) => overlayPanelRef.current.toggle(event)}
             aria-haspopup
             style={{
-              width: "40px",
-              height: "40px",
-              background: "transparent",
-              border: "none",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              padding: '8px',
+              position: 'relative'
             }}
-          />
+          >
+            <Bell 
+              style={{ 
+                width: "24px", 
+                height: "24px", 
+                color: "#0387D9"
+              }} 
+            />
+            {notifications.length > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '4px',
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#FF4B4B',
+                  borderRadius: '50%',
+                  border: '2px solid #fff'
+                }}
+              />
+            )}
+          </button>
         )}
         {/* Profile Section - Only show on desktop */}
         {!isMobile && (
@@ -650,8 +694,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 alt="Profile"
                 className="profile-image"
                 style={{
-                  width: "30px",
-                  height: "30px",
+                  width: "32px",
+                  height: "32px",
                   borderRadius: "50%",
                   objectFit: "cover",
                 }}
