@@ -14,6 +14,7 @@ import NotificationDetailsModal from "../../components/NotificationDetailsModal"
 import { getNotifications, updateComplaintStatus } from "../../services/notification/notificationService"
 import { TableSkeleton } from "../../components/TableSkeleton"
 import { useToast } from "../../components/Toast"
+import { Pagination } from "../../components/pagination"
 import React from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -820,36 +821,16 @@ export default function Notifications({ role }) {
               />
             </DataTable>
 
-            {/* Pagination */}
-            <div
-              className="pagination"
-              style={{
-                marginTop: "20px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div>
-                <span style={{ color: "#667085" }}>
-                  Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalItems)} of {totalItems} items
-                </span>
-              </div>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <Button
-                  icon="pi pi-chevron-left"
-                  className="p-button-text"
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-                />
-                <Button
-                  icon="pi pi-chevron-right"
-                  className="p-button-text"
-                  disabled={page === totalPages}
-                  onClick={() => setPage(page + 1)}
-                />
-              </div>
-            </div>
+            {/* Use the new Pagination component */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={setPage}
+              isMobile={isMobile}
+              isTablet={isTablet}
+            />
           </div>
         )}
 
@@ -878,6 +859,17 @@ export default function Notifications({ role }) {
                 No notifications found
               </Typography>
             )}
+
+            {/* Add pagination to mobile view */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={setPage}
+              isMobile={isMobile}
+              isTablet={isTablet}
+            />
           </Box>
         )}
       </div>
