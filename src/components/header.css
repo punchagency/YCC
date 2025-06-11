@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px;
 }
 
 /* Hide on desktop (1024px and above) */
@@ -72,11 +73,30 @@
     z-index: 1000;
     background: #f8fbff !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px !important;
   }
 
   /* Add padding to the body to account for fixed header */
   body {
-    padding-top: 72px; /* Adjust this value based on your header height */
+    padding-top: 64px;
+  }
+
+  /* Ensure proper spacing between header elements */
+  .p-menubar .p-menubar-start {
+    width: 100%;
+  }
+
+  /* Adjust button sizes for mobile */
+  .p-button {
+    min-width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+  }
+
+  /* Ensure profile image is properly sized */
+  .profile-image {
+    width: 30px !important;
+    height: 30px !important;
   }
 }
 

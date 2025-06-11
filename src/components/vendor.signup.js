@@ -771,7 +771,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 type="email"
                 id="email"
                 required
-                placeholder="Enter Business Contact Email"
+                placeholder="Business Contact Email"
                 value={formData.email || ""}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 style={{
@@ -823,7 +823,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             <input
               type="url"
               id="businessWebsite"
-              placeholder="Enter Business Website"
+              placeholder="E.g. https://www.yourbusiness.com"
               value={formData.businessWebsite}
               onChange={(e) =>
                 handleInputChange("businessWebsite", e.target.value)
@@ -1385,7 +1385,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   role: e.target.value,
                 })
               }
-              placeholder="Enter contact person role"
+              placeholder="E.g. Owner, Manager, etc."
             />
           </div>
         </div>
