@@ -59,11 +59,6 @@
   visibility: visible;
 }
 
-.supplier-management-btn:hover span,
-.supplier-management-btn:hover svg {
-  color: white !important;
-}
-
 /* Notifications tooltip */
 .notifications-btn {
   position: relative;
