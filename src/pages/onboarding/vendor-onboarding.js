@@ -317,7 +317,7 @@ const VendorOnboarding = () => {
                   Congratulations!
                 </Typography>
                 <Typography sx={{ mb: 3, color: "success.dark" }}>
-                  You have successfully completed the vendor onboarding
+                  You have successfully completed the services onboarding
                   process.
                 </Typography>
               </Box>

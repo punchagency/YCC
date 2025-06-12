@@ -15,7 +15,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Determine role based on URL path
-  const role = location.pathname.includes('/vendor/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes('/vendors/onboarding/') ? 'supplier' : 'service_provider';
 
   useEffect(() => {
     // if (hasRunRef.current) return; // prevent second run

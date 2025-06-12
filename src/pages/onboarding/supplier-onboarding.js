@@ -325,7 +325,7 @@ const SupplierOnboarding = () => {
                   Congratulations!
                 </Typography>
                 <Typography sx={{ mb: 3, color: "success.dark" }}>
-                  You have successfully completed the supplier onboarding
+                  You have successfully completed the vendors onboarding
                   process.
                 </Typography>
               </Box>

@@ -15,7 +15,7 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
   const [error, setError] = useState(null);
 
   // Determine role based on URL path - more explicit check
-  const role = location.pathname.includes('/vendor/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes('/vendors/onboarding/') ? 'supplier' : 'service_provider';
 
   useEffect(() => {
     const fetchStripeAccount = async () => {
