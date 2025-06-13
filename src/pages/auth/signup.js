@@ -1,88 +1,58 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SignupForm from '../../components/signup';
-import logo from '../../assets/images/logo-login.png';
-
-function isMobile() {
-  return typeof window !== 'undefined' && window.innerWidth < 600;
-}
+import React from "react";
+import { Link } from "react-router-dom";
+import backgroundImage from "../../assets/images/captain_login_bg.jpg";
+import logo from "../../assets/images/logo-login.png";
+import SignupForm from "../../components/signup";
 
 const Signup = () => {
-  const navigate = useNavigate();
-
+  const title = "Explore the story behind Yacht Crew Center's journey.";
+  // const role = location.state?.role || "Guest";
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', padding: isMobile() ? '0' : undefined }}>
-      {/* Back Button for mobile (fixed at top) */}
-      {window.history.length > 1 && isMobile() && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          zIndex: 2000,
-          background: 'transparent',
-          width: '100vw',
-          padding: '16px 0 0 16px',
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#000',
-              fontSize: 28
-            }}
-            aria-label="Back"
-          >
-            <ArrowBackIcon />
-          </button>
+    <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login">
+      <div
+        className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          height: "120vh", // Sets the height of the background to 12vh
+          width: "100%", // Ensures it takes full width
+          backgroundAttachment: "fixed", // Keeps the background fixed in place while scrolling
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        <div className="login-content">
+          <h2 className="font-semibold text-white">{title}</h2>
         </div>
-      )}
-      {/* Back Button for desktop (absolute in container) */}
-      {window.history.length > 1 && !isMobile() && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#034D92',
-            margin: '16px 0 0 16px',
-            position: 'absolute',
-            zIndex: 10
-          }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
-      <div className="signup-right-component" style={isMobile() ? { maxWidth: 340, width: '100%', margin: '0 auto', padding: '8px 4px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', borderRadius: 12, background: 'white' } : {}}>
-        {/* Hide logo on mobile */}
-        {!isMobile() && (
+      </div>
+
+      <div className="flex-1 flex align-items-center justify-content-center right-panel">
+        <div className="login-right-component">
           <div className="logo-wraper">
             <div className="logo">
-              <img src={logo} alt="Company logo" className="image-full" />
+              <img
+                src={logo}
+                alt="Company logo"
+                className="image-full"
+                style={{ paddingTop: "120px", width: "100px" }}
+              />
             </div>
           </div>
-        )}
-        <div className="signup-heading" style={isMobile() ? { marginBottom: 12, marginTop: 4, textAlign: 'center' } : {}}>
-          <h2 className="font-medium mb-1">Sign up</h2>
-          <p>
-            Already have an account?{" "}
-            <Link to="/login">
-              Sign in!
-            </Link>
-          </p>
-        </div>
-        <div className="signup-form" style={isMobile() ? { marginTop: 4 } : {}}>
-          <SignupForm />
+          <div className="login-heading">
+            <h2 className="font-medium mb-20">Create an account</h2>
+            <p>
+              Already a member? <Link to="/login">Sign in!</Link>
+            </p>
+          </div>
+          <div
+            className="login-form captain-login-form"
+            style={{ backgroundColor: "blue", height: "900px" }}
+          >
+            <SignupForm />
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Signup; 
+export default Signup;

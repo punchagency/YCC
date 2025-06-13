@@ -1095,24 +1095,8 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               opacity: { duration: 0.2 },
             }}
           >
-            <div style={{
-              maxWidth: 420,
-              margin: '0 auto',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              background: '#fff',
-              borderRadius: 16,
-              boxShadow: '0 4px 24px rgba(0,0,0,0.07)',
-              padding: '32px 24px 32px 24px',
-              position: 'relative',
-            }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 32 }}>
-                <span style={{ fontSize: 32, color: '#0487D9', marginBottom: 8 }}>✔️</span>
-                <div style={{ fontWeight: 600, fontSize: 18, color: '#034d92', marginBottom: 4 }}>Step 4</div>
-                <div style={{ fontSize: 14, color: '#888' }}>Upload CV & Profile Picture</div>
-              </div>
-              <div className="file-upload-container" style={{ marginBottom: 32, width: '100%' }}>
+            <div className="signup-step">
+              <div className="file-upload-container">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -1120,25 +1104,34 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   accept=".jpg,.jpeg,.png,.svg"
                   className="hidden-file-input"
                 />
+
                 <div
                   className="upload-box"
                   onClick={triggerFileInput}
                   style={{
                     cursor: "pointer",
+                    lineHeight: "60px",
                     width: "100%",
-                    height: "160px",
+                    height: "180px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexDirection: "column",
-                    border: '2px dashed #b3e0fc',
-                    borderRadius: 12,
-                    background: '#f8fbfd',
-                    boxShadow: '0 2px 8px rgba(4,135,217,0.04)',
-                    marginBottom: 16,
                   }}
                 >
-                  <div className="upload-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                  <div
+                    className="upload-content"
+                    style={{
+                      borderRadius: "8px",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      height: "100%",
+                      width: "100%",
+                      padding: "0px",
+                    }}
+                  >
                     <div className="upload-icon">
                       {isProfileUploading ? (
                         <div className="loading-spinner">
@@ -1149,30 +1142,46 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           src={URL.createObjectURL(selectedFiles[0])}
                           className="profileLogo"
                           alt="Selected profile"
-                          style={{ width: "40px", height: "40px", borderRadius: 8, marginBottom: 8 }}
+                          style={{ width: "35px", height: "35px" }}
                         />
                       ) : (
                         <img
                           src={profileLogo}
                           className="profileLogo"
-                          style={{ width: "40px", height: "40px", borderRadius: 8, marginBottom: 8 }}
+                          style={{ width: "35px", height: "35px" }}
                           alt="profile"
                         />
                       )}
-                      <p style={{ fontSize: "13px", fontWeight: 500, color: "#0487D9", margin: 0 }}>Upload photo</p>
+                      <p
+                        className="optional"
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "bold",
+                          color: "grey",
+                        }}
+                      >
+                        Upload photo{" "}
+                        <span
+                          style={{ color: "lightgrey", fontWeight: "normal" }}
+                        ></span>
+                      </p>
                     </div>
                     <button
                       className="browse-button"
                       onClick={triggerFileInput}
                       type="button"
-                      style={{ marginTop: "18px", background: 'linear-gradient(to right, #034d92, #0487d9)', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, fontSize: 14, cursor: 'pointer' }}
+                      style={{ marginTop: "50px" }}
                     >
-                      {selectedFiles.length > 0 ? "Change Photo" : "Browse Files"}
+                      {selectedFiles.length > 0
+                        ? "Change Photo"
+                        : "Browse Files"}
                     </button>
+                    <br />
+                    <span className="file-types"></span>
                   </div>
                 </div>
               </div>
-              <div className="cv-upload-container" style={{ marginBottom: 32, width: '100%' }}>
+              <div className="cv-upload-container">
                 <div
                   className="cv-upload-box"
                   onDragOver={handleDragOver}
@@ -1180,16 +1189,13 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   onClick={triggerCVInput}
                   style={{
                     cursor: "pointer",
+                    lineHeight: "-30px",
                     width: "100%",
-                    height: "160px",
+                    height: "180px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     flexDirection: "column",
-                    border: '2px dashed #b3e0fc',
-                    borderRadius: 12,
-                    background: '#f8fbfd',
-                    boxShadow: '0 2px 8px rgba(4,135,217,0.04)',
                   }}
                 >
                   {isCVUploading ? (
@@ -1199,7 +1205,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   ) : (
                     <img
                       src={cvUploadLogo}
-                      style={{ width: "40px", height: "40px", marginBottom: 8 }}
+                      style={{ width: "40px", height: "40px" }}
                       alt="cv"
                     />
                   )}
@@ -1211,24 +1217,36 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     className="hidden-file-input"
                     style={{ display: "none" }}
                   />
-                  <div className="upload-content" style={{ width: '100%', textAlign: 'center' }}>
+
+                  <div className="upload-content">
                     <div className="upload-icon">
                       <i className="fas fa-file-alt"></i>
                     </div>
                     {selectedCV ? (
                       <>
-                        <p className="file-name" style={{ fontSize: "11px", marginBottom: 2, marginTop: 8, color: '#222' }}>
-                          {selectedCV.name.length > 20 ? selectedCV.name.substring(0, 20) + "..." : selectedCV.name}
+                        <p
+                          className="file-name"
+                          style={{
+                            fontSize: "10px",
+                            lineHeight: "-20px",
+                            marginBottom: "0px",
+                          }}
+                        >
+                          {selectedCV.name.length > 20
+                            ? selectedCV.name.substring(0, 20) + "..."
+                            : selectedCV.name}
                         </p>
-                        <span className="file-size" style={{ fontSize: 11, color: '#888' }}>
+                        <span className="file-size">
                           ({(selectedCV.size / 1024 / 1024).toFixed(2)} MB)
                         </span>
-                        <div className="cv-actions" style={{ marginTop: "18px" }}>
+                        <div
+                          className="cv-actions"
+                          style={{ marginTop: "100px" }}
+                        >
                           <button
                             className="change-cv"
                             onClick={triggerCVInput}
                             type="button"
-                            style={{ background: 'linear-gradient(to right, #034d92, #0487d9)', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, fontSize: 14, cursor: 'pointer' }}
                           >
                             Browse Files
                           </button>
@@ -1236,14 +1254,17 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       </>
                     ) : (
                       <>
-                        <p style={{ marginBottom: "10px", fontSize: "13px", color: '#222' }}>
+                        <p style={{ marginBottom: "15px", fontSize: "12px" }}>
                           Drag & drop your CV here or
                         </p>
                         <button
                           className="browse-button"
                           onClick={triggerCVInput}
                           type="button"
-                          style={{ background: 'linear-gradient(to right, #034d92, #0487d9)', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 500, fontSize: 14, cursor: 'pointer' }}
+                          style={{
+                            background:
+                              "linear-gradient(to right, #034d92, #0487d9)",
+                          }}
                         >
                           Browse Files
                         </button>
@@ -1252,11 +1273,12 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   </div>
                 </div>
               </div>
-              <div className="button-group" style={{ display: 'flex', justifyContent: 'center', gap: 16, width: '100%' }}>
+
+              <div className="button-group">
                 <button
                   className="prev-button"
                   onClick={() => setStep(3)}
-                  style={{ width: "48%", background: "#f0f0f0", border: 'none', borderRadius: 6, padding: '10px 0', fontWeight: 500, fontSize: 15, cursor: 'pointer' }}
+                  style={{ width: "100%", background: "#f0f0f0" }}
                 >
                   Previous
                 </button>
@@ -1264,7 +1286,11 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   className="next-button nextbtn"
                   onClick={() => setStep(5)}
                   disabled={false}
-                  style={{ width: "48%", background: "linear-gradient(to right, #034d92, #0487d9)", color: '#fff', border: 'none', borderRadius: 6, padding: '10px 0', fontWeight: 500, fontSize: 15, cursor: 'pointer' }}
+                  style={{
+                    width: "100%",
+                    marginLeft: "20px",
+                    background: "linear-gradient(to right, #034d92, #0487d9)",
+                  }}
                 >
                   Next
                 </button>

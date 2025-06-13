@@ -421,16 +421,16 @@ const Chatbot = () => {
             position: "fixed",
             bottom: 19,
             right: 19,
-            display: "block",
+            display: {
+              xs: "block",
+              md: "none",
+            },
             backgroundColor: "transparent",
             boxShadow: "none", // Removes the shadow
-            animation: 'chatbotPulse 1.5s infinite',
             "&:hover": {
               backgroundColor: "transparent", // Prevents background change on hover
               boxShadow: "none", // Ensures no shadow on hover
-              animation: 'chatbotPulse 0.7s infinite',
             },
-            zIndex: 1300,
           }}
         >
           <img
@@ -1031,15 +1031,5 @@ const ChatbotFooterText = styled(Typography)({
   letterSpacing: "0%",
   color: "#667085",
 });
-
-// Add keyframes for chatbotPulse animation
-const style = document.createElement('style');
-style.innerHTML = `
-@keyframes chatbotPulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0.4); }
-  70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(4,135,217,0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0); }
-}`;
-document.head.appendChild(style);
 
 export default Chatbot;

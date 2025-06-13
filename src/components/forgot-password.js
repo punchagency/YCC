@@ -3,7 +3,6 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { ForgotPassword } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import CustomButton from './Button';
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -114,12 +113,12 @@ const ForgotPasswordForm = () => {
           {emailError && <small className="p-error">{emailError}</small>}
         </div>
 
-        <CustomButton
+        <Button
           type="submit"
+          label={loading ? "Sending..." : "Send Reset Link"}
+          className="p-mt-2 p-button-primary w-full"
           disabled={loading}
-        >
-          {loading ? "Sending..." : "Send Reset Link"}
-        </CustomButton>
+        />
       </form>
 
       {/* CSS Animation */}

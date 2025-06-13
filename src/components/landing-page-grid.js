@@ -29,39 +29,44 @@ const LandingPageGrid = ({gridData}) => {
                             textAlign: "left",
                         }}
                     >
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: "13px" }}>
-                            <Box>
-                                <img src={item.image} alt="yacht" />
-                            </Box>
-                            <Box sx={{  display: "flex", flexDirection: "column", gap: "23px"  }}>
-                                <SecondaryHeadingText>
-                                    {item.title}
-                                </SecondaryHeadingText>
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'start',
-                                    gap: '8px'
-                                }}>
-                                    <CheckCircleIcon sx={{
-                                        width: '26.7109375px',
-                                        height: '26px',
-                                        color: '#02214B'
-                                    }} />
-                                    <SecondarySubTextBlack>{item.subtext1}</SecondarySubTextBlack>
+                        <Box sx={{ px: 7, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px", justifyContent: "space-between" }}>
+
+                            <Box sx={{ display: "flex", flexDirection: "column", gap: "13px" }}>
+                                <Box>
+                                    <img src={item.image} alt="yacht" />
                                 </Box>
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'start', 
-                                    gap: '8px'
-                                }}>
-                                    <CheckCircleIcon sx={{
-                                        width: '26.7109375px',
-                                        height: '26px',
-                                        color: '#02214B'
-                                    }} />
-                                    <SecondarySubTextBlack>{item.subtext2}</SecondarySubTextBlack>
+                                <Box sx={{  display: "flex", flexDirection: "column", gap: "23px"  }}>
+                                    <SecondaryHeadingText>
+                                        {item.title}
+                                    </SecondaryHeadingText>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'start',
+                                        gap: '8px'
+                                    }}>
+                                        <CheckCircleIcon sx={{
+                                            width: '26.7109375px',
+                                            height: '26px',
+                                            color: '#02214B'
+                                        }} />
+                                        <SecondarySubTextBlack>{item.subtext1}</SecondarySubTextBlack>
+                                    </Box>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'start', 
+                                        gap: '8px'
+                                    }}>
+                                        <CheckCircleIcon sx={{
+                                            width: '26.7109375px',
+                                            height: '26px',
+                                            color: '#02214B'
+                                        }} />
+                                        <SecondarySubTextBlack>{item.subtext2}</SecondarySubTextBlack>
+                                    </Box>
                                 </Box>
+
                             </Box>
+
                         </Box>
                     </Grid>
                 ))}
