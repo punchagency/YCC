@@ -17,7 +17,8 @@ import {
 } from "@mui/material";
 import { useState, useEffect, useRef, useCallback } from "react";
 import csvTemplate from '../../../assets/vendor-onboarding-template.csv';
-import excelTemplate from '../../../assets/vendor-onboarding-template.xlsx';
+// import excelTemplate from '../../../assets/vendor-onboarding-template-old.xlsx';
+import excelTemplate from '../../../assets/vendor_onboarding_template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
