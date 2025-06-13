@@ -417,8 +417,17 @@ const Order = () => {
                 </div>
                 <Button
                   label="Order Now"
+                  icon="pi pi-shopping-cart"
                   onClick={() => {
-                    console.log("Inventory item being selected:", inventory);
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      window.location.href = "/login";
+                      return;
+                    }
+                    console.log(
+                      "Inventory item being selected:",
+                      inventory
+                    );
                     console.log("Product data:", inventory?.product);
                     setSelectedInventory(inventory);
                     setQuickOrderForm({
@@ -429,7 +438,14 @@ const Order = () => {
                     setShowQuickOrderModal(true);
                   }}
                   className="p-button-primary"
-                  style={{ width: "100%", marginTop: "20px" }}
+                  style={{
+                    width: "100%",
+                    marginTop: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
                 />
               </div>
             ))}

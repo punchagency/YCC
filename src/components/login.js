@@ -7,6 +7,9 @@ import { Message } from "primereact/message";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
+import LandingPageChatbot from "./chatbot/landing-page-chatbot";
+import CustomButton from "./Button";
+import { isMobile } from './ResponsiveDevice';
 
 const LoginForm = () => {
   // Define the options for the user roles
@@ -96,12 +99,84 @@ const LoginForm = () => {
     }
   };
 
+  // Remember Me and Forgot Password Row Component
+  const RememberForgotRow = ({ rememberMe, onCheckboxChange }) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 989;
+    return (
+      <div
+        className="p-field-checkbox p-d-flex p-ai-center"
+        style={
+          isDesktop
+            ? { justifyContent: 'space-between', display: 'flex', alignItems: 'center', gap: 16, width: '100%' }
+            : { flexDirection: 'column', alignItems: 'flex-start', gap: 4, width: '100%' }
+        }
+      >
+        <div className="p-d-flex p-ai-center" style={{ display: 'flex', alignItems: 'center', gap: 6, height: 32 }}>
+          <Checkbox
+            inputId="rememberMe"
+            checked={rememberMe}
+            onChange={onCheckboxChange}
+            style={{
+              width: 22,
+              height: 22,
+              minWidth: 22,
+              minHeight: 22,
+              borderColor: rememberMe ? '#034D92' : undefined,
+              background: rememberMe ? '#034D92' : undefined,
+              color: rememberMe ? '#fff' : undefined,
+              display: 'inline-block',
+              verticalAlign: 'middle',
+              marginRight: 4
+            }}
+          />
+          <label
+            htmlFor="rememberMe"
+            className="p-ml-2"
+            style={{
+              color: rememberMe ? '#034D92' : undefined,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              fontSize: 16,
+              lineHeight: '22px',
+              display: 'inline-block',
+              verticalAlign: 'middle',
+              margin: 0,
+              fontFamily: 'Inter, sans-serif',
+              minWidth: 110,
+              textAlign: 'left',
+            }}
+          >
+            Remember Me
+          </label>
+        </div>
+        <Link
+          to="/forgot-password"
+          style={{
+            color: '#034D92',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 16,
+            lineHeight: '22px',
+            minWidth: 110,
+            textAlign: isDesktop ? 'right' : 'left',
+            display: 'inline-block',
+            alignSelf: isDesktop ? 'center' : 'flex-start',
+            marginLeft: isDesktop ? 'auto' : 0,
+            marginTop: isDesktop ? 0 : 8
+          }}
+        >
+          Forgot Your Password?
+        </Link>
+      </div>
+    );
+  };
+
   return (
-    <div className="p-d-flex p-jc-center p-ai-center">
-      <form onSubmit={handleSubmit}>
+    <div className="p-d-flex p-jc-center p-ai-center" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <form onSubmit={handleSubmit} style={isMobile() ? { margin: 0, padding: 0 } : {}}>
         {error && <Message severity="error" text={error} className="p-mb-3 " />}
-        <div className="flex flex-column p-field p-mb-3">
-          <label htmlFor="username">Email Address</label>
+        <div className="flex flex-column p-field" style={isMobile() ? { marginBottom: 8 } : {}}>
+          <label htmlFor="username" style={{ fontFamily: 'Inter, sans-serif' }}>Email Address</label>
           <InputText
             id="email"
             name="email"
@@ -113,8 +188,8 @@ const LoginForm = () => {
           />
           {emailError && <small className="p-error">{emailError}</small>}
         </div>
-        <div className="flex flex-column p-field p-mb-3">
-          <label htmlFor="password">Password</label>
+        <div className="flex flex-column p-field" style={isMobile() ? { marginBottom: 8 } : {}}>
+          <label htmlFor="password" style={{ fontFamily: 'Inter, sans-serif' }}>Password</label>
           <Password
             id="password"
             name="password"
@@ -124,30 +199,20 @@ const LoginForm = () => {
             toggleMask
             placeholder="Password"
             required
-            className="w-full" // Apply the full-width class
+            className="w-full"
           />
           {passwordError && <small className="p-error">{passwordError}</small>}
         </div>
-        <div className="p-field-checkbox p-d-flex p-ai-center p-jc-between">
-          <div className="p-d-flex p-ai-center">
-            <Checkbox
-              inputId="rememberMe"
-              checked={formData.rememberMe}
-              onChange={handleCheckboxChange}
-            />
-            <label htmlFor="rememberMe" className="p-ml-2">
-              Remember Me
-            </label>
-          </div>
-          <Link to="/forgot-password">Forgot Your Password?</Link>
-        </div>
-        <Button
+        <RememberForgotRow rememberMe={formData.rememberMe} onCheckboxChange={handleCheckboxChange} />
+        <CustomButton
           type="submit"
-          label={loading ? "Logging in..." : "Sign In"}
-          className="p-mt-2 p-button-primary w-full"
           disabled={loading}
-        />
+          style={isMobile() ? { marginTop: 8, marginBottom: 0 } : {}}
+        >
+          {loading ? "Logging in..." : "Sign In"}
+        </CustomButton>
       </form>
+      <LandingPageChatbot />
     </div>
   );
 };
