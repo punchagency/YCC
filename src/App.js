@@ -359,6 +359,7 @@ function App() {
         </NotificationsProvider>
       </ToastProvider>
     </UserProvider>
+  </AuthProvider>
   );
 }
 
