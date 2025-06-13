@@ -20,19 +20,19 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
   useEffect(() => {
     const fetchStripeAccount = async () => {
       try {
-        console.log('Stripe Step 2 - Current userId:', userId);
-        console.log('Stripe Step 2 - Current role:', role);
-        console.log('Stripe Step 2 - Current path:', location.pathname);
-        console.log('Stripe Step 2 - Search params:', Object.fromEntries(searchParams.entries()));
+        // console.log('Stripe Step 2 - Current userId:', userId);
+        // console.log('Stripe Step 2 - Current role:', role);
+        // console.log('Stripe Step 2 - Current path:', location.pathname);
+        // console.log('Stripe Step 2 - Search params:', Object.fromEntries(searchParams.entries()));
         
         const response = await getStripeAccount(userId, role);
-        console.log('Stripe Step 2 - getStripeAccount response:', response);
+        //console.log('Stripe Step 2 - getStripeAccount response:', response);
         
         if (!response.status) {
           setError(response.message);
         }
       } catch (error) {
-        console.error('Stripe Step 2 - getStripeAccount error:', error);
+        //console.error('Stripe Step 2 - getStripeAccount error:', error);
         setError(error.message);
       }
     };
@@ -42,23 +42,23 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
   }, [userId, role]);
 
   useEffect(() => {
-    console.log('Stripe Step 2 - stripeAccount updated:', stripeAccount);
+    //console.log('Stripe Step 2 - stripeAccount updated:', stripeAccount);
     
     // If stripeAccount is null, we need to stay on this step and show setup button
     if (stripeAccount === null) {
-      console.log('Stripe Step 2 - No Stripe account found, staying on step 2');
+      //console.log('Stripe Step 2 - No Stripe account found, staying on step 2');
       setShowContinueButton(false); // Show "Set Up Stripe Account" button
       return; // Explicitly stay on this step
     }
     
     // If stripeAccount exists and is fully set up, move to next step
     if (stripeAccount && stripeAccount?.chargesEnabled && stripeAccount?.transfersEnabled && stripeAccount?.detailsSubmitted) {
-      console.log('Stripe Step 2 - Stripe account fully set up, moving to next step');
+      //console.log('Stripe Step 2 - Stripe account fully set up, moving to next step');
       handleNext();
     } 
     // If stripeAccount exists but setup is incomplete, show continue button
     else if (stripeAccount) {
-      console.log('Stripe Step 2 - Stripe account exists but setup incomplete, showing continue button');
+      //console.log('Stripe Step 2 - Stripe account exists but setup incomplete, showing continue button');
       setShowContinueButton(true);
     }
   }, [stripeAccount]);
@@ -67,14 +67,14 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
     setIsLoading(true);
     setError(null);
     try {
-      console.log('Stripe Step 2 - Creating/Refreshing account with:', { userId, role });
+      //console.log('Stripe Step 2 - Creating/Refreshing account with:', { userId, role });
       if (stripeAccount) {
         await refreshStripeAccountLink(userId, role);
       } else {
         await createStripeAccount(userId, role);
       }
     } catch (error) {
-      console.error('Error handling Stripe account:', error);
+      //console.error('Error handling Stripe account:', error);
       setError(error.message);
     } finally {
       setIsLoading(false);

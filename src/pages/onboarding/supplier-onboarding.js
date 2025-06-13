@@ -192,8 +192,8 @@ const SupplierOnboarding = () => {
 
   // Add step validation logic
   const canAdvanceToStep = (stepIndex) => {
-    console.log('SupplierOnboarding - canAdvanceToStep called with:', stepIndex);
-    console.log('SupplierOnboarding - Current stripeAccount:', stripeAccount);
+    //console.log('SupplierOnboarding - canAdvanceToStep called with:', stepIndex);
+    //console.log('SupplierOnboarding - Current stripeAccount:', stripeAccount);
     
     switch (stepIndex) {
       case 0: // Step 1 - Always accessible
@@ -205,7 +205,7 @@ const SupplierOnboarding = () => {
                           stripeAccount?.chargesEnabled && 
                           stripeAccount?.transfersEnabled && 
                           stripeAccount?.detailsSubmitted;
-        console.log('SupplierOnboarding - Can advance to Step 3:', canAdvance);
+        //console.log('SupplierOnboarding - Can advance to Step 3:', canAdvance);
         return canAdvance;
       case 3: // Final step
         return true;
@@ -215,16 +215,16 @@ const SupplierOnboarding = () => {
   };
 
   const handleNext = () => {
-    console.log('SupplierOnboarding - handleNext called, current step:', activeStep);
+    //console.log('SupplierOnboarding - handleNext called, current step:', activeStep);
     
     const nextStep = activeStep + 1;
     
     // Check if we can advance to the next step
     if (canAdvanceToStep(nextStep)) {
-      console.log('SupplierOnboarding - Advancing to step:', nextStep);
+      //console.log('SupplierOnboarding - Advancing to step:', nextStep);
       setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
     } else {
-      console.log('SupplierOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
+      //console.log('SupplierOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
       // Optionally show a message to user that requirements aren't met
     }
   };
@@ -235,12 +235,12 @@ const SupplierOnboarding = () => {
 
   // Add effect to monitor step validation changes
   React.useEffect(() => {
-    console.log('SupplierOnboarding - Step validation check, activeStep:', activeStep);
-    console.log('SupplierOnboarding - stripeAccount state:', stripeAccount);
+    //console.log('SupplierOnboarding - Step validation check, activeStep:', activeStep);
+    //console.log('SupplierOnboarding - stripeAccount state:', stripeAccount);
     
     // If we're on step 3 but no longer meet requirements, go back to step 2
     if (activeStep === 2 && !canAdvanceToStep(2)) {
-      console.log('SupplierOnboarding - Step 3 requirements no longer met, going back to Step 2');
+      //console.log('SupplierOnboarding - Step 3 requirements no longer met, going back to Step 2');
       setActiveStep(1);
     }
   }, [stripeAccount, activeStep]);

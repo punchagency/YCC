@@ -188,8 +188,8 @@ const VendorOnboarding = () => {
   const [activeStep, setActiveStep] = React.useState(0);
 
   const canAdvanceToStep = (stepIndex) => {
-    console.log('VendorOnboarding - canAdvanceToStep called with:', stepIndex);
-    console.log('VendorOnboarding - Current stripeAccount:', stripeAccount);
+    //console.log('VendorOnboarding - canAdvanceToStep called with:', stepIndex);
+    //console.log('VendorOnboarding - Current stripeAccount:', stripeAccount);
     
     switch (stepIndex) {
       case 0: // Step 1 - Always accessible
@@ -201,7 +201,7 @@ const VendorOnboarding = () => {
                           stripeAccount?.chargesEnabled && 
                           stripeAccount?.transfersEnabled && 
                           stripeAccount?.detailsSubmitted;
-        console.log('VendorOnboarding - Can advance to Step 3:', canAdvance);
+        //console.log('VendorOnboarding - Can advance to Step 3:', canAdvance);
         return canAdvance;
       case 3: // Final step
         return true;
@@ -211,15 +211,15 @@ const VendorOnboarding = () => {
   };
 
   const handleNext = () => {
-    console.log('VendorOnboarding - handleNext called, current step:', activeStep);
+    //console.log('VendorOnboarding - handleNext called, current step:', activeStep);
     
     const nextStep = activeStep + 1;
     
     if (canAdvanceToStep(nextStep)) {
-      console.log('VendorOnboarding - Advancing to step:', nextStep);
+      //console.log('VendorOnboarding - Advancing to step:', nextStep);
       setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
     } else {
-      console.log('VendorOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
+      //console.log('VendorOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
     }
   };
 
@@ -228,11 +228,11 @@ const VendorOnboarding = () => {
   };
 
   React.useEffect(() => {
-    console.log('VendorOnboarding - Step validation check, activeStep:', activeStep);
-    console.log('VendorOnboarding - stripeAccount state:', stripeAccount);
+    //console.log('VendorOnboarding - Step validation check, activeStep:', activeStep);
+    //console.log('VendorOnboarding - stripeAccount state:', stripeAccount);
     
     if (activeStep === 2 && !canAdvanceToStep(2)) {
-      console.log('VendorOnboarding - Step 3 requirements no longer met, going back to Step 2');
+      //console.log('VendorOnboarding - Step 3 requirements no longer met, going back to Step 2');
       setActiveStep(1);
     }
   }, [stripeAccount, activeStep]);

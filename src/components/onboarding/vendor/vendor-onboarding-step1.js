@@ -115,18 +115,18 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     const verifyInventoryUpload = async () => {
       try {
         if (!userId) {
-          console.error('Missing userId:', { userId });
+          //console.error('Missing userId:', { userId });
           return;
         }
 
         const data = await verifyOnboardingStep1(userId, role);
-        console.log('Step 1 - Verification response:', data);
+        //console.log('Step 1 - Verification response:', data);
         
         if (data?.data?.length > 0) {
           handleNext();
         }
       } catch (error) {
-        console.error('Step 1 - Verification error:', error);
+        //console.error('Step 1 - Verification error:', error);
         toast.current.show({
           severity: "error",
           summary: "Error",

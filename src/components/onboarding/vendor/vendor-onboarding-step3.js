@@ -25,13 +25,13 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
       hasRunRef.current = true;
 
       try {
-        console.log('Step 3 - Current userId:', userId);
-        console.log('Step 3 - Current role:', role);
-        console.log('Step 3 - Current path:', location.pathname);
+        // console.log('Step 3 - Current userId:', userId);
+        // console.log('Step 3 - Current role:', role);
+        // console.log('Step 3 - Current path:', location.pathname);
 
         //check onboarding status
         const status = await checkOnboardingStatus(userId, role);
-        console.log('Step 3 - checkOnboardingStatus response:', status);
+        //console.log('Step 3 - checkOnboardingStatus response:', status);
         
         if(status === true){
           handleNext();
@@ -39,13 +39,13 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
         }
 
         const data = await verifyOnboardingStep1(userId, role);
-        console.log('Step 3 - verifyOnboardingStep1 response:', data);
+        //console.log('Step 3 - verifyOnboardingStep1 response:', data);
         
         if (data.data.length > 0) {
           setServicesData(data.data);
         }
       } catch (error) {
-        console.error('Step 3 - Error:', error);
+        //console.error('Step 3 - Error:', error);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -61,9 +61,9 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
 
   const handleFinish = async () => {
     try {
-      console.log('Step 3 - Completing onboarding with:', { userId, role });
+      //console.log('Step 3 - Completing onboarding with:', { userId, role });
       const status = await completeOnboarding(userId, role);
-      console.log('Step 3 - completeOnboarding response:', status);
+      //console.log('Step 3 - completeOnboarding response:', status);
       
       if (status) {
         handleNext();
@@ -75,7 +75,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
         });
       }
     } catch (error) {
-      console.error('Step 3 - Error completing onboarding:', error);
+      //console.error('Step 3 - Error completing onboarding:', error);
       toast.current.show({
         severity: "error",
         summary: "Error",
