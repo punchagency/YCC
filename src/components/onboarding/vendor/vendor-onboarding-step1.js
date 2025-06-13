@@ -17,7 +17,8 @@ import {
 } from "@mui/material";
 import { useState, useEffect, useRef, useCallback } from "react";
 import csvTemplate from '../../../assets/vendor-onboarding-template.csv';
-import excelTemplate from '../../../assets/vendor-onboarding-template.xlsx';
+// import excelTemplate from '../../../assets/vendor-onboarding-template-old.xlsx';
+import excelTemplate from '../../../assets/vendor_onboarding_template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
@@ -49,7 +50,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   
   // Determine role based on URL path
-  const role = location.pathname.includes('/vendor/onboarding/') ? 'service_provider' : 'supplier';
+  const role = location.pathname.includes('/services/onboarding/') ? 'service_provider' : 'supplier';
 
   const requiredHeaders = ["service name", "description", "price"];
 
@@ -114,18 +115,18 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     const verifyInventoryUpload = async () => {
       try {
         if (!userId) {
-          console.error('Missing userId:', { userId });
+          //console.error('Missing userId:', { userId });
           return;
         }
 
         const data = await verifyOnboardingStep1(userId, role);
-        console.log('Step 1 - Verification response:', data);
+        //console.log('Step 1 - Verification response:', data);
         
         if (data?.data?.length > 0) {
           handleNext();
         }
       } catch (error) {
-        console.error('Step 1 - Verification error:', error);
+        //console.error('Step 1 - Verification error:', error);
         toast.current.show({
           severity: "error",
           summary: "Error",

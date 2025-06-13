@@ -429,7 +429,7 @@ const SupplierSignUpForm = ({
               id="phone"
               value={formData.phone || ""}
               onChange={(e) => handleInputChange("phone", e.target.value)}
-              placeholder="Enter your phone number"
+              placeholder="E.g. +1 555-123-4567"
             />
           </div>
         </div>
@@ -475,7 +475,7 @@ const SupplierSignUpForm = ({
               id="website"
               value={formData.website || ""}
               onChange={(e) => handleInputChange("website", e.target.value)}
-              placeholder="Enter your website URL"
+              placeholder="E.g. https://www.yourbusiness.com"
             />
           </div>
         </div>
@@ -562,7 +562,7 @@ const SupplierSignUpForm = ({
                   role: e.target.value,
                 })
               }
-              placeholder="Enter contact person role"
+              placeholder="E.g. Owner, Manager, etc."
             />
           </div>
         </div>
@@ -607,7 +607,7 @@ const SupplierSignUpForm = ({
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "10px 0"
+              padding: "5px 0 2px 0"
             }}
           >
             <input
@@ -647,7 +647,7 @@ const SupplierSignUpForm = ({
             display: "flex",
             alignItems: "center",
             gap: "10px",
-              padding: "10px 0"
+              padding: "5px 0 10px 0"
           }}
         >
           <input
