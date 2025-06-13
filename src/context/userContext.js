@@ -29,7 +29,7 @@ export const UserProvider = ({ children }) => {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
       } catch (error) {
-        console.error("Error parsing user data:", error);
+        //console.error("Error parsing user data:", error);
         localStorage.removeItem("user"); // Clear invalid data
       }
     }
@@ -98,7 +98,7 @@ export const UserProvider = ({ children }) => {
       }
       return data;
     } catch (error) {
-      console.error('userContext - getStripeAccount error:', error);
+      //console.error('userContext - getStripeAccount error:', error);
       // Don't set stripeAccount to null on network errors
       return { status: false, message: error.message };
     }
@@ -160,10 +160,10 @@ export const UserProvider = ({ children }) => {
         throw new Error(error);
       }
 
-      console.log("Upload successful:", data);
+      //console.log("Upload successful:", data);
       return data.status;
     } catch (err) {
-      console.error("Upload failed:", err.message);
+      //console.error("Upload failed:", err.message);
       throw err;
     }
   };
@@ -188,10 +188,10 @@ export const UserProvider = ({ children }) => {
         throw new Error(error);
       }
 
-      console.log("Upload successful:", data);
+      //console.log("Upload successful:", data);
       return data.status;
     } catch (err) {
-      console.error("Upload failed:", err.message);
+      //console.error("Upload failed:", err.message);
       throw err;
     }
   };
@@ -209,7 +209,7 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - verifyOnboardingStep1 response:', data);
+        //console.log('userContext - verifyOnboardingStep1 response:', data);
         return data;
       }else if(role === "service_provider"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`, {
@@ -221,11 +221,11 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - verifyOnboardingStep1 response:', data);
+        //console.log('userContext - verifyOnboardingStep1 response:', data);
         return data;
       }
     } catch (error) {
-      console.error('userContext - verifyOnboardingStep1 error:', error);
+      //console.error('userContext - verifyOnboardingStep1 error:', error);
       throw error;
     }
   }
@@ -248,7 +248,7 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - completeOnboarding response:', data);
+        //console.log('userContext - completeOnboarding response:', data);
         return data.status;
       }else if(role === "service_provider"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
@@ -260,11 +260,11 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - completeOnboarding response:', data);
+        //console.log('userContext - completeOnboarding response:', data);
         return data.status;
       }
     } catch (error) {
-      console.error('userContext - completeOnboarding error:', error);
+      //console.error('userContext - completeOnboarding error:', error);
       throw error;
     }
   }
@@ -282,7 +282,7 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - checkOnboardingStatus response:', data);
+        //console.log('userContext - checkOnboardingStatus response:', data);
         return data.data;
       }else if(role === "service_provider"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
@@ -294,11 +294,11 @@ export const UserProvider = ({ children }) => {
           body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        console.log('userContext - checkOnboardingStatus response:', data);
+        //console.log('userContext - checkOnboardingStatus response:', data);
         return data.data;
       }
     } catch (error) {
-      console.error('userContext - checkOnboardingStatus error:', error);
+      //console.error('userContext - checkOnboardingStatus error:', error);
       throw error;
     }
   }
