@@ -9,18 +9,19 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from "@mui/icons-material/Menu";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useUser } from '../context/userContext';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import './SignInButton.css';
+import { Link } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
+
+
+
 
 const LandingPageHeader = () => {
+
   const location = useLocation();
-  const { user } = useUser();
-  const navigate = useNavigate();
   const navItems = [
     { title: "Home", link: "/" },
     {
@@ -46,11 +47,6 @@ const LandingPageHeader = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-
-  const landingPages = [
-    '/', '/resource-center', '/about-us', '/contact-us', '/crew', '/captain', '/exterior', '/interior', '/engineering', '/chef-galley', '/vendor-services'
-  ];
-  const isLandingPage = landingPages.includes(location.pathname);
 
   // Detect scroll position
   useEffect(() => {
@@ -78,6 +74,7 @@ const LandingPageHeader = () => {
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
 
+
   return (
     <TransparentAppBar
       position="fixed"
@@ -92,19 +89,9 @@ const LandingPageHeader = () => {
         maxWidth: '100%'
       }}>
 
+
       <Toolbar sx={{ width: "100%", display: "flex", justifyContent: { xs: 'space-between', md: 'center' }, gap: "30px" }}>
-        {/* Back Button */}
-        {window.history.length > 1 && !isLandingPage && (
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="back"
-            onClick={() => navigate(-1)}
-            sx={{ color: 'white', mr: 1 }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-        )}
+
         {/* Hamburger Menu - Always on the Left */}
         <IconButton
           edge="start"
@@ -213,42 +200,46 @@ const LandingPageHeader = () => {
           ))}
         </Box>
 
-        {/* Desktop Buttons/User Info */}
-        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2, alignItems: 'center' }}>
-          {user ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <img src={user.avatar || '/default-avatar.png'} alt={user.name} style={{ width: 40, height: 40, borderRadius: '50%' }} />
-              <Box>
-                <Typography sx={{ color: 'white', fontWeight: 600 }}>{user.name || user.fullName || 'User'}</Typography>
-                <Typography sx={{ color: 'white', fontSize: 14 }}>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1).replace('_', ' ') : ''}</Typography>
-              </Box>
-              <KeyboardArrowDownIcon sx={{ color: 'white', ml: 1 }} />
-            </Box>
-          ) : (
-            <>
-              <Link to='/get-started' >
-                <GradientButton variant="contained" sx={{ textTransform: "none", height: 40, minWidth: 120, fontSize: 16, padding: '8px 24px' }}>
-                  <ButtonTypography sx={{ color: "white" }}>Join Now</ButtonTypography>
-                </GradientButton>
-              </Link>
-              <Button variant="contained" component={Link} to='/login' sx={{ backgroundColor: "white", textTransform: "none", height: 40, minWidth: 120, fontSize: 16, padding: '8px 24px', position: 'relative', overflow: 'hidden', '&:hover': { background: 'linear-gradient(90deg, #034D92, #0487D9)' } }} className="sign-in-btn">
-                <ButtonTypography className="sign-in-btn-text">Sign In</ButtonTypography>
-              </Button>
-            </>
-          )}
+
+        {/* Desktop Buttons */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+          <Link to='/get-started' >
+          <GradientButton variant="contained">
+            <ButtonTypography sx={{ color: "white" }}>Join Now</ButtonTypography></GradientButton>
+            </Link>
+          <Button variant="contained" component={Link} to='/login' sx={{ backgroundColor: "white", textTransform: "none" }}>
+            <ButtonTypography sx={{
+              background: "linear-gradient(90deg, #034D92, #0487D9)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>Sign In</ButtonTypography>
+          </Button>
         </Box>
 
       </Toolbar>
+
 
       {/* Mobile Drawer */}
       <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer} sx={{
         zIndex: 1301,
       }}>
+
+
+
+
+
+
+
+
+
         <Box sx={{ width: 250, display: "flex", flexDirection: "column", height: "100%",background: "linear-gradient(90deg, #034D92, #0487D9)", paddingBlock: '40px' }}>
+
+
           <Box sx={{ flex: 1, padding: "20px" }}>
             {/* Nav Item with dropdown */}
             {navItems.map((item) =>
               item.options ? (
+
                 <Box key={item.title}>
                 {/* Parent Item (Clickable) */}
                 <Button
@@ -322,32 +313,30 @@ const LandingPageHeader = () => {
 
           {/* Mobile Buttons at Bottom */}
           <Box sx={{ padding: "20px", borderTop: "1px solid #ddd", textAlign: "center" }}>
-            <Link to='/get-started' >
-              <GradientButton variant="contained" sx={{ textTransform: "none", height: 40, minWidth: 120, fontSize: 16, padding: '8px 24px' }}>
-                <ButtonTypography sx={{ color: "white" }}>Join Now</ButtonTypography>
-              </GradientButton>
-            </Link>
-            <Button component={Link} to='/login' fullWidth variant="contained" sx={{ backgroundColor: "white", textTransform: 'none', height: 40, minWidth: 120, fontSize: 16, padding: '8px 24px', '&:hover': { background: 'linear-gradient(90deg, #034D92, #0487D9)' } }}>
-              <ButtonTypography
-                sx={{
-                  background: "linear-gradient(90deg, #034D92, #0487D9)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  transition: 'background 0.3s, color 0.3s, -webkit-text-fill-color 0.3s',
-                  '&:hover, &:active, &:focus': {
-                    background: 'none',
-                    WebkitBackgroundClip: 'border-box',
-                    WebkitTextFillColor: '#fff',
-                    color: '#fff',
-                  }
-                }}
-              >
+            <Button component={Link} to='/get-started' fullWidth variant="contained" sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", textTransform: 'none', color: "white", marginBottom: "10px" }}>
+            <Typography sx={{ fontSize: "14px", cursor: "pointer", color: "white", alignText: "center", letterSpacing: "-2%" }}>
+                   Join Now
+                  </Typography>
+            </Button>
+            <Button component={Link} to='/login' fullWidth variant="contained" sx={{ backgroundColor: "white", textTransform: 'none' }}>
+              <Typography sx={{ background: "linear-gradient(90deg, #034D92, #0487D9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",fontSize: "15px", cursor: "pointer",alignText: "center", letterSpacing: "-2%" }}>
                 Sign In
-              </ButtonTypography>
+              </Typography>
             </Button>
           </Box>
 
+
+
+
         </Box>
+
+
+
+
+
+
+
+
       </Drawer>
 
     </TransparentAppBar>
@@ -403,5 +392,6 @@ export const GradientButton = styled(Button)({
   },
   padding: "12px 14px",
 });
+
 
 export default LandingPageHeader

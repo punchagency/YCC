@@ -7,7 +7,6 @@ import { Dropdown } from "primereact/dropdown";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { InputText } from "primereact/inputtext";
-import CustomButton from '../../components/Button';
 
 const Compliance = () => {
   const [documents, setDocuments] = useState([]);
@@ -233,18 +232,27 @@ const Compliance = () => {
             placeholder="Status"
             className="mr-3"
           />
-          <CustomButton onClick={goToAddCompliancePage}>
-            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add Compliance
-          </CustomButton>
+          <Button
+            label="Add Compliance"
+            icon="pi pi-plus"
+            onClick={goToAddCompliancePage}
+            className="p-button-primary"
+          />
         </div>
         <div className="sub-header-right sub-header-small-desktop ">
           <div className="p-input-icon-left search mr-3">
             <i className="pi pi-search" />
             <InputText type="search" placeholder="Search" />
           </div>
-          <CustomButton className="mr-3" onClick={(e) => op.current && op.current.toggle(e)}>
-            <i className="pi pi-filter" style={{ marginRight: 8 }} /> Filters
-          </CustomButton>
+          <Button
+            label="Filters"
+            className="mr-3"
+            severity="secondary"
+            outlined
+            icon="pi pi-filter"
+            iconPos="right" // This will place the icon to the right of the text
+            onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
+          />
           <OverlayPanel ref={op}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
@@ -273,9 +281,12 @@ const Compliance = () => {
               />
             </div>
           </OverlayPanel>
-          <CustomButton onClick={goToAddCompliancePage}>
-            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add Compliance
-          </CustomButton>
+          <Button
+            label="Add Compliance"
+            icon="pi pi-plus"
+            onClick={goToAddCompliancePage}
+            className="p-button-primary"
+          />
         </div>
       </div>
       <div className="card-wrapper-gap">

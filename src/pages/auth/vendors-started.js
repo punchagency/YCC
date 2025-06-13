@@ -5,7 +5,6 @@ import backgroundImage from "../../assets/images/crew/back.png";
 // import captain from "../../assets/images/captain1.svg";
 import hod from "../../assets/images/HOD.svg";
 import crew from "../../assets/images/mechanic1.svg";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const VendorStarted = ({ name }) => {
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
@@ -63,75 +62,55 @@ const VendorStarted = ({ name }) => {
   //  }, [navigate]);
 
   return (
-    <div style={{ position: 'relative' }}>
-      {/* Back Button */}
-      {window.history.length > 1 && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#034D92',
-            margin: '16px 0 0 16px',
-            position: 'absolute',
-            zIndex: 10
-          }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
-      <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">
-        <div
-          className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        >
-          {/* <div className="border-circle mb-3 bg-white font-bold flex align-items-center justify-content-center logo">
-            <img src={logo} alt="Company logo" className="image-full" />
-          </div> */}
-          {/* <div className="get-started-content">
-            <h2 className="font-semibold text-white">{title}</h2>
-            <p className="text-white m-0 line-height-3">{description}</p>
-          </div> */}
-        </div>
-        <div className="flex-1 flex align-items-center justify-content-center right-panel">
-          <div className="get-started-right-component">
-            <h6>Welcome,</h6>
-            <h2>Lets, Get started</h2>
-            <p className="font-medium">
-              Please select your preferred option to proceed with the
-              registration.
-            </p>
-            <div className="get-started-right-component-content">
-              <ul>
-                {roles.map((role, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleRoleSelect(role.path, role.text)}
-                  >
-                    <div className="content">
-                      <div className="icons">
-                        <img
-                          src={role.image}
-                          alt={role.alt}
-                          className="image-full"
-                        />
-                      </div>
-                      <div className="text">
-                        <p>Are you a</p>
-                        {role.newText}
-                      </div>
+    <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">
+      <div
+        className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        {/* <div className="border-circle mb-3 bg-white font-bold flex align-items-center justify-content-center logo">
+          <img src={logo} alt="Company logo" className="image-full" />
+        </div> */}
+        {/* <div className="get-started-content">
+          <h2 className="font-semibold text-white">{title}</h2>
+          <p className="text-white m-0 line-height-3">{description}</p>
+        </div> */}
+      </div>
+      <div className="flex-1 flex align-items-center justify-content-center right-panel">
+        <div className="get-started-right-component">
+          <h6>Welcome,</h6>
+          <h2>Lets, Get started</h2>
+          <p className="font-medium">
+            Please select your preferred option to proceed with the
+            registration.
+          </p>
+          <div className="get-started-right-component-content">
+            <ul>
+              {roles.map((role, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleRoleSelect(role.path, role.text)}
+                >
+                  <div className="content">
+                    <div className="icons">
+                      <img
+                        src={role.image}
+                        alt={role.alt}
+                        className="image-full"
+                      />
                     </div>
-                    <div className="arrow">
-                      <div className="arrow-wraper">
-                        <i className="pi pi-angle-right"></i>
-                      </div>
+                    <div className="text">
+                      <p>Are you a</p>
+                      {role.newText}
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  </div>
+                  <div className="arrow">
+                    <div className="arrow-wraper">
+                      <i className="pi pi-angle-right"></i>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/theme/themeContext";
 import TopNav from "./TopNav";
 import GlobalSearchModal from "./GlobalSearchModal";
@@ -17,12 +17,11 @@ import { Store, Bell } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 import { getNotifications } from '../services/notification/notificationService';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const { user } = useUser();
 
   if (!role) {
@@ -243,11 +242,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
 
   // Detect if we're on mobile
   const isMobile = window.innerWidth <= 768;
-
-  const landingPages = [
-    '/', '/resource-center', '/about-us', '/contact-us', '/crew', '/captain', '/exterior', '/interior', '/engineering', '/chef-galley', '/vendor-services'
-  ];
-  const isLandingPage = landingPages.includes(location.pathname);
 
   const start = (
     <>
@@ -726,17 +720,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   );
 
   return (
-    <header className="admin-header">
-      {/* Back Button */}
-      {window.history.length > 1 && !isLandingPage && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#034D92', marginRight: 8 }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
+    <>
       <Menubar
         start={start}
         end={end}
@@ -764,7 +748,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         initialQuery={searchValue}
         initialFilters={searchFilters}
       />
-    </header>
+    </>
   );
 };
 
