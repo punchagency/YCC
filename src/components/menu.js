@@ -469,32 +469,22 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   }, []);
 
   return (
-    <>
-      <ConfirmDialog />
-      <div
-        className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
-        style={{
-          backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-        }}
-      >
-        <div className="flex justify-content-center align-items-center logo-wraper">
-          <div className="logo relative">
-            <a href={isCrewMember ? "/" : "/"}>
-              <img src={logo} alt="Company logo" className="image-full" />
-            </a>
-          </div>
-          <Button
-            icon="pi pi-times"
-            text
-            className="p-0 collapse-close-btn"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+    <aside className={`left-menu${isCollapsed ? " collapsed" : ""}`}>
+      <div className="sidebar-logo-container">
+        <a href={isCrewMember ? "/" : "/"}>
+          <img
+            src={logo}
+            alt="Crew Center Logo"
+            className="sidebar-logo-img"
+            style={{ width: isCollapsed ? 40 : 120, height: 60, transition: "width 0.3s" }}
           />
-        </div>
-        <div>
-          <PanelMenu model={menuItems} />
-        </div>
+        </a>
       </div>
-    </>
+      <div className="sidebar-menu-container">
+        <PanelMenu model={menuItems} />
+      </div>
+      <ConfirmDialog />
+    </aside>
   );
 };
 
