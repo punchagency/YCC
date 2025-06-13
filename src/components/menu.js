@@ -479,7 +479,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       >
         <div className="flex justify-content-center align-items-center logo-wraper">
           <div className="logo relative">
-            <a href={isCrewMember ? "/crew/dashboard" : "/admin/dashboard"}>
+            <a href={isCrewMember ? "/" : "/"}>
               <img src={logo} alt="Company logo" className="image-full" />
             </a>
           </div>
