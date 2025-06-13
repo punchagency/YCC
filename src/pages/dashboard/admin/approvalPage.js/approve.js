@@ -116,7 +116,7 @@ const ApprovePage = () => {
       setEmailContent('');
       setSelectedVendor(null);
     } catch (error) {
-      console.error('Approval error:', error);
+      //console.error('Approval error:', error);
       
       let errorMessage = 'Failed to approve vendor';
       if (error.response) {
@@ -192,7 +192,7 @@ const ApprovePage = () => {
       setRejectionContent('');
       setSelectedVendor(null);
     } catch (error) {
-      console.error('Rejection error:', error);
+      //console.error('Rejection error:', error);
       
       let errorMessage = 'Failed to reject vendor';
       if (error.response) {

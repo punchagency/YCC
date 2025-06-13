@@ -72,13 +72,16 @@ export const formatAmount = (amount) => {
   export const unformatAmount = (formattedAmount) => {
     if (!formattedAmount || formattedAmount === '') return 0;
     
+    // Convert to string if it's a number
+    const amountStr = String(formattedAmount);
+    
     // Handle case where user is still typing (e.g., "1,234.")
-    if (formattedAmount.endsWith('.')) {
-      const cleanValue = formattedAmount.replace(/,/g, '').slice(0, -1);
+    if (amountStr.endsWith('.')) {
+      const cleanValue = amountStr.replace(/,/g, '').slice(0, -1);
       return cleanValue === '' ? 0 : Number(cleanValue);
     }
     
     // Remove commas and convert to number
-    const cleanValue = formattedAmount.replace(/,/g, '');
+    const cleanValue = amountStr.replace(/,/g, '');
     return cleanValue === '' ? 0 : Number(cleanValue);
   };

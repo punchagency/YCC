@@ -91,7 +91,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
         });
       }
     } catch (error) {
-      console.error('Error updating inventory:', error);
+      //console.error('Error updating inventory:', error);
       toast.current.show({
         severity: "error",
         summary: "Error",
