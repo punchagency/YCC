@@ -9,6 +9,7 @@ import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
 import LandingPageChatbot from "./chatbot/landing-page-chatbot";
 import CustomButton from "./Button";
+import { isMobile } from './ResponsiveDevice';
 
 const LoginForm = () => {
   // Define the options for the user roles
@@ -172,9 +173,9 @@ const LoginForm = () => {
 
   return (
     <div className="p-d-flex p-jc-center p-ai-center" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={isMobile() ? { margin: 0, padding: 0 } : {}}>
         {error && <Message severity="error" text={error} className="p-mb-3 " />}
-        <div className="flex flex-column p-field p-mb-3">
+        <div className="flex flex-column p-field" style={isMobile() ? { marginBottom: 8 } : {}}>
           <label htmlFor="username" style={{ fontFamily: 'Inter, sans-serif' }}>Email Address</label>
           <InputText
             id="email"
@@ -187,7 +188,7 @@ const LoginForm = () => {
           />
           {emailError && <small className="p-error">{emailError}</small>}
         </div>
-        <div className="flex flex-column p-field p-mb-3">
+        <div className="flex flex-column p-field" style={isMobile() ? { marginBottom: 8 } : {}}>
           <label htmlFor="password" style={{ fontFamily: 'Inter, sans-serif' }}>Password</label>
           <Password
             id="password"
@@ -206,6 +207,7 @@ const LoginForm = () => {
         <CustomButton
           type="submit"
           disabled={loading}
+          style={isMobile() ? { marginTop: 8, marginBottom: 0 } : {}}
         >
           {loading ? "Logging in..." : "Sign In"}
         </CustomButton>

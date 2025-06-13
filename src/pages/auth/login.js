@@ -51,11 +51,12 @@ const Login = () => {
       {isMobile() && (
         <div className="logo-wraper" style={{ 
           width: '100%', 
-          padding: '16px',
+          padding: '0 16px 8px 16px',
           textAlign: 'center',
           background: 'white',
           flexShrink: 0,
-          maxHeight: 'none'
+          maxHeight: 'none',
+          marginBottom: 0
         }}>
           <div className="logo" style={{ 
             maxWidth: 320,
@@ -65,7 +66,7 @@ const Login = () => {
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <img src={logo} alt="Company logo" className="image-full" style={{ maxHeight: 160, width: '100%', objectFit: 'contain' }} />
+            <img src={logo} alt="Company logo" className="image-full" style={{ maxHeight: 120, width: '100%', objectFit: 'contain' }} />
           </div>
         </div>
       )}
@@ -130,7 +131,7 @@ const Login = () => {
           maxWidth: 340, 
           width: '100%', 
           margin: '0 auto', 
-          padding: '8px 4px 16px 4px', 
+          padding: '0 4px 8px 4px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)', 
           borderRadius: 12, 
           background: 'white',
@@ -139,7 +140,8 @@ const Login = () => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          minHeight: '0'
+          minHeight: '0',
+          marginTop: 0
         } : {}}>
           {/* Logo for desktop above the form */}
           {!isMobile() && (
@@ -149,7 +151,7 @@ const Login = () => {
               </div>
             </div>
           )}
-          <div className="login-heading" style={isMobile() ? { marginBottom: 12, marginTop: 4, textAlign: 'center' } : {}}>
+          <div className="login-heading" style={isMobile() ? { marginBottom: 8, marginTop: 0, textAlign: 'center' } : {}}>
             <h2 className="font-medium mb-1">Sign in</h2>
             <p>
               Don't have an account?{" "}
@@ -158,7 +160,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
-          <div className="login-form captain-login-form" style={isMobile() ? { marginTop: 4 } : {}}>
+          <div className="login-form captain-login-form" style={isMobile() ? { marginTop: 4, marginBottom: 8 } : {}}>
             <LoginForm />
           </div>
         </div>
