@@ -1,11 +1,17 @@
 import React from 'react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { isMobile } from './ResponsiveDevice';
 
 const BackButton = ({ onClick }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const handleClick = onClick || (() => navigate(-1));
+
+  // Don't show back button for crew and admin routes
+  if (location.pathname.startsWith('/crew/') || location.pathname.startsWith('/admin/')) {
+    return null;
+  }
 
   // Desktop: absolute at far left of container
   // Mobile: fixed at top left of viewport

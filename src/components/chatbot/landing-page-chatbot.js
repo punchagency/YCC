@@ -30,10 +30,13 @@ const LandingPageChatbot = () => {
 
     useEffect(() => {
         if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTo({
-                top: chatContainerRef.current.scrollHeight,
-                behavior: "smooth",
-            });
+            const scrollableNode = chatContainerRef.current.getScrollElement();
+            if (scrollableNode) {
+                scrollableNode.scrollTo({
+                    top: scrollableNode.scrollHeight,
+                    behavior: "smooth",
+                });
+            }
         }
     }, [chatData]);
 

@@ -51,20 +51,22 @@ const Login = () => {
       {isMobile() && (
         <div className="logo-wraper" style={{ 
           width: '100%', 
-          padding: '0 16px 8px 16px',
+          padding: '0 16px 0 16px',
           textAlign: 'center',
           background: 'white',
           flexShrink: 0,
           maxHeight: 'none',
-          marginBottom: 0
+          marginBottom: 0,
+          marginTop: 0
         }}>
           <div className="logo" style={{ 
             maxWidth: 320,
             margin: '0 auto',
             height: '100%',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            paddingTop: 0
           }}>
             <img src={logo} alt="Company logo" className="image-full" style={{ maxHeight: 120, width: '100%', objectFit: 'contain' }} />
           </div>
@@ -131,7 +133,7 @@ const Login = () => {
           maxWidth: 340, 
           width: '100%', 
           margin: '0 auto', 
-          padding: '0 4px 8px 4px',
+          padding: '0 4px 0 4px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)', 
           borderRadius: 12, 
           background: 'white',
@@ -141,7 +143,8 @@ const Login = () => {
           flexDirection: 'column',
           justifyContent: 'flex-start',
           minHeight: '0',
-          marginTop: 0
+          marginTop: 0,
+          marginBottom: 0
         } : {}}>
           {/* Logo for desktop above the form */}
           {!isMobile() && (
@@ -160,7 +163,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
-          <div className="login-form captain-login-form" style={isMobile() ? { marginTop: 4, marginBottom: 8 } : {}}>
+          <div className="login-form captain-login-form" style={isMobile() ? { marginTop: 0, marginBottom: 0 } : {}}>
             <LoginForm />
           </div>
         </div>

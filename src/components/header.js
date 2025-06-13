@@ -728,7 +728,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   return (
     <header className="admin-header">
       {/* Back Button */}
-      {window.history.length > 1 && !isLandingPage && (
+      {window.history.length > 1 && !isLandingPage && !location.pathname.startsWith('/crew/') && !location.pathname.startsWith('/admin/') && (
         <button
           onClick={() => navigate(-1)}
           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#034D92', marginRight: 8 }}
