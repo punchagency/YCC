@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import csvTemplate from '../../../assets/csv-template.csv';
-import excelTemplate from '../../../assets/excel-template.xlsx';
+// import excelTemplate from '../../../assets/excel-template.xlsx';
+import excelTemplate from '../../../assets/supplier_onboarding_template.xlsx';
 import { Toast } from 'primereact/toast';
 import { useUser } from '../../../context/userContext';
 import * as XLSX from 'xlsx';
@@ -35,7 +36,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const requiredHeaders = ["product name"];
 
   // Determine role based on URL path - more explicit check
-  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes('/vendors/onboarding/') ? 'supplier' : 'service_provider';
 
   const downloadTemplate = (fileType) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
@@ -61,24 +62,24 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   useEffect(() => {
     const verifyInventoryUpload = async () => {
       if (!userId) {
-        console.log('Step 1 - No userId found in URL params');
+        //console.log('Step 1 - No userId found in URL params');
         return;
       }
       
-      console.log('Step 1 - Verifying inventory for userId:', userId);
-      console.log('Step 1 - Current path:', location.pathname);
+      // console.log('Step 1 - Verifying inventory for userId:', userId);
+      // console.log('Step 1 - Current path:', location.pathname);
       
       setIsVerifying(true);
       try {
         const data = await verifyOnboardingStep1(userId, role);
-        console.log('Step 1 - Verification response:', data);
+        //console.log('Step 1 - Verification response:', data);
         
         if (data?.data?.length > 0) {
-          console.log('Step 1 - Inventory verified, moving to next step');
+          //console.log('Step 1 - Inventory verified, moving to next step');
           handleNext();
         }
       } catch (error) {
-        console.error('Step 1 - Verification error:', error);
+        //console.error('Step 1 - Verification error:', error);
         setError('Error verifying inventory. Please try uploading again.');
       } finally {
         setIsVerifying(false);
@@ -168,7 +169,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
           setError(null);
         } catch (error) {
           setError('Error reading CSV file. Please ensure it is properly formatted.');
-          console.error('CSV parsing error:', error);
+          //console.error('CSV parsing error:', error);
         }
       };
   
@@ -212,7 +213,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
           setError(null);
         } catch (error) {
           setError('Error reading Excel file. Please ensure it is properly formatted.');
-          console.error('Excel parsing error:', error);
+          //console.error('Excel parsing error:', error);
         }
       };
 
@@ -228,9 +229,9 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
     setIsLoading(true);
     try {
       if (apiEndpoint) {
-        console.log("Submitting API endpoint:", apiEndpoint);
+        //console.log("Submitting API endpoint:", apiEndpoint);
       } else if (selectedFile) {
-        console.log("Submitting file:", selectedFile);
+        //console.log("Submitting file:", selectedFile);
         const status = await uploadInventoryData(selectedFile, userId);
         if (status) {
           toast.current.show({

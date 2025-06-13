@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 8px;
 }
 
 /* Hide on desktop (1024px and above) */
@@ -58,10 +59,78 @@
   visibility: visible;
 }
 
-.supplier-management-btn:hover span,
-.supplier-management-btn:hover svg {
-  color: white !important;
-} 
+/* Notifications tooltip */
+.notifications-btn {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.notifications-btn:hover {
+  background: rgba(3, 135, 217, 0.1) !important;
+}
+
+.notifications-btn:hover svg {
+  color: #0387D9 !important;
+}
+
+.notifications-btn::before {
+  content: "View notifications";
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1F2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.notifications-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #1F2937 transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.notifications-btn:hover::before,
+.notifications-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Profile image ring effect */
+.profile-section {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.profile-section:hover .profile-image {
+  box-shadow: 0 0 0 3px #0387D9;
+  transform: scale(1.02);
+}
+
+.profile-image {
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.profile-section:hover .profile-image {
+  border-color: #0387D9;
+}
 
 @media screen and (max-width: 768px) {
   .p-menubar {
@@ -72,11 +141,30 @@
     z-index: 1000;
     background: #f8fbff !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 12px 16px !important;
   }
 
   /* Add padding to the body to account for fixed header */
   body {
-    padding-top: 72px; /* Adjust this value based on your header height */
+    padding-top: 64px;
+  }
+
+  /* Ensure proper spacing between header elements */
+  .p-menubar .p-menubar-start {
+    width: 100%;
+  }
+
+  /* Adjust button sizes for mobile */
+  .p-button {
+    min-width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+  }
+
+  /* Ensure profile image is properly sized */
+  .profile-image {
+    width: 30px !important;
+    height: 30px !important;
   }
 }
 

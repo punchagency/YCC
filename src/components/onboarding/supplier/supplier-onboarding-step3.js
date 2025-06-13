@@ -15,7 +15,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Determine role based on URL path
-  const role = location.pathname.includes('/supplier/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes('/vendors/onboarding/') ? 'supplier' : 'service_provider';
 
   useEffect(() => {
     // if (hasRunRef.current) return; // prevent second run
@@ -26,24 +26,24 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
         //check onboarding status
         const status = await checkOnboardingStatus(userId, role);
         if(status === true){
-          console.log('Step 3 - Onboarding status is true');
+          //console.log('Step 3 - Onboarding status is true');
           handleNext();
           return;
         }
 
         if (!userId) {
-          console.error('Missing userId:', { userId });
+          //console.error('Missing userId:', { userId });
           return;
         }
 
         const data = await verifyOnboardingStep1(userId, role);
-        console.log('Step 3 - Verification response:', data);
+        //console.log('Step 3 - Verification response:', data);
         
         if (data?.data?.length > 0) {
           setInventoryData(data.data);
         }
       } catch (error) {
-        console.error('Step 3 - Verification error:', error);
+        //console.error('Step 3 - Verification error:', error);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -70,7 +70,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
         });
       }
     } catch (error) {
-      console.error('Step 3 - Complete onboarding error:', error);
+      //console.error('Step 3 - Complete onboarding error:', error);
       toast.current.show({
         severity: "error",
         summary: "Error",

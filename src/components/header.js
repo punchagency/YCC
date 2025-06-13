@@ -13,7 +13,7 @@ import share from "../assets/images/crew/share.png";
 import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
-import { Store } from 'lucide-react';
+import { Store, Bell } from 'lucide-react';
 import { useUser } from "../context/userContext";
 import { checkPendingVendors } from '../services/admin/adminService';
 import { getNotifications } from '../services/notification/notificationService';
@@ -261,136 +261,183 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             width: "100%",
             alignItems: "center",
             gap: "15px",
+            justifyContent: "space-between"
           }}
         >
-          {/* Hamburger Menu */}
-          <div
-            className="hamburger-container"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <img
-              src={hamburger}
-              alt="menu"
-              style={{ width: "24px", height: "24px" }}
-            />
-          </div>
+          {/* Left Group: Hamburger + Search */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+          }}>
+            {/* Hamburger Menu */}
+            <div
+              className="hamburger-container"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <img
+                src={hamburger}
+                alt="menu"
+                style={{ width: "24px", height: "24px" }}
+              />
+            </div>
 
-          {/* Search Input */}
-          <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              width: isMobile ? "auto" : "350px",
-              flex: isMobile ? "none" : "none",
-            }}
-          >
-            {isMobile ? (
-              <Button
-                icon={
+            {/* Search Input */}
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                width: isMobile ? "auto" : "350px",
+                flex: isMobile ? "none" : "none",
+              }}
+            >
+              {isMobile ? (
+                <Button
+                  icon={
+                    <img
+                      src={searchLogo}
+                      alt="search"
+                      style={{ width: "24px", height: "24px" }}
+                    />
+                  }
+                  onClick={() => setShowSearchModal(true)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    padding: "0",
+                    width: "40px",
+                    height: "40px",
+                  }}
+                />
+              ) : (
+                <>
                   <img
                     src={searchLogo}
                     alt="search"
-                    style={{ width: "24px", height: "24px" }}
+                    style={{ position: "absolute", left: "10px" }}
                   />
-                }
-                onClick={() => setShowSearchModal(true)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  padding: "0",
-                  width: "40px",
-                  height: "40px",
-                }}
-              />
-            ) : (
-              <>
-                <img
-                  src={searchLogo}
-                  alt="search"
-                  style={{ position: "absolute", left: "10px" }}
-                />
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                  onClick={() => setShowSearchModal(true)}
-                  style={{
-                    paddingLeft: "35px",
-                    width: "100%",
-                    height: "40px",
-                    border: "1px solid #ced4da",
-                    borderRadius: "30px",
-                    backgroundColor: "#F5F6FA",
-                    outline: "none",
-                    fontSize: "10px",
-                    cursor: "pointer",
-                  }}
-                />
-              </>
-            )}
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    onClick={() => setShowSearchModal(true)}
+                    style={{
+                      paddingLeft: "35px",
+                      width: "100%",
+                      height: "40px",
+                      border: "1px solid #ced4da",
+                      borderRadius: "30px",
+                      backgroundColor: "#F5F6FA",
+                      outline: "none",
+                      fontSize: "10px",
+                      cursor: "pointer",
+                    }}
+                  />
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Profile Section - Show on mobile next to search */}
+          {/* Right Group: Store + Notifications + Profile */}
           {isMobile && (
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "15px",
-                marginLeft: "auto",
+                gap: "8px",
               }}
             >
-              {/* Bell Icon for mobile */}
-              <Button
-                icon={
-                  <img
-                    src={icon}
-                    alt="notification"
-                    style={{ width: "24px", height: "24px" }}
+              {/* Store Icon */}
+              {role === "admin" && (
+                <button
+                  onClick={() => navigate('/admin/approve')}
+                  className="supplier-management-btn"
+                  aria-label="Supplier and Vendor Management"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '40px',
+                    height: '40px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    padding: '8px',
+                    position: 'relative'
+                  }}
+                >
+                  <Store 
+                    style={{ 
+                      width: "24px", 
+                      height: "24px", 
+                      color: "#0387D9"
+                    }} 
                   />
-                }
-                className="notifications"
+                  {hasPendingVendors && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '4px',
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: '#FF4B4B',
+                        borderRadius: '50%',
+                        border: '2px solid #fff'
+                      }}
+                    />
+                  )}
+                </button>
+              )}
+
+              {/* Bell Icon */}
+              <button
+                className="notifications-btn"
                 onClick={(event) => overlayPanelRef.current.toggle(event)}
                 aria-haspopup
                 style={{
-                  width: "40px",
-                  height: "40px",
-                  background: "transparent",
-                  border: "none",
-                  padding: "0",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  padding: '8px',
+                  position: 'relative'
                 }}
-              />
-
-              {/* Share Button for mobile */}
-              <Menu model={shareItems} popup ref={shareMenuRef} />
-              <Button
-                label="Share"
-                icon={
-                  <img
-                    src={share}
-                    alt="share"
-                    style={{ width: "12px", height: "12px" }}
+              >
+                <Bell 
+                  style={{ 
+                    width: "24px", 
+                    height: "24px", 
+                    color: "#0387D9"
+                  }} 
+                />
+                {notifications.length > 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '4px',
+                      width: '12px',
+                      height: '12px',
+                      backgroundColor: '#FF4B4B',
+                      borderRadius: '50%',
+                      border: '2px solid #fff'
+                    }}
                   />
-                }
-                onClick={(e) => shareMenuRef.current.toggle(e)}
-                style={{
-                  height: "30px",
-                  backgroundColor: "#F5F6FA",
-                  border: "1px solid #ced4da",
-                  borderRadius: "8px",
-                  color: "#495057",
-                  fontSize: "12px",
-                  padding: "0.5rem 0.5rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "4px",
-                }}
-              />
+                )}
+              </button>
 
-              {/* Profile Section with properties */}
+              {/* Profile Image Only */}
               <div
                 className="profile-section"
                 onClick={() => navigate("/admin/profile")}
@@ -398,7 +445,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
                 }}
               >
                 <img
@@ -406,18 +452,12 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   alt="Profile"
                   className="profile-image"
                   style={{
-                    width: "30px",
-                    height: "30px",
+                    width: "32px",
+                    height: "32px",
                     borderRadius: "50%",
                     objectFit: "cover",
                   }}
                 />
-                <div>
-                  <p style={{ margin: 0, fontSize: "12px" }}>{userName}</p>
-                  <p style={{ margin: 0, fontSize: "10px", color: "#666" }}>
-                    Admin
-                  </p>
-                </div>
               </div>
             </div>
           )}
@@ -551,8 +591,9 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           onClick={viewAllNotifications}
         />
       </OverlayPanel>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {role === "admin" && (
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        {/* Store Icon - Only show on desktop */}
+        {!isMobile && role === "admin" && (
           <button
             onClick={() => navigate('/admin/approve')}
             className="supplier-management-btn"
@@ -568,7 +609,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               borderRadius: '50%',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              marginRight: '16px',
               padding: '8px',
               position: 'relative'
             }}
@@ -599,24 +639,47 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
 
         {/* Notification Bell - Only show on desktop */}
         {!isMobile && (
-          <Button
-            icon={
-              <img
-                src={icon}
-                alt="notification"
-                style={{ width: "24px", height: "24px" }}
-              />
-            }
-            className="notifications"
+          <button
+            className="notifications-btn"
             onClick={(event) => overlayPanelRef.current.toggle(event)}
             aria-haspopup
             style={{
-              width: "40px",
-              height: "40px",
-              background: "transparent",
-              border: "none",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              padding: '8px',
+              position: 'relative'
             }}
-          />
+          >
+            <Bell 
+              style={{ 
+                width: "24px", 
+                height: "24px", 
+                color: "#0387D9"
+              }} 
+            />
+            {notifications.length > 0 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '8px',
+                  right: '4px',
+                  width: '12px',
+                  height: '12px',
+                  backgroundColor: '#FF4B4B',
+                  borderRadius: '50%',
+                  border: '2px solid #fff'
+                }}
+              />
+            )}
+          </button>
         )}
         {/* Profile Section - Only show on desktop */}
         {!isMobile && (
@@ -631,8 +694,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 alt="Profile"
                 className="profile-image"
                 style={{
-                  width: "30px",
-                  height: "30px",
+                  width: "32px",
+                  height: "32px",
                   borderRadius: "50%",
                   objectFit: "cover",
                 }}
