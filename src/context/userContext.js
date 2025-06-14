@@ -74,7 +74,7 @@ export const UserProvider = ({ children }) => {
   //   return data;
   // };
   const getStripeAccount = async (userId, role) => {
-    console.log('userContext - getStripeAccount called with:', { userId, role });
+    //console.log('userContext - getStripeAccount called with:', { userId, role });
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
         method: 'POST',
@@ -85,7 +85,7 @@ export const UserProvider = ({ children }) => {
         body: JSON.stringify({ userId, role })
       });
       const data = await response.json();
-      console.log('userContext - getStripeAccount response:', data);
+      //console.log('userContext - getStripeAccount response:', data);
       
       if (!data.status) {
         // Only set to null if account truly doesn't exist
@@ -105,7 +105,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const createStripeAccount = async (userId, role) => {
-    console.log('userContext - createStripeAccount called with:', { userId, role });
+    //console.log('userContext - createStripeAccount called with:', { userId, role });
     const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`, {
       method: 'POST',
       headers: {
@@ -115,7 +115,7 @@ export const UserProvider = ({ children }) => {
       body: JSON.stringify({ userId, role })
     });
     const data = await response.json();
-    console.log('userContext - createStripeAccount response:', data);
+    //console.log('userContext - createStripeAccount response:', data);
     if(data.status){
       window.location.href = data.data.url;
     }
@@ -123,7 +123,7 @@ export const UserProvider = ({ children }) => {
   }
 
   const refreshStripeAccountLink = async (userId, role) => {
-    console.log('userContext - refreshStripeAccountLink called with:', { userId, role });
+    //console.log('userContext - refreshStripeAccountLink called with:', { userId, role });
     const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`, {
       method: 'POST',
       headers: {
@@ -133,7 +133,7 @@ export const UserProvider = ({ children }) => {
       body: JSON.stringify({ userId, role })
     });
     const data = await response.json();
-    console.log('userContext - refreshStripeAccountLink response:', data);
+    //console.log('userContext - refreshStripeAccountLink response:', data);
     if(data.status){
       window.location.href = data.data.url;
     }
@@ -197,7 +197,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const verifyOnboardingStep1 = async (userId, role) => {
-    console.log('userContext - verifyOnboardingStep1 called with userId:', userId);
+    //console.log('userContext - verifyOnboardingStep1 called with userId:', userId);
     try {
       if(role === "supplier"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {
@@ -236,7 +236,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const completeOnboarding = async (userId, role) => {
-    console.log('userContext - completeOnboarding called with:', { userId, role });
+    //console.log('userContext - completeOnboarding called with:', { userId, role });
     try {
       if(role === "supplier"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
@@ -270,7 +270,7 @@ export const UserProvider = ({ children }) => {
   }
 
   const checkOnboardingStatus = async (userId, role) => {
-    console.log('userContext - checkOnboardingStatus called with:', { userId, role });
+    //console.log('userContext - checkOnboardingStatus called with:', { userId, role });
     try {
       if(role === "supplier"){
         const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {

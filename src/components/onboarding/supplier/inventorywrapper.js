@@ -327,12 +327,12 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
               onChange={handleChange('category')}
               fullWidth
             />
-            <TextField
+            {/* <TextField
               label="Service Area"
               value={editedItem?.serviceArea || ''}
               onChange={handleChange('serviceArea')}
               fullWidth
-            />
+            /> */}
             <TextField
               label="Quantity"
               type="number"
