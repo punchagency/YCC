@@ -1,42 +1,20 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo-login.png";
-import LoginForm from "../../components/login";
-import { useLocation } from "react-router-dom";
-import backgroundImage from "../../assets/images/crew/back.png";
+import ForgotPasswordForm from "../../components/ForgotPasswordForm";
+import backgroundImage from "../../assets/images/captain_login_bg.jpg";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { isMobile } from "../../components/ResponsiveDevice";
+import LandingPageChatbot from "../../components/chatbot/landing-page-chatbot";
 
-function isMobile() {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth < 989;
-}
-
-const Login = () => {
-  // const title = "Explore the story behind Yacht Crew Center's journey.";
-  const location = useLocation();
-  const role = location.state?.role || "Guest"; // Default to 'Guest' if no role is passed
+const ForgotPasswordDesktop = () => {
   const navigate = useNavigate();
-
-  // const getBackgroundImage = (role) => {
-  //   switch (role) {
-  //     case "Captain":
-  //       return backgroundImageCaptain;
-  //     case "Crew Member":
-  //       return backgroundImageCrew;
-  //     default:
-  //       return backgroundImageCaptain; // Default image
-  //   }
-  // };
-
-  // const backgroundImage = getBackgroundImage(role);
-
-  // const title = `Welcome, ${role}! Explore the story behind Yacht Crew Center's journey.`;
   return (
     <div
       className="flex flex-column lg:flex-row h-screen align-content-start justify-content-center gap-0 login"
       style={{
         position: "relative",
-        height: isMobile() ? "auto" : "100vh",
+        height: isMobile() ? "100vh" : "100vh",
         overflow: isMobile() ? "hidden" : "hidden",
         padding: isMobile() ? "0" : undefined,
       }}
@@ -48,6 +26,7 @@ const Login = () => {
           style={{ backgroundImage: `url(${backgroundImage})` }}
         />
       )}
+
       {/* Logo for mobile/tablet (show instead of background) */}
       {isMobile() && (
         <div
@@ -84,6 +63,7 @@ const Login = () => {
           </div>
         </div>
       )}
+
       {/* Back Button for mobile/tablet (fixed at top) */}
       {window.history.length > 1 && isMobile() && (
         <div
@@ -114,6 +94,7 @@ const Login = () => {
           </button>
         </div>
       )}
+
       {/* Back Button for desktop (absolute in container) */}
       {window.history.length > 1 && !isMobile() && (
         <button
@@ -132,17 +113,18 @@ const Login = () => {
           <ArrowBackIcon />
         </button>
       )}
+
       <div
-        className={
-          isMobile()
-            ? undefined
-            : "flex-1 flex align-items-center justify-content-center right-panel"
-        }
+        className="flex-1 flex align-items-center justify-content-center right-panel"
         style={
           isMobile()
             ? {
                 padding: 0,
                 margin: 0,
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "center",
+                flex: 1,
                 overflow: "auto",
                 minHeight: "0",
                 height: "auto",
@@ -190,11 +172,14 @@ const Login = () => {
                 : {}
             }
           >
-            <h2 className="font-medium mb-1">Sign in</h2>
+            <h2 className="font-medium mb-1">Forgot Password</h2>
             <p>
-              Don't have an account?{" "}
-              <Link to="/signup" state={{ role }} style={{ color: "#034D92" }}>
-                Create new!
+              Forgot your password?{" "}
+              <Link
+                to="/login"
+                style={{ color: "#034D92", fontFamily: "Inter, sans-serif" }}
+              >
+                Back to Login
               </Link>
             </p>
           </div>
@@ -202,12 +187,17 @@ const Login = () => {
             className="login-form captain-login-form"
             style={isMobile() ? { marginTop: 0, marginBottom: 0 } : {}}
           >
-            <LoginForm />
+            <ForgotPasswordForm />
           </div>
         </div>
+      </div>
+
+      {/* Chatbot */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <LandingPageChatbot />
       </div>
     </div>
   );
 };
 
-export default Login;
+export default ForgotPasswordDesktop;

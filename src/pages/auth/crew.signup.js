@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/images/water.jpg";
 import check from "../../assets/images/check1.png";
 import yachtCrew from "../../assets/images/yacht.png";
 import CrewSignUpForm from "../../components/crew.signup";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Select } from "react-select";
+import LandingPageChatbot from "../../components/chatbot/landing-page-chatbot";
 
-const StepInfo = ({ currentStep }) => {
+const StepInfo = ({ currentStep, onBack }) => {
   const stepData = {
     1: {
       step: "Step 1",
@@ -31,20 +33,76 @@ const StepInfo = ({ currentStep }) => {
   };
 
   return (
-    <div className="logo_crew">
+    <div
+      className="logo_crew"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        width: "100%",
+      }}
+    >
+      {/* Back button for mobile only */}
+      <div
+        className="mobile-back-btn"
+        style={{ display: "none", position: "absolute", left: 0, top: 0 }}
+      >
+        <button
+          onClick={onBack}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#034D92",
+            margin: 0,
+            padding: 0,
+            fontSize: 24,
+          }}
+          aria-label="Back"
+        >
+          <ArrowBackIcon />
+        </button>
+      </div>
       <div>
         <img src={check} className="checkImg" alt="" />
       </div>
-      <div>
-        <p>{stepData[currentStep].step}</p>
-        <p className="personal_info">{stepData[currentStep].info}</p>
+      <div style={{ textAlign: "center", width: "100%" }}>
+        <p
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 22,
+            fontWeight: 600,
+            margin: 0,
+          }}
+        >
+          {stepData[currentStep].step}
+        </p>
+        <p
+          className="personal_info"
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: 18,
+            fontWeight: 400,
+            margin: 0,
+          }}
+        >
+          {stepData[currentStep].info}
+        </p>
       </div>
+      <style>{`
+        @media (max-width: 600px) {
+          .logo_crew { align-items: center !important; justify-content: center !important; }
+          .mobile-back-btn { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 };
 
 function isMobile() {
-  return typeof window !== 'undefined' && window.innerWidth < 600;
+  return typeof window !== "undefined" && window.innerWidth < 600;
 }
 
 const Signup = () => {
@@ -76,53 +134,15 @@ const Signup = () => {
   };
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', padding: window.innerWidth < 600 ? '0' : undefined }}>
-      {/* Back Button for mobile (fixed at top) */}
-      {window.history.length > 1 && isMobile() && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          zIndex: 2000,
-          background: 'transparent',
-          width: '100vw',
-          padding: '16px 0 0 16px',
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#034D92',
-              fontSize: 28
-            }}
-            aria-label="Back"
-          >
-            <ArrowBackIcon />
-          </button>
-        </div>
-      )}
-      {/* Back Button for desktop (absolute in container) */}
-      {window.history.length > 1 && !isMobile() && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#034D92',
-            margin: '16px 0 0 16px',
-            position: 'absolute',
-            zIndex: 10
-          }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
+    <div
+      style={{
+        position: "relative",
+        minHeight: "100vh",
+        maxHeight: "100vh",
+        overflow: "hidden",
+        padding: window.innerWidth < 600 ? "0" : undefined,
+      }}
+    >
       <div className="check-bg">
         <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login bg-inner testing">
           <div
@@ -133,43 +153,138 @@ const Signup = () => {
               width: "100%",
               backgroundAttachment: "fixed",
               backgroundPosition: "center",
-              backgroundSize: "center",
-              objectFit: "center",
+              backgroundSize: "cover",
+              objectFit: "cover",
               overflow: "hidden",
             }}
           >
             <div className="login-content">
-              <img src={yachtCrew} style={{ width: "200px" }} alt="" />
+              <img src={yachtCrew} style={{ width: "100%" }} alt="" />
             </div>
           </div>
 
-          <div className="flex-1 flex align-items-center justify-content-center right-panel">
+          <div
+            className="flex-1 flex align-items-center justify-content-center right-panel"
+            style={{
+              padding: 0,
+              margin: 0,
+              width: "100%",
+              height: "100%",
+              alignItems: "flex-start",
+              justifyContent: "center",
+              position: "relative",
+            }}
+          >
+            {/* Back Button for desktop (absolute in right panel) */}
+            {window.history.length > 1 && !isMobile() && (
+              <button
+                onClick={() => navigate(-1)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#034D92",
+                  margin: "16px 0 0 16px",
+                  position: "absolute",
+                  zIndex: 10,
+                  top: 0,
+                  left: 0,
+                }}
+                aria-label="Back"
+              >
+                <ArrowBackIcon />
+              </button>
+            )}
             <div
               className="login-right-component"
-              style={{ width: "100%", paddingTop: "0px" }}
+              style={{
+                flex: "1 1 0%",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: 0,
+              }}
             >
-              <div className="logo-wraper">
-                <StepInfo currentStep={step} />
-              </div>
               <div
                 className="login-form captain-login-form"
                 style={{
+                  width: "100%",
+                  maxWidth: 600,
+                  margin: "0 auto",
                   display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "stretch",
+                  flex: 1,
+                  height: "80vh",
+                  overflowY: "auto",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#034D92 #f0f0f0",
+                  position: "relative",
+                  paddingTop: 0,
                 }}
               >
-                <CrewSignUpForm
-                  setStep={setStep}
-                  currentStep={step}
-                  formData={formData}
-                  setFormData={handleFormDataChange}
-                />
+                {/* StepInfo in its own card */}
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: 600,
+                    margin: "0 auto",
+                    background: "#fff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                    borderRadius: 12,
+                    padding: 24,
+                    marginBottom: 16,
+                  }}
+                >
+                  <StepInfo currentStep={step} onBack={() => navigate(-1)} />
+                </div>
+                {/* Form content in a separate scrollable card */}
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: 600,
+                    margin: "0 auto",
+                    background: "#fff",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                    borderRadius: 12,
+                    height: "70vh",
+                    overflowY: "auto",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
+                    alignItems: "stretch",
+                    padding: 24,
+                  }}
+                >
+                  <CrewSignUpForm
+                    setStep={setStep}
+                    currentStep={step}
+                    formData={formData}
+                    setFormData={handleFormDataChange}
+                  />
+                </div>
               </div>
+            </div>
+            {/* Chatbot - Fixed Position */}
+            <div
+              style={{ position: "fixed", bottom: 20, right: 20, zIndex: 1000 }}
+            >
+              <LandingPageChatbot />
             </div>
           </div>
         </div>
       </div>
+      <style>{`
+@media (max-width: 600px) {
+  .left-panel {
+    display: none !important;
+  }
+}
+`}</style>
     </div>
   );
 };
