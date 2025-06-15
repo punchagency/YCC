@@ -310,7 +310,7 @@ const Dashboard = () => {
                   </div>
                   <div className="dashboard-overview-item">
                     30
-                    <p>Passed   with Deficiencies</p>
+                    <p>Passed with Deficiencies</p>
                   </div>
                 </div>
               </Card>
