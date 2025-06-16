@@ -23,6 +23,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useUser } from "../context/userContext";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import "./SignInButton.css";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 const LandingPageHeader = () => {
   const location = useLocation();
@@ -108,7 +109,7 @@ const LandingPageHeader = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("id");
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
 
   return (
@@ -316,7 +317,10 @@ const LandingPageHeader = () => {
                   <Avatar
                     src={user.avatar || "/default-avatar.png"}
                     alt={user.name}
-                    sx={{ width: 40, height: 40 }}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                    }}
                   />
                   <KeyboardArrowDownIcon sx={{ color: "white", ml: 0.5 }} />
                 </IconButton>
@@ -461,6 +465,51 @@ const LandingPageHeader = () => {
           }}
         >
           <Box sx={{ flex: 1, padding: "20px" }}>
+            {/* If user is logged in, show avatar, name, and role above menu */}
+            {user && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  mb: 3,
+                  mt: -2,
+                  gap: 1,
+                }}
+              >
+                <Avatar
+                  src={user.avatar || "/default-avatar.png"}
+                  alt={user.name || "User"}
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    border: "2px solid #000",
+                    background: "#fff",
+                    color: "#000",
+                    fontWeight: 700,
+                    fontSize: 24,
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  {!user.avatar && user.name
+                    ? user.name[0].toUpperCase()
+                    : null}
+                </Avatar>
+                <Typography
+                  sx={{ color: "white", fontWeight: 700, fontSize: 16, mt: 1 }}
+                >
+                  {user.name || user.fullName || "User"}
+                </Typography>
+                <Typography
+                  sx={{ color: "#000", fontSize: 13, fontWeight: 500 }}
+                >
+                  {user.role
+                    ? user.role.charAt(0).toUpperCase() +
+                      user.role.slice(1).replace("_", " ")
+                    : ""}
+                </Typography>
+              </Box>
+            )}
             {/* Nav Item with dropdown */}
             {navItems.map((item) =>
               item.options ? (
@@ -587,57 +636,90 @@ const LandingPageHeader = () => {
               textAlign: "center",
             }}
           >
-            <Link to="/get-started">
-              <GradientButton
-                variant="contained"
+            {/* If user is not logged in, show Join Now and Sign In */}
+            {!user ? (
+              <>
+                <Link to="/get-started">
+                  <GradientButton
+                    variant="contained"
+                    sx={{
+                      textTransform: "none",
+                      height: 40,
+                      minWidth: 120,
+                      fontSize: 16,
+                      padding: "8px 24px",
+                    }}
+                  >
+                    <ButtonTypography sx={{ color: "white" }}>
+                      Join Now
+                    </ButtonTypography>
+                  </GradientButton>
+                </Link>
+                <Button
+                  component={Link}
+                  to="/login"
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "white",
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                    "&:hover": {
+                      background: "linear-gradient(90deg, #034D92, #0487D9)",
+                    },
+                  }}
+                >
+                  <ButtonTypography
+                    sx={{
+                      background: "linear-gradient(90deg, #034D92, #0487D9)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      transition:
+                        "background 0.3s, color 0.3s, -webkit-text-fill-color 0.3s",
+                      "&:hover, &:active, &:focus": {
+                        background: "none",
+                        WebkitBackgroundClip: "border-box",
+                        WebkitTextFillColor: "#fff",
+                        color: "#fff",
+                      },
+                    }}
+                  >
+                    Sign In
+                  </ButtonTypography>
+                </Button>
+              </>
+            ) : (
+              // If user is logged in, show Logout button
+              <Button
+                onClick={handleLogout}
+                fullWidth
+                variant="outlined"
                 sx={{
-                  textTransform: "none",
-                  height: 40,
-                  minWidth: 120,
+                  backgroundColor: "transparent",
+                  color: "#FF4B4B",
+                  border: "2px solid #FF4B4B",
+                  borderRadius: 2,
+                  fontWeight: 700,
                   fontSize: 16,
-                  padding: "8px 24px",
-                }}
-              >
-                <ButtonTypography sx={{ color: "white" }}>
-                  Join Now
-                </ButtonTypography>
-              </GradientButton>
-            </Link>
-            <Button
-              component={Link}
-              to="/login"
-              fullWidth
-              variant="contained"
-              sx={{
-                backgroundColor: "white",
-                textTransform: "none",
-                height: 40,
-                minWidth: 120,
-                fontSize: 16,
-                padding: "8px 24px",
-                "&:hover": {
-                  background: "linear-gradient(90deg, #034D92, #0487D9)",
-                },
-              }}
-            >
-              <ButtonTypography
-                sx={{
-                  background: "linear-gradient(90deg, #034D92, #0487D9)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  transition:
-                    "background 0.3s, color 0.3s, -webkit-text-fill-color 0.3s",
-                  "&:hover, &:active, &:focus": {
-                    background: "none",
-                    WebkitBackgroundClip: "border-box",
-                    WebkitTextFillColor: "#fff",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                  mt: 1,
+                  "&:hover": {
+                    backgroundColor: "#FF4B4B",
                     color: "#fff",
                   },
                 }}
               >
-                Sign In
-              </ButtonTypography>
-            </Button>
+                <LogoutIcon sx={{ mr: 1 }} />
+                Logout
+              </Button>
+            )}
           </Box>
         </Box>
       </Drawer>
