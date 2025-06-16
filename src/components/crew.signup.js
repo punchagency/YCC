@@ -182,7 +182,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       const response = await signup(formDataObj);
 
       if (response.status === "success") {
-        navigate("/crew/inventory/dashboard");
+        navigate("/login");
       }
     } catch (err) {
       setError(err.message || "Failed to sign up. Please try again.");
