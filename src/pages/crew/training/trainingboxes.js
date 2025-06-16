@@ -70,7 +70,31 @@ const TrainingBoxes = () => {
 
   return (
     <div className="container mx-auto">
+      <style>{`
+        @media (max-width: 600px) {
+          .training-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+            padding: 10px !important;
+          }
+          .training-card {
+            padding: 12px 8px 10px 8px !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 12px rgba(4, 135, 217, 0.08) !important;
+            margin-bottom: 10px !important;
+          }
+          .training-card h2 {
+            font-size: 1.1rem !important;
+          }
+          .training-card button {
+            font-size: 0.95rem !important;
+            padding: 6px 12px !important;
+          }
+        }
+      `}</style>
       <div
+        className="training-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
@@ -81,14 +105,19 @@ const TrainingBoxes = () => {
         {trainingCourses.map((course, index) => (
           <div
             key={index}
+            className="training-card"
             style={{
               height: "300px",
+              background: "#fff",
+              borderRadius: "10px",
+              boxShadow: "0 2px 12px rgba(4, 135, 217, 0.08)",
+              padding: "16px 14px 14px 14px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
             }}
           >
-            <div
-              className="bg-white rounded-lg p-4"
-              style={{ height: "100%", borderRadius: "10px" }}
-            >
+            <div>
               <div className="flex justify-content-between align-items-center mb-5">
                 <h2>{course.title}</h2>
                 <button
@@ -119,37 +148,35 @@ const TrainingBoxes = () => {
                   {course.status}
                 </button>
               </div>
-              <div className="mb-6">
-                <div className="flex align-items-center mb-3">
-                  <img src={location} alt="location" className="mr-2" />
-                  <p className="">{course.location}</p>
-                </div>
-                <div className="flex align-items-center mb-3">
-                  <img src={calendar} alt="calendar" className="mr-2" />
-                  <p className="">{course.duration}</p>
-                </div>
-                <div className="flex align-items-center mb-3">
-                  <img src={building} alt="building" className="mr-2" />
-                  <p className="">{course.provider}</p>
-                </div>
+              <div className="flex align-items-center mb-3">
+                <img src={location} alt="location" className="mr-2" />
+                <p className="">{course.location}</p>
               </div>
-              <div className="flex justify-content-between items-center">
-                <p>{course.price}</p>
-                <button
-                  style={{
-                    backgroundColor: "#0387D9",
-                    color: "white",
-                    border: "1px solid #0387D9",
-                    outline: "none",
-                    borderRadius: "5px",
-                    padding: "5px 10px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleViewDetails(course)}
-                >
-                  View Details
-                </button>
+              <div className="flex align-items-center mb-3">
+                <img src={calendar} alt="calendar" className="mr-2" />
+                <p className="">{course.duration}</p>
               </div>
+              <div className="flex align-items-center mb-3">
+                <img src={building} alt="building" className="mr-2" />
+                <p className="">{course.provider}</p>
+              </div>
+            </div>
+            <div className="flex justify-content-between items-center">
+              <p>{course.price}</p>
+              <button
+                style={{
+                  backgroundColor: "#0387D9",
+                  color: "white",
+                  border: "1px solid #0387D9",
+                  outline: "none",
+                  borderRadius: "5px",
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleViewDetails(course)}
+              >
+                View Details
+              </button>
             </div>
           </div>
         ))}

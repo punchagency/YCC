@@ -98,11 +98,39 @@ const LegalBoxes = ({ selectedCountry, searchText }) => {
 
   return (
     <>
-      <div className="grid grid-cols-2" style={{ paddingLeft: "30px" }}>
+      <style>{`
+        @media (max-width: 600px) {
+          .legal-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 14px !important;
+            padding: 10px !important;
+          }
+          .legal-card {
+            padding: 12px 8px 10px 8px !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 12px rgba(4, 135, 217, 0.08) !important;
+            margin-bottom: 10px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+          .legal-card h1 {
+            font-size: 1.1rem !important;
+          }
+          .legal-card p, .legal-card button {
+            font-size: 0.95rem !important;
+          }
+        }
+      `}</style>
+      <div
+        className="legal-grid grid grid-cols-2"
+        style={{ paddingLeft: "30px" }}
+      >
         {filteredStates.length > 0 ? (
           filteredStates.map((state, index) => (
             <div
               key={index}
+              className="legal-card"
               style={{
                 width: "45%",
                 height: "280px",
@@ -135,21 +163,19 @@ const LegalBoxes = ({ selectedCountry, searchText }) => {
                       <p className="">{state.website}</p>
                     </div>
                   </div>
-                  <div className="flex align-items-center">
-                    <p
-                      className="mr-4"
-                      style={{ color: "#0387D9", cursor: "pointer" }}
-                      onClick={() => handleViewDetails(state)}
-                    >
-                      View Details
-                    </p>
-                    <p
-                      style={{ color: "#0387D9", cursor: "pointer" }}
-                      onClick={() => handleDownloadInfo(state)}
-                    >
-                      Download Info
-                    </p>
-                  </div>
+                  <p
+                    className="mr-4"
+                    style={{ color: "#0387D9", cursor: "pointer" }}
+                    onClick={() => handleViewDetails(state)}
+                  >
+                    View Details
+                  </p>
+                  <p
+                    style={{ color: "#0387D9", cursor: "pointer" }}
+                    onClick={() => handleDownloadInfo(state)}
+                  >
+                    Download Info
+                  </p>
                 </div>
                 <div className="pt-2">
                   <img src={addpeg} alt="addpeg" />

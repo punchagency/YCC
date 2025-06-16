@@ -44,6 +44,12 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       acceptLabel: "Yes",
       rejectLabel: "Cancel",
       style: { textAlign: "center" },
+      accept: () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      },
       footer: (options) => (
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
           <Button
