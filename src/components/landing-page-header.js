@@ -50,8 +50,8 @@ const LandingPageHeader = () => {
   ];
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [departmentsAnchorEl, setDepartmentsAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -85,25 +85,23 @@ const LandingPageHeader = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleClick = (event, title) => {
-    setAnchorEl(event.currentTarget);
-    setOpenDropdown(title);
+  const handleDepartmentsClick = (event) => {
+    setDepartmentsAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-    setOpenDropdown(null);
+  const handleDepartmentsClose = () => {
+    setDepartmentsAnchorEl(null);
+  };
+
+  const handleProfileClick = (event) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchorEl(null);
   };
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
-
-  const handleProfileClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -192,7 +190,7 @@ const LandingPageHeader = () => {
               <Box key={item.title}>
                 <Button
                   color="inherit"
-                  onClick={(event) => handleClick(event, item.title)}
+                  onClick={handleDepartmentsClick}
                   sx={{
                     textTransform: "none",
                   }}
@@ -211,9 +209,9 @@ const LandingPageHeader = () => {
                   <KeyboardArrowDownIcon sx={{ color: "white" }} />
                 </Button>
                 <Menu
-                  anchorEl={anchorEl}
-                  open={openDropdown === item.title}
-                  onClose={handleClose}
+                  anchorEl={departmentsAnchorEl}
+                  open={Boolean(departmentsAnchorEl)}
+                  onClose={handleDepartmentsClose}
                   disablePortal
                   disableScrollLock
                   sx={{
@@ -229,7 +227,7 @@ const LandingPageHeader = () => {
                   {item.options.map((option) => (
                     <MenuItem
                       key={option}
-                      onClick={handleClose}
+                      onClick={handleDepartmentsClose}
                       component={Link}
                       to={option.route}
                       sx={{
@@ -358,9 +356,9 @@ const LandingPageHeader = () => {
                 </Box>
               </Box>
               <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
+                anchorEl={profileAnchorEl}
+                open={Boolean(profileAnchorEl)}
+                onClose={handleProfileClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
                 PaperProps={{
@@ -390,7 +388,7 @@ const LandingPageHeader = () => {
               >
                 <MenuItem
                   onClick={() => {
-                    handleMenuClose();
+                    handleProfileClose();
                     window.location.href = "/crew/dashboard";
                   }}
                 >

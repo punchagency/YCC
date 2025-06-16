@@ -4,6 +4,7 @@ import backgroundImage from "../../assets/images/crew/back.png";
 import captain from "../../assets/images/captain1.svg";
 import crew from "../../assets/images/mechanic1.svg";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot';
 
 const GetStarted = ({ name }) => {
   const navigate = useNavigate(); // Initialize useNavigate for programmatic navigation
@@ -66,52 +67,9 @@ const GetStarted = ({ name }) => {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', padding: window.innerWidth < 600 ? '0' : undefined }}>
-      {/* Back Button for mobile (fixed at top) */}
-      {window.history.length > 1 && isMobile() && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          zIndex: 2000,
-          background: 'transparent',
-          width: '100vw',
-          padding: '16px 0 0 16px',
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#034D92',
-              fontSize: 28
-            }}
-            aria-label="Back"
-          >
-            <ArrowBackIcon />
-          </button>
-        </div>
-      )}
-      {/* Back Button for desktop (absolute in container) */}
-      {window.history.length > 1 && !isMobile() && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#034D92',
-            margin: '16px 0 0 16px',
-            position: 'absolute',
-            zIndex: 10
-          }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
+      {/* Landing Page Chatbot floating button */}
+      <LandingPageChatbot />
+      {/* Back Button for mobile (now inside white panel) */}
       <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 get-started">
         <div
           className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
@@ -125,7 +83,27 @@ const GetStarted = ({ name }) => {
             <p className="text-white m-0 line-height-3">{description}</p>
           </div> */}
         </div>
-        <div className="flex-1 flex align-items-center justify-content-center right-panel">
+        <div className="flex-1 flex align-items-center justify-content-center right-panel" style={{ position: 'relative' }}>
+          {/* Desktop back button absolutely positioned in the white panel */}
+          {window.history.length > 1 && !isMobile() && (
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                position: 'absolute',
+                top: 16,
+                left: 16,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#034D92',
+                fontSize: 28,
+                zIndex: 10
+              }}
+              aria-label="Back"
+            >
+              <ArrowBackIcon />
+            </button>
+          )}
           <div className="get-started-right-component">
             <h6>Welcome,</h6>
             <h2>Lets, Get started</h2>

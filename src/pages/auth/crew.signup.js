@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import backgroundImage from "../../assets/images/water.jpg";
+import backgroundImage from "../../assets/images/crew/back.png";
 import check from "../../assets/images/check1.png";
-import yachtCrew from "../../assets/images/yacht.png";
+// import yachtCrew from "../../assets/images/yacht.png";
 import CrewSignUpForm from "../../components/crew.signup";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Select } from "react-select";
@@ -23,11 +23,11 @@ const StepInfo = ({ currentStep, onBack }) => {
       info: "Certifications and training",
     },
     4: {
-      step: "step 4",
+      step: "Step 4",
       info: "Upload CV & Profile Picture",
     },
     5: {
-      step: "step 5",
+      step: "Step 5",
       info: "Create Password",
     },
   };
@@ -146,20 +146,13 @@ const Signup = () => {
       <div className="check-bg">
         <div className="flex flex-column lg:flex-row align-content-start justify-content-center gap-0 login bg-inner testing">
           <div
-            className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center bgImage"
+            className="flex-1 flex-column bg-cover flex align-items-center justify-content-center left-panel bg-center"
             style={{
-              backgroundImage: `url(${backgroundImage})`,
-              height: "100vh",
-              width: "100%",
-              backgroundAttachment: "fixed",
-              backgroundPosition: "center",
-              backgroundSize: "cover",
-              objectFit: "cover",
-              overflow: "hidden",
+              backgroundImage: `url(${backgroundImage})`
             }}
           >
             <div className="login-content">
-              <img src={yachtCrew} style={{ width: "100%" }} alt="" />
+              {/* Removed yachtCrew image */}
             </div>
           </div>
 
