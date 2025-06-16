@@ -1,97 +1,81 @@
+@use "../mixins/breakpoints" as bp;
+
 .right-panel-component {
-    .card-wrapper-gap {
-        .p-tabview-nav-container{
-            .p-tabview-nav{
-                .pendingHeading  a{
-                    color: #D9712A;
-                }
-                .progressHeading a{
-                    color: #188A42;
-                }
-                .completeHeading a {
-                    color: #337E89;
-                }
-                
-                
-            }
-            
+  .card-wrapper-gap {
+    .p-tabview-nav-container {
+      .p-tabview-nav {
+        .pendingHeading a {
+          color: #d9712a;
         }
-        .form-container {
-            .horizontalLine {
-                border: 1px solid #DEE2E6;
+        .progressHeading a {
+          color: #188a42;
+        }
+        .completeHeading a {
+          color: #337e89;
+        }
+      }
+    }
+    .form-container {
+      .horizontalLine {
+        border: 1px solid #dee2e6;
+      }
 
-            }
+      .parts {
+        border-bottom: 1px solid #dee2e6;
 
-            .parts {
-                border-bottom: 1px solid #DEE2E6;
-
-                .p-button-icon {
-                    color: #556376;
-                }
-
-                .p-button-label {
-                    color: #556376;
-                }
-
-            }
-
-           
-
-            .p-card {
-                margin-bottom: 20px;
-                border-radius: 10px;
-                background-color: #F4F4F4;
-                box-shadow: none;
-                margin-top: 15px;
-
-
-            }
-
-            .content{
-                .contentHeading{
-                    font-size: 14px;
-                    color: #212121;
-                }
-                .contentPara{
-                    font-size: 14px;
-                    color: #000000;
-                }
-            }
-
+        .p-button-icon {
+          color: #556376;
         }
 
+        .p-button-label {
+          color: #556376;
+        }
+      }
 
+      .p-card {
+        margin-bottom: 20px;
+        border-radius: 14px;
+        background-color: #fff;
+        box-shadow: 0 2px 12px rgba(4, 135, 217, 0.08);
+        margin-top: 15px;
+        padding: 18px 14px 14px 14px;
+        @include bp.bp(phone-end) {
+          padding: 12px 8px 10px 8px;
+        }
+      }
 
+      .content {
+        .contentHeading {
+          font-size: 14px;
+          color: #212121;
+        }
+        .contentPara {
+          font-size: 14px;
+          color: #000000;
+        }
+      }
     }
-    .tabview-in-progress .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-        border-color: #188A42;
-    }
-    
-    .tabview-pending .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-        border-color: #D9712A;
-    }
-    
-    .tabview-completed .p-tabview-nav li.p-highlight .p-tabview-nav-link {
-        border-color: #337E89;
-    }
-  
+  }
+  .tabview-in-progress .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    border-color: #188a42;
+  }
 
+  .tabview-pending .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    border-color: #d9712a;
+  }
+
+  .tabview-completed .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+    border-color: #337e89;
+  }
 }
 
 .smooth-transition {
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  
-  .smooth-transition.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
 
-
-
-
-
-
+.smooth-transition.show {
+  opacity: 1;
+  transform: translateY(0);
+}

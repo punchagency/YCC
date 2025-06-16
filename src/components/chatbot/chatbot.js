@@ -421,16 +421,16 @@ const Chatbot = () => {
             position: "fixed",
             bottom: 19,
             right: 19,
-            display: {
-              xs: "block",
-              md: "none",
-            },
+            display: "block",
             backgroundColor: "transparent",
             boxShadow: "none", // Removes the shadow
+            animation: "chatbotPulse 1.5s infinite",
             "&:hover": {
               backgroundColor: "transparent", // Prevents background change on hover
               boxShadow: "none", // Ensures no shadow on hover
+              animation: "chatbotPulse 0.7s infinite",
             },
+            zIndex: 1300,
           }}
         >
           <img
@@ -463,8 +463,15 @@ const Chatbot = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              width: "90%",
-              maxHeight: "40vh",
+              width: { xs: "95vw", sm: "400px" },
+              maxWidth: { xs: "400px", sm: "400px" },
+              height: { xs: "70vh", sm: "70vh" },
+              maxHeight: { xs: "80vh", sm: "80vh" },
+              minHeight: "320px",
+              background: "white",
+              borderRadius: "24px",
+              boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+              p: 0,
             }}
           >
             {/* Chat section */}
@@ -1031,5 +1038,15 @@ const ChatbotFooterText = styled(Typography)({
   letterSpacing: "0%",
   color: "#667085",
 });
+
+// Add keyframes for chatbotPulse animation
+const style = document.createElement("style");
+style.innerHTML = `
+@keyframes chatbotPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0.4); }
+  70% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(4,135,217,0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(4,135,217,0); }
+}`;
+document.head.appendChild(style);
 
 export default Chatbot;

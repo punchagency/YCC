@@ -49,7 +49,17 @@ const DocumentBox = () => {
 
   return (
     <>
+      <style>{`
+        @media (max-width: 600px) {
+          .document-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            padding: 10px !important;
+          }
+        }
+      `}</style>
       <div
+        className="document-grid"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",

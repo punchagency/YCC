@@ -26,6 +26,7 @@ import { useTheme } from "../context/theme/themeContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { ConfirmDialog } from "primereact/confirmdialog";
 import "../styles/menu.css";
+import CustomButton from "./Button";
 
 const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
@@ -42,25 +43,31 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       acceptClassName: "p-button-danger",
       acceptLabel: "Yes",
       rejectLabel: "Cancel",
+      style: { textAlign: "center" },
       accept: () => {
         localStorage.removeItem("token");
-        navigate("/login");
+        localStorage.removeItem("id");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
       },
-      reject: () => {
-        // Do nothing on cancel
-      },
-      style: { textAlign: "center" },
       footer: (options) => (
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
           <Button
             label="Cancel"
-            className="p-button-outlined"
+            className="p-button-text"
             onClick={options.reject}
+            style={{
+              width: "100px",
+              backgroundColor: "#f3f4f6",
+              color: "#000000",
+              border: "1px solid #e5e7eb",
+            }}
           />
           <Button
             label="Yes"
             className="p-button-danger"
             onClick={options.accept}
+            style={{ width: "100px" }}
           />
         </div>
       ),
@@ -247,12 +254,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       separator: true,
       style: { margin: "15px 0" },
     },
-    {
-      label: "Log Out",
-      icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,
-      command: handleLogout,
-      style: { color: "#FF4B4B" },
-    },
   ];
 
   const adminMenuItems = [
@@ -374,12 +375,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       separator: true,
       style: { margin: "15px 0" },
     },
-    {
-      label: "Log Out",
-      icon: <img src={logoutLogo} alt="Log Out" width={15} height={15} />,
-      command: handleLogout,
-      style: { color: "#FF4B4B" },
-    },
   ];
 
   const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
@@ -475,11 +470,14 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
         style={{
           backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
         }}
       >
         <div className="flex justify-content-center align-items-center logo-wraper">
           <div className="logo relative">
-            <a href={isCrewMember ? "/crew/dashboard" : "/admin/dashboard"}>
+            <a href={isCrewMember ? "/" : "/"}>
               <img src={logo} alt="Company logo" className="image-full" />
             </a>
           </div>
@@ -490,8 +488,44 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
           />
         </div>
-        <div>
+        <div style={{ flex: 1, overflowY: "auto" }}>
           <PanelMenu model={menuItems} />
+        </div>
+        <div
+          style={{
+            padding: "24px",
+            borderTop: "1px solid #f0f0f0",
+            background: "inherit",
+          }}
+        >
+          <CustomButton
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "#FFE5E5",
+              color: "#FF4B4B",
+              border: "2px solid #FFB3B3",
+              borderRadius: 8,
+              fontWeight: 700,
+              width: "100%",
+              fontSize: 16,
+              transition: "all 0.2s",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#FFB3B3";
+              e.target.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#FFE5E5";
+              e.target.style.color = "#FF4B4B";
+            }}
+          >
+            <img src={logoutLogo} alt="Log Out" width={18} height={18} /> Log
+            Out
+          </CustomButton>
         </div>
       </div>
     </>

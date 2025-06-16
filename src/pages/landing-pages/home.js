@@ -7,7 +7,7 @@ import Section3Home from '../../components/home/section3-home'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section4Home from '../../components/home/section4-home'
 import LandingPageBanner from '../../components/landing-page-banner'
-import Chatbot from '../../components/chatbot/chatbot'
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 
 const HomeLandingPage = () => {
   useEffect(() => {
@@ -32,7 +32,6 @@ const HomeLandingPage = () => {
   }
   const page = 'home'
   return (
-
     <Box sx={{
       display: "flex",
       flexDirection: "column",
@@ -44,35 +43,22 @@ const HomeLandingPage = () => {
       },    
       maxWidth: '100vw'
     }}>
-    
- 
-         <LandingPageBanner
-      backgroundImage={backgroundImage}
-      header={header}
-      subtext1={subtext1}
-      subtext2={subtext2}
-      button1={button1}
-      button2={button2}
-      page = {page}
+      <LandingPageBanner
+        backgroundImage={backgroundImage}
+        header={header}
+        subtext1={subtext1}
+        subtext2={subtext2}
+        button1={button1}
+        button2={button2}
+        page={page}
       />
-         <Section1Home />
-         <Chatbot />
-         <Section2Home />
-         <Section3Home />
-         <Section4Home />
-         <LandingPageFooter />
-      {/*
-
-   
-
-            
-    
-       */}
-      {/* <Section4Home />*/}
-      {/*  <LandingPageFooter />*/}
-
+      <Section1Home />
+      <LandingPageChatbot />
+      <Section2Home />
+      <Section3Home />
+      <Section4Home />
+      <LandingPageFooter />
     </Box>
-
   );
 };
 
@@ -106,6 +92,5 @@ const GradientText = (props) => (
     {props.children}
   </Typography>
 );
-
 
 export default HomeLandingPage

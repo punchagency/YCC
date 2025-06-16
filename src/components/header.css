@@ -26,7 +26,7 @@
   bottom: -40px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1F2937;
+  background: #1f2937;
   color: white;
   padding: 8px 12px;
   border-radius: 6px;
@@ -46,7 +46,7 @@
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent transparent #1F2937 transparent;
+  border-color: transparent transparent #1f2937 transparent;
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
@@ -70,7 +70,7 @@
 }
 
 .notifications-btn:hover svg {
-  color: #0387D9 !important;
+  color: #0387d9 !important;
 }
 
 .notifications-btn::before {
@@ -79,7 +79,7 @@
   bottom: -40px;
   left: 50%;
   transform: translateX(-50%);
-  background: #1F2937;
+  background: #1f2937;
   color: white;
   padding: 8px 12px;
   border-radius: 6px;
@@ -99,7 +99,7 @@
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: transparent transparent #1F2937 transparent;
+  border-color: transparent transparent #1f2937 transparent;
   opacity: 0;
   visibility: hidden;
   transition: all 0.2s ease;
@@ -119,7 +119,7 @@
 }
 
 .profile-section:hover .profile-image {
-  box-shadow: 0 0 0 3px #0387D9;
+  box-shadow: 0 0 0 3px #0387d9;
   transform: scale(1.02);
 }
 
@@ -129,7 +129,7 @@
 }
 
 .profile-section:hover .profile-image {
-  border-color: #0387D9;
+  border-color: #0387d9;
 }
 
 @media screen and (max-width: 768px) {
@@ -147,6 +147,19 @@
   /* Add padding to the body to account for fixed header */
   body {
     padding-top: 64px;
+  }
+  /* Optional - Even narrower devices (older phones, etc.) */
+  @media (max-width: 480px) {
+    body {
+      padding-top: 0px;
+    }
+  }
+
+  /* General mobile + small tablets */
+  @media (max-width: 768px) {
+    body {
+      padding-top: 0px;
+    }
   }
 
   /* Ensure proper spacing between header elements */

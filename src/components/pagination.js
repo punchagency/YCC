@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 export const Pagination = ({
   currentPage,
@@ -9,7 +9,7 @@ export const Pagination = ({
   isMobile = false,
   isTablet = false,
 }) => {
-  if (totalPages <= 1) return null
+  if (totalPages <= 1) return null;
 
   return (
     <div
@@ -32,8 +32,9 @@ export const Pagination = ({
           textAlign: "center",
         }}
       >
-        Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of{" "}
-        {totalItems} results
+        Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+        {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}{" "}
+        results
       </div>
 
       {/* Pagination controls */}
@@ -45,7 +46,8 @@ export const Pagination = ({
           background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
           padding: isMobile ? "8px" : "12px",
           borderRadius: "12px",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+          boxShadow:
+            "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
           border: "1px solid #e2e8f0",
           maxWidth: "100%",
           overflowX: "auto",
@@ -73,20 +75,20 @@ export const Pagination = ({
           title="Previous page"
           onMouseEnter={(e) => {
             if (currentPage !== 1) {
-              e.target.style.backgroundColor = "#0387D9"
-              e.target.style.borderColor = "#0387D9"
-              e.target.style.color = "#ffffff"
-              e.target.style.transform = "translateY(-1px)"
-              e.target.style.boxShadow = "0 4px 12px rgba(3, 135, 217, 0.3)"
+              e.target.style.backgroundColor = "#0387D9";
+              e.target.style.borderColor = "#0387D9";
+              e.target.style.color = "#ffffff";
+              e.target.style.transform = "translateY(-1px)";
+              e.target.style.boxShadow = "0 4px 12px rgba(3, 135, 217, 0.3)";
             }
           }}
           onMouseLeave={(e) => {
             if (currentPage !== 1) {
-              e.target.style.backgroundColor = "#ffffff"
-              e.target.style.borderColor = "#e2e8f0"
-              e.target.style.color = "#374151"
-              e.target.style.transform = "translateY(0)"
-              e.target.style.boxShadow = "none"
+              e.target.style.backgroundColor = "#ffffff";
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.color = "#374151";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
             }
           }}
         >
@@ -94,15 +96,24 @@ export const Pagination = ({
         </button>
 
         {/* Page numbers */}
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? "2px" : "4px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: isMobile ? "2px" : "4px",
+          }}
+        >
           {(() => {
-            const pages = []
-            const showPages = isMobile ? 3 : 5
-            let startPage = Math.max(1, currentPage - Math.floor(showPages / 2))
-            const endPage = Math.min(totalPages, startPage + showPages - 1)
+            const pages = [];
+            const showPages = isMobile ? 3 : 5;
+            let startPage = Math.max(
+              1,
+              currentPage - Math.floor(showPages / 2)
+            );
+            const endPage = Math.min(totalPages, startPage + showPages - 1);
 
             if (endPage - startPage + 1 < showPages) {
-              startPage = Math.max(1, endPage - showPages + 1)
+              startPage = Math.max(1, endPage - showPages + 1);
             }
 
             // First page
@@ -128,21 +139,21 @@ export const Pagination = ({
                     flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#0387D9"
-                    e.target.style.borderColor = "#0387D9"
-                    e.target.style.color = "#ffffff"
-                    e.target.style.transform = "translateY(-1px)"
+                    e.target.style.backgroundColor = "#0387D9";
+                    e.target.style.borderColor = "#0387D9";
+                    e.target.style.color = "#ffffff";
+                    e.target.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "#ffffff"
-                    e.target.style.borderColor = "#e2e8f0"
-                    e.target.style.color = "#374151"
-                    e.target.style.transform = "translateY(0)"
+                    e.target.style.backgroundColor = "#ffffff";
+                    e.target.style.borderColor = "#e2e8f0";
+                    e.target.style.color = "#374151";
+                    e.target.style.transform = "translateY(0)";
                   }}
                 >
                   1
-                </button>,
-              )
+                </button>
+              );
 
               if (startPage > 2) {
                 pages.push(
@@ -156,14 +167,14 @@ export const Pagination = ({
                     }}
                   >
                     ...
-                  </span>,
-                )
+                  </span>
+                );
               }
             }
 
             // Page numbers
             for (let i = startPage; i <= endPage; i++) {
-              const isActive = i === currentPage
+              const isActive = i === currentPage;
               pages.push(
                 <button
                   key={i}
@@ -175,35 +186,39 @@ export const Pagination = ({
                     width: isMobile ? "28px" : "32px",
                     height: isMobile ? "28px" : "32px",
                     borderRadius: "6px",
-                    border: isActive ? "2px solid #0387D9" : "1px solid #e2e8f0",
+                    border: isActive
+                      ? "2px solid #0387D9"
+                      : "1px solid #e2e8f0",
                     backgroundColor: isActive ? "#0387D9" : "#ffffff",
                     color: isActive ? "#ffffff" : "#374151",
                     cursor: "pointer",
                     transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                     fontSize: isMobile ? "12px" : "14px",
                     fontWeight: isActive ? "600" : "500",
-                    boxShadow: isActive ? "0 4px 12px rgba(3, 135, 217, 0.3)" : "none",
+                    boxShadow: isActive
+                      ? "0 4px 12px rgba(3, 135, 217, 0.3)"
+                      : "none",
                     transform: isActive ? "translateY(-1px)" : "translateY(0)",
                     flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.target.style.backgroundColor = "#f1f5f9"
-                      e.target.style.borderColor = "#cbd5e1"
-                      e.target.style.transform = "translateY(-1px)"
+                      e.target.style.backgroundColor = "#f1f5f9";
+                      e.target.style.borderColor = "#cbd5e1";
+                      e.target.style.transform = "translateY(-1px)";
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
-                      e.target.style.backgroundColor = "#ffffff"
-                      e.target.style.borderColor = "#e2e8f0"
-                      e.target.style.transform = "translateY(0)"
+                      e.target.style.backgroundColor = "#ffffff";
+                      e.target.style.borderColor = "#e2e8f0";
+                      e.target.style.transform = "translateY(0)";
                     }
                   }}
                 >
                   {i}
-                </button>,
-              )
+                </button>
+              );
             }
 
             // Last page
@@ -220,8 +235,8 @@ export const Pagination = ({
                     }}
                   >
                     ...
-                  </span>,
-                )
+                  </span>
+                );
               }
 
               pages.push(
@@ -245,24 +260,24 @@ export const Pagination = ({
                     flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.backgroundColor = "#0387D9"
-                    e.target.style.borderColor = "#0387D9"
-                    e.target.style.color = "#ffffff"
-                    e.target.style.transform = "translateY(-1px)"
+                    e.target.style.backgroundColor = "#0387D9";
+                    e.target.style.borderColor = "#0387D9";
+                    e.target.style.color = "#ffffff";
+                    e.target.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.backgroundColor = "#ffffff"
-                    e.target.style.borderColor = "#e2e8f0"
-                    e.target.style.color = "#374151"
-                    e.target.style.transform = "translateY(0)"
+                    e.target.style.backgroundColor = "#ffffff";
+                    e.target.style.borderColor = "#e2e8f0";
+                    e.target.style.color = "#374151";
+                    e.target.style.transform = "translateY(0)";
                   }}
                 >
                   {totalPages}
-                </button>,
-              )
+                </button>
+              );
             }
 
-            return pages
+            return pages;
           })()}
         </div>
 
@@ -288,20 +303,20 @@ export const Pagination = ({
           title="Next page"
           onMouseEnter={(e) => {
             if (currentPage !== totalPages) {
-              e.target.style.backgroundColor = "#0387D9"
-              e.target.style.borderColor = "#0387D9"
-              e.target.style.color = "#ffffff"
-              e.target.style.transform = "translateY(-1px)"
-              e.target.style.boxShadow = "0 4px 12px rgba(3, 135, 217, 0.3)"
+              e.target.style.backgroundColor = "#0387D9";
+              e.target.style.borderColor = "#0387D9";
+              e.target.style.color = "#ffffff";
+              e.target.style.transform = "translateY(-1px)";
+              e.target.style.boxShadow = "0 4px 12px rgba(3, 135, 217, 0.3)";
             }
           }}
           onMouseLeave={(e) => {
             if (currentPage !== totalPages) {
-              e.target.style.backgroundColor = "#ffffff"
-              e.target.style.borderColor = "#e2e8f0"
-              e.target.style.color = "#374151"
-              e.target.style.transform = "translateY(0)"
-              e.target.style.boxShadow = "none"
+              e.target.style.backgroundColor = "#ffffff";
+              e.target.style.borderColor = "#e2e8f0";
+              e.target.style.color = "#374151";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
             }
           }}
         >
@@ -309,5 +324,5 @@ export const Pagination = ({
         </button>
       </div>
     </div>
-  )
-}
+  );
+};

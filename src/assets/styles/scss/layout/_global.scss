@@ -5,11 +5,9 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
 
-
-
 :root {
   --bg-color: #ffffff;
-  --text-color: #103B57;
+  --text-color: #103b57;
   --card-bg: #ffffff;
   --border-color: #e0e0e0;
   --primary-color: #0387d9;
@@ -23,7 +21,7 @@
 
 .dark-theme {
   --bg-color: #03141f;
-  --text-color: #F8FBFF;
+  --text-color: #f8fbff;
   --card-bg: #0a2133;
   --border-color: #1e3a4f;
   --sidebar-bg: #051825;
@@ -246,7 +244,7 @@
 // Priority styles
 .priority-high {
   background-color: #e2f9f0;
-  color: purple !important;  // Changed to purple
+  color: purple !important; // Changed to purple
   width: 100px;
   text-align: center;
   font-weight: bold;
@@ -340,8 +338,8 @@
       align-items: center;
       padding: 0.75rem 0;
       border-bottom: 1px solid #eee;
-      
-      color:orange;
+
+      color: orange;
 
       &:last-child {
         border-bottom: none;
@@ -364,7 +362,7 @@
 
         &.priority-high {
           background-color: #e2f9f0;
-          color: purple;  // Changed to purple
+          color: purple; // Changed to purple
         }
 
         &.priority-medium {
@@ -415,7 +413,7 @@
 
 /* Update existing priority styles to match filter colors */
 .priority-high {
-  color: purple !important;  // Changed to purple
+  color: purple !important; // Changed to purple
 }
 
 .priority-medium {
@@ -458,7 +456,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  
 }
 
 .report-container-inventory-reports {
@@ -548,7 +545,7 @@
   max-height: 130px;
   padding: 16px; // Adjusted padding
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
-  h2{
+  h2 {
     font-size: 100px;
     font-weight: bold;
   }
@@ -768,27 +765,7 @@ ul {
   text-align: left;
   min-height: calc(100vh - 144px);
   @include bp.bp(custome-375) {
-    padding: 20px 15px;
-  }
-  .form-container {
-    .p-tabview {
-      .p-tabview-nav-container {
-        .p-tabview-nav-content {
-          .p-tabview-nav {
-            display: flex;
-            flex-direction: row;
-            width: 100%;
-            //  border-bottom: 2px solid #d1d5db;
-            .p-unselectable-text {
-              .p-tabview-nav-link {
-                font-size: 14px;
-                color: #212121;
-              }
-            }
-          }
-        }
-      }
-    }
+    padding: 20px 15px 60px 15px; // extra bottom padding for chat button
   }
 }
 
@@ -798,6 +775,7 @@ ul {
   margin-bottom: 20px;
   @include bp.bp(phone-end) {
     column-count: 1;
+    column-gap: 0;
   }
   &:last-child {
     margin-bottom: 0;
@@ -805,11 +783,18 @@ ul {
   .item {
     margin-bottom: 20px;
     break-inside: avoid;
+    @include bp.bp(phone-end) {
+      margin-bottom: 16px;
+    }
   }
 }
 
 .p-card {
   width: 100%;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(4, 135, 217, 0.08);
+  background: #fff;
+  margin-bottom: 18px;
   .p-card-title {
     font-size: 18px;
     font-weight: 600;
@@ -817,144 +802,19 @@ ul {
     @include bp.bp(custome-991) {
       font-size: 17px;
     }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      .three-dot-menu {
-        .p-button {
-          &.p-button-icon-only {
-            &.p-button-rounded {
-              border-radius: 0;
-              height: auto;
-              padding: 0;
-              width: auto;
-              color: #000;
-            }
-          }
-          &.p-button-text {
-            &:not(:disabled):hover {
-              background: transparent;
-              color: #000;
-            }
-          }
-          &:focus {
-            box-shadow: 0 0 0 0px #ffffff, 0 0 0 0px #b1b3f8,
-              0 0px 0px 0 rgb(0, 0, 0);
-          }
-        }
-      }
-    }
   }
   .p-card-content {
-    padding: 0;
+    padding: 16px 14px 14px 14px;
     padding-top: 15px;
-  }
-  &.role-card {
-    .p-card-body {
-      .p-card-content {
-        padding-top: 0px;
-        .card-header {
-          margin-bottom: 20px;
-          .card-icon {
-            max-width: 49px;
-          }
-          .card-heading {
-            padding-left: 20px;
-            h3 {
-              &.title {
-                font-size: 18px;
-                font-weight: 500;
-                color: #212121;
-              }
-            }
-            p {
-              &.subtitle {
-                font-size: 12px;
-                font-weight: 500;
-                color: #757575;
-              }
-            }
-          }
-        }
-        .card-content {
-          font-size: 14px;
-          font-weight: 400;
-          color: #757575;
-        }
-      }
+    @include bp.bp(phone-end) {
+      padding: 12px 8px 10px 8px;
     }
   }
-  &.details-card {
-    .p-card-title {
-      padding-bottom: 8px;
-    }
-    .p-card-content {
-      border-top: 1px solid #e0e0e0;
-      .details-content {
-        display: flex;
-        border-bottom: 1px solid #dfe7ef;
-        width: 100%;
-        margin-bottom: 14px;
-        flex-wrap: wrap;
-        .details-content-lable {
-          width: 30%;
-          padding-bottom: 14px;
-          color: #9e9e9e;
-          font-size: 14px;
-          font-weight: 500;
-          word-wrap: break-word;
-          padding-right: 20px;
-          @include bp.bp(custome-1440) {
-            width: 40%;
-          }
-          @include bp.bp(custome-991) {
-            box-sizing: border-box;
-            line-height: 20px;
-          }
-        }
-        .details-content-text {
-          width: 70%;
-          padding-bottom: 14px;
-          color: #111;
-          font-size: 14px;
-          font-weight: 400;
-          word-wrap: break-word;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          overflow-wrap: anywhere;
-          @include bp.bp(custome-1440) {
-            width: 60%;
-          }
-          @include bp.bp(custome-991) {
-            padding-left: 20px;
-            box-sizing: border-box;
-          }
-        }
-        &:last-child {
-          border-bottom: 0px solid #dfe7ef;
-          margin-bottom: 0px;
-        }
-      }
-      .detail-item {
-        .p-d-flex {
-          .download-btn {
-            .p-button-label {
-              @include bp.bp(custome-568) {
-                display: none;
-              }
-            }
-            .p-button-icon {
-              @include bp.bp(custome-568) {
-                margin-right: 0rem;
-                margin-left: 0rem;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+}
+
+// Utility class for extra bottom padding (for chat button)
+.pb-chat-btn {
+  padding-bottom: 80px !important;
 }
 
 .right-aligned-menu .p-menu {
@@ -1413,7 +1273,7 @@ label {
   position: absolute;
   width: 100%;
   background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .select__container {
@@ -1750,12 +1610,12 @@ label {
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #034D92;
+    border-color: #034d92;
     background: #f5f5f5;
   }
 
   &:focus-within {
-    border-color: #034D92;
+    border-color: #034d92;
     box-shadow: 0 0 0 2px rgba(3, 77, 146, 0.1);
     background: #fff;
   }
@@ -1834,11 +1694,11 @@ label {
 
   &--is-focused {
     background: #f0f7ff;
-    color: #034D92;
+    color: #034d92;
   }
 
   &--is-selected {
-    background: #034D92;
+    background: #034d92;
     color: #fff;
   }
 }
@@ -1888,7 +1748,7 @@ label {
     height: 18px;
     margin: 0;
     cursor: pointer;
-    accent-color: #034D92;
+    accent-color: #034d92;
   }
 
   label {
@@ -2160,7 +2020,6 @@ label {
 
 // Make main content adjust for sidebar
 .main-content {
-  margin-left: 250px;
   padding: 20px;
 }
 
@@ -4334,16 +4193,16 @@ label {
         font-weight: 500;
 
         &.priority-high {
-          background: #E2F9F0 !important;
+          background: #e2f9f0 !important;
           color: purple !important;
         }
         &.priority-medium {
-          background: #FFFEDB !important;
-          color: #827F29 !important;
+          background: #fffedb !important;
+          color: #827f29 !important;
         }
         &.priority-low {
-          background: #E414171A !important;
-          color: #DB5F61 !important;
+          background: #e414171a !important;
+          color: #db5f61 !important;
         }
       }
 
@@ -4427,7 +4286,8 @@ label {
     width: 100%;
     border-collapse: collapse;
 
-    th, td {
+    th,
+    td {
       padding: 16px;
       text-align: left;
       border-bottom: 1px solid #f1f5f9;
@@ -4437,7 +4297,7 @@ label {
       font-weight: 600;
       color: #64748b;
       font-size: 14px;
-      
+
       i {
         margin-left: 4px;
         font-size: 12px;
@@ -4497,7 +4357,7 @@ label {
 }
 
 .settings-container {
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 8px;
   padding: 24px;
   margin: 20px;
@@ -4514,7 +4374,7 @@ label {
     label {
       display: block;
       margin-bottom: 8px;
-      color: #1E293B;
+      color: #1e293b;
       font-weight: 500;
       font-size: 14px;
     }
@@ -4524,7 +4384,7 @@ label {
     .p-dropdown {
       width: 100%;
       height: 40px;
-      border: 1px solid #E2E8F0;
+      border: 1px solid #e2e8f0;
       border-radius: 4px;
       font-size: 14px;
     }
@@ -4534,12 +4394,12 @@ label {
       align-items: center;
       justify-content: space-between;
       padding: 8px 16px;
-      border: 1px solid #E2E8F0;
+      border: 1px solid #e2e8f0;
       border-radius: 4px;
       height: 40px;
 
       span {
-        color: #64748B;
+        color: #64748b;
         font-size: 14px;
       }
     }
@@ -4603,7 +4463,7 @@ label {
 
   .p-panelmenu-header {
     background-color: transparent !important;
-    
+
     > a {
       background-color: transparent !important;
       color: var(--text-color) !important;
@@ -4611,7 +4471,9 @@ label {
       padding: 1rem;
 
       // Remove all hover styles
-      &:hover, &:focus, &:active {
+      &:hover,
+      &:focus,
+      &:active {
         background-color: transparent !important;
         color: inherit !important;
         box-shadow: none !important;
@@ -4632,14 +4494,17 @@ label {
         border: none !important;
 
         // Remove all hover styles
-        &:hover, &:focus, &:active {
+        &:hover,
+        &:focus,
+        &:active {
           background-color: transparent !important;
           color: inherit !important;
           box-shadow: none !important;
         }
 
         // Override PrimeReact's default hover styles
-        .p-menuitem-text, .p-menuitem-icon {
+        .p-menuitem-text,
+        .p-menuitem-icon {
           &:hover {
             color: inherit !important;
           }
@@ -4663,11 +4528,11 @@ label {
   .p-menuitem-text {
     color: var(--text-color) !important;
   }
-  
+
   .p-menuitem-icon {
     color: var(--text-color) !important;
   }
-  
+
   // Override hover states specifically targeting text
   .p-menuitem-link:hover .p-menuitem-text,
   .p-menuitem-link:focus .p-menuitem-text,
@@ -4676,10 +4541,14 @@ label {
   a.p-panelmenu-header-link:hover span {
     color: var(--text-color) !important;
   }
-  
+
   // Force text color
-  span, a, div {
-    &:hover, &:focus, &:active {
+  span,
+  a,
+  div {
+    &:hover,
+    &:focus,
+    &:active {
       color: var(--text-color) !important;
     }
   }

@@ -1,0 +1,16 @@
+.sign-in-btn-text {
+  background: linear-gradient(90deg, #034D92, #0487D9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: background 0.3s, color 0.3s, -webkit-text-fill-color 0.3s;
+}
+
+.sign-in-btn:hover .sign-in-btn-text,
+.sign-in-btn:focus .sign-in-btn-text,
+.sign-in-btn:active .sign-in-btn-text {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  -webkit-text-fill-color: #fff !important;
+  color: #fff !important;
+} 

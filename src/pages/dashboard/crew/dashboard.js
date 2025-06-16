@@ -14,7 +14,6 @@ const CrewDashboard1 = () => {
         backgroundColor: "white",
       }}
     >
-      <DashboardTitleBar title="Dashboard" />
       <Dashboard1 />
     </Box>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Select from "react-select";
 import countriesData from "../../../data/countries.json";
 import searchIcon from "../../../assets/images/crew/searchLogo.png";
@@ -69,16 +69,70 @@ const LegalSearch = ({
   searchText,
   setSearchText,
 }) => {
+  // For SSR safety
+  const isClient = typeof window !== "undefined";
+  const selectRef = useRef();
+
+  useEffect(() => {
+    if (isClient && document.body) {
+      // Ensure body has position: relative for portal
+      document.body.style.position = "relative";
+    }
+  }, [isClient]);
+
   return (
     <>
+      <style>{`
+        @media (max-width: 600px) {
+          .legal-search-header {
+            width: 100% !important;
+            margin-left: 0 !important;
+            padding: 0 8px !important;
+          }
+          .legal-search-bar {
+            width: 100% !important;
+            margin-left: 0 !important;
+            padding: 6px 0 !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+          }
+          .legal-search-bar input {
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+          .legal-search-bar .react-select__control {
+            min-width: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          .legal-search-bar .react-select__menu {
+            min-width: 0 !important;
+            width: 100vw !important;
+            left: 0 !important;
+            max-width: 100vw !important;
+          }
+          .react-select__menu-portal {
+            left: 0 !important;
+            width: 100vw !important;
+            min-width: 0 !important;
+            max-width: 100vw !important;
+            position: fixed !important;
+            z-index: 99999 !important;
+            top: 56px !important;
+          }
+        }
+      `}</style>
       <div>
         <div className="flex align-items-center justify-content-between p-4">
-          <div className="" style={{ width: "95%", marginLeft: "20px" }}>
+          <div
+            className="legal-search-header"
+            style={{ width: "95%", marginLeft: "20px" }}
+          >
             <h2>Legal Resources</h2>
           </div>
           <div className="flex align-items-center">
             <div
-              className="bg-transparent border-1 border-gray-300"
+              className="bg-transparent border-1 border-gray-300 legal-search-bar"
               style={{ width: "350px", borderRadius: "4px", padding: "5px" }}
             >
               <div className="flex align-items-center justify-content-between">
@@ -87,23 +141,45 @@ const LegalSearch = ({
                 </div>
                 <div style={{ width: "100%" }}>
                   <Select
+                    ref={selectRef}
+                    classNamePrefix="react-select"
                     options={countryOptions}
                     value={selectedCountry}
                     onChange={setSelectedCountry}
                     placeholder="Filter"
                     isClearable
+                    menuPortalTarget={isClient ? document.body : null}
+                    menuPosition="fixed"
                     components={{ Option: customOption }}
                     styles={{
-                      control: (base) => ({
+                      control: (base, state) => ({
                         ...base,
                         background: "transparent",
                         border: "none",
                         boxShadow: "none",
                         cursor: "pointer",
+                        minWidth: 0,
+                        width: "100%",
+                        maxWidth: "100%",
                       }),
                       menu: (base) => ({
                         ...base,
-                        zIndex: 9999,
+                        zIndex: 99999,
+                        minWidth: 0,
+                        width: "100vw",
+                        left: 0,
+                        maxWidth: "100vw",
+                        position: "fixed",
+                      }),
+                      menuPortal: (base) => ({
+                        ...base,
+                        left: 0,
+                        width: "100vw",
+                        minWidth: 0,
+                        maxWidth: "100vw",
+                        position: "fixed",
+                        zIndex: 99999,
+                        top: 56,
                       }),
                     }}
                   />
@@ -111,7 +187,7 @@ const LegalSearch = ({
               </div>
             </div>
             <div
-              className="border-1 border-gray-300"
+              className="border-1 border-gray-300 legal-search-bar"
               style={{
                 width: "350px",
                 borderRadius: "4px",
