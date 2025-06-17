@@ -32,6 +32,8 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
   const toast = useRef(null);
   const { id: userId } = useParams();
 
+  //console.log('inventoryData', inventoryData);
+
   // Sample data - replace with your actual data source
   const handleRowClick = (inventoryItem) => {
     setSelectedItem(inventoryItem);
@@ -42,6 +44,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
       quantity: inventoryItem.quantity,
       sku: inventoryItem.product.sku,
       price: formatAmount(inventoryItem.price), // Format price for display
+      warehouseLocation: inventoryItem.warehouseLocation || '',
     });
     setOpen(true);
   };
@@ -63,7 +66,8 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
         serviceArea: editedItem.serviceArea,
         quantity: Number(editedItem.quantity),
         price: unformatAmount(editedItem.price), // Convert formatted price back to number
-        sku: editedItem.sku || ''
+        sku: editedItem.sku || '',
+        warehouseLocation: editedItem.warehouseLocation || '',
       };
 
       const result = await updateInventoryItem(selectedItem._id, updateData, userId);
@@ -191,7 +195,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
               >
                 Product Category
               </TableCell>
-              <TableCell 
+              {/* <TableCell 
                 sx={{ 
                   fontWeight: 'bold', 
                   backgroundColor: '#f5f5f5',
@@ -200,7 +204,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                 }}
               >
                 Service Area
-              </TableCell>
+              </TableCell> */}
               <TableCell 
                 sx={{ 
                   fontWeight: 'bold', 
@@ -219,6 +223,16 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                 }}
               >
                 SKU
+              </TableCell>
+              <TableCell 
+                sx={{ 
+                  fontWeight: 'bold', 
+                  backgroundColor: '#f5f5f5',
+                  display: { xs: 'none', md: 'table-cell' },
+                  width: { md: '15%' }
+                }}
+              >
+                Warehouse Location
               </TableCell>
               <TableCell 
                 sx={{ 
@@ -267,7 +281,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                 >
                   {item.product.category}
                 </TableCell>
-                <TableCell 
+                {/* <TableCell 
                   sx={{ 
                     display: { xs: 'none', sm: 'table-cell' },
                     maxWidth: '120px',
@@ -278,7 +292,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                   title={item.product.serviceArea || "N/A"}
                 >
                   {item.product.serviceArea || "N/A"}
-                </TableCell>
+                </TableCell> */}
                 <TableCell>
                   {item.quantity}
                 </TableCell>
@@ -293,6 +307,18 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                   title={item.product.sku}
                 >
                   {item.product.sku}
+                </TableCell>
+                <TableCell 
+                  sx={{ 
+                    display: { xs: 'none', md: 'table-cell' },
+                    maxWidth: '120px',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title={item.warehouseLocation || "N/A"}
+                >
+                  {item.warehouseLocation || "N/A"}
                 </TableCell>
                 <TableCell
                   sx={{ 
@@ -344,6 +370,12 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
               label="SKU"
               value={editedItem?.sku || ''}
               onChange={handleChange('sku')}
+              fullWidth
+            />
+            <TextField
+              label="Warehouse Location"
+              value={editedItem?.warehouseLocation || ''}
+              onChange={handleChange('warehouseLocation')}
               fullWidth
             />
             <TextField
