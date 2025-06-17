@@ -50,8 +50,8 @@ const LandingPageHeader = () => {
   ];
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
+  const [departmentsAnchorEl, setDepartmentsAnchorEl] = useState(null);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -85,25 +85,23 @@ const LandingPageHeader = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleClick = (event, title) => {
-    setAnchorEl(event.currentTarget);
-    setOpenDropdown(title);
+  const handleDepartmentsClick = (event) => {
+    setDepartmentsAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-    setOpenDropdown(null);
+  const handleDepartmentsClose = () => {
+    setDepartmentsAnchorEl(null);
+  };
+
+  const handleProfileClick = (event) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchorEl(null);
   };
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
-
-  const handleProfileClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -192,7 +190,7 @@ const LandingPageHeader = () => {
               <Box key={item.title}>
                 <Button
                   color="inherit"
-                  onClick={(event) => handleClick(event, item.title)}
+                  onClick={handleDepartmentsClick}
                   sx={{
                     textTransform: "none",
                   }}
@@ -211,9 +209,9 @@ const LandingPageHeader = () => {
                   <KeyboardArrowDownIcon sx={{ color: "white" }} />
                 </Button>
                 <Menu
-                  anchorEl={anchorEl}
-                  open={openDropdown === item.title}
-                  onClose={handleClose}
+                  anchorEl={departmentsAnchorEl}
+                  open={Boolean(departmentsAnchorEl)}
+                  onClose={handleDepartmentsClose}
                   disablePortal
                   disableScrollLock
                   sx={{
@@ -229,7 +227,7 @@ const LandingPageHeader = () => {
                   {item.options.map((option) => (
                     <MenuItem
                       key={option}
-                      onClick={handleClose}
+                      onClick={handleDepartmentsClose}
                       component={Link}
                       to={option.route}
                       sx={{
@@ -309,58 +307,52 @@ const LandingPageHeader = () => {
         >
           {user ? (
             <>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <IconButton
                   onClick={handleProfileClick}
                   sx={{ p: 0, display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <Avatar
-                    src={user.avatar || "/default-avatar.png"}
-                    alt={user.name}
+                    src={user.crewProfile?.profilePicture || "/default-avatar.png"}
+                    alt={user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name}
                     sx={{
                       width: 40,
                       height: 40,
                     }}
                   />
-                  <KeyboardArrowDownIcon sx={{ color: "white", ml: 0.5 }} />
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography
+                        sx={{
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: 16,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name || user.fullName || "User"}
+                      </Typography>
+                      <KeyboardArrowDownIcon sx={{ color: "white", fontSize: 20 }} />
+                    </Box>
+                    <Typography
+                      sx={{
+                        color: "white",
+                        fontSize: 13,
+                        opacity: 0.85,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {user.role?.name
+                        ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ")
+                        : user.crewProfile?.position || ""}
+                    </Typography>
+                  </Box>
                 </IconButton>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    ml: 1,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: "white",
-                      fontWeight: 600,
-                      fontSize: 16,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {user.name || user.fullName || "User"}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: "white",
-                      fontSize: 13,
-                      opacity: 0.85,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {user.role
-                      ? user.role.charAt(0).toUpperCase() +
-                        user.role.slice(1).replace("_", " ")
-                      : ""}
-                  </Typography>
-                </Box>
               </Box>
               <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleMenuClose}
+                anchorEl={profileAnchorEl}
+                open={Boolean(profileAnchorEl)}
+                onClose={handleProfileClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
                 PaperProps={{
@@ -390,7 +382,7 @@ const LandingPageHeader = () => {
               >
                 <MenuItem
                   onClick={() => {
-                    handleMenuClose();
+                    handleProfileClose();
                     window.location.href = "/crew/dashboard";
                   }}
                 >
@@ -478,8 +470,8 @@ const LandingPageHeader = () => {
                 }}
               >
                 <Avatar
-                  src={user.avatar || "/default-avatar.png"}
-                  alt={user.name || "User"}
+                  src={user.crewProfile?.profilePicture || "/default-avatar.png"}
+                  alt={user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name}
                   sx={{
                     width: 56,
                     height: 56,
@@ -491,22 +483,21 @@ const LandingPageHeader = () => {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   }}
                 >
-                  {!user.avatar && user.name
+                  {!user.crewProfile && user.name
                     ? user.name[0].toUpperCase()
                     : null}
                 </Avatar>
                 <Typography
                   sx={{ color: "white", fontWeight: 700, fontSize: 16, mt: 1 }}
                 >
-                  {user.name || user.fullName || "User"}
+                  {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name || user.fullName || "User"}
                 </Typography>
                 <Typography
                   sx={{ color: "#000", fontSize: 13, fontWeight: 500 }}
                 >
-                  {user.role
-                    ? user.role.charAt(0).toUpperCase() +
-                      user.role.slice(1).replace("_", " ")
-                    : ""}
+                  {user.role?.name
+                    ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ")
+                    : user.crewProfile?.position || ""}
                 </Typography>
               </Box>
             )}

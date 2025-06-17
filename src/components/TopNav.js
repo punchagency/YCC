@@ -318,7 +318,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
           marginBottom: "30px",
         }}
       >
-        <div className="logo-container">
+        <div 
+          className="logo-container" 
+          onClick={() => navigate("/")}
+          style={{ cursor: "pointer" }}
+        >
           <img src={logo} alt="Logo" style={{ height: "40px" }} />
         </div>
         <Button

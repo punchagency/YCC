@@ -50,9 +50,9 @@ const CrewSetting = () => {
   useEffect(() => {
     // Populate form with user data when available
     if (user) {
-      // Set name from firstName and lastName if available
-      const firstName = user.firstName || user?.profile?.firstName || "";
-      const lastName = user.lastName || user?.profile?.lastName || "";
+      // Set name from crewProfile firstName and lastName if available
+      const firstName = user.crewProfile?.firstName || user.firstName || "";
+      const lastName = user.crewProfile?.lastName || user.lastName || "";
       setName(
         firstName && lastName
           ? `${firstName} ${lastName}`
@@ -61,8 +61,8 @@ const CrewSetting = () => {
 
       // Set email
       setEmail(user.email || "");
-      // Set phone
-      setPhone(user.phone || user?.profile?.phone || "");
+      // Set phone from crewProfile
+      setPhone(user.crewProfile?.phoneNumber || user.phone || "");
       // Set two-factor authentication status if available
       setTwoFactorEnabled(user.twoFactorEnabled || false);
 

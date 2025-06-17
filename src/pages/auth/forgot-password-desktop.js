@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo-login.png";
 import ForgotPasswordForm from "../../components/ForgotPasswordForm";
-import backgroundImage from "../../assets/images/captain_login_bg.jpg";
+import backgroundImage from "../../assets/images/crew/back.png";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { isMobile } from "../../components/ResponsiveDevice";
 import LandingPageChatbot from "../../components/chatbot/landing-page-chatbot";

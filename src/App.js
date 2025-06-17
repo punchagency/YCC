@@ -226,6 +226,14 @@ function App() {
                     }
                   />
                   <Route
+                    path="/crew/profile"
+                    element={
+                      <ProtectedRoute requiredRoles={["crew_member"]}>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/crew/calendar"
                     element={
                       <ProtectedRoute requiredRoles={["crew_member"]}>

@@ -33,7 +33,14 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const { user } = useUser();
-  const isCrewMember = user?.role === "crew_member";
+  
+  // Get role name from object or string
+  let userRole = user?.role;
+  if (typeof userRole === 'object' && userRole.name) {
+    userRole = userRole.name;
+  }
+  
+  const isCrewMember = userRole === "crew_member";
 
   const handleLogout = () => {
     confirmDialog({
@@ -248,7 +255,9 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         location.pathname === "/crew/settings"
           ? "active-menu-item menu-red-background"
           : "",
-      command: () => navigate("/crew/settings"),
+      command: () => {
+        navigate("/crew/settings");
+      },
     },
     {
       separator: true,

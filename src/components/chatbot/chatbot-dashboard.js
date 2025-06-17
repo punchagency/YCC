@@ -21,7 +21,14 @@ import { useUser } from "../../context/userContext";
 
 const ChatbotDashboard = () => {
     const { user } = useUser();
-    const role = user ? user.role.split('_')[0] : 'guest';
+    let role = 'guest';
+    if (user) {
+      if (typeof user.role === 'string') {
+        role = user.role.split('_')[0];
+      } else if (user.role && typeof user.role.name === 'string') {
+        role = user.role.name.split('_')[0];
+      }
+    }
 
     const {
         isAIAssistantOpen,
@@ -148,10 +155,32 @@ const ChatbotDashboard = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: { xs: '95vw', sm: '600px', md: '800px', lg: '900px' },
-                    maxWidth: '98vw',
-                    maxHeight: { xs: '90vh', md: '80vh', lg: '70vh' },
-                    minHeight: '350px',
+                    width: {
+                        xs: '97vw',
+                        sm: '97vw',
+                        md: '80vw',
+                        lg: '900px',
+                        xl: '900px',
+                        '@media (max-width:1100px)': '97vw',
+                    },
+                    maxWidth: {
+                        xs: '99vw',
+                        sm: '99vw',
+                        md: '900px',
+                        lg: '900px',
+                        xl: '900px',
+                        '@media (max-width:1100px)': '99vw',
+                    },
+                    minWidth: {
+                        xs: '280px',
+                        sm: '320px',
+                        md: '400px',
+                        lg: '400px',
+                        xl: '400px',
+                        '@media (max-width:1100px)': '280px',
+                    },
+                    maxHeight: '85vh',
+                    minHeight: '200px',
                 }}>
 
                     {/* Chat section */}
