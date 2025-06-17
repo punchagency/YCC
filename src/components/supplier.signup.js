@@ -14,6 +14,8 @@ import uploadfileLogo from "../assets/images/uploadfileLogo.png";
 import { signup } from "../services/authService";
 import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
+import TermsModal from "./TermsModal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // Replace the static supplierTypeOptions with a mapping of departments to their options
 const departmentSupplierTypes = {
@@ -144,6 +146,8 @@ const SupplierSignUpForm = ({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [setSuccess] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   // Add state to store current supplier type options
   const [supplierTypeOptions, setSupplierTypeOptions] = useState(
@@ -622,21 +626,70 @@ const SupplierSignUpForm = ({
                 cursor: "pointer"
               }}
             />
-            <label 
-              htmlFor="terms" 
-              style={{
-                cursor: "pointer",
-                fontSize: "14px",
-                color: "#333",
-                margin: "0",
-                lineHeight: "1.4"
-              }}
-            >
-              I agree to the Terms and Conditions
-            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+              <label 
+                htmlFor="terms" 
+                style={{
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: "#333",
+                  margin: "0",
+                  lineHeight: "1.4",
+                  flex: 1
+                }}
+              >
+                I agree to the{" "}
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsTermsModalOpen(true);
+                  }}
+                  style={{
+                    color: "#034D92",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#0487d9";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#034D92";
+                  }}
+                >
+                  Terms and Conditions
+                </span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsTermsModalOpen(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "24px",
+                  height: "24px",
+                  border: "none",
+                  borderRadius: "4px",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#f0f0f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                }}
+                title="View Terms and Conditions"
+              >
+                <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-        </div>
-        </div>
 
       {/* Privacy Policy */}
       <div className="form-group1">
@@ -662,18 +715,67 @@ const SupplierSignUpForm = ({
                 cursor: "pointer"
             }}
           />
-          <label
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+            <label
               htmlFor="privacy" 
             style={{
               cursor: "pointer",
               fontSize: "14px",
                 color: "#333",
                 margin: "0",
-                lineHeight: "1.4"
+                lineHeight: "1.4",
+                flex: 1
             }}
           >
-              I agree to the Privacy Policy
-          </label>
+              I agree to the{" "}
+              <span
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsPrivacyModalOpen(true);
+                }}
+                style={{
+                  color: "#034D92",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  transition: "color 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = "#0487d9";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = "#034D92";
+                }}
+              >
+                Privacy Policy
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={() => setIsPrivacyModalOpen(true)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "24px",
+                height: "24px",
+                border: "none",
+                borderRadius: "4px",
+                backgroundColor: "transparent",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "#f0f0f0";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "transparent";
+              }}
+              title="View Privacy Policy"
+            >
+              <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
+            </button>
+          </div>
           </div>
         </div>
         </div>
@@ -704,6 +806,24 @@ const SupplierSignUpForm = ({
           {isSubmitting ? "Submitting..." : "Submit Application"}
           </button>
       </div>
+
+      {/* Terms Modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        pdfUrl="/YCC Vendor Agreement.pdf"
+        title="YCC Vendor Agreement"
+        fileName="YCC-Vendor-Agreement.pdf"
+      />
+
+      {/* Privacy Policy Modal */}
+      <TermsModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        pdfUrl="/YCC Vendor Agreement.pdf"
+        title="Privacy Policy"
+        fileName="Privacy-Policy.pdf"
+      />
     </motion.div>
   );
 

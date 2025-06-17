@@ -15,11 +15,14 @@ import uploadfileLogo from "../assets/images/uploadfileLogo.png";
 import serviceLogo from "../assets/images/serviceLogo.png";
 import { signup } from "../services/authService";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
+import TermsModal from "./TermsModal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   // const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   // Add stepData object
   const stepData = {
@@ -1418,18 +1421,67 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 cursor: "pointer"
               }}
             />
-            <label 
-              htmlFor="terms" 
-              style={{ 
-                cursor: "pointer",
-                fontSize: "14px",
-                color: "#333",
-                margin: "0",
-                lineHeight: "1.4"
-              }}
-            >
-              I agree to the Terms and Conditions
-            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+              <label 
+                htmlFor="terms" 
+                style={{ 
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: "#333",
+                  margin: "0",
+                  lineHeight: "1.4",
+                  flex: 1
+                }}
+              >
+                I agree to the{" "}
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsTermsModalOpen(true);
+                  }}
+                  style={{
+                    color: "#034D92",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#0487d9";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#034D92";
+                  }}
+                >
+                  Terms and Conditions
+                </span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setIsTermsModalOpen(true)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "24px",
+                  height: "24px",
+                  border: "none",
+                  borderRadius: "4px",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = "#f0f0f0";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                }}
+                title="View Terms and Conditions"
+              >
+                <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1458,6 +1510,15 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           {isSubmitting ? "Submitting..." : "Submit Application"}
         </button>
       </div>
+
+      {/* Terms Modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        pdfUrl="/YCC Service Provider Agreement.pdf"
+        title="YCC Service Provider Agreement"
+        fileName="YCC-Service-Provider-Agreement.pdf"
+      />
     </motion.div>
   );
 
