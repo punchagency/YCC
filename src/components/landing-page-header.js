@@ -307,53 +307,47 @@ const LandingPageHeader = () => {
         >
           {user ? (
             <>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <IconButton
                   onClick={handleProfileClick}
                   sx={{ p: 0, display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <Avatar
-                    src={user.avatar || "/default-avatar.png"}
-                    alt={user.name}
+                    src={user.crewProfile?.profilePicture || "/default-avatar.png"}
+                    alt={user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name}
                     sx={{
                       width: 40,
                       height: 40,
                     }}
                   />
-                  <KeyboardArrowDownIcon sx={{ color: "white", ml: 0.5 }} />
+                  <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <Typography
+                        sx={{
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: 16,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name || user.fullName || "User"}
+                      </Typography>
+                      <KeyboardArrowDownIcon sx={{ color: "white", fontSize: 20 }} />
+                    </Box>
+                    <Typography
+                      sx={{
+                        color: "white",
+                        fontSize: 13,
+                        opacity: 0.85,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {user.role?.name
+                        ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ")
+                        : user.crewProfile?.position || ""}
+                    </Typography>
+                  </Box>
                 </IconButton>
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    ml: 1,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      color: "white",
-                      fontWeight: 600,
-                      fontSize: 16,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {user.name || user.fullName || "User"}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: "white",
-                      fontSize: 13,
-                      opacity: 0.85,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {user.role
-                      ? user.role.charAt(0).toUpperCase() +
-                        user.role.slice(1).replace("_", " ")
-                      : ""}
-                  </Typography>
-                </Box>
               </Box>
               <Menu
                 anchorEl={profileAnchorEl}
@@ -476,8 +470,8 @@ const LandingPageHeader = () => {
                 }}
               >
                 <Avatar
-                  src={user.avatar || "/default-avatar.png"}
-                  alt={user.name || "User"}
+                  src={user.crewProfile?.profilePicture || "/default-avatar.png"}
+                  alt={user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name}
                   sx={{
                     width: 56,
                     height: 56,
@@ -489,22 +483,21 @@ const LandingPageHeader = () => {
                     boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
                   }}
                 >
-                  {!user.avatar && user.name
+                  {!user.crewProfile && user.name
                     ? user.name[0].toUpperCase()
                     : null}
                 </Avatar>
                 <Typography
                   sx={{ color: "white", fontWeight: 700, fontSize: 16, mt: 1 }}
                 >
-                  {user.name || user.fullName || "User"}
+                  {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name || user.fullName || "User"}
                 </Typography>
                 <Typography
                   sx={{ color: "#000", fontSize: 13, fontWeight: 500 }}
                 >
-                  {user.role
-                    ? user.role.charAt(0).toUpperCase() +
-                      user.role.slice(1).replace("_", " ")
-                    : ""}
+                  {user.role?.name
+                    ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ")
+                    : user.crewProfile?.position || ""}
                 </Typography>
               </Box>
             )}

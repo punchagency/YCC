@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getUserSettings } from '../services/crewSettings/crewsettings';
 
 // Create the context
 export const UserContext = createContext();
@@ -20,19 +21,44 @@ export const UserProvider = ({ children }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [stripeAccount, setStripeAccount] = useState(null);
 
-  // Load user from localStorage (useful for page refreshes)
+  // Load user from API on mount (for real info)
   useEffect(() => {
-    // Get user data from localStorage
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-      } catch (error) {
-        //console.error("Error parsing user data:", error);
-        localStorage.removeItem("user"); // Clear invalid data
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // If no token, try to load from localStorage as fallback
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          try {
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+          } catch (error) {
+            localStorage.removeItem("user");
+          }
+        }
+        return;
       }
-    }
+      
+      try {
+        const response = await getUserSettings();
+        if (response.status && response.data && response.data.user) {
+          setUser(response.data.user);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+      } catch (e) {
+        // fallback to localStorage if API fails
+        const savedUser = localStorage.getItem("user");
+        if (savedUser) {
+          try {
+            const parsedUser = JSON.parse(savedUser);
+            setUser(parsedUser);
+          } catch (error) {
+            localStorage.removeItem("user");
+          }
+        }
+      }
+    };
+    fetchUser();
   }, []);
 
   // Function to log in the user and store data
@@ -51,6 +77,7 @@ export const UserProvider = ({ children }) => {
   const logoutUser = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   // const getStripeAccount = async (userId, role) => {

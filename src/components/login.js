@@ -79,13 +79,19 @@ const LoginForm = () => {
         // Store user data
         loginUser(response.data.user);
 
-        if (response.data.user.role === "crew_member") {
+        // Get role name from object or string
+        let userRole = response.data.user.role;
+        if (typeof userRole === 'object' && userRole.name) {
+          userRole = userRole.name;
+        }
+
+        if (userRole === "crew_member") {
           navigate("/crew/dashboard");
-        } else if (response.data.user.role === "admin") {
+        } else if (userRole === "admin") {
           navigate("/admin/dashboard");
-        } else if (response.data.user.role === "supplier") {
+        } else if (userRole === "supplier") {
           navigate("/supplier/onboarding");
-        } else if (response.data.user.role === "service_provider") {
+        } else if (userRole === "service_provider") {
           navigate("/vendor/onboarding");
         }
       } else {

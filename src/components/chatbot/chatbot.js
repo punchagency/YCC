@@ -33,15 +33,13 @@ import {
     // Destructure only what we need, comment out unused variables
     const {
       isAIAssistantOpen,
-      // setIsAIAssistantOpen, // Unused
+      setIsAIAssistantOpen,
       chatData,
       setChatData,
       typingState,
-      // setTypingState, // Unused
       message,
       setMessage,
       sendMessage,
-      // getResponse, // Unused
       preDefinedMessages,
     } = useLandingPageAI();
   
@@ -113,6 +111,8 @@ import {
       }
     }, []);
   
+    const [minimized, setMinimized] = useState(false);
+  
     return (
       <>
         {/* Chatbot for wide screen */}
@@ -145,8 +145,66 @@ import {
                 flexDirection: "column",
               }}
             >
+              {/* Chatbot header with close and minimize buttons */}
+              {isAIAssistantOpen && !minimized && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    background: "linear-gradient(79.56deg, #034D92 12.26%, #0487D9 71.92%)",
+                    borderTopLeftRadius: "24px",
+                    borderTopRightRadius: "24px",
+                    borderTop: "1px solid #A6C2D4",
+                    borderLeft: "1px solid #A6C2D4",
+                    borderRight: "1px solid #A6C2D4",
+                    padding: "8px 16px 8px 0",
+                  }}
+                >
+                  <IconButton
+                    onClick={() => setMinimized(true)}
+                    sx={{ color: "white" }}
+                  >
+                    <RemoveIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => setIsAIAssistantOpen(false)}
+                    sx={{ color: "white" }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+              )}
+              {/* Minimized bar */}
+              {isAIAssistantOpen && minimized && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    background: "linear-gradient(79.56deg, #034D92 12.26%, #0487D9 71.92%)",
+                    borderRadius: "24px",
+                    border: "1px solid #A6C2D4",
+                    padding: "8px 20px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setMinimized(false)}
+                >
+                  <Typography sx={{ color: 'white', fontWeight: 600, fontSize: 16 }}>
+                    Chatbot (Click to restore)
+                  </Typography>
+                  <IconButton
+                    onClick={e => { e.stopPropagation(); setIsAIAssistantOpen(false); }}
+                    sx={{ color: "white" }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+              )}
               {/* Main chat section */}
-              {isAIAssistantOpen && (
+              {isAIAssistantOpen && !minimized && (
                 <Box
                   sx={{
                     display: "flex",
@@ -154,9 +212,6 @@ import {
                     width: "100%",
                     backgroundColor: "#F3F3F3",
                     padding: "5px",
-                    borderTopLeftRadius: "24px",
-                    borderTopRightRadius: "24px",
-                    borderTop: "1px solid #A6C2D4",
                     borderLeft: "1px solid #A6C2D4",
                     borderRight: "1px solid #A6C2D4",
                   }}

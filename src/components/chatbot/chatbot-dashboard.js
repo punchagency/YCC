@@ -21,7 +21,14 @@ import { useUser } from "../../context/userContext";
 
 const ChatbotDashboard = () => {
     const { user } = useUser();
-    const role = user ? user.role.split('_')[0] : 'guest';
+    let role = 'guest';
+    if (user) {
+      if (typeof user.role === 'string') {
+        role = user.role.split('_')[0];
+      } else if (user.role && typeof user.role.name === 'string') {
+        role = user.role.name.split('_')[0];
+      }
+    }
 
     const {
         isAIAssistantOpen,

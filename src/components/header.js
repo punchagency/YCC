@@ -446,7 +446,20 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               {/* Profile Image Only */}
               <div
                 className="profile-section"
-                onClick={() => navigate("/admin/profile")}
+                onClick={() => {
+                  // Get role name from object or string
+                  let userRole = user?.role;
+                  if (typeof userRole === 'object' && userRole.name) {
+                    userRole = userRole.name;
+                  }
+                  
+                  // Navigate based on role
+                  if (userRole === "crew_member") {
+                    navigate("/crew/profile");
+                  } else {
+                    navigate("/admin/profile");
+                  }
+                }}
                 style={{
                   cursor: "pointer",
                   display: "flex",
@@ -454,7 +467,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 }}
               >
                 <img
-                  src={manprofile}
+                  src={user?.crewProfile?.profilePicture || manprofile}
                   alt="Profile"
                   className="profile-image"
                   style={{
@@ -692,11 +705,24 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           <>
             <div
               className="profile-section"
-              onClick={() => navigate("/admin/profile")}
+              onClick={() => {
+                // Get role name from object or string
+                let userRole = user?.role;
+                if (typeof userRole === 'object' && userRole.name) {
+                  userRole = userRole.name;
+                }
+                
+                // Navigate based on role
+                if (userRole === "crew_member") {
+                  navigate("/crew/profile");
+                } else {
+                  navigate("/admin/profile");
+                }
+              }}
               style={{ cursor: "pointer" }}
             >
               <img
-                src={manprofile}
+                src={user?.crewProfile?.profilePicture || manprofile}
                 alt="Profile"
                 className="profile-image"
                 style={{
@@ -715,8 +741,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               }}
             >
               <div>
-                <p>{userName}</p>
-                <p>Admin</p>
+                <p>{user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : userName}</p>
+                <p>{user?.role?.name ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ") : "Admin"}</p>
               </div>
             </div>
           </>
