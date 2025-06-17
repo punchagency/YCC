@@ -10,12 +10,18 @@ const ProtectedRoute = ({ children, requiredRoles = [] }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
+  // Get role name from object or string
+  let userRole = user.role;
+  if (typeof userRole === 'object' && userRole.name) {
+    userRole = userRole.name;
+  }
+
   // If requiredRoles is provided and not empty, check if user has required role
-  if (requiredRoles.length > 0 && !requiredRoles.includes(user.role)) {
+  if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
     // Redirect based on user role
-    if (user.role === "crew_member") {
+    if (userRole === "crew_member") {
       return <Navigate to="/crew/dashboard" replace />;
-    } else if (user.role === "admin") {
+    } else if (userRole === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
     } else {
       return <Navigate to="/login" replace />;

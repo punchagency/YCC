@@ -40,43 +40,63 @@ const LandingPageChatbot = () => {
         }
     }, [chatData]);
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (!(message.trim())) return;
         if (!isAIAssistantOpen) {
             setIsAIAssistantOpen(true);
         }
         setTypingState(true);
-        let previousChatData = chatData;
-        previousChatData.messages.push({ role: 'user', content: message });
+        let previousChatData = { ...chatData };
+        previousChatData.messages = [...previousChatData.messages, { role: 'user', content: message }];
         setChatData(previousChatData);
-        // Simulate AI response for now
-        setTimeout(() => {
+        setMessage("");
+        try {
+            const response = await fetch('https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ inputs: message })
+            });
+            const data = await response.json();
             setChatData(prev => ({
                 ...prev,
-                messages: [...prev.messages, { role: 'assistant', content: 'Thank you for your message. This is a demo response.' }]
+                messages: [...prev.messages, { role: 'assistant', content: data.generated_text || "Sorry, I didn't get that." }]
             }));
-            setTypingState(false);
-        }, 1000);
-        setMessage("");
+        } catch (error) {
+            setChatData(prev => ({
+                ...prev,
+                messages: [...prev.messages, { role: 'assistant', content: "Sorry, I couldn't connect to the AI service." }]
+            }));
+        }
+        setTypingState(false);
     };
 
-    const preDefinedMessages = (predefinedMessage) => {
+    const preDefinedMessages = async (predefinedMessage) => {
         if (!(predefinedMessage.trim())) return;
         if (!isAIAssistantOpen) {
             setIsAIAssistantOpen(true);
         }
         setTypingState(true);
-        let previousChatData = chatData;
-        previousChatData.messages.push({ role: 'user', content: predefinedMessage });
+        let previousChatData = { ...chatData };
+        previousChatData.messages = [...previousChatData.messages, { role: 'user', content: predefinedMessage }];
         setChatData(previousChatData);
-        // Simulate AI response for now
-        setTimeout(() => {
+        try {
+            const response = await fetch('https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ inputs: predefinedMessage })
+            });
+            const data = await response.json();
             setChatData(prev => ({
                 ...prev,
-                messages: [...prev.messages, { role: 'assistant', content: 'Thank you for your message. This is a demo response.' }]
+                messages: [...prev.messages, { role: 'assistant', content: data.generated_text || "Sorry, I didn't get that." }]
             }));
-            setTypingState(false);
-        }, 1000);
+        } catch (error) {
+            setChatData(prev => ({
+                ...prev,
+                messages: [...prev.messages, { role: 'assistant', content: "Sorry, I couldn't connect to the AI service." }]
+            }));
+        }
+        setTypingState(false);
     };
 
     const parseAIMessage = (message) => {
@@ -142,10 +162,32 @@ const LandingPageChatbot = () => {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: { xs: '95vw', sm: '600px', md: '800px', lg: '900px' },
-                    maxWidth: '98vw',
-                    maxHeight: { xs: '90vh', md: '80vh', lg: '70vh' },
-                    minHeight: '350px',
+                    width: {
+                        xs: '97vw',
+                        sm: '97vw',
+                        md: '80vw',
+                        lg: '900px',
+                        xl: '900px',
+                        '@media (max-width:1100px)': '97vw',
+                    },
+                    maxWidth: {
+                        xs: '99vw',
+                        sm: '99vw',
+                        md: '900px',
+                        lg: '900px',
+                        xl: '900px',
+                        '@media (max-width:1100px)': '99vw',
+                    },
+                    minWidth: {
+                        xs: '280px',
+                        sm: '320px',
+                        md: '400px',
+                        lg: '400px',
+                        xl: '400px',
+                        '@media (max-width:1100px)': '280px',
+                    },
+                    maxHeight: '85vh',
+                    minHeight: '200px',
                 }}>
                     {/* Chat section */}
                     <Box sx={{
@@ -220,7 +262,7 @@ const LandingPageChatbot = () => {
                         {/* Chat messages */}
                         <Box sx={{
                             width: '100%',
-                            height: '400px',
+                            height: '300px',
                             overflowY: 'auto',
                             p: 2,
                             bgcolor: '#f5f8fa',

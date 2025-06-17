@@ -57,7 +57,11 @@ endOfNextMonth.setHours(23, 59, 59, 999);
             endDate = endOfCurrentMonth;
         }
         const response = await fetchEvents(startDate, endDate);
-        setEvents(response.data.data || []);
+        if (response && response.data && response.data.data) {
+            setEvents(response.data.data);
+        } else {
+            setEvents([]);
+        }
     };
 
     const fetchEventsForTodayAndTomorrow = async () => {
@@ -72,7 +76,11 @@ endOfNextMonth.setHours(23, 59, 59, 999);
         endOfTomorrow.setDate(endOfTomorrow.getDate() + 1);
         endOfTomorrow.setHours(23, 59, 59, 999);
         const response = await fetchEvents(startOfToday, endOfTomorrow);
-        setEventsForTodayAndTomorrow(response.data.data || []);
+        if (response && response.data && response.data.data) {
+            setEventsForTodayAndTomorrow(response.data.data);
+        } else {
+            setEventsForTodayAndTomorrow([]);
+        }
     };
 
     const addGuest = async (eventId, guestEmails) => {
