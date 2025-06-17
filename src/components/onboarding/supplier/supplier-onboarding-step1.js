@@ -43,7 +43,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   
     const link = document.createElement("a");
     link.href = templateUrl;
-    link.download = `supplier_onboarding_template.${fileType}`;
+    link.download = `vendor-onboarding-template.${fileType}`;
     link.style.display = "none";
   
     document.body.appendChild(link);
