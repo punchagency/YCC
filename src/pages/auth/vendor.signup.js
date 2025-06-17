@@ -177,21 +177,26 @@ const VendorSignup = () => {
           </div>
 
           {/* Right Panel */}
-          <div className="flex-1 flex align-items-center justify-content-center right-panel">
-            <div className="login-right-component">
+          <div
+            className="flex-1 flex align-items-start justify-content-center right-panel"
+            style={{
+              height: "100vh",
+              overflowY: "auto",
+              background: "#fff"
+            }}
+          >
+            <div className="login-right-component" style={{ width: "100%", maxWidth: "600px", margin: "0 auto", paddingBottom: "50px" }}>
               <div
                 className="logo-wraper"
-                style={{ marginBottom: "5px", paddingTop: "30px" }}
+                style={{ marginBottom: "20px", paddingTop: "30px" }}
               >
                 <StepInfo currentStep={step} />
               </div>
               <div
                 className="login-form vendor-login-form"
                 style={{
-                 
-                  minHeight: "700px",
-                  height: "auto",
-                  padding: "0px",
+                  width: "100%",
+                  padding: "0px"
                 }}
               >
                 <VendorSignUpForm
