@@ -45,13 +45,13 @@ import {
       });
       setOpen(true);
     };
-  
+
     const handleClose = () => {
       setOpen(false);
       setSelectedItem(null);
       setEditedItem(null);
     };
-  
+
     const handleSave = async () => {
       try {
         setIsUpdating(true);
@@ -95,7 +95,7 @@ import {
 
         handleClose();
       } catch (error) {
-        //console.error('Error updating service:', error);
+        console.error('Error updating service:', error);
         toast.current.show({
           severity: "error",
           summary: "Error",

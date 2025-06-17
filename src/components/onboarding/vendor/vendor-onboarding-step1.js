@@ -86,11 +86,11 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     
     // Set proper file extension and MIME type
     if (fileType === "excel") {
-      link.download = "vendor_onboarding_template.xlsx";
+      link.download = "service-onboarding-template.xlsx";
       // Set the correct MIME type for modern Excel files
       link.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     } else {
-      link.download = "vendor_onboarding_template.csv";
+      link.download = "service-onboarding-template.csv";
       link.type = "text/csv";
     }
     
