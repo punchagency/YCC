@@ -693,7 +693,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             <div
               className="profile-section"
               onClick={() => navigate("/admin/profile")}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
             >
               <img
                 src={manprofile}
@@ -714,9 +714,22 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 justifyContent: "space-between",
               }}
             >
-              <div>
-                <p>{userName}</p>
-                <p>Admin</p>
+              <div className="">
+                <p title={user.email} style={{
+                  fontSize: '12px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '90px',
+                  width: '100%',
+                  margin: 0,
+                  fontWeight: '500'
+                }}>{user.email}</p>
+                <p style={{
+                  fontSize: '12px',
+                  marginTop: '-6px',
+                  margin: 0
+                }}>{user.role === 'admin' ? 'Admin' : 'Crew'}</p>
               </div>
             </div>
           </>
