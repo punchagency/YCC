@@ -25,10 +25,34 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const location = useLocation();
   const { user } = useUser();
 
-  if (!role) {
-    role = user.role;
-    console.log(role);
+  // Debug: Log user data
+  console.log('Header - User data:', {
+    user: user,
+    crewProfile: user?.crewProfile,
+    profilePicture: user?.profilePicture,
+    role: user?.role
+  });
+
+  // Helper function to get role name
+  const getRoleName = (roleObj) => {
+    if (typeof roleObj === 'string') {
+      return roleObj;
+    }
+    if (typeof roleObj === 'object' && roleObj?.name) {
+      return roleObj.name;
+    }
+    return null;
+  };
+
+  // Determine the role
+  let userRole = role;
+  if (!userRole) {
+    userRole = getRoleName(user?.role);
+  } else {
+    userRole = getRoleName(userRole);
   }
+
+  console.log('User role:', userRole);
 
   // const overlayPanelRef = useRef(null);
   // const { user } = useUser(); // Get user data from context
@@ -58,7 +82,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   useEffect(() => {
     fetchNotifications();
     const checkVendors = async () => {
-      if (role === 'admin') {
+      if (userRole === 'admin') {
         try {
           const response = await checkPendingVendors();
           if (response.status === 'success') {
@@ -77,7 +101,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     const interval = setInterval(checkVendors, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [role]);
+  }, [userRole]);
 
   const fetchNotifications = async () => {
     setLoading(true);
@@ -234,7 +258,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   ];
 
   const viewAllNotifications = () => {
-    if (role === "Captain") {
+    if (userRole === "Captain") {
       navigate("/admin/notifications");
     } else {
       navigate("/admin/notifications");
@@ -356,7 +380,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               }}
             >
               {/* Store Icon */}
-              {role === "admin" && (
+              {userRole === "admin" && (
                 <button
                   onClick={() => navigate('/admin/approve')}
                   className="supplier-management-btn"
@@ -447,12 +471,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               <div
                 className="profile-section"
                 onClick={() => {
-                  // Get role name from object or string
-                  let userRole = user?.role;
-                  if (typeof userRole === 'object' && userRole.name) {
-                    userRole = userRole.name;
-                  }
-                  
                   // Navigate based on role
                   if (userRole === "crew_member") {
                     navigate("/crew/profile");
@@ -467,7 +485,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 }}
               >
                 <img
-                  src={user?.crewProfile?.profilePicture || manprofile}
+                  src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
                   alt="Profile"
                   className="profile-image"
                   style={{
@@ -612,7 +630,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       </OverlayPanel>
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         {/* Store Icon - Only show on desktop */}
-        {!isMobile && role === "admin" && (
+        {!isMobile && userRole === "admin" && (
           <button
             onClick={() => navigate('/admin/approve')}
             className="supplier-management-btn"
@@ -706,12 +724,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             <div
               className="profile-section"
               onClick={() => {
-                // Get role name from object or string
-                let userRole = user?.role;
-                if (typeof userRole === 'object' && userRole.name) {
-                  userRole = userRole.name;
-                }
-                
                 // Navigate based on role
                 if (userRole === "crew_member") {
                   navigate("/crew/profile");
@@ -722,7 +734,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               style={{ cursor: "pointer" }}
             >
               <img
-                src={user?.crewProfile?.profilePicture || manprofile}
+                src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
                 alt="Profile"
                 className="profile-image"
                 style={{
@@ -741,8 +753,8 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               }}
             >
               <div>
-                <p>{user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : userName}</p>
-                <p>{user?.role?.name ? user.role.name.charAt(0).toUpperCase() + user.role.name.slice(1).replace("_", " ") : "Admin"}</p>
+                <p>{user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : (user?.name || userName)}</p>
+                <p>{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1).replace("_", " ") : "Admin"}</p>
               </div>
             </div>
           </>
@@ -782,7 +794,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
       <TopNav
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        role={role}
+        role={userRole}
       />
       <GlobalSearchModal
         visible={showSearchModal}

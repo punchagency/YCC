@@ -7,8 +7,17 @@ import "./profile.css";
 import { uploadProfilePicture, removeProfilePicture } from '../../services/crewSettings/crewsettings';
 
 const ProfilePage = () => {
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const isCrew = user?.role?.name === 'crew_member' || user?.role === 'crew_member';
+
+  // Debug: Log user data
+  console.log('Profile - User data:', {
+    user: user,
+    crewProfile: user?.crewProfile,
+    profilePicture: user?.profilePicture,
+    role: user?.role,
+    isCrew: isCrew
+  });
 
   // Helper to always prefix phone with + if not empty
   const formatPhone = (phone) => {
@@ -68,11 +77,15 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
     setPicLoading(true);
+    console.log('Uploading profile picture:', file.name);
     const res = await uploadProfilePicture(file);
+    console.log('Upload response:', res);
     setPicLoading(false);
     if (res.status) {
-      window.location.reload(); // or refetch user context
+      console.log('Upload successful, refreshing user data...');
+      await refreshUser();
     } else {
+      console.error('Upload failed:', res.message);
       alert(res.message || 'Failed to upload profile picture');
     }
   };
@@ -80,11 +93,15 @@ const ProfilePage = () => {
   const handleRemovePicture = async () => {
     if (!window.confirm('Remove your profile picture?')) return;
     setPicLoading(true);
+    console.log('Removing profile picture...');
     const res = await removeProfilePicture();
+    console.log('Remove response:', res);
     setPicLoading(false);
     if (res.status) {
-      window.location.reload(); // or refetch user context
+      console.log('Remove successful, refreshing user data...');
+      await refreshUser();
     } else {
+      console.error('Remove failed:', res.message);
       alert(res.message || 'Failed to remove profile picture');
     }
   };
@@ -208,7 +225,7 @@ const ProfilePage = () => {
         <div className="profile-pic-preview-modal" onClick={()=>setShowPicPreview(false)}>
           <div className="profile-pic-preview-content" onClick={e=>e.stopPropagation()}>
             <img
-              src={isCrew ? (user?.crewProfile?.profilePicture || manprofile) : manprofile}
+              src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
               alt="Profile Preview"
               style={{maxWidth:'90vw',maxHeight:'70vh',borderRadius:16,boxShadow:'0 8px 32px rgba(4,135,217,0.18)'}}
             />
@@ -232,7 +249,7 @@ const ProfilePage = () => {
             <div className="profile-container-about-left-top">
               <img
                 ref={picRef}
-                src={isCrew ? (user?.crewProfile?.profilePicture || manprofile) : manprofile}
+                src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
                 alt="manprofile"
                 className="profile-picture-clickable"
                 onClick={() => setShowPicDrawer((v) => !v)}

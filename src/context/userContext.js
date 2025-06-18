@@ -42,8 +42,15 @@ export const UserProvider = ({ children }) => {
       try {
         const response = await getUserSettings();
         if (response.status && response.data && response.data.user) {
+          console.log('Updating user context with:', response.data.user);
+          console.log('User profilePicture field:', response.data.user.profilePicture);
+          console.log('Complete user object keys:', Object.keys(response.data.user));
+          console.log('User object JSON:', JSON.stringify(response.data.user, null, 2));
           setUser(response.data.user);
           localStorage.setItem('user', JSON.stringify(response.data.user));
+          return response.data.user;
+        } else {
+          console.log('Invalid response format:', response);
         }
       } catch (e) {
         // fallback to localStorage if API fails
@@ -78,6 +85,35 @@ export const UserProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+  };
+
+  // Function to refresh user data
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('No token found, cannot refresh user');
+      return;
+    }
+    
+    try {
+      console.log('Refreshing user data...');
+      const response = await getUserSettings();
+      console.log('Refresh response:', response);
+      
+      if (response.status && response.data && response.data.user) {
+        console.log('Updating user context with:', response.data.user);
+        console.log('User profilePicture field:', response.data.user.profilePicture);
+        console.log('Complete user object keys:', Object.keys(response.data.user));
+        console.log('User object JSON:', JSON.stringify(response.data.user, null, 2));
+        setUser(response.data.user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        return response.data.user;
+      } else {
+        console.log('Invalid response format:', response);
+      }
+    } catch (e) {
+      console.error('Error refreshing user data:', e);
+    }
   };
 
   // const getStripeAccount = async (userId, role) => {
@@ -348,7 +384,8 @@ export const UserProvider = ({ children }) => {
         uploadServicesData,
         verifyOnboardingStep1,
         completeOnboarding,
-        checkOnboardingStatus
+        checkOnboardingStatus,
+        refreshUser
       }}
     >
       {children}
