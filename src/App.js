@@ -79,7 +79,6 @@ const AuthCheck = ({ children }) => {
   const location = useLocation();
   const token = localStorage.getItem("token");
 
-  // List of public routes that don't require authentication
   const publicRoutes = [
     "/",
     "/captain",
@@ -102,19 +101,27 @@ const AuthCheck = ({ children }) => {
     "/forgot-password",
     "/coming-soon",
     "/service/quotes/respond",
-    "/vendors/onboarding/:id",
+    "/vendors/onboarding",
     "/vendors/onboarding/refresh-stripe-account",
-    "/services/onboarding/:id",
+    "/services/onboarding",
     "/services/onboarding/refresh-stripe-account",
   ];
 
   // Check if the current path is a public route
   const isPublicRoute = publicRoutes.some(
-    (route) =>
-      location.pathname === route || location.pathname.startsWith(route + "/")
+    (route) => {
+      // Convert route pattern to regex if it contains :id
+      const routePattern = route.replace(/:id/g, '[^/]+');
+      const regex = new RegExp(`^${routePattern}$`);
+      const matches = regex.test(location.pathname) || location.pathname.startsWith(route + "/");
+      
+
+      
+      return matches;
+    }
   );
 
-  // If no token and not on a public route, redirect to home
+
   if (!token && !isPublicRoute) {
     return <Navigate to="/" replace />;
   }
