@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
   Button,
+  Grid2,
 } from "@mui/material";
 import CurrentOrderSummary from "./current-order-summary";
 import BookingSummary from "./booking-summary";
@@ -17,8 +18,9 @@ import { useInvoice } from "../../context/invoice/invoiceContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
+import DashboardTitleBar from './title-bar'
 
-const Dashboard1 = () => {
+const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("monthly");
@@ -32,7 +34,7 @@ const Dashboard1 = () => {
     fetchOrderSummary();
     fetchInvoices();
     fetchLowInventory();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   console.log("lowInventory", lowInventory);
@@ -53,21 +55,20 @@ const Dashboard1 = () => {
 
   return (
     <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "#F8FBFF",
-        height: "auto",
-        minHeight: "100vh",
-        padding: { xs: "10px", sm: "15px", md: "20px" },
-        gap: { xs: "10px", sm: "15px", md: "20px" },
-        overflow: "visible",
-        width: "100%",
-        maxWidth: "100%",
-      }}
+      paddingTop={{ xs: 9, md: 0 }}
+      paddingBottom={5} 
+      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
     >
-      <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
-        <Grid item xs={12} md={6} lg={6}>
+      <DashboardTitleBar title="Bookings Dashboard" />
+      <Box
+        paddingTop={5}
+        paddingX={{ xs: 2, sm: 3 }}
+        spacing={{ xs: 1, sm: 1.5, md: 2 }}
+        display="flex"
+        flexDirection={{ xs: "column", lg: "row" }}
+        gap={{ xs: 2, lg: 3 }}
+      >
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Low Inventories */}
           {lowInventory && lowInventory.length > 0 ? (
             <Box
@@ -102,10 +103,10 @@ const Dashboard1 = () => {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: { xs: "column", md: "row" },
+                  flexDirection: { xs: "column", lg: "row", xl: "column" },
                   gap: "10px",
                   width: "100%",
-                  flexWrap: { xs: "nowrap", md: "wrap" },
+                  flexWrap: { xs: "nowrap", lg: "wrap", xl: "nowrap" },
                 }}
               >
                 <Box
@@ -114,7 +115,7 @@ const Dashboard1 = () => {
                     borderRadius: "8px",
                     padding: { xs: "12px", sm: "15px", md: "17px" },
                     height: { xs: "auto", md: "180px" },
-                    width: { xs: "100%", md: "32%" },
+                    width: { xs: "100%", lg: "32%", xl: "100%" },
                     minWidth: { xs: "100%", md: "auto" },
                     flexGrow: 1,
                   }}
@@ -168,7 +169,7 @@ const Dashboard1 = () => {
                     borderRadius: "8px",
                     padding: { xs: "12px", sm: "15px", md: "17px" },
                     height: { xs: "auto", md: "180px" },
-                    width: { xs: "100%", md: "32%" },
+                    width: { xs: "100%", lg: "32%", xl: "100%" },
                     minWidth: { xs: "100%", md: "auto" },
                     flexGrow: 1,
                   }}
@@ -222,7 +223,7 @@ const Dashboard1 = () => {
                     borderRadius: "8px",
                     padding: { xs: "12px", sm: "15px", md: "17px" },
                     height: { xs: "auto", md: "180px" },
-                    width: { xs: "100%", md: "32%" },
+                    width: { xs: "100%", lg: "50%", xl: "100%" },
                     minWidth: { xs: "100%", md: "auto" },
                     flexGrow: 1,
                   }}
@@ -316,9 +317,9 @@ const Dashboard1 = () => {
               </Link>
             </Box>
           )}
-        </Grid>
+        </Grid2>
 
-        <Grid item xs={12} md={6} lg={6}>
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Financial Summary */}
           {invoices && (
             <Box
@@ -412,20 +413,20 @@ const Dashboard1 = () => {
               </Box>
             </Box>
           )}
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Box>
 
-      <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
-        <Grid item xs={12} md={6} lg={6}>
+      <Box paddingX={{ xs: 2, sm: 3 }} paddingTop={{ xs: 1, sm: 2, md: 3 }} display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={{ xs: 2, lg: 3 }}>
+        <Box width={{ xs: "100%", lg: "55%" }}>
           {/* Current Order Summary */}
           {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} md={6} lg={6}>
+        <Box width={{ xs: "100%", lg: "45%" }}>
           {/* Booking Summary */}
           <BookingSummary />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Box>
   );
 };
@@ -511,4 +512,4 @@ const ViewButtonText = styled(Typography)({
   color: "#565656",
 });
 
-export default Dashboard1;
+export default BookingsDashboard;

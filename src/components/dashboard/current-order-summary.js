@@ -1,22 +1,62 @@
-import { Box, Typography, styled } from "@mui/material";
+import { Box, Tab, Tabs, Typography, styled } from "@mui/material";
+import { useState } from "react";
 import BasicTable from "./basic-table";
 import { useTheme } from "../../context/theme/themeContext";
+
 const CurrentOrderSummary = ({ orderSummary }) => {
   const { theme } = useTheme();
+  const [activeTab, setActiveTab] = useState('total');
+
   const summaryData = [
     {
-      title: "Total Orders",
+      title: "Total",
       value: orderSummary.totalData,
+      tabValue: 'total',
     },
     {
-      title: "Pending Orders",
+      title: "Pending", 
       value: orderSummary.pendingOrders,
+      tabValue: 'pending',
     },
     {
-      title: "Completed Orders",
+      title: "Completed",
       value: orderSummary.completedOrders,
+      tabValue: 'completed',
     },
   ];
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const getFilteredOrders = () => {
+    if (!orderSummary?.result) return [];
+    
+    switch (activeTab) {
+      case 'total':
+        return orderSummary.result;
+      case 'pending':
+        return orderSummary.result.filter(order => order.status === 'pending');
+      case 'completed':
+        return orderSummary.result.filter(order => order.status === 'completed');
+      default:
+        return orderSummary.result;
+    }
+  };
+
+  const getCurrentValue = () => {
+    switch (activeTab) {
+      case 'total':
+        return orderSummary.totalData;
+      case 'pending':
+        return orderSummary.pendingOrders;
+      case 'completed':
+        return orderSummary.completedOrders;
+      default:
+        return orderSummary.totalData;
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -26,7 +66,6 @@ const CurrentOrderSummary = ({ orderSummary }) => {
         borderRadius: "8px",
         padding: "20px",
         boxShadow: "0px 2px 8px 0px #0000001A",
-        textAlign: "start",
       }}
     >
       <Box
@@ -41,20 +80,34 @@ const CurrentOrderSummary = ({ orderSummary }) => {
           Displays real-time updates on placed, pending, and completed orders.
         </DashBoardDescriptionText>
 
-        <Box sx={{ display: "flex", flexDirection: "row", gap: "10px", marginTop: "20px" }}>
-          {summaryData.map((item, index) => (
-            <SummaryWidgetBox mode={theme}>
-                <Box>
-                    <DashBoardTitleText mode={theme}>{item.value}</DashBoardTitleText>
-                    <CurrentSummarySubText mode={theme}>{item.title}</CurrentSummarySubText>
-                </Box>
-            </SummaryWidgetBox>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          textColor="primary"
+          indicatorColor="primary"
+          aria-label="order status tabs"
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 500,
+              fontSize: '14px',
+              minWidth: 'auto',
+              padding: '8px 16px',
+            }
+          }}
+        >
+          {summaryData.map((item) => (
+            <Tab 
+              key={item.tabValue} 
+              value={item.tabValue} 
+              label={`${item.title} (${item.value || 0})`}
+            />
           ))}
-        </Box>
+        </Tabs>
 
-          {/* Table */}
-        <Box sx={{marginTop: "10px"}}>
-        {orderSummary && <BasicTable orders={orderSummary.result} />}
+        {/* Table */}
+        <Box sx={{ marginTop: "10px" }}>
+          {orderSummary && <BasicTable orders={getFilteredOrders()} />}
         </Box>
       </Box>
     </Box>
@@ -76,6 +129,7 @@ const DashBoardDescriptionText = styled(Typography)(({ mode }) => ({
   fontSize: "12px",
   color: mode === "light" ? "#212121" : "white",
 }));
+
 const CurrentSummarySubText = styled(Typography)(({ mode }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 500,
@@ -87,21 +141,20 @@ const CurrentSummarySubText = styled(Typography)(({ mode }) => ({
 }));
 
 const SummaryWidgetBox = styled(Box)(({ mode }) => ({
-    display: "flex",
-    width: "100%",
-    height: "100%",
-    gap: "10px",
-    paddingTop: 14,
-    paddingRight: 20,
-    paddingBottom: 14,
-    paddingLeft: 20,
-    borderRadius: 12,
-    boxShadow: "0px 1px 6px 0px #00000024",
-    textAlign: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: mode === "light" ? "white" : "#7A7A7A",
+  display: "flex",
+  width: "100%",
+  height: "100%",
+  gap: "10px",
+  paddingTop: 14,
+  paddingRight: 20,
+  paddingBottom: 14,
+  paddingLeft: 20,
+  borderRadius: 12,
+  boxShadow: "0px 1px 6px 0px #00000024",
+  textAlign: "center",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: mode === "light" ? "white" : "#7A7A7A",
 }));
-
 
 export default CurrentOrderSummary;
