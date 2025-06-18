@@ -1,7 +1,7 @@
-import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
+import BookingsDashboard from "../../../components/dashboard/bookings-dashboard";
 import DashboardTitleBar from "../../../components/dashboard/title-bar";
 import { Box } from "@mui/material";
-const CrewDashboard1 = () => {
+const CrewDashboard = () => {
   return (
     <Box
       sx={{
@@ -14,9 +14,9 @@ const CrewDashboard1 = () => {
         backgroundColor: "white",
       }}
     >
-      <Dashboard1 />
+      <BookingsDashboard />
     </Box>
   );
 };
 
-export default CrewDashboard1;
+export default CrewDashboard;

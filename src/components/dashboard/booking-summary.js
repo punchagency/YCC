@@ -43,12 +43,10 @@ const BookingSummary = () => {
           }}
         >
           <Grid
-            container
             spacing={{ xs: 1, sm: 1.5, md: 2 }}
             sx={{ height: "100%" }}
           >
             <Grid
-              item
               xs={12}
               md={6}
               lg={7.5}
@@ -61,7 +59,6 @@ const BookingSummary = () => {
               <UpdatedCalendar />
             </Grid>
             <Grid
-              item
               xs={12}
               md={6}
               lg={4.5}

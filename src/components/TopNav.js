@@ -22,7 +22,14 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
   const location = useLocation();
   const { theme } = useTheme();
   const { user } = useUser();
-  const isCrewMember = user?.role === "crew_member";
+  
+  // Get role name from object or string (consistent with menu component)
+  let userRole = user?.role;
+  if (typeof userRole === 'object' && userRole.name) {
+    userRole = userRole.name;
+  }
+  
+  const isCrewMember = userRole === "crew_member";
 
   // Prevent scrolling when menu is open
   useEffect(() => {
@@ -187,37 +194,37 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
     {
       label: "Inventory Management",
       icon: inventoryLogo,
-      path: "/admin/inventory-management",
+      path: "/crew/inventory-management",
     },
     {
       label: "Orders",
       icon: orderLogo,
-      path: "/admin/orders-management",
+      path: "/crew/orders-management",
     },
     {
       label: "Bookings",
       icon: bookingLogo,
-      path: "/admin/bookings-management",
+      path: "/crew/booking",
     },
     {
       label: "Financial Management",
       icon: financeLogo,
-      path: "/admin/financial-management",
+      path: "/crew/financial-management",
     },
     {
       label: "Notifications",
       icon: notificationLogo,
-      path: "/admin/notifications",
+      path: "/crew/notifications",
     },
     {
       label: "Reports",
       icon: reportLogo,
-      path: "/admin/reports",
+      path: "/crew/reports",
     },
     {
       label: "Settings",
       icon: settingsLogo,
-      path: "/admin/settings",
+      path: "/crew/settings",
     },
     {
       label: "Log Out",

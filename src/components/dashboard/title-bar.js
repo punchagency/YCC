@@ -2,26 +2,29 @@ import React from 'react'
 import {Box, Typography} from '@mui/material'
 import { useTheme } from '../../context/theme/themeContext';
 
-const DashboardTitleBar = ({title}) => {
+const DashboardTitleBar = ({title, button}) => {
   const { theme } = useTheme();
   return (
     <Box sx={{
         display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        padding: '10px',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingX: '20px',
+        // paddingY: '14px',
+        height: '4rem',
         backgroundColor: theme === "light" ? "white" : "#03141F",
         border: '1px solid #E0E0E0',
         
     }}>
         <Typography
         sx={{
-            fontSize: '16px',
+            fontSize: '1.2rem',
             fontWeight: 'bold',
-            color: theme === "light" ? "#212121" : "white",
             fontFamily: 'Plus Jakarta Sans',
         }}
+        className='text-[#212121] dark:text-white font-semibold font-plus-jakarta-sans'
         >{title}</Typography>
+        {button && button}
     </Box>
   )
 }
