@@ -134,31 +134,55 @@ const LandingPageFooter = () => {
         </Grid>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={9}>
-            <Box sx={{ textAlign: "left" }}>
-              <FooterTypography>
-                © 2025 SC Yacht Crew Center LLC . All Rights
-                Reserved.&nbsp;&nbsp;|&nbsp;&nbsp;
-                <FooterLink href="/terms-and-conditions">
-                  Terms and Conditions
-                </FooterLink>
-                &nbsp;&nbsp;|&nbsp;&nbsp;
+          <Grid item xs={12} md={12} lg={9}>
+            <Box sx={{ 
+              textAlign: { xs: 'center', md: 'left' },
+              marginBottom: { xs: '20px', md: '0' }
+            }}>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'center', sm: 'flex-start' },
+                gap: { xs: '10px', sm: '0' },
+                justifyContent: { xs: 'center', sm: 'flex-start' }
+              }}>
+                <CopyrightText>
+                  © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
+                </CopyrightText>
+                <Box component="span" sx={{ 
+                  display: { xs: 'none', sm: 'inline' },
+                  mx: 2,
+                  color: '#E0E0E0'
+                }}>|</Box>
+                <FooterLink href="/terms-and-conditions">Terms and Conditions</FooterLink>
+                <Box component="span" sx={{ 
+                  display: { xs: 'none', sm: 'inline' },
+                  mx: 2,
+                  color: '#E0E0E0'
+                }}>|</Box>
                 <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
-              </FooterTypography>
+              </Box>
             </Box>
           </Grid>
-          <Grid item xs={12} sm={12} md={3}>
+          <Grid item xs={12} md={12} lg={3}>
             <Box
               sx={{
-                textAlign: "right",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
+                textAlign: { xs: 'center', lg: 'right' },
+                display: 'flex',
+                justifyContent: { xs: 'center', lg: 'flex-end' },
+                gap: '10px',
+                marginTop: { xs: '20px', md: '0' }
               }}
             >
-              <FacebookIcon sx={{ color: "white" }} />
-              <InstagramIcon sx={{ color: "white" }} />
-              <YouTubeIcon sx={{ color: "white" }} />
+              <SocialIconLink href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                <FacebookIcon sx={{ color: "white" }} />
+              </SocialIconLink>
+              <SocialIconLink href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                <InstagramIcon sx={{ color: "white" }} />
+              </SocialIconLink>
+              <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                <YouTubeIcon sx={{ color: "white" }} />
+              </SocialIconLink>
             </Box>
           </Grid>
         </Grid>
@@ -183,7 +207,7 @@ const FooterHeadingTypography = styled(Typography)({
   lineHeight: "24px",
   letterSpacing: "0%",
   color: "#FFFFFF",
-  whiteSpace: "nowrap",
+  whiteSpace: "nowrap"
 });
 
 const FooterTypography = styled(Typography)(({ theme }) => ({
@@ -193,14 +217,31 @@ const FooterTypography = styled(Typography)(({ theme }) => ({
   lineHeight: "21px",
   letterSpacing: "0%",
   color: "#E0E0E0",
+  transition: "all 0.3s ease-in-out",
+  position: "relative",
+  "&:hover": {
+    color: "#0487D9",
+    transform: "translateX(5px)",
+  },
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    width: "0",
+    height: "2px",
+    bottom: -2,
+    left: 0,
+    background: "#0487D9",
+    transition: "width 0.3s ease-in-out",
+  },
+  "&:hover:after": {
+    width: "100%",
+  },
 
   [theme.breakpoints.up("md")]: {
-    // No wrap on larger screens (md+)
     whiteSpace: "nowrap",
   },
 
   [theme.breakpoints.down("sm")]: {
-    // Wrap on small screens
     whiteSpace: "normal",
   },
 }));
@@ -208,6 +249,57 @@ const FooterTypography = styled(Typography)(({ theme }) => ({
 const FooterLink = styled(Link)({
   color: "#E0E0E0",
   textDecoration: "none",
+  transition: "all 0.3s ease-in-out",
+  position: "relative",
+  "&:hover": {
+    color: "#0487D9",
+    transform: "translateX(5px)",
+  },
+  "&:after": {
+    content: '""',
+    position: "absolute",
+    width: "0",
+    height: "2px",
+    bottom: -2,
+    left: 0,
+    background: "#0487D9",
+    transition: "width 0.3s ease-in-out",
+  },
+  "&:hover:after": {
+    width: "100%",
+  }
 });
+
+const SocialIconLink = styled('a')({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-5px) scale(1.1)',
+    '& svg': {
+      color: '#0487D9 !important',
+    }
+  },
+  '& svg': {
+    fontSize: '24px',
+    transition: 'all 0.3s ease-in-out',
+  }
+});
+
+const CopyrightText = styled(Typography)(({ theme }) => ({
+  fontFamily: "Plus Jakarta Sans",
+  fontWeight: 400,
+  fontSize: "16px",
+  lineHeight: "21px",
+  letterSpacing: "0%",
+  color: "#E0E0E0",
+  [theme.breakpoints.up("md")]: {
+    whiteSpace: "nowrap",
+  },
+  [theme.breakpoints.down("sm")]: {
+    whiteSpace: "normal",
+  },
+}));
 
 export default LandingPageFooter;

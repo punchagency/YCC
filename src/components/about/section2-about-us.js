@@ -5,39 +5,43 @@ import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
 import { GradientText } from '../home/section1-home'
 import { ButtonTypography, linearGradient } from '../landing-page-header'
+import { useNavigate } from 'react-router-dom'
 
 const Section2AboutUs = () => {
+    const navigate = useNavigate();
 
     const gridData = [
         {
             title: "Vendor & Service Connections",
             description: "A growing network of trusted vendors and service providers to meet your unique needs.",
             image: shipIcon,
+            path: '/vendor-services'
         },
         {
             title: "Crew Support",
             description: "Resources for career advancement, certifications, and professional growth.",
             image: engineeringIcon,
+            path: '/crew'
         },
         {
             title: "Community Engagement",
             description: "Opportunities to network, learn, and collaborate within a vibrant global yachting community.",
             image: shipIcon,
-        },   {
+            path: '/about-us'
+        },   
+        {
             title: "Expert Guidance",
             description: "Insights and advice to help you make the most of your yachting journey.",
             image: crewIcon,
+            path: '/resource-center'
         },
-
     ]
 
     return (
-
         <Box component="section" sx={{
             minHeight: "100vh",
             width: "100%",
         }}>
-
             <Container maxWidth="lg" sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -45,8 +49,6 @@ const Section2AboutUs = () => {
                 justifyContent: "center",
                 alignItems: "center",
             }}>
-
-
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
@@ -86,8 +88,8 @@ const Section2AboutUs = () => {
                     {gridData.map((item, index) => (
                         <Grid
                             item
-                            xs={12}  // Full width on extra-small screens (mobile)
-                            sm={6}   // 2-column layout on small screens (600px+)
+                            xs={12}
+                            sm={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -95,41 +97,54 @@ const Section2AboutUs = () => {
                                 textAlign: "left",
                             }}
                         >
-                            <Box sx={{
-                                px: 4, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px",
-                                alignItems: "center", textAlign: "center", justifyContent: "space-between"
-                            }}>
-
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                    <Box>
-                                        <img src={item.image} alt="yacht" />
+                            <AnimatedBox>
+                                <Box sx={{ 
+                                    px: 4, 
+                                    py: 7, 
+                                    display: "flex", 
+                                    background: "#E6EFF28A", 
+                                    borderRadius: '13px', 
+                                    flexDirection: "column", 
+                                    gap: "28px", 
+                                    justifyContent: "space-between",
+                                    height: "100%",
+                                    transition: "all 0.3s ease-in-out",
+                                    "&:hover": {
+                                        transform: "translateY(-10px)",
+                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
+                                        background: "#E6EFF2",
+                                    }
+                                }}>
+                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+                                        <AnimatedIcon>
+                                            <img src={item.image} alt={item.title} style={{ width: "48px", height: "48px" }}/>
+                                        </AnimatedIcon>
+                                        <Box>
+                                            <SecondaryHeadingText>
+                                                {item.title}
+                                            </SecondaryHeadingText>
+                                            <SecondarySubTextBlack>
+                                                {item.description}
+                                            </SecondarySubTextBlack>
+                                        </Box>
                                     </Box>
                                     <Box>
-                                        <SecondaryHeadingText>
-                                            {item.title}
-                                        </SecondaryHeadingText>
-                                        <SecondarySubTextBlack>
-                                            {item.description}
-                                        </SecondarySubTextBlack>
+                                        <AnimatedButton onClick={() => navigate(item.path)}>
+                                            <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
+                                        </AnimatedButton>
                                     </Box>
-
                                 </Box>
-
-                            </Box>
+                            </AnimatedBox>
                         </Grid>
                     ))}
                 </Grid>
 
                 <Box>
-                    <GradientButton>
+                    <AnimatedGradientButton onClick={() => navigate('/resource-center')}>
                         <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
-                    </GradientButton>
+                    </AnimatedGradientButton>
                 </Box>
-
-
-
             </Container>
-
         </Box>
     )
 }
@@ -169,15 +184,59 @@ const SecondaryHeadingText = styled(Typography)({
 
 })
 
-const GradientButton = styled(Button)({
+const AnimatedGradientButton = styled(Button)({
     background: linearGradient,
     fontSize: "16px",
     fontFamily: "Inter, sans-serif",
     textTransform: "none",
+    padding: "15px 41px",
+    transition: "all 0.3s ease-in-out",
+    animation: "pulse 2s infinite",
+    "@keyframes pulse": {
+        "0%": {
+            transform: "scale(1)",
+            boxShadow: "0 0 0 0 rgba(4, 135, 217, 0.4)",
+        },
+        "70%": {
+            transform: "scale(1.05)",
+            boxShadow: "0 0 0 10px rgba(4, 135, 217, 0)",
+        },
+        "100%": {
+            transform: "scale(1)",
+            boxShadow: "0 0 0 0 rgba(4, 135, 217, 0)",
+        }
+    },
     "&:hover": {
         background: linearGradient2,
+        transform: "translateY(-3px)",
+        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
     },
+});
+
+const AnimatedBox = styled(Box)({
+    width: "100%",
+    transition: "transform 0.3s ease-in-out",
+});
+
+const AnimatedIcon = styled(Box)({
+    transition: "transform 0.3s ease-in-out",
+    "&:hover": {
+        transform: "scale(1.1) rotate(5deg)",
+    }
+});
+
+const AnimatedButton = styled(Button)({
+    background: linearGradient,
+    fontSize: "16px",
+    fontFamily: "Inter, sans-serif",
+    textTransform: "none",
     padding: "15px 41px",
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+        background: linearGradient2,
+        transform: "translateY(-3px)",
+        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
+    },
 });
 
 export default Section2AboutUs      

@@ -47,16 +47,13 @@ const Section2Home = () => {
             image: interiorIcon,
             path: '/interior'
         },
-
     ]
 
     return (
-
         <Box component="section" sx={{
             minHeight: "100vh",
             width: "100%",
         }}>
-
             <Container maxWidth="lg" sx={{
                 display: "flex",
                 flexDirection: "column",
@@ -64,17 +61,15 @@ const Section2Home = () => {
                 justifyContent: "center",
                 alignItems: "center",
             }}>
-
-
                 <Box sx={{
                     display: "flex",
                     flexDirection: "column",
                     gap: "13px",
                     maxWidth: {
-                        xs: "90%",  // Mobile - almost full width
-                        sm: "75%",  // Small screens - slightly smaller
-                        md: "60%",  // Medium screens - more controlled
-                        lg: "50%",  // Large screens - original width
+                        xs: "90%",
+                        sm: "75%",
+                        md: "60%",
+                        lg: "50%",
                     },
                 }}>
                     <Box sx={{
@@ -84,7 +79,6 @@ const Section2Home = () => {
                         justifyContent: "center",
                         alignItems: "center",
                     }}>
-
                         <Badge variant='dot' sx={{
                             "& .MuiBadge-dot": {
                                 background: linearGradient,
@@ -93,7 +87,6 @@ const Section2Home = () => {
                         <GradientText>
                             Navigate to department-specific tools and resources
                         </GradientText>
-
                     </Box>
 
                     <HeadingText>
@@ -105,8 +98,8 @@ const Section2Home = () => {
                     {gridData.map((item, index) => (
                         <Grid
                             item
-                            xs={12}  // Full width on extra-small screens (mobile)
-                            sm={6}   // 2-column layout on small screens (600px+)
+                            xs={12}
+                            sm={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -114,42 +107,82 @@ const Section2Home = () => {
                                 textAlign: "left",
                             }}
                         >
-                            <Box sx={{ px: 4, py: 7, display: "flex", background: "#E6EFF28A", borderRadius: '13px', flexDirection: "column", gap: "28px", justifyContent: "space-between" }}>
-
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                    <Box>
-                                        <img src={item.image} alt="yacht" />
+                            <AnimatedBox>
+                                <Box sx={{ 
+                                    px: 4, 
+                                    py: 7, 
+                                    display: "flex", 
+                                    background: "#E6EFF28A", 
+                                    borderRadius: '13px', 
+                                    flexDirection: "column", 
+                                    gap: "28px", 
+                                    justifyContent: "space-between",
+                                    height: "100%",
+                                    transition: "all 0.3s ease-in-out",
+                                    "&:hover": {
+                                        transform: "translateY(-10px)",
+                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
+                                        background: "#E6EFF2",
+                                    }
+                                }}>
+                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
+                                        <AnimatedIcon>
+                                            <img src={item.image} alt="yacht" style={{ width: "48px", height: "48px" }}/>
+                                        </AnimatedIcon>
+                                        <Box>
+                                            <SecondaryHeadingText>
+                                                {item.title}
+                                            </SecondaryHeadingText>
+                                            <SecondarySubTextBlack>
+                                                {item.description}
+                                            </SecondarySubTextBlack>
+                                        </Box>
                                     </Box>
                                     <Box>
-                                        <SecondaryHeadingText>
-                                            {item.title}
-                                        </SecondaryHeadingText>
-                                        <SecondarySubTextBlack>
-                                            {item.description}
-                                        </SecondarySubTextBlack>
+                                        <Link to={item.path} style={{ textDecoration: 'none' }}>
+                                            <AnimatedButton>
+                                                <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
+                                            </AnimatedButton>
+                                        </Link>
                                     </Box>
-
                                 </Box>
-                                <Box>
-                                    <Link to={item.path}>
-                                    <GradientButton>
-                                        <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
-                                    </GradientButton>
-                                    </Link>
-                                </Box>
-                            </Box>
+                            </AnimatedBox>
                         </Grid>
                     ))}
                 </Grid>
-
-
-
             </Container>
-
         </Box>
     )
 }
+
 const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
+
+const AnimatedBox = styled(Box)({
+    width: "100%",
+    transition: "transform 0.3s ease-in-out",
+});
+
+const AnimatedIcon = styled(Box)({
+    transition: "transform 0.3s ease-in-out",
+    "&:hover": {
+        transform: "scale(1.1) rotate(5deg)",
+    }
+});
+
+const AnimatedButton = styled(Button)({
+    background: linearGradient,
+    fontSize: "16px",
+    fontFamily: "Inter, sans-serif",
+    textTransform: "none",
+    padding: "15px 41px",
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+        background: linearGradient2,
+        transform: "translateY(-3px)",
+        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
+    },
+});
+
 const SecondarySubTextBlack = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 400,
@@ -157,7 +190,7 @@ const SecondarySubTextBlack = styled(Typography)({
     lineHeight: "26.55px",
     letterSpacing: "0%",
     color: "#373737",
-})
+});
 
 const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",
@@ -166,11 +199,11 @@ const HeadingText = styled(Typography)(({ theme }) => ({
     fontSize: theme.breakpoints.values.xs ? "36px" :
         theme.breakpoints.values.sm ? "40px" :
             theme.breakpoints.values.md ? "42px" :
-                "46px", // Default for large screens
+                "46px",
     lineHeight: theme.breakpoints.values.xs ? "36px" :
         theme.breakpoints.values.sm ? "40px" :
             theme.breakpoints.values.md ? "46px" :
-                "51px", // Default for large screens
+                "51px",
     letterSpacing: "-2%",
 }));
 
@@ -181,18 +214,6 @@ const SecondaryHeadingText = styled(Typography)({
     fontSize: "30px",
     lineHeight: "36.6px",
     letterSpacing: "1%",
-
-})
-
-const GradientButton = styled(Button)({
-    background: linearGradient,
-    fontSize: "16px",
-    fontFamily: "Inter, sans-serif",
-    textTransform: "none",
-    "&:hover": {
-        background: linearGradient2,
-    },
-    padding: "15px 41px",
 });
 
 export default Section2Home

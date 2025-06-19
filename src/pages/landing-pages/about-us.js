@@ -7,15 +7,17 @@ import Section2AboutUs from '../../components/about/section2-about-us'
 import Section3AboutUs from '../../components/about/section3-about-us'
 import Section4AboutUs from '../../components/about/section4-about-us'
 import Section5AboutUs from '../../components/about/section5-about-us'
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
+
 const AboutUs = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     const backgroundImage = banner
     const header = (
         <>
-        Yacht Crew <br /> Center - Here To <br /> <GradientText>Assist</GradientText>{" "}
+            Yacht Crew <br /> Center - Here To <br /> <GradientText>Assist</GradientText>{" "}
             <GradientText>You</GradientText>
         </> 
     );
@@ -28,7 +30,11 @@ const AboutUs = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+            gap: {
+                xs: "0px",
+                md: "120px",
+                lg: "60px"
+            },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -43,10 +49,10 @@ const AboutUs = () => {
             <Section4AboutUs />
             <Section5AboutUs />
             <LandingPageFooter />
+            <LandingPageChatbot />
         </Box>
     )
 }
-
 
 const linearGradientLight =  `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
 const GradientText = (props) => (
@@ -78,6 +84,5 @@ const GradientText = (props) => (
     {props.children}
   </Typography>
 );
-
 
 export default AboutUs  

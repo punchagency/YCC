@@ -3,6 +3,7 @@ import banner from '../../assets/images/contact-us/YCC-contact-us-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section1ContactUs from '../../components/contact-us/section1-contact-us'
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
 
 const ContactUs = () => {
@@ -25,7 +26,11 @@ const ContactUs = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+            gap: {
+              xs: "120px",
+              md: "120px",
+              lg: "60px"
+          },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -36,6 +41,7 @@ const ContactUs = () => {
             <Section1ContactUs />
             
             <LandingPageFooter />
+            <LandingPageChatbot />
         </Box>
     )
 }   

@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { Box, Typography, Button, styled } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from '../components/landing-page-header'
@@ -53,7 +52,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
         <Box
             sx={{
                 position: "absolute",
-                top: "0", // Adjust this so it doesn’t overlap
+                top: "0", // Adjust this so it doesn't overlap
                 left: 0,
                 width: "55%", // Covers 50% of the parent
                 height: "95%",
@@ -69,7 +68,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
     <Box
     sx={{
         position: "absolute",
-        top: 0, // Adjust this so it doesn’t overlap
+        top: 0, // Adjust this so it doesn't overlap
         left: 0,
         width: "92%", // Covers 92% of the parent
         height: "100%",
@@ -158,28 +157,58 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         sx={{
                             position: "relative",
                             overflow: "hidden",
-                            border: "none", // Remove the border since we use background trick
+                            border: "none",
                             borderRadius: "8px",
                             padding: "10px 20px",
                             background: "transparent",
                             textTransform: "none",
+                            transition: "all 0.3s ease-in-out",
+                            "&:hover": {
+                                transform: "translateY(-3px)",
+                                "& .button-text": {
+                                    color: "#0487D9",
+                                },
+                                "&::before": {
+                                    opacity: 0.7,
+                                    transform: "rotate(3deg) scale(1.05)",
+                                }
+                            },
                             "&::before": {
                                 content: '""',
                                 position: "absolute",
                                 inset: 0,
-                                padding: "2px", // Controls the border thickness
+                                padding: "2px",
                                 borderRadius: "inherit",
-                                background: linearGradient, // Use your gradient here
-                                WebkitMask:
-                                    "linear-gradient(white, white) content-box, linear-gradient(white, white)",
+                                background: linearGradient,
+                                WebkitMask: "linear-gradient(white, white) content-box, linear-gradient(white, white)",
                                 WebkitMaskComposite: "destination-out",
+                                transition: "all 0.3s ease-in-out",
+                            },
+                            "&::after": {
+                                content: '""',
+                                position: "absolute",
+                                inset: 0,
+                                background: "rgba(255, 255, 255, 0.1)",
+                                transform: "translateX(-100%)",
+                                transition: "transform 0.3s ease-in-out",
+                            },
+                            "&:hover::after": {
+                                transform: "translateX(0)",
                             }
                         }}
 
                     >
-                        <ButtonTypography sx={{ color: "white" }}>{button2.text}</ButtonTypography>
-                        </Button>
-                        }
+                        <ButtonTypography 
+                            className="button-text"
+                            sx={{ 
+                                color: "white",
+                                transition: "color 0.3s ease-in-out"
+                            }}
+                        >
+                            {button2.text}
+                        </ButtonTypography>
+                    </Button>
+                  }
                 </Box>   }   
             </Box>
 

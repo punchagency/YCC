@@ -1,13 +1,12 @@
-
 import { Box, Typography, styled } from '@mui/material'
 import banner from '../../assets/images/engineering/YCC-engineering-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1Engineering from '../../components/engineering/section1-engineering'
 import Section2Engineering from '../../components/engineering/section2-engineering'
 import Section3Engineering from '../../components/engineering/section3-engineering'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
+
 const EngineeringLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -29,7 +28,10 @@ const EngineeringLandingPage = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+                gap: {
+                    md: "120px",
+                    lg: "60px"
+                },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -37,16 +39,13 @@ const EngineeringLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1Engineering /> 
             <Chatbot />
             <Section2Engineering />
             <Section3Engineering />
             <LandingPageFooter />
         </Box>
     )
-
 }
-
 
 const GradientText = styled(Typography)({
     fontWeight: 600,

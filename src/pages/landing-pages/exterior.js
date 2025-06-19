@@ -2,7 +2,6 @@ import { Box, Typography, styled } from '@mui/material'
 import banner from '../../assets/images/exterior/YCC-exterior-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1Exterior from '../../components/exterior/section1-exterior'
 import Section2Exterior from '../../components/exterior/section2-exterior'
 import Section3Exterior from '../../components/exterior/section3-exterior'
 import { useEffect } from 'react'
@@ -28,7 +27,11 @@ const ExteriorLandingPage = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+            gap: {
+                xs: "120px",
+                md: "120px",
+                lg: "60px"
+            },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -36,18 +39,13 @@ const ExteriorLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1Exterior />
             <Chatbot />
             <Section2Exterior />
             <Section3Exterior />
             <LandingPageFooter />
         </Box>
     )
-
 }
-
-
-
 
 const GradientText = styled(Typography)({
     fontWeight: 600,
@@ -59,6 +57,5 @@ const GradientText = styled(Typography)({
     textTransform: "uppercase",
     display: "inline-block",
 });
-
 
 export default ExteriorLandingPage
