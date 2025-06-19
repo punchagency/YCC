@@ -74,7 +74,13 @@ const Section2VendorServices = () => {
                     </HeadingText>
                 </Box>
 
-                <Grid container rowSpacing={{ xs: 3, sm: 4, md: 5 }} columnSpacing={{ xs: 3, sm: 4, md: 5 }} sx={{ width: "100%" }}>
+                <Grid container spacing={4} sx={{
+                    flexWrap: "wrap",
+                    backgroundColor: "transparent",
+                    width: "100%",
+                    mt: 2,
+                    mb: 8
+                }}>
                     {gridData.map((item, index) => (
                         <Grid
                             item
@@ -83,11 +89,11 @@ const Section2VendorServices = () => {
                             key={index}
                             sx={{
                                 display: "flex",
-                                justifyContent: "start",
-                                textAlign: "left",
+                                flexDirection: "column",
+                                height: "100%"
                             }}
                         >
-                            <AnimatedBox>
+                            <AnimatedBox sx={{ height: "100%" }}>
                                 <Box sx={{ 
                                     px: 4, 
                                     py: 7, 
