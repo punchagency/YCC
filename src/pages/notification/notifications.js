@@ -1,58 +1,69 @@
-"use client";
+"use client"
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { Badge } from "primereact/badge";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
-import { Toast } from "primereact/toast";
-import { useMediaQuery } from "@mui/material";
-import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { Box, Typography, Card, CardContent, Chip } from "@mui/material";
-import NotificationDetailsModal from "../../components/NotificationDetailsModal";
-import {
-  getNotifications,
-  updateComplaintStatus,
-} from "../../services/notification/notificationService";
-import { TableSkeleton } from "../../components/TableSkeleton";
-import { useToast } from "../../components/Toast";
-import { Pagination } from "../../components/pagination";
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useState, useEffect, useCallback } from "react"
+import { Badge } from "primereact/badge"
+import { Button } from "primereact/button"
+import { DataTable } from "primereact/datatable"
+import { Column } from "primereact/column"
+import { Menu } from "primereact/menu"
+import { Toast } from "primereact/toast"
+import { useMediaQuery } from "@mui/material"
+import { useTheme as useMuiTheme } from "@mui/material/styles"
+import { Box, Typography, Card, CardContent, Chip } from "@mui/material"
+import NotificationDetailsModal from "../../components/NotificationDetailsModal"
+import { getNotifications, markNotificationAsRead } from "../../services/notification/notificationService"
+import { TableSkeleton } from "../../components/TableSkeleton"
+import { useToast } from "../../components/Toast"
+import { Pagination } from "../../components/pagination"
+import React from "react"
+import { useNavigate } from "react-router-dom"
 
 // Mobile notification card component
-const MobileNotificationCard = ({
-  notification,
-  handleViewDetails,
-  handleStatusChange,
-  statusLoading,
-  theme,
-}) => {
-  const cellStatusMenu = useRef(null);
+const MobileNotificationCard = ({ notification, handleViewDetails, handleStatusChange, statusLoading, theme }) => {
+  const cellStatusMenu = useRef(null)
+
+  // Add click outside handler for mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      try {
+        if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
+          const menuElement = cellStatusMenu.current.getElement()
+          if (menuElement && !menuElement.contains(event.target)) {
+            cellStatusMenu.current.hide()
+          }
+        }
+      } catch (error) {
+        // Silently handle any errors to prevent ugly error messages
+        console.warn("Menu close error:", error)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   const statusStyles = {
     read: { bg: "#ECFDF3", color: "#027A48" },
     unread: { bg: "#FEF3F2", color: "#B42318" },
-  };
+  }
 
   const style = statusStyles[notification?.read ? "read" : "unread"] || {
     bg: "#F2F4F7",
     color: "#344054",
-  };
+  }
 
   const priorityStyles = {
     high: { bg: "#ECFDF3", color: "#027A48" },
     medium: { bg: "#FFFAEB", color: "#B54708" },
     low: { bg: "#FEF3F2", color: "#B42318" },
-  };
+  }
 
-  const priorityStyle = priorityStyles[
-    (notification?.priority || "").toLowerCase()
-  ] || {
+  const priorityStyle = priorityStyles[(notification?.priority || "").toLowerCase()] || {
     bg: "#F2F4F7",
     color: "#344054",
-  };
+  }
 
   return (
     <Card
@@ -105,7 +116,7 @@ const MobileNotificationCard = ({
             color: "#101828",
           }}
         >
-          {notification?.type || "N/A"}
+          {notification?.title || "N/A"}
         </Typography>
 
         <Typography
@@ -138,40 +149,13 @@ const MobileNotificationCard = ({
               color: "#667085",
             }}
           >
-            {notification?.createdAt
-              ? new Date(notification.createdAt).toLocaleDateString()
-              : "N/A"}
+            {notification?.createdAt ? new Date(notification.createdAt).toLocaleDateString() : "N/A"}
           </Typography>
 
           <Box sx={{ display: "flex", gap: 1 }}>
             <Button
-              icon="pi pi-check-circle"
-              className="p-button-rounded p-button-text p-button-sm"
-              tooltip="Change Status"
-              tooltipOptions={{ position: "top" }}
-              onClick={(e) => cellStatusMenu.current.toggle(e)}
-              disabled={statusLoading}
-              style={{ padding: "6px" }}
-            />
-            <Menu
-              model={[
-                {
-                  label: "Mark as Read",
-                  command: () => handleStatusChange(notification._id, "read"),
-                },
-                {
-                  label: "Mark as Unread",
-                  command: () => handleStatusChange(notification._id, "unread"),
-                },
-              ]}
-              popup
-              ref={cellStatusMenu}
-              id={`status-menu-${notification?._id || Math.random()}`}
-            />
-
-            <Button
               label="View"
-              className="p-button-outlined p-button-sm"
+              className="p-button-outlined p-button-sm mobile-view-details-btn"
               style={{
                 border: "1px solid #D0D5DD",
                 color: "#344054",
@@ -179,6 +163,7 @@ const MobileNotificationCard = ({
                 padding: "6px 12px",
                 fontSize: "12px",
                 borderRadius: "8px",
+                transition: "background 0.2s, border-color 0.2s, color 0.2s",
               }}
               onClick={() => handleViewDetails(notification)}
             />
@@ -186,206 +171,448 @@ const MobileNotificationCard = ({
         </Box>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-const StatusCell = React.memo(
-  ({ rowData, handleStatusChange, statusLoading }) => {
-    const cellStatusMenu = useRef(null);
+const StatusCell = React.memo(({ rowData, handleStatusChange, statusLoading }) => {
+  const cellStatusMenu = useRef(null)
 
-    const statusStyles = {
-      "resolve & archive": { bg: "#ECFDF3", color: "#027A48" },
-      flagged: { bg: "#EFF8FF", color: "#175CD3" },
-      "escalate unresolved": { bg: "#FEF3F2", color: "#B42318" },
-      "assign to a manager": { bg: "#F9F5FF", color: "#6941C6" },
-      pending: { bg: "#FEF3F2", color: "#B42318" },
-      "in-progress": { bg: "#FFFAEB", color: "#B54708" },
-      resolved: { bg: "#ECFDF3", color: "#027A48" },
-      dismissed: { bg: "#F2F4F7", color: "#344054" },
-    };
+  // Add click outside handler for desktop menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      try {
+        if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
+          const menuElement = cellStatusMenu.current.getElement()
+          if (menuElement && !menuElement.contains(event.target)) {
+            cellStatusMenu.current.hide()
+          }
+        }
+      } catch (error) {
+        // Silently handle any errors to prevent ugly error messages
+        console.warn("Menu close error:", error)
+      }
+    }
 
-    const style = statusStyles[rowData.status.toLowerCase()] || {
-      bg: "#F2F4F7",
-      color: "#344054",
-    };
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
-    const statusOptions = [
-      { label: "Pending", value: "pending" },
-      { label: "In Progress", value: "in-progress" },
-      { label: "Resolved", value: "resolved" },
-      { label: "Dismissed", value: "dismissed" },
-      { label: "Flagged", value: "flagged" },
-    ];
+  const statusOptions = [{ label: "Mark as Read", value: "read" }]
 
-    const statusMenuItems = statusOptions.map((option) => ({
-      label: option.label,
-      command: () => handleStatusChange(rowData._id, option.value),
-    }));
-
-    return (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <span
-          style={{
-            backgroundColor: style.bg,
-            color: style.color,
-            padding: "2px 8px",
-            borderRadius: "16px",
-            fontSize: "12px",
-            marginRight: "8px",
-          }}
-        >
-          {rowData.status}
-        </span>
-        <Button
-          icon="pi pi-check-circle"
-          className="p-button-rounded p-button-text p-button-sm"
-          tooltip="Change Status"
-          tooltipOptions={{ position: "top" }}
-          onClick={(e) => cellStatusMenu.current.toggle(e)}
-          disabled={statusLoading}
-        />
-        <Menu
-          model={statusMenuItems}
-          popup
-          ref={cellStatusMenu}
-          id={`status-menu-${rowData._id}`}
-        />
-      </div>
-    );
-  }
-);
-
-// Modern Filter Component
-const NotificationFilter = ({ activeFilter, onFilterChange, isMobile }) => {
-  const filters = [
-    { key: "all", label: "All", icon: "pi pi-list" },
-    {
-      key: "high",
-      label: "High Priority",
-      icon: "pi pi-exclamation-triangle",
-      color: "#DC2626",
-    },
-    {
-      key: "medium",
-      label: "Medium Priority",
-      icon: "pi pi-minus",
-      color: "#D97706",
-    },
-    {
-      key: "low",
-      label: "Low Priority",
-      icon: "pi pi-circle",
-      color: "#059669",
-    },
-  ];
+  const statusMenuItems = statusOptions.map((option) => ({
+    label: option.label,
+    command: () => handleStatusChange(rowData._id, option.value),
+  }))
 
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-        borderRadius: "12px",
-        padding: isMobile ? "12px" : "16px",
-        margin: isMobile ? "0 16px 20px 16px" : "0 20px 24px 20px",
-        boxShadow:
-          "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
-        border: "1px solid #e2e8f0",
-      }}
-    >
-      <div
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <span
         style={{
-          display: "flex",
-          gap: isMobile ? "8px" : "12px",
-          overflowX: "auto",
-          paddingBottom: "4px",
+          backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
+          color: rowData.read ? "#027A48" : "#B42318",
+          padding: "2px 8px",
+          borderRadius: "16px",
+          fontSize: "12px",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "4px",
         }}
       >
-        {filters.map((filter) => {
-          const isActive = activeFilter === filter.key;
-          return (
-            <button
-              key={filter.key}
-              onClick={() => onFilterChange(filter.key)}
+        {rowData.read ? "Read" : "Unread"}
+      </span>
+      <Button
+        icon="pi pi-check-circle"
+        className="p-button-rounded p-button-text p-button-sm"
+        tooltip="Change Status"
+        tooltipOptions={{ position: "top" }}
+        onClick={(e) => cellStatusMenu.current.toggle(e)}
+        disabled={statusLoading}
+      />
+      <Menu model={statusMenuItems} popup ref={cellStatusMenu} id={`status-menu-${rowData._id}`} />
+    </div>
+  )
+})
+
+// Modern Compact Filter Component with Dropdowns
+const NotificationFilter = ({ activeFilter, activeStatusFilter, onFilterChange, onStatusFilterChange, isMobile }) => {
+  const [priorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+
+  const priorityFilters = [
+    { key: "all", label: "All Priorities", icon: "pi pi-list" },
+    { key: "high", label: "High Priority", icon: "pi pi-exclamation-triangle", color: "#DC2626" },
+    { key: "medium", label: "Medium Priority", icon: "pi pi-minus", color: "#D97706" },
+    { key: "low", label: "Low Priority", icon: "pi pi-circle", color: "#059669" },
+  ]
+
+  const statusFilters = [
+    { key: "all", label: "All Status", icon: "pi pi-list" },
+    { key: "unread", label: "Unread", icon: "pi pi-circle", color: "#DC2626" },
+    { key: "read", label: "Read", icon: "pi pi-check-circle", color: "#059669" },
+  ]
+
+  const getActiveFilterLabel = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey)
+    return filter ? filter.label : "Select..."
+  }
+
+  const getActiveFilterIcon = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey)
+    return filter ? filter.icon : "pi pi-list"
+  }
+
+  const getActiveFilterColor = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey)
+    return filter ? filter.color : "#6b7280"
+  }
+
+  // Custom click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.custom-dropdown')) {
+        setPriorityDropdownOpen(false);
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handlePrioritySelect = (key) => {
+    onFilterChange(key);
+    setPriorityDropdownOpen(false);
+  };
+
+  const handleStatusSelect = (key) => {
+    onStatusFilterChange(key);
+    setStatusDropdownOpen(false);
+  };
+
+  return (
+    <>
+      <style>
+        {`
+          .filter-dropdown-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: ${isMobile ? "10px 14px" : "12px 16px"};
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            color: #374151;
+            font-size: ${isMobile ? "13px" : "14px"};
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            min-width: ${isMobile ? "140px" : "160px"};
+            justify-content: space-between;
+          }
+
+          .filter-dropdown-button:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          .filter-dropdown-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .filter-dropdown-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+          }
+
+          .filter-dropdown-chevron {
+            font-size: 12px;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+          }
+
+          .filter-dropdown-button:hover .filter-dropdown-chevron {
+            color: #374151;
+          }
+
+          .custom-dropdown {
+            position: relative;
+          }
+
+          .custom-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            margin-top: 4px;
+            padding: 4px;
+            min-width: 100%;
+          }
+
+          .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #374151;
+            font-size: ${isMobile ? "13px" : "14px"};
+          }
+
+          .custom-dropdown-item:hover {
+            background-color: #f8fafc;
+          }
+
+          .custom-dropdown-item.active {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+          }
+
+          .custom-dropdown-item i {
+            font-size: ${isMobile ? "12px" : "14px"};
+          }
+        `}
+      </style>
+
+      <div
+        style={{
+          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+          borderRadius: "12px",
+          padding: isMobile ? "16px" : "20px",
+          margin: isMobile ? "0 16px 20px 16px" : "0 20px 24px 20px",
+          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+          border: "1px solid #e2e8f0",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: isMobile ? "12px" : "16px",
+            flexWrap: isMobile ? "wrap" : "nowrap",
+          }}
+        >
+          {/* Filter Label */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              color: "#374151",
+              fontWeight: "600",
+              fontSize: isMobile ? "14px" : "16px",
+              minWidth: "fit-content",
+            }}
+          >
+            <i className="pi pi-filter" style={{ fontSize: isMobile ? "14px" : "16px", color: "#6b7280" }} />
+            <span>Filters</span>
+          </div>
+
+          {/* Priority Filter Dropdown */}
+          <div className="custom-dropdown">
+            <button 
+              className="filter-dropdown-button" 
+              onClick={() => setPriorityDropdownOpen(!priorityDropdownOpen)}
+            >
+              <div className="filter-dropdown-content">
+                <i
+                  className={getActiveFilterIcon(priorityFilters, activeFilter)}
+                  style={{
+                    fontSize: isMobile ? "12px" : "14px",
+                    color: getActiveFilterColor(priorityFilters, activeFilter),
+                  }}
+                />
+                <span>{getActiveFilterLabel(priorityFilters, activeFilter)}</span>
+              </div>
+              <i 
+                className={`pi pi-chevron-down filter-dropdown-chevron ${priorityDropdownOpen ? 'rotate-180' : ''}`} 
+                style={{ transform: priorityDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
+            {priorityDropdownOpen && (
+              <div className="custom-dropdown-menu">
+                {priorityFilters.map((filter) => (
+                  <div
+                    key={filter.key}
+                    className={`custom-dropdown-item ${activeFilter === filter.key ? 'active' : ''}`}
+                    onClick={() => handlePrioritySelect(filter.key)}
+                  >
+                    <i 
+                      className={filter.icon}
+                      style={{ color: filter.color || "#6b7280" }}
+                    />
+                    <span>{filter.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status Filter Dropdown */}
+          <div className="custom-dropdown">
+            <button 
+              className="filter-dropdown-button" 
+              onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+            >
+              <div className="filter-dropdown-content">
+                <i
+                  className={getActiveFilterIcon(statusFilters, activeStatusFilter)}
+                  style={{
+                    fontSize: isMobile ? "12px" : "14px",
+                    color: getActiveFilterColor(statusFilters, activeStatusFilter),
+                  }}
+                />
+                <span>{getActiveFilterLabel(statusFilters, activeStatusFilter)}</span>
+              </div>
+              <i 
+                className={`pi pi-chevron-down filter-dropdown-chevron ${statusDropdownOpen ? 'rotate-180' : ''}`} 
+                style={{ transform: statusDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
+            {statusDropdownOpen && (
+              <div className="custom-dropdown-menu">
+                {statusFilters.map((filter) => (
+                  <div
+                    key={filter.key}
+                    className={`custom-dropdown-item ${activeStatusFilter === filter.key ? 'active' : ''}`}
+                    onClick={() => handleStatusSelect(filter.key)}
+                  >
+                    <i 
+                      className={filter.icon}
+                      style={{ color: filter.color || "#6b7280" }}
+                    />
+                    <span>{filter.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Active Filters Indicator */}
+          {(activeFilter !== "all" || activeStatusFilter !== "all") && (
+            <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
-                padding: isMobile ? "8px 12px" : "10px 16px",
-                borderRadius: "8px",
-                border: isActive ? "2px solid #0387D9" : "1px solid #e2e8f0",
-                backgroundColor: isActive ? "#0387D9" : "#ffffff",
-                color: isActive ? "#ffffff" : "#374151",
-                fontSize: isMobile ? "12px" : "14px",
-                fontWeight: isActive ? "600" : "500",
-                cursor: "pointer",
-                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-                boxShadow: isActive
-                  ? "0 4px 12px rgba(3, 135, 217, 0.3)"
-                  : "0 1px 2px rgba(0, 0, 0, 0.05)",
-                transform: isActive ? "translateY(-1px)" : "translateY(0)",
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.target.style.backgroundColor = "#f8fafc";
-                  e.target.style.borderColor = "#cbd5e1";
-                  e.target.style.transform = "translateY(-1px)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.target.style.backgroundColor = "#ffffff";
-                  e.target.style.borderColor = "#e2e8f0";
-                  e.target.style.transform = "translateY(0)";
-                }
+                gap: "8px",
+                marginLeft: isMobile ? "0" : "auto",
+                flexWrap: "wrap",
               }}
             >
-              <i
-                className={filter.icon}
-                style={{
-                  fontSize: isMobile ? "12px" : "14px",
-                  color: isActive ? "#ffffff" : filter.color || "#6b7280",
-                }}
-              />
-              <span>
-                {isMobile && filter.key !== "all"
-                  ? filter.key.charAt(0).toUpperCase() + filter.key.slice(1)
-                  : filter.label}
-              </span>
-            </button>
-          );
-        })}
+              {activeFilter !== "all" && (
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #0387D9 0%, #0369A1 100%)",
+                    color: "#ffffff",
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "11px",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  {activeFilter}
+                  <button
+                    onClick={() => onFilterChange("all")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <i className="pi pi-times" style={{ fontSize: "10px" }} />
+                  </button>
+                </span>
+              )}
+              {activeStatusFilter !== "all" && (
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    color: "#ffffff",
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "11px",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  {activeStatusFilter}
+                  <button
+                    onClick={() => onStatusFilterChange("all")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <i className="pi pi-times" style={{ fontSize: "10px" }} />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    </>
+  )
+}
 
 export default function Notifications({ role }) {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedNotification, setSelectedNotification] = useState(null);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [statusLoading, setStatusLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const [showModal, setShowModal] = useState(false)
+  const [selectedNotification, setSelectedNotification] = useState(null)
+  const [activeFilter, setActiveFilter] = useState("all")
+  const [activeStatusFilter, setActiveStatusFilter] = useState("all")
+  const [notifications, setNotifications] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [statusLoading, setStatusLoading] = useState(false)
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
 
-  const toast = useRef(null);
-  const { showSuccess, showError } = useToast();
+  const toast = useRef(null)
+  const { showSuccess, showError } = useToast()
 
   // Add responsive detection
-  const muiTheme = useMuiTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
-  const { theme } = useMuiTheme();
+  const muiTheme = useMuiTheme()
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"))
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"))
+  const { theme } = useMuiTheme()
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const fetchNotifications = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       console.log(
         "Fetching notifications with page:",
@@ -393,87 +620,116 @@ export default function Notifications({ role }) {
         "limit:",
         limit,
         "filter:",
-        activeFilter
-      );
+        activeFilter,
+        "statusFilter:",
+        activeStatusFilter,
+      )
 
       const response = await getNotifications({
         page,
         limit,
         priority: activeFilter !== "all" ? activeFilter : undefined,
-      });
+        status: activeStatusFilter !== "all" ? activeStatusFilter : undefined,
+      })
 
-      console.log("Notifications response:", response);
+      console.log("Notifications response:", response)
 
       if (response.success) {
-        setNotifications(response.data);
-        setTotalPages(response.pagination.pages);
-        setTotalItems(response.pagination.total);
-        setError(null);
+        setNotifications(response.data)
+        setTotalPages(response.pagination.pages)
+        setTotalItems(response.pagination.total)
+        setError(null)
       } else {
-        setError(response.error);
-        showError(response.error || "Failed to fetch notifications");
+        setError(response.error)
+        showError(response.error || "Failed to fetch notifications")
       }
     } catch (err) {
-      console.error("Error loading notifications:", err);
-      setError("Failed to fetch notifications");
-      showError("Failed to fetch notifications");
+      console.error("Error loading notifications:", err)
+      setError("Failed to fetch notifications")
+      showError("Failed to fetch notifications")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [page, limit, activeFilter, showError]);
+  }, [page, limit, activeFilter, activeStatusFilter, showError])
 
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    fetchNotifications()
+  }, [fetchNotifications])
 
   const handleFilterClick = (filter) => {
-    console.log("Filter clicked:", filter);
-    setActiveFilter(filter);
-    setPage(1); // Reset to first page when filter changes
-  };
+    console.log("Filter clicked:", filter)
+    setActiveFilter(filter)
+    setPage(1) // Reset to first page when filter changes
+  }
 
-  const handleViewDetails = (notification) => {
-    console.log("Viewing details for notification:", notification);
-    setSelectedNotification(notification);
-    setShowModal(true);
-  };
+  const handleStatusFilterClick = (filter) => {
+    console.log("Status filter clicked:", filter)
+    setActiveStatusFilter(filter)
+    setPage(1) // Reset to first page when status filter changes
+  }
+
+  const handleViewDetails = async (notification) => {
+    // If not read, optimistically update selectedNotification to read: true
+    if (!notification.read) {
+      setSelectedNotification({ ...notification, read: true })
+    } else {
+      setSelectedNotification(notification)
+    }
+    setShowModal(true)
+
+    // Auto-mark as read when viewing details (if not already read)
+    if (!notification.read) {
+      try {
+        const response = await markNotificationAsRead(notification._id)
+        if (response.success) {
+          // Update the local state
+          setNotifications(
+            notifications.map((notif) => (notif._id === notification._id ? { ...notif, read: true } : notif)),
+          )
+        }
+      } catch (error) {
+        // Silently handle errors - don't show error for auto-read
+        console.warn("Auto-read error:", error)
+      }
+    }
+  }
 
   const handleStatusChange = async (notificationId, newStatus) => {
-    setStatusLoading(true);
+    setStatusLoading(true)
     try {
-      const response = await updateComplaintStatus(notificationId, newStatus);
+      // For now, we only support marking as read since that's what the backend supports
+      // The newStatus parameter is ignored since the backend only marks as read
+      const response = await markNotificationAsRead(notificationId)
       if (response.success) {
         // Update the local state
         setNotifications(
           notifications.map((notification) =>
-            notification._id === notificationId
-              ? { ...notification, read: newStatus === "read" }
-              : notification
-          )
-        );
+            notification._id === notificationId ? { ...notification, read: true } : notification,
+          ),
+        )
 
-        showSuccess(`Notification marked as ${newStatus}`);
+        showSuccess("Notification marked as read")
       } else {
-        showError(response.error || "Failed to update status");
+        showError(response.error || "Failed to update status")
       }
     } catch (error) {
-      showError("An error occurred while updating status");
+      showError("An error occurred while updating status")
     } finally {
-      setStatusLoading(false);
+      setStatusLoading(false)
     }
-  };
+  }
 
   const priorityTemplate = (rowData) => {
     const bgColors = {
       high: { bg: "#ECFDF3", color: "#027A48" },
       medium: { bg: "#FFFAEB", color: "#B54708" },
       low: { bg: "#FEF3F2", color: "#B42318" },
-    };
+    }
 
     const style = bgColors[rowData.priority.toLowerCase()] || {
       bg: "#F2F4F7",
       color: "#344054",
-    };
+    }
 
     return (
       <span
@@ -487,8 +743,8 @@ export default function Notifications({ role }) {
       >
         {rowData.priority}
       </span>
-    );
-  };
+    )
+  }
 
   const statusTemplate = (rowData) => {
     return (
@@ -508,14 +764,14 @@ export default function Notifications({ role }) {
           {rowData.read ? "Read" : "Unread"}
         </span>
       </div>
-    );
-  };
+    )
+  }
 
   const actionTemplate = (rowData) => {
     return (
       <Button
         label="View Details"
-        className="p-button-outlined"
+        className="p-button-outlined desktop-view-details-btn"
         style={{
           border: "1px solid #D0D5DD",
           color: "#344054",
@@ -523,18 +779,32 @@ export default function Notifications({ role }) {
           padding: isTablet ? "6px 12px" : "8px 14px",
           fontSize: isTablet ? "12px" : "14px",
           borderRadius: "8px",
+          transition: "background 0.2s, border-color 0.2s, color 0.2s",
         }}
         onClick={() => handleViewDetails(rowData)}
       />
-    );
-  };
+    )
+  }
+
+  // Calculate unread notifications count
+  const unreadCount = notifications.filter((n) => !n.read).length
+
+  // --- Filtering logic ---
+  const filteredNotifications = notifications.filter((notif) => {
+    let priorityMatch = true;
+    let statusMatch = true;
+    if (activeFilter !== "all") {
+      priorityMatch = notif.priority && notif.priority.toLowerCase() === activeFilter;
+    }
+    if (activeStatusFilter !== "all") {
+      statusMatch = activeStatusFilter === "read" ? notif.read : !notif.read;
+    }
+    return priorityMatch && statusMatch;
+  });
 
   if (loading) {
     return (
-      <div
-        className="notification-container"
-        style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}
-      >
+      <div className="notification-container" style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
         <div
           className="notification-header"
           style={{
@@ -546,6 +816,33 @@ export default function Notifications({ role }) {
             borderBottom: "1px solid #e2e8f0",
           }}
         >
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: isMobile ? "36px" : "40px",
+              height: isMobile ? "36px" : "40px",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+              backgroundColor: "#ffffff",
+              color: "#374151",
+              cursor: "pointer",
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+            }}
+            title="Go back"
+          >
+            <i
+              className="pi pi-arrow-left"
+              style={{
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "600",
+              }}
+            />
+          </button>
+
           <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <h3
               style={{
@@ -557,17 +854,15 @@ export default function Notifications({ role }) {
             >
               Notifications
             </h3>
-            <Badge
-              value="--"
-              severity="danger"
-              style={{ marginLeft: "12px" }}
-            />
+            <Badge value="--" severity="danger" style={{ marginLeft: "12px" }} />
           </div>
         </div>
 
         <NotificationFilter
           activeFilter={activeFilter}
+          activeStatusFilter={activeStatusFilter}
           onFilterChange={handleFilterClick}
+          onStatusFilterChange={handleStatusFilterClick}
           isMobile={isMobile}
         />
 
@@ -583,20 +878,17 @@ export default function Notifications({ role }) {
           showHeader={true}
         />
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
       <div className="notification-container">
-        <div
-          className="error-message"
-          style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}
-        >
+        <div className="error-message" style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}>
           Error: {error}
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -615,13 +907,17 @@ export default function Notifications({ role }) {
           .shine-effect:hover {
             animation: shine 0.6s ease-in-out;
           }
+
+          .mobile-view-details-btn:hover,
+          .desktop-view-details-btn:hover {
+            background: #F3F4F6 !important;
+            border-color: #A3A3A3 !important;
+            color: #22223B !important;
+          }
         `}
       </style>
       <Toast ref={toast} />
-      <div
-        className="notification-container"
-        style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}
-      >
+      <div className="notification-container" style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
         <div
           className="notification-header"
           style={{
@@ -633,6 +929,121 @@ export default function Notifications({ role }) {
             borderBottom: "1px solid #e2e8f0",
           }}
         >
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: isMobile ? "36px" : "40px",
+              height: isMobile ? "36px" : "40px",
+              borderRadius: "8px",
+              border: "1px solid #e2e8f0",
+              backgroundColor: "#ffffff",
+              color: "#374151",
+              cursor: "pointer",
+              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+              position: "relative",
+              overflow: "hidden",
+            }}
+            title="Go back"
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "#0387D9"
+              e.target.style.borderColor = "#0387D9"
+              e.target.style.color = "#ffffff"
+              e.target.style.transform = "translateY(-2px) scale(1.05)"
+              e.target.style.boxShadow = "0 8px 25px rgba(3, 135, 217, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15)"
+
+              // Add a subtle glow effect
+              const glowEffect = e.target.querySelector(".glow-effect")
+              if (glowEffect) {
+                glowEffect.style.opacity = "1"
+                glowEffect.style.transform = "scale(1.2)"
+              }
+
+              // Animate the arrow icon
+              const icon = e.target.querySelector("i")
+              if (icon) {
+                icon.style.transform = "translateX(-2px)"
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#ffffff"
+              e.target.style.borderColor = "#e2e8f0"
+              e.target.style.color = "#374151"
+              e.target.style.transform = "translateY(0) scale(1)"
+              e.target.style.boxShadow = "0 1px 2px rgba(0, 0, 0, 0.05)"
+
+              // Remove glow effect
+              const glowEffect = e.target.querySelector(".glow-effect")
+              if (glowEffect) {
+                glowEffect.style.opacity = "0"
+                glowEffect.style.transform = "scale(1)"
+              }
+
+              // Reset arrow icon
+              const icon = e.target.querySelector("i")
+              if (icon) {
+                icon.style.transform = "translateX(0)"
+              }
+            }}
+            onMouseDown={(e) => {
+              e.target.style.transform = "translateY(-1px) scale(1.02)"
+            }}
+            onMouseUp={(e) => {
+              e.target.style.transform = "translateY(-2px) scale(1.05)"
+            }}
+          >
+            {/* Glow effect background */}
+            <div
+              className="glow-effect"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                width: "100%",
+                height: "100%",
+                background: "radial-gradient(circle, rgba(3, 135, 217, 0.2) 0%, transparent 70%)",
+                borderRadius: "50%",
+                transform: "translate(-50%, -50%) scale(1)",
+                opacity: "0",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+
+            {/* Ripple effect on click */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: "8px",
+                background: "linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)",
+                transform: "translateX(-100%)",
+                transition: "transform 0.6s ease",
+                pointerEvents: "none",
+                zIndex: 1,
+              }}
+              className="shine-effect"
+            />
+
+            <i
+              className="pi pi-arrow-left"
+              style={{
+                fontSize: isMobile ? "14px" : "16px",
+                fontWeight: "600",
+                transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                position: "relative",
+                zIndex: 2,
+              }}
+            />
+          </button>
+
           <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
             <h3
               style={{
@@ -644,17 +1055,15 @@ export default function Notifications({ role }) {
             >
               Notifications
             </h3>
-            <Badge
-              value={notifications.length}
-              severity="danger"
-              style={{ marginLeft: "12px" }}
-            />
+            <Badge value={unreadCount} severity="danger" style={{ marginLeft: "12px" }} />
           </div>
         </div>
 
         <NotificationFilter
           activeFilter={activeFilter}
+          activeStatusFilter={activeStatusFilter}
           onFilterChange={handleFilterClick}
+          onStatusFilterChange={handleStatusFilterClick}
           isMobile={isMobile}
         />
 
@@ -668,7 +1077,7 @@ export default function Notifications({ role }) {
             }}
           >
             <DataTable
-              value={notifications}
+              value={filteredNotifications}
               responsiveLayout="scroll"
               style={{
                 border: "1px solid #EAECF0",
@@ -691,7 +1100,7 @@ export default function Notifications({ role }) {
                 }}
               />
               <Column
-                field="type"
+                field="title"
                 header="Type"
                 style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
                 headerStyle={{
@@ -767,8 +1176,8 @@ export default function Notifications({ role }) {
         {/* Mobile View */}
         {isMobile && (
           <Box sx={{ padding: "15px" }}>
-            {notifications.length > 0 ? (
-              notifications.map((notification) => (
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notification) => (
                 <MobileNotificationCard
                   key={notification._id}
                   notification={notification}
@@ -807,11 +1216,11 @@ export default function Notifications({ role }) {
       <NotificationDetailsModal
         visible={showModal}
         onHide={() => {
-          setShowModal(false);
-          fetchNotifications();
+          setShowModal(false)
+          fetchNotifications()
         }}
         notificationData={selectedNotification}
       />
     </>
-  );
+  )
 }
