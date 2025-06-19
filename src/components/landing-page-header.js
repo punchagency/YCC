@@ -193,6 +193,21 @@ const LandingPageHeader = () => {
                   onClick={handleDepartmentsClick}
                   sx={{
                     textTransform: "none",
+                    position: "relative",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      bottom: -2,
+                      left: 0,
+                      width: "100%",
+                      height: "2px",
+                      background: linearGradient,
+                      opacity: item.options.some(opt => opt.route === location.pathname) ? 1 : 0,
+                      transition: "opacity 0.3s ease-in-out",
+                    },
+                    "&:hover::after": {
+                      opacity: 1,
+                    },
                   }}
                 >
                   <Typography
@@ -202,11 +217,21 @@ const LandingPageHeader = () => {
                       color: "white",
                       alignText: "center",
                       letterSpacing: "-2%",
+                      transition: "color 0.3s ease-in-out",
+                      "&:hover": {
+                        color: "#0487D9",
+                      },
                     }}
                   >
                     {item.title}
                   </Typography>
-                  <KeyboardArrowDownIcon sx={{ color: "white" }} />
+                  <KeyboardArrowDownIcon sx={{ 
+                    color: "white",
+                    transition: "color 0.3s ease-in-out",
+                    "&:hover": {
+                      color: "#0487D9",
+                    },
+                  }} />
                 </Button>
                 <Menu
                   anchorEl={departmentsAnchorEl}
@@ -220,46 +245,36 @@ const LandingPageHeader = () => {
                       boxShadow: "none",
                       minWidth: "200px",
                       borderRadius: "13px",
-                    }, // Remove padding from Paper
+                    },
                     "& .MuiList-root": { padding: 0 },
                   }}
                 >
                   {item.options.map((option) => (
                     <MenuItem
-                      key={option}
+                      key={option.title}
                       onClick={handleDepartmentsClose}
                       component={Link}
                       to={option.route}
                       sx={{
-                        borderRadius: 0, // Default no border radius
+                        borderRadius: 0,
                         "&:first-of-type": {
                           borderTopLeftRadius: "13px",
                           borderTopRightRadius: "13px",
-                        }, // ✅ Rounded top
+                        },
                         "&:last-of-type": {
                           borderBottomLeftRadius: "13px",
                           borderBottomRightRadius: "13px",
-                        }, // ✅ Rounded bottom
-                        width: "100%", // ✅ Ensure it spans full width
-                        height: "100%", // ✅ Ensures full height
-                        display: "flex", // ✅ Makes sure it fills the container properly
-                        alignItems: "center", // Aligns text vertically
-                        justifyContent: "flex-start", // Aligns text to the left
-                        padding: "12px 16px", // Adjust padding to remove unnecessary space
-                        color:
-                          location.pathname === option.route
-                            ? "white"
-                            : "#131313",
-                        backgroundImage:
-                          location.pathname === option.route
-                            ? linearGradient
-                            : "none", // ✅ Use backgroundImage for gradients
-                        backgroundColor:
-                          location.pathname === option.route
-                            ? "transparent"
-                            : "white", // ✅ Ensure white background for non-active items
+                        },
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-start",
+                        padding: "12px 16px",
+                        color: location.pathname === option.route ? "#0487D9" : "#131313",
+                        background: location.pathname === option.route ? "#E6EFF2" : "transparent",
                         "&:hover": {
-                          backgroundColor: "#f5f5f5", // ✅ Apply gradient on hover
+                          background: "#E6EFF2",
                         },
                       }}
                     >
@@ -271,11 +286,25 @@ const LandingPageHeader = () => {
             ) : (
               <Button
                 key={item.title}
-                color="inherit"
                 component={Link}
                 to={item.link}
                 sx={{
                   textTransform: "none",
+                  position: "relative",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    bottom: -2,
+                    left: 0,
+                    width: "100%",
+                    height: "2px",
+                    background: linearGradient,
+                    opacity: location.pathname === item.link ? 1 : 0,
+                    transition: "opacity 0.3s ease-in-out",
+                  },
+                  "&:hover::after": {
+                    opacity: 1,
+                  },
                 }}
               >
                 <Typography
@@ -285,9 +314,10 @@ const LandingPageHeader = () => {
                     color: "white",
                     alignText: "center",
                     letterSpacing: "-2%",
-                    //color: location.pathname === item.link ? "blue" : "white",
-                    fontWeight:
-                      location.pathname === item.link ? "bold" : "normal",
+                    transition: "color 0.3s ease-in-out",
+                    "&:hover": {
+                      color: "#0487D9",
+                    },
                   }}
                 >
                   {item.title}
@@ -761,14 +791,33 @@ export const ButtonTypography = styled(Typography)(({ theme }) => ({
 }));
 
 export const GradientButton = styled(Button)({
+  position: "relative",
   background: linearGradient,
   fontSize: "16px",
   fontFamily: "Inter, sans-serif",
   textTransform: "none",
-  "&:hover": {
-    background: linearGradient2,
-  },
   padding: "12px 14px",
+  overflow: "hidden",
+  transition: "all 0.3s ease-in-out",
+  "&:hover": {
+    background: linearGradient,
+    transform: "translateY(-3px)",
+    boxShadow: "0 4px 12px rgba(4, 135, 217, 0.3)",
+    "&::after": {
+      transform: "translateX(100%)",
+    }
+  },
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%)",
+    transform: "translateX(-100%)",
+    transition: "transform 0.6s ease-in-out",
+  }
 });
 
 export default LandingPageHeader;

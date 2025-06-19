@@ -2,7 +2,6 @@ import { Box, Typography, styled } from '@mui/material'
 import banner from '../../assets/images/chef-gallery/YCC-chef-gallery-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1ChefGallery from '../../components/chef-gallery/section1-chef-gallery'
 import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gallery'
 import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
 import { useEffect } from 'react'
@@ -28,7 +27,11 @@ const ChefGalleryLandingPage = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+            gap: {
+                xs: "120px",
+                md: "120px",
+                lg: "60px"
+            },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -36,7 +39,6 @@ const ChefGalleryLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1ChefGallery />
             <Chatbot />
             <Section2ChefGallery />
             <Section3ChefGallery />

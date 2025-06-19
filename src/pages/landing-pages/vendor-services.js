@@ -2,8 +2,8 @@ import { Box, Typography, styled } from '@mui/material'
 import banner from '../../assets/images/vendor-services/YCC-vendor-services-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
 import Section2VendorServices from '../../components/vendor-services/section2-vendor-services'
+import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
 
 const VendorAndServices = () => {
@@ -17,7 +17,7 @@ const VendorAndServices = () => {
             <GradientText>Solutions</GradientText> at Your Fingertips 
         </> 
     );
-    const subtext2 = "Find and connect directly with Yacht Crew. Simplify your order & booking management with Yacht Crew Center’s platform .Onboard your Yacht Services and Supplies to simplify Business Management.";
+    const subtext2 = "Find and connect directly with Yacht Crew. Simplify your order & booking management with Yacht Crew Center's platform .Onboard your Yacht Services and Supplies to simplify Business Management.";
     const button1 = {
         text: 'Join A Comprehensive Global Marketplace',
         path: '/apply'
@@ -26,7 +26,11 @@ const VendorAndServices = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+            gap: {
+                xs: "120px",
+                md: "120px",
+                lg: "60px"
+            },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -34,13 +38,12 @@ const VendorAndServices = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1VendorServices />
             <Section2VendorServices />
             <LandingPageFooter />
+            <LandingPageChatbot />
         </Box>
     )
 }
-
 
 const GradientText = styled(Typography)({
     fontWeight: 600,

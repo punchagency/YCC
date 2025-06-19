@@ -40,10 +40,9 @@ const Section3Home = () => {
                     </Box>
 
                     <Box>
-                        <Link to='/vendor-services'>
-                        <CustomButton variant="contained" color="white">Learn More</CustomButton>
+                        <Link to='/vendor-services' style={{ textDecoration: 'none' }}>
+                            <AnimatedButton variant="contained">Learn More</AnimatedButton>
                         </Link>
-
                     </Box>
 
                 </Box>
@@ -80,7 +79,7 @@ const HeadingText = styled(Typography)({
     color: "#FFFFFF",
 })
 
-export const CustomButton = styled(Button)({
+const AnimatedButton = styled(Button)({
     background: "white",
     fontSize: "16px",
     fontFamily: "Inter, sans-serif",
@@ -88,7 +87,28 @@ export const CustomButton = styled(Button)({
     color: "black",
     padding: "13px 40px",
     borderRadius: "8px",
+    transition: "all 0.3s ease-in-out",
+    position: "relative",
+    overflow: "hidden",
+    "&:hover": {
+        background: "white",
+        transform: "translateY(-3px)",
+        boxShadow: "0 5px 15px rgba(255, 255, 255, 0.3)",
+        "&:before": {
+            transform: "translateX(100%)",
+        }
+    },
+    "&:before": {
+        content: '""',
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        background: "rgba(255, 255, 255, 0.2)",
+        transform: "translateX(-100%)",
+        transition: "transform 0.3s ease-in-out",
+    }
 });
-
 
 export default Section3Home

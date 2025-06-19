@@ -1,11 +1,16 @@
-import React from 'react'
-import { Box, Typography, Container,styled, Grid } from '@mui/material'
+import React, { useState } from 'react'
+import { Box, Typography, Container, styled, Grid, Modal, IconButton } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
 import yatch from '../../assets/images/YCC-yatch.png'
 import banner from '../../assets/images/water-wide.png'
 import playIcon from '../../assets/images/icons/play-button.png'
+import CloseIcon from '@mui/icons-material/Close'
 import { Link } from 'react-router-dom'
+
 const Section5AboutUs = () => {
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     return (
         <Box sx={{
@@ -30,7 +35,6 @@ const Section5AboutUs = () => {
                 <Container maxWidth="lg" sx={{
                     justifyContent: 'center',
                     display: 'flex',
-
                 }}>
                     <Box sx={{
                         display: 'flex',
@@ -41,7 +45,27 @@ const Section5AboutUs = () => {
                         width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
-                        <Box>
+                        <Box 
+                            onClick={handleOpen}
+                            sx={{ 
+                                cursor: 'pointer',
+                                animation: 'pulse 2s infinite',
+                                '@keyframes pulse': {
+                                    '0%': {
+                                        transform: 'scale(1)',
+                                        opacity: 1
+                                    },
+                                    '50%': {
+                                        transform: 'scale(1.1)',
+                                        opacity: 0.8
+                                    },
+                                    '100%': {
+                                        transform: 'scale(1)',
+                                        opacity: 1
+                                    }
+                                }
+                            }}
+                        >
                             <img src={playIcon} alt="play" width='91px' height='91px' />
                         </Box>
 
@@ -52,63 +76,104 @@ const Section5AboutUs = () => {
                         <Box>
                             <SecondarySubText>To inspire and support yachting professionals by providing access to the best resources, services, and connections, ensuring their success both on and off the water.</SecondarySubText>
                         </Box>
-
-
                     </Box>
 
+                    {/* Video Modal */}
+                    <Modal
+                        open={open}
+                        onClose={handleClose}
+                        aria-labelledby="video-modal"
+                        aria-describedby="company-mission-video"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Box sx={{
+                            position: 'relative',
+                            width: { xs: '90%', sm: '80%', md: '70%', lg: '60%' },
+                            height: { xs: '50vh', sm: '60vh', md: '70vh' },
+                            bgcolor: 'black',
+                            borderRadius: '10px',
+                            overflow: 'hidden',
+                            '& iframe': {
+                                width: '100%',
+                                height: '100%',
+                                border: 'none',
+                            }
+                        }}>
+                            <IconButton
+                                onClick={handleClose}
+                                sx={{
+                                    position: 'absolute',
+                                    right: 8,
+                                    top: 8,
+                                    color: 'white',
+                                    zIndex: 1,
+                                    bgcolor: 'rgba(0,0,0,0.5)',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(0,0,0,0.7)',
+                                    }
+                                }}
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                            <iframe
+                                src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1"
+                                title="Company Mission"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            />
+                        </Box>
+                    </Modal>
+
                     <Box sx={{
-                        position: 'absolute', // Position it relative to the red box
-                        bottom: '0', // Aligns to the bottom
-                        left: '50%', // Center it horizontally
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '50%',
                         transform: {
-                            xs: "translate(-50%, 100%)", // Directly below for small screens
-                            sm: "translate(-50%, 30%)", // Slight offset for tablets
-                            md: "translate(-50%, 45%)", // Adjusted for medium screens
-                            lg: "translate(-50%, 60%)", // Default large screen behavior
+                            xs: "translate(-50%, 100%)",
+                            sm: "translate(-50%, 30%)",
+                            md: "translate(-50%, 45%)",
+                            lg: "translate(-50%, 60%)",
                         },
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
                         width: {
-                            xs: "90%", // Mobile: take almost full width
-                            sm: "80%", // Tablets: slightly smaller
-                            md: "70%", // Medium screens
-                            lg: "1180px", // Large screens: fixed width
+                            xs: "90%",
+                            sm: "80%",
+                            md: "70%",
+                            lg: "1180px",
                         },
                         height: {
-                            xs: "300px", // Smaller height on mobile
+                            xs: "300px",
                             sm: "400px",
-                            md: "480px", // Original height on larger screens
+                            md: "480px",
                         },
                         flexWrap: { xs: "wrap", md: "nowrap" },
                     }}>
-
-
                         <Grid container rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }} sx={{
                             flexWrap: "wrap",
                             backgroundColor: "white",
                             borderRadius: '9px',
                             boxShadow: "0px 4px 10.2px 0px #0000001A"
                         }}>
-
-
                             <Grid item xs={12} md={6} sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "28px",
                                 textAlign: { xs: "center", md: "left" },
-                                padding: { xs: '16px', sm: '24px', md: '32px', lg: '40px' }, // Adds padding for better spacing
+                                padding: { xs: '16px', sm: '24px', md: '32px', lg: '40px' },
                                 justifyContent: 'center'
-
                             }}>
                                 <Box sx={{
                                     display: "flex",
                                     flexDirection: "column",
                                     gap: "12px",
-
                                 }}>
-
                                     <HeadingTextBlack>
                                     Ready To Enhance Your Yachting Career?
                                     </HeadingTextBlack>
@@ -131,10 +196,8 @@ const Section5AboutUs = () => {
                                     <img src={yatch} alt="Yacht Crew Center"
                                         style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
                                 </Box>
-
                             </Grid>
                         </Grid>
-
                     </Box>
                 </Container>
             </Box>
@@ -151,37 +214,34 @@ const SecondarySubText = styled(Typography)({
     color: "white",
 })
 
-
 export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px", // Default for large screens
+    fontSize: "15.26px",
     lineHeight: "22.51px",
     letterSpacing: "0%",
     color: "#373737",
     display: "inline-block",
-    width: "100%", // Makes it flexible
+    width: "100%",
 
     [theme.breakpoints.down("md")]: {
         fontSize: "14px",
         lineHeight: "20px",
-        width: "500px", // Reduce width on tablets
+        width: "500px",
     },
     [theme.breakpoints.down("sm")]: {
         fontSize: "13px",
         lineHeight: "18px",
-        width: "100%", // Full width on mobile
+        width: "100%",
         padding: "0 20px 0 20px"
     },
 }));
-
 
 export const HeadingText = styled(Typography)(({ theme }) => ({
     color: "white",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px", // Default size
-
+    fontSize: "46px",
     lineHeight: "51px",
     letterSpacing: "-2%",
 
@@ -202,7 +262,7 @@ export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px", // Default for large screens
+    fontSize: "46px",
     lineHeight: "51px",
     letterSpacing: "-2%",
 

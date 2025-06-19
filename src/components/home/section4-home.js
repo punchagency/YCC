@@ -1,20 +1,14 @@
 import React from 'react'
-import { Box, Typography, Container, Button, styled, Grid, TextField } from '@mui/material'
+import { Box, Typography, Container, styled, Grid } from '@mui/material'
 import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
 import yatch from '../../assets/images/YCC-yatch.png'
 import banner from '../../assets/images/water-wide.png'
 import { Link } from 'react-router-dom'
-import { useState, useRef } from 'react';
 
 const Section4Home = () => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [email, setEmail] = useState("");
-    const inputRef = useRef(null);
-
     return (
         <Box sx={{
-            paddingBottom: { xs: "710px", md: "288px" },// must be exactly 60% of the overflowing box at the end
-            //backgroundColor: 'pink',
+            paddingBottom: { xs: "710px", md: "288px" },
         }}>
             <Box
                 sx={{
@@ -35,7 +29,6 @@ const Section4Home = () => {
                 <Container maxWidth="lg" sx={{
                     justifyContent: 'center',
                     display: 'flex',
-
                 }}>
                     <Box sx={{
                         display: 'flex',
@@ -46,7 +39,6 @@ const Section4Home = () => {
                         width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
-
                         <Box>
                             <HeadingText>Join Our Crew Network</HeadingText>
                         </Box>
@@ -69,55 +61,49 @@ const Section4Home = () => {
                     </Box>
 
                     <Box sx={{
-                        position: 'absolute', // Position it relative to the red box
-                        bottom: '0', // Aligns to the bottom
-                        left: '50%', // Center it horizontally
+                        position: 'absolute',
+                        bottom: '0',
+                        left: '50%',
                         transform: {
-                            xs: "translate(-50%, 100%)", // Directly below for small screens
-                            sm: "translate(-50%, 30%)", // Slight offset for tablets
-                            md: "translate(-50%, 45%)", // Adjusted for medium screens
-                            lg: "translate(-50%, 60%)", // Default large screen behavior
+                            xs: "translate(-50%, 100%)",
+                            sm: "translate(-50%, 30%)",
+                            md: "translate(-50%, 45%)",
+                            lg: "translate(-50%, 60%)",
                         },
                         display: 'flex',
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'center',
                         width: {
-                            xs: "90%", // Mobile: take almost full width
-                            sm: "80%", // Tablets: slightly smaller
-                            md: "70%", // Medium screens
-                            lg: "1180px", // Large screens: fixed width
+                            xs: "90%",
+                            sm: "80%",
+                            md: "70%",
+                            lg: "1180px",
                         },
                         height: {
-                            xs: "300px", // Smaller height on mobile
+                            xs: "300px",
                             sm: "400px",
-                            md: "480px", // Original height on larger screens
+                            md: "480px",
                         },
                         flexWrap: { xs: "wrap", md: "nowrap" },
                     }}>
-
-
                         <Grid container rowSpacing={{ xs: 3, md: 0 }} columnSpacing={{ xs: 0, md: 4 }} sx={{
                             flexWrap: "wrap",
                             backgroundColor: "white",
                             borderRadius: '9px',
                             boxShadow: "0px 4px 10.2px 0px #0000001A"
                         }}>
-
-
                             <Grid item xs={12} md={6} sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "28px",
                                 textAlign: { xs: "center", md: "left" },
                                 alignItems: { xs: "center", md: "flex-start" },
-
                             }}>
                                 <Box sx={{
                                     display: "flex",
                                     flexDirection: "column",
                                     gap: "12px",
-
                                 }}>
                                     <Box sx={{
                                         display: "flex",
@@ -128,10 +114,10 @@ const Section4Home = () => {
                                     }}>
                                         <Box
                                             sx={{
-                                                width: 8, // Controls the size of the badge anchor
+                                                width: 8,
                                                 height: 8,
                                                 display: "inline-block",
-                                                backgroundColor: "#295FD1", // Keeps it invisible but structured
+                                                backgroundColor: "#295FD1",
                                                 borderRadius: '20px',
                                             }}
                                         />
@@ -140,70 +126,20 @@ const Section4Home = () => {
                                         </BadgeText>
                                     </Box>
 
-
                                     <HeadingTextBlack>
                                         Expert Advice, Tips, And Trends for Yachting Professionals
                                     </HeadingTextBlack>
                                 </Box>
-                                <SecondarySubTextBlack >
-                                    Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you’re managing operations or advancing your career, our blog is your resource for success.
+                                <SecondarySubTextBlack>
+                                    Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you're managing operations or advancing your career, our blog is your resource for success.
                                 </SecondarySubTextBlack>
 
-                                <Box sx={{ display: "flex", gap: "15px", padding: { xs: "0 20px 0 20px", md: "0 0 0 0" } }}>
-                                    <Link to='/resource-center' >
+                                <Box sx={{ padding: { xs: "0 20px 0 20px", md: "0 0 0 0" } }}>
+                                    <Link to='/resource-center' style={{ textDecoration: 'none' }}>
                                         <GradientButton>
                                             <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
-
-                                            
                                         </GradientButton>
-                                    </Link> 
-                                
-                                {isEditing ? (
-                                    <TextField
-                                        inputRef={inputRef}
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        onBlur={() => setIsEditing(false)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter") {
-                                                setIsEditing(false);
-                                            }
-                                        }}
-                                        variant="outlined"
-                                        size="small"
-                                        placeholder="Enter your email"
-                                        sx={{ borderRadius: "8px", width: "250px" }}
-                                    />
-                                    ) : (
-                                    <Button
-                                        variant="outlined"
-                                        onClick={() => setIsEditing(true)}
-                                        sx={{
-                                            position: "relative",
-                                            overflow: "hidden",
-                                            border: "none",
-                                            borderRadius: "8px",
-                                            padding: "10px 20px",
-                                            background: "transparent",
-                                            textTransform: "none",
-                                            "&::before": {
-                                                content: '""',
-                                                position: "absolute",
-                                                inset: 0,
-                                                padding: "2px",
-                                                borderRadius: "inherit",
-                                                background: linearGradient,
-                                                WebkitMask:
-                                                    "linear-gradient(white, white) content-box, linear-gradient(white, white)",
-                                                WebkitMaskComposite: "destination-out",
-                                            },
-                                        }}
-                                    >
-                                        Enter Your Email For Weekly Article
-                                    </Button>
-                                    )
-                                }
+                                    </Link>
                                 </Box>
                             </Grid>
 
@@ -212,24 +148,23 @@ const Section4Home = () => {
                                     sx={{
                                         position: 'relative',
                                         height: '100%'
-                                    }} >
+                                    }}>
                                     <img src={yatch} alt="Yacht Crew Center"
                                         style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
                                     <Box
                                         sx={{
                                             position: "absolute",
                                             top: 0,
-                                            left: 0, // Ensure it starts from the left
+                                            left: 0,
                                             background: "linear-gradient(90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%)",
                                             height: "100%",
                                             width: "35%",
-                                            zIndex: 1, // Ensure it appears above the image
+                                            zIndex: 1,
                                         }}
                                     />
                                 </Box>
                             </Grid>
                         </Grid>
-
                     </Box>
                 </Container>
             </Box>
@@ -246,97 +181,43 @@ const SecondarySubText = styled(Typography)({
     color: "white",
 })
 
-
-export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
+const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px", // Default for large screens
+    fontSize: "15.26px",
     lineHeight: "22.51px",
     letterSpacing: "0%",
     color: "#373737",
-    display: "inline-block",
-    width: "100%", // Makes it flexible
+    textAlign: { xs: "center", md: "left" },
+}))
 
-    [theme.breakpoints.down("md")]: {
-        fontSize: "14px",
-        lineHeight: "20px",
-        width: "500px", // Reduce width on tablets
-    },
-    [theme.breakpoints.down("sm")]: {
-        fontSize: "13px",
-        lineHeight: "18px",
-        width: "100%", // Full width on mobile
-        padding: "0 20px 0 20px"
-    },
-}));
-
-
-export const HeadingText = styled(Typography)(({ theme }) => ({
+const HeadingText = styled(Typography)({
+    fontFamily: "Plus Jakarta Sans",
+    fontWeight: 600,
+    fontSize: "46px",
+    lineHeight: "51px",
+    letterSpacing: "-2%",
     color: "white",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "46px", // Default size
+    textAlign: "center",
+})
 
-    lineHeight: "51px",
-    letterSpacing: "-2%",
-
-    [theme.breakpoints.down("lg")]: {
-        fontSize: "42px",
-        lineHeight: "48px",
-    },
-    [theme.breakpoints.down("md")]: {
-        fontSize: "36px",
-        lineHeight: "44px",
-    },
-    [theme.breakpoints.down("sm")]: {
-        fontSize: "28px",
-        lineHeight: "36px",
-    },
-}));
-export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
+const HeadingTextBlack = styled(Typography)({
+    fontFamily: "Plus Jakarta Sans",
+    fontWeight: 600,
+    fontSize: "30px",
+    lineHeight: "40px",
+    letterSpacing: "0%",
     color: "#131313",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "46px", // Default for large screens
-    lineHeight: "51px",
-    letterSpacing: "-2%",
-
-    [theme.breakpoints.down("lg")]: {
-        fontSize: "30px",
-        lineHeight: "40px",
-    },
-    [theme.breakpoints.down("md")]: {
-        fontSize: "36px",
-        lineHeight: "44px",
-    },
-    [theme.breakpoints.down("sm")]: {
-        fontSize: "28px",
-        lineHeight: "36px",
-    },
-}));
-
+})
 
 const BadgeText = styled(Typography)({
-    color: '#295FD1',
     fontFamily: "Inter",
     fontWeight: 600,
     fontSize: "14px",
     lineHeight: "16.94px",
     letterSpacing: "-2%",
+    color: "#295FD1",
     textTransform: "uppercase",
-    display: "inline-block",
-});
+})
 
-export const GradientText = styled(Typography)({
-    background: linearGradient,
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    fontFamily: "Inter",
-    fontWeight: 600,
-    fontSize: "14px",
-    lineHeight: "16.94px",
-    letterSpacing: "-2%",
-    textTransform: "uppercase",
-    display: "inline-block",
-});
 export default Section4Home

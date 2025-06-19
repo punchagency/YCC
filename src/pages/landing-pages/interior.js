@@ -2,11 +2,11 @@ import { Box, Typography, styled } from '@mui/material'
 import banner from '../../assets/images/interior/YCC-interior-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
-import Section1Interior from '../../components/interior/section1-interior'
 import Section2Interior from '../../components/interior/section2-interior'
 import Section3Interior from '../../components/interior/section3-interior'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
+
 const InteriorLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -27,7 +27,11 @@ const InteriorLandingPage = () => {
         <Box sx={{
             display: "flex",
             flexDirection: "column",
-            gap: "120px",
+                gap: {
+                    xs: "120px",
+                    md: "120px",
+                    lg: "60px"
+            },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -35,7 +39,6 @@ const InteriorLandingPage = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
-            <Section1Interior />
             <Chatbot />
             <Section2Interior />
             <Section3Interior />

@@ -3,7 +3,6 @@ import banner from '../../assets/images/captain/YCC-captain-banner.png'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import { Typography, Box } from '@mui/material'
-import Section1Captain from '../../components/captain/section1-captain'
 import Section2Captain from '../../components/captain/section2-captain'
 import Section3Captain from '../../components/captain/section3-captain'
 import Chatbot from '../../components/chatbot/chatbot'
@@ -29,7 +28,11 @@ const backgroundImage = banner
     <Box sx={{
         display: "flex",
         flexDirection: "column",
-        gap: "120px",
+        gap: {
+          xs: "120px",
+          md: "120px",
+          lg: "60px"
+      },
       }}>
         <LandingPageBanner
         backgroundImage={backgroundImage}
@@ -37,8 +40,6 @@ const backgroundImage = banner
         subtext2={subtext2}
         button1={button1}
         />
-        <Section1Captain />
-        
         <Chatbot />
         <Section2Captain />
         <Section3Captain />
