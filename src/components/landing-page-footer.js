@@ -26,8 +26,6 @@ const LandingPageFooter = () => {
         { name: "Resource Center", path: "/resource-center" },
         { name: "Contact Us", path: "/contact-us" },
       ],
-
-      size: 2.5,
     },
     {
       title: "Departments",
@@ -39,150 +37,128 @@ const LandingPageFooter = () => {
         { name: "Interior", path: "/interior" },
         { name: "Exterior", path: "/exterior" },
       ],
-      size: 2.5,
     },
-    // {
-    //     title: "Contacts",
-    //     links: [
-    //         { name: "contact@yachtcrewcenter.com", path: "mailto:contact@yachtcrewcenter.com" },
-    //         { name: "+1 954 532 0550", path: "tel:+19545320550" },
-    //     ],
-    //     size: 3,
-    // },
   ];
+
   return (
     <Box
+      component="footer"
       sx={{
         background: "#011632",
         width: "100%",
-        minHeight: "40vh", // Use minHeight instead of height for flexibility
+        position: "relative",
+        bottom: 0,
+        left: 0,
+        minHeight: "40vh",
         display: "flex",
         justifyContent: "center",
-        alignItems: "center", // Center content
+        alignItems: "center",
         flexDirection: "column",
-        maxWidth: "100vw",
+        mt: "auto",
+        zIndex: 0,
       }}
     >
-      <Container
-        maxWidth="lg"
-        disableGutters
-        sx={{
-          py: 4, // Padding instead of margin
-          px: { xs: 2, sm: 4, md: 8 }, // Responsive padding
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          gap: "31px",
-        }}
-      >
-        <Grid container spacing={1}>
-          {/* First column (2x wider, but responsive) */}
-          <Grid item xs={12} sm={6} md={4}>
-            <Box
-              sx={{
-                textAlign: "left",
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
-              }}
-            >
-              <Box>
-                <img
-                  src={logo}
-                  alt="logo"
-                  style={{ width: "70px", height: "65px" }}
-                />
-              </Box>
-              <Box>
-                <Link to="/contact-us" style={{ textDecoration: "none" }}>
-                  <GradientButton>
-                    <ButtonTypography
-                      sx={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        color: "white",
-                      }}
-                    >
-                      Contact Yacht Crew Center, LLC
-                    </ButtonTypography>
-                  </GradientButton>
-                </Link>
-              </Box>
-            </Box>
-          </Grid>
-
-          {/* Remaining 3 columns (equal width, responsive) */}
-          {footerData.map((link, index) => (
-            <Grid item xs={12} sm={3} md={link.size} key={index}>
-              <Box sx={{ textAlign: "left" }}>
-                <FooterHeadingTypography>{link.title}</FooterHeadingTypography>
-                <List>
-                  {link.links.map((linkItem, idx) => (
-                    <ListItem
-                      key={idx}
-                      component={Link}
-                      to={linkItem.path}
-                      sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
-                    >
-                      <FooterTypography>{linkItem.name}</FooterTypography>
-                    </ListItem>
-                  ))}
-                </List>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={12} lg={9}>
+      <Container maxWidth="lg">
+        <Grid container spacing={3} sx={{ py: 4 }}>
+          <Grid item xs={12} md={4}>
             <Box sx={{ 
-              textAlign: { xs: 'center', md: 'left' },
-              marginBottom: { xs: '20px', md: '0' }
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: { xs: 'center', md: 'flex-start' },
+              gap: 2
             }}>
-              <Box sx={{
-                display: 'flex',
-                flexDirection: { xs: 'column', sm: 'row' },
-                alignItems: { xs: 'center', sm: 'flex-start' },
-                gap: { xs: '10px', sm: '0' },
-                justifyContent: { xs: 'center', sm: 'flex-start' }
-              }}>
-                <CopyrightText>
-                  © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
-                </CopyrightText>
-                <Box component="span" sx={{ 
-                  display: { xs: 'none', sm: 'inline' },
-                  mx: 2,
-                  color: '#E0E0E0'
-                }}>|</Box>
-                <FooterLink href="/terms-and-conditions">Terms and Conditions</FooterLink>
-                <Box component="span" sx={{ 
-                  display: { xs: 'none', sm: 'inline' },
-                  mx: 2,
-                  color: '#E0E0E0'
-                }}>|</Box>
-                <FooterLink href="/privacy-policy">Privacy Policy</FooterLink>
-              </Box>
+              <img src={logo} alt="logo" style={{ width: "70px", height: "65px" }} />
+              <Link to="/contact-us" style={{ textDecoration: "none" }}>
+                <GradientButton>
+                  <ButtonTypography>
+                    Contact Yacht Crew Center, LLC
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
             </Box>
           </Grid>
-          <Grid item xs={12} md={12} lg={3}>
-            <Box
-              sx={{
-                textAlign: { xs: 'center', lg: 'right' },
-                display: 'flex',
-                justifyContent: { xs: 'center', lg: 'flex-end' },
-                gap: '10px',
-                marginTop: { xs: '20px', md: '0' }
-              }}
-            >
-              <SocialIconLink href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <FacebookIcon sx={{ color: "white" }} />
-              </SocialIconLink>
-              <SocialIconLink href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <InstagramIcon sx={{ color: "white" }} />
-              </SocialIconLink>
-              <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
-                <YouTubeIcon sx={{ color: "white" }} />
-              </SocialIconLink>
+
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={3}>
+              <Grid item xs={6}>
+                <Box>
+                  <FooterHeadingTypography>{footerData[0].title}</FooterHeadingTypography>
+                  <List>
+                    {footerData[0].links.map((linkItem, idx) => (
+                      <ListItem
+                        key={idx}
+                        component={Link}
+                        to={linkItem.path}
+                        sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
+                      >
+                        <FooterTypography>{linkItem.name}</FooterTypography>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Box>
+                  <FooterHeadingTypography>{footerData[1].title}</FooterHeadingTypography>
+                  <List>
+                    {footerData[1].links.map((linkItem, idx) => (
+                      <ListItem
+                        key={idx}
+                        component={Link}
+                        to={linkItem.path}
+                        sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
+                      >
+                        <FooterTypography>{linkItem.name}</FooterTypography>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Box sx={{ 
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              mt: 3,
+              pt: 3,
+            }}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <Box sx={{ 
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'center', md: 'flex-start' },
+                    gap: { xs: '10px', sm: '0' },
+                  }}>
+                    <CopyrightText>
+                      © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
+                    </CopyrightText>
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
+                    <FooterLink to="/terms-and-conditions">Terms and Conditions</FooterLink>
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
+                    <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={4}>
+                  <Box sx={{
+                    display: 'flex',
+                    justifyContent: { xs: 'center', md: 'flex-end' },
+                    gap: '10px',
+                    mt: { xs: 2, md: 0 },
+                  }}>
+                    <SocialIconLink href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                      <FacebookIcon sx={{ color: "white" }} />
+                    </SocialIconLink>
+                    <SocialIconLink href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                      <InstagramIcon sx={{ color: "white" }} />
+                    </SocialIconLink>
+                    <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                      <YouTubeIcon sx={{ color: "white" }} />
+                    </SocialIconLink>
+                  </Box>
+                </Grid>
+              </Grid>
             </Box>
           </Grid>
         </Grid>
