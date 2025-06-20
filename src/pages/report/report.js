@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import DashboardTitleBar from "../../components/dashboard/title-bar";
 
 import { Button } from "primereact/button";
 // import { useNavigate } from "react-router-dom";
@@ -339,462 +340,455 @@ const Reports = () => {
         flexDirection: "column",
       }}
     >
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{ marginBottom: "30px" }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content" style={{marginLeft:"40px"}}>
-            <h3>Reports</h3>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="report-container-inventory-reports-and-bar-graph"
-        style={{ width: "100%", paddingLeft: "20px" }}
-      >
+      <DashboardTitleBar title="Reports" />
+      
+      <div className="bg-white" style={{ padding: "20px" }}>
         <div
-          className="report-container-inventory-reports"
-          style={{ width: "35%" }}
+          className="report-container-inventory-reports-and-bar-graph"
+          style={{ width: "100%", paddingLeft: "20px" }}
         >
-          <div>
-            <h2>Inventory Report</h2>
+          <div
+            className="report-container-inventory-reports"
+            style={{ width: "35%" }}
+          >
             <div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "90%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Customer Satisfaction
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
+              <h2>Inventory Report</h2>
+              <div>
+                <div className="report-container-flop" style={{ width: "100%" }}>
+                  <div>
+                    <img src={profileReport} alt="iconcontainer" />
+                  </div>
+                  <div
+                    className="report-container-flop-2"
+                    style={{ width: "100%" }}
+                  >
+                    <div style={{ width: "90%" }}>
+                      <p style={{ color: "#212121", fontWeight: "bold" }}>
+                        Customer Satisfaction
+                      </p>
                       <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.customerSatisfaction.rate}%`,
-                        }}
-                      ></div>
+                        className="report-progress-outer-bar"
+                        style={{ width: "100%" }}
+                      >
+                        <div
+                          className="report-progress-inner-bar"
+                          style={{
+                            width: `${healthReports.customerSatisfaction.rate}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="report-progress-text">
+                      <p>{healthReports.customerSatisfaction.rate}% </p>
                     </div>
                   </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.customerSatisfaction.rate}% </p>
+                </div>
+                <div className="report-container-flop" style={{ width: "100%" }}>
+                  <div>
+                    <img src={profileReport} alt="iconcontainer" />
                   </div>
-                </div>
-              </div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "90%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Supplier Availability
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
+                  <div
+                    className="report-container-flop-2"
+                    style={{ width: "100%" }}
+                  >
+                    <div style={{ width: "90%" }}>
+                      <p style={{ color: "#212121", fontWeight: "bold" }}>
+                        Supplier Availability
+                      </p>
                       <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.supplierAvailability.rate}%`,
-                        }}
-                      ></div>
+                        className="report-progress-outer-bar"
+                        style={{ width: "100%" }}
+                      >
+                        <div
+                          className="report-progress-inner-bar"
+                          style={{
+                            width: `${healthReports.supplierAvailability.rate}%`,
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="report-progress-text">
+                      <p>{healthReports.supplierAvailability.rate}%</p>
                     </div>
                   </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.supplierAvailability.rate}%</p>
+                </div>
+                <div className="report-container-flop" style={{ width: "100%" }}>
+                  <div>
+                    <img src={profileReport} alt="iconcontainer" />
                   </div>
-                </div>
-              </div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "100%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Stock Levels
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
+                  <div
+                    className="report-container-flop-2"
+                    style={{ width: "100%" }}
+                  >
+                    <div style={{ width: "100%" }}>
+                      <p style={{ color: "#212121", fontWeight: "bold" }}>
+                        Stock Levels
+                      </p>
                       <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.stockLevels.rate}%`,
-                        }}
-                      ></div>
+                        className="report-progress-outer-bar"
+                        style={{ width: "100%" }}
+                      >
+                        <div
+                          className="report-progress-inner-bar"
+                          style={{
+                            width: `${healthReports.stockLevels.rate}%`,
+                          }}
+                        ></div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.stockLevels.rate}%</p>
+                    <div className="report-progress-text">
+                      <p>{healthReports.stockLevels.rate}%</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="report-container-bar-graph" style={{ width: "33%" }}>
-          <div style={{ width: "100%", height: "100%", padding: "10px" }}>
-            <Bar data={activityData} options={chartOptions} ref={barChartRef} />
+          <div className="report-container-bar-graph" style={{ width: "33%" }}>
+            <div style={{ width: "100%", height: "100%", padding: "10px" }}>
+              <Bar data={activityData} options={chartOptions} ref={barChartRef} />
+            </div>
           </div>
-        </div>
 
-        <div className="metrics-container" style={{ width: "33%" }}>
-          {systemMetrics.map((metric, index) => (
-            <div
-              key={index}
-              className="metric-card"
-              style={{
-                width: "90%",
-                overflow: "hidden",
-                position: "relative",
-                boxSizing: "border-box",
-              }}
-            >
-              <div className="metric-header">
-                <span style={{ fontSize: "15px" }}>{metric.title}</span>
-                <h2 style={{ fontSize: "25px" }}>{metric.value}</h2>
-              </div>
+          <div className="metrics-container" style={{ width: "33%" }}>
+            {systemMetrics.map((metric, index) => (
               <div
-                className="sparkline"
+                key={index}
+                className="metric-card"
                 style={{
-                  height: "40px",
-                  width: "100%",
+                  width: "90%",
                   overflow: "hidden",
                   position: "relative",
-                  paddingBottom: "10px",
-                  marginBottom: "10px",
                   boxSizing: "border-box",
                 }}
               >
-                <Line
-                  data={sparklineData}
-                  options={sparklineOptions}
-                  ref={(el) => {
-                    if (el) lineChartRefs.current[index] = el;
+                <div className="metric-header">
+                  <span style={{ fontSize: "15px" }}>{metric.title}</span>
+                  <h2 style={{ fontSize: "25px" }}>{metric.value}</h2>
+                </div>
+                <div
+                  className="sparkline"
+                  style={{
+                    height: "40px",
+                    width: "100%",
+                    overflow: "hidden",
+                    position: "relative",
+                    paddingBottom: "10px",
+                    marginBottom: "10px",
+                    boxSizing: "border-box",
                   }}
+                >
+                  <Line
+                    data={sparklineData}
+                    options={sparklineOptions}
+                    ref={(el) => {
+                      if (el) lineChartRefs.current[index] = el;
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="order-summary-text-header">
+          <h2>Order Summary</h2>
+        </div>
+
+        <div className="box-order-container" style={{ minWidth: "800px" }}>
+          <div className="box1-order" style={{ minWidth: "180px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0px 9px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src={lockLogo} alt="lockLogo" />
+                <h3>All Orders</h3>
+              </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p style={{ marginRight: "5px" }}>This week</p>
+                <img
+                  src={dropdown}
+                  alt="dropdown"
+                  style={{ width: "15px", height: "15px" }}
                 />
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="order-summary-text-header">
-        <h2>Order Summary</h2>
-      </div>
-
-      <div className="box-order-container" style={{ minWidth: "800px" }}>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>All Orders</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
+            <div className="pending-order-container">
+              <div style={{ marginRight: "5px" }}>
+                <p
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    minWidth: "50px",
+                    fontSize: "13px",
+                  }}
+                >
+                  In progress
+                </p>
+                <p style={{ fontSize: "12px" }}>885</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Pending</p>
+                <p style={{ fontSize: "12px" }}>579</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Completed</p>
+                <p style={{ fontSize: "12px" }}>9981</p>
+              </div>
             </div>
           </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>885</p>
+          <div className="box1-order" style={{ minWidth: "180px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0px 9px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src={lockLogo} alt="lockLogo" />
+                <h3>Inventory</h3>
+              </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p style={{ marginRight: "5px" }}>This week</p>
+                <img
+                  src={dropdown}
+                  alt="dropdown"
+                  style={{ width: "15px", height: "15px" }}
+                />
+              </div>
             </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>579</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>9981</p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Inventory</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>885</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>5</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>22</p>
+            <div className="pending-order-container">
+              <div style={{ marginRight: "5px" }}>
+                <p
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    minWidth: "50px",
+                    fontSize: "13px",
+                  }}
+                >
+                  In progress
+                </p>
+                <p style={{ fontSize: "12px" }}>885</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Pending</p>
+                <p style={{ fontSize: "12px" }}>5</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Completed</p>
+                <p style={{ fontSize: "12px" }}>22</p>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Bookings</h3>
+          <div className="box1-order" style={{ minWidth: "180px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0px 9px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src={lockLogo} alt="lockLogo" />
+                <h3>Bookings</h3>
+              </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p style={{ marginRight: "5px" }}>This week</p>
+                <img
+                  src={dropdown}
+                  alt="dropdown"
+                  style={{ width: "15px", height: "15px" }}
+                />
+              </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>457</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Financial</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
+            <div className="pending-order-container">
+              <div style={{ marginRight: "5px" }}>
+                <p
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    minWidth: "50px",
+                    fontSize: "13px",
+                  }}
+                >
+                  In progress
+                </p>
+                <p style={{ fontSize: "12px" }}>457</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Pending </p>
+                <p style={{ fontSize: "12px" }}>25</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Completed</p>
+                <p style={{ fontSize: "12px" }}>232</p>
+              </div>
             </div>
           </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>457</p>
+          <div className="box1-order" style={{ minWidth: "180px" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "0px 9px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img src={lockLogo} alt="lockLogo" />
+                <h3>Financial</h3>
+              </div>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <p style={{ marginRight: "5px" }}>This week</p>
+                <img
+                  src={dropdown}
+                  alt="dropdown"
+                  style={{ width: "15px", height: "15px" }}
+                />
+              </div>
             </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
+            <div className="pending-order-container">
+              <div style={{ marginRight: "5px" }}>
+                <p
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    minWidth: "50px",
+                    fontSize: "13px",
+                  }}
+                >
+                  In progress
+                </p>
+                <p style={{ fontSize: "12px" }}>457</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Pending </p>
+                <p style={{ fontSize: "12px" }}>25</p>
+              </div>
+              <div style={{ marginRight: "5px" }}>
+                <p style={{ fontSize: "13px" }}>Completed</p>
+                <p style={{ fontSize: "12px" }}>232</p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="selling-products-container">
-        <div className="selling-products-header">
-          <h2>Selling Products</h2>
-          <Button
-            label="AI Report Generate"
-            icon="pi pi-file"
-            className="p-button-primary"
-          />
         </div>
 
-        <table className="selling-products-table">
-          <thead>
-            <tr>
-              <th>
-                Product Name <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Sales <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Type <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Tracking ID <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Total <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Profit <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                1500 <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Status <img src={sortIcon} alt="sortIcon" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Fuel</td>
-              <td>Sold</td>
-              <td>Earned</td>
-              <td>Placed</td>
-              <td>Processed</td>
-              <td>Net</td>
-              <td>Widgets Pro</td>
-              <td>
-                <span className="status-confirmed">Confirmed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Energy</td>
-              <td>Delivered</td>
-              <td>Generated</td>
-              <td>Allocated</td>
-              <td>Completed</td>
-              <td>Gross</td>
-              <td>Widgets Plus</td>
-              <td>
-                <span className="status-in-progress">In Progress</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Power</td>
-              <td>Distributed</td>
-              <td>Produced</td>
-              <td>Assigned</td>
-              <td>Finalized</td>
-              <td>Total</td>
-              <td>Widgets Max</td>
-              <td>
-                <span className="status-pending">Pending</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Electricity</td>
-              <td>Supplied</td>
-              <td>Achieved</td>
-              <td>Settled</td>
-              <td>Executed</td>
-              <td>Balance</td>
-              <td>Widgets Elite</td>
-              <td>
-                <span className="status-completed">Completed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Gas</td>
-              <td>Rendered</td>
-              <td>Accumulated</td>
-              <td>Distributed</td>
-              <td>Confirmed</td>
-              <td>Surplus</td>
-              <td>Widgets Standard</td>
-              <td>
-                <span className="status-flagged">Flagged</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="selling-products-container">
+          <div className="selling-products-header">
+            <h2>Selling Products</h2>
+            <Button
+              label="AI Report Generate"
+              icon="pi pi-file"
+              className="p-button-primary"
+            />
+          </div>
+
+          <table className="selling-products-table">
+            <thead>
+              <tr>
+                <th>
+                  Product Name <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  Sales <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  Order Type <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  Tracking ID <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  Order Total <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  Profit <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                  1500 <img src={sortIcon} alt="sortIcon" />
+                </th>
+                <th>
+                    Status <img src={sortIcon} alt="sortIcon" />
+                  </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Fuel</td>
+                <td>Sold</td>
+                <td>Earned</td>
+                <td>Placed</td>
+                <td>Processed</td>
+                <td>Net</td>
+                <td>Widgets Pro</td>
+                <td>
+                  <span className="status-confirmed">Confirmed</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Energy</td>
+                <td>Delivered</td>
+                <td>Generated</td>
+                <td>Allocated</td>
+                <td>Completed</td>
+                <td>Gross</td>
+                <td>Widgets Plus</td>
+                <td>
+                  <span className="status-in-progress">In Progress</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Power</td>
+                <td>Distributed</td>
+                <td>Produced</td>
+                <td>Assigned</td>
+                <td>Finalized</td>
+                <td>Total</td>
+                <td>Widgets Max</td>
+                <td>
+                  <span className="status-pending">Pending</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Electricity</td>
+                <td>Supplied</td>
+                <td>Achieved</td>
+                <td>Settled</td>
+                <td>Executed</td>
+                <td>Balance</td>
+                <td>Widgets Elite</td>
+                <td>
+                  <span className="status-completed">Completed</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Gas</td>
+                <td>Rendered</td>
+                <td>Accumulated</td>
+                <td>Distributed</td>
+                <td>Confirmed</td>
+                <td>Surplus</td>
+                <td>Widgets Standard</td>
+                <td>
+                  <span className="status-flagged">Flagged</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

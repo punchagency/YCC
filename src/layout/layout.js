@@ -15,6 +15,8 @@ import { InvoiceProvider } from "../context/invoice/invoiceContext";
 import { InventoryProvider } from "../context/inventory/inventoryContext";
 import { CalendarProvider } from "../context/calendar/calendarContext";
 import { SupplierProvider } from "../context/supplier/supplierContext";
+import "../styles/layout.css";
+
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   return (

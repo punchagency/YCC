@@ -30,6 +30,21 @@ import "jspdf-autotable";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import Chip from '@mui/material/Chip';
+import LockIcon from '@mui/icons-material/Lock';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
+import DashboardTitleBar from "../../../components/dashboard/title-bar";
 
 // Register the components
 ChartJS.register(
@@ -972,58 +987,32 @@ const Reports = () => {
 
   return (
     <div
+      className="report-container"
       style={{
-        background: "#F8FBFF",
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100%', 
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      <Toast ref={toast} />
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{ marginBottom: "30px" }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ marginLeft: "40px" }}>Reports</h3>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="bg-white"
-        style={{
-          width: "95%",
-          marginLeft: "30px",
-          padding: "20px 15px 20px 15px",
-          borderRadius: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className="flex items-center justify-between ">
-          <div className="flex items-center justify-between">
-            <div className="mr-3">
+      <DashboardTitleBar title="Reports" />
+      
+      <Box sx={{ p: 3, backgroundColor: "white" }}>
+        <Grid container spacing={3}>
+          {/* Date Range Section */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ mb: 1 }}>
               <h3>Date Range</h3>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                }}
-              >
-                <div className="flex align-items-center gap-2">
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
                   <Calendar
                     value={startDate}
                     onChange={(e) => setStartDate(e.value)}
                     dateFormat="yy-mm-dd"
                     placeholder="Start Date"
                     showIcon
-                    className="p-inputtext-sm"
+                  className="p-inputtext-sm w-full"
                     minDate={new Date(2000, 0, 1)}
                     maxDate={endDate || new Date(2100, 11, 31)}
                   />
@@ -1034,71 +1023,69 @@ const Reports = () => {
                     dateFormat="yy-mm-dd"
                     placeholder="End Date"
                     showIcon
-                    className="p-inputtext-sm"
+                  className="p-inputtext-sm w-full"
                     minDate={startDate || new Date(2000, 0, 1)}
                     maxDate={new Date(2100, 11, 31)}
                   />
-                </div>
+              </Box>
                 <small style={{ color: "#666", fontSize: "12px" }}>
                   Select both start and end dates to generate report
                 </small>
-              </div>
-            </div>
-            <div className="mr-3">
+            </Box>
+          </Grid>
+
+          {/* Report Type Section */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ mb: 1 }}>
               <h3>Report Type</h3>
-              <div
-                className="border-1 border-gray-200 p-2 rounded-lg"
-                style={{ width: "300px", borderRadius: "10px" }}
-              >
+            </Box>
+            <Box sx={{ 
+              border: "1px solid #e0e0e0", 
+              borderRadius: "10px",
+              p: 1
+            }}>
                 <Dropdown
                   value={reportType}
                   onChange={(e) => setReportType(e.value)}
                   options={reportTypeOptions}
                   placeholder="Select Report Type"
                   className="w-full"
-                  style={{ width: "100%" }}
-                />
-              </div>
-            </div>
-            <div className="mr-3">
+              />
+            </Box>
+          </Grid>
+
+          {/* Frequency Section */}
+          <Grid item xs={12} md={4}>
+            <Box sx={{ mb: 1 }}>
               <h3>Frequency</h3>
-              <div
-                className="border-1 border-gray-200 p-2 rounded-lg"
-                style={{ width: "300px", borderRadius: "10px" }}
-              >
+            </Box>
+            <Box sx={{ 
+              border: "1px solid #e0e0e0", 
+              borderRadius: "10px",
+              p: 1
+            }}>
                 <Dropdown
                   value={frequency}
                   onChange={(e) => setFrequency(e.value)}
                   options={frequencyOptions}
                   placeholder="Select Frequency"
                   className="w-full"
-                  style={{ width: "100%" }}
-                />
-              </div>
-            </div>
-          </div>
-          <div
-            className=""
-            style={{
-              width: "200px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "400px",
-            }}
-          >
-            <div className="flex items-center justify-center ">
+              />
+            </Box>
+          </Grid>
+
+          {/* Action Buttons */}
+          <Grid item xs={12} md={12} sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
               <button
                 style={{
                   backgroundColor: "transparent",
                   border: "1px solid #21212133",
-                  paddingLeft: "7px",
-                  paddingRight: "7px",
+                padding: "8px 16px",
                   borderRadius: "3px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  width: "120px",
+                minWidth: "120px",
                 }}
                 onClick={handleExport}
               >
@@ -1110,287 +1097,529 @@ const Reports = () => {
                 Export
               </button>
               <button
-                className="p-2"
                 style={{
                   backgroundColor: "#0387D9",
-                  width: "150px",
+                padding: "8px 16px",
+                minWidth: "150px",
                   color: "white",
-                  border: "1px solid #0387D9",
                   borderRadius: "3px",
-                  marginLeft: "10px",
                 }}
                 onClick={handleGenerateReport}
               >
                 Generate Report
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="order-summary-text-header">
-        <h2>Report Summary</h2>
-      </div>
+          </Grid>
+        </Grid>
+      </Box>
 
-      <div className="box-order-container" style={{ minWidth: "800px" }}>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>All Orders</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
+      {/* Report Summary Section */}
+      <Box sx={{ p: 3, backgroundColor: "white" }}>
+        <Typography variant="h6" sx={{ mb: 3, color: '#0A2647', fontWeight: 600 }}>
+          Report Summary
+        </Typography>
+        
+        <Grid container spacing={3}>
+          {/* All Orders Card */}
+          <Grid item xs={12} sm={6} lg={3}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2.5,
+                height: '100%',
+                borderRadius: 2,
+                border: '1px solid #E0E7ED'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                mb: 3
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+                    All Orders
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5
+                }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
+                    This week
+                  </Typography>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
+                </Box>
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Confirmed
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.orders?.confirmed || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Pending
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.orders?.pending || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Total
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : 
+                      (dashboardSummary.orders?.confirmed || 0) + (dashboardSummary.orders?.pending || 0)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+
+          {/* Inventory Card */}
+          <Grid item xs={12} sm={6} lg={3}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2.5,
+                height: '100%',
+                borderRadius: 2,
+                border: '1px solid #E0E7ED'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                mb: 3
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+                    Inventory
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5
+                }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
+                    This week
+                  </Typography>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
+                </Box>
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Low Stock
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.inventory?.lowStockItems || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Total Items
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.inventory?.totalItems || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Total value
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    ${dashboardSummary.loading ? "--" : 
+                      (dashboardSummary.inventory?.totalValue || 0).toLocaleString()}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+
+          {/* Bookings Card */}
+          <Grid item xs={12} sm={6} lg={3}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2.5,
+                height: '100%',
+                borderRadius: 2,
+                border: '1px solid #E0E7ED'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                mb: 3
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+                    Bookings
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5
+                }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
+                    This week
+                  </Typography>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
+                </Box>
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
                 Confirmed
-              </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.confirmed}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.pending}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Total</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.total}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Inventory</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          {renderInventoryStats()}
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Bookings</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                Comfirmed
-              </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.confirmed}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.pending}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Total</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.total}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Financial</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-          </div>
-        </div>
-      </div>
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.bookings?.confirmed || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Pending
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : dashboardSummary.bookings?.pending || 0}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Total
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    {dashboardSummary.loading ? "--" : 
+                      (dashboardSummary.bookings?.confirmed || 0) + (dashboardSummary.bookings?.pending || 0)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
 
-      <div className="selling-products-container">
-        <div className="selling-products-header">
-          <h2>Weekly & Monthly Reports</h2>
-        </div>
+          {/* Financial Card */}
+          <Grid item xs={12} sm={6} lg={3}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                p: 2.5,
+                height: '100%',
+                borderRadius: 2,
+                border: '1px solid #E0E7ED'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                mb: 3
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+                    Financial
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5
+                }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
+                    This week
+                  </Typography>
+                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
+                </Box>
+              </Box>
 
-        <table className="selling-products-table">
-          <thead>
-            <tr>
-              <th>
-                Type <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Name <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Vendor <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Date <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Total <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Status <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                ID <img src={sortIcon} alt="sortIcon" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              <Grid container spacing={2}>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    In progress
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    0
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Pending
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    0
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                    Completed
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                    0
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Weekly & Monthly Reports Section */}
+      <Box sx={{ p: 3, mt: 3, backgroundColor: "white" }}>
+        <Typography variant="h6" sx={{ mb: 3, color: '#0A2647', fontWeight: 600 }}>
+          Weekly & Monthly Reports
+        </Typography>
+        
+        <Box sx={{ overflowX: "auto" }}>
+          <TableContainer 
+            component={Paper} 
+            elevation={0}
+            sx={{ 
+              border: '1px solid #E0E7ED',
+              borderRadius: 2,
+              minWidth: {
+                xs: '100%',
+                sm: '650px'
+              }
+            }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Type
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Name
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Vendor
+                  </TableCell>
+                  <TableCell 
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Date
+                  </TableCell>
+                  <TableCell 
+                    align="right"
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Total
+                  </TableCell>
+                  <TableCell 
+                    align="center"
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    Status
+                  </TableCell>
+                  <TableCell 
+                    align="center"
+                    sx={{ 
+                      fontWeight: 600,
+                      color: '#475569',
+                      borderBottom: '1px solid #E0E7ED',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    ID
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
             {dashboardSummary && dashboardSummary.recentActivity ? (
               formatRecentActivity().map((activity, index) => (
-                <tr key={activity.id || index}>
-                  <td>{activity.type}</td>
-                  <td className="product-cell">{activity.name}</td>
-                  <td>{activity.vendor}</td>
-                  <td>{activity.date}</td>
-                  <td>${activity.total.toFixed(2)}</td>
-                  <td>
-                    <span className={`status-${activity.status.toLowerCase()}`}>
-                      {activity.status}
-                    </span>
-                  </td>
-                  <td>{activity.id.substring(0, 8)}...</td>
-                </tr>
+                    <TableRow 
+                      key={activity.id || index}
+                      sx={{ 
+                        '&:last-child td, &:last-child th': { border: 0 },
+                        '&:hover': { backgroundColor: '#F8FAFC' }
+                      }}
+                    >
+                      <TableCell 
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          whiteSpace: 'nowrap',
+                          '@media (max-width: 900px)': {
+                            maxWidth: '80px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }
+                        }}
+                      >
+                        {activity.type}
+                      </TableCell>
+                      <TableCell
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          '@media (max-width: 900px)': {
+                            maxWidth: '120px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }
+                        }}
+                      >
+                        {activity.name}
+                      </TableCell>
+                      <TableCell
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          '@media (max-width: 900px)': {
+                            maxWidth: '100px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }
+                        }}
+                      >
+                        {activity.vendor}
+                      </TableCell>
+                      <TableCell sx={{ borderBottom: '1px solid #E0E7ED' }}>
+                        {activity.date}
+                      </TableCell>
+                      <TableCell 
+                        align="right"
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          fontWeight: 500
+                        }}
+                      >
+                        ${activity.total.toFixed(2)}
+                      </TableCell>
+                      <TableCell 
+                        align="center"
+                        sx={{ borderBottom: '1px solid #E0E7ED' }}
+                      >
+                        <Chip
+                          label={activity.status}
+                          size="small"
+                          sx={{
+                            backgroundColor: activity.status.toLowerCase() === 'completed' ? '#E8F5E9' : '#FFF3E0',
+                            color: activity.status.toLowerCase() === 'completed' ? '#2E7D32' : '#ED6C02',
+                            fontWeight: 500,
+                            fontSize: '12px',
+                            height: '24px',
+                            borderRadius: '12px'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell 
+                        align="center"
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          fontFamily: 'monospace',
+                          color: '#64748B',
+                          '@media (max-width: 900px)': {
+                            maxWidth: '80px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }
+                        }}
+                      >
+                        {activity.id.substring(0, 8)}...
+                      </TableCell>
+                    </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
+                  <TableRow>
+                    <TableCell 
+                      colSpan={7} 
+                      align="center"
+                      sx={{ 
+                        borderBottom: '1px solid #E0E7ED',
+                        py: 4,
+                        color: '#64748B'
+                      }}
+                    >
                   Loading data...
-                </td>
-              </tr>
+                    </TableCell>
+                  </TableRow>
             )}
 
             {dashboardSummary &&
               dashboardSummary.recentActivity &&
               formatRecentActivity().length === 0 && (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                    <TableRow>
+                      <TableCell 
+                        colSpan={7} 
+                        align="center"
+                        sx={{ 
+                          borderBottom: '1px solid #E0E7ED',
+                          py: 4,
+                          color: '#64748B'
+                        }}
+                      >
                     No recent activity found.
-                  </td>
-                </tr>
-              )}
-          </tbody>
-        </table>
-      </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
     </div>
   );
 };
@@ -1398,6 +1627,14 @@ const Reports = () => {
 // Create and add a stylesheet element for responsive design
 const responsiveStyle = document.createElement("style");
 responsiveStyle.innerHTML = `
+  /* Ensure the report container respects viewport height */
+  .report-container {
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
   @media screen and (max-width: 768px) {
     /* Main layout - stack everything vertically */
     .report-container-inventory-reports-and-bar-graph {
@@ -1497,6 +1734,12 @@ responsiveStyle.innerHTML = `
     .order-summary-text-header {
       margin-top: 15px !important;
       padding-left: 2% !important;
+    }
+    
+    /* Ensure proper height constraints on mobile */
+    .report-container {
+      height: 100vh !important;
+      overflow: auto !important;
     }
   }
 `;

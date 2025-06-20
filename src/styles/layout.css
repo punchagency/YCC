@@ -1,1 +1,205 @@
- 
+/* Main layout wrapper */
+.wrapper {
+  display: flex;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Page container */
+.page {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Left menu (sidebar) */
+.left-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-width: 280px;
+  max-width: 280px;
+  position: relative;
+}
+
+.left-menu.collapsed {
+  min-width: 80px;
+  max-width: 80px;
+}
+
+/* Logo wrapper - fixed at top */
+.left-menu > div:first-child {
+  flex-shrink: 0;
+  background: white;
+  z-index: 10;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Logo wrapper specific styles */
+.left-menu .logo-wraper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 40px;
+}
+
+.left-menu .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left-menu .logo img {
+  max-width: 100%;
+  height: auto;
+  max-height: 40px;
+}
+
+.left-menu .collapse-close-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Menu container - scrollable area between logo and logout */
+.left-menu .menu-container {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 0;
+}
+
+/* Ensure PanelMenu takes full available space */
+.left-menu .menu-container .p-panelmenu {
+  height: 100%;
+}
+
+/* Remove any max-height constraints from PanelMenu content */
+.left-menu .menu-container .p-panelmenu .p-panelmenu-content {
+  height: auto;
+}
+
+/* Ensure menu items are visible */
+.left-menu .menu-container .p-panelmenu .p-panelmenu-root-list {
+  height: auto;
+  width: 100%;
+}
+
+/* Custom scrollbar styling */
+.left-menu .menu-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left-menu .menu-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.left-menu .menu-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.left-menu .menu-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Logout container - fixed at bottom */
+.left-menu .logout-container {
+  flex-shrink: 0;
+  background: white;
+  z-index: 10;
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Right panel component (main content area) */
+.right-panel-component {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100vh;
+  overflow: hidden;
+  min-height: 0; /* Important for flex child */
+}
+
+/* Main content area (where Outlet renders) */
+.right-panel-component > *:nth-child(2) {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* Important for flex child */
+  padding: 20px;
+  background-color: #f8fafc;
+}
+
+/* Ensure the header stays at top */
+.right-panel-component > *:first-child {
+  flex-shrink: 0;
+}
+
+/* Ensure the chatbot stays at bottom */
+.right-panel-component > *:last-child {
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .wrapper {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .page {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .right-panel-component {
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  .right-panel-component > *:nth-child(2) {
+    padding: 15px;
+  }
+}
+
+/* Ensure proper scrolling behavior */
+.right-panel-component > *:nth-child(2)::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-panel-component > *:nth-child(2)::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.right-panel-component > *:nth-child(2)::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.right-panel-component > *:nth-child(2)::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-height: 1030px) {
+  .left-menu .menu-container {
+    height: calc(100vh - 160px);
+  }
+  
+  .left-menu .logout-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+} 

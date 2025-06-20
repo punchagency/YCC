@@ -479,9 +479,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
         style={{
           backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
         }}
       >
         <div className="flex justify-content-center align-items-center logo-wraper">
@@ -497,16 +494,10 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
           />
         </div>
-        <div style={{ flex: 1, overflowY: "auto" }}>
+        <div className="menu-container">
           <PanelMenu model={menuItems} />
         </div>
-        <div
-          style={{
-            padding: "24px",
-            borderTop: "1px solid #f0f0f0",
-            background: "inherit",
-          }}
-        >
+        <div className="logout-container">
           <CustomButton
             onClick={handleLogout}
             style={{
