@@ -83,7 +83,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                     wordBreak: "break-word",
                   }}
                 >
-                  {title || "Terms and Conditions"}
+                  {title || "Agreement"}
                 </h2>
                 <p
                   style={{
@@ -93,7 +93,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                     lineHeight: "1.4",
                   }}
                 >
-                  Please review the complete terms and conditions
+                  Please review the complete agreement
                 </p>
               </div>
               <div
@@ -226,7 +226,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                   borderRadius: "0 0 16px 16px",
                 }}
                 onLoad={handleIframeLoad}
-                title={title || "Terms and Conditions"}
+                title={title || "Agreement"}
                 allow="fullscreen"
               />
             </div>
@@ -249,7 +249,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                   lineHeight: "1.5",
                 }}
               >
-                By closing this modal, you acknowledge that you have reviewed the terms and conditions
+                By closing this modal, you acknowledge that you have reviewed the agreement
               </p>
             </div>
           </motion.div>

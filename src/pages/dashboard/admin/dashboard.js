@@ -17,7 +17,7 @@ const AdminDashboard1 = () => {
         backgroundColor: "white",
       }}
     >
-      <DashboardTitleBar title="Dashboard" />
+      {/* <DashboardTitleBar title="Dashboard" /> */}
       <Dashboard1 />
     </Box>
   );

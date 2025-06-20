@@ -256,8 +256,8 @@ const SupplierSignUpForm = ({
   };
 
   const handleSignup = async () => {
-    if (!formData.acceptTerms || !formData.acceptPrivacy) {
-      setError("Please accept both Terms and Conditions and Privacy Policy to continue.");
+    if (!formData.acceptTerms) {
+      setError("Please accept the Supplier Agreement to continue.");
       return;
     }
 
@@ -602,7 +602,7 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-      {/* Terms and Conditions */}
+      {/* Supplier Agreement */}
       <div className="form-group1">
         <div className="input-field">
           <div
@@ -658,7 +658,7 @@ const SupplierSignUpForm = ({
                     e.target.style.color = "#034D92";
                   }}
                 >
-                  Terms and Conditions
+                  Supplier Agreement
                 </span>
               </label>
               <button
@@ -682,7 +682,7 @@ const SupplierSignUpForm = ({
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = "transparent";
                 }}
-                title="View Terms and Conditions"
+                title="View Supplier Agreement"
               >
                 <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
               </button>
@@ -691,8 +691,8 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-      {/* Privacy Policy */}
-      <div className="form-group1">
+      {/* Privacy Policy - Commented out as requested */}
+      {/* <div className="form-group1">
         <div className="input-field">
         <div
             className="checkbox-field" 
@@ -778,7 +778,7 @@ const SupplierSignUpForm = ({
           </div>
           </div>
         </div>
-        </div>
+        </div> */}
 
       {/* Navigation Buttons */}
         <div className="button-group">
@@ -812,18 +812,18 @@ const SupplierSignUpForm = ({
         isOpen={isTermsModalOpen}
         onClose={() => setIsTermsModalOpen(false)}
         pdfUrl="/YCC Vendor Agreement.pdf"
-        title="YCC Vendor Agreement"
-        fileName="YCC-Vendor-Agreement.pdf"
+        title="YCC Supplier Agreement"
+        fileName="YCC-Supplier-Agreement.pdf"
       />
 
-      {/* Privacy Policy Modal */}
-      <TermsModal
+      {/* Privacy Policy Modal - Commented out as requested */}
+      {/* <TermsModal
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
         pdfUrl="/YCC Vendor Agreement.pdf"
         title="Privacy Policy"
         fileName="Privacy-Policy.pdf"
-      />
+      /> */}
     </motion.div>
   );
 

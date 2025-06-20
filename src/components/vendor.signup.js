@@ -58,7 +58,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
   const handleSignup = async () => {
     if (!formData.acceptTerms) {
-      setError("Please accept the Terms and Conditions to continue.");
+      setError("Please accept the Service Provider Agreement to continue.");
       return;
     }
 
@@ -1397,7 +1397,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       {/* Platform Fees Information */}
       {/* // Platform fees note and related UI removed as per client request */}
 
-      {/* Terms and Conditions checkbox */}
+      {/* Service Provider Agreement checkbox */}
       <div className="form-group1">
         <div className="input-field">
           <div 
@@ -1453,7 +1453,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     e.target.style.color = "#034D92";
                   }}
                 >
-                  Terms and Conditions
+                  Service Provider Agreement
                 </span>
               </label>
               <button
@@ -1477,7 +1477,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = "transparent";
                 }}
-                title="View Terms and Conditions"
+                title="View Service Provider Agreement"
               >
                 <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
               </button>

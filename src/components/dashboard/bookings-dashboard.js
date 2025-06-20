@@ -59,7 +59,7 @@ const BookingsDashboard = () => {
       paddingBottom={5} 
       className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
     >
-      <DashboardTitleBar title="Bookings Dashboard" />
+      <DashboardTitleBar title="Dashboard"  />
       <Box
         paddingTop={5}
         paddingX={{ xs: 2, sm: 3 }}

@@ -17,6 +17,7 @@ import { useToast } from "../../components/Toast"
 import { Pagination } from "../../components/pagination"
 import React from "react"
 import { useNavigate } from "react-router-dom"
+import DashboardTitleBar from '../../components/dashboard/title-bar'
 
 // Mobile notification card component
 const MobileNotificationCard = ({ notification, handleViewDetails, handleStatusChange, statusLoading, theme }) => {
@@ -396,7 +397,7 @@ const NotificationFilter = ({ activeFilter, activeStatusFilter, onFilterChange, 
           background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
           borderRadius: "12px",
           padding: isMobile ? "16px" : "20px",
-          margin: isMobile ? "0 16px 20px 16px" : "0 20px 24px 20px",
+          margin: isMobile ? "0 16px 6px 16px" : "0 20px 4px 20px",
           boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
           border: "1px solid #e2e8f0",
         }}
@@ -804,59 +805,13 @@ export default function Notifications({ role }) {
 
   if (loading) {
     return (
-      <div className="notification-container" style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
-        <div
-          className="notification-header"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: isMobile ? "12px" : "16px",
-            padding: isMobile ? "16px 20px" : "20px 24px",
-            background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-            borderBottom: "1px solid #e2e8f0",
-          }}
-        >
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: isMobile ? "36px" : "40px",
-              height: isMobile ? "36px" : "40px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              backgroundColor: "#ffffff",
-              color: "#374151",
-              cursor: "pointer",
-              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-            }}
-            title="Go back"
-          >
-            <i
-              className="pi pi-arrow-left"
-              style={{
-                fontSize: isMobile ? "14px" : "16px",
-                fontWeight: "600",
-              }}
-            />
-          </button>
-
-          <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <h3
-              style={{
-                fontSize: isMobile ? "20px" : "24px",
-                fontWeight: "700",
-                color: "#1f2937",
-                margin: 0,
-              }}
-            >
-              Notifications
-            </h3>
-            <Badge value="--" severity="danger" style={{ marginLeft: "12px" }} />
-          </div>
-        </div>
+      <div 
+        className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
+        <DashboardTitleBar title="Notifications" backArrow={true} />
 
         <NotificationFilter
           activeFilter={activeFilter}
@@ -883,7 +838,12 @@ export default function Notifications({ role }) {
 
   if (error) {
     return (
-      <div className="notification-container">
+      <div 
+        className="notification-container"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
         <div className="error-message" style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}>
           Error: {error}
         </div>
@@ -917,147 +877,14 @@ export default function Notifications({ role }) {
         `}
       </style>
       <Toast ref={toast} />
-      <div className="notification-container" style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
-        <div
-          className="notification-header"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: isMobile ? "12px" : "16px",
-            padding: isMobile ? "16px 20px" : "20px 24px",
-            background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-            borderBottom: "1px solid #e2e8f0",
-          }}
-        >
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: isMobile ? "36px" : "40px",
-              height: isMobile ? "36px" : "40px",
-              borderRadius: "8px",
-              border: "1px solid #e2e8f0",
-              backgroundColor: "#ffffff",
-              color: "#374151",
-              cursor: "pointer",
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-              position: "relative",
-              overflow: "hidden",
-            }}
-            title="Go back"
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "#0387D9"
-              e.target.style.borderColor = "#0387D9"
-              e.target.style.color = "#ffffff"
-              e.target.style.transform = "translateY(-2px) scale(1.05)"
-              e.target.style.boxShadow = "0 8px 25px rgba(3, 135, 217, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15)"
-
-              // Add a subtle glow effect
-              const glowEffect = e.target.querySelector(".glow-effect")
-              if (glowEffect) {
-                glowEffect.style.opacity = "1"
-                glowEffect.style.transform = "scale(1.2)"
-              }
-
-              // Animate the arrow icon
-              const icon = e.target.querySelector("i")
-              if (icon) {
-                icon.style.transform = "translateX(-2px)"
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#ffffff"
-              e.target.style.borderColor = "#e2e8f0"
-              e.target.style.color = "#374151"
-              e.target.style.transform = "translateY(0) scale(1)"
-              e.target.style.boxShadow = "0 1px 2px rgba(0, 0, 0, 0.05)"
-
-              // Remove glow effect
-              const glowEffect = e.target.querySelector(".glow-effect")
-              if (glowEffect) {
-                glowEffect.style.opacity = "0"
-                glowEffect.style.transform = "scale(1)"
-              }
-
-              // Reset arrow icon
-              const icon = e.target.querySelector("i")
-              if (icon) {
-                icon.style.transform = "translateX(0)"
-              }
-            }}
-            onMouseDown={(e) => {
-              e.target.style.transform = "translateY(-1px) scale(1.02)"
-            }}
-            onMouseUp={(e) => {
-              e.target.style.transform = "translateY(-2px) scale(1.05)"
-            }}
-          >
-            {/* Glow effect background */}
-            <div
-              className="glow-effect"
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                width: "100%",
-                height: "100%",
-                background: "radial-gradient(circle, rgba(3, 135, 217, 0.2) 0%, transparent 70%)",
-                borderRadius: "50%",
-                transform: "translate(-50%, -50%) scale(1)",
-                opacity: "0",
-                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                pointerEvents: "none",
-                zIndex: 0,
-              }}
-            />
-
-            {/* Ripple effect on click */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                borderRadius: "8px",
-                background: "linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)",
-                transform: "translateX(-100%)",
-                transition: "transform 0.6s ease",
-                pointerEvents: "none",
-                zIndex: 1,
-              }}
-              className="shine-effect"
-            />
-
-            <i
-              className="pi pi-arrow-left"
-              style={{
-                fontSize: isMobile ? "14px" : "16px",
-                fontWeight: "600",
-                transition: "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                position: "relative",
-                zIndex: 2,
-              }}
-            />
-          </button>
-
-          <div style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <h3
-              style={{
-                fontSize: isMobile ? "20px" : "24px",
-                fontWeight: "700",
-                color: "#1f2937",
-                margin: 0,
-              }}
-            >
-              Notifications
-            </h3>
-            <Badge value={unreadCount} severity="danger" style={{ marginLeft: "12px" }} />
-          </div>
-        </div>
+      <div 
+        className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
+        <DashboardTitleBar title="Notifications" backArrow={true} />
+        <div className="mb-4"></div>
 
         <NotificationFilter
           activeFilter={activeFilter}
