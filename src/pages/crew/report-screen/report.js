@@ -43,8 +43,13 @@ import TableCell from '@mui/material/TableCell';
 import Chip from '@mui/material/Chip';
 import LockIcon from '@mui/icons-material/Lock';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Button, Select, MenuItem } from "@mui/material";
+import DownloadIcon from '@mui/icons-material/Download';
 import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
 import DashboardTitleBar from "../../../components/dashboard/title-bar";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 // Register the components
 ChartJS.register(
@@ -57,6 +62,16 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler
+);
+
+// Helper for table header cells with filter icons
+const TableHeaderCell = ({ children }) => (
+    <TableCell sx={{ fontWeight: 500, color: '#475467', backgroundColor: '#F9FAFB', borderBottom: '1px solid #EAECF0', whiteSpace: 'nowrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {children}
+            <FilterListIcon sx={{ fontSize: '16px' }} />
+        </Box>
+    </TableCell>
 );
 
 const Reports = () => {
@@ -84,6 +99,47 @@ const Reports = () => {
     },
     customerSatisfaction: 0,
   });
+
+  const [view, setView] = useState('month');
+  const [ordersDateRange, setOrdersDateRange] = useState('week');
+  const [inventoryDateRange, setInventoryDateRange] = useState('week');
+  const [bookingsDateRange, setBookingsDateRange] = useState('week');
+  const [financialDateRange, setFinancialDateRange] = useState('week');
+
+  const handleViewChange = (event, newView) => {
+    if (newView !== null) {
+      setView(newView);
+    }
+  };
+
+  const reportsData = [
+    { id: 1, name: 'Maintenance Report', date: '2023-10-28', status: 'Paid', amount: 500.00, invoiceId: 'INV-001' },
+    { id: 2, name: 'Fuel Consumption', date: '2023-10-27', status: 'Pending', amount: 1200.50, invoiceId: 'INV-002' },
+    { id: 3, name: 'Inventory Check', date: '2023-10-26', status: 'Overdue', amount: 350.75, invoiceId: 'INV-003' },
+    { id: 4, name: 'Crew Payroll', date: '2023-10-25', status: 'Paid', amount: 8500.00, invoiceId: 'INV-004' },
+    { id: 5, name: 'Supplier Payment', date: '2023-10-24', status: 'Pending', amount: 2300.00, invoiceId: 'INV-005' },
+  ];
+
+  const getStatusChip = (status) => {
+    let sxProps = {};
+    const normalizedStatus = status.toLowerCase();
+
+    if (normalizedStatus.includes('confirm')) {
+      sxProps = { backgroundColor: '#FFFAEB', color: '#B54708', label: 'Confirmed' };
+    } else if (normalizedStatus.includes('in progress')) {
+      sxProps = { backgroundColor: '#ECFDF3', color: '#027A48', label: 'In Progress' };
+    } else if (normalizedStatus.includes('complete')) {
+      sxProps = { backgroundColor: '#EFF8FF', color: '#175CD3', label: 'Completed' };
+    } else if (normalizedStatus.includes('pending')) {
+      sxProps = { backgroundColor: '#FFFAEB', color: '#B54708', label: 'Pending' };
+    } else if (normalizedStatus.includes('flagged')) {
+        sxProps = { backgroundColor: '#FEF3F2', color: '#B42318', label: 'Flagged' };
+    } else {
+      sxProps = { backgroundColor: '#F2F4F7', color: '#364152', label: status };
+    }
+  
+    return <Chip label={sxProps.label} size="small" sx={{ ...sxProps, fontWeight: 500, borderRadius: '16px', height: '22px' }} />;
+  };
 
   const fetchDashboardSummary = async () => {
     try {
@@ -986,15 +1042,8 @@ const Reports = () => {
   };
 
   return (
-    <div
-      className="report-container"
-      style={{
-        height: '100%', 
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
+    <div>
+      <Toast ref={toast} />
       <DashboardTitleBar title="Reports" />
       
       <Box sx={{ p: 3, backgroundColor: "white" }}>
@@ -1012,7 +1061,6 @@ const Reports = () => {
                     dateFormat="yy-mm-dd"
                     placeholder="Start Date"
                     showIcon
-                  className="p-inputtext-sm w-full"
                     minDate={new Date(2000, 0, 1)}
                     maxDate={endDate || new Date(2100, 11, 31)}
                   />
@@ -1023,7 +1071,6 @@ const Reports = () => {
                     dateFormat="yy-mm-dd"
                     placeholder="End Date"
                     showIcon
-                  className="p-inputtext-sm w-full"
                     minDate={startDate || new Date(2000, 0, 1)}
                     maxDate={new Date(2100, 11, 31)}
                   />
@@ -1075,39 +1122,44 @@ const Reports = () => {
           </Grid>
 
           {/* Action Buttons */}
-          <Grid item xs={12} md={12} sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-              <button
-                style={{
-                  backgroundColor: "transparent",
-                  border: "1px solid #21212133",
-                padding: "8px 16px",
-                  borderRadius: "3px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                minWidth: "120px",
-                }}
-                onClick={handleExport}
-              >
-                <img
-                  src={downloadIcon}
-                  alt="downloadIcon"
-                  style={{ width: "20px", height: "20px", marginRight: "5px" }}
-                />
-                Export
-              </button>
-              <button
-                style={{
-                  backgroundColor: "#0387D9",
-                padding: "8px 16px",
-                minWidth: "150px",
-                  color: "white",
-                  borderRadius: "3px",
-                }}
-                onClick={handleGenerateReport}
-              >
-                Generate Report
-              </button>
+          <Grid item xs={12} sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<DownloadIcon />}
+              onClick={handleExport}
+              sx={{
+                width: '180px',
+                textTransform: 'none',
+                borderColor: '#e0e0e0',
+                color: '#333',
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                  borderColor: '#bdbdbd',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                },
+              }}
+            >
+              Export
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleGenerateReport}
+              sx={{
+                width: '180px',
+                textTransform: 'none',
+                backgroundColor: '#0387D9',
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#0277bd',
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                },
+              }}
+            >
+              Generate Report
+            </Button>
           </Grid>
         </Grid>
       </Box>
@@ -1127,7 +1179,12 @@ const Reports = () => {
                 p: 2.5,
                 height: '100%',
                 borderRadius: 2,
-                border: '1px solid #E0E7ED'
+                border: '1px solid #E0E7ED',
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                }
               }}
             >
               <Box sx={{ 
@@ -1142,19 +1199,33 @@ const Reports = () => {
                     All Orders
                   </Typography>
                 </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  bgcolor: '#F8FAFC',
-                  borderRadius: 1,
-                  px: 1,
-                  py: 0.5
-                }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
-                    This week
-                  </Typography>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
-                </Box>
+                <Select
+                  value={ordersDateRange}
+                  onChange={(e) => setOrdersDateRange(e.target.value)}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    '& .MuiSelect-select': {
+                      color: '#64748B',
+                      fontSize: 'caption.fontSize',
+                      paddingRight: '24px !important',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      color: '#64748B',
+                    },
+                  }}
+                >
+                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                </Select>
               </Box>
 
               <Grid container spacing={2}>
@@ -1195,7 +1266,12 @@ const Reports = () => {
                 p: 2.5,
                 height: '100%',
                 borderRadius: 2,
-                border: '1px solid #E0E7ED'
+                border: '1px solid #E0E7ED',
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                }
               }}
             >
               <Box sx={{ 
@@ -1210,19 +1286,33 @@ const Reports = () => {
                     Inventory
                   </Typography>
                 </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  bgcolor: '#F8FAFC',
-                  borderRadius: 1,
-                  px: 1,
-                  py: 0.5
-                }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
-                    This week
-                  </Typography>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
-                </Box>
+                <Select
+                  value={inventoryDateRange}
+                  onChange={(e) => setInventoryDateRange(e.target.value)}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    '& .MuiSelect-select': {
+                      color: '#64748B',
+                      fontSize: 'caption.fontSize',
+                      paddingRight: '24px !important',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      color: '#64748B',
+                    },
+                  }}
+                >
+                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                </Select>
               </Box>
 
               <Grid container spacing={2}>
@@ -1263,7 +1353,12 @@ const Reports = () => {
                 p: 2.5,
                 height: '100%',
                 borderRadius: 2,
-                border: '1px solid #E0E7ED'
+                border: '1px solid #E0E7ED',
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                }
               }}
             >
               <Box sx={{ 
@@ -1278,19 +1373,33 @@ const Reports = () => {
                     Bookings
                   </Typography>
                 </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  bgcolor: '#F8FAFC',
-                  borderRadius: 1,
-                  px: 1,
-                  py: 0.5
-                }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
-                    This week
-                  </Typography>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
-                </Box>
+                <Select
+                  value={bookingsDateRange}
+                  onChange={(e) => setBookingsDateRange(e.target.value)}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    '& .MuiSelect-select': {
+                      color: '#64748B',
+                      fontSize: 'caption.fontSize',
+                      paddingRight: '24px !important',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      color: '#64748B',
+                    },
+                  }}
+                >
+                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                </Select>
               </Box>
 
               <Grid container spacing={2}>
@@ -1331,7 +1440,12 @@ const Reports = () => {
                 p: 2.5,
                 height: '100%',
                 borderRadius: 2,
-                border: '1px solid #E0E7ED'
+                border: '1px solid #E0E7ED',
+                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                }
               }}
             >
               <Box sx={{ 
@@ -1346,19 +1460,33 @@ const Reports = () => {
                     Financial
                   </Typography>
                 </Box>
-                <Box sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  bgcolor: '#F8FAFC',
-                  borderRadius: 1,
-                  px: 1,
-                  py: 0.5
-                }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', mr: 0.5 }}>
-                    This week
-                  </Typography>
-                  <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#64748B' }} />
-                </Box>
+                <Select
+                  value={financialDateRange}
+                  onChange={(e) => setFinancialDateRange(e.target.value)}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    '& .MuiSelect-select': {
+                      color: '#64748B',
+                      fontSize: 'caption.fontSize',
+                      paddingRight: '24px !important',
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiSvgIcon-root': {
+                      color: '#64748B',
+                    },
+                  }}
+                >
+                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                </Select>
               </Box>
 
               <Grid container spacing={2}>
@@ -1394,227 +1522,128 @@ const Reports = () => {
 
       {/* Weekly & Monthly Reports Section */}
       <Box sx={{ p: 3, mt: 3, backgroundColor: "white" }}>
-        <Typography variant="h6" sx={{ mb: 3, color: '#0A2647', fontWeight: 600 }}>
-          Weekly & Monthly Reports
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="h6" sx={{ color: '#101828', fontWeight: 600 }}>
+                Weekly & Monthly Reports
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <ToggleButtonGroup
+                    value={view}
+                    exclusive
+                    onChange={handleViewChange}
+                    aria-label="text alignment"
+                    sx={{ 
+                      height: '40px',
+                      '& .MuiToggleButton-root': {
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        borderRadius: '8px',
+                        padding: '8px 16px',
+                        border: '1px solid #D0D5DD',
+                        color: '#344054',
+                        transition: 'background-color 0.3s, color 0.3s',
+                        '&.Mui-selected': {
+                          backgroundColor: '#0387D9',
+                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: '#0277bd'
+                          }
+                        },
+                        '&:not(.Mui-selected):hover': {
+                          backgroundColor: '#F9FAFB'
+                        }
+                      }
+                    }}
+                >
+                    <ToggleButton value="day" aria-label="left aligned">
+                        Day
+                    </ToggleButton>
+                    <ToggleButton value="week" aria-label="centered">
+                        Week
+                    </ToggleButton>
+                    <ToggleButton value="month" aria-label="right aligned">
+                        Month
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
+        </Box>
         
         <Box sx={{ overflowX: "auto" }}>
           <TableContainer 
             component={Paper} 
             elevation={0}
             sx={{ 
-              border: '1px solid #E0E7ED',
+              border: '1px solid #EAECF0',
               borderRadius: 2,
-              minWidth: {
-                xs: '100%',
-                sm: '650px'
-              }
+              minWidth: { xs: '100%', sm: '800px' }
             }}
           >
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#F8FAFC' }}>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Type
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Name
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Vendor
-                  </TableCell>
-                  <TableCell 
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Date
-                  </TableCell>
-                  <TableCell 
-                    align="right"
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Total
-                  </TableCell>
-                  <TableCell 
-                    align="center"
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    Status
-                  </TableCell>
-                  <TableCell 
-                    align="center"
-                    sx={{ 
-                      fontWeight: 600,
-                      color: '#475569',
-                      borderBottom: '1px solid #E0E7ED',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    ID
-                  </TableCell>
+                <TableRow>
+                  <TableHeaderCell>Vendor</TableHeaderCell>
+                  <TableHeaderCell>Order ID</TableHeaderCell>
+                  <TableHeaderCell>Invoices No.</TableHeaderCell>
+                  <TableHeaderCell>Payment Status</TableHeaderCell>
+                  <TableHeaderCell>Bookings</TableHeaderCell>
+                  <TableHeaderCell>Purchased Supplies</TableHeaderCell>
+                  <TableHeaderCell>Status</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-            {dashboardSummary && dashboardSummary.recentActivity ? (
-              formatRecentActivity().map((activity, index) => (
-                    <TableRow 
-                      key={activity.id || index}
-                      sx={{ 
-                        '&:last-child td, &:last-child th': { border: 0 },
-                        '&:hover': { backgroundColor: '#F8FAFC' }
-                      }}
-                    >
-                      <TableCell 
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          whiteSpace: 'nowrap',
-                          '@media (max-width: 900px)': {
-                            maxWidth: '80px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }
-                        }}
-                      >
-                        {activity.type}
-                      </TableCell>
-                      <TableCell
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          '@media (max-width: 900px)': {
-                            maxWidth: '120px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }
-                        }}
-                      >
-                        {activity.name}
-                      </TableCell>
-                      <TableCell
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          '@media (max-width: 900px)': {
-                            maxWidth: '100px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }
-                        }}
-                      >
-                        {activity.vendor}
-                      </TableCell>
-                      <TableCell sx={{ borderBottom: '1px solid #E0E7ED' }}>
-                        {activity.date}
-                      </TableCell>
-                      <TableCell 
-                        align="right"
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          fontWeight: 500
-                        }}
-                      >
-                        ${activity.total.toFixed(2)}
-                      </TableCell>
-                      <TableCell 
-                        align="center"
-                        sx={{ borderBottom: '1px solid #E0E7ED' }}
-                      >
-                        <Chip
-                          label={activity.status}
-                          size="small"
-                          sx={{
-                            backgroundColor: activity.status.toLowerCase() === 'completed' ? '#E8F5E9' : '#FFF3E0',
-                            color: activity.status.toLowerCase() === 'completed' ? '#2E7D32' : '#ED6C02',
-                            fontWeight: 500,
-                            fontSize: '12px',
-                            height: '24px',
-                            borderRadius: '12px'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell 
-                        align="center"
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          fontFamily: 'monospace',
-                          color: '#64748B',
-                          '@media (max-width: 900px)': {
-                            maxWidth: '80px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis'
-                          }
-                        }}
-                      >
-                        {activity.id.substring(0, 8)}...
+                {dashboardSummary && dashboardSummary.recentActivity ? (
+                  formatRecentActivity().length > 0 ? (
+                    formatRecentActivity().map((activity, index) => {
+                      const statuses = ['Confirmed', 'In Progress', 'Completed', 'Pending', 'Flagged'];
+                      const mockStatus = statuses[index % statuses.length];
+                      const paymentStatus = (index % 2 === 0) ? 'Paid' : 'Pending';
+                      const bookingStatus = (activity.type === 'Booking') 
+                        ? (index % 3 === 0 ? 'Completed' : 'Processing') 
+                        : 'N/A';
+
+                      return (
+                        <TableRow 
+                          key={activity.id || index}
+                          sx={{ '&:hover': { backgroundColor: '#F9FAFB' } }}
+                        >
+                          <TableCell sx={{ fontWeight: 500, color: '#101828', borderBottom: '1px solid #EAECF0' }}>
+                            {activity.vendor}
+                          </TableCell>
+                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                            {`OR-${activity.id.slice(-5)}`}
+                          </TableCell>
+                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                            {`INV-${activity.id.slice(-4)}`}
+                          </TableCell>
+                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                            {paymentStatus}
+                          </TableCell>
+                           <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                            {bookingStatus}
+                          </TableCell>
+                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                            {activity.name}
+                          </TableCell>
+                          <TableCell sx={{ borderBottom: '1px solid #EAECF0' }}>
+                            {getStatusChip(mockStatus)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center" sx={{ py: 4, color: '#64748B', borderBottom: '1px solid #EAECF0' }}>
+                        No recent activity found.
                       </TableCell>
                     </TableRow>
-              ))
-            ) : (
+                  )
+                ) : (
                   <TableRow>
-                    <TableCell 
-                      colSpan={7} 
-                      align="center"
-                      sx={{ 
-                        borderBottom: '1px solid #E0E7ED',
-                        py: 4,
-                        color: '#64748B'
-                      }}
-                    >
-                  Loading data...
+                    <TableCell colSpan={7} align="center" sx={{ py: 4, color: '#64748B', borderBottom: '1px solid #EAECF0' }}>
+                      Loading data...
                     </TableCell>
                   </TableRow>
-            )}
-
-            {dashboardSummary &&
-              dashboardSummary.recentActivity &&
-              formatRecentActivity().length === 0 && (
-                    <TableRow>
-                      <TableCell 
-                        colSpan={7} 
-                        align="center"
-                        sx={{ 
-                          borderBottom: '1px solid #E0E7ED',
-                          py: 4,
-                          color: '#64748B'
-                        }}
-                      >
-                    No recent activity found.
-                      </TableCell>
-                    </TableRow>
-                  )}
+                )}
               </TableBody>
             </Table>
           </TableContainer>

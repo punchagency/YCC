@@ -3,7 +3,6 @@
   display: flex;
   min-height: 100vh;
   height: 100vh;
-  overflow: hidden;
 }
 
 /* Page container */
@@ -11,7 +10,6 @@
   display: flex;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
 }
 
 /* Left menu (sidebar) */
@@ -165,6 +163,7 @@
   .right-panel-component {
     height: 100vh;
     overflow: hidden;
+    padding-top: 80px;
   }
   
   .right-panel-component > *:nth-child(2) {

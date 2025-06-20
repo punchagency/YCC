@@ -330,18 +330,15 @@ const Reports = () => {
   };
 
   return (
-    <div
-      style={{
-        background: "#F8FBFF",
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div>
       <DashboardTitleBar title="Reports" />
-      
+      <div
+        className="report-container-main"
+        style={{
+          display: "flex",
+          background: "#F8FBFF",
+        }}
+      >
       <div className="bg-white" style={{ padding: "20px" }}>
         <div
           className="report-container-inventory-reports-and-bar-graph"
@@ -790,119 +787,9 @@ const Reports = () => {
           </table>
         </div>
       </div>
+      </div>
     </div>
   );
 };
-
-// Create and add a stylesheet element for responsive design
-const responsiveStyle = document.createElement("style");
-responsiveStyle.innerHTML = `
-  @media screen and (max-width: 768px) {
-    /* Main layout - stack everything vertically */
-    .report-container-inventory-reports-and-bar-graph {
-      display: flex !important;
-      flex-direction: column !important;
-      width: 100% !important;
-      padding-left: 10px !important;
-      padding-right: 10px !important;
-    }
-    
-    /* Make all sections the EXACT same width on mobile */
-    .report-container-inventory-reports,
-    .report-container-bar-graph,
-    .metrics-container {
-      width: 92% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      margin-bottom: 20px !important;
-    }
-    
-    /* Make sure the chart container itself has the right styling */
-    .report-container-bar-graph {
-      background-color: #FFFFFF !important;
-      border-radius: 8px !important;
-      padding: 10px !important;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.05) !important;
-    }
-    
-    /* Style the chart's inner container */
-    .report-container-bar-graph > div {
-      width: 100% !important;
-      height: 250px !important;
-      padding: 5px !important;
-    }
-    
-    /* Stack order summary boxes vertically */
-    .box-order-container {
-      display: flex !important;
-      flex-direction: column !important;
-      min-width: unset !important;
-      width: 96% !important;
-      margin: 0 auto !important;
-    }
-    
-    .box1-order {
-      width: 100% !important;
-      min-width: unset !important;
-      margin-bottom: 15px !important;
-    }
-    
-    /* Fix selling products section */
-    .selling-products-container {
-      margin-top: 20px !important;
-      width: 96% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-    }
-    
-    .selling-products-header {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-start !important;
-    }
-    
-    .selling-products-header .p-button {
-      width: 100% !important;
-      margin-top: 10px !important;
-    }
-    
-    /* Make table horizontally scrollable */
-    .selling-products-container {
-      overflow-x: auto !important;
-    }
-    
-    .selling-products-table {
-      min-width: 600px !important;
-    }
-    
-    /* Adjust font sizes for better mobile readability */
-    h3 {
-      font-size: 20px !important;
-    }
-    
-    h2 {
-      font-size: 18px !important;
-    }
-    
-    .metric-header span {
-      font-size: 12px !important;
-    }
-    
-    .metric-header h2 {
-      font-size: 18px !important;
-    }
-    
-    /* Add margin to order summary title */
-    .order-summary-text-header {
-      margin-top: 15px !important;
-      padding-left: 2% !important;
-    }
-  }
-`;
-
-// Add style element to document head
-if (typeof document !== "undefined") {
-  document.head.appendChild(responsiveStyle);
-}
 
 export default Reports;
