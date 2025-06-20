@@ -805,7 +805,12 @@ export default function Notifications({ role }) {
 
   if (loading) {
     return (
-      <div className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full">
+      <div 
+        className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
         <DashboardTitleBar title="Notifications" backArrow={true} />
 
         <NotificationFilter
@@ -833,7 +838,12 @@ export default function Notifications({ role }) {
 
   if (error) {
     return (
-      <div className="notification-container">
+      <div 
+        className="notification-container"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
         <div className="error-message" style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}>
           Error: {error}
         </div>
@@ -867,7 +877,12 @@ export default function Notifications({ role }) {
         `}
       </style>
       <Toast ref={toast} />
-      <div className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full">
+      <div 
+        className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? '67px' : '0',
+        }}
+      >
         <DashboardTitleBar title="Notifications" backArrow={true} />
         <div className="mb-4"></div>
 
