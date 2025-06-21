@@ -277,16 +277,16 @@ const ChatbotDashboard = () => {
                             },
                         }}>
                             <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[0] || 'my bookings for this month')}  >
-                                <CustomOPtionText>{chatData.chatSuggestions[0] || chatSuggestions[role][0]}</CustomOPtionText>
+                                <CustomOPtionText>{chatData.chatSuggestions[0] || (chatSuggestions[role] && chatSuggestions[role][0]) || chatSuggestions.guest[0]}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || chatSuggestions[role][1])}>
-                                <CustomOPtionText>{chatData.chatSuggestions[1] || chatSuggestions[role][1]}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[1] || chatSuggestions[role]?.[1] || chatSuggestions.guest[1])}>
+                                <CustomOPtionText>{chatData.chatSuggestions[1] || (chatSuggestions[role] && chatSuggestions[role][1]) || chatSuggestions.guest[1]}</CustomOPtionText>
                             </CustomOptionButton>   
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || chatSuggestions[role][2])}>
-                                <CustomOPtionText> {chatData.chatSuggestions[2] || chatSuggestions[role][2]}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[2] || chatSuggestions[role]?.[2] || chatSuggestions.guest[2])}>
+                                <CustomOPtionText> {chatData.chatSuggestions[2] || (chatSuggestions[role] && chatSuggestions[role][2]) || chatSuggestions.guest[2]}</CustomOPtionText>
                             </CustomOptionButton>
-                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || chatSuggestions[role][3])}>
-                                <CustomOPtionText> {chatData.chatSuggestions[3] || chatSuggestions[role][3]}</CustomOPtionText>
+                            <CustomOptionButton onClick={() => preDefinedMessages(chatData.chatSuggestions[3] || chatSuggestions[role]?.[3] || chatSuggestions.guest[3])}>
+                                <CustomOPtionText> {chatData.chatSuggestions[3] || (chatSuggestions[role] && chatSuggestions[role][3]) || chatSuggestions.guest[3]}</CustomOPtionText>
                             </CustomOptionButton>
                         </Box>
 

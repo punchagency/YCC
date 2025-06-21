@@ -11,7 +11,7 @@ import LandingPageChatbot from "./chatbot/landing-page-chatbot";
 import CustomButton from "./Button";
 import { isMobile } from './ResponsiveDevice';
 
-const LoginForm = () => {
+const LoginForm = ({ onClose }) => {
   // Define the options for the user roles
   const navigate = useNavigate(); // Add useNavigate hook
 
@@ -31,7 +31,7 @@ const LoginForm = () => {
   const [error, setError] = useState(null);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const { loginUser } = useUser(); // Get loginUser function from context
+  const { loginUser, refreshUser } = useUser(); // Get loginUser and refreshUser functions from context
 
   // Add this useState hook for loading state
   const [loading, setLoading] = useState(false);
@@ -76,7 +76,7 @@ const LoginForm = () => {
           localStorage.setItem("token", response.data.token);
         }
 
-        // Store user data
+        // Store initial user data
         loginUser(response.data.user);
 
         // Get role name from object or string
@@ -85,6 +85,15 @@ const LoginForm = () => {
           userRole = userRole.name;
         }
 
+        // Wait for complete user data to be fetched
+        try {
+          await refreshUser();
+        } catch (error) {
+          console.error("Error refreshing user data:", error);
+          // Continue with navigation even if refresh fails
+        }
+
+        // Navigate based on role
         if (userRole === "crew_member") {
           navigate("/crew/dashboard");
         } else if (userRole === "admin") {
