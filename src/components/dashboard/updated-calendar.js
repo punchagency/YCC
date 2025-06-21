@@ -37,7 +37,7 @@ const UpdatedCalendar = () => {
   // Fetch events when component mounts
   useEffect(() => {
     fetchEventsByDate();
-  }, [fetchEventsByDate]);
+  }, []);
 
   // Fetch events when currentDate (month) changes
   // useEffect(() => {

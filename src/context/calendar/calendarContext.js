@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useCallback } from "react";
 import { fetchEvents, createEvent, addGuestService } from "../../services/calendar/calendarService";
 import { useToast } from '../toast/toastContext';
 export const CalendarContext = createContext();
@@ -51,7 +51,7 @@ endOfNextMonth.setHours(23, 59, 59, 999);
         }
     }
 
-    const fetchEventsByDate = async (startDate, endDate) => {
+    const fetchEventsByDate = useCallback(async (startDate, endDate) => {
         if (!startDate || !endDate) {
             startDate = startOfCurrentMonth;
             endDate = endOfCurrentMonth;
@@ -62,9 +62,9 @@ endOfNextMonth.setHours(23, 59, 59, 999);
         } else {
             setEvents([]);
         }
-    };
+    }, []);
 
-    const fetchEventsForTodayAndTomorrow = async () => {
+    const fetchEventsForTodayAndTomorrow = useCallback(async () => {
         const startOfToday = new Date();
         startOfToday.setHours(0, 0, 0, 0);
         const endOfToday = new Date();
@@ -81,7 +81,7 @@ endOfNextMonth.setHours(23, 59, 59, 999);
         } else {
             setEventsForTodayAndTomorrow([]);
         }
-    };
+    }, []);
 
     const addGuest = async (eventId, guestEmails) => {
         const response = await addGuestService(eventId, guestEmails);
