@@ -6,6 +6,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Dialog } from 'primereact/dialog';
 import { useToast } from '../../../../context/toast/toastContext';
 import { fetchPendingVendors, approveVendor, rejectVendor } from '../../../../services/admin/adminService';
+import { constructOnboardingUrl } from '../../../../utils/urlUtils';
 import './approve.css';
 
 const ApprovePage = () => {
@@ -93,10 +94,13 @@ const ApprovePage = () => {
       // Map activeTab to correct URL path
       const urlPath = activeTab === 'supplier' ? 'vendors' : 'services';
 
+      // Use environment variable for frontend URL to avoid including admin subdirectory
+      const baseUrl = process.env.REACT_APP_FRONTEND_URL || window.location.origin.replace('/admin', '');
+
       const emailData = {
         subject: emailSubject.trim(),
         emailBody: emailContent.trim(),
-        onboardingUrl: `${window.location.origin}/${urlPath}/onboarding/${selectedVendor.user}`
+        onboardingUrl: constructOnboardingUrl(activeTab, selectedVendor.user)
       };
 
       await approveVendor(selectedVendor.user, activeTab, emailData);

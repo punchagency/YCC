@@ -17,6 +17,7 @@ import { signup } from "../services/authService";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { normalizeWebsiteUrl } from "../utils/urlUtils";
 
 const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   // const navigate = useNavigate();
@@ -106,7 +107,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         businessName: formData.businessName,
         businessAddress: formData.businessAddress,
         phone: formData.phone,
-        businessWebsite: formData.businessWebsite,
+        businessWebsite: normalizeWebsiteUrl(formData.businessWebsite),
         departments: formData.departments?.map(dept => dept.value) || [],
         services: formData.services?.map(service => service.value),
         availability: formData.availability,

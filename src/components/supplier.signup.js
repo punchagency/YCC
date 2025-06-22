@@ -16,6 +16,7 @@ import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { normalizeWebsiteUrl } from "../utils/urlUtils";
 
 // Replace the static supplierTypeOptions with a mapping of departments to their options
 const departmentSupplierTypes = {
@@ -284,7 +285,7 @@ const SupplierSignUpForm = ({
         departments: formData.departments?.map(dept => dept.value) || [],
         phone: formData.phone || "",
         address: formData.address || "",
-        website: formData.website || "",
+        website: normalizeWebsiteUrl(formData.website || ""),
         serviceArea: getServiceAreaArray(),
         contactPerson: {
           fullName: formData.contactPerson?.fullName || "",
