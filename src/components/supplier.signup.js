@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-// import PhoneInput from "react-phone-input-2";
+import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import inputLogo from "../assets/images/nameinput.png";
 import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
@@ -135,6 +137,7 @@ const SupplierSignUpForm = ({
   formData,
   setFormData,
 }) => {
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
@@ -316,6 +319,37 @@ const SupplierSignUpForm = ({
       exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.35, ease: "easeInOut" }}
     >
+      {/* Back Navigation Button - Only on Step 1 */}
+      <div style={{ marginBottom: "20px" }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "none",
+            border: "none",
+            color: "#034D92",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: "500",
+            padding: "8px 0",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "#0487d9";
+            e.target.style.transform = "translateX(-2px)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "#034D92";
+            e.target.style.transform = "translateX(0)";
+          }}
+        >
+          <ArrowBackIcon style={{ fontSize: "18px" }} />
+          Back
+        </button>
+      </div>
+
       {/* Business Name */}
       <div className="form-group1">
         <div className="input-field">
@@ -339,23 +373,23 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-        {/* Email */}
+      {/* Email */}
       <div className="form-group1">
-          <div className="input-field">
-            <div>
+        <div className="input-field">
+          <div>
             <label htmlFor="email">Contact Email</label>
-            </div>
+          </div>
           <div className="inputBorder">
-              <img
-                src={emailLogo}
+            <img
+              src={emailLogo}
               style={{ width: "12px", height: "12px" }}
               alt="email"
-              />
-              <input
-                type="email"
-                id="email"
-                value={formData.email || ""}
-                onChange={(e) => handleInputChange("email", e.target.value)}
+            />
+            <input
+              type="email"
+              id="email"
+              value={formData.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="Enter your email"
             />
           </div>
@@ -401,6 +435,18 @@ const SupplierSignUpForm = ({
           style={{
             width: "100%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
           }}
         >
           Next
@@ -423,18 +469,30 @@ const SupplierSignUpForm = ({
           <div>
             <label htmlFor="phone">Phone Number</label>
           </div>
-          <div className="inputBorder">
-            <img
-              src={phone}
-              style={{ width: "12px", height: "12px" }}
-              alt="phone"
-            />
-            <input
-              type="tel"
-              id="phone"
+          <div
+            className="inputBorder"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "8px 12px",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "5px",
+              width: "100%",
+              height: "40px",
+            }}
+          >
+            <PhoneInput
+              country={"us"}
               value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              placeholder="E.g. +1 555-123-4567"
+              onChange={(value) => handleInputChange("phone", value)}
+              inputStyle={{
+                width: "100%",
+                height: "100%",
+                background: "transparent",
+                border: "none",
+                fontSize: "16px",
+              }}
+              containerStyle={{ width: "100%" }}
             />
           </div>
         </div>
@@ -491,7 +549,22 @@ const SupplierSignUpForm = ({
         <button
           className="prev-button"
           onClick={() => setStep(1)}
-          style={{ width: "48%", background: "#f0f0f0" }}
+          style={{ 
+            width: "48%", 
+            background: "#f0f0f0",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "#e0e0e0";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "#f0f0f0";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
+          }}
         >
           Previous
         </button>
@@ -501,6 +574,18 @@ const SupplierSignUpForm = ({
           style={{
             width: "48%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
           }}
         >
           Next
@@ -786,7 +871,22 @@ const SupplierSignUpForm = ({
           <button
             className="prev-button"
           onClick={() => setStep(2)}
-            style={{ width: "48%", background: "#f0f0f0" }}
+            style={{ 
+              width: "48%", 
+              background: "#f0f0f0",
+              transition: "all 0.3s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = "#e0e0e0";
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "#f0f0f0";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
+            }}
           >
             Previous
           </button>
@@ -802,6 +902,20 @@ const SupplierSignUpForm = ({
             cursor: !isSubmitting ? "pointer" : "not-allowed",
             opacity: !isSubmitting ? 1 : 0.7,
               transition: "all 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "none";
+              }
             }}
           >
           {isSubmitting ? "Submitting..." : "Submit Application"}
