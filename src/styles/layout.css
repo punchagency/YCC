@@ -1,4 +1,4 @@
-/* Main layout wrapper */
+Main layout wrapper
 .wrapper {
   display: flex;
   min-height: 100vh;
@@ -124,7 +124,7 @@
   flex-direction: column;
   flex: 1;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   min-height: 0; /* Important for flex child */
 }
 
@@ -132,10 +132,11 @@
 .right-panel-component > *:nth-child(2) {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   min-height: 0; /* Important for flex child */
   padding: 20px;
   background-color: #f8fafc;
+  width: 100%;
 }
 
 /* Ensure the header stays at top */
@@ -151,18 +152,18 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .wrapper {
-    height: 100vh;
-    overflow: hidden;
+    height: auto;
+    overflow: auto;
   }
   
   .page {
-    height: 100vh;
-    overflow: hidden;
+    height: auto;
+    overflow: auto;
   }
   
   .right-panel-component {
-    height: 100vh;
-    overflow: hidden;
+    height: auto;
+    overflow: auto;
     padding-top: 80px;
   }
   

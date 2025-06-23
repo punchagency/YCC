@@ -13,12 +13,11 @@ import share from "../assets/images/crew/share.png";
 import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
-import { Store, Bell } from 'lucide-react';
+import { Store, Bell } from "lucide-react";
 import { useUser } from "../context/userContext";
-import { checkPendingVendors } from '../services/admin/adminService';
-import { getNotifications } from '../services/notification/notificationService';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+import { checkPendingVendors } from "../services/admin/adminService";
+import { getNotifications } from "../services/notification/notificationService";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -26,19 +25,19 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const { user } = useUser();
 
   // Debug: Log user data
-  console.log('Header - User data:', {
+  console.log("Header - User data:", {
     user: user,
     crewProfile: user?.crewProfile,
     profilePicture: user?.profilePicture,
-    role: user?.role
+    role: user?.role,
   });
 
   // Helper function to get role name
   const getRoleName = (roleObj) => {
-    if (typeof roleObj === 'string') {
+    if (typeof roleObj === "string") {
       return roleObj;
     }
-    if (typeof roleObj === 'object' && roleObj?.name) {
+    if (typeof roleObj === "object" && roleObj?.name) {
       return roleObj.name;
     }
     return null;
@@ -52,7 +51,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     userRole = getRoleName(userRole);
   }
 
-  console.log('User role:', userRole);
+  console.log("User role:", userRole);
 
   // const overlayPanelRef = useRef(null);
   // const { user } = useUser(); // Get user data from context
@@ -74,7 +73,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     type: "all",
     status: "all",
     sortField: "relevance",
-    sortDirection: "desc"
+    sortDirection: "desc",
   });
 
   const [hasPendingVendors, setHasPendingVendors] = useState(false);
@@ -82,14 +81,14 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   useEffect(() => {
     fetchNotifications();
     const checkVendors = async () => {
-      if (userRole === 'admin') {
+      if (userRole === "admin") {
         try {
           const response = await checkPendingVendors();
-          if (response.status === 'success') {
+          if (response.status === "success") {
             setHasPendingVendors(response.data.hasPendingVendors);
           }
         } catch (error) {
-          console.error('Error checking pending vendors:', error);
+          console.error("Error checking pending vendors:", error);
         }
       }
     };
@@ -137,64 +136,96 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     {
       label: "Relevance",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "relevance", sortDirection: "desc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "relevance",
+          sortDirection: "desc",
+        });
         if (showSearchModal) {
           setShowSearchModal(false);
           setTimeout(() => setShowSearchModal(true), 0);
         } else {
           setShowSearchModal(true);
         }
-      }
+      },
     },
     {
       label: "Date (Newest)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "date", sortDirection: "desc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "date",
+          sortDirection: "desc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Date (Oldest)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "date", sortDirection: "asc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "date",
+          sortDirection: "asc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Name (A-Z)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "name", sortDirection: "asc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "name",
+          sortDirection: "asc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Name (Z-A)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "name", sortDirection: "desc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "name",
+          sortDirection: "desc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Status",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "status", sortDirection: "asc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "status",
+          sortDirection: "asc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Price (High to Low)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "price", sortDirection: "desc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "price",
+          sortDirection: "desc",
+        });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Price (Low to High)",
       command: () => {
-        setSearchFilters({...searchFilters, sortField: "price", sortDirection: "asc"});
+        setSearchFilters({
+          ...searchFilters,
+          sortField: "price",
+          sortDirection: "asc",
+        });
         setShowSearchModal(true);
-      }
-    }
+      },
+    },
   ];
 
   // Define menu items for Filter and Sort
@@ -202,34 +233,34 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     {
       label: "All Items",
       command: () => {
-        setSearchFilters({...searchFilters, type: "all"});
+        setSearchFilters({ ...searchFilters, type: "all" });
         if (showSearchModal) {
           // If modal is already open, this will apply the filter
           setShowSearchModal(false);
           setTimeout(() => setShowSearchModal(true), 0);
         }
-      }
+      },
     },
     {
       label: "Vendors",
       command: () => {
-        setSearchFilters({...searchFilters, type: "vendors"});
+        setSearchFilters({ ...searchFilters, type: "vendors" });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Orders",
       command: () => {
-        setSearchFilters({...searchFilters, type: "orders"});
+        setSearchFilters({ ...searchFilters, type: "orders" });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Bookings",
       command: () => {
-        setSearchFilters({...searchFilters, type: "bookings"});
+        setSearchFilters({ ...searchFilters, type: "bookings" });
         setShowSearchModal(true);
-      }
+      },
     },
     {
       label: "Inventory",
@@ -238,7 +269,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         setShowSearchModal(true);
       },
     },
-  ]
+  ];
 
   // Refs and hooks
   // const navigate = useNavigate();
@@ -268,8 +299,21 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   // Detect if we're on mobile
   const isMobile = window.innerWidth <= 768;
 
+  // Detect iPad Pro specifically
+  const isIpadPro = window.innerWidth === 1024 && window.innerHeight === 1366;
+
   const landingPages = [
-    '/', '/resource-center', '/about-us', '/contact-us', '/crew', '/captain', '/exterior', '/interior', '/engineering', '/chef-galley', '/vendor-services'
+    "/",
+    "/resource-center",
+    "/about-us",
+    "/contact-us",
+    "/crew",
+    "/captain",
+    "/exterior",
+    "/interior",
+    "/engineering",
+    "/chef-galley",
+    "/vendor-services",
   ];
   const isLandingPage = landingPages.includes(location.pathname);
 
@@ -291,15 +335,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             width: "100%",
             alignItems: "center",
             gap: "15px",
-            justifyContent: "space-between"
+            justifyContent: "space-between",
           }}
         >
           {/* Left Group: Hamburger + Search */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px"
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+            }}
+          >
             {/* Hamburger Menu */}
             <div
               className="hamburger-container"
@@ -382,42 +428,42 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               {/* Store Icon */}
               {userRole === "admin" && (
                 <button
-                  onClick={() => navigate('/admin/approve')}
+                  onClick={() => navigate("/admin/approve")}
                   className="supplier-management-btn"
                   aria-label="Supplier and Vendor Management"
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '40px',
-                    height: '40px',
-                    background: 'transparent',
-                    border: 'none',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    padding: '8px',
-                    position: 'relative'
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "40px",
+                    height: "40px",
+                    background: "transparent",
+                    border: "none",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    padding: "8px",
+                    position: "relative",
                   }}
                 >
-                  <Store 
-                    style={{ 
-                      width: "24px", 
-                      height: "24px", 
-                      color: "#0387D9"
-                    }} 
+                  <Store
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      color: "#0387D9",
+                    }}
                   />
                   {hasPendingVendors && (
                     <div
                       style={{
-                        position: 'absolute',
-                        top: '8px',
-                        right: '4px',
-                        width: '12px',
-                        height: '12px',
-                        backgroundColor: '#FF4B4B',
-                        borderRadius: '50%',
-                        border: '2px solid #fff'
+                        position: "absolute",
+                        top: "8px",
+                        right: "4px",
+                        width: "12px",
+                        height: "12px",
+                        backgroundColor: "#FF4B4B",
+                        borderRadius: "50%",
+                        border: "2px solid #fff",
                       }}
                     />
                   )}
@@ -430,38 +476,38 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 onClick={(event) => overlayPanelRef.current.toggle(event)}
                 aria-haspopup
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '40px',
-                  height: '40px',
-                  background: 'transparent',
-                  border: 'none',
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  padding: '8px',
-                  position: 'relative'
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "40px",
+                  height: "40px",
+                  background: "transparent",
+                  border: "none",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  padding: "8px",
+                  position: "relative",
                 }}
               >
-                <Bell 
-                  style={{ 
-                    width: "24px", 
-                    height: "24px", 
-                    color: "#0387D9"
-                  }} 
+                <Bell
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    color: "#0387D9",
+                  }}
                 />
                 {notifications.length > 0 && (
                   <div
                     style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '4px',
-                      width: '12px',
-                      height: '12px',
-                      backgroundColor: '#FF4B4B',
-                      borderRadius: '50%',
-                      border: '2px solid #fff'
+                      position: "absolute",
+                      top: "8px",
+                      right: "4px",
+                      width: "12px",
+                      height: "12px",
+                      backgroundColor: "#FF4B4B",
+                      borderRadius: "50%",
+                      border: "2px solid #fff",
                     }}
                   />
                 )}
@@ -485,7 +531,11 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 }}
               >
                 <img
-                  src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+                  src={
+                    user?.profilePicture ||
+                    user?.crewProfile?.profilePicture ||
+                    manprofile
+                  }
                   alt="Profile"
                   className="profile-image"
                   style={{
@@ -632,42 +682,42 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         {/* Store Icon - Only show on desktop */}
         {!isMobile && userRole === "admin" && (
           <button
-            onClick={() => navigate('/admin/approve')}
+            onClick={() => navigate("/admin/approve")}
             className="supplier-management-btn"
             aria-label="Supplier and Vendor Management"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              padding: '8px',
-              position: 'relative'
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "40px",
+              height: "40px",
+              background: "transparent",
+              border: "none",
+              borderRadius: "50%",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              padding: "8px",
+              position: "relative",
             }}
           >
-            <Store 
-              style={{ 
-                width: "24px", 
-                height: "24px", 
-                color: "#0387D9"
-              }} 
+            <Store
+              style={{
+                width: "24px",
+                height: "24px",
+                color: "#0387D9",
+              }}
             />
             {hasPendingVendors && (
               <div
                 style={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '4px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: '#FF4B4B',
-                  borderRadius: '50%',
-                  border: '2px solid #fff'
+                  position: "absolute",
+                  top: "8px",
+                  right: "4px",
+                  width: "12px",
+                  height: "12px",
+                  backgroundColor: "#FF4B4B",
+                  borderRadius: "50%",
+                  border: "2px solid #fff",
                 }}
               />
             )}
@@ -681,38 +731,38 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
             onClick={(event) => overlayPanelRef.current.toggle(event)}
             aria-haspopup
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              padding: '8px',
-              position: 'relative'
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "40px",
+              height: "40px",
+              background: "transparent",
+              border: "none",
+              borderRadius: "50%",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              padding: "8px",
+              position: "relative",
             }}
           >
-            <Bell 
-              style={{ 
-                width: "24px", 
-                height: "24px", 
-                color: "#0387D9"
-              }} 
+            <Bell
+              style={{
+                width: "24px",
+                height: "24px",
+                color: "#0387D9",
+              }}
             />
             {notifications.length > 0 && (
               <div
                 style={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '4px',
-                  width: '12px',
-                  height: '12px',
-                  backgroundColor: '#FF4B4B',
-                  borderRadius: '50%',
-                  border: '2px solid #fff'
+                  position: "absolute",
+                  top: "8px",
+                  right: "4px",
+                  width: "12px",
+                  height: "12px",
+                  backgroundColor: "#FF4B4B",
+                  borderRadius: "50%",
+                  border: "2px solid #fff",
                 }}
               />
             )}
@@ -734,7 +784,11 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               style={{ cursor: "pointer" }}
             >
               <img
-                src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+                src={
+                  user?.profilePicture ||
+                  user?.crewProfile?.profilePicture ||
+                  manprofile
+                }
                 alt="Profile"
                 className="profile-image"
                 style={{
@@ -753,8 +807,17 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
               }}
             >
               <div>
-                <p>{user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : (user?.name || userName)}</p>
-                <p>{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1).replace("_", " ") : "Admin"}</p>
+                <p>
+                  {user?.crewProfile
+                    ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}`
+                    : user?.name || userName}
+                </p>
+                <p>
+                  {userRole
+                    ? userRole.charAt(0).toUpperCase() +
+                      userRole.slice(1).replace("_", " ")
+                    : "Admin"}
+                </p>
               </div>
             </div>
           </>
@@ -766,15 +829,24 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   return (
     <header className="admin-header">
       {/* Back Button */}
-      {window.history.length > 1 && !isLandingPage && !location.pathname.startsWith('/crew/') && !location.pathname.startsWith('/admin/') && (
-        <button
-          onClick={() => navigate(-1)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#034D92', marginRight: 8 }}
-          aria-label="Back"
-        >
-          <ArrowBackIcon />
-        </button>
-      )}
+      {window.history.length > 1 &&
+        !isLandingPage &&
+        !location.pathname.startsWith("/crew/") &&
+        !location.pathname.startsWith("/admin/") && (
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#034D92",
+              marginRight: 8,
+            }}
+            aria-label="Back"
+          >
+            <ArrowBackIcon />
+          </button>
+        )}
       <Menubar
         start={start}
         end={end}
@@ -796,10 +868,28 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         onClose={() => setMobileMenuOpen(false)}
         role={userRole}
       />
+      {isIpadPro && (
+        <div
+          className="ipad-pro-menu"
+          style={{
+            position: "fixed",
+            top: "16px",
+            left: "16px",
+            zIndex: 1001,
+            cursor: "pointer",
+          }}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <img
+            src={hamburger}
+            alt="menu"
+            style={{ width: "24px", height: "24px" }}
+          />
+        </div>
+      )}
       <GlobalSearchModal
         visible={showSearchModal}
         onHide={() => setShowSearchModal(false)}
-        initialQuery={searchValue}
         initialFilters={searchFilters}
       />
     </header>
