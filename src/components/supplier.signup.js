@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-// import PhoneInput from "react-phone-input-2";
+import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import inputLogo from "../assets/images/nameinput.png";
 import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
-import phone from "../assets/images/phone.png";
 import Select from "react-select";
 import departmentLogo from "../assets/images/departmentLogo.png";
-import serviceLogo from "../assets/images/serviceLogo.png";
 import websiteLogo from "../assets/images/websiteLogo.png";
-import uploadfileLogo from "../assets/images/uploadfileLogo.png";
 import { signup } from "../services/authService";
 import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { normalizeWebsiteUrl } from "../utils/urlUtils";
 
 // Replace the static supplierTypeOptions with a mapping of departments to their options
 const departmentSupplierTypes = {
@@ -116,12 +116,6 @@ const departmentOptions = [
   { value: "galley", label: "Galley" },
 ];
 
-const deliveryOptions = [
-  { value: "Same-day Delivery", label: "Same-day Delivery" },
-  { value: "Scheduled Delivery", label: "Scheduled Delivery" },
-  { value: "Express Delivery", label: "Express Delivery" },
-];
-
 const serviceAreaOptions = [
   { value: "United States", label: "United States" },
   { value: "Mediterranean", label: "Mediterranean" },
@@ -134,25 +128,10 @@ const SupplierSignUpForm = ({
   formData,
   setFormData,
 }) => {
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [licenseFile, setLicenseFile] = useState(null);
-  const [taxIdFile, setTaxIdFile] = useState(null);
-  const [insuranceFile, setInsuranceFile] = useState(null);
-  const [setFileErrors] = useState({
-    supplierVatTaxId: "",
-    supplierLiabilityInsurance: "",
-    licenseSupplierFile: "",
-    spreadsheetFile: "",
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [setSuccess] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-
-  // Add state to store current supplier type options
-  const [supplierTypeOptions, setSupplierTypeOptions] = useState(
-    departmentSupplierTypes.default
-  );
 
   // Ensure formData includes departments as an array
   const [localFormData, setLocalFormData] = useState({
@@ -165,8 +144,6 @@ const SupplierSignUpForm = ({
     if (formData.department && formData.department.value) {
       const departmentValue = formData.department.value;
       if (departmentSupplierTypes[departmentValue]) {
-        setSupplierTypeOptions(departmentSupplierTypes[departmentValue]);
-
         // Reset the selected supplier type if it's not in the new options list
         if (formData.supplierType) {
           const typeExists = departmentSupplierTypes[departmentValue].some(
@@ -177,11 +154,7 @@ const SupplierSignUpForm = ({
             handleInputChange("supplierType", null);
           }
         }
-      } else {
-        setSupplierTypeOptions(departmentSupplierTypes.default);
       }
-    } else {
-      setSupplierTypeOptions(departmentSupplierTypes.default);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.department]); // We're disabling the lint rule to prevent excessive rerenders
@@ -194,65 +167,6 @@ const SupplierSignUpForm = ({
     };
     setLocalFormData(updated);
     setFormData(updated);
-  };
-
-  const handleFileUpload = async (file, type) => {
-    if (!file) return;
-
-    setFileErrors((prev) => ({ ...prev, [type]: "" }));
-
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError("File size should not exceed 10MB");
-      return;
-    }
-
-    // Validate file type based on upload type
-    const validTypes =
-      type === "spreadsheet"
-        ? [
-            "application/vnd.ms-excel",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "text/csv",
-          ]
-        : ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
-
-    if (!validTypes.includes(file.type)) {
-      setError(
-        type === "spreadsheet"
-          ? "Please upload an Excel or CSV file"
-          : "Please upload a PDF, JPG, or PNG file"
-      );
-      return;
-    }
-
-    setError("");
-
-    try {
-      switch (type) {
-        case "spreadsheet":
-          handleInputChange("spreadsheetFile", file);
-          break;
-        case "license":
-          setLicenseFile(file);
-          handleInputChange("licenseSupplierFile", file);
-          break;
-        case "taxId":
-          setTaxIdFile(file);
-          handleInputChange("supplierVatTaxId", file);
-          break;
-        case "insurance":
-          setInsuranceFile(file);
-          handleInputChange("supplierLiabilityInsurance", file);
-          break;
-        default:
-          setError("Invalid file type");
-          return;
-      }
-    } catch (error) {
-      setError("File upload failed. Please try again.");
-    }
   };
 
   const handleSignup = async () => {
@@ -284,7 +198,7 @@ const SupplierSignUpForm = ({
         departments: formData.departments?.map(dept => dept.value) || [],
         phone: formData.phone || "",
         address: formData.address || "",
-        website: formData.website || "",
+        website: normalizeWebsiteUrl(formData.website || ""),
         serviceArea: getServiceAreaArray(),
         contactPerson: {
           fullName: formData.contactPerson?.fullName || "",
@@ -315,6 +229,37 @@ const SupplierSignUpForm = ({
       exit={{ opacity: 0, y: -40 }}
       transition={{ duration: 0.35, ease: "easeInOut" }}
     >
+      {/* Back Navigation Button - Only on Step 1 */}
+      <div style={{ marginBottom: "20px" }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "none",
+            border: "none",
+            color: "#034D92",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: "500",
+            padding: "8px 0",
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "#0487d9";
+            e.target.style.transform = "translateX(-2px)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "#034D92";
+            e.target.style.transform = "translateX(0)";
+          }}
+        >
+          <ArrowBackIcon style={{ fontSize: "18px" }} />
+          Back
+        </button>
+      </div>
+
       {/* Business Name */}
       <div className="form-group1">
         <div className="input-field">
@@ -338,23 +283,23 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-        {/* Email */}
+      {/* Email */}
       <div className="form-group1">
-          <div className="input-field">
-            <div>
+        <div className="input-field">
+          <div>
             <label htmlFor="email">Contact Email</label>
-            </div>
+          </div>
           <div className="inputBorder">
-              <img
-                src={emailLogo}
+            <img
+              src={emailLogo}
               style={{ width: "12px", height: "12px" }}
               alt="email"
-              />
-              <input
-                type="email"
-                id="email"
-                value={formData.email || ""}
-                onChange={(e) => handleInputChange("email", e.target.value)}
+            />
+            <input
+              type="email"
+              id="email"
+              value={formData.email || ""}
+              onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="Enter your email"
             />
           </div>
@@ -400,6 +345,18 @@ const SupplierSignUpForm = ({
           style={{
             width: "100%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
           }}
         >
           Next
@@ -422,18 +379,30 @@ const SupplierSignUpForm = ({
           <div>
             <label htmlFor="phone">Phone Number</label>
           </div>
-          <div className="inputBorder">
-            <img
-              src={phone}
-              style={{ width: "12px", height: "12px" }}
-              alt="phone"
-            />
-            <input
-              type="tel"
-              id="phone"
+          <div
+            className="inputBorder"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "8px 12px",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "5px",
+              width: "100%",
+              height: "40px",
+            }}
+          >
+            <PhoneInput
+              country={"us"}
               value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              placeholder="E.g. +1 555-123-4567"
+              onChange={(value) => handleInputChange("phone", value)}
+              inputStyle={{
+                width: "100%",
+                height: "100%",
+                background: "transparent",
+                border: "none",
+                fontSize: "16px",
+              }}
+              containerStyle={{ width: "100%" }}
             />
           </div>
         </div>
@@ -490,7 +459,22 @@ const SupplierSignUpForm = ({
         <button
           className="prev-button"
           onClick={() => setStep(1)}
-          style={{ width: "48%", background: "#f0f0f0" }}
+          style={{ 
+            width: "48%", 
+            background: "#f0f0f0",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "#e0e0e0";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "#f0f0f0";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
+          }}
         >
           Previous
         </button>
@@ -500,6 +484,18 @@ const SupplierSignUpForm = ({
           style={{
             width: "48%",
             background: "linear-gradient(to right, #034d92, #0487d9)",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
           }}
         >
           Next
@@ -691,101 +687,27 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-      {/* Privacy Policy - Commented out as requested */}
-      {/* <div className="form-group1">
-        <div className="input-field">
-        <div
-            className="checkbox-field" 
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-              padding: "5px 0 10px 0"
-          }}
-        >
-          <input
-            type="checkbox"
-              id="privacy"
-              checked={formData.acceptPrivacy}
-              onChange={(e) => handleInputChange("acceptPrivacy", e.target.checked)}
-            style={{
-                width: "18px",
-                height: "18px",
-                margin: "0",
-                cursor: "pointer"
-            }}
-          />
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-            <label
-              htmlFor="privacy" 
-            style={{
-              cursor: "pointer",
-              fontSize: "14px",
-                color: "#333",
-                margin: "0",
-                lineHeight: "1.4",
-                flex: 1
-            }}
-          >
-              I agree to the{" "}
-              <span
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsPrivacyModalOpen(true);
-                }}
-                style={{
-                  color: "#034D92",
-                  textDecoration: "underline",
-                  cursor: "pointer",
-                  fontWeight: "500",
-                  transition: "color 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = "#0487d9";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = "#034D92";
-                }}
-              >
-                Privacy Policy
-              </span>
-            </label>
-            <button
-              type="button"
-              onClick={() => setIsPrivacyModalOpen(true)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "24px",
-                height: "24px",
-                border: "none",
-                borderRadius: "4px",
-                backgroundColor: "transparent",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "#f0f0f0";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = "transparent";
-              }}
-              title="View Privacy Policy"
-            >
-              <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
-            </button>
-          </div>
-          </div>
-        </div>
-        </div> */}
-
       {/* Navigation Buttons */}
         <div className="button-group">
           <button
             className="prev-button"
           onClick={() => setStep(2)}
-            style={{ width: "48%", background: "#f0f0f0" }}
+            style={{ 
+              width: "48%", 
+              background: "#f0f0f0",
+              transition: "all 0.3s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = "#e0e0e0";
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "#f0f0f0";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
+            }}
           >
             Previous
           </button>
@@ -802,6 +724,20 @@ const SupplierSignUpForm = ({
             opacity: !isSubmitting ? 1 : 0.7,
               transition: "all 0.3s ease",
             }}
+            onMouseEnter={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSubmitting) {
+                e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "none";
+              }
+            }}
           >
           {isSubmitting ? "Submitting..." : "Submit Application"}
           </button>
@@ -815,15 +751,6 @@ const SupplierSignUpForm = ({
         title="YCC Supplier Agreement"
         fileName="YCC-Supplier-Agreement.pdf"
       />
-
-      {/* Privacy Policy Modal - Commented out as requested */}
-      {/* <TermsModal
-        isOpen={isPrivacyModalOpen}
-        onClose={() => setIsPrivacyModalOpen(false)}
-        pdfUrl="/YCC Vendor Agreement.pdf"
-        title="Privacy Policy"
-        fileName="Privacy-Policy.pdf"
-      /> */}
     </motion.div>
   );
 
