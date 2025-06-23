@@ -74,7 +74,6 @@ const MobileNotificationCard = ({ notification, handleViewDetails, handleStatusC
         borderRadius: "8px",
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
         backgroundColor: "#F8FBFF",
-        height: "100%",
         width: "100%",
       }}
     >
@@ -845,7 +844,7 @@ export default function Notifications({ role }) {
       <div 
         className="notification-container"
         style={{
-          paddingTop: isMobile ? '67px' : '0',
+          paddingTop: isMobile ? '0' : '0',
         }}
       >
         <div className="error-message" style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}>
@@ -884,7 +883,7 @@ export default function Notifications({ role }) {
       <div 
         className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
         style={{
-          paddingTop: isMobile ? '67px' : '0',
+          paddingTop: isMobile ? '0px' : '0',
         }}
       >
         <DashboardTitleBar title="Notifications" backArrow={true} />
