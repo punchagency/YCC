@@ -190,19 +190,8 @@ const CrewSetting = () => {
     <>
       <Toast ref={toast} />
       <div style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
-        <div className="flex align-items-center justify-content-between sub-header-panel">
-          <div className="sub-header-left sub-header-left-with-arrow">
-            <div className="content">
-              <h3
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  paddingLeft: "20px",
-                }}
-              >
-                Settings
-              </h3>
-            </div>
-          </div>
+        <div className="sub-header-left sub-header-left-with-arrow">
+          <div className="content"></div>
         </div>
 
         <div className="settings-container">
@@ -246,7 +235,7 @@ const CrewSetting = () => {
               <label>New Password</label>
               <Password
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} 
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="New Password"
                 feedback={true}
                 style={{ width: "100%" }}

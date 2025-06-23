@@ -30,26 +30,26 @@ import "jspdf-autotable";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import Chip from '@mui/material/Chip';
-import LockIcon from '@mui/icons-material/Lock';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import Chip from "@mui/material/Chip";
+import LockIcon from "@mui/icons-material/Lock";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Button, Select, MenuItem } from "@mui/material";
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download";
 import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
-import DashboardTitleBar from "../../../components/dashboard/title-bar";
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { useOutletContext } from "react-router-dom";
 
 // Register the components
 ChartJS.register(
@@ -66,15 +66,28 @@ ChartJS.register(
 
 // Helper for table header cells with filter icons
 const TableHeaderCell = ({ children }) => (
-    <TableCell sx={{ fontWeight: 500, color: '#475467', backgroundColor: '#F9FAFB', borderBottom: '1px solid #EAECF0', whiteSpace: 'nowrap' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {children}
-            <FilterListIcon sx={{ fontSize: '16px' }} />
-        </Box>
-    </TableCell>
+  <TableCell
+    sx={{
+      fontWeight: 500,
+      color: "#475467",
+      backgroundColor: "#F9FAFB",
+      borderBottom: "1px solid #EAECF0",
+      whiteSpace: "nowrap",
+    }}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {children}
+      <FilterListIcon sx={{ fontSize: "16px" }} />
+    </Box>
+  </TableCell>
 );
 
 const Reports = () => {
+  const { setPageTitle } = useOutletContext() || {};
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Reports");
+  }, [setPageTitle]);
+
   // Move all state hooks and functions inside the component
   const [dashboardSummary, setDashboardSummary] = useState({
     inventory: {
@@ -100,11 +113,11 @@ const Reports = () => {
     customerSatisfaction: 0,
   });
 
-  const [view, setView] = useState('month');
-  const [ordersDateRange, setOrdersDateRange] = useState('week');
-  const [inventoryDateRange, setInventoryDateRange] = useState('week');
-  const [bookingsDateRange, setBookingsDateRange] = useState('week');
-  const [financialDateRange, setFinancialDateRange] = useState('week');
+  const [view, setView] = useState("month");
+  const [ordersDateRange, setOrdersDateRange] = useState("week");
+  const [inventoryDateRange, setInventoryDateRange] = useState("week");
+  const [bookingsDateRange, setBookingsDateRange] = useState("week");
+  const [financialDateRange, setFinancialDateRange] = useState("week");
 
   const handleViewChange = (event, newView) => {
     if (newView !== null) {
@@ -113,32 +126,98 @@ const Reports = () => {
   };
 
   const reportsData = [
-    { id: 1, name: 'Maintenance Report', date: '2023-10-28', status: 'Paid', amount: 500.00, invoiceId: 'INV-001' },
-    { id: 2, name: 'Fuel Consumption', date: '2023-10-27', status: 'Pending', amount: 1200.50, invoiceId: 'INV-002' },
-    { id: 3, name: 'Inventory Check', date: '2023-10-26', status: 'Overdue', amount: 350.75, invoiceId: 'INV-003' },
-    { id: 4, name: 'Crew Payroll', date: '2023-10-25', status: 'Paid', amount: 8500.00, invoiceId: 'INV-004' },
-    { id: 5, name: 'Supplier Payment', date: '2023-10-24', status: 'Pending', amount: 2300.00, invoiceId: 'INV-005' },
+    {
+      id: 1,
+      name: "Maintenance Report",
+      date: "2023-10-28",
+      status: "Paid",
+      amount: 500.0,
+      invoiceId: "INV-001",
+    },
+    {
+      id: 2,
+      name: "Fuel Consumption",
+      date: "2023-10-27",
+      status: "Pending",
+      amount: 1200.5,
+      invoiceId: "INV-002",
+    },
+    {
+      id: 3,
+      name: "Inventory Check",
+      date: "2023-10-26",
+      status: "Overdue",
+      amount: 350.75,
+      invoiceId: "INV-003",
+    },
+    {
+      id: 4,
+      name: "Crew Payroll",
+      date: "2023-10-25",
+      status: "Paid",
+      amount: 8500.0,
+      invoiceId: "INV-004",
+    },
+    {
+      id: 5,
+      name: "Supplier Payment",
+      date: "2023-10-24",
+      status: "Pending",
+      amount: 2300.0,
+      invoiceId: "INV-005",
+    },
   ];
 
   const getStatusChip = (status) => {
     let sxProps = {};
     const normalizedStatus = status.toLowerCase();
 
-    if (normalizedStatus.includes('confirm')) {
-      sxProps = { backgroundColor: '#FFFAEB', color: '#B54708', label: 'Confirmed' };
-    } else if (normalizedStatus.includes('in progress')) {
-      sxProps = { backgroundColor: '#ECFDF3', color: '#027A48', label: 'In Progress' };
-    } else if (normalizedStatus.includes('complete')) {
-      sxProps = { backgroundColor: '#EFF8FF', color: '#175CD3', label: 'Completed' };
-    } else if (normalizedStatus.includes('pending')) {
-      sxProps = { backgroundColor: '#FFFAEB', color: '#B54708', label: 'Pending' };
-    } else if (normalizedStatus.includes('flagged')) {
-        sxProps = { backgroundColor: '#FEF3F2', color: '#B42318', label: 'Flagged' };
+    if (normalizedStatus.includes("confirm")) {
+      sxProps = {
+        backgroundColor: "#FFFAEB",
+        color: "#B54708",
+        label: "Confirmed",
+      };
+    } else if (normalizedStatus.includes("in progress")) {
+      sxProps = {
+        backgroundColor: "#ECFDF3",
+        color: "#027A48",
+        label: "In Progress",
+      };
+    } else if (normalizedStatus.includes("complete")) {
+      sxProps = {
+        backgroundColor: "#EFF8FF",
+        color: "#175CD3",
+        label: "Completed",
+      };
+    } else if (normalizedStatus.includes("pending")) {
+      sxProps = {
+        backgroundColor: "#FFFAEB",
+        color: "#B54708",
+        label: "Pending",
+      };
+    } else if (normalizedStatus.includes("flagged")) {
+      sxProps = {
+        backgroundColor: "#FEF3F2",
+        color: "#B42318",
+        label: "Flagged",
+      };
     } else {
-      sxProps = { backgroundColor: '#F2F4F7', color: '#364152', label: status };
+      sxProps = { backgroundColor: "#F2F4F7", color: "#364152", label: status };
     }
-  
-    return <Chip label={sxProps.label} size="small" sx={{ ...sxProps, fontWeight: 500, borderRadius: '16px', height: '22px' }} />;
+
+    return (
+      <Chip
+        label={sxProps.label}
+        size="small"
+        sx={{
+          ...sxProps,
+          fontWeight: 500,
+          borderRadius: "16px",
+          height: "22px",
+        }}
+      />
+    );
   };
 
   const fetchDashboardSummary = async () => {
@@ -1044,9 +1123,7 @@ const Reports = () => {
   return (
     <div>
       <Toast ref={toast} />
-      <DashboardTitleBar title="Reports" />
-      
-      <Box sx={{ p: 3, backgroundColor: "white" }}>
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
         <Grid container spacing={3}>
           {/* Date Range Section */}
           <Grid item xs={12} md={4}>
@@ -1054,30 +1131,37 @@ const Reports = () => {
               <h3>Date Range</h3>
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: { xs: "wrap", sm: "nowrap" } }}>
-                  <Calendar
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.value)}
-                    dateFormat="yy-mm-dd"
-                    placeholder="Start Date"
-                    showIcon
-                    minDate={new Date(2000, 0, 1)}
-                    maxDate={endDate || new Date(2100, 11, 31)}
-                  />
-                  <span className="font-bold">to</span>
-                  <Calendar
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.value)}
-                    dateFormat="yy-mm-dd"
-                    placeholder="End Date"
-                    showIcon
-                    minDate={startDate || new Date(2000, 0, 1)}
-                    maxDate={new Date(2100, 11, 31)}
-                  />
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                }}
+              >
+                <Calendar
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.value)}
+                  dateFormat="yy-mm-dd"
+                  placeholder="Start Date"
+                  showIcon
+                  minDate={new Date(2000, 0, 1)}
+                  maxDate={endDate || new Date(2100, 11, 31)}
+                />
+                <span className="font-bold">to</span>
+                <Calendar
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.value)}
+                  dateFormat="yy-mm-dd"
+                  placeholder="End Date"
+                  showIcon
+                  minDate={startDate || new Date(2000, 0, 1)}
+                  maxDate={new Date(2100, 11, 31)}
+                />
               </Box>
-                <small style={{ color: "#666", fontSize: "12px" }}>
-                  Select both start and end dates to generate report
-                </small>
+              <small style={{ color: "#666", fontSize: "12px" }}>
+                Select both start and end dates to generate report
+              </small>
             </Box>
           </Grid>
 
@@ -1086,17 +1170,19 @@ const Reports = () => {
             <Box sx={{ mb: 1 }}>
               <h3>Report Type</h3>
             </Box>
-            <Box sx={{ 
-              border: "1px solid #e0e0e0", 
-              borderRadius: "10px",
-              p: 1
-            }}>
-                <Dropdown
-                  value={reportType}
-                  onChange={(e) => setReportType(e.value)}
-                  options={reportTypeOptions}
-                  placeholder="Select Report Type"
-                  className="w-full"
+            <Box
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "10px",
+                p: 1,
+              }}
+            >
+              <Dropdown
+                value={reportType}
+                onChange={(e) => setReportType(e.value)}
+                options={reportTypeOptions}
+                placeholder="Select Report Type"
+                className="w-full"
               />
             </Box>
           </Grid>
@@ -1106,38 +1192,45 @@ const Reports = () => {
             <Box sx={{ mb: 1 }}>
               <h3>Frequency</h3>
             </Box>
-            <Box sx={{ 
-              border: "1px solid #e0e0e0", 
-              borderRadius: "10px",
-              p: 1
-            }}>
-                <Dropdown
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.value)}
-                  options={frequencyOptions}
-                  placeholder="Select Frequency"
-                  className="w-full"
+            <Box
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "10px",
+                p: 1,
+              }}
+            >
+              <Dropdown
+                value={frequency}
+                onChange={(e) => setFrequency(e.value)}
+                options={frequencyOptions}
+                placeholder="Select Frequency"
+                className="w-full"
               />
             </Box>
           </Grid>
 
           {/* Action Buttons */}
-          <Grid item xs={12} sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+          <Grid
+            item
+            xs={12}
+            sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
+          >
             <Button
               variant="outlined"
               startIcon={<DownloadIcon />}
               onClick={handleExport}
               sx={{
-                width: '180px',
-                textTransform: 'none',
-                borderColor: '#e0e0e0',
-                color: '#333',
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                  borderColor: '#bdbdbd',
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                width: "180px",
+                textTransform: "none",
+                borderColor: "#e0e0e0",
+                color: "#333",
+                transition:
+                  "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "#f5f5f5",
+                  borderColor: "#bdbdbd",
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
                 },
               }}
             >
@@ -1147,14 +1240,15 @@ const Reports = () => {
               variant="contained"
               onClick={handleGenerateReport}
               sx={{
-                width: '180px',
-                textTransform: 'none',
-                backgroundColor: '#0387D9',
-                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                '&:hover': {
-                  backgroundColor: '#0277bd',
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
+                width: "180px",
+                textTransform: "none",
+                backgroundColor: "#0387D9",
+                transition:
+                  "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "#0277bd",
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
                 },
               }}
             >
@@ -1166,36 +1260,42 @@ const Reports = () => {
 
       {/* Report Summary Section */}
       <Box sx={{ p: 3, backgroundColor: "white" }}>
-        <Typography variant="h6" sx={{ mb: 3, color: '#0A2647', fontWeight: 600 }}>
+        <Typography
+          variant="h6"
+          sx={{ mb: 3, color: "#0A2647", fontWeight: 600 }}
+        >
           Report Summary
         </Typography>
-        
+
         <Grid container spacing={3}>
           {/* All Orders Card */}
           <Grid item xs={12} sm={6} lg={3}>
-            <Paper 
+            <Paper
               elevation={0}
-              sx={{ 
+              sx={{
                 p: 2.5,
-                height: '100%',
+                height: "100%",
                 borderRadius: 2,
-                border: '1px solid #E0E7ED',
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
-                }
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
-                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
                     All Orders
                   </Typography>
                 </Box>
@@ -1205,19 +1305,19 @@ const Reports = () => {
                   variant="standard"
                   disableUnderline
                   sx={{
-                    bgcolor: '#F8FAFC',
+                    bgcolor: "#F8FAFC",
                     borderRadius: 1,
                     px: 1,
                     py: 0.5,
-                    '& .MuiSelect-select': {
-                      color: '#64748B',
-                      fontSize: 'caption.fontSize',
-                      paddingRight: '24px !important',
-                      display: 'flex',
-                      alignItems: 'center',
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
                     },
-                    '& .MuiSvgIcon-root': {
-                      color: '#64748B',
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
                     },
                   }}
                 >
@@ -1230,28 +1330,43 @@ const Reports = () => {
 
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Confirmed
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.orders?.confirmed || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.orders?.confirmed || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Pending
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.orders?.pending || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.orders?.pending || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Total
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : 
-                      (dashboardSummary.orders?.confirmed || 0) + (dashboardSummary.orders?.pending || 0)}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : (dashboardSummary.orders?.confirmed || 0) +
+                        (dashboardSummary.orders?.pending || 0)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -1260,29 +1375,32 @@ const Reports = () => {
 
           {/* Inventory Card */}
           <Grid item xs={12} sm={6} lg={3}>
-            <Paper 
+            <Paper
               elevation={0}
-              sx={{ 
+              sx={{
                 p: 2.5,
-                height: '100%',
+                height: "100%",
                 borderRadius: 2,
-                border: '1px solid #E0E7ED',
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
-                }
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
-                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
                     Inventory
                   </Typography>
                 </Box>
@@ -1292,19 +1410,19 @@ const Reports = () => {
                   variant="standard"
                   disableUnderline
                   sx={{
-                    bgcolor: '#F8FAFC',
+                    bgcolor: "#F8FAFC",
                     borderRadius: 1,
                     px: 1,
                     py: 0.5,
-                    '& .MuiSelect-select': {
-                      color: '#64748B',
-                      fontSize: 'caption.fontSize',
-                      paddingRight: '24px !important',
-                      display: 'flex',
-                      alignItems: 'center',
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
                     },
-                    '& .MuiSvgIcon-root': {
-                      color: '#64748B',
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
                     },
                   }}
                 >
@@ -1317,28 +1435,45 @@ const Reports = () => {
 
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Low Stock
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.inventory?.lowStockItems || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.inventory?.lowStockItems || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Total Items
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.inventory?.totalItems || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.inventory?.totalItems || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Total value
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    ${dashboardSummary.loading ? "--" : 
-                      (dashboardSummary.inventory?.totalValue || 0).toLocaleString()}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    $
+                    {dashboardSummary.loading
+                      ? "--"
+                      : (
+                          dashboardSummary.inventory?.totalValue || 0
+                        ).toLocaleString()}
                   </Typography>
                 </Grid>
               </Grid>
@@ -1347,29 +1482,32 @@ const Reports = () => {
 
           {/* Bookings Card */}
           <Grid item xs={12} sm={6} lg={3}>
-            <Paper 
+            <Paper
               elevation={0}
-              sx={{ 
+              sx={{
                 p: 2.5,
-                height: '100%',
+                height: "100%",
                 borderRadius: 2,
-                border: '1px solid #E0E7ED',
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
-                }
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
-                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
                     Bookings
                   </Typography>
                 </Box>
@@ -1379,19 +1517,19 @@ const Reports = () => {
                   variant="standard"
                   disableUnderline
                   sx={{
-                    bgcolor: '#F8FAFC',
+                    bgcolor: "#F8FAFC",
                     borderRadius: 1,
                     px: 1,
                     py: 0.5,
-                    '& .MuiSelect-select': {
-                      color: '#64748B',
-                      fontSize: 'caption.fontSize',
-                      paddingRight: '24px !important',
-                      display: 'flex',
-                      alignItems: 'center',
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
                     },
-                    '& .MuiSvgIcon-root': {
-                      color: '#64748B',
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
                     },
                   }}
                 >
@@ -1404,28 +1542,43 @@ const Reports = () => {
 
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
-                Confirmed
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
+                    Confirmed
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.bookings?.confirmed || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.bookings?.confirmed || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Pending
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : dashboardSummary.bookings?.pending || 0}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : dashboardSummary.bookings?.pending || 0}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Total
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
-                    {dashboardSummary.loading ? "--" : 
-                      (dashboardSummary.bookings?.confirmed || 0) + (dashboardSummary.bookings?.pending || 0)}
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                    {dashboardSummary.loading
+                      ? "--"
+                      : (dashboardSummary.bookings?.confirmed || 0) +
+                        (dashboardSummary.bookings?.pending || 0)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -1434,29 +1587,32 @@ const Reports = () => {
 
           {/* Financial Card */}
           <Grid item xs={12} sm={6} lg={3}>
-            <Paper 
+            <Paper
               elevation={0}
-              sx={{ 
+              sx={{
                 p: 2.5,
-                height: '100%',
+                height: "100%",
                 borderRadius: 2,
-                border: '1px solid #E0E7ED',
-                transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.12)',
-                }
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <LockIcon sx={{ color: '#2563EB', fontSize: 20 }} />
-                  <Typography sx={{ fontSize: '15px', fontWeight: 500 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
                     Financial
                   </Typography>
                 </Box>
@@ -1466,19 +1622,19 @@ const Reports = () => {
                   variant="standard"
                   disableUnderline
                   sx={{
-                    bgcolor: '#F8FAFC',
+                    bgcolor: "#F8FAFC",
                     borderRadius: 1,
                     px: 1,
                     py: 0.5,
-                    '& .MuiSelect-select': {
-                      color: '#64748B',
-                      fontSize: 'caption.fontSize',
-                      paddingRight: '24px !important',
-                      display: 'flex',
-                      alignItems: 'center',
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
                     },
-                    '& .MuiSvgIcon-root': {
-                      color: '#64748B',
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
                     },
                   }}
                 >
@@ -1491,26 +1647,35 @@ const Reports = () => {
 
               <Grid container spacing={2}>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     In progress
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
                     0
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Pending
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
                     0
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.5 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                  >
                     Completed
                   </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: '15px' }}>
+                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
                     0
                   </Typography>
                 </Grid>
@@ -1522,60 +1687,76 @@ const Reports = () => {
 
       {/* Weekly & Monthly Reports Section */}
       <Box sx={{ p: 3, mt: 3, backgroundColor: "white" }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-            <Typography variant="h6" sx={{ color: '#101828', fontWeight: 600 }}>
-                Weekly & Monthly Reports
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                <ToggleButtonGroup
-                    value={view}
-                    exclusive
-                    onChange={handleViewChange}
-                    aria-label="text alignment"
-                    sx={{ 
-                      height: '40px',
-                      '& .MuiToggleButton-root': {
-                        textTransform: 'none',
-                        fontWeight: 500,
-                        borderRadius: '8px',
-                        padding: '8px 16px',
-                        border: '1px solid #D0D5DD',
-                        color: '#344054',
-                        transition: 'background-color 0.3s, color 0.3s',
-                        '&.Mui-selected': {
-                          backgroundColor: '#0387D9',
-                          color: 'white',
-                          '&:hover': {
-                            backgroundColor: '#0277bd'
-                          }
-                        },
-                        '&:not(.Mui-selected):hover': {
-                          backgroundColor: '#F9FAFB'
-                        }
-                      }
-                    }}
-                >
-                    <ToggleButton value="day" aria-label="left aligned">
-                        Day
-                    </ToggleButton>
-                    <ToggleButton value="week" aria-label="centered">
-                        Week
-                    </ToggleButton>
-                    <ToggleButton value="month" aria-label="right aligned">
-                        Month
-                    </ToggleButton>
-                </ToggleButtonGroup>
-            </Box>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+            flexWrap: "wrap",
+            gap: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ color: "#101828", fontWeight: 600 }}>
+            Weekly & Monthly Reports
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              flexWrap: "wrap",
+            }}
+          >
+            <ToggleButtonGroup
+              value={view}
+              exclusive
+              onChange={handleViewChange}
+              aria-label="text alignment"
+              sx={{
+                height: "40px",
+                "& .MuiToggleButton-root": {
+                  textTransform: "none",
+                  fontWeight: 500,
+                  borderRadius: "8px",
+                  padding: "8px 16px",
+                  border: "1px solid #D0D5DD",
+                  color: "#344054",
+                  transition: "background-color 0.3s, color 0.3s",
+                  "&.Mui-selected": {
+                    backgroundColor: "#0387D9",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#0277bd",
+                    },
+                  },
+                  "&:not(.Mui-selected):hover": {
+                    backgroundColor: "#F9FAFB",
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="day" aria-label="left aligned">
+                Day
+              </ToggleButton>
+              <ToggleButton value="week" aria-label="centered">
+                Week
+              </ToggleButton>
+              <ToggleButton value="month" aria-label="right aligned">
+                Month
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
         </Box>
-        
+
         <Box sx={{ overflowX: "auto" }}>
-          <TableContainer 
-            component={Paper} 
+          <TableContainer
+            component={Paper}
             elevation={0}
-            sx={{ 
-              border: '1px solid #EAECF0',
+            sx={{
+              border: "1px solid #EAECF0",
               borderRadius: 2,
-              minWidth: { xs: '100%', sm: '800px' }
+              minWidth: { xs: "100%", sm: "800px" },
             }}
           >
             <Table>
@@ -1594,37 +1775,78 @@ const Reports = () => {
                 {dashboardSummary && dashboardSummary.recentActivity ? (
                   formatRecentActivity().length > 0 ? (
                     formatRecentActivity().map((activity, index) => {
-                      const statuses = ['Confirmed', 'In Progress', 'Completed', 'Pending', 'Flagged'];
+                      const statuses = [
+                        "Confirmed",
+                        "In Progress",
+                        "Completed",
+                        "Pending",
+                        "Flagged",
+                      ];
                       const mockStatus = statuses[index % statuses.length];
-                      const paymentStatus = (index % 2 === 0) ? 'Paid' : 'Pending';
-                      const bookingStatus = (activity.type === 'Booking') 
-                        ? (index % 3 === 0 ? 'Completed' : 'Processing') 
-                        : 'N/A';
+                      const paymentStatus =
+                        index % 2 === 0 ? "Paid" : "Pending";
+                      const bookingStatus =
+                        activity.type === "Booking"
+                          ? index % 3 === 0
+                            ? "Completed"
+                            : "Processing"
+                          : "N/A";
 
                       return (
-                        <TableRow 
+                        <TableRow
                           key={activity.id || index}
-                          sx={{ '&:hover': { backgroundColor: '#F9FAFB' } }}
+                          sx={{ "&:hover": { backgroundColor: "#F9FAFB" } }}
                         >
-                          <TableCell sx={{ fontWeight: 500, color: '#101828', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              fontWeight: 500,
+                              color: "#101828",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {activity.vendor}
                           </TableCell>
-                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              color: "#475467",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {`OR-${activity.id.slice(-5)}`}
                           </TableCell>
-                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              color: "#475467",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {`INV-${activity.id.slice(-4)}`}
                           </TableCell>
-                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              color: "#475467",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {paymentStatus}
                           </TableCell>
-                           <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              color: "#475467",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {bookingStatus}
                           </TableCell>
-                          <TableCell sx={{ color: '#475467', borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell
+                            sx={{
+                              color: "#475467",
+                              borderBottom: "1px solid #EAECF0",
+                            }}
+                          >
                             {activity.name}
                           </TableCell>
-                          <TableCell sx={{ borderBottom: '1px solid #EAECF0' }}>
+                          <TableCell sx={{ borderBottom: "1px solid #EAECF0" }}>
                             {getStatusChip(mockStatus)}
                           </TableCell>
                         </TableRow>
@@ -1632,14 +1854,30 @@ const Reports = () => {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} align="center" sx={{ py: 4, color: '#64748B', borderBottom: '1px solid #EAECF0' }}>
+                      <TableCell
+                        colSpan={7}
+                        align="center"
+                        sx={{
+                          py: 4,
+                          color: "#64748B",
+                          borderBottom: "1px solid #EAECF0",
+                        }}
+                      >
                         No recent activity found.
                       </TableCell>
                     </TableRow>
                   )
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 4, color: '#64748B', borderBottom: '1px solid #EAECF0' }}>
+                    <TableCell
+                      colSpan={7}
+                      align="center"
+                      sx={{
+                        py: 4,
+                        color: "#64748B",
+                        borderBottom: "1px solid #EAECF0",
+                      }}
+                    >
                       Loading data...
                     </TableCell>
                   </TableRow>

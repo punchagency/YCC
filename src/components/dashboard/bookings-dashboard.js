@@ -18,7 +18,6 @@ import { useInvoice } from "../../context/invoice/invoiceContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
 import { Link } from "react-router-dom";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import DashboardTitleBar from './title-bar'
 
 const BookingsDashboard = () => {
   const { theme } = useTheme();
@@ -56,10 +55,9 @@ const BookingsDashboard = () => {
   return (
     <Box
       paddingTop={{ xs: 9, md: 0 }}
-      paddingBottom={5} 
+      paddingBottom={5}
       className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
     >
-      <DashboardTitleBar title="Dashboard"  />
       <Box
         paddingTop={5}
         paddingX={{ xs: 2, sm: 3 }}
@@ -416,7 +414,13 @@ const BookingsDashboard = () => {
         </Grid2>
       </Box>
 
-      <Box paddingX={{ xs: 2, sm: 3 }} paddingTop={{ xs: 1, sm: 2, md: 3 }} display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={{ xs: 2, lg: 3 }}>
+      <Box
+        paddingX={{ xs: 2, sm: 3 }}
+        paddingTop={{ xs: 1, sm: 2, md: 3 }}
+        display="flex"
+        flexDirection={{ xs: "column", lg: "row" }}
+        gap={{ xs: 2, lg: 3 }}
+      >
         <Box width={{ xs: "100%", lg: "55%" }}>
           {/* Current Order Summary */}
           {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}

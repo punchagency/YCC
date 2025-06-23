@@ -86,7 +86,6 @@ const Outstanding = () => {
                   border: "none",
                   backgroundColor: "#0387D9",
                   cursor: "pointer",
-                  
                 }}
                 onClick={() => setShowExpenseModal(true)}
               >
@@ -205,7 +204,7 @@ const Outstanding = () => {
                 width: "100%",
                 padding: "0.75rem",
                 borderRadius: "0.375rem",
-                
+
                 outline: "none",
               }}
             />

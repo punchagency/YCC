@@ -31,6 +31,7 @@ import { useInventory } from "../../context/inventory/inventoryContext";
 import { getProductsWithVendors } from "../../services/crew/crewOrderService";
 import { getSuppliersWithInventories } from "../../services/supplier/supplierService";
 // import { Skeleton } from "primereact/skeleton";
+import { useOutletContext } from "react-router-dom";
 
 const Order = () => {
   console.log("=== Order Component Mounting ===");
@@ -1490,6 +1491,11 @@ const Order = () => {
     }
   };
 
+  const { setPageTitle } = useOutletContext() || {};
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Orders");
+  }, [setPageTitle]);
+
   return loading ? (
     <div className="loading-container">
       <div className="loading-spinner"></div>
@@ -1497,20 +1503,6 @@ const Order = () => {
   ) : (
     <>
       <style>{skeletonStyle}</style>
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{
-          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-          color: theme === "light" ? "#103B57" : "#FFFFFF",
-        }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow flex justify-content-between align-items-center">
-          <div className="content">
-            <h3 style={{ marginLeft: "40px" }}>Orders</h3>
-          </div>
-        </div>
-      </div>
-
       <div
         style={{
           height: "100%",

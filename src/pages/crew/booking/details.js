@@ -1,6 +1,11 @@
 import { LineWeight } from "@mui/icons-material";
 import React, { useState, useEffect, useCallback } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import vector from "../../../assets/images/crew/Vector 5.png";
 import calendar from "../../../assets/images/crew/crewcalendar.png";
 import location from "../../../assets/images/crew/location.png";
@@ -19,6 +24,7 @@ const BookingDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showError } = useToast();
+  const outletContext = useOutletContext();
 
   // Get booking details from location state or initialize empty object
   const [bookingDetails, setBookingDetails] = useState(
@@ -72,6 +78,13 @@ const BookingDetails = () => {
     navigate(-1);
   }, [navigate]);
 
+  // Set the title bar and back button for this details/inner page
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Booking Details", { backArrow: true });
+    }
+  }, [outletContext]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -95,164 +108,106 @@ const BookingDetails = () => {
   }
 
   return (
-    <>
-      <div className="mb-6 ml-5 mt-5 flex align-items-center">
-        <img
-          src={vector}
-          alt="vector"
-          width="10px"
-          height="10px"
-          objectFit="contain"
-          onClick={handleGoBack}
-          style={{ cursor: "pointer" }}
-        />
-        <h2 className="ml-2">Booking Detail</h2>
-      </div>
-
-      <div>
-        <div className="flex justify-content-around">
-          <div
-            className="bg-white pt-4 pb-4 pl-5 pr-5"
-            style={{ width: "55%", borderRadius: "10px" }}
-          >
-            <div className="mb-5">
-              <h2>
-                Booking{" "}
-                {bookingDetails.bookingId || bookingDetails._id || "N/A"}
-              </h2>
-              <p>Payment Status: {bookingDetails.paymentStatus || "N/A"}</p>
-            </div>
-            <div className="flex justify-content-between mb-5">
-              <div>
-                <h3>Service Details</h3>
-                <div className="flex align-items-center mb-3">
-                  <img
-                    src={cleaning}
-                    alt="cleaning"
-                    width="15px"
-                    height="15px"
-                    className="mr-2"
-                  />
-                  <p>
-                    {(bookingDetails.services &&
-                      bookingDetails.services[0]?.service?.name) ||
-                      "N/A"}
-                  </p>
-                </div>
-
-                <div className="flex align-items-center mb-3">
-                  <img
-                    src={calendar}
-                    alt="calendar"
-                    width="15px"
-                    height="15px"
-                    className="mr-2"
-                  />
-                  <p>
-                    {bookingDetails.dateTime
-                      ? new Date(bookingDetails.dateTime).toLocaleString()
-                      : "N/A"}
-                  </p>
-                </div>
-                <div className="flex align-items-center mb-3">
-                  <img
-                    src={location}
-                    alt="location"
-                    width="15px"
-                    height="15px"
-                    className="mr-2"
-                  />
-                  <p>
-                    {bookingDetails.serviceLocation ||
-                      bookingDetails.vendorLocation ||
-                      "N/A"}
-                  </p>
-                </div>
-                <div className="flex align-items-center mb-3">
-                  <img
-                    src={dollar}
-                    alt="dollar"
-                    width="10px"
-                    height="15px"
-                    className="mr-2"
-                  />
-                  <p>
-                    $
-                    {(bookingDetails.services &&
-                      bookingDetails.services[0]?.service?.price) ||
-                      "N/A"}
-                  </p>
-                </div>
+    <div
+      className="booking-details-main-container"
+      style={{ padding: "24px 8px", maxWidth: 1200, margin: "0 auto" }}
+    >
+      <div className="flex flex-wrap justify-content-around gap-4">
+        <div
+          className="bg-white pt-4 pb-4 pl-5 pr-5 booking-details-card"
+          style={{
+            width: "100%",
+            maxWidth: 600,
+            borderRadius: "18px",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
+            marginBottom: 24,
+          }}
+        >
+          <div className="mb-5">
+            <h2 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>
+              Booking {bookingDetails.bookingId || bookingDetails._id || "N/A"}
+            </h2>
+            <p style={{ fontSize: 16, color: "#666", marginBottom: 0 }}>
+              Payment Status: {bookingDetails.paymentStatus || "N/A"}
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-content-between mb-5 gap-3">
+            <div>
+              <h3 style={{ fontSize: 20, fontWeight: 600 }}>Service Details</h3>
+              <div className="flex align-items-center mb-3">
+                <img
+                  src={cleaning}
+                  alt="cleaning"
+                  width="18"
+                  height="18"
+                  className="mr-2"
+                />
+                <p style={{ fontSize: 16, margin: 0 }}>
+                  {(bookingDetails.services &&
+                    bookingDetails.services[0]?.service?.name) ||
+                    "N/A"}
+                </p>
               </div>
-              <div>
-                <h3>Vendor Information</h3>
-                <p>{bookingDetails.vendorName || "N/A"}</p>
-                <p>{bookingDetails.vendorDescription || "Service Provider"}</p>
-                <div
-                  className="mt-4 flex justify-content-between"
-                  style={{ width: "400px" }}
-                >
-                  <button
-                    style={{
-                      backgroundColor: " #1A9E6D",
-                      color: "white",
-                      width: "150px",
-                      height: "35px",
-                      border: "1px solid #1A9E6D",
-                      borderRadius: "8px",
-                      marginRight: "5px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <img
-                      src={message}
-                      alt="message"
-                      width="15px"
-                      height="15px"
-                      className="mr-2"
-                    />
-                    Message
-                  </button>
-                  <button
-                    style={{
-                      backgroundColor: "#0387D9",
-                      color: "white",
-                      width: "150px",
-                      height: "35px",
-                      border: "1px solid #0387D9",
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <img
-                      src={call}
-                      alt="call"
-                      width="15px"
-                      height="15px"
-                      className="mr-2"
-                    />
-                    Call
-                  </button>
-                </div>
+              <div className="flex align-items-center mb-3">
+                <img
+                  src={calendar}
+                  alt="calendar"
+                  width="18"
+                  height="18"
+                  className="mr-2"
+                />
+                <p style={{ fontSize: 16, margin: 0 }}>
+                  {bookingDetails.dateTime
+                    ? new Date(bookingDetails.dateTime).toLocaleString()
+                    : "N/A"}
+                </p>
+              </div>
+              <div className="flex align-items-center mb-3">
+                <img
+                  src={location}
+                  alt="location"
+                  width="15px"
+                  height="15px"
+                  className="mr-2"
+                />
+                <p>
+                  {bookingDetails.serviceLocation ||
+                    bookingDetails.vendorLocation ||
+                    "N/A"}
+                </p>
+              </div>
+              <div className="flex align-items-center mb-3">
+                <img
+                  src={dollar}
+                  alt="dollar"
+                  width="10px"
+                  height="15px"
+                  className="mr-2"
+                />
+                <p>
+                  $
+                  {(bookingDetails.services &&
+                    bookingDetails.services[0]?.service?.price) ||
+                    "N/A"}
+                </p>
               </div>
             </div>
             <div>
-              <div className="mb-4">
-                <h2>Modify Meeting</h2>
-              </div>
-              <div className="flex">
+              <h3>Vendor Information</h3>
+              <p>{bookingDetails.vendorName || "N/A"}</p>
+              <p>{bookingDetails.vendorDescription || "Service Provider"}</p>
+              <div
+                className="mt-4 flex justify-content-between"
+                style={{ width: "400px" }}
+              >
                 <button
-                  className=""
                   style={{
-                    backgroundColor: "#D5D5D54D",
-                    border: "1px solid #D5D5D54D",
-                    borderRadius: "4px",
+                    backgroundColor: " #1A9E6D",
+                    color: "white",
                     width: "150px",
                     height: "35px",
+                    border: "1px solid #1A9E6D",
+                    borderRadius: "8px",
                     marginRight: "5px",
                     display: "flex",
                     alignItems: "center",
@@ -260,164 +215,250 @@ const BookingDetails = () => {
                   }}
                 >
                   <img
-                    src={calendar}
-                    alt="calendar"
+                    src={message}
+                    alt="message"
                     width="15px"
                     height="15px"
                     className="mr-2"
                   />
-                  Reschedule
+                  Message
                 </button>
                 <button
-                  className=""
                   style={{
-                    backgroundColor: "#D5D5D54D",
-                    border: "1px solid #D5D5D54D",
-                    borderRadius: "4px",
+                    backgroundColor: "#0387D9",
+                    color: "white",
                     width: "150px",
                     height: "35px",
-                    marginRight: "5px",
+                    border: "1px solid #0387D9",
+                    borderRadius: "8px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    cursor: "pointer",
                   }}
-                  onClick={handleNavigateToModifyService}
                 >
                   <img
-                    src={editLogo}
-                    alt="editLogo"
+                    src={call}
+                    alt="call"
                     width="15px"
                     height="15px"
                     className="mr-2"
                   />
-                  Modify Service
-                </button>
-                <button
-                  className=""
-                  style={{
-                    backgroundColor: "#D5D5D54D",
-                    border: "1px solid #D5D5D54D",
-                    borderRadius: "4px",
-                    width: "150px",
-                    height: "35px",
-                    marginRight: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setShowModificationHistory(true)}
-                >
-                  <img
-                    src={editLogo}
-                    alt="editLogo"
-                    width="15px"
-                    height="15px"
-                    className="mr-2"
-                  />
-                  Modify History
-                </button>
-                <button
-                  className=""
-                  style={{
-                    backgroundColor: "#EF444433",
-                    border: "1px solid #EF444433",
-                    borderRadius: "4px",
-                    width: "150px",
-                    height: "35px",
-                  }}
-                >
-                  Cancel
+                  Call
                 </button>
               </div>
             </div>
           </div>
-          <div
-            className="bg-white"
-            style={{
-              width: "40%",
-              padding: "20px",
-              borderRadius: "10px",
-              height: "350px",
-            }}
-          >
-            <div className="mb-5">
-              <h2>Booking History</h2>
-            </div>
-            <div
-              className="flex justify-content-between align-items-center"
+          <div className="flex flex-wrap gap-3 mb-4">
+            <button
+              className="booking-action-btn"
               style={{
+                backgroundColor: "#D5D5D54D",
                 border: "1px solid #D5D5D54D",
-                borderRadius: "10px",
-                padding: "5px 15px",
-                alignContent: "center",
-                marginBottom: "20px",
+                borderRadius: "12px",
+                width: 150,
+                height: 42,
+                marginRight: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                fontSize: 15,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                transition:
+                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#e5e7eb";
+                e.currentTarget.style.transform = "scale(1.04)";
+                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.10)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "#D5D5D54D";
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.outline = "2px solid #026bb3";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.outline = "none";
               }}
             >
-              <div style={{ lineHeight: "1.5" }}>
-                <span className="font-bold mb-6">
-                  {bookingDetails.vendorName || "N/A"}
-                </span>
-                <br />
-                <span>
-                  {bookingDetails.dateTime
-                    ? new Date(bookingDetails.dateTime).toLocaleString()
-                    : "N/A"}
-                </span>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#5570F11A",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                }}
-              >
-                <p>{bookingDetails.bookingStatus || "N/A"}</p>
-              </div>
-            </div>
+              <img
+                src={calendar}
+                alt="calendar"
+                width="18"
+                height="18"
+                className="mr-2"
+              />
+              Reschedule
+            </button>
+            <button
+              className="booking-action-btn"
+              style={{
+                backgroundColor: "#D5D5D54D",
+                border: "1px solid #D5D5D54D",
+                borderRadius: "12px",
+                width: 150,
+                height: 42,
+                marginRight: 8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 600,
+                fontSize: 15,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                transition:
+                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#e5e7eb";
+                e.currentTarget.style.transform = "scale(1.04)";
+                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.10)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "#D5D5D54D";
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.outline = "2px solid #026bb3";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.outline = "none";
+              }}
+              onClick={handleNavigateToModifyService}
+            >
+              <img
+                src={editLogo}
+                alt="editLogo"
+                width="18"
+                height="18"
+                className="mr-2"
+              />
+              Modify Service
+            </button>
+            <button
+              className="booking-action-btn"
+              style={{
+                backgroundColor: "#EF444433",
+                border: "1px solid #EF444433",
+                borderRadius: "12px",
+                width: 150,
+                height: 42,
+                fontWeight: 600,
+                fontSize: 15,
+                boxShadow: "0 2px 8px rgba(239,68,68,0.10)",
+                transition:
+                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#fca5a5";
+                e.currentTarget.style.transform = "scale(1.04)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 16px rgba(239,68,68,0.18)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "#EF444433";
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow =
+                  "0 2px 8px rgba(239,68,68,0.10)";
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
         <div
           className="bg-white"
           style={{
-            width: "55%",
+            width: "40%",
             padding: "20px",
             borderRadius: "10px",
-            marginLeft: "20px",
-            marginTop: "20px",
+            height: "350px",
           }}
         >
-          <h1 className="mb-5">Report an Issue</h1>
-          <form>
-            <textarea
-              type="text"
-              placeholder="Issue Description"
+          <div className="mb-5">
+            <h2>Booking History</h2>
+          </div>
+          <div
+            className="flex justify-content-between align-items-center"
+            style={{
+              border: "1px solid #D5D5D54D",
+              borderRadius: "10px",
+              padding: "5px 15px",
+              alignContent: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <div style={{ lineHeight: "1.5" }}>
+              <span className="font-bold mb-6">
+                {bookingDetails.vendorName || "N/A"}
+              </span>
+              <br />
+              <span>
+                {bookingDetails.dateTime
+                  ? new Date(bookingDetails.dateTime).toLocaleString()
+                  : "N/A"}
+              </span>
+            </div>
+            <div
               style={{
-                width: "100%",
-                height: "150px",
-                borderRadius: "10px",
-                border: "1px solid lightgrey",
-                padding: "10px",
-                outline: "1px solid lightgrey",
-              }}
-            />
-            <br />
-            <button
-              style={{
-                backgroundColor: "#EF4444",
-                color: "white",
-                width: "150px",
-                height: "35px",
-                borderRadius: "8px",
-                border: "1px solid #EF4444",
-                marginTop: "10px",
+                backgroundColor: "#5570F11A",
+                padding: "5px 10px",
+                borderRadius: "5px",
               }}
             >
-              Submit
-            </button>
-          </form>
+              <p>{bookingDetails.bookingStatus || "N/A"}</p>
+            </div>
+          </div>
         </div>
+      </div>
+      <div
+        className="bg-white"
+        style={{
+          width: "55%",
+          padding: "20px",
+          borderRadius: "10px",
+          marginLeft: "20px",
+          marginTop: "20px",
+        }}
+      >
+        <h1 className="mb-5">Report an Issue</h1>
+        <form>
+          <textarea
+            type="text"
+            placeholder="Issue Description"
+            style={{
+              width: "100%",
+              height: "150px",
+              borderRadius: "10px",
+              border: "1px solid lightgrey",
+              padding: "10px",
+              outline: "1px solid lightgrey",
+            }}
+          />
+          <br />
+          <button
+            style={{
+              backgroundColor: "#EF4444",
+              color: "white",
+              width: "150px",
+              height: "35px",
+              borderRadius: "8px",
+              border: "1px solid #EF4444",
+              marginTop: "10px",
+            }}
+          >
+            Submit
+          </button>
+        </form>
       </div>
 
       <Dialog
@@ -707,7 +748,7 @@ const BookingDetails = () => {
           </div>
         </div>
       </Dialog>
-    </>
+    </div>
   );
 };
 

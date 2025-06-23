@@ -1,13 +1,14 @@
 import { Box } from "@mui/material";
-import DashboardTitleBar from "../../../../components/dashboard/title-bar";
 import Section1FinancialManagement from "./section1-financial-management";
 import Section2FinancialManagement from "./section2-financial-management";
 import Section3FinancialManagement from "./section3-financial-management";
 
 import { useTransaction } from "../../../../context/transaction/transactionContext";
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
+import React from "react";
+
 const AdminFinancialManagement = () => {
-  // const { theme } = useTheme();
   const { transactions, metrics, getTransactions, totalPages, totalItems } =
     useTransaction();
   const [search, setSearch] = useState("");
@@ -15,6 +16,12 @@ const AdminFinancialManagement = () => {
   const [limit, setLimit] = useState(10);
   const [transactionStatus, setTransactionStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const { setPageTitle } = useOutletContext() || {};
+
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Financial Management");
+  }, [setPageTitle]);
+
   useEffect(() => {
     try {
       getTransactions({ page, limit, transactionStatus, search });
@@ -37,7 +44,6 @@ const AdminFinancialManagement = () => {
         backgroundColor: "#F8FBFF",
       }}
     >
-      <DashboardTitleBar title="Financial Management" />
       {metrics && (
         <Section1FinancialManagement metrics={metrics} loading={loading} />
       )}

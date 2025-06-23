@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import { updateUserSettings } from "../../../services/crewSettings/crewsettings";
 import SettingsForm from "./SettingsForm";
@@ -9,6 +9,11 @@ const CrewSettings = () => {
   const navigate = useNavigate();
   const toast = useRef(null);
   const [loading, setLoading] = useState(false);
+  const { setPageTitle } = useOutletContext() || {};
+
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Settings");
+  }, [setPageTitle]);
 
   const handleSaveChanges = async (settingsData) => {
     setLoading(true);
@@ -65,11 +70,7 @@ const CrewSettings = () => {
   return (
     <>
       <Toast ref={toast} />
-      <div className=" mb-4">
-        <div className="mb-6 bg-white p-2 rounded-lg shadow-md">
-          <h3 style={{marginLeft:"40px"}}>Settings</h3>
-        </div>
-
+      <div className="mb-4">
         <div className="settings-container">
           <SettingsForm
             onSave={handleSaveChanges}

@@ -5,6 +5,7 @@ import { getBookings } from "../../../services/crew/crewBookingService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { useToast } from "../../../components/Toast";
+import { Pagination } from "../../../components/pagination";
 
 import {
   FiEye,
@@ -24,6 +25,10 @@ const BookingTable = () => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Add window resize handler
   useEffect(() => {
@@ -38,11 +43,13 @@ const BookingTable = () => {
   // Fetch bookings when component mounts
   const fetchBookings = useCallback(async () => {
     try {
-      const response = await getBookings();
+      const response = await getBookings({ page, limit });
       console.log("Fetched bookings:", response);
 
       if (response.status) {
         setBookings(response.data.data || []);
+        setTotalPages(response.data.pagination?.totalPages || 1);
+        setTotalItems(response.data.pagination?.totalItems || 0);
       } else {
         setError(response.error || "Failed to fetch bookings");
         showError(response.error || "Failed to fetch bookings");
@@ -54,7 +61,7 @@ const BookingTable = () => {
     } finally {
       setLoading(false);
     }
-  }, [showError]);
+  }, [showError, page, limit]);
 
   useEffect(() => {
     fetchBookings();
@@ -478,67 +485,14 @@ const BookingTable = () => {
           )}
 
           {/* Pagination */}
-          <div
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-1 sm:px-6 mt-4"
-            style={{ height: "50px" }}
-          >
-            {/* Mobile view pagination */}
-            <div className="flex flex-1 justify-between sm:hidden">
-              <div>
-                <p className="text-xs text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">10</span> of{" "}
-                  <span className="font-medium">200</span> results
-                </p>
-              </div>
-              <div className="flex">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <FiChevronLeft size={15} />
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <FiChevronRight size={15} />
-                </a>
-              </div>
-            </div>
-
-            {/* Desktop view pagination */}
-            <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 bg-white border rounded-md shadow-sm">
-              {/* Left: Items per page and count */}
-              <div className="flex items-center ">
-                {/* Items per page dropdown */}
-                <div className="">
-                  <span className="text-gray-500 p-3">10</span>
-                  <FiChevronDown className="text-xs" />
-                </div>
-                <span className="text-gray-500">Items Per Page</span>
-                <span className="text-gray-500">1–10 Of 200 Items</span>
-              </div>
-
-              {/* Right: Page navigation */}
-              <div className="flex items-center gap-2">
-                {/* Page number dropdown */}
-                <div className="">
-                  <span>1</span>
-                  <FiChevronDown className="text-xs" />
-                </div>
-                <span className="text-gray-500">Of 44 Pages</span>
-
-                {/* Arrows */}
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiChevronLeft />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiChevronRight />
-                </button>
-              </div>
-            </div>
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={limit}
+            onPageChange={setPage}
+            isMobile={isMobile}
+          />
         </div>
       </div>
     </>
