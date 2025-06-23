@@ -10,7 +10,6 @@ import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
 import departmentLogo from "../assets/images/departmentLogo.png";
 import websiteLogo from "../assets/images/websiteLogo.png";
-import availabilityLogo from "../assets/images/availablityLogo.png";
 import areaLogo from "../assets/images/areaLogo.png";
 import roleLogo from "../assets/images/roleLogo.png";
 import uploadfileLogo from "../assets/images/uploadfileLogo.png";
@@ -26,30 +25,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
-
-  // Add stepData object
-  const stepData = {
-    1: {
-      step: "Step 1",
-      info: "Business Information",
-    },
-    2: {
-      step: "Step 2",
-      info: "Service & Pricing Information",
-    },
-    3: {
-      step: "Step 3",
-      info: "Company Representative Information & Terms",
-    },
-    4: {
-      step: "Step 4",
-      info: "Submit Application",
-    },
-    6: {
-      step: "Success",
-      info: "Application Submitted",
-    },
-  };
 
   // Ensure email is always initialized in formData
   useEffect(() => {
@@ -169,15 +144,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     { value: "both", label: "Both" },
   ];
 
-  const departmentOptions = [
-    { value: "captain", label: "Captain" },
-    { value: "crew", label: "Crew" },
-    { value: "exterior", label: "Exterior" },
-    { value: "engineering", label: "Engineering" },
-    { value: "interior", label: "Interior" },
-    { value: "galley", label: "Galley" },
-  ];
-
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
@@ -198,27 +164,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [pricingFile, setPricingFile] = useState(null);
-  const [fileUploading, setFileUploading] = useState({
-    licenseFile: false,
-    taxIdFile: false,
-    insuranceFile: false,
-    pricingFile: false,
-  });
 
-  const [fileErrors, setFileErrors] = useState({
-    licenseFile: "",
-    taxIdFile: "",
-    insuranceFile: "",
-    pricingFile: "",
-  });
-
-  // File upload handlers
   const handleFileUpload = async (file, type) => {
     if (!file) return;
-
-    setFileErrors((prev) => ({ ...prev, [type]: "" }));
 
     // Validate file size (e.g., max 10MB)
     const maxSize = 10 * 1024 * 1024;
@@ -228,7 +177,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
 
     // Validate file type
-    const validTypes = ["application/pdf", "image/jpeg", "image/png"];
+    const validTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
     if (!validTypes.includes(file.type)) {
       setError("Please upload a PDF, JPG, or PNG file");
       return;
@@ -236,10 +185,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
     setError("");
 
-    // Start loading for this file type
-    setFileUploading((prev) => ({ ...prev, [type]: true }));
-
-    setIsUploading(true);
+    setIsSubmitting(true);
     try {
       // Simulate upload delay (remove in production)
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -268,7 +214,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     } catch (error) {
       setError("File upload failed. Please try again.");
     } finally {
-      setIsUploading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -901,166 +847,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     </motion.div>
   );
 
-  const renderStep2 = () => (
-    <motion.div
-      key="step2"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -40 }}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-    >
-      {/* <div className="login-heading" style={{ marginTop: "0px" }}>
-        <h2 className="font-medium mb-10">Document Upload</h2>
-        <p className="text-sm text-gray-600">
-          Please upload the required documents below
-        </p>
-      </div> */}
-
-      {/* License Upload */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Business License</label>
-          <div className="upload-input">
-            <input
-              type="text"
-              placeholder="Upload Business License"
-              value={licenseFile ? licenseFile.name : ""}
-              readOnly
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              className="upload-icon"
-              onClick={() => document.getElementById("licenseInput").click()}
-            />
-            <input
-              type="file"
-              id="licenseInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "license")}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Tax ID Upload */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Tax ID Document</label>
-          <div className="upload-input">
-            <input
-              type="text"
-              placeholder="Upload Tax ID Document"
-              value={taxIdFile ? taxIdFile.name : ""}
-              readOnly
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              className="upload-icon"
-              onClick={() => document.getElementById("taxIdInput").click()}
-            />
-            <input
-              type="file"
-              id="taxIdInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "taxId")}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Liability Insurance Upload */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Liability Insurance</label>
-          <div className="upload-input">
-            <input
-              type="text"
-              placeholder="Upload Liability Insurance"
-              value={insuranceFile ? insuranceFile.name : ""}
-              readOnly
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              className="upload-icon"
-              onClick={() => document.getElementById("insuranceInput").click()}
-            />
-            <input
-              type="file"
-              id="insuranceInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "insurance")}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="button-group">
-        <button
-          className="prev-button"
-          onClick={() => setStep(1)}
-          style={{ 
-            width: "48%", 
-            background: "#f0f0f0",
-            transition: "all 0.3s ease",
-            cursor: "pointer",
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = "#e0e0e0";
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = "#f0f0f0";
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "none";
-          }}
-        >
-          Previous
-        </button>
-        <button
-          className="next-button"
-          onClick={() => setStep(3)}
-          style={{
-            width: "48%",
-            background: "linear-gradient(to right, #034d92, #0487d9)",
-            transition: "all 0.3s ease",
-            cursor: "pointer",
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
-            e.target.style.transform = "translateY(-2px)";
-            e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
-            e.target.style.transform = "translateY(0)";
-            e.target.style.boxShadow = "none";
-          }}
-        >
-          Next
-        </button>
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div
-          className="error-message"
-          style={{ color: "red", marginTop: "10px" }}
-        >
-          {error}
-        </div>
-      )}
-    </motion.div>
-  );
-
-  // Step 3: Services and Pricing
   const renderStep3 = () => (
     <motion.div
       key="step3"
@@ -1546,6 +1332,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       </div>
     </motion.div>
   );
+
   const renderStep4 = () => (
     <motion.div
       key="step4"
@@ -1764,123 +1551,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         title="YCC Service Provider Agreement"
         fileName="YCC-Service-Provider-Agreement.pdf"
       />
-    </motion.div>
-  );
-
-  const renderStep5 = () => (
-    <motion.div
-      key="step5"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -40 }}
-      transition={{ duration: 0.35, ease: "easeInOut" }}
-      className="platform-fee-container"
-    >
-      <div>
-        <div>
-          <h3>Platform Fees</h3>
-        </div>
-
-        {/* <div className="fees">
-          <ul>
-            <li>
-              Vendors may be charged either a 2% transaction fee per invoice or
-              5% per invoice fee for premium visibility.
-            </li>
-            <li>Your fee structure will be finalized during onborading.</li>
-            <li>
-              Bookings and your order are processed through our AI-powered
-              system.
-            </li>
-          </ul>
-        </div> */}
-
-        {/* Added Checkbox */}
-        <div
-          className="terms-checkbox"
-          style={{
-            marginBottom: "10px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <input
-            type="checkbox"
-            id="acceptFees"
-            checked={formData.acceptFees}
-            onChange={(e) => handleInputChange("acceptFees", e.target.checked)}
-            style={{
-              width: "16px",
-              height: "16px",
-              cursor: "pointer",
-            }}
-          />
-          <label
-            htmlFor="acceptFees"
-            style={{
-              cursor: "pointer",
-              fontSize: "14px",
-              color: "#666",
-            }}
-          >
-            I understand and accept the platform fees structure
-          </label>
-        </div>
-
-        <div className="button-group">
-          <button
-            className="prev-button"
-            onClick={() => setStep(4)}
-            style={{ width: "48%", background: "#f0f0f0" }}
-          >
-            Previous
-          </button>
-          <button
-            className="next-button"
-            onClick={handleSignup}
-            disabled={!formData.acceptFees || isSubmitting}
-            style={{
-              width: "48%",
-              background:
-                formData.acceptFees && !isSubmitting
-                  ? "linear-gradient(to right, #034d92, #0487d9)"
-                  : "#ccc",
-              cursor:
-                formData.acceptFees && !isSubmitting
-                  ? "pointer"
-                  : "not-allowed",
-              opacity: formData.acceptFees && !isSubmitting ? 1 : 0.7,
-              transition: "all 0.3s ease",
-            }}
-          >
-            {isSubmitting ? "Submitting..." : "Accept & Continue"}
-          </button>
-        </div>
-
-        {/* Error Message */}
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              className="error-message"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              style={{
-                position: "fixed",
-                bottom: 20,
-                right: 20,
-                background: "#ffdddd",
-                padding: "10px 20px",
-                borderRadius: "5px",
-                color: "red",
-              }}
-            >
-              {error}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
     </motion.div>
   );
 

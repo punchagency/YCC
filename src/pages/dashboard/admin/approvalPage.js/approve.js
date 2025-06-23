@@ -52,7 +52,7 @@ const ApprovePage = () => {
   // Initial fetch
   useEffect(() => {
     fetchVendors(true);
-  }, [activeTab]);
+  }, [activeTab, fetchVendors]);
 
   // Infinite scroll handler
   const observer = useRef();
@@ -90,12 +90,6 @@ const ApprovePage = () => {
       }
 
       setSendingEmail(true);
-
-      // Map activeTab to correct URL path
-      const urlPath = activeTab === 'supplier' ? 'vendors' : 'services';
-
-      // Use environment variable for frontend URL to avoid including admin subdirectory
-      const baseUrl = process.env.REACT_APP_FRONTEND_URL || window.location.origin.replace('/admin', '');
 
       const emailData = {
         subject: emailSubject.trim(),
