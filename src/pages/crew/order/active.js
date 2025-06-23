@@ -127,8 +127,15 @@ const ActiveOrders = ({ onFilterChange }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <div style={{ width: "30%" }} className="m-4">
+      <div
+        style={{
+          marginTop: "15px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ width: "30%" }}>
           <div
             className="flex bg-white p-4"
             style={{ width: "200px", borderRadius: "10px" }}
@@ -156,7 +163,7 @@ const ActiveOrders = ({ onFilterChange }) => {
             </div>
           </div>
         </div>
-        <div style={{ width: "30%" }} className="m-4">
+        <div style={{ width: "30%" }}>
           <div
             className="flex bg-white p-4"
             style={{ width: "200px", borderRadius: "10px" }}
@@ -184,7 +191,7 @@ const ActiveOrders = ({ onFilterChange }) => {
             </div>
           </div>
         </div>
-        <div style={{ width: "30%" }} className="m-4">
+        <div style={{ width: "30%" }}>
           <div
             className="flex bg-white p-4"
             style={{ width: "200px", borderRadius: "10px" }}
@@ -215,7 +222,7 @@ const ActiveOrders = ({ onFilterChange }) => {
       </div>
       <div style={{ width: "30%" }}>
         <div
-          className="flex justify-content-between align-items-center bg-white ml-5 mt-4 p-2"
+          className="flex justify-content-between align-items-center bg-white mt-4 p-2"
           style={{ borderRadius: "10px", height: "100%" }}
         >
           <div

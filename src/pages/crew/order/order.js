@@ -43,6 +43,9 @@ const Order = () => {
   // Add a new state for order filters
   const [orderFilters, setOrderFilters] = useState({});
 
+  // Add a new state for hover effect
+  const [isHovered, setIsHovered] = useState(false);
+
   const outletContext = useOutletContext();
   useEffect(() => {
     if (outletContext && outletContext.setPageTitle) {
@@ -250,15 +253,33 @@ const Order = () => {
     }
   }, [showSupplierModal]);
 
+  // Create Orders Button
   const createOrdersButton = () => {
     return (
-        <button onClick={() => setShowSupplierModal(true)} className='bg-primary-600 border border-none hover:bg-primary-700 text-white font-semibold rounded-md px-5 py-2 transition-colors duration-200 shadow-sm'>Create Order</button>
+        <button
+          onClick={() => setShowSupplierModal(true)}
+          style={{
+            backgroundColor: "#0387D9",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            border: "1px solid #0387D9",
+            boxShadow: isHovered ? "0 6px 24px rgba(3,135,217,0.18)" : "0 2px 8px rgba(3,135,217,0.08)",
+            transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+            transition: "all 0.18s cubic-bezier(.4,0,.2,1)",
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          Create Order
+        </button>
     )
   }
 
   return (
     <>
-      <div className="">
+      <div className="bg-red-500">
         <div className="w-full">
           <DashboardTitleBar title="Orders" backArrow={true} button={createOrdersButton()} />
         </div>
