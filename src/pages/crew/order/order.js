@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import { getSuppliersWithInventories } from "../../../services/supplier/supplierService";
 import { createOrder } from "../../../services/crew/crewOrderService";
 import "./order.css";
+import DashboardTitleBar from "../../../components/dashboard/title-bar";
 import { useOutletContext } from "react-router-dom";
 import neworder from "../../../assets/images/crew/neworder.png";
 
@@ -249,10 +250,27 @@ const Order = () => {
     }
   }, [showSupplierModal]);
 
+  const createOrdersButton = () => {
+    return (
+        <button onClick={() => setShowSupplierModal(true)} className='bg-primary-600 border border-none hover:bg-primary-700 text-white font-semibold rounded-md px-5 py-2 transition-colors duration-200 shadow-sm'>Create Order</button>
+    )
+  }
+
   return (
     <>
-      <div className="crew-order-main-content">
-        <div className="create-order-button-container">
+      <div className="">
+        <div className="w-full">
+          <DashboardTitleBar title="Orders" backArrow={true} button={createOrdersButton()} />
+        </div>
+        {/* <div
+          className="flex justify-content-between"
+          style={{
+            width: "100%",
+            backgroundColor: "white",
+            padding: "15px 30px",
+          }}
+        >
+          <h1 className="text-2xl font-bold">Orders</h1>
           <button
             onClick={() => setShowSupplierModal(true)}
             className="create-order-button"
@@ -260,7 +278,8 @@ const Order = () => {
             <img src={neworder} alt="neworder" />
             <span>Create New Order</span>
           </button>
-        </div>
+        </div> */}
+
         {/* Pass the handleFilterChange function to ActiveOrders */}
         <ActiveOrders onFilterChange={handleFilterChange} />
         {/* Pass the filters to OrderTable and get the ref */}
