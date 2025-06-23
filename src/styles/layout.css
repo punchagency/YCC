@@ -136,6 +136,7 @@ Main layout wrapper
   min-height: 0; /* Important for flex child */
   padding: 20px;
   background-color: #f8fafc;
+  width: 100%;
 }
 
 /* Ensure the header stays at top */
