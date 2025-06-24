@@ -9,7 +9,8 @@ export const Pagination = ({
   isMobile = false,
   isTablet = false,
 }) => {
-  if (totalPages <= 1) return null;
+  // Only hide pagination if there are no items at all
+  if (totalItems === 0) return null;
 
   return (
     <div

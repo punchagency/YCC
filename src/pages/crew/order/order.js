@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import { getSuppliersWithInventories } from "../../../services/supplier/supplierService";
 import { createOrder } from "../../../services/crew/crewOrderService";
 import "./order.css";
+import DashboardTitleBar from "../../../components/dashboard/title-bar";
 import { useOutletContext } from "react-router-dom";
 import neworder from "../../../assets/images/crew/neworder.png";
 
@@ -41,6 +42,9 @@ const Order = () => {
 
   // Add a new state for order filters
   const [orderFilters, setOrderFilters] = useState({});
+
+  // Add a new state for hover effect
+  const [isHovered, setIsHovered] = useState(false);
 
   const outletContext = useOutletContext();
   useEffect(() => {
@@ -249,18 +253,37 @@ const Order = () => {
     }
   }, [showSupplierModal]);
 
+  // Create Orders Button
+  const createOrdersButton = () => {
+    return (
+        <button
+          onClick={() => setShowSupplierModal(true)}
+          style={{
+            backgroundColor: "#0387D9",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: "pointer",
+            border: "1px solid #0387D9",
+            boxShadow: isHovered ? "0 6px 24px rgba(3,135,217,0.18)" : "0 2px 8px rgba(3,135,217,0.08)",
+            transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+            transition: "all 0.18s cubic-bezier(.4,0,.2,1)",
+          }}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          Create Order
+        </button>
+    )
+  }
+
   return (
     <>
-      <div className="crew-order-main-content">
-        <div className="create-order-button-container">
-          <button
-            onClick={() => setShowSupplierModal(true)}
-            className="create-order-button"
-          >
-            <img src={neworder} alt="neworder" />
-            <span>Create New Order</span>
-          </button>
+      <div className="lg:p-4">
+        <div className="text-right">
+          {createOrdersButton()}
         </div>
+
         {/* Pass the handleFilterChange function to ActiveOrders */}
         <ActiveOrders onFilterChange={handleFilterChange} />
         {/* Pass the filters to OrderTable and get the ref */}

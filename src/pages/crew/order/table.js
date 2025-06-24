@@ -9,12 +9,25 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getUserOrders } from "../../../services/supplier/supplierService";
+import { getOrders } from "../../../services/crew/crewOrderService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { Pagination } from "../../../components/pagination";
+import { TableSkeleton } from "../../../components/TableSkeleton";
 
 const OrderTable = ({ filters = {}, onRef }) => {
   const [sortField, setSortField] = useState(null);
@@ -30,64 +43,84 @@ const OrderTable = ({ filters = {}, onRef }) => {
   });
   const [viewOrderDialog, setViewOrderDialog] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const toast = useRef(null);
 
   const navigate = useNavigate();
+  const muiTheme = useMuiTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
 
   // Fetch orders from API with filters
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      console.log("Fetching orders with filters:", filters);
-
-      const response = await getUserOrders();
-      console.log("Raw API response:", response);
-
+      console.log("Fetching crew orders with filters:", filters);
+      
+      const response = await getOrders({
+        page: pagination.page,
+        limit: pagination.limit,
+        ...filters
+      });
+      
+      console.log("Crew orders response:", response);
+      
       if (response.status) {
         let ordersData = [];
-
-        // Handle the API response structure
-        if (response.data?.data) {
-          // If data is nested under data.data
+        
+        // Handle different response structures
+        if (response.data?.data && Array.isArray(response.data.data)) {
           ordersData = response.data.data;
-          console.log("Orders data from response.data.data:", ordersData);
-        } else if (response.data) {
-          // If data is directly in response.data
+        } else if (response.data && Array.isArray(response.data)) {
           ordersData = response.data;
-          console.log("Orders data from response.data:", ordersData);
+        } else {
+          console.error("Unexpected response structure:", response.data);
+          setError("Invalid data structure received");
+          return;
         }
 
-        // Sort orders by createdAt in descending order (newest first)
-        ordersData.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-
-        // Log the first order to verify structure
-        if (ordersData.length > 0) {
-          console.log("First order structure:", {
-            supplier: ordersData[0].supplier,
-            deliveryDate: ordersData[0].deliveryDate,
-            products: ordersData[0].products,
-          });
-        }
+        console.log(`Found ${ordersData.length} orders`);
 
         // Apply client-side filtering for criteria that can't be sent to the API
         if (filters.futureDelivery) {
           const currentDate = new Date();
           ordersData = ordersData.filter((order) => {
-            const deliveryDate = order.deliveryDate
-              ? new Date(order.deliveryDate)
+            const deliveryDate = order.estimatedDeliveryDate
+              ? new Date(order.estimatedDeliveryDate)
               : null;
             return deliveryDate && deliveryDate > currentDate;
           });
         }
 
-        console.log("Final orders data:", ordersData);
-        setOrders(ordersData);
+        // Apply status filtering if specified
+        if (filters.status && Array.isArray(filters.status)) {
+          ordersData = ordersData.filter((order) => 
+            filters.status.includes(order.status?.toLowerCase())
+          );
+        }
+
+        // Sort orders by createdAt in descending order (newest first)
+        ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Use server pagination if available, otherwise client-side
+        const total = response.data?.pagination?.totalItems || ordersData.length;
+        const totalPages = response.data?.pagination?.totalPages || Math.ceil(total / pagination.limit) || 1;
+        
+        // If server pagination is used, don't slice the data
+        const finalOrders = response.data?.pagination ? ordersData : ordersData.slice(
+          (pagination.page - 1) * pagination.limit,
+          pagination.page * pagination.limit
+        );
+
+        setOrders(finalOrders);
+        setPagination((prev) => ({
+          ...prev,
+          total,
+          totalPages,
+        }));
+        setError(null);
       } else {
         console.error("Failed to fetch orders:", response.error);
-        setError("Failed to load orders");
+        setError(response.error || "Failed to load orders");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -95,7 +128,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, pagination.page, pagination.limit]);
 
   // Expose fetchOrders to parent component
   useEffect(() => {
@@ -104,34 +137,23 @@ const OrderTable = ({ filters = {}, onRef }) => {
     }
   }, [onRef, fetchOrders]);
 
-  // Fetch orders when component mounts and when filters change
+  // Fetch orders when component mounts and when filters or pagination change
   useEffect(() => {
     fetchOrders();
   }, [fetchOrders]);
 
   // Format date for display
   const formatDate = (dateString) => {
-    console.log("Formatting date:", dateString);
-    if (!dateString) {
-      console.log("No date string provided");
-      return "N/A";
-    }
+    if (!dateString) return "N/A";
     try {
       const date = new Date(dateString);
-      console.log("Parsed date:", date);
-      if (isNaN(date.getTime())) {
-        console.log("Invalid date");
-        return "Invalid Date";
-      }
-      const formattedDate = date.toLocaleDateString("en-GB", {
+      if (isNaN(date.getTime())) return "Invalid Date";
+      return date.toLocaleDateString("en-GB", {
         year: "numeric",
         month: "short",
         day: "numeric",
       });
-      console.log("Formatted date:", formattedDate);
-      return formattedDate;
     } catch (error) {
-      console.error("Error formatting date:", error);
       return "Invalid Date";
     }
   };
@@ -156,23 +178,6 @@ const OrderTable = ({ filters = {}, onRef }) => {
     return <FaSortAmountUp className="ml-1 opacity-30" />;
   };
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "Processing":
-        return "bg-blue-100 text-blue-800";
-      case "Shipped":
-        return "bg-yellow-100 text-yellow-800";
-      case "Delivered":
-        return "bg-green-100 text-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      case "Pending":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
@@ -187,17 +192,10 @@ const OrderTable = ({ filters = {}, onRef }) => {
 
   // Function to handle downloading order details as PDF
   const handleDownloadPDF = (order) => {
-    console.log("Downloading PDF for order:", order.orderId || order._id);
-
     try {
-      // Create a new PDF document
       const doc = new jsPDF();
-
-      // Add title
       doc.setFontSize(20);
       doc.text("Order Invoice", 14, 22);
-
-      // Add order ID and dates
       doc.setFontSize(12);
       doc.text(`Order ID: ${order.orderId || order._id || "N/A"}`, 14, 32);
       doc.text(
@@ -212,39 +210,28 @@ const OrderTable = ({ filters = {}, onRef }) => {
         14,
         44
       );
-
-      // Add vendor information
       doc.setFontSize(16);
       doc.text("Vendor Information", 14, 54);
       doc.setFontSize(12);
-      doc.text(`Vendor: ${order.vendorName || "N/A"}`, 14, 60);
-
-      // Add order status
+      doc.text(`Vendor: ${order.vendor?.name || order.vendorName || "N/A"}`, 14, 60);
       doc.setFontSize(16);
       doc.text("Order Status", 14, 70);
       doc.setFontSize(12);
-      doc.text(`Status: ${order.status || "Pending"}`, 14, 76);
-
-      // Add order items table if available
-      if (order.items && order.items.length > 0) {
+      doc.text(`Status: ${order.status || "pending"}`, 14, 76);
+      if (order.products && order.products.length > 0) {
         doc.setFontSize(16);
         doc.text("Order Items", 14, 86);
-
-        // Prepare table data
         const tableColumn = ["Item", "Quantity", "Price", "Total"];
         const tableRows = [];
-
-        order.items.forEach((item) => {
+        order.products.forEach((item) => {
           const itemData = [
-            item.name || "Unknown Item",
+            item.id?.name || "Unknown Item",
             item.quantity || 1,
             `$${item.price?.toFixed(2) || "0.00"}`,
             `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`,
           ];
           tableRows.push(itemData);
         });
-
-        // Add the table
         doc.autoTable({
           startY: 90,
           head: [tableColumn],
@@ -252,13 +239,10 @@ const OrderTable = ({ filters = {}, onRef }) => {
           theme: "striped",
           headStyles: { fillColor: [66, 139, 202] },
         });
-
-        // Add total amount
-        const totalAmount = order.items.reduce(
+        const totalAmount = order.products.reduce(
           (total, item) => total + (item.price || 0) * (item.quantity || 1),
           0
         );
-
         doc.setFontSize(14);
         doc.text(
           `Total Amount: $${totalAmount.toFixed(2)}`,
@@ -266,48 +250,30 @@ const OrderTable = ({ filters = {}, onRef }) => {
           doc.autoTable.previous.finalY + 10
         );
       } else {
-        // If no items, add order total if available
         doc.setFontSize(14);
         doc.text(
           `Total Amount: ${
-            order.totalAmount ? `$${order.totalAmount.toFixed(2)}` : "N/A"
+            order.totalPrice ? `$${order.totalPrice.toFixed(2)}` : "N/A"
           }`,
           14,
           86
         );
       }
-
-      // Add shipping information if available
-      if (order.shippingAddress) {
+      if (order.deliveryAddress) {
         doc.setFontSize(16);
         doc.text(
-          "Shipping Information",
+          "Delivery Information",
           14,
           doc.autoTable?.previous?.finalY + 20 || 96
         );
         doc.setFontSize(12);
-
-        const shippingY = doc.autoTable?.previous?.finalY + 26 || 102;
+        const deliveryY = doc.autoTable?.previous?.finalY + 26 || 102;
         doc.text(
-          `Address: ${order.shippingAddress.street || ""}`,
+          `Address: ${order.deliveryAddress}`,
           14,
-          shippingY
-        );
-        doc.text(
-          `${order.shippingAddress.city || ""}, ${
-            order.shippingAddress.state || ""
-          } ${order.shippingAddress.zip || ""}`,
-          14,
-          shippingY + 6
-        );
-        doc.text(
-          `Country: ${order.shippingAddress.country || ""}`,
-          14,
-          shippingY + 12
+          deliveryY
         );
       }
-
-      // Add footer with date
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
@@ -318,16 +284,11 @@ const OrderTable = ({ filters = {}, onRef }) => {
           doc.internal.pageSize.height - 10
         );
       }
-
-      // Generate filename with order ID
       const filename = `order-invoice-${
         order.orderId || order._id || "details"
       }.pdf`;
-
-      // Save the PDF
       doc.save(filename);
     } catch (error) {
-      console.error("Error generating PDF:", error);
       alert("Failed to generate PDF. Please try again.");
     }
   };
@@ -338,632 +299,196 @@ const OrderTable = ({ filters = {}, onRef }) => {
     setViewOrderDialog(true);
   };
 
-  // Handle window resize for mobile detection (similar to order.js)
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  // Table columns
+  const columns = [
+    { id: "supplier", label: "Supplier Name", minWidth: 120 },
+    { id: "quantity", label: "Quantity", minWidth: 80 },
+    { id: "deliveryAddress", label: "Delivery Address", minWidth: 180 },
+    { id: "orderDate", label: "Order Date", minWidth: 120 },
+    { id: "status", label: "Status", minWidth: 100 },
+    { id: "totalPrice", label: "Total Price", minWidth: 100 },
+    { id: "actions", label: "Actions", minWidth: 120 },
+  ];
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Table row rendering
+  const renderCell = (order, column) => {
+    switch (column.id) {
+      case "supplier":
+        return order?.vendor?.name || order?.vendorName || "N/A";
+      case "quantity":
+        return (
+          order.products?.reduce(
+            (sum, product) => sum + (product.quantity || 0),
+            0
+          ) || 0
+        );
+      case "deliveryAddress":
+        return order.deliveryAddress || "N/A";
+      case "orderDate":
+        return formatDate(order.createdAt || order.orderDate);
+      case "status":
+        return (
+          <span
+            style={{
+              backgroundColor: order.status === "delivered"
+                ? "#ECFDF3"
+                : order.status === "confirmed"
+                ? "#F0F9FF"
+                : order.status === "shipped"
+                ? "#FFFAEB"
+                : order.status === "cancelled"
+                ? "#FEF3F2"
+                : order.status === "declined"
+                ? "#FEF3F2"
+                : "#F2F4F7",
+              color: order.status === "delivered"
+                ? "#027A48"
+                : order.status === "confirmed"
+                ? "#0369A1"
+                : order.status === "shipped"
+                ? "#B54708"
+                : order.status === "cancelled"
+                ? "#B42318"
+                : order.status === "declined"
+                ? "#B42318"
+                : "#344054",
+              padding: "2px 8px",
+              borderRadius: "16px",
+              fontSize: "12px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            {order.status || "pending"}
+          </span>
+        );
+      case "totalPrice":
+        return `$${order.totalPrice?.toFixed(2) || "0.00"}`;
+      case "actions":
+        return (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              icon={<FiEye size={18} />}
+              className="p-button-outlined p-button-sm"
+              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
+              onClick={() => handleViewOrder(order)}
+              tooltip="View Order"
+            />
+            <Button
+              icon={<FiEdit size={18} />}
+              className="p-button-outlined p-button-sm"
+              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
+              tooltip="Edit Order"
+            />
+            <Button
+              icon={<FiDownload size={18} />}
+              className="p-button-outlined p-button-sm"
+              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
+              onClick={() => handleDownloadPDF(order)}
+              tooltip="Download Invoice"
+            />
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Loading state
+  if (loading) {
+    return <TableSkeleton showSummary={false} />;
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center", color: "#dc3545" }}>{error}</Box>
+    );
+  }
 
   return (
-    <>
-      <div className="bg-white p-4 m-4">
-        {/* Order Table */}
-        <div className="p-2 bg-white rounded-xl shadow-sm mt-5">
-          {loading ? (
-            <div className="text-center py-4">Loading orders...</div>
-          ) : error ? (
-            <div className="text-center py-4 text-red-500">{error}</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table
-                style={{
-                  width: "100%",
-                  tableLayout: "fixed",
-                  borderCollapse: "collapse",
-                }}
-              >
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("vendorName")}
-                    >
-                      <div className="flex items-center">
-                        Supplier Name {getSortIcon("vendorName")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("quantity")}
-                    >
-                      <div className="flex items-center">
-                        Quantity {getSortIcon("quantity")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "25%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("deliveryAddress")}
-                    >
-                      <div className="flex items-center">
-                        Delivery Address {getSortIcon("deliveryAddress")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("orderDate")}
-                    >
-                      <div className="flex items-center">
-                        Order Date {getSortIcon("orderDate")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("status")}
-                    >
-                      <div className="flex items-center">
-                        Status {getSortIcon("status")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("totalPrice")}
-                    >
-                      <div className="flex items-center">
-                        Total Price {getSortIcon("totalPrice")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                    >
-                      <div className="flex items-center">Actions</div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan="7"
-                        className="text-center py-4 text-gray-500"
+    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2}}>
+      <Paper sx={{ width: "100%", overflow: "auto", borderRadius: 2, boxShadow: 1 }}>
+        <TableContainer>
+          <Table stickyHeader aria-label="orders table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.id === "actions" ? "right" : "left"}
+                    sx={{
+                      minWidth: column.minWidth,
+                      backgroundColor: "#F9FAFB",
+                      color: "#344054",
+                      fontWeight: 600,
+                      fontSize: isTablet ? 12 : 14,
+                      borderBottom: "1px solid #EAECF0",
+                      padding: isTablet ? "10px 16px" : "12px 24px",
+                      letterSpacing: 0.1,
+                    }}
+                    onClick={
+                      ["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id)
+                        ? () => handleSort(column.id)
+                        : undefined
+                    }
+                    style={{ cursor: ["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) ? "pointer" : "default" }}
+                  >
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      {column.label}
+                      {["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) && (
+                        <span style={{ marginLeft: 4 }}>{getSortIcon(column.id)}</span>
+                      )}
+                    </Box>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {orders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} align="center" sx={{ py: 4, color: "#667085" }}>
+                    No orders found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                orders.map((order, idx) => (
+                  <TableRow key={order._id || idx} hover sx={{ transition: "background 0.2s", backgroundColor: "#fff", '&:hover': { backgroundColor: '#F3F4F6' } }}>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.id === "actions" ? "right" : "left"}
+                        sx={{
+                          minWidth: column.minWidth,
+                          color: "#344054",
+                          fontWeight: 500,
+                          fontSize: isTablet ? 13 : 15,
+                          borderBottom: "1px solid #EAECF0",
+                          padding: isTablet ? "10px 16px" : "12px 24px",
+                          backgroundColor: '#fff',
+                        }}
                       >
-                        No orders found
-                      </td>
-                    </tr>
-                  ) : (
-                    orders.map((order, index) => (
-                      <tr key={order._id || index} className="hover:bg-gray-50">
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          {(() => {
-                            console.log("Order data:", order);
-                            console.log("Supplier data:", order?.supplier);
-                            return order?.supplier?.businessName || "N/A";
-                          })()}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          {order.products?.reduce(
-                            (sum, product) => sum + (product.quantity || 0),
-                            0
-                          ) || 0}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          {order.deliveryAddress || "N/A"}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          {formatDate(order.orderDate)}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <span
-                            className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                              order.status
-                            )}`}
-                          >
-                            {order.status || "Pending"}
-                          </span>
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          ${order.totalPrice?.toFixed(2) || "0.00"}
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                          }}
-                        >
-                          <div className="flex justify-end space-x-4">
-                            <div
-                              style={{
-                                border: "1px solid lightgrey",
-                                padding: "5px",
-                                cursor: "pointer",
-                              }}
-                              title="View Order"
-                              onClick={() => handleViewOrder(order)}
-                            >
-                              <FiEye size={18} />
-                            </div>
-                            <div
-                              style={{
-                                border: "1px solid lightgrey",
-                                padding: "5px",
-                                cursor: "pointer",
-                              }}
-                              title="Edit Order"
-                            >
-                              <FiEdit size={18} />
-                            </div>
-                            <div
-                              style={{
-                                border: "1px solid lightgrey",
-                                padding: "5px",
-                                cursor: "pointer",
-                              }}
-                              title="Download Invoice"
-                              onClick={() => handleDownloadPDF(order)}
-                            >
-                              <FiDownload
-                                size={18}
-                                style={{ cursor: "pointer" }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Pagination */}
-          <div
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-1 sm:px-6 mt-4"
-            style={{ height: "50px" }}
-          >
-            {/* Mobile view pagination */}
-            <div className="flex flex-1 justify-between sm:hidden">
-              <div>
-                <p className="text-xs text-gray-700">
-                  Showing{" "}
-                  <span className="font-medium">
-                    {(pagination.page - 1) * pagination.limit + 1}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(
-                      pagination.page * pagination.limit,
-                      pagination.total
-                    )}
-                  </span>{" "}
-                  of <span className="font-medium">{pagination.total}</span>{" "}
-                  results
-                </p>
-              </div>
-              <div className="flex">
-                <button
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                  className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium ${
-                    pagination.page === 1
-                      ? "text-gray-400"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <FiChevronLeft size={15} />
-                </button>
-                <button
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page === pagination.totalPages}
-                  className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium ${
-                    pagination.page === pagination.totalPages
-                      ? "text-gray-400"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <FiChevronRight size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* Desktop view pagination */}
-            <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 bg-white border rounded-md shadow-sm">
-              {/* Left: Items per page and count */}
-              <div className="flex items-center ">
-                {/* Items per page dropdown */}
-                <div
-                  className="flex items-center cursor-pointer"
-                  onClick={() =>
-                    handleLimitChange(pagination.limit === 10 ? 20 : 10)
-                  }
-                >
-                  <span className="text-gray-500 p-3">{pagination.limit}</span>
-                  <FiChevronDown className="text-xs" />
-                </div>
-                <span className="text-gray-500">Items Per Page</span>
-                <span className="text-gray-500 ml-4">
-                  {(pagination.page - 1) * pagination.limit + 1}–
-                  {Math.min(
-                    pagination.page * pagination.limit,
-                    pagination.total
-                  )}{" "}
-                  Of {pagination.total} Items
-                </span>
-              </div>
-
-              {/* Right: Page navigation */}
-              <div className="flex items-center gap-2">
-                {/* Page number dropdown */}
-                <div className="flex items-center">
-                  <span>{pagination.page}</span>
-                  <FiChevronDown className="text-xs ml-1" />
-                </div>
-                <span className="text-gray-500">
-                  Of {pagination.totalPages} Pages
-                </span>
-
-                {/* Arrows */}
-                <button
-                  className={`text-gray-400 hover:text-gray-600 ${
-                    pagination.page === 1
-                      ? "opacity-50 cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
-                  onClick={() => handlePageChange(pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                >
-                  <FiChevronLeft />
-                </button>
-                <button
-                  className={`text-gray-400 hover:text-gray-600 ${
-                    pagination.page === pagination.totalPages
-                      ? "opacity-50 cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
-                  onClick={() => handlePageChange(pagination.page + 1)}
-                  disabled={pagination.page === pagination.totalPages}
-                >
-                  <FiChevronRight />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* View Order Dialog */}
-      <Dialog
-        visible={viewOrderDialog}
-        onHide={() => setViewOrderDialog(false)}
-        style={{ width: isMobile ? "95vw" : "70vw" }}
-        contentStyle={{ backgroundColor: "#F8FBFF" }}
-        header={`Order Details: ${
-          selectedOrder?.orderId || selectedOrder?._id || "N/A"
-        }`}
-        className="order-modal"
-      >
-        <div className="flex justify-content-between">
-          <div style={{ width: "60%" }}>
-            <div
-              className="bg-white p-4 rounded-md"
-              style={{ width: "100%", margin: "20px", borderRadius: "10px" }}
-            >
-              <h3>Ordered Item</h3>
-              <table
-                style={{
-                  width: "100%",
-                  border: "1px solid lightgrey",
-                  borderCollapse: "collapse",
-                }}
-                className="table-order"
-              >
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        padding: "8px",
-                        textAlign: "left",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      Order ID
-                    </th>
-                    <th
-                      style={{
-                        padding: "8px",
-                        textAlign: "left",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      Item Name
-                    </th>
-                    <th
-                      style={{
-                        padding: "8px",
-                        textAlign: "left",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      Quantity
-                    </th>
-                    <th
-                      style={{
-                        padding: "8px",
-                        textAlign: "left",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      Price
-                    </th>
-                    <th
-                      style={{
-                        padding: "8px",
-                        textAlign: "left",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        padding: "8px",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      {selectedOrder?.orderId || selectedOrder?._id || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "8px",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      {selectedOrder?.products?.[0]?.name ||
-                        selectedOrder?.products?.[0]?.id?.name ||
-                        "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "8px",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      {selectedOrder?.products?.[0]?.quantity || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "8px",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      ${selectedOrder?.products?.[0]?.price || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "8px",
-                        borderBottom: "1px solid lightgrey",
-                      }}
-                    >
-                      $
-                      {selectedOrder?.totalPrice ||
-                        (selectedOrder?.products?.[0]?.price &&
-                        selectedOrder?.products?.[0]?.quantity
-                          ? (
-                              selectedOrder.products[0].price *
-                              selectedOrder.products[0].quantity
-                            ).toFixed(2)
-                          : "N/A")}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div
-              className="bg-white p-4 rounded-md"
-              style={{ width: "100%", margin: "20px", borderRadius: "10px" }}
-            >
-              <div
-                style={{
-                  borderBottom: "1px solid lightgrey",
-                  padding: "10px",
-                  marginBottom: "20px",
-                }}
-              >
-                <h3>Estimated Delivery Date</h3>
-                <p>{selectedOrder?.estimatedDeliveryDate || "N/A"}</p>
-              </div>
-              <div
-                style={{
-                  borderBottom: "1px solid lightgrey",
-                  padding: "10px",
-                  marginBottom: "20px",
-                }}
-              >
-                <h3>Shipping address</h3>
-                <p>{selectedOrder?.deliveryAddress || "N/A"}</p>
-              </div>
-              <div>
-                <h3>Order Actions</h3>
-                <button
-                  style={{
-                    backgroundColor: "#FF30211A",
-                    color: "#FF3021",
-                    padding: "10px 20px",
-                    border: "1px solid #FF30211A",
-                    marginRight: "10px",
-                  }}
-                >
-                  Report An Issue
-                </button>
-                <button
-                  style={{
-                    backgroundColor: "#3D56D81A",
-                    color: "#3D56D8",
-                    padding: "10px 20px",
-                    border: "1px solid #3D56D81A",
-                    marginRight: "10px",
-                  }}
-                >
-                  ReOrder Item
-                </button>
-                <button
-                  style={{
-                    border: "1px solid lightgrey",
-                    backgroundColor: "transparent",
-                    padding: "10px 20px",
-                  }}
-                >
-                  Cancel Order
-                </button>
-              </div>
-            </div>
-          </div>
-          <div
-            className="bg-white p-4 rounded-md"
-            style={{ width: "35%", margin: "20px" }}
-          >
-            <div>
-              <h3>Cost summary</h3>
-              <div className="flex justify-content-between">
-                <p>Price</p>
-                <p>${selectedOrder?.products?.[0]?.price || "N/A"}</p>
-              </div>
-              <div className="flex justify-content-between">
-                <p>Subtotal</p>
-                <p>${selectedOrder?.products?.[0]?.price || "N/A"}</p>
-              </div>
-              <div
-                className="flex justify-content-between"
-                style={{
-                  borderTop: "1px solid lightgrey",
-                  padding: "10px",
-                  marginTop: "20px",
-                }}
-              >
-                <p>Total</p>
-                <p>
-                  $
-                  {selectedOrder?.totalPrice ||
-                    selectedOrder?.products?.[0]?.price ||
-                    "N/A"}
-                </p>
-              </div>
-            </div>
-            <div
-              className="bg-white rounded-md"
-              style={{
-                width: "100%",
-                marginTop: "40px",
-                borderRadius: "10px",
-                boxShadow: "0px -2px 2px lightgrey",
-                padding: "30px 20px",
-              }}
-            >
-              <h3 className="mb-2">Vendor Information</h3>
-              <p className="mb-2">
-                Vendor Name: {selectedOrder?.vendorName || "N/A"}
-              </p>
-              {/* <p className="mb-2">
-                {selectedOrder?.vendorAddress || "N/A"}
-              </p>
-              <p className="mb-2">
-                {selectedOrder?.vendorPhone || "N/A"}
-              </p>
-              <p className="mb-2">
-                {selectedOrder?.vendorEmail || "N/A"}
-              </p> */}
-              <button
-                style={{
-                  backgroundColor: "#F0F0F0",
-                  padding: "10px 20px",
-                  borderRadius: "5px",
-                  marginTop: "20px",
-                  width: "100%",
-                  border: "1px solid #F0F0F0",
-                  outline: "none",
-                }}
-              >
-                Contact Vendor
-              </button>
-            </div>
-          </div>
-        </div>
-      </Dialog>
-
-      <Toast ref={toast} position="bottom-right" />
-    </>
+                        {renderCell(order, column)}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+      <Pagination
+        currentPage={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.total}
+        itemsPerPage={pagination.limit}
+        onPageChange={handlePageChange}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+    </Box>
   );
 };
 
