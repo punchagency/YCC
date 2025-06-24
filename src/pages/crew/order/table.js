@@ -9,7 +9,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getUserOrders } from "../../../services/supplier/supplierService";
+import { getOrders } from "../../../services/crew/crewOrderService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { Dialog } from "primereact/dialog";
@@ -54,32 +54,64 @@ const OrderTable = ({ filters = {}, onRef }) => {
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getUserOrders();
+      console.log("Fetching crew orders with filters:", filters);
+      
+      const response = await getOrders({
+        page: pagination.page,
+        limit: pagination.limit,
+        ...filters
+      });
+      
+      console.log("Crew orders response:", response);
+      
       if (response.status) {
         let ordersData = [];
-        if (response.data?.data) {
+        
+        // Handle different response structures
+        if (response.data?.data && Array.isArray(response.data.data)) {
           ordersData = response.data.data;
-        } else if (response.data) {
+        } else if (response.data && Array.isArray(response.data)) {
           ordersData = response.data;
+        } else {
+          console.error("Unexpected response structure:", response.data);
+          setError("Invalid data structure received");
+          return;
         }
-        // Sort orders by createdAt in descending order (newest first)
-        ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        console.log(`Found ${ordersData.length} orders`);
+
         // Apply client-side filtering for criteria that can't be sent to the API
         if (filters.futureDelivery) {
           const currentDate = new Date();
           ordersData = ordersData.filter((order) => {
-            const deliveryDate = order.deliveryDate
-              ? new Date(order.deliveryDate)
+            const deliveryDate = order.estimatedDeliveryDate
+              ? new Date(order.estimatedDeliveryDate)
               : null;
             return deliveryDate && deliveryDate > currentDate;
           });
         }
-        // Pagination logic
-        const total = ordersData.length;
-        const totalPages = Math.ceil(total / pagination.limit) || 1;
-        const startIdx = (pagination.page - 1) * pagination.limit;
-        const endIdx = startIdx + pagination.limit;
-        setOrders(ordersData.slice(startIdx, endIdx));
+
+        // Apply status filtering if specified
+        if (filters.status && Array.isArray(filters.status)) {
+          ordersData = ordersData.filter((order) => 
+            filters.status.includes(order.status?.toLowerCase())
+          );
+        }
+
+        // Sort orders by createdAt in descending order (newest first)
+        ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Use server pagination if available, otherwise client-side
+        const total = response.data?.pagination?.totalItems || ordersData.length;
+        const totalPages = response.data?.pagination?.totalPages || Math.ceil(total / pagination.limit) || 1;
+        
+        // If server pagination is used, don't slice the data
+        const finalOrders = response.data?.pagination ? ordersData : ordersData.slice(
+          (pagination.page - 1) * pagination.limit,
+          pagination.page * pagination.limit
+        );
+
+        setOrders(finalOrders);
         setPagination((prev) => ({
           ...prev,
           total,
@@ -87,9 +119,11 @@ const OrderTable = ({ filters = {}, onRef }) => {
         }));
         setError(null);
       } else {
-        setError("Failed to load orders");
+        console.error("Failed to fetch orders:", response.error);
+        setError(response.error || "Failed to load orders");
       }
     } catch (error) {
+      console.error("Error fetching orders:", error);
       setError("An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -179,19 +213,19 @@ const OrderTable = ({ filters = {}, onRef }) => {
       doc.setFontSize(16);
       doc.text("Vendor Information", 14, 54);
       doc.setFontSize(12);
-      doc.text(`Vendor: ${order.vendorName || "N/A"}`, 14, 60);
+      doc.text(`Vendor: ${order.vendor?.name || order.vendorName || "N/A"}`, 14, 60);
       doc.setFontSize(16);
       doc.text("Order Status", 14, 70);
       doc.setFontSize(12);
-      doc.text(`Status: ${order.status || "Pending"}`, 14, 76);
-      if (order.items && order.items.length > 0) {
+      doc.text(`Status: ${order.status || "pending"}`, 14, 76);
+      if (order.products && order.products.length > 0) {
         doc.setFontSize(16);
         doc.text("Order Items", 14, 86);
         const tableColumn = ["Item", "Quantity", "Price", "Total"];
         const tableRows = [];
-        order.items.forEach((item) => {
+        order.products.forEach((item) => {
           const itemData = [
-            item.name || "Unknown Item",
+            item.id?.name || "Unknown Item",
             item.quantity || 1,
             `$${item.price?.toFixed(2) || "0.00"}`,
             `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`,
@@ -205,7 +239,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
           theme: "striped",
           headStyles: { fillColor: [66, 139, 202] },
         });
-        const totalAmount = order.items.reduce(
+        const totalAmount = order.products.reduce(
           (total, item) => total + (item.price || 0) * (item.quantity || 1),
           0
         );
@@ -219,37 +253,25 @@ const OrderTable = ({ filters = {}, onRef }) => {
         doc.setFontSize(14);
         doc.text(
           `Total Amount: ${
-            order.totalAmount ? `$${order.totalAmount.toFixed(2)}` : "N/A"
+            order.totalPrice ? `$${order.totalPrice.toFixed(2)}` : "N/A"
           }`,
           14,
           86
         );
       }
-      if (order.shippingAddress) {
+      if (order.deliveryAddress) {
         doc.setFontSize(16);
         doc.text(
-          "Shipping Information",
+          "Delivery Information",
           14,
           doc.autoTable?.previous?.finalY + 20 || 96
         );
         doc.setFontSize(12);
-        const shippingY = doc.autoTable?.previous?.finalY + 26 || 102;
+        const deliveryY = doc.autoTable?.previous?.finalY + 26 || 102;
         doc.text(
-          `Address: ${order.shippingAddress.street || ""}`,
+          `Address: ${order.deliveryAddress}`,
           14,
-          shippingY
-        );
-        doc.text(
-          `${order.shippingAddress.city || ""}, ${
-            order.shippingAddress.state || ""
-          } ${order.shippingAddress.zip || ""}`,
-          14,
-          shippingY + 6
-        );
-        doc.text(
-          `Country: ${order.shippingAddress.country || ""}`,
-          14,
-          shippingY + 12
+          deliveryY
         );
       }
       const pageCount = doc.internal.getNumberOfPages();
@@ -292,7 +314,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
   const renderCell = (order, column) => {
     switch (column.id) {
       case "supplier":
-        return order?.supplier?.businessName || "N/A";
+        return order?.vendor?.name || order?.vendorName || "N/A";
       case "quantity":
         return (
           order.products?.reduce(
@@ -303,27 +325,31 @@ const OrderTable = ({ filters = {}, onRef }) => {
       case "deliveryAddress":
         return order.deliveryAddress || "N/A";
       case "orderDate":
-        return formatDate(order.orderDate);
+        return formatDate(order.createdAt || order.orderDate);
       case "status":
         return (
           <span
             style={{
-              backgroundColor: order.status === "Delivered"
+              backgroundColor: order.status === "delivered"
                 ? "#ECFDF3"
-                : order.status === "Processing"
+                : order.status === "confirmed"
                 ? "#F0F9FF"
-                : order.status === "Shipped"
+                : order.status === "shipped"
                 ? "#FFFAEB"
-                : order.status === "Cancelled"
+                : order.status === "cancelled"
+                ? "#FEF3F2"
+                : order.status === "declined"
                 ? "#FEF3F2"
                 : "#F2F4F7",
-              color: order.status === "Delivered"
+              color: order.status === "delivered"
                 ? "#027A48"
-                : order.status === "Processing"
+                : order.status === "confirmed"
                 ? "#0369A1"
-                : order.status === "Shipped"
+                : order.status === "shipped"
                 ? "#B54708"
-                : order.status === "Cancelled"
+                : order.status === "cancelled"
+                ? "#B42318"
+                : order.status === "declined"
                 ? "#B42318"
                 : "#344054",
               padding: "2px 8px",
@@ -334,7 +360,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
               gap: "4px",
             }}
           >
-            {order.status || "Pending"}
+            {order.status || "pending"}
           </span>
         );
       case "totalPrice":
@@ -382,7 +408,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2, pt: 2, mt: 2}}>
+    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2}}>
       <Paper sx={{ width: "100%", overflow: "auto", borderRadius: 2, boxShadow: 1 }}>
         <TableContainer>
           <Table stickyHeader aria-label="orders table">

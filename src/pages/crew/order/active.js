@@ -54,22 +54,23 @@ const ActiveOrders = ({ onFilterChange }) => {
           const estimatedDelivery = order.estimatedDeliveryDate
             ? new Date(order.estimatedDeliveryDate)
             : null;
-          // Active orders: delivery date is in the future and status is not completed/cancelled
+
+          // Active orders: delivery date is in the future and status is not delivered/cancelled/declined
           if (
             estimatedDelivery &&
             estimatedDelivery > currentDate &&
             status !== "delivered" &&
-            status !== "completed" &&
-            status !== "cancelled"
+            status !== "cancelled" &&
+            status !== "declined"
           ) {
             counts.active++;
           }
-          // Completed orders: status is delivered or completed
-          else if (status === "delivered" || status === "completed") {
+          // Completed orders: status is delivered
+          else if (status === "delivered") {
             counts.completed++;
           }
-          // Pending orders: status is pending or processing
-          else if (status === "pending" || status === "processing") {
+          // Pending orders: status is pending or confirmed
+          else if (status === "pending" || status === "confirmed") {
             counts.pending++;
           }
         });
@@ -100,20 +101,20 @@ const ActiveOrders = ({ onFilterChange }) => {
     let filterCriteria = {};
 
     if (tab === "active") {
-      // Active orders: future delivery date and not completed/cancelled
+      // Active orders: future delivery date and not delivered/cancelled/declined
       filterCriteria = {
-        status: ["pending", "processing", "shipped"],
+        status: ["pending", "confirmed", "shipped"],
         futureDelivery: true,
       };
     } else if (tab === "completed") {
       // Completed orders
       filterCriteria = {
-        status: ["delivered", "completed"],
+        status: ["delivered"],
       };
     } else if (tab === "pending") {
       // Pending orders
       filterCriteria = {
-        status: ["pending", "processing"],
+        status: ["pending", "confirmed"],
       };
     }
 
@@ -131,7 +132,8 @@ const ActiveOrders = ({ onFilterChange }) => {
       p: isMobile ? 2 : 3,
       boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
       border: "1px solid #e2e8f0",
-      mb: 3
+      mb: 2,
+      mt: 2
     }}>
       {/* Order Summary Cards Section */}
       <Box
