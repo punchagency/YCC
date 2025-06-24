@@ -279,27 +279,10 @@ const Order = () => {
 
   return (
     <>
-      <div className="">
-        <div className="w-full">
-          <DashboardTitleBar title="Orders" backArrow={true} button={createOrdersButton()} />
+      <div className="lg:p-4">
+        <div className="text-right">
+          {createOrdersButton()}
         </div>
-        {/* <div
-          className="flex justify-content-between"
-          style={{
-            width: "100%",
-            backgroundColor: "white",
-            padding: "15px 30px",
-          }}
-        >
-          <h1 className="text-2xl font-bold">Orders</h1>
-          <button
-            onClick={() => setShowSupplierModal(true)}
-            className="create-order-button"
-          >
-            <img src={neworder} alt="neworder" />
-            <span>Create New Order</span>
-          </button>
-        </div> */}
 
         {/* Pass the handleFilterChange function to ActiveOrders */}
         <ActiveOrders onFilterChange={handleFilterChange} />
