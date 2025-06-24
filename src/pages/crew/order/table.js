@@ -382,7 +382,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2, p: isMobile ? 1 : 3 }}>
+    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2, pt: 2, mt: 2}}>
       <Paper sx={{ width: "100%", overflow: "auto", borderRadius: 2, boxShadow: 1 }}>
         <TableContainer>
           <Table stickyHeader aria-label="orders table">

@@ -279,7 +279,7 @@ const Order = () => {
 
   return (
     <>
-      <div className="bg-red-500">
+      <div className="">
         <div className="w-full">
           <DashboardTitleBar title="Orders" backArrow={true} button={createOrdersButton()} />
         </div>
