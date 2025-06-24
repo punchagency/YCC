@@ -181,20 +181,22 @@ const CreateBooking = () => {
             transition: "background 0.18s, transform 0.18s, box-shadow 0.18s",
             outline: "none",
           }}
-          onMouseOver={e => {
+          onMouseOver={(e) => {
             e.currentTarget.style.backgroundColor = "#026bb3";
             e.currentTarget.style.transform = "scale(1.06)";
-            e.currentTarget.style.boxShadow = "0 8px 24px rgba(3, 135, 217, 0.18)";
+            e.currentTarget.style.boxShadow =
+              "0 8px 24px rgba(3, 135, 217, 0.18)";
           }}
-          onMouseOut={e => {
+          onMouseOut={(e) => {
             e.currentTarget.style.backgroundColor = "#0387D9";
             e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(3, 135, 217, 0.10)";
+            e.currentTarget.style.boxShadow =
+              "0 4px 16px rgba(3, 135, 217, 0.10)";
           }}
-          onFocus={e => {
+          onFocus={(e) => {
             e.currentTarget.style.outline = "2px solid #026bb3";
           }}
-          onBlur={e => {
+          onBlur={(e) => {
             e.currentTarget.style.outline = "none";
           }}
           onClick={() => setShowVendorModal(true)}

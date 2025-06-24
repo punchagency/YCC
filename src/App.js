@@ -16,6 +16,8 @@ import VendorStarted from "./pages/auth/vendors-started";
 // end of new import
 
 import ForgotPassword from "./pages/auth/forgot-password";
+import VerifyOtp from "./pages/auth/verify-otp";
+import ResetPassword from "./pages/auth/reset-password";
 // import Reports from "./pages/reports/reports";
 // import ReportDetails from "./pages/reports/report-details";
 import Notifications from "./pages/notification/notifications";
@@ -70,7 +72,7 @@ import RespondToQuote from "./pages/quote-related-pages/service-providers/respon
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
 import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
 import ApprovePage from "./pages/dashboard/admin/approvalPage.js/approve";
-import { AuthProvider } from './context/authContext';
+import { AuthProvider } from "./context/authContext";
 import TestApi from "./components/TestApi";
 import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
 
@@ -105,22 +107,20 @@ const AuthCheck = ({ children }) => {
     "/vendors/onboarding/refresh-stripe-account",
     "/services/onboarding",
     "/services/onboarding/refresh-stripe-account",
+    "/reset-password",
   ];
 
   // Check if the current path is a public route
-  const isPublicRoute = publicRoutes.some(
-    (route) => {
-      // Convert route pattern to regex if it contains :id
-      const routePattern = route.replace(/:id/g, '[^/]+');
-      const regex = new RegExp(`^${routePattern}$`);
-      const matches = regex.test(location.pathname) || location.pathname.startsWith(route + "/");
-      
+  const isPublicRoute = publicRoutes.some((route) => {
+    // Convert route pattern to regex if it contains :id
+    const routePattern = route.replace(/:id/g, "[^/]+");
+    const regex = new RegExp(`^${routePattern}$`);
+    const matches =
+      regex.test(location.pathname) ||
+      location.pathname.startsWith(route + "/");
 
-      
-      return matches;
-    }
-  );
-
+    return matches;
+  });
 
   if (!token && !isPublicRoute) {
     return <Navigate to="/" replace />;
@@ -157,10 +157,7 @@ function App() {
                     element={<VendorAndServices />}
                   />
                   <Route path="/about-us" element={<AboutUs />} />
-                  <Route
-                    path="/resource-center"
-                    element={<ResourceCenter />}
-                  />
+                  <Route path="/resource-center" element={<ResourceCenter />} />
                   <Route path="/resource-center/test" element={<TestApi />} />
                   <Route path="/contact-us" element={<ContactUs />} />
                 </Route>
@@ -174,6 +171,7 @@ function App() {
                 <Route path="/service/signup" element={<VendorSignup />} />
                 <Route path="/vendor/signup" element={<SupplierSignup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/coming-soon" element={<ComingSoon />} />
                 <Route
                   path="/service/quotes/respond/:quoteId"
@@ -347,9 +345,9 @@ function App() {
                   />
                 </Route>
 
-              {/* Onboarding Routes */}
-              <Route element={<OnboardingPageLayout />}>
-                {/* <Route
+                {/* Onboarding Routes */}
+                <Route element={<OnboardingPageLayout />}>
+                  {/* <Route
                   path="/supplier/onboarding/:id"
                   element={<SupplierOnboarding />}
                 />
@@ -362,22 +360,26 @@ function App() {
                   path="/vendor/onboarding/refresh-stripe-account"
                   element={<VendorOnboardingStep2 />}
                 /> */}
-                <Route path="/crew/settings" element={<CrewSettings />} />
-              </Route>
-              <Route
-                path="/vendors/onboarding/:id"
-                element={<SupplierOnboarding />}
-              />
-              <Route
-                path="/vendors/onboarding/refresh-stripe-account"
-                element={<SupplierOnboardingStep2 />}
-              />
-              <Route path="/services/onboarding/:id" element={<VendorOnboarding />} />
-              <Route
-                path="/services/onboarding/refresh-stripe-account"
-                element={<VendorOnboardingStep2 />}
-              />
-            </Routes>
+                  <Route path="/crew/settings" element={<CrewSettings />} />
+                </Route>
+                <Route
+                  path="/vendors/onboarding/:id"
+                  element={<SupplierOnboarding />}
+                />
+                <Route
+                  path="/vendors/onboarding/refresh-stripe-account"
+                  element={<SupplierOnboardingStep2 />}
+                />
+                <Route
+                  path="/services/onboarding/:id"
+                  element={<VendorOnboarding />}
+                />
+                <Route
+                  path="/services/onboarding/refresh-stripe-account"
+                  element={<VendorOnboardingStep2 />}
+                />
+                <Route path="/verify-otp" element={<VerifyOtp />} />
+              </Routes>
             </AuthCheck>
           </NotificationsProvider>
         </ToastProvider>

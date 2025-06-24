@@ -96,9 +96,21 @@ export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("id");
   localStorage.removeItem("user");
-  
+
   console.log("User logged out, tokens removed from localStorage");
-  
+
   // Redirect to login page
   window.location.href = "/login";
+};
+
+export const verifyOtp = async (email, otp) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/verify-otp`, {
+      email,
+      otp,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
 };

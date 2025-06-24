@@ -163,7 +163,7 @@ const ForgotPasswordMobile = () => {
                 margin: 0,
               }}
             >
-              Enter your email address and we'll send you an OTP to reset your
+              Enter your email address and we'll send you a link to reset your
               password.
             </p>
           </div>

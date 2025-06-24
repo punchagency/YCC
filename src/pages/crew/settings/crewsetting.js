@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 // import { Checkbox } from "primereact/checkbox";
@@ -30,6 +30,7 @@ const LANGUAGES = [
 
 const CrewSetting = () => {
   const navigate = useNavigate();
+  const { setPageTitle } = useOutletContext() || {};
   const { user } = useUser();
   const { notificationsEnabled, toggleNotifications } = useNotifications();
 
@@ -48,6 +49,7 @@ const CrewSetting = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (setPageTitle) setPageTitle("Settings");
     // Populate form with user data when available
     if (user) {
       // Set name from crewProfile firstName and lastName if available
@@ -69,7 +71,7 @@ const CrewSetting = () => {
       // Set account visibility if available
       setAccountVisibility(user.accountVisibility !== false);
     }
-  }, [user]);
+  }, [user, setPageTitle]);
 
   const handleSaveChanges = async () => {
     setLoading(true);

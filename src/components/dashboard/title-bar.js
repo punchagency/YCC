@@ -13,11 +13,15 @@ const DashboardTitleBar = ({ title, button, backArrow = false }) => {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingX: "20px",
-        // paddingY: '14px',
+        paddingX: { xs: "10px", sm: "20px" },
         height: "4rem",
         backgroundColor: theme === "light" ? "white" : "#03141F",
         border: "1px solid #E0E0E0",
+        width: "100vw",
+        marginLeft: { xs: "calc(-100vw + 100%)", sm: 0 },
+        marginRight: { xs: "calc(-50vw + 50%)", sm: 0 },
+        marginTop: { xs: "10px", sm: 0 },
+        boxSizing: "border-box",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
