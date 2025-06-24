@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+  useOutletContext,
+} from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
 import { InputText } from "primereact/inputtext";
@@ -124,6 +129,8 @@ const Invent = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observer = useRef();
   const [totalItems, setTotalItems] = useState(0);
+
+  const { setPageTitle } = useOutletContext() || {};
 
   // Add this function to handle infinite scroll
   const lastInventoryElementRef = useCallback(
@@ -1198,19 +1205,12 @@ const Invent = () => {
     );
   };
 
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Inventory Management");
+  }, [setPageTitle]);
+
   return (
     <>
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{}}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ margin: "0 0 10px 40px" }}>Inventory</h3>
-          </div>
-        </div>
-      </div>
-
       <div
         className="inventory-wrapper"
         style={{
@@ -1227,13 +1227,7 @@ const Invent = () => {
           {isLoading ? (
             <TableSkeleton showSummary={false} />
           ) : (
-            <>
-              {isMobile
-                ? // Mobile view
-                  renderMobileInventoryCards()
-                : // Desktop view
-                  renderDesktopView()}
-            </>
+            <>{isMobile ? renderMobileInventoryCards() : renderDesktopView()}</>
           )}
         </div>
       </div>

@@ -10,6 +10,8 @@ import { Toast } from "primereact/toast";
 import { getSuppliersWithInventories } from "../../../services/supplier/supplierService";
 import { createOrder } from "../../../services/crew/crewOrderService";
 import "./order.css";
+import { useOutletContext } from "react-router-dom";
+import neworder from "../../../assets/images/crew/neworder.png";
 
 const Order = () => {
   const [showOrderModal, setShowOrderModal] = useState(false);
@@ -39,6 +41,13 @@ const Order = () => {
 
   // Add a new state for order filters
   const [orderFilters, setOrderFilters] = useState({});
+
+  const outletContext = useOutletContext();
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Orders");
+    }
+  }, [outletContext]);
 
   // Handle window resize for mobile detection
   useEffect(() => {
@@ -242,34 +251,18 @@ const Order = () => {
 
   return (
     <>
-      <div className="">
-        <div
-          className="flex justify-content-between"
-          style={{
-            width: "100%",
-            backgroundColor: "white",
-            padding: "15px 30px",
-          }}
-        >
-          <h1 className="text-2xl font-bold">Orders</h1>
+      <div className="crew-order-main-content">
+        <div className="create-order-button-container">
           <button
-            style={{
-              backgroundColor: "#0387D9",
-              color: "white",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-              border: "1px solid #0387D9",
-            }}
             onClick={() => setShowSupplierModal(true)}
+            className="create-order-button"
           >
-            Create Order
+            <img src={neworder} alt="neworder" />
+            <span>Create New Order</span>
           </button>
         </div>
-
         {/* Pass the handleFilterChange function to ActiveOrders */}
         <ActiveOrders onFilterChange={handleFilterChange} />
-
         {/* Pass the filters to OrderTable and get the ref */}
         <OrderTable
           filters={orderFilters}
@@ -424,10 +417,7 @@ const Order = () => {
                       window.location.href = "/login";
                       return;
                     }
-                    console.log(
-                      "Inventory item being selected:",
-                      inventory
-                    );
+                    console.log("Inventory item being selected:", inventory);
                     console.log("Product data:", inventory?.product);
                     setSelectedInventory(inventory);
                     setQuickOrderForm({

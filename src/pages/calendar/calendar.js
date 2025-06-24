@@ -34,6 +34,7 @@ import {
 import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
 // import more from "../../assets/images/crew/more.png";
+import { useOutletContext } from "react-router-dom";
 
 const EventCard = ({
   title,
@@ -657,6 +658,10 @@ const AllEventsModal = ({
 };
 
 export default function CalendarPage() {
+  const { setPageTitle } = useOutletContext() || {};
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Calendar");
+  }, [setPageTitle]);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [activeView, setActiveView] = useState("events");
   const [calendarEvents, setCalendarEvents] = useState([]);
@@ -1166,23 +1171,24 @@ export default function CalendarPage() {
     >
       <Toast ref={toast} />
 
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ marginLeft: "40px" }}>Calendar</h3>
-          </div>
-        </div>
-        <div className="sub-header-right mr-4">
-          <Button
-            label="Add Event"
-            className="p-button-primary"
-            icon="pi pi-plus"
-            onClick={() => setShowEventModal(true)}
-          />
-        </div>
-      </div>
-
       {renderMobileViewToggle()}
+
+      {/* Add Event button at the top right of main content */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          margin: "20px 20px 0 20px",
+        }}
+      >
+        <Button
+          label="Add Event"
+          className="p-button-primary"
+          icon="pi pi-plus"
+          onClick={() => setShowEventModal(true)}
+        />
+      </div>
 
       <div
         className="widget-container"

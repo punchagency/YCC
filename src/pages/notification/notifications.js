@@ -19,8 +19,8 @@ import { TableSkeleton } from "../../components/TableSkeleton";
 import { useToast } from "../../components/Toast";
 import { Pagination } from "../../components/pagination";
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import DashboardTitleBar from "../../components/dashboard/title-bar";
+import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutlet } from "react-router-dom";
 
 // Mobile notification card component
 const MobileNotificationCard = ({
@@ -689,6 +689,11 @@ export default function Notifications({ role }) {
   const { theme } = useMuiTheme();
 
   const navigate = useNavigate();
+  const { setPageTitle } = useOutletContext() || {};
+
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Notifications");
+  }, [setPageTitle]);
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -894,27 +899,12 @@ export default function Notifications({ role }) {
           paddingTop: isMobile ? "67px" : "0",
         }}
       >
-        <DashboardTitleBar title="Notifications" backArrow={true} />
-
-        <NotificationFilter
-          activeFilter={activeFilter}
-          activeStatusFilter={activeStatusFilter}
-          onFilterChange={handleFilterClick}
-          onStatusFilterChange={handleStatusFilterClick}
-          isMobile={isMobile}
-        />
-
-        <TableSkeleton
-          columns={[
-            { width: isMobile ? "80px" : "100px" }, // Priority
-            { width: isMobile ? "120px" : "150px" }, // Type
-            { width: isMobile ? "200px" : "300px" }, // Description
-            { width: isMobile ? "120px" : "150px" }, // Status
-            { width: isMobile ? "100px" : "120px" }, // Action
-          ]}
-          rows={5}
-          showHeader={true}
-        />
+        <div
+          className="error-message"
+          style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}
+        >
+          Loading...
+        </div>
       </div>
     );
   }
@@ -939,29 +929,6 @@ export default function Notifications({ role }) {
 
   return (
     <>
-      <style>
-        {`
-          @keyframes shine {
-            0% {
-              transform: translateX(-100%);
-            }
-            100% {
-              transform: translateX(100%);
-            }
-          }
-
-          .shine-effect:hover {
-            animation: shine 0.6s ease-in-out;
-          }
-
-          .mobile-view-details-btn:hover,
-          .desktop-view-details-btn:hover {
-            background: #F3F4F6 !important;
-            border-color: #A3A3A3 !important;
-            color: #22223B !important;
-          }
-        `}
-      </style>
       <Toast ref={toast} />
       <div
         className={
@@ -973,7 +940,6 @@ export default function Notifications({ role }) {
           ...(isMobile ? {} : { overflow: "unset" }),
         }}
       >
-        <DashboardTitleBar title="Notifications" backArrow={true} />
         <div className="mb-4"></div>
 
         <NotificationFilter

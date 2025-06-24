@@ -1,5 +1,4 @@
-Main layout wrapper
-.wrapper {
+Main layout wrapper .wrapper {
   display: flex;
   min-height: 100vh;
   height: 100vh;
@@ -123,7 +122,7 @@ Main layout wrapper
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: 100vh;
+  height: auto;
   overflow: auto;
   min-height: 0; /* Important for flex child */
 }
@@ -134,7 +133,6 @@ Main layout wrapper
   overflow-y: auto;
   overflow-x: auto;
   min-height: 0; /* Important for flex child */
-  padding: 20px;
   background-color: #f8fafc;
   width: 100%;
 }
@@ -155,20 +153,31 @@ Main layout wrapper
     height: auto;
     overflow: auto;
   }
-  
+
   .page {
     height: auto;
     overflow: auto;
   }
-  
+
   .right-panel-component {
     height: auto;
     overflow: auto;
-    padding-top: 80px;
   }
-  
+
   .right-panel-component > *:nth-child(2) {
     padding: 15px;
+  }
+
+  .dashboard-title-bar,
+  .admin-header,
+  .notification-title-bar {
+    display: flex !important;
+    min-height: 56px !important;
+    height: auto !important;
+    align-items: center;
+    background: #fff;
+    width: 100%;
+    z-index: 1000;
   }
 }
 
@@ -195,11 +204,45 @@ Main layout wrapper
   .left-menu .menu-container {
     height: calc(100vh - 160px);
   }
-  
+
   .left-menu .logout-container {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
   }
-} 
+}
+
+/* Remove extra bottom white space on iPad/iPad Pro for dashboard/notification pages */
+@media (min-width: 768px) and (max-width: 1366px) and (orientation: portrait),
+  (min-width: 1024px) and (max-width: 1366px) and (orientation: landscape) {
+  .right-panel-component > *:nth-child(2) {
+    padding-bottom: 0 !important;
+  }
+  .pagination-container,
+  .p-paginator {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+/* Only for dashboard/notification main content on iPad/iPad Pro */
+@media (min-width: 768px) and (max-width: 1366px) {
+  .right-panel-component {
+    background: #fff !important;
+  }
+  .right-panel-component > *:nth-child(2) {
+    background: #fff !important;
+    min-height: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .p-paginator,
+  .pagination-container {
+    margin-bottom: 0 !important;
+    padding-bottom: 24px !important; /* Add a little space if needed */
+    background: #fff !important;
+  }
+}

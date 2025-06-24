@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminHeader from "../components/header";
 import LeftMenu from "../components/menu";
-import { useState } from "react";
 import ChatbotDashboard from "../components/chatbot/chatbot-dashboard";
 import { DashboardAIProvider } from "../context/AIAssistant/dashboardAIContext";
 import { BookingProvider } from "../context/booking/bookingContext";
@@ -18,9 +17,11 @@ import { SupplierProvider } from "../context/supplier/supplierContext";
 import "../styles/layout.css";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import DashboardTitleBar from "../components/dashboard/title-bar";
 
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [pageTitle, setPageTitle] = useState("");
   const muiTheme = useMuiTheme();
 
   // iPad Pro detection (1024 x 1366) - use mobile nav, no left panel
@@ -62,14 +63,38 @@ const AdminLayout = ({ role }) => {
                               />
                             )}
                             <div className="w-full right-panel-component overflow-x-hidden">
-                              <AdminHeader
-                                isCollapsed={isCollapsed}
-                                setIsCollapsed={setIsCollapsed}
-                                role={role}
-                                isMobileView={isIpadPro} // Pass this prop to AdminHeader to show mobile nav on iPad Pro
-                              />
-                              <Outlet />
-
+                              {/* Fixed top bar */}
+                              <div
+                                style={{
+                                  position: "fixed",
+                                  top: 0,
+                                  left: shouldHideLeftPanel ? 0 : 280,
+                                  right: 0,
+                                  zIndex: 1100,
+                                  width: shouldHideLeftPanel
+                                    ? "100%"
+                                    : "calc(100% - 280px)",
+                                }}
+                              >
+                                <AdminHeader
+                                  isCollapsed={isCollapsed}
+                                  setIsCollapsed={setIsCollapsed}
+                                  role={role}
+                                  isMobileView={isIpadPro}
+                                />
+                                {/* Only one title bar, dynamic title from context */}
+                                <DashboardTitleBar title={pageTitle} />
+                              </div>
+                              {/* Main content starts below the fixed bars */}
+                              <div
+                                style={{
+                                  marginTop: "8rem",
+                                  height: "calc(100vh - 8rem)",
+                                  overflowY: "auto",
+                                }}
+                              >
+                                <Outlet context={{ pageTitle, setPageTitle }} />
+                              </div>
                               <ChatbotDashboard />
                             </div>
                           </main>
