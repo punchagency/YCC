@@ -61,41 +61,6 @@ const Outstanding = () => {
 
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div
-          className="sub-header-left sub-header-left-with-arrow"
-          style={{ width: "100%" }}
-        >
-          <div
-            className="content flex justify-content-between align-items-center"
-            style={{ width: "100%" }}
-          >
-            <h3
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "40px",
-              }}
-            >
-              Financial Management
-            </h3>
-            <div style={{ marginRight: "10px" }}>
-              <button
-                className="text-white px-4 py-2 rounded-md mr-4"
-                style={{
-                  borderRadius: "4px",
-                  border: "none",
-                  backgroundColor: "#0387D9",
-                  cursor: "pointer",
-                }}
-                onClick={() => setShowExpenseModal(true)}
-              >
-                Add New Expense
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="flex flex-wrap justify-content-around align-items-center">
         <div
           style={{ width: "30%", borderRadius: "6px" }}

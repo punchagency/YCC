@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Outstanding from "./outstanding";
 import SearchFilters from "./filters";
 import Table from "./table";
@@ -7,6 +7,7 @@ import History from "./history";
 import { Pagination } from "../../../components/pagination";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { useOutletContext } from "react-router-dom";
 
 const FinancialManagement = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -15,10 +16,15 @@ const FinancialManagement = () => {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const { setPageTitle } = useOutletContext();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
+  useEffect(() => {
+    setPageTitle("Financial Management");
+  });
 
   const handleFilterChange = (filter) => {
     console.log("Filter changed to:", filter);
