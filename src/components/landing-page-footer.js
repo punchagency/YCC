@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -14,8 +14,12 @@ import { Link } from "react-router-dom";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
+import TermsModal from "./TermsModal";
 
 const LandingPageFooter = () => {
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+
   const footerData = [
     {
       title: "Quick Links",
@@ -70,7 +74,7 @@ const LandingPageFooter = () => {
               <img src={logo} alt="logo" style={{ width: "70px", height: "65px" }} />
               <Link to="/contact-us" style={{ textDecoration: "none" }}>
                 <GradientButton>
-                  <ButtonTypography>
+                  <ButtonTypography sx={{ color: "white" }}>
                     Contact Yacht Crew Center, LLC
                   </ButtonTypography>
                 </GradientButton>
@@ -135,9 +139,9 @@ const LandingPageFooter = () => {
                       © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
                     </CopyrightText>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
-                    <FooterLink to="/terms-and-conditions">Terms and Conditions</FooterLink>
+                    <FooterButton onClick={() => setIsTermsModalOpen(true)}>Terms and Conditions</FooterButton>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
-                    <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>
+                    <FooterButton onClick={() => setIsPrivacyModalOpen(true)}>Privacy Policy</FooterButton>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -147,10 +151,10 @@ const LandingPageFooter = () => {
                     gap: '10px',
                     mt: { xs: 2, md: 0 },
                   }}>
-                    <SocialIconLink href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+                    <SocialIconLink href="https://www.facebook.com/groups/yachtiesnameshameandfame" target="_blank" rel="noopener noreferrer">
                       <FacebookIcon sx={{ color: "white" }} />
                     </SocialIconLink>
-                    <SocialIconLink href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                    <SocialIconLink href=" https://www.instagram.com/yachtcrewcenter" target="_blank" rel="noopener noreferrer">
                       <InstagramIcon sx={{ color: "white" }} />
                     </SocialIconLink>
                     <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
@@ -163,6 +167,24 @@ const LandingPageFooter = () => {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Terms and Conditions Modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        pdfUrl="/Terms-and-Conditions.pdf"
+        title="Yacht Crew Center Terms and Conditions"
+        fileName="YCC-Terms-and-Conditions.pdf"
+      />
+
+      {/* Privacy Policy Modal */}
+      <TermsModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        pdfUrl="/Privacy-Policy.pdf"
+        title="Yacht Crew Center Privacy Policy"
+        fileName="YCC-Privacy-Policy.pdf"
+      />
     </Box>
   );
 };
@@ -222,11 +244,23 @@ const FooterTypography = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const FooterLink = styled(Link)({
+const FooterButton = styled('button')({
+  background: "none",
+  border: "none",
+  padding: 0,
+  font: "inherit",
+  cursor: "pointer",
+  outline: "inherit",
   color: "#E0E0E0",
   textDecoration: "none",
   transition: "all 0.3s ease-in-out",
   position: "relative",
+  fontFamily: "Plus Jakarta Sans",
+  fontWeight: 400,
+  fontSize: "14px",
+  lineHeight: "18px",
+  letterSpacing: "0%",
+  whiteSpace: "nowrap",
   "&:hover": {
     color: "#0487D9",
     transform: "translateX(5px)",
