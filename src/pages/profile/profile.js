@@ -1,34 +1,42 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useUser } from '../../context/userContext';
+import { useUser } from "../../context/userContext";
+import { useOutletContext } from "react-router-dom";
 
 import manprofile from "../../assets/images/crew/manprofile.png";
 import "./profile.css";
-import { uploadProfilePicture, removeProfilePicture } from '../../services/crewSettings/crewsettings';
+import {
+  uploadProfilePicture,
+  removeProfilePicture,
+} from "../../services/crewSettings/crewsettings";
 
 const ProfilePage = () => {
   const { user, refreshUser } = useUser();
-  const isCrew = user?.role?.name === 'crew_member' || user?.role === 'crew_member';
+  const isCrew =
+    user?.role?.name === "crew_member" || user?.role === "crew_member";
+  const outletContext = useOutletContext();
 
   // Debug: Log user data
-  console.log('Profile - User data:', {
+  console.log("Profile - User data:", {
     user: user,
     crewProfile: user?.crewProfile,
     profilePicture: user?.profilePicture,
     role: user?.role,
-    isCrew: isCrew
+    isCrew: isCrew,
   });
 
   // Helper to always prefix phone with + if not empty
   const formatPhone = (phone) => {
-    if (!phone) return '';
-    return phone.startsWith('+') ? phone : `+${phone}`;
+    if (!phone) return "";
+    return phone.startsWith("+") ? phone : `+${phone}`;
   };
 
   // Initial form data for admin or crew
   const initialFormData = isCrew
     ? {
-        name: user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user?.name || "",
+        name: user?.crewProfile
+          ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}`
+          : user?.name || "",
         email: user?.email || "",
         location: user?.crewProfile?.country || "",
         phone: formatPhone(user?.crewProfile?.phone || ""),
@@ -77,32 +85,32 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
     setPicLoading(true);
-    console.log('Uploading profile picture:', file.name);
+    console.log("Uploading profile picture:", file.name);
     const res = await uploadProfilePicture(file);
-    console.log('Upload response:', res);
+    console.log("Upload response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log('Upload successful, refreshing user data...');
+      console.log("Upload successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error('Upload failed:', res.message);
-      alert(res.message || 'Failed to upload profile picture');
+      console.error("Upload failed:", res.message);
+      alert(res.message || "Failed to upload profile picture");
     }
   };
 
   const handleRemovePicture = async () => {
-    if (!window.confirm('Remove your profile picture?')) return;
+    if (!window.confirm("Remove your profile picture?")) return;
     setPicLoading(true);
-    console.log('Removing profile picture...');
+    console.log("Removing profile picture...");
     const res = await removeProfilePicture();
-    console.log('Remove response:', res);
+    console.log("Remove response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log('Remove successful, refreshing user data...');
+      console.log("Remove successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error('Remove failed:', res.message);
-      alert(res.message || 'Failed to remove profile picture');
+      console.error("Remove failed:", res.message);
+      alert(res.message || "Failed to remove profile picture");
     }
   };
 
@@ -113,48 +121,52 @@ const ProfilePage = () => {
 
   // Calculate drawer position relative to profile picture
   const getDrawerStyle = () => {
-    if (!picRef.current) return { opacity: 0, pointerEvents: 'none' };
+    if (!picRef.current) return { opacity: 0, pointerEvents: "none" };
     const rect = picRef.current.getBoundingClientRect();
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       return {
-        position: 'absolute',
+        position: "absolute",
         top: rect.bottom + 12 + window.scrollY,
         left: rect.left + window.scrollX,
         zIndex: 1000,
         opacity: showPicDrawer ? 1 : 0,
-        pointerEvents: showPicDrawer ? 'auto' : 'none',
-        transform: showPicDrawer ? 'translateY(0)' : 'translateY(40px)',
-        transition: 'opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)',
+        pointerEvents: showPicDrawer ? "auto" : "none",
+        transform: showPicDrawer ? "translateY(0)" : "translateY(40px)",
+        transition:
+          "opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)",
         minWidth: 220,
         maxWidth: 260,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)',
-        background: '#fff',
-        padding: '0.5rem 0.75rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        boxShadow:
+          "0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)",
+        background: "#fff",
+        padding: "0.5rem 0.75rem",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
       };
     } else {
       return {
-        position: 'absolute',
+        position: "absolute",
         top: rect.top + window.scrollY,
         left: rect.right + 16 + window.scrollX,
         zIndex: 1000,
         opacity: showPicDrawer ? 1 : 0,
-        pointerEvents: showPicDrawer ? 'auto' : 'none',
-        transform: showPicDrawer ? 'translateX(0)' : 'translateX(40px)',
-        transition: 'opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)',
+        pointerEvents: showPicDrawer ? "auto" : "none",
+        transform: showPicDrawer ? "translateX(0)" : "translateX(40px)",
+        transition:
+          "opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)",
         minWidth: 220,
         maxWidth: 260,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)',
-        background: '#fff',
-        padding: '0.5rem 0.75rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        boxShadow:
+          "0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)",
+        background: "#fff",
+        padding: "0.5rem 0.75rem",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
       };
     }
   };
@@ -162,42 +174,69 @@ const ProfilePage = () => {
   // Close drawer on click outside
   React.useEffect(() => {
     const handleClick = (e) => {
-      if (showPicDrawer && picRef.current && !picRef.current.contains(e.target)) {
-        const drawer = document.getElementById('profile-pic-mini-drawer');
+      if (
+        showPicDrawer &&
+        picRef.current &&
+        !picRef.current.contains(e.target)
+      ) {
+        const drawer = document.getElementById("profile-pic-mini-drawer");
         if (drawer && !drawer.contains(e.target)) {
           setShowPicDrawer(false);
         }
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, [showPicDrawer]);
+
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Profile", { backArrow: true });
+    }
+  }, [outletContext]);
 
   return (
     <>
       {/* Mini-drawer for profile picture actions */}
       <div
         id="profile-pic-mini-drawer"
-        style={showPicDrawer ? getDrawerStyle() : { ...getDrawerStyle(), pointerEvents: 'none' }}
+        style={
+          showPicDrawer
+            ? getDrawerStyle()
+            : { ...getDrawerStyle(), pointerEvents: "none" }
+        }
       >
         {showPicDrawer && (
           <div className="profile-pic-drawer-content">
-            <div style={{display:'flex',width:'100%',justifyContent:'flex-end',marginBottom:4}}>
-              <Button icon="pi pi-times" className="p-button-text" onClick={()=>setShowPicDrawer(false)} aria-label="Close" style={{fontSize:20}}/>
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "flex-end",
+                marginBottom: 4,
+              }}
+            >
+              <Button
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={() => setShowPicDrawer(false)}
+                aria-label="Close"
+                style={{ fontSize: 20 }}
+              />
             </div>
             <Button
               label="Change Profile Picture"
               icon="pi pi-upload"
               className="p-button-text drawer-action-btn"
               onClick={handleChangePicture}
-              style={{ width: '100%', marginBottom: 12 }}
+              style={{ width: "100%", marginBottom: 12 }}
               disabled={picLoading}
             />
             <input
               type="file"
               accept="image/*"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={handleFileChange}
             />
             <Button
@@ -205,7 +244,7 @@ const ProfilePage = () => {
               icon="pi pi-eye"
               className="p-button-text drawer-action-btn"
               onClick={handleViewPicture}
-              style={{ width: '100%', marginBottom: 12 }}
+              style={{ width: "100%", marginBottom: 12 }}
             />
             <Button
               label="Remove Profile Picture"
@@ -213,7 +252,7 @@ const ProfilePage = () => {
               className="p-button-text drawer-action-btn"
               severity="danger"
               onClick={handleRemovePicture}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               disabled={picLoading}
             />
           </div>
@@ -222,38 +261,54 @@ const ProfilePage = () => {
 
       {/* Profile picture preview modal */}
       {showPicPreview && (
-        <div className="profile-pic-preview-modal" onClick={()=>setShowPicPreview(false)}>
-          <div className="profile-pic-preview-content" onClick={e=>e.stopPropagation()}>
+        <div
+          className="profile-pic-preview-modal"
+          onClick={() => setShowPicPreview(false)}
+        >
+          <div
+            className="profile-pic-preview-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
-              src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+              src={
+                user?.profilePicture ||
+                user?.crewProfile?.profilePicture ||
+                manprofile
+              }
               alt="Profile Preview"
-              style={{maxWidth:'90vw',maxHeight:'70vh',borderRadius:16,boxShadow:'0 8px 32px rgba(4,135,217,0.18)'}}
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "70vh",
+                borderRadius: 16,
+                boxShadow: "0 8px 32px rgba(4,135,217,0.18)",
+              }}
             />
-            <Button icon="pi pi-times" className="p-button-text" onClick={()=>setShowPicPreview(false)} style={{position:'absolute',top:8,right:8,fontSize:22}} aria-label="Close"/>
+            <Button
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => setShowPicPreview(false)}
+              style={{ position: "absolute", top: 8, right: 8, fontSize: 22 }}
+              aria-label="Close"
+            />
           </div>
         </div>
       )}
 
-      <div className="flex align-items-center justify-content-between sub-header-panel sticky-profile-header">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Profile
-            </h3>
-          </div>
-        </div>
-      </div>
       <div className="settings-container">
         <div className="profile-container-about">
           <div className="profile-container-about-left">
             <div className="profile-container-about-left-top">
               <img
                 ref={picRef}
-                src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+                src={
+                  user?.profilePicture ||
+                  user?.crewProfile?.profilePicture ||
+                  manprofile
+                }
                 alt="manprofile"
                 className="profile-picture-clickable"
                 onClick={() => setShowPicDrawer((v) => !v)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               />
               <div className="profile-name">
                 <p>{formData.name}</p>

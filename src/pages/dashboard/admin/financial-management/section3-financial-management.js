@@ -3,8 +3,8 @@ import {
   Typography,
   // styled,
   Button,
-    // Checkbox,
-    // CircularProgress,
+  // Checkbox,
+  // CircularProgress,
   Skeleton,
   useMediaQuery,
 } from "@mui/material";
@@ -20,7 +20,7 @@ import Paper from "@mui/material/Paper";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import downloadIcon from "../../../../assets/images/icons/financial-management/download-icon.png";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import Pagination from "./pagination";
+import { Pagination } from "../../../../components/pagination";
 import { useTheme } from "../../../../context/theme/themeContext";
 
 // Mobile Transaction Card Component
@@ -257,7 +257,6 @@ const Section3FinancialManagement = ({
                 currentPage={page}
                 itemsPerPage={limit}
                 onPageChange={setPage}
-                onItemsPerPageChange={setLimit}
                 isMobile={isMobile}
               />
             </Box>
@@ -720,12 +719,11 @@ const Section3FinancialManagement = ({
                       }}
                     >
                       <Pagination
+                        currentPage={page}
                         totalPages={totalPages}
                         totalItems={totalItems}
-                        currentPage={page}
                         itemsPerPage={limit}
                         onPageChange={setPage}
-                        onItemsPerPageChange={setLimit}
                         isMobile={isMobile}
                         isTablet={isTablet}
                       />

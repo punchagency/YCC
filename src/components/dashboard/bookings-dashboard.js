@@ -54,13 +54,13 @@ const BookingsDashboard = () => {
 
   return (
     <Box
-      paddingTop={{ xs: 9, md: 0 }}
-      paddingBottom={5}
-      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+      paddingTop={{ xs: 0, md: 2 }}
+      paddingBottom={0}
+      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-auto w-full max-w-full"
     >
       <Box
-        paddingTop={5}
-        paddingX={{ xs: 2, sm: 3 }}
+        paddingTop={{ xs: 0, md: 2 }}
+        paddingX={{ xs: 0, sm: 3 }}
         spacing={{ xs: 1, sm: 1.5, md: 2 }}
         display="flex"
         flexDirection={{ xs: "column", lg: "row" }}
@@ -415,7 +415,7 @@ const BookingsDashboard = () => {
       </Box>
 
       <Box
-        paddingX={{ xs: 2, sm: 3 }}
+        paddingX={{ xs: 0, sm: 3 }}
         paddingTop={{ xs: 1, sm: 2, md: 3 }}
         display="flex"
         flexDirection={{ xs: "column", lg: "row" }}
