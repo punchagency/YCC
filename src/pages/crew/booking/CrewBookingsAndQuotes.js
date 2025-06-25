@@ -11,6 +11,7 @@ const CrewBookingsAndQuotes = () => {
   const [view, setView] = useState("bookings");
   const { theme } = useTheme();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const isLargeDesktop = useMediaQuery("(min-width: 1400px)");
   const { showError } = useToast();
   const navigate = useNavigate();
   const outletContext = useOutletContext();
@@ -242,14 +243,16 @@ const CrewBookingsAndQuotes = () => {
       {/* Bookings/Quotes content */}
       <div
         style={{
-          width: "100%",
-          maxWidth: "100%",
+          width: isLargeDesktop ? "100%" : "100%",
+          maxWidth: isLargeDesktop ? "1400px" : "100%",
           ...(isMobile
             ? {
                 flex: 1,
                 overflowY: "auto",
                 display: "flex",
                 flexDirection: "column",
+                paddingTop: 116, // 56px title bar + 60px filter bar
+                paddingBottom: 16, // ensure last card is visible
               }
             : {
                 display: "flex",
@@ -258,7 +261,7 @@ const CrewBookingsAndQuotes = () => {
           justifyContent: "flex-start",
           alignItems: "center",
           boxSizing: "border-box",
-          padding: isMobile ? "0 8px" : "0 10px",
+          padding: isMobile ? "0 8px" : isLargeDesktop ? "0" : "0 10px",
         }}
       >
         {view === "bookings" ? (
@@ -353,8 +356,14 @@ const CrewBookingsAndQuotes = () => {
             )
           ) : (
             // Desktop/tablet: render as table (unchanged)
-            <div style={{ width: "100%", overflowX: "auto" }}>
-              <table style={{ minWidth: 600 }}>
+            <div
+              style={{
+                width: "100%",
+                maxWidth: isLargeDesktop ? "1400px" : "100%",
+                overflowX: "auto",
+              }}
+            >
+              <table style={{ width: "100%", minWidth: 600 }}>
                 <BookingTable />
               </table>
             </div>
