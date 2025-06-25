@@ -22,6 +22,8 @@ import DashboardTitleBar from "../components/dashboard/title-bar";
 const AdminLayout = ({ role }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
+  const [backArrow, setBackArrow] = useState(false);
+  const [currentSection, setCurrentSection] = useState("");
   const muiTheme = useMuiTheme();
 
   // iPad Pro detection (1024 x 1366) - use mobile nav, no left panel
@@ -41,6 +43,132 @@ const AdminLayout = ({ role }) => {
 
   // Hide left panel for tablets except Nest Hub
   const shouldHideLeftPanel = (isTablet || isIpadPro) && !isNestHub;
+
+  // Custom setPageTitle function that also handles backArrow and section tracking
+  const handleSetPageTitle = (title, options = {}) => {
+    setPageTitle(title);
+
+    // Determine current section based on title
+    let newSection = "";
+    if (title === "Dashboard") {
+      newSection = "dashboard";
+    } else if (title.includes("Booking") || title.includes("booking")) {
+      newSection = "booking";
+    } else if (title.includes("Order") || title.includes("order")) {
+      newSection = "order";
+    } else if (title.includes("Report") || title.includes("report")) {
+      newSection = "report";
+    } else if (title.includes("Setting") || title.includes("setting")) {
+      newSection = "setting";
+    } else if (
+      title.includes("Notification") ||
+      title.includes("notification")
+    ) {
+      newSection = "notification";
+    } else if (title.includes("Inventory") || title.includes("inventory")) {
+      newSection = "inventory";
+    } else if (title.includes("Financial") || title.includes("financial")) {
+      newSection = "financial";
+    } else if (title.includes("Calendar") || title.includes("calendar")) {
+      newSection = "calendar";
+    } else if (title.includes("Document") || title.includes("document")) {
+      newSection = "document";
+    } else if (title.includes("Training") || title.includes("training")) {
+      newSection = "training";
+    } else if (title.includes("Legal") || title.includes("legal")) {
+      newSection = "legal";
+    } else if (
+      title.includes("Accommodation") ||
+      title.includes("accommodation")
+    ) {
+      newSection = "accommodation";
+    } else if (title.includes("Crew") || title.includes("crew")) {
+      newSection = "crew";
+    } else {
+      newSection = "other";
+    }
+
+    // Show back button by default, but hide it on dashboard pages
+    const isDashboardPage = title === "Dashboard";
+    setBackArrow(
+      options.backArrow !== undefined ? options.backArrow : !isDashboardPage
+    );
+
+    // Store the previous section before updating
+    const previousSection = currentSection;
+    setCurrentSection(newSection);
+
+    // Store navigation info for smart back button
+    if (
+      previousSection &&
+      previousSection !== newSection &&
+      previousSection !== "dashboard"
+    ) {
+      // Store that we navigated from a different section
+      sessionStorage.setItem("navigatedFromSection", previousSection);
+      sessionStorage.setItem("shouldGoToDashboard", "true");
+    } else if (newSection === "dashboard") {
+      // Clear navigation info when on dashboard
+      sessionStorage.removeItem("navigatedFromSection");
+      sessionStorage.removeItem("shouldGoToDashboard");
+    }
+  };
+
+  // Determine if we should show the create booking button
+  const shouldShowCreateBookingButton = pageTitle === "Bookings";
+
+  // Create Booking button (using existing style and logic)
+  const createBookingButton = (
+    <button
+      onClick={() => {
+        // Trigger the existing modal in the booking pages
+        const event = new CustomEvent("openCreateBookingModal");
+        window.dispatchEvent(event);
+      }}
+      style={{
+        backgroundColor: "#0387D9",
+        color: "white",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "background 0.2s, transform 0.2s",
+        outline: "none",
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor = "#026bb3";
+        e.currentTarget.style.transform = "scale(1.02)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = "#0387D9";
+        e.currentTarget.style.transform = "scale(1)";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = "2px solid #026bb3";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline = "none";
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Create Booking
+    </button>
+  );
 
   return (
     <ThemeProvider>
@@ -83,17 +211,36 @@ const AdminLayout = ({ role }) => {
                                   isMobileView={isIpadPro}
                                 />
                                 {/* Only one title bar, dynamic title from context */}
-                                <DashboardTitleBar title={pageTitle} />
+                                <DashboardTitleBar
+                                  title={pageTitle}
+                                  backArrow={backArrow}
+                                  button={
+                                    shouldShowCreateBookingButton
+                                      ? createBookingButton
+                                      : null
+                                  }
+                                />
                               </div>
                               {/* Main content starts below the fixed bars */}
                               <div
                                 style={{
                                   marginTop: "8rem",
                                   height: "calc(100vh - 8rem)",
+                                  maxHeight: "calc(100vh - 8rem)",
                                   overflowY: "auto",
+                                  overflowX: "hidden",
+                                  WebkitOverflowScrolling: "touch", // Enable smooth scrolling on iOS
+                                  minHeight: "0", // Ensure flex child can shrink
+                                  position: "relative", // Ensure proper positioning
+                                  paddingBottom: "2rem", // Add bottom padding to ensure content is visible
                                 }}
                               >
-                                <Outlet context={{ pageTitle, setPageTitle }} />
+                                <Outlet
+                                  context={{
+                                    pageTitle,
+                                    setPageTitle: handleSetPageTitle,
+                                  }}
+                                />
                               </div>
                               <ChatbotDashboard />
                             </div>

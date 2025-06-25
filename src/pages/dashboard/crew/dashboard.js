@@ -6,7 +6,7 @@ import React from "react";
 const CrewDashboard = () => {
   const { setPageTitle } = useOutletContext() || {};
   React.useEffect(() => {
-    if (setPageTitle) setPageTitle("Dashboard", { backArrow: true });
+    if (setPageTitle) setPageTitle("Dashboard");
   }, [setPageTitle]);
 
   return (
@@ -16,7 +16,7 @@ const CrewDashboard = () => {
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
         backgroundColor: "white",
       }}

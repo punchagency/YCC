@@ -9,7 +9,7 @@ import React from "react";
 const AdminDashboard1 = () => {
   const { setPageTitle } = useOutletContext() || {};
   React.useEffect(() => {
-    if (setPageTitle) setPageTitle("Dashboard", { backArrow: true });
+    if (setPageTitle) setPageTitle("Dashboard");
   }, [setPageTitle]);
 
   return (
@@ -19,7 +19,7 @@ const AdminDashboard1 = () => {
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
         backgroundColor: "white",
       }}

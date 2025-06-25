@@ -34,6 +34,14 @@ const BookingDetails = () => {
   const [error, setError] = useState(null);
   const [showModificationHistory, setShowModificationHistory] = useState(false);
 
+  // Responsive: detect mobile
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Function to fetch booking by ID
   const fetchBookingById = useCallback(
     async (id) => {
@@ -110,39 +118,73 @@ const BookingDetails = () => {
   return (
     <div
       className="booking-details-main-container"
-      style={{ padding: "24px 8px", maxWidth: 1200, margin: "0 auto" }}
+      style={{
+        padding: isMobile ? "12px 0" : "24px 8px",
+        maxWidth: isMobile ? "100%" : 1200,
+        margin: "0 auto",
+        width: "100%",
+        minHeight: "100vh",
+        background: isMobile ? "#F3F4F6" : undefined,
+      }}
     >
-      <div className="flex flex-wrap justify-content-around gap-4">
+      <div
+        className="flex flex-wrap justify-content-around gap-4"
+        style={{
+          flexDirection: isMobile ? "column" : undefined,
+          alignItems: isMobile ? "stretch" : undefined,
+          gap: isMobile ? 12 : 16,
+        }}
+      >
         <div
           className="bg-white pt-4 pb-4 pl-5 pr-5 booking-details-card"
           style={{
-            width: "100%",
-            maxWidth: 600,
-            borderRadius: "18px",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.07)",
-            marginBottom: 24,
+            width: isMobile ? "100%" : "100%",
+            maxWidth: isMobile ? "100%" : 600,
+            borderRadius: isMobile ? "10px" : "18px",
+            boxShadow: isMobile
+              ? "0 1px 6px rgba(0,0,0,0.06)"
+              : "0 4px 24px rgba(0,0,0,0.07)",
+            marginBottom: isMobile ? 16 : 24,
+            padding: isMobile ? "16px 10px" : undefined,
           }}
         >
           <div className="mb-5">
-            <h2 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8 }}>
+            <h2
+              style={{
+                fontSize: isMobile ? 20 : 28,
+                fontWeight: 700,
+                marginBottom: 8,
+              }}
+            >
               Booking {bookingDetails.bookingId || bookingDetails._id || "N/A"}
             </h2>
-            <p style={{ fontSize: 16, color: "#666", marginBottom: 0 }}>
+            <p
+              style={{
+                fontSize: isMobile ? 14 : 16,
+                color: "#666",
+                marginBottom: 0,
+              }}
+            >
               Payment Status: {bookingDetails.paymentStatus || "N/A"}
             </p>
           </div>
-          <div className="flex flex-wrap justify-content-between mb-5 gap-3">
+          <div
+            className="flex flex-wrap justify-content-between mb-5 gap-3"
+            style={{ flexDirection: isMobile ? "column" : undefined }}
+          >
             <div>
-              <h3 style={{ fontSize: 20, fontWeight: 600 }}>Service Details</h3>
+              <h3 style={{ fontSize: isMobile ? 16 : 20, fontWeight: 600 }}>
+                Service Details
+              </h3>
               <div className="flex align-items-center mb-3">
                 <img
                   src={cleaning}
                   alt="cleaning"
-                  width="18"
-                  height="18"
+                  width={isMobile ? "16" : "18"}
+                  height={isMobile ? "16" : "18"}
                   className="mr-2"
                 />
-                <p style={{ fontSize: 16, margin: 0 }}>
+                <p style={{ fontSize: isMobile ? 14 : 16, margin: 0 }}>
                   {(bookingDetails.services &&
                     bookingDetails.services[0]?.service?.name) ||
                     "N/A"}
@@ -152,11 +194,11 @@ const BookingDetails = () => {
                 <img
                   src={calendar}
                   alt="calendar"
-                  width="18"
-                  height="18"
+                  width={isMobile ? "16" : "18"}
+                  height={isMobile ? "16" : "18"}
                   className="mr-2"
                 />
-                <p style={{ fontSize: 16, margin: 0 }}>
+                <p style={{ fontSize: isMobile ? 14 : 16, margin: 0 }}>
                   {bookingDetails.dateTime
                     ? new Date(bookingDetails.dateTime).toLocaleString()
                     : "N/A"}
@@ -166,11 +208,11 @@ const BookingDetails = () => {
                 <img
                   src={location}
                   alt="location"
-                  width="15px"
-                  height="15px"
+                  width={isMobile ? "13" : "15"}
+                  height={isMobile ? "13" : "15"}
                   className="mr-2"
                 />
-                <p>
+                <p style={{ fontSize: isMobile ? 14 : 16 }}>
                   {bookingDetails.serviceLocation ||
                     bookingDetails.vendorLocation ||
                     "N/A"}
@@ -180,11 +222,11 @@ const BookingDetails = () => {
                 <img
                   src={dollar}
                   alt="dollar"
-                  width="10px"
-                  height="15px"
+                  width={isMobile ? "9" : "10"}
+                  height={isMobile ? "13" : "15"}
                   className="mr-2"
                 />
-                <p>
+                <p style={{ fontSize: isMobile ? 14 : 16 }}>
                   $
                   {(bookingDetails.services &&
                     bookingDetails.services[0]?.service?.price) ||
@@ -192,10 +234,16 @@ const BookingDetails = () => {
                 </p>
               </div>
             </div>
-            <div>
-              <h3>Vendor Information</h3>
-              <p>{bookingDetails.vendorName || "N/A"}</p>
-              <p>{bookingDetails.vendorDescription || "Service Provider"}</p>
+            <div style={{ marginTop: isMobile ? 12 : 0 }}>
+              <h3 style={{ fontSize: isMobile ? 16 : 20 }}>
+                Vendor Information
+              </h3>
+              <p style={{ fontSize: isMobile ? 14 : 16 }}>
+                {bookingDetails.vendorName || "N/A"}
+              </p>
+              <p style={{ fontSize: isMobile ? 13 : 15 }}>
+                {bookingDetails.vendorDescription || "Service Provider"}
+              </p>
               <div
                 className="mt-4 flex justify-content-between"
                 style={{ width: "400px" }}
@@ -378,26 +426,31 @@ const BookingDetails = () => {
         <div
           className="bg-white"
           style={{
-            width: "40%",
-            padding: "20px",
+            width: isMobile ? "100%" : "40%",
+            padding: isMobile ? "14px 10px" : "20px",
             borderRadius: "10px",
-            height: "350px",
+            height: isMobile ? "auto" : "350px",
+            marginBottom: isMobile ? 12 : 0,
+            boxSizing: "border-box",
           }}
         >
           <div className="mb-5">
-            <h2>Booking History</h2>
+            <h2 style={{ fontSize: isMobile ? 18 : 22 }}>Booking History</h2>
           </div>
           <div
             className="flex justify-content-between align-items-center"
             style={{
               border: "1px solid #D5D5D54D",
               borderRadius: "10px",
-              padding: "5px 15px",
+              padding: isMobile ? "8px 10px" : "5px 15px",
               alignContent: "center",
               marginBottom: "20px",
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: isMobile ? "flex-start" : "center",
+              gap: isMobile ? 6 : 0,
             }}
           >
-            <div style={{ lineHeight: "1.5" }}>
+            <div style={{ lineHeight: "1.5", fontSize: isMobile ? 14 : 16 }}>
               <span className="font-bold mb-6">
                 {bookingDetails.vendorName || "N/A"}
               </span>
@@ -411,54 +464,67 @@ const BookingDetails = () => {
             <div
               style={{
                 backgroundColor: "#5570F11A",
-                padding: "5px 10px",
+                padding: isMobile ? "4px 10px" : "5px 10px",
                 borderRadius: "5px",
+                display: "inline-block",
+                fontSize: isMobile ? 13 : 15,
+                marginTop: isMobile ? 4 : 0,
+                whiteSpace: "nowrap",
+                minWidth: 60,
+                textAlign: "center",
               }}
             >
-              <p>{bookingDetails.bookingStatus || "N/A"}</p>
+              <p style={{ margin: 0 }}>
+                {bookingDetails.bookingStatus || "N/A"}
+              </p>
             </div>
           </div>
         </div>
-      </div>
-      <div
-        className="bg-white"
-        style={{
-          width: "55%",
-          padding: "20px",
-          borderRadius: "10px",
-          marginLeft: "20px",
-          marginTop: "20px",
-        }}
-      >
-        <h1 className="mb-5">Report an Issue</h1>
-        <form>
-          <textarea
-            type="text"
-            placeholder="Issue Description"
-            style={{
-              width: "100%",
-              height: "150px",
-              borderRadius: "10px",
-              border: "1px solid lightgrey",
-              padding: "10px",
-              outline: "1px solid lightgrey",
-            }}
-          />
-          <br />
-          <button
-            style={{
-              backgroundColor: "#EF4444",
-              color: "white",
-              width: "150px",
-              height: "35px",
-              borderRadius: "8px",
-              border: "1px solid #EF4444",
-              marginTop: "10px",
-            }}
-          >
-            Submit
-          </button>
-        </form>
+        <div
+          className="bg-white"
+          style={{
+            width: isMobile ? "100%" : "55%",
+            padding: isMobile ? "14px 10px" : "20px",
+            borderRadius: "10px",
+            marginLeft: isMobile ? 0 : "20px",
+            marginTop: isMobile ? 0 : "20px",
+            boxSizing: "border-box",
+          }}
+        >
+          <h1 className="mb-5" style={{ fontSize: isMobile ? 18 : 22 }}>
+            Report an Issue
+          </h1>
+          <form>
+            <textarea
+              type="text"
+              placeholder="Issue Description"
+              style={{
+                width: "100%",
+                height: isMobile ? "100px" : "150px",
+                borderRadius: "10px",
+                border: "1px solid lightgrey",
+                padding: "10px",
+                outline: "1px solid lightgrey",
+                fontSize: isMobile ? 14 : 16,
+              }}
+            />
+            <br />
+            <button
+              style={{
+                backgroundColor: "#EF4444",
+                color: "white",
+                width: isMobile ? "100%" : "150px",
+                height: "35px",
+                borderRadius: "8px",
+                border: "1px solid #EF4444",
+                marginTop: "10px",
+                fontSize: isMobile ? 15 : 16,
+              }}
+            >
+              Submit
+            </button>
+          </form>
+        </div>
       </div>
 
       <Dialog

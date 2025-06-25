@@ -963,9 +963,9 @@
 
 /* Mobile view improvements */
 @media screen and (max-width: 768px) {
-  .mobile-view {
-    padding: 0 15px;
-  }
+  /* .mobile-view {
+    padding: 0 15px; */
+  
 
   .mobile-booking-card {
     background: white;
@@ -982,9 +982,9 @@
     align-items: center;
   }
 
-  .mobile-booking-details {
+  /* .mobile-booking-details {
     padding: 15px;
-  }
+  } */
 
   .detail-row {
     margin-bottom: 10px;

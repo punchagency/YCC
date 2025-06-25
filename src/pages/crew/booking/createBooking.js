@@ -156,54 +156,23 @@ const CreateBooking = () => {
     }
   }, [showVendorModal, fetchVendors]);
 
+  // Listen for create booking button click from title bar
+  useEffect(() => {
+    const handleCreateBookingClick = () => {
+      setShowVendorModal(true);
+    };
+    window.addEventListener("openCreateBookingModal", handleCreateBookingClick);
+    return () => {
+      window.removeEventListener(
+        "openCreateBookingModal",
+        handleCreateBookingClick
+      );
+    };
+  }, []);
+
   return (
     <>
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "36px 30px 0 30px",
-        }}
-      >
-        <button
-          className="create-booking-button"
-          style={{
-            backgroundColor: "#0387D9",
-            color: "white",
-            padding: "12px 32px",
-            borderRadius: "14px",
-            cursor: "pointer",
-            border: "none",
-            fontWeight: 700,
-            fontSize: "17px",
-            boxShadow: "0 4px 16px rgba(3, 135, 217, 0.10)",
-            transition: "background 0.18s, transform 0.18s, box-shadow 0.18s",
-            outline: "none",
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#026bb3";
-            e.currentTarget.style.transform = "scale(1.06)";
-            e.currentTarget.style.boxShadow =
-              "0 8px 24px rgba(3, 135, 217, 0.18)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#0387D9";
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow =
-              "0 4px 16px rgba(3, 135, 217, 0.10)";
-          }}
-          onFocus={(e) => {
-            e.currentTarget.style.outline = "2px solid #026bb3";
-          }}
-          onBlur={(e) => {
-            e.currentTarget.style.outline = "none";
-          }}
-          onClick={() => setShowVendorModal(true)}
-        >
-          Create New Booking
-        </button>
-      </div>
+      {/* Create New Booking button removed from main content; now only in title bar */}
       {/* Vendor Selection Modal */}
       <Dialog
         visible={showVendorModal}
