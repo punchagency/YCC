@@ -10,6 +10,7 @@ import editLogo from "../../../assets/images/crew/editLogo.png";
 import deleteLogo from "../../../assets/images/crew/deleteLogo.png";
 import "../inventory/inventory.css"; // Reuse the inventory CSS
 import { Dialog } from "primereact/dialog";
+import { Pagination } from "../../../components/pagination";
 
 const Table = ({ activeFilter = "all", searchQuery = "" }) => {
   const [sortField, setSortField] = useState(null);
@@ -622,49 +623,14 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
             </tbody>
           </table>
 
-          {/* Pagination footer */}
-          <div
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4"
-            style={{ height: "50px" }}
-          >
-            <div></div>
-            <div className="flex flex-1 justify-between sm:hidden">
-              <div className="text-xs text-gray-700">
-                Page <span className="font-medium">1</span> of{" "}
-                <span className="font-medium">10</span>
-              </div>
-            </div>
-
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
-                  of{" "}
-                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
-                  results
-                </p>
-              </div>
-              <div>
-                <nav
-                  className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                  aria-label="Pagination"
-                >
-                  <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                    <span className="sr-only">Previous</span>
-                    <FaChevronDown className="h-3 w-3 rotate-90" />
-                  </button>
-                  <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 bg-blue-50">
-                    1
-                  </button>
-                  <button className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                    <span className="sr-only">Next</span>
-                    <FaChevronDown className="h-3 w-3 -rotate-90" />
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
+          <Pagination
+            currentPage={1}
+            totalPages={1}
+            totalItems={filteredInvoices.length}
+            itemsPerPage={10}
+            onPageChange={() => {}}
+            isMobile={false}
+          />
         </div>
 
         {/* Invoice Details Modal */}
