@@ -10,6 +10,8 @@ dist/
 #env file
 .env
 
+package.json
+
 # Compiled Java class files
 *.class
 

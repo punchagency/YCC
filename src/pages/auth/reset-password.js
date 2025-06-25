@@ -19,6 +19,11 @@ import {
   CheckCircleOutline,
 } from "@mui/icons-material";
 import yatchLogo from "../../assets/images/yatchLogo.png";
+import { buildApiUrl } from "../../utils/apiUtils";
+
+// Get API URL from environment
+const API_URL =
+  process.env.REACT_APP_API_URL || "https://ycc-backend.onrender.com";
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -52,7 +57,10 @@ const ResetPassword = () => {
     setError("");
     setSuccess("");
     try {
-      const response = await fetch(`/api/auth/reset-password?token=${token}`, {
+      // Use the proper API URL instead of relative URL
+      const resetUrl = buildApiUrl(`auth/reset-password?token=${token}`);
+
+      const response = await fetch(resetUrl, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password, confirmPassword }),
