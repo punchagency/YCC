@@ -4,7 +4,7 @@
  */
 export const buildApiUrl = (endpoint) => {
   const API_URL =
-    process.env.REACT_APP_API_URL || "https://ycc-backend.onrender.com";
+    process.env.REACT_APP_API_URL || "https://ycc-servers2-5368640ed4f5.herokuapp.com/api";
 
   // Remove leading slash from endpoint if present
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
