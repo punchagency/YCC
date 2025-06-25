@@ -2,7 +2,7 @@ import axios from "axios";
 import { buildApiUrl } from "../utils/apiUtils";
 
 const API_URL =
-  process.env.REACT_APP_API_URL || "https://ycc-backend.onrender.com";
+  process.env.REACT_APP_API_URL;
 console.log("API_URL:", API_URL);
 
 export const signup = async (formData) => {
