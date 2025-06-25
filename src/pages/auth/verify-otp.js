@@ -7,6 +7,11 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import { buildApiUrl } from "../../utils/apiUtils";
+
+// Get API URL from environment
+const API_URL =
+  process.env.REACT_APP_API_URL || "https://ycc-backend.onrender.com";
 
 const VerifyOtp = () => {
   const location = useLocation();
@@ -25,7 +30,10 @@ const VerifyOtp = () => {
     setError("");
     setSuccess(false);
     try {
-      const response = await fetch("/api/auth/verify-otp", {
+      // Use the proper API URL instead of relative URL
+      const verifyUrl = buildApiUrl("auth/verify-otp");
+
+      const response = await fetch(verifyUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
