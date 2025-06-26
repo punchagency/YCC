@@ -1,10 +1,17 @@
 import React from "react";
+import { useOutletContext } from "react-router-dom";
 
 const OrderDetails = () => {
+  const { setPageTitle } = useOutletContext() || {};
+
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Order Details");
+  }, [setPageTitle]);
+
   return (
     <>
-      <div>
-        <h1>Order Details</h1>
+      <div className="">
+        <h1></h1>
       </div>
     </>
   );

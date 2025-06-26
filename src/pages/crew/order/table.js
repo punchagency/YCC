@@ -302,7 +302,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
   // Table columns
   const columns = [
     { id: "supplier", label: "Supplier Name", minWidth: 120 },
-    { id: "quantity", label: "Quantity", minWidth: 80 },
+    { id: "productCount", label: "Product Count", minWidth: 100 },
     { id: "deliveryAddress", label: "Delivery Address", minWidth: 180 },
     { id: "orderDate", label: "Order Date", minWidth: 120 },
     { id: "status", label: "Status", minWidth: 100 },
@@ -315,13 +315,8 @@ const OrderTable = ({ filters = {}, onRef }) => {
     switch (column.id) {
       case "supplier":
         return order?.vendor?.name || order?.vendorName || "N/A";
-      case "quantity":
-        return (
-          order.products?.reduce(
-            (sum, product) => sum + (product.quantity || 0),
-            0
-          ) || 0
-        );
+      case "productCount":
+        return order.products?.length || 0;
       case "deliveryAddress":
         return order.deliveryAddress || "N/A";
       case "orderDate":
@@ -429,15 +424,15 @@ const OrderTable = ({ filters = {}, onRef }) => {
                       letterSpacing: 0.1,
                     }}
                     onClick={
-                      ["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id)
+                      ["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id)
                         ? () => handleSort(column.id)
                         : undefined
                     }
-                    style={{ cursor: ["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) ? "pointer" : "default" }}
+                    style={{ cursor: ["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) ? "pointer" : "default" }}
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       {column.label}
-                      {["supplier", "quantity", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) && (
+                      {["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) && (
                         <span style={{ marginLeft: 4 }}>{getSortIcon(column.id)}</span>
                       )}
                     </Box>
