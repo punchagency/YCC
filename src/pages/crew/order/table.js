@@ -1,20 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState } from "react";
 import { FaSortAmountUp, FaSortAmountDown } from "react-icons/fa";
-import {
-  FiEye,
-  FiEdit,
-  FiDownload,
-  FiChevronLeft,
-  FiChevronRight,
-  FiChevronDown,
-} from "react-icons/fi";
+import { FiEye } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { getOrders } from "../../../services/crew/crewOrderService";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
@@ -23,124 +11,27 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { Pagination } from "../../../components/pagination";
-import { TableSkeleton } from "../../../components/TableSkeleton";
+import { OrderTableSkeleton } from "../../../components/CrewOrderSkeletons";
+import { formatAmount } from "../../../utils/formatAmount";
 
-const OrderTable = ({ filters = {}, onRef }) => {
+const OrderTable = ({ 
+  orders = [], 
+  loading = false, 
+  error = null, 
+  pagination = { page: 1, limit: 10, total: 0, totalPages: 0 },
+  onPageChange,
+  onLimitChange
+}) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0,
-  });
-  const [viewOrderDialog, setViewOrderDialog] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const toast = useRef(null);
 
   const navigate = useNavigate();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
-
-  // Fetch orders from API with filters
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching crew orders with filters:", filters);
-      
-      const response = await getOrders({
-        page: pagination.page,
-        limit: pagination.limit,
-        ...filters
-      });
-      
-      console.log("Crew orders response:", response);
-      
-      if (response.status) {
-        let ordersData = [];
-        
-        // Handle different response structures
-        if (response.data?.data && Array.isArray(response.data.data)) {
-          ordersData = response.data.data;
-        } else if (response.data && Array.isArray(response.data)) {
-          ordersData = response.data;
-        } else {
-          console.error("Unexpected response structure:", response.data);
-          setError("Invalid data structure received");
-          return;
-        }
-
-        console.log(`Found ${ordersData.length} orders`);
-
-        // Apply client-side filtering for criteria that can't be sent to the API
-        if (filters.futureDelivery) {
-          const currentDate = new Date();
-          ordersData = ordersData.filter((order) => {
-            const deliveryDate = order.estimatedDeliveryDate
-              ? new Date(order.estimatedDeliveryDate)
-              : null;
-            return deliveryDate && deliveryDate > currentDate;
-          });
-        }
-
-        // Apply status filtering if specified
-        if (filters.status && Array.isArray(filters.status)) {
-          ordersData = ordersData.filter((order) => 
-            filters.status.includes(order.status?.toLowerCase())
-          );
-        }
-
-        // Sort orders by createdAt in descending order (newest first)
-        ordersData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        // Use server pagination if available, otherwise client-side
-        const total = response.data?.pagination?.totalItems || ordersData.length;
-        const totalPages = response.data?.pagination?.totalPages || Math.ceil(total / pagination.limit) || 1;
-        
-        // If server pagination is used, don't slice the data
-        const finalOrders = response.data?.pagination ? ordersData : ordersData.slice(
-          (pagination.page - 1) * pagination.limit,
-          pagination.page * pagination.limit
-        );
-
-        setOrders(finalOrders);
-        setPagination((prev) => ({
-          ...prev,
-          total,
-          totalPages,
-        }));
-        setError(null);
-      } else {
-        console.error("Failed to fetch orders:", response.error);
-        setError(response.error || "Failed to load orders");
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      setError("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, pagination.page, pagination.limit]);
-
-  // Expose fetchOrders to parent component
-  useEffect(() => {
-    if (onRef) {
-      onRef({ fetchOrders });
-    }
-  }, [onRef, fetchOrders]);
-
-  // Fetch orders when component mounts and when filters or pagination change
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -178,174 +69,57 @@ const OrderTable = ({ filters = {}, onRef }) => {
     return <FaSortAmountUp className="ml-1 opacity-30" />;
   };
 
-  // Handle page change
-  const handlePageChange = (newPage) => {
-    if (newPage > 0 && newPage <= pagination.totalPages) {
-      setPagination((prev) => ({ ...prev, page: newPage }));
-    }
-  };
-
-  // Handle items per page change
-  const handleLimitChange = (newLimit) => {
-    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
-  };
-
-  // Function to handle downloading order details as PDF
-  const handleDownloadPDF = (order) => {
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(20);
-      doc.text("Order Invoice", 14, 22);
-      doc.setFontSize(12);
-      doc.text(`Order ID: ${order.orderId || order._id || "N/A"}`, 14, 32);
-      doc.text(
-        `Date Placed: ${
-          formatDate(order.createdAt || order.orderDate) || "N/A"
-        }`,
-        14,
-        38
-      );
-      doc.text(
-        `Est. Delivery: ${formatDate(order.estimatedDeliveryDate) || "N/A"}`,
-        14,
-        44
-      );
-      doc.setFontSize(16);
-      doc.text("Vendor Information", 14, 54);
-      doc.setFontSize(12);
-      doc.text(`Vendor: ${order.vendor?.name || order.vendorName || "N/A"}`, 14, 60);
-      doc.setFontSize(16);
-      doc.text("Order Status", 14, 70);
-      doc.setFontSize(12);
-      doc.text(`Status: ${order.status || "pending"}`, 14, 76);
-      if (order.products && order.products.length > 0) {
-        doc.setFontSize(16);
-        doc.text("Order Items", 14, 86);
-        const tableColumn = ["Item", "Quantity", "Price", "Total"];
-        const tableRows = [];
-        order.products.forEach((item) => {
-          const itemData = [
-            item.id?.name || "Unknown Item",
-            item.quantity || 1,
-            `$${item.price?.toFixed(2) || "0.00"}`,
-            `$${((item.price || 0) * (item.quantity || 1)).toFixed(2)}`,
-          ];
-          tableRows.push(itemData);
-        });
-        doc.autoTable({
-          startY: 90,
-          head: [tableColumn],
-          body: tableRows,
-          theme: "striped",
-          headStyles: { fillColor: [66, 139, 202] },
-        });
-        const totalAmount = order.products.reduce(
-          (total, item) => total + (item.price || 0) * (item.quantity || 1),
-          0
-        );
-        doc.setFontSize(14);
-        doc.text(
-          `Total Amount: $${totalAmount.toFixed(2)}`,
-          14,
-          doc.autoTable.previous.finalY + 10
-        );
-      } else {
-        doc.setFontSize(14);
-        doc.text(
-          `Total Amount: ${
-            order.totalPrice ? `$${order.totalPrice.toFixed(2)}` : "N/A"
-          }`,
-          14,
-          86
-        );
-      }
-      if (order.deliveryAddress) {
-        doc.setFontSize(16);
-        doc.text(
-          "Delivery Information",
-          14,
-          doc.autoTable?.previous?.finalY + 20 || 96
-        );
-        doc.setFontSize(12);
-        const deliveryY = doc.autoTable?.previous?.finalY + 26 || 102;
-        doc.text(
-          `Address: ${order.deliveryAddress}`,
-          14,
-          deliveryY
-        );
-      }
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(10);
-        doc.text(
-          `Generated on ${new Date().toLocaleString()}`,
-          14,
-          doc.internal.pageSize.height - 10
-        );
-      }
-      const filename = `order-invoice-${
-        order.orderId || order._id || "details"
-      }.pdf`;
-      doc.save(filename);
-    } catch (error) {
-      alert("Failed to generate PDF. Please try again.");
-    }
-  };
-
   // Function to handle view order dialog
   const handleViewOrder = (order) => {
-    setSelectedOrder(order);
-    setViewOrderDialog(true);
+    // Navigate to order details page
+    navigate(`/crew/orders/${order._id}`);
   };
 
   // Table columns
   const columns = [
-    { id: "supplier", label: "Supplier Name", minWidth: 120 },
-    { id: "productCount", label: "Product Count", minWidth: 100 },
-    { id: "deliveryAddress", label: "Delivery Address", minWidth: 180 },
-    { id: "orderDate", label: "Order Date", minWidth: 120 },
-    { id: "status", label: "Status", minWidth: 100 },
-    { id: "totalPrice", label: "Total Price", minWidth: 100 },
-    { id: "actions", label: "Actions", minWidth: 120 },
+    { id: "orderId", label: "Order ID", minWidth: 120 },
+    { id: "totalPrice", label: "Total Price", minWidth: 120 },
+    { id: "overallStatus", label: "Overall Status", minWidth: 140 },
+    { id: "orderDate", label: "Order Date", minWidth: 140 },
+    { id: "actions", label: "Actions", minWidth: 100 },
   ];
 
   // Table row rendering
   const renderCell = (order, column) => {
     switch (column.id) {
-      case "supplier":
-        return order?.vendor?.name || order?.vendorName || "N/A";
-      case "productCount":
-        return order.products?.length || 0;
-      case "deliveryAddress":
-        return order.deliveryAddress || "N/A";
-      case "orderDate":
-        return formatDate(order.createdAt || order.orderDate);
-      case "status":
+      case "orderId":
+        return order.orderId || "N/A";
+      case "totalPrice":
+        return `$${formatAmount(order.totalPrice)}`;
+      case "overallStatus":
         return (
           <span
             style={{
-              backgroundColor: order.status === "delivered"
+              backgroundColor: order.overallStatus === "delivered"
                 ? "#ECFDF3"
-                : order.status === "confirmed"
+                : order.overallStatus === "confirmed"
                 ? "#F0F9FF"
-                : order.status === "shipped"
+                : order.overallStatus === "shipped"
                 ? "#FFFAEB"
-                : order.status === "cancelled"
+                : order.overallStatus === "cancelled"
                 ? "#FEF3F2"
-                : order.status === "declined"
+                : order.overallStatus === "declined"
                 ? "#FEF3F2"
+                : order.overallStatus === "partially_confirmed"
+                ? "#F0F9FF"
                 : "#F2F4F7",
-              color: order.status === "delivered"
+              color: order.overallStatus === "delivered"
                 ? "#027A48"
-                : order.status === "confirmed"
+                : order.overallStatus === "confirmed"
                 ? "#0369A1"
-                : order.status === "shipped"
+                : order.overallStatus === "shipped"
                 ? "#B54708"
-                : order.status === "cancelled"
+                : order.overallStatus === "cancelled"
                 ? "#B42318"
-                : order.status === "declined"
+                : order.overallStatus === "declined"
                 ? "#B42318"
+                : order.overallStatus === "partially_confirmed"
+                ? "#0369A1"
                 : "#344054",
               padding: "2px 8px",
               borderRadius: "16px",
@@ -355,11 +129,11 @@ const OrderTable = ({ filters = {}, onRef }) => {
               gap: "4px",
             }}
           >
-            {order.status || "pending"}
+            {order.overallStatus || "pending"}
           </span>
         );
-      case "totalPrice":
-        return `$${order.totalPrice?.toFixed(2) || "0.00"}`;
+      case "orderDate":
+        return formatDate(order.orderDate);
       case "actions":
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
@@ -368,20 +142,7 @@ const OrderTable = ({ filters = {}, onRef }) => {
               className="p-button-outlined p-button-sm"
               style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
               onClick={() => handleViewOrder(order)}
-              tooltip="View Order"
-            />
-            <Button
-              icon={<FiEdit size={18} />}
-              className="p-button-outlined p-button-sm"
-              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
-              tooltip="Edit Order"
-            />
-            <Button
-              icon={<FiDownload size={18} />}
-              className="p-button-outlined p-button-sm"
-              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
-              onClick={() => handleDownloadPDF(order)}
-              tooltip="Download Invoice"
+              tooltip="See Details"
             />
           </Box>
         );
@@ -390,15 +151,18 @@ const OrderTable = ({ filters = {}, onRef }) => {
     }
   };
 
-  // Loading state
+  // Loading state with skeleton
   if (loading) {
-    return <TableSkeleton showSummary={false} />;
+    return <OrderTableSkeleton />;
   }
 
   // Error state
   if (error) {
     return (
-      <Box sx={{ p: 4, textAlign: "center", color: "#dc3545" }}>{error}</Box>
+      <Box sx={{ p: 4, textAlign: "center", color: "#dc3545" }}>
+        <Box sx={{ mb: 2, fontSize: 18, fontWeight: 600 }}>Error Loading Orders</Box>
+        <Box sx={{ fontSize: 14, color: "#666" }}>{error}</Box>
+      </Box>
     );
   }
 
@@ -424,15 +188,15 @@ const OrderTable = ({ filters = {}, onRef }) => {
                       letterSpacing: 0.1,
                     }}
                     onClick={
-                      ["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id)
+                      ["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id)
                         ? () => handleSort(column.id)
                         : undefined
                     }
-                    style={{ cursor: ["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) ? "pointer" : "default" }}
+                    style={{ cursor: ["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id) ? "pointer" : "default" }}
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       {column.label}
-                      {["supplier", "productCount", "deliveryAddress", "orderDate", "status", "totalPrice"].includes(column.id) && (
+                      {["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id) && (
                         <span style={{ marginLeft: 4 }}>{getSortIcon(column.id)}</span>
                       )}
                     </Box>
@@ -474,15 +238,20 @@ const OrderTable = ({ filters = {}, onRef }) => {
           </Table>
         </TableContainer>
       </Paper>
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={pagination.totalPages}
-        totalItems={pagination.total}
-        itemsPerPage={pagination.limit}
-        onPageChange={handlePageChange}
-        isMobile={isMobile}
-        isTablet={isTablet}
-      />
+      
+      {/* Pagination component */}
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          itemsPerPage={pagination.limit}
+          onPageChange={onPageChange}
+          onLimitChange={onLimitChange}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+      )}
     </Box>
   );
 };

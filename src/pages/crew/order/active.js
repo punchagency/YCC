@@ -1,97 +1,16 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import bar from "../../../assets/images/crew/bar.png";
-import { getOrders } from "../../../services/crew/crewOrderService";
 import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import { CardSkeleton } from "../../../components/CrewOrderSkeletons";
 
-const ActiveOrders = ({ onFilterChange }) => {
-  const [orderCounts, setOrderCounts] = useState({
-    active: 0,
-    completed: 0,
-    pending: 0,
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const ActiveOrders = ({ onFilterChange, statusCounts = { pending: 0, active: 0, completed: 0, total: 0 }, loading = false }) => {
   const [activeTab, setActiveTab] = useState("pending"); // Default tab
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-
-  // Fetch all orders to count by status
-  const fetchOrderCounts = useCallback(async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching orders for counts...");
-      // Get all orders without pagination to count totals
-      const response = await getOrders({ limit: 1000 });
-      console.log("Orders count response:", response);
-      if (response.status) {
-        let orders = [];
-        // Extract orders from the response based on structure
-        if (response.data?.data && Array.isArray(response.data.data)) {
-          orders = response.data.data;
-        } else if (
-          response.data?.data?.data &&
-          Array.isArray(response.data.data.data)
-        ) {
-          orders = response.data.data.data;
-        } else if (Array.isArray(response.data)) {
-          orders = response.data;
-        }
-        console.log(`Found ${orders.length} total orders`);
-        // Get current date for comparing with estimated delivery dates
-        const currentDate = new Date();
-        // Count orders by status
-        const counts = {
-          active: 0,
-          completed: 0,
-          pending: 0,
-        };
-        orders.forEach((order) => {
-          const status = (order.status || "").toLowerCase();
-          const estimatedDelivery = order.estimatedDeliveryDate
-            ? new Date(order.estimatedDeliveryDate)
-            : null;
-
-          // Active orders: delivery date is in the future and status is not delivered/cancelled/declined
-          if (
-            estimatedDelivery &&
-            estimatedDelivery > currentDate &&
-            status !== "delivered" &&
-            status !== "cancelled" &&
-            status !== "declined"
-          ) {
-            counts.active++;
-          }
-          // Completed orders: status is delivered
-          else if (status === "delivered") {
-            counts.completed++;
-          }
-          // Pending orders: status is pending or confirmed
-          else if (status === "pending" || status === "confirmed") {
-            counts.pending++;
-          }
-        });
-        console.log("Order counts:", counts);
-        setOrderCounts(counts);
-      } else {
-        console.error("Failed to fetch orders:", response.error);
-        setError("Failed to load order counts");
-      }
-    } catch (error) {
-      console.error("Error fetching order counts:", error);
-      setError("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch order counts on component mount
-  useEffect(() => {
-    fetchOrderCounts();
-  }, [fetchOrderCounts]);
 
   // Handle tab change and notify parent component
   const handleTabChange = (tab) => {
@@ -101,20 +20,19 @@ const ActiveOrders = ({ onFilterChange }) => {
     let filterCriteria = {};
 
     if (tab === "active") {
-      // Active orders: future delivery date and not delivered/cancelled/declined
+      // Active orders: partially_confirmed, confirmed, shipped
       filterCriteria = {
-        status: ["pending", "confirmed", "shipped"],
-        futureDelivery: true,
+        status: ["partially_confirmed", "confirmed", "shipped"],
       };
     } else if (tab === "completed") {
-      // Completed orders
+      // Completed orders: delivered
       filterCriteria = {
         status: ["delivered"],
       };
     } else if (tab === "pending") {
-      // Pending orders
+      // Pending orders: pending
       filterCriteria = {
-        status: ["pending", "confirmed"],
+        status: ["pending"],
       };
     }
 
@@ -152,176 +70,187 @@ const ActiveOrders = ({ onFilterChange }) => {
           mb: 3
         }}
       >
-        {/* Active Orders Card */}
-        <Box
-          sx={{
-            minWidth: isMobile ? 200 : "30%",
-            maxWidth: isMobile ? 220 : "32%",
-            bgcolor: "#ffffff",
-            borderRadius: 3,
-            p: 3,
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            border: "1px solid #f1f5f9",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            "&:hover": {
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              transform: "translateY(-2px)",
-            },
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Box
-            sx={{
-              mr: 2,
-              bgcolor: "#D5B184",
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
-            }}
-          >
-            <img src={bar} alt="bar" width="24px" height="24px" />
-          </Box>
-          <Box>
+        {/* Show skeleton loading or actual cards */}
+        {loading ? (
+          <>
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </>
+        ) : (
+          <>
+            {/* Active Orders Card */}
             <Box
               sx={{
-                fontSize: isMobile ? 16 : 18,
-                fontWeight: 600,
-                color: "#374151",
-                mb: 0.5,
+                minWidth: isMobile ? 200 : "30%",
+                maxWidth: isMobile ? 220 : "32%",
+                bgcolor: "#ffffff",
+                borderRadius: 3,
+                p: 3,
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                border: "1px solid #f1f5f9",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                  transform: "translateY(-2px)",
+                },
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              Active Orders
+              <Box
+                sx={{
+                  mr: 2,
+                  bgcolor: "#D5B184",
+                  borderRadius: "50%",
+                  width: 48,
+                  height: 48,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
+                }}
+              >
+                <img src={bar} alt="bar" width="24px" height="24px" />
+              </Box>
+              <Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: 600,
+                    color: "#374151",
+                    mb: 0.5,
+                  }}
+                >
+                  Active Orders
+                </Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 24 : 28,
+                    fontWeight: 700,
+                    color: "#0387D9",
+                  }}
+                >
+                  {statusCounts.active || 0}
+                </Box>
+              </Box>
             </Box>
-            <Box
-              sx={{
-                fontSize: isMobile ? 24 : 28,
-                fontWeight: 700,
-                color: "#0387D9",
-              }}
-            >
-              {loading ? "..." : orderCounts.active}
-            </Box>
-          </Box>
-        </Box>
 
-        {/* Completed Orders Card */}
-        <Box
-          sx={{
-            minWidth: isMobile ? 200 : "30%",
-            maxWidth: isMobile ? 220 : "32%",
-            bgcolor: "#ffffff",
-            borderRadius: 3,
-            p: 3,
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            border: "1px solid #f1f5f9",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            "&:hover": {
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              transform: "translateY(-2px)",
-            },
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Box
-            sx={{
-              mr: 2,
-              bgcolor: "#D5B184",
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
-            }}
-          >
-            <img src={bar} alt="bar" width="24px" height="24px" />
-          </Box>
-          <Box>
+            {/* Completed Orders Card */}
             <Box
               sx={{
-                fontSize: isMobile ? 16 : 18,
-                fontWeight: 600,
-                color: "#374151",
-                mb: 0.5,
+                minWidth: isMobile ? 200 : "30%",
+                maxWidth: isMobile ? 220 : "32%",
+                bgcolor: "#ffffff",
+                borderRadius: 3,
+                p: 3,
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                border: "1px solid #f1f5f9",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                  transform: "translateY(-2px)",
+                },
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              Completed Orders
+              <Box
+                sx={{
+                  mr: 2,
+                  bgcolor: "#D5B184",
+                  borderRadius: "50%",
+                  width: 48,
+                  height: 48,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
+                }}
+              >
+                <img src={bar} alt="bar" width="24px" height="24px" />
+              </Box>
+              <Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: 600,
+                    color: "#374151",
+                    mb: 0.5,
+                  }}
+                >
+                  Completed Orders
+                </Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 24 : 28,
+                    fontWeight: 700,
+                    color: "#059669",
+                  }}
+                >
+                  {statusCounts.completed || 0}
+                </Box>
+              </Box>
             </Box>
-            <Box
-              sx={{
-                fontSize: isMobile ? 24 : 28,
-                fontWeight: 700,
-                color: "#059669",
-              }}
-            >
-              {loading ? "..." : orderCounts.completed}
-            </Box>
-          </Box>
-        </Box>
 
-        {/* Pending Orders Card */}
-        <Box
-          sx={{
-            minWidth: isMobile ? 200 : "30%",
-            maxWidth: isMobile ? 220 : "32%",
-            bgcolor: "#ffffff",
-            borderRadius: 3,
-            p: 3,
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            border: "1px solid #f1f5f9",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            "&:hover": {
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-              transform: "translateY(-2px)",
-            },
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <Box
-            sx={{
-              mr: 2,
-              bgcolor: "#D5B184",
-              borderRadius: "50%",
-              width: 48,
-              height: 48,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
-            }}
-          >
-            <img src={bar} alt="bar" width="24px" height="24px" />
-          </Box>
-          <Box>
+            {/* Pending Orders Card */}
             <Box
               sx={{
-                fontSize: isMobile ? 16 : 18,
-                fontWeight: 600,
-                color: "#374151",
-                mb: 0.5,
+                minWidth: isMobile ? 200 : "30%",
+                maxWidth: isMobile ? 220 : "32%",
+                bgcolor: "#ffffff",
+                borderRadius: 3,
+                p: 3,
+                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                border: "1px solid #f1f5f9",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&:hover": {
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                  transform: "translateY(-2px)",
+                },
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              Pending Orders
+              <Box
+                sx={{
+                  mr: 2,
+                  bgcolor: "#D5B184",
+                  borderRadius: "50%",
+                  width: 48,
+                  height: 48,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 2px 4px rgba(213, 177, 132, 0.3)",
+                }}
+              >
+                <img src={bar} alt="bar" width="24px" height="24px" />
+              </Box>
+              <Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: 600,
+                    color: "#374151",
+                    mb: 0.5,
+                  }}
+                >
+                  Pending Orders
+                </Box>
+                <Box
+                  sx={{
+                    fontSize: isMobile ? 24 : 28,
+                    fontWeight: 700,
+                    color: "#D97706",
+                  }}
+                >
+                  {statusCounts.pending || 0}
+                </Box>
+              </Box>
             </Box>
-            <Box
-              sx={{
-                fontSize: isMobile ? 24 : 28,
-                fontWeight: 700,
-                color: "#D97706",
-              }}
-            >
-              {loading ? "..." : orderCounts.pending}
-            </Box>
-          </Box>
-        </Box>
+          </>
+        )}
       </Box>
 
       {/* Filter Tabs Section */}
@@ -384,22 +313,6 @@ const ActiveOrders = ({ onFilterChange }) => {
           ))}
         </Box>
       </Box>
-
-      {error && (
-        <Box
-          sx={{
-            color: "#dc3545",
-            mt: 2,
-            p: 2,
-            bgcolor: "#fef2f2",
-            borderRadius: 2,
-            border: "1px solid #fecaca",
-            fontSize: 14,
-          }}
-        >
-          Error loading order counts: {error}
-        </Box>
-      )}
     </Box>
   );
 };
