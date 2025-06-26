@@ -240,8 +240,7 @@ const Documents = () => {
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left">
-          <h3>Documents</h3>
-          <p></p>
+          {/* Removed double title bar here */}
         </div>
         <div className="sub-header-right sub-header-big-desktop">
           <div className="p-input-icon-left search mr-3">
@@ -372,7 +371,6 @@ const Documents = () => {
               );
             }}
           />
-         
         </DataTable>
       </div>
     </>
