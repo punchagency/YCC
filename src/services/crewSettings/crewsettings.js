@@ -75,18 +75,23 @@ export const uploadProfilePicture = async (file) => {
     }
     const formData = new FormData();
     formData.append("profilePicture", file);
-    const response = await axios.post(`${API_URL}/settings/profile-picture`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const response = await axios.post(
+      `${API_URL}/settings/profile-picture`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error uploading profile picture:", error);
     return {
       status: false,
-      message: error.response?.data?.message || "Error uploading profile picture",
+      message:
+        error.response?.data?.message || "Error uploading profile picture",
       error: error.message,
     };
   }
@@ -110,7 +115,34 @@ export const removeProfilePicture = async () => {
     console.error("Error removing profile picture:", error);
     return {
       status: false,
-      message: error.response?.data?.message || "Error removing profile picture",
+      message:
+        error.response?.data?.message || "Error removing profile picture",
+      error: error.message,
+    };
+  }
+};
+
+// Update crew profile settings
+export const updateCrewProfile = async (profileData) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return {
+        status: false,
+        message: "Authentication required",
+      };
+    }
+
+    const response = await axios.put(`${API_URL}/crew/profile`, profileData, {
+      headers: getAuthHeader(),
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating crew profile:", error);
+    return {
+      status: false,
+      message: error.response?.data?.message || "Error updating crew profile",
       error: error.message,
     };
   }

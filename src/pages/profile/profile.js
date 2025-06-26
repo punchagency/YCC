@@ -8,7 +8,23 @@ import "./profile.css";
 import {
   uploadProfilePicture,
   removeProfilePicture,
+  updateUserSettings,
+  updateCrewProfile,
 } from "../../services/crewSettings/crewsettings";
+
+const YEARS_OF_EXPERIENCE_OPTIONS = [
+  { label: "0-2", value: "0-2" },
+  { label: "2-4", value: "2-4" },
+  { label: "4-10", value: "4-10" },
+  { label: "10+", value: "10+" },
+];
+const DEPARTMENT_OPTIONS = [
+  { label: "Captain", value: "captain" },
+  { label: "Exterior", value: "exterior" },
+  { label: "Interior", value: "interior" },
+  { label: "Chef", value: "chef" },
+  { label: "Engineering", value: "engineering" },
+];
 
 const ProfilePage = () => {
   const { user, refreshUser } = useUser();
@@ -56,20 +72,80 @@ const ProfilePage = () => {
   const picRef = useRef(null);
   const [showPicPreview, setShowPicPreview] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleEdit = () => {
     setIsEditing(true);
+    setSaveLoading(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setFormData(initialFormData);
+    setSaveLoading(false);
   };
 
-  const handleSave = () => {
-    // Add your save logic here
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (isCrew) {
+      setSaveLoading(true);
+      try {
+        // Parse name into firstName and lastName
+        const nameParts = formData.name.trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        const updateData = {
+          firstName,
+          lastName,
+          phone: formData.phone.replace(/^\+/, ""),
+          country: formData.location,
+          yearsOfExperience: formData.yearsOfExperience,
+          position: formData.department,
+        };
+
+        const response = await updateCrewProfile(updateData);
+        if (response.status) {
+          await refreshUser();
+          setIsEditing(false);
+        } else {
+          alert(response.message || "Failed to update crew profile");
+        }
+      } catch (error) {
+        alert("An error occurred while updating your profile");
+      } finally {
+        setSaveLoading(false);
+      }
+      return;
+    }
+
+    // For admin users, update the basic profile fields
+    setSaveLoading(true);
+    try {
+      const updateData = {
+        name: formData.name,
+        email: formData.email,
+        location: formData.location,
+        phone: formData.phone.replace(/^\+/, ""), // Remove + prefix for backend
+      };
+
+      console.log("Updating admin profile with:", updateData);
+      const response = await updateUserSettings(updateData);
+
+      if (response.status) {
+        console.log("Profile updated successfully");
+        await refreshUser(); // Refresh user data from context
+        setIsEditing(false);
+      } else {
+        console.error("Failed to update profile:", response.message);
+        alert(response.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating your profile");
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -394,25 +470,37 @@ const ProfilePage = () => {
             <>
               <div className="form-group">
                 <label>Years of Experience</label>
-                <input
-                  type="text"
+                <select
                   name="yearsOfExperience"
                   value={formData.yearsOfExperience}
                   disabled={!isEditing}
                   className="form-input"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select...</option>
+                  {YEARS_OF_EXPERIENCE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Department</label>
-                <input
-                  type="text"
+                <select
                   name="department"
                   value={formData.department}
                   disabled={!isEditing}
                   className="form-input"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select...</option>
+                  {DEPARTMENT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -430,6 +518,7 @@ const ProfilePage = () => {
               className="save-button"
               icon="pi pi-check"
               onClick={handleSave}
+              loading={saveLoading}
             />
           </div>
         )}
