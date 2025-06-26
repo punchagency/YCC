@@ -121,3 +121,29 @@ export const removeProfilePicture = async () => {
     };
   }
 };
+
+// Update crew profile settings
+export const updateCrewProfile = async (profileData) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return {
+        status: false,
+        message: "Authentication required",
+      };
+    }
+
+    const response = await axios.put(`${API_URL}/crew/profile`, profileData, {
+      headers: getAuthHeader(),
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating crew profile:", error);
+    return {
+      status: false,
+      message: error.response?.data?.message || "Error updating crew profile",
+      error: error.message,
+    };
+  }
+};

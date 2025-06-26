@@ -28,7 +28,7 @@ const LANGUAGES = [
   { name: "Arabic", code: "ar" },
 ];
 
-const CrewSetting = () => {
+const AdminSetting = () => {
   const navigate = useNavigate();
   const { setPageTitle } = useOutletContext() || {};
   const { user } = useUser();
@@ -342,4 +342,4 @@ const CrewSetting = () => {
   );
 };
 
-export default CrewSetting;
+export default AdminSetting;
