@@ -840,7 +840,7 @@ const Order = () => {
         setIsFetching(false);
       }
     },
-    [showError, isFetching]
+    [showError] // Remove isFetching dependency to prevent infinite loop
   );
 
   // Initial data fetch
@@ -867,7 +867,7 @@ const Order = () => {
       // Don't reset hasFetchedData here to prevent duplicate fetches on remount
       setIsFetching(false);
     };
-  }, [fetchAllInventoryItems, fetchOrders]);
+  }, []); // Remove dependencies to prevent infinite loop
 
   // Add pagination controls
   const handlePageChange = (newPage) => {
@@ -940,7 +940,7 @@ const Order = () => {
         orders.length
       );
     }
-  }, [fetchAllInventoryItems, fetchOrders, orders.length, isFetching]);
+  }, []); // Remove all dependencies to prevent infinite loop
 
   // Add a cleanup function to reset runCount when component unmounts
   useEffect(() => {
@@ -1124,14 +1124,14 @@ const Order = () => {
     } finally {
       setFetchingProducts(false);
     }
-  }, []);
+  }, [showError]); // Add showError dependency
 
   // Fetch products when modal opens
   useEffect(() => {
     if (showOrderModal) {
       fetchProductsWithVendors();
     }
-  }, [showOrderModal, fetchProductsWithVendors]);
+  }, [showOrderModal]); // Remove fetchProductsWithVendors dependency to prevent infinite loop
 
   // Update product selection when selectedProduct changes
   useEffect(() => {
@@ -1197,23 +1197,8 @@ const Order = () => {
   const [hasMore, setHasMore] = useState(true);
   const observer = useRef();
 
-  // Add this function to handle infinite scroll
-  const lastSupplierElementRef = useCallback(
-    (node) => {
-      if (loadingSuppliers) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          fetchSuppliers(supplierPagination.currentPage + 1, true);
-        }
-      });
-      if (node) observer.current.observe(node);
-    },
-    [loadingSuppliers, hasMore]
-  );
-
   // Modify the fetchSuppliers function to support infinite scroll
-  const fetchSuppliers = async (page = 1, append = false) => {
+  const fetchSuppliers = useCallback(async (page = 1, append = false) => {
     try {
       setLoadingSuppliers(true);
       const response = await getSuppliersWithInventories({
@@ -1269,7 +1254,22 @@ const Order = () => {
     } finally {
       setLoadingSuppliers(false);
     }
-  };
+  }, [supplierPagination.pageSize, showError]); // Add dependencies
+
+  // Add this function to handle infinite scroll
+  const lastSupplierElementRef = useCallback(
+    (node) => {
+      if (loadingSuppliers) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          fetchSuppliers(supplierPagination.currentPage + 1, true);
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [loadingSuppliers, hasMore, supplierPagination.currentPage] // Remove fetchSuppliers to break circular dependency
+  );
 
   // Add the Skeleton component
   const SupplierSkeleton = () => (
@@ -1366,7 +1366,7 @@ const Order = () => {
     if (showSupplierModal) {
       fetchSuppliers();
     }
-  }, [showSupplierModal]);
+  }, [showSupplierModal]); // Remove fetchSuppliers to prevent circular dependency
 
   // Update the Create Order button click handler
   const handleCreateOrderClick = () => {

@@ -27,6 +27,10 @@ import cvUploadLogo from "../assets/images/cvUploadLogo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { signup } from "../services/authService";
+import TermsModal from "./TermsModal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { normalizeWebsiteUrl } from "../utils/urlUtils";
+import { useUser } from "../context/userContext";
 
 const formattedCountries = countryData.map((country) => ({
   value: country.cca2,
@@ -52,6 +56,9 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [certificationFiles, setCertificationFiles] = useState([]);
+  const { signup: userSignup } = useUser();
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -1232,10 +1239,30 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   style={{ marginRight: 8 }}
                 />
                 <span style={{ fontSize: 14, color: '#333', fontFamily: 'Inter, sans-serif' }}>
-                  By signing up, you acknowledge that you have read and agree to our
-                  <a href="#" style={{ color: '#034D92', textDecoration: 'underline', margin: '0 4px', cursor: 'pointer' }} onClick={e => e.preventDefault()}>Privacy Policy</a>
-                  and
-                  <a href="#" style={{ color: '#034D92', textDecoration: 'underline', margin: '0 4px', cursor: 'pointer' }} onClick={e => e.preventDefault()}>Terms & Conditions</a>.
+                  By signing up, you acknowledge that you have read and agree to our{" "}
+                  <span
+                    onClick={() => setIsPrivacyModalOpen(true)}
+                    style={{ 
+                      color: '#034D92', 
+                      textDecoration: 'underline', 
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Privacy Policy
+                  </span>
+                  {" "}and{" "}
+                  <span
+                    onClick={() => setIsTermsModalOpen(true)}
+                    style={{ 
+                      color: '#034D92', 
+                      textDecoration: 'underline', 
+                      cursor: 'pointer',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Terms & Conditions
+                  </span>.
                 </span>
               </div>
 
@@ -1338,6 +1365,24 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Terms and Conditions Modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        pdfUrl="/Terms-and-Conditions.pdf"
+        title="Yacht Crew Center Terms and Conditions"
+        fileName="YCC-Terms-and-Conditions.pdf"
+      />
+
+      {/* Privacy Policy Modal */}
+      <TermsModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        pdfUrl="/Privacy-Policy.pdf"
+        title="Yacht Crew Center Privacy Policy"
+        fileName="YCC-Privacy-Policy.pdf"
+      />
     </div>
   );
 };
