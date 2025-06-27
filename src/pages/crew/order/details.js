@@ -14,6 +14,13 @@ import {
   CardContent,
   Snackbar,
   Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material"
 import {
   CopyIcon,
@@ -24,10 +31,13 @@ import {
   FileTextIcon,
   TruckIcon,
   ClockIcon,
+  DownloadIcon,
 } from "lucide-react"
 import { styled } from "@mui/material/styles"
 import { getOrderById } from "../../../services/crew/crewOrderService"
 import { formatCurrency } from "../../../utils/formatters"
+import { exportOrderToPDF } from "../../../utils/pdfUtils"
+import { useToast } from "../../../context/toast/toastContext"
 
 // Styled components for custom design
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -86,6 +96,7 @@ const OrderDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { setPageTitle } = useOutletContext() || {}
+  const { toast } = useToast()
 
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -221,10 +232,28 @@ const OrderDetails = () => {
       setSnackbarSeverity("success")
       setSnackbarOpen(true)
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      setSnackbarMessage("Could not copy order ID to clipboard")
+    } catch (error) {
+      setSnackbarMessage("Failed to copy Order ID")
       setSnackbarSeverity("error")
       setSnackbarOpen(true)
+    }
+  }
+
+  const handleExportPDF = () => {
+    try {
+      exportOrderToPDF(order)
+      toast.current.show({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'PDF exported successfully!'
+      })
+    } catch (error) {
+      console.error("PDF export error:", error)
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to export PDF'
+      })
     }
   }
 
@@ -634,10 +663,8 @@ const OrderDetails = () => {
                       borderColor: "#0387D9",
                     },
                   }}
-                  startIcon={<PackageIcon size={18} stroke="#0387D9" />}
-                  onClick={() => {
-                    /* Add export functionality */
-                  }}
+                  startIcon={<DownloadIcon size={18} stroke="#0387D9" />}
+                  onClick={handleExportPDF}
                 >
                   Export to PDF
                 </Button>
