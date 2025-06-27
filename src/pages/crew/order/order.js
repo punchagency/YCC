@@ -28,51 +28,23 @@ const Order = () => {
     if (setPageTitle) setPageTitle("Orders");
   }, [setPageTitle]);
 
-  // Fetch orders data when component mounts
+  // Fetch orders data when component mounts or pagination changes
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        console.log("Fetching orders data...");
         const response = await getOrders({
           page: pagination.page,
           limit: pagination.limit,
         });
         
-        console.log("Orders API response:", response);
-        
         if (response.status) {
-          // Extract orders data from response
-          let ordersData = [];
-          if (response.data?.data && Array.isArray(response.data.data)) {
-            ordersData = response.data.data;
-          } else if (response.data && Array.isArray(response.data)) {
-            ordersData = response.data;
-          } else {
-            throw new Error("Invalid data structure received");
-          }
-
-          // Extract status counts from response
-          const counts = response.data?.statusCounts || { pending: 0, active: 0, completed: 0, total: 0 };
+          const { data, statusCounts: counts, pagination: paginationData } = response.data;
           
-          // Extract pagination data
-          const paginationData = response.data?.pagination || {
-            totalItems: ordersData.length,
-            totalPages: Math.ceil(ordersData.length / pagination.limit),
-            currentPage: pagination.page,
-            pageSize: pagination.limit,
-          };
-
-          console.log("Processed data:", {
-            ordersCount: ordersData.length,
-            statusCounts: counts,
-            pagination: paginationData
-          });
-
           // Update state with fetched data
-          setOrders(ordersData);
+          setOrders(data);
           setStatusCounts(counts);
           setPagination(prev => ({
             ...prev,
@@ -81,10 +53,10 @@ const Order = () => {
           }));
           
         } else {
-          throw new Error(response.error || "Failed to fetch orders");
+          setError(response.error);
         }
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error("Error in fetchOrdersData:", error);
         setError(error.message || "An unexpected error occurred");
       } finally {
         setLoading(false);
