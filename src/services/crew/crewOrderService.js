@@ -45,8 +45,19 @@ export const getOrders = async (params = {}) => {
   try {
     console.log("Fetching orders with params:", params);
     
+    // Build query parameters
+    const queryParams = {
+      page: params.page || 1,
+      limit: params.limit || 10,
+    };
+
+    // Add status filter if provided
+    if (params.status && params.status !== 'all') {
+      queryParams.status = params.status;
+    }
+    
     const response = await axios.get(`${API_URL}/crew-orders`, {
-      params,
+      params: queryParams,
       headers: {
         ...getAuthHeader(),
       },

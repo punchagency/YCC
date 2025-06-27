@@ -3,11 +3,12 @@ import ActiveOrders from "./active";
 import OrderTable from "./table";
 import { getOrders } from "../../../services/crew/crewOrderService";
 import "./order.css";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 
 const Order = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isHovered, setIsHovered] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   
   // Data fetching states
   const [orders, setOrders] = useState([]);
@@ -23,12 +24,26 @@ const Order = () => {
 
   const { setPageTitle } = useOutletContext() || {};
 
+  // Get current status filter from URL
+  const currentStatus = searchParams.get('status') || 'all';
+  const currentPage = parseInt(searchParams.get('page')) || 1;
+  const currentLimit = parseInt(searchParams.get('limit')) || 10;
+
   // Set page title when component mounts
   useEffect(() => {
     if (setPageTitle) setPageTitle("Orders");
   }, [setPageTitle]);
 
-  // Fetch orders data when component mounts or pagination changes
+  // Initialize pagination state from URL
+  useEffect(() => {
+    setPagination(prev => ({
+      ...prev,
+      page: currentPage,
+      limit: currentLimit,
+    }));
+  }, []); // Only run once on mount
+
+  // Fetch orders data when component mounts, pagination changes, or status filter changes
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
@@ -38,6 +53,7 @@ const Order = () => {
         const response = await getOrders({
           page: pagination.page,
           limit: pagination.limit,
+          status: currentStatus,
         });
         
         if (response.status) {
@@ -64,12 +80,67 @@ const Order = () => {
     };
 
     fetchOrdersData();
-  }, [pagination.page, pagination.limit]);
+  }, [pagination.page, pagination.limit, currentStatus]);
 
   // Handle filter changes from ActiveOrders component
   const handleFilterChange = (filterCriteria) => {
     console.log("Filter criteria changed:", filterCriteria);
-    // TODO: Implement filtering logic in next step
+    
+    // Extract status from filter criteria
+    let newStatus = 'all';
+    
+    if (filterCriteria.status) {
+      if (Array.isArray(filterCriteria.status)) {
+        if (filterCriteria.status.includes('pending')) {
+          newStatus = 'pending';
+        } else if (filterCriteria.status.includes('partially_confirmed') || 
+                   filterCriteria.status.includes('confirmed') || 
+                   filterCriteria.status.includes('shipped')) {
+          newStatus = 'active';
+        } else if (filterCriteria.status.includes('delivered')) {
+          newStatus = 'completed';
+        }
+      } else if (filterCriteria.status === 'pending') {
+        newStatus = 'pending';
+      } else if (filterCriteria.status === 'active') {
+        newStatus = 'active';
+      } else if (filterCriteria.status === 'completed') {
+        newStatus = 'completed';
+      }
+    }
+
+    // Update URL with new status filter
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (newStatus === 'all') {
+      newSearchParams.delete('status');
+    } else {
+      newSearchParams.set('status', newStatus);
+    }
+    setSearchParams(newSearchParams);
+
+    // Reset to first page when filter changes
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
+  // Handle page change while maintaining status filter
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+    
+    // Update URL with new page while maintaining status filter
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('page', newPage.toString());
+    setSearchParams(newSearchParams);
+  };
+
+  // Handle limit change while maintaining status filter
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
+    
+    // Update URL with new limit and reset page while maintaining status filter
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('limit', newLimit.toString());
+    newSearchParams.set('page', '1');
+    setSearchParams(newSearchParams);
   };
 
   // Create Orders Button
@@ -111,6 +182,7 @@ const Order = () => {
           onFilterChange={handleFilterChange} 
           statusCounts={statusCounts}
           loading={loading}
+          currentStatus={currentStatus}
         />
         
         {/* OrderTable component with orders data */}
@@ -119,8 +191,8 @@ const Order = () => {
           loading={loading}
           error={error}
           pagination={pagination}
-          onPageChange={(newPage) => setPagination(prev => ({ ...prev, page: newPage }))}
-          onLimitChange={(newLimit) => setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }))}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
         />
       </div>
     </>
