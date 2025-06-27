@@ -25,6 +25,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] = useState(false);
 
   // Ensure email is always initialized in formData
   useEffect(() => {
@@ -37,6 +39,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const handleSignup = async () => {
     if (!formData.acceptTerms) {
       setError("Please accept the Service Provider Agreement to continue.");
+      return;
+    }
+
+    if (!formData.acceptPrivacyTerms) {
+      setError("Please accept the Privacy Policy and Terms & Conditions to continue.");
       return;
     }
 
@@ -1409,7 +1416,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "10px 0"
+              padding: "5px 0"
             }}
           >
             <input
@@ -1489,6 +1496,92 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
+      {/* Privacy Policy and Terms & Conditions */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div 
+            className="checkbox-field" 
+            style={{ 
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              padding: "5px 0"
+            }}
+          >
+            <input
+              type="checkbox"
+              id="privacyTerms"
+              checked={formData.acceptPrivacyTerms}
+              onChange={(e) => handleInputChange("acceptPrivacyTerms", e.target.checked)}
+              style={{ 
+                width: "18px",
+                height: "18px",
+                margin: "0",
+                cursor: "pointer"
+              }}
+            />
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
+              <label 
+                htmlFor="privacyTerms" 
+                style={{ 
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  color: "#333",
+                  margin: "0",
+                  lineHeight: "1.4",
+                  flex: 1
+                }}
+              >
+                I agree to the{" "}
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsPrivacyModalOpen(true);
+                  }}
+                  style={{
+                    color: "#034D92",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#0487d9";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#034D92";
+                  }}
+                >
+                  Privacy Policy
+                </span>
+                {" "}and{" "}
+                <span
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsTermsConditionsModalOpen(true);
+                  }}
+                  style={{
+                    color: "#034D92",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#0487d9";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#034D92";
+                  }}
+                >
+                  Terms & Conditions
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Navigation Buttons */}
       <div className="button-group">
         <button
@@ -1550,6 +1643,24 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         pdfUrl="/YCC Service Provider Agreement.pdf"
         title="YCC Service Provider Agreement"
         fileName="YCC-Service-Provider-Agreement.pdf"
+      />
+
+      {/* Privacy Policy Modal */}
+      <TermsModal
+        isOpen={isPrivacyModalOpen}
+        onClose={() => setIsPrivacyModalOpen(false)}
+        pdfUrl="/Privacy-Policy.pdf"
+        title="Yacht Crew Center Privacy Policy"
+        fileName="YCC-Privacy-Policy.pdf"
+      />
+
+      {/* Terms and Conditions Modal */}
+      <TermsModal
+        isOpen={isTermsConditionsModalOpen}
+        onClose={() => setIsTermsConditionsModalOpen(false)}
+        pdfUrl="/Terms-and-Conditions.pdf"
+        title="Yacht Crew Center Terms and Conditions"
+        fileName="YCC-Terms-and-Conditions.pdf"
       />
     </motion.div>
   );

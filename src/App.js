@@ -75,6 +75,7 @@ import ApprovePage from "./pages/dashboard/admin/approvalPage.js/approve";
 import { AuthProvider } from "./context/authContext";
 import TestApi from "./components/TestApi";
 import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
+import OrderDetails from "./pages/crew/order/details";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -267,6 +268,14 @@ function App() {
                     element={
                       <ProtectedRoute requiredRoles={["crew_member"]}>
                         <CrewOrder />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crew/orders-management/:id"
+                    element={
+                      <ProtectedRoute requiredRoles={["crew_member"]}>
+                        <OrderDetails />
                       </ProtectedRoute>
                     }
                   />
