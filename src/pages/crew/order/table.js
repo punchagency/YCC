@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaSortAmountUp, FaSortAmountDown } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "primereact/button";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -69,12 +69,6 @@ const OrderTable = ({
     return <FaSortAmountUp className="ml-1 opacity-30" />;
   };
 
-  // Function to handle view order dialog
-  const handleViewOrder = (order) => {
-    // Navigate to order details page
-    navigate(`/crew/orders/${order._id}`);
-  };
-
   // Table columns
   const columns = [
     { id: "orderId", label: "Order ID", minWidth: 120 },
@@ -137,13 +131,23 @@ const OrderTable = ({
       case "actions":
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Button
-              icon={<FiEye size={18} />}
-              className="p-button-outlined p-button-sm"
-              style={{ border: "1px solid #D0D5DD", color: "#344054", backgroundColor: "white", borderRadius: 8 }}
-              onClick={() => handleViewOrder(order)}
-              tooltip="See Details"
-            />
+            <Link 
+              to={`/crew/orders-management/${order._id}`}
+              style={{ textDecoration: 'none' }}
+            >
+              <Button
+                icon={<FiEye size={18} />}
+                className="p-button-outlined p-button-sm"
+                style={{ 
+                  border: "1px solid #D0D5DD", 
+                  color: "#344054", 
+                  backgroundColor: "white", 
+                  borderRadius: 8,
+                  transition: "all 0.2s ease"
+                }}
+                tooltip="See Details"
+              />
+            </Link>
           </Box>
         );
       default:
