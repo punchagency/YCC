@@ -56,7 +56,7 @@ const BookingsDashboard = () => {
     <Box
       paddingTop={{ xs: 0, md: 2 }}
       paddingBottom={0}
-      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-auto w-full max-w-full"
+      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen w-full max-w-full"
     >
       <Box
         paddingTop={{ xs: 0, md: 2 }}

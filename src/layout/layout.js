@@ -31,9 +31,9 @@ const AdminLayout = ({ role }) => {
     "(min-width: 1024px) and (max-width: 1024px) and (min-height: 1366px)"
   );
 
-  // General tablet detection (excluding Nest Hub)
+  // General tablet detection (excluding Nest Hub and 1024-1200px range)
   const isTablet = useMediaQuery(
-    "(min-width:600px) and (max-width:1200px) and (max-height:1365px)"
+    "(min-width:600px) and (max-width:1023px) and (max-height:1365px)"
   );
 
   // Nest Hub detection (1024 x 600) - keep left panel
@@ -41,7 +41,7 @@ const AdminLayout = ({ role }) => {
     "(min-width: 1024px) and (max-width: 1024px) and (max-height: 600px)"
   );
 
-  // Hide left panel for tablets except Nest Hub
+  // Hide left panel for tablets except Nest Hub and 1024-1200px range
   const shouldHideLeftPanel = (isTablet || isIpadPro) && !isNestHub;
 
   // Custom setPageTitle function that also handles backArrow and section tracking

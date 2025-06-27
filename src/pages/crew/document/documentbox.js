@@ -24,11 +24,14 @@ const DocumentBox = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const response = await fetch("/api/crew/documents/counts", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/crew/documents/counts`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         if (response.ok) {
           const data = await response.json();
           setCounts(data);
@@ -53,23 +56,29 @@ const DocumentBox = () => {
     }
     let result = null;
     try {
-      const response = await fetch("/api/crew/documents", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/crew/documents`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: formData,
+        }
+      );
       result = await response.json();
       setUploadResult(result);
       setShowPopup(true);
       // Refresh document counts after upload
       if (response.ok) {
-        const countRes = await fetch("/api/crew/documents/counts", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const countRes = await fetch(
+          `${process.env.REACT_APP_API_URL}/crew/documents/counts`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         if (countRes.ok) {
           const data = await countRes.json();
           setCounts(data);
@@ -119,20 +128,21 @@ const DocumentBox = () => {
   return (
     <>
       <style>{`
+        .document-card {
+          transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
+        }
+        .document-card:hover, .document-card:active, .document-card:focus {
+          box-shadow: 0 8px 24px rgba(4,135,217,0.14), 0 1.5px 6px rgba(0,0,0,0.10);
+          transform: scale(1.06);
+          background: #f0f8ff;
+          outline: none;
+        }
         @media (max-width: 600px) {
           .document-grid {
             grid-template-columns: 1fr !important;
             gap: 12px !important;
             padding: 10px !important;
           }
-        }
-        .document-card {
-          transition: box-shadow 0.2s, transform 0.2s;
-          cursor: pointer;
-        }
-        .document-card:hover {
-          box-shadow: 0 8px 24px rgba(4,135,217,0.12), 0 1.5px 6px rgba(0,0,0,0.08);
-          transform: translateY(-4px) scale(1.03);
         }
         .upload-popup {
           position: fixed;
@@ -153,6 +163,23 @@ const DocumentBox = () => {
         }
         .upload-popup-content.success h3 { color: #188A42; }
         .upload-popup-content.fail h3 { color: #EF4444; }
+        .add-document-btn {
+          border-radius: 10px;
+          padding: 10px 20px;
+          border: none;
+          cursor: pointer;
+          background: #0387D9;
+          color: #fff;
+          font-weight: 600;
+          font-size: 16px;
+          transition: all 0.18s cubic-bezier(.4,2,.6,1);
+          box-shadow: 0 1px 2px rgba(3,135,217,0.08);
+        }
+        .add-document-btn:hover:not(:disabled) {
+          background: #0ea5e9;
+          box-shadow: 0 4px 16px 0 rgba(3,135,217,0.18);
+          transform: scale(1.06);
+        }
       `}</style>
       <input
         ref={fileInputRef}
@@ -231,13 +258,7 @@ const DocumentBox = () => {
               style={{ width: "100%", marginTop: "16px" }}
             >
               <button
-                className="bg-primary text-white "
-                style={{
-                  borderRadius: "10px",
-                  padding: "10px 20px",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="add-document-btn"
                 disabled={uploading}
                 onClick={(e) => {
                   e.stopPropagation();

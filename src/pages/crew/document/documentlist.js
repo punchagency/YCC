@@ -1,6 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 import { Button } from "primereact/button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import MuiButton from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import Box from "@mui/material/Box";
+import { FiEye, FiDownload, FiTrash2 } from "react-icons/fi";
 
 const DocumentList = () => {
   const location = useLocation();
@@ -27,7 +48,9 @@ const DocumentList = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/crew/documents?category=${encodeURIComponent(category)}`,
+          `${
+            process.env.REACT_APP_API_URL
+          }/crew/documents?category=${encodeURIComponent(category)}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -55,16 +78,44 @@ const DocumentList = () => {
   // State for modals/dialogs
   const [viewDoc, setViewDoc] = useState(null); // document object or null
   const [deleteDoc, setDeleteDoc] = useState(null); // document object or null
+  const [downloading, setDownloading] = useState(false);
+
+  // Add a ref for the download anchor
+  const downloadAnchorRef = useRef(null);
+
+  const handleModalDownload = async (doc) => {
+    setDownloading(true);
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/crew/documents/${doc._id}/download-url`
+      );
+      const data = await res.json();
+      if (data.url) {
+        const anchor = document.createElement("a");
+        anchor.href = data.url;
+        anchor.setAttribute("download", doc.originalName || "document");
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+      }
+    } catch (err) {
+      alert("Failed to download file.");
+    }
+    setDownloading(false);
+  };
 
   // Handle document deletion
   const handleDeleteDocument = async (documentId) => {
     try {
-      const response = await fetch(`/api/crew/documents/${documentId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/crew/documents/${documentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       if (response.ok) {
         // Remove the document from the list
@@ -107,169 +158,553 @@ const DocumentList = () => {
 
   return (
     <div className="p-6 w-full max-w-5xl mx-auto">
-      <div className="overflow-x-auto rounded-lg shadow bg-white">
-        {documents.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">📄</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No documents found
-            </h3>
-            <p className="text-gray-500 mb-4">
-              No documents have been uploaded for the "{category}" category yet.
-            </p>
-            <Button
-              label="Go Back"
-              icon="pi pi-arrow-left"
-              onClick={() => navigate("/crew/document-management")}
-            />
-          </div>
-        ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Uploaded
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Size
-                </th>
-                <th
-                  className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  colSpan={3}
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {documents.map((doc) => (
-                <tr key={doc._id} className="hover:bg-blue-50 transition">
-                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {doc.originalName}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                    {new Date(doc.uploadedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
-                    {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
-                  </td>
-                  <td className="px-2 py-3 text-center">
-                    <Button
-                      icon="pi pi-eye"
-                      className="p-button-text"
-                      onClick={() => setViewDoc(doc)}
-                      tooltip="View"
-                    />
-                  </td>
-                  <td className="px-2 py-3 text-center">
-                    <Button
-                      icon="pi pi-trash"
-                      className="p-button-text p-button-danger"
-                      onClick={() => setDeleteDoc(doc)}
-                      tooltip="Delete"
-                    />
-                  </td>
-                  <td className="px-2 py-3 text-center">
-                    <Button
-                      icon="pi pi-download"
-                      className="p-button-text"
-                      onClick={() => window.open(doc.fileUrl, "_blank")}
-                      tooltip="Download"
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* View Document Modal */}
-      {viewDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
-              onClick={() => setViewDoc(null)}
-              aria-label="Close"
-            >
-              &times;
-            </button>
-            <h2 className="text-xl font-bold mb-2">{viewDoc.originalName}</h2>
-            <div className="mb-2 text-gray-600 text-sm">
-              <span className="mr-4">
-                Uploaded: {new Date(viewDoc.uploadedAt).toLocaleDateString()}
-              </span>
-              <span>
-                Size: {(viewDoc.fileSize / 1024 / 1024).toFixed(2)} MB
-              </span>
-            </div>
-            <div className="mb-4">
-              {viewDoc.mimeType && viewDoc.mimeType.startsWith("image/") ? (
-                <img
-                  src={viewDoc.fileUrl}
-                  alt={viewDoc.originalName}
-                  className="max-w-full max-h-80 rounded border"
-                />
-              ) : viewDoc.mimeType === "application/pdf" ? (
-                <iframe
-                  src={viewDoc.fileUrl}
-                  title={viewDoc.originalName}
-                  className="w-full h-80 border rounded"
-                />
-              ) : (
-                <div className="p-4 bg-gray-100 rounded text-gray-700">
-                  <span>No preview available for this file type.</span>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-4">
-              <Button
-                label="Download"
-                icon="pi pi-download"
-                onClick={() => window.open(viewDoc.fileUrl, "_blank")}
-              />
-              <Button
-                label="Delete"
-                icon="pi pi-trash"
-                className="p-button-danger"
-                onClick={() => {
-                  setDeleteDoc(viewDoc);
-                  setViewDoc(null);
-                }}
-              />
-            </div>
-          </div>
+      <style>{`
+      .p-6 { padding: 1rem !important;
+        padding-top: 2rem !important; }
+        @media (max-width: 600px) {
+          .p-6 { padding: 0 !important; padding-top: 0 !important; }
+          .doc-table-container { display: none; }
+          .doc-card-list { display: block; }
+          .doc-card {
+            transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
+          }
+          .doc-card:hover, .doc-card:active, .doc-card:focus {
+            box-shadow: 0 8px 24px rgba(4,135,217,0.14), 0 1.5px 6px rgba(0,0,0,0.10);
+            transform: scale(1.06);
+            background: #f0f8ff;
+            outline: none;
+          }
+        }
+        @media (min-width: 601px) {
+          .doc-table-container { display: block; }
+          .doc-card-list { display: none; }
+        }
+        .doc-card {
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          margin-bottom: 16px;
+          padding: 18px 16px 12px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          transition: box-shadow 0.18s, transform 0.18s, background 0.18s;
+        }
+        .doc-card-title {
+          font-weight: 600;
+          font-size: 16px;
+          margin-bottom: 4px;
+          color: #222;
+          word-break: break-all;
+        }
+        .doc-card-meta {
+          font-size: 13px;
+          color: #6b7280;
+          margin-bottom: 8px;
+        }
+        .doc-card-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 6px;
+        }
+      `}</style>
+      {documents.length === 0 ? (
+        <div className="empty-docs-message text-center py-12">
+          <div className="text-gray-400 text-6xl mb-4">📄</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No documents found
+          </h3>
+          <p className="text-gray-500 mb-4">
+            No documents have been uploaded for the "{category}" category yet.
+          </p>
         </div>
+      ) : (
+        <>
+          <div className="doc-table-container">
+            <TableContainer
+              component={Paper}
+              sx={{
+                borderRadius: 2,
+                boxShadow: 1,
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              <Table sx={{ fontFamily: "Inter, sans-serif" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        fontSize: 12,
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                    >
+                      Name
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        fontSize: 12,
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                    >
+                      Uploaded
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        fontSize: 12,
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                    >
+                      Size
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        fontSize: 12,
+                        fontFamily: "Inter, sans-serif",
+                        width: 160,
+                        pl: 2,
+                      }}
+                    >
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {documents.map((doc) => (
+                    <TableRow
+                      key={doc._id}
+                      hover
+                      sx={{ height: 56, fontFamily: "Inter, sans-serif" }}
+                    >
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          fontFamily: "Inter, sans-serif",
+                        }}
+                      >
+                        {doc.originalName}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: "Inter, sans-serif" }}>
+                        {new Date(doc.uploadedAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: "Inter, sans-serif" }}>
+                        {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontFamily: "Inter, sans-serif", pl: 2 }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            gap: 1,
+                            justifyContent: "flex-start",
+                          }}
+                        >
+                          <MuiButton
+                            variant="outlined"
+                            size="small"
+                            style={{
+                              border: "1px solid #D0D5DD",
+                              color: "#344054",
+                              backgroundColor: "white",
+                              borderRadius: 8,
+                              minWidth: 36,
+                              padding: 6,
+                              fontFamily: "Inter, sans-serif",
+                              transition:
+                                "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                            }}
+                            onClick={() => setViewDoc(doc)}
+                            title="View"
+                            sx={{
+                              "&:hover": {
+                                background: "#f0f4ff",
+                                color: "#1976d2",
+                                boxShadow: "0 4px 16px 0 rgba(3,135,217,0.10)",
+                                transform: "scale(1.13)",
+                              },
+                            }}
+                          >
+                            <FiEye size={18} />
+                          </MuiButton>
+                          <MuiButton
+                            variant="outlined"
+                            size="small"
+                            style={{
+                              border: "1px solid #D0D5DD",
+                              color: "#344054",
+                              backgroundColor: "white",
+                              borderRadius: 8,
+                              minWidth: 36,
+                              padding: 6,
+                              fontFamily: "Inter, sans-serif",
+                              transition:
+                                "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                            }}
+                            onClick={() => handleModalDownload(doc)}
+                            title="Download"
+                            sx={{
+                              "&:hover": {
+                                background: "#f0f4ff",
+                                color: "#1976d2",
+                                boxShadow: "0 4px 16px 0 rgba(3,135,217,0.10)",
+                                transform: "scale(1.13)",
+                              },
+                            }}
+                          >
+                            <FiDownload size={18} />
+                          </MuiButton>
+                          <MuiButton
+                            variant="outlined"
+                            size="small"
+                            style={{
+                              border: "1px solid #D0D5DD",
+                              color: "#B42318",
+                              backgroundColor: "white",
+                              borderRadius: 8,
+                              minWidth: 36,
+                              padding: 6,
+                              fontFamily: "Inter, sans-serif",
+                              transition:
+                                "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                            }}
+                            onClick={() => setDeleteDoc(doc)}
+                            title="Delete"
+                            sx={{
+                              "&:hover": {
+                                background: "#fbe9e9",
+                                color: "#B42318",
+                                boxShadow: "0 4px 16px 0 rgba(180,35,24,0.10)",
+                                transform: "scale(1.13)",
+                              },
+                            }}
+                          >
+                            <FiTrash2 size={18} />
+                          </MuiButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+          <div className="doc-card-list">
+            {documents.map((doc) => (
+              <div className="doc-card" key={doc._id}>
+                <div className="doc-card-title">{doc.originalName}</div>
+                <div className="doc-card-meta">
+                  Uploaded: {new Date(doc.uploadedAt).toLocaleDateString()}
+                  <br />
+                  Size: {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
+                </div>
+                <div className="doc-card-actions">
+                  <MuiButton
+                    variant="outlined"
+                    size="small"
+                    style={{
+                      border: "1px solid #D0D5DD",
+                      color: "#344054",
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      minWidth: 36,
+                      padding: 6,
+                      fontFamily: "Inter, sans-serif",
+                      transition:
+                        "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                    }}
+                    onClick={() => setViewDoc(doc)}
+                    title="View"
+                    sx={{
+                      "&:hover": {
+                        background: "#f0f4ff",
+                        color: "#1976d2",
+                        boxShadow: "0 4px 16px 0 rgba(3,135,217,0.10)",
+                        transform: "scale(1.13)",
+                      },
+                    }}
+                  >
+                    <FiEye size={18} />
+                  </MuiButton>
+                  <MuiButton
+                    variant="outlined"
+                    size="small"
+                    style={{
+                      border: "1px solid #D0D5DD",
+                      color: "#344054",
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      minWidth: 36,
+                      padding: 6,
+                      fontFamily: "Inter, sans-serif",
+                      transition:
+                        "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                    }}
+                    onClick={() => handleModalDownload(doc)}
+                    title="Download"
+                    sx={{
+                      "&:hover": {
+                        background: "#f0f4ff",
+                        color: "#1976d2",
+                        boxShadow: "0 4px 16px 0 rgba(3,135,217,0.10)",
+                        transform: "scale(1.13)",
+                      },
+                    }}
+                  >
+                    <FiDownload size={18} />
+                  </MuiButton>
+                  <MuiButton
+                    variant="outlined"
+                    size="small"
+                    style={{
+                      border: "1px solid #D0D5DD",
+                      color: "#B42318",
+                      backgroundColor: "white",
+                      borderRadius: 8,
+                      minWidth: 36,
+                      padding: 6,
+                      fontFamily: "Inter, sans-serif",
+                      transition:
+                        "background 0.2s, color 0.2s, box-shadow 0.18s, transform 0.18s",
+                    }}
+                    onClick={() => setDeleteDoc(doc)}
+                    title="Delete"
+                    sx={{
+                      "&:hover": {
+                        background: "#fbe9e9",
+                        color: "#B42318",
+                        boxShadow: "0 4px 16px 0 rgba(180,35,24,0.10)",
+                        transform: "scale(1.13)",
+                      },
+                    }}
+                  >
+                    <FiTrash2 size={18} />
+                  </MuiButton>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
+
+      {/* View Document Modal using Material UI Dialog */}
+      <Dialog
+        open={!!viewDoc}
+        onClose={() => setViewDoc(null)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          style: { borderRadius: 16, padding: 0 },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            m: 0,
+            p: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span
+            style={{
+              maxWidth: "80%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              fontWeight: 600,
+            }}
+          >
+            {viewDoc?.originalName}
+          </span>
+          <IconButton
+            aria-label="close"
+            onClick={() => setViewDoc(null)}
+            sx={{ color: (theme) => theme.palette.grey[500] }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent
+          dividers
+          sx={{
+            p: 3,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            minHeight: "40vh",
+            maxHeight: "60vh",
+          }}
+        >
+          {viewDoc?.mimeType && viewDoc.mimeType.startsWith("image/") ? (
+            <img
+              src={viewDoc.fileUrl}
+              alt={viewDoc.originalName}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "45vh",
+                borderRadius: 8,
+                border: "1px solid #eee",
+                display: "block",
+              }}
+            />
+          ) : viewDoc?.mimeType === "application/pdf" ? (
+            <iframe
+              src={viewDoc.fileUrl}
+              title={viewDoc.originalName}
+              style={{
+                width: "100%",
+                height: "45vh",
+                borderRadius: 8,
+                border: "1px solid #eee",
+                background: "#f9f9f9",
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                padding: 16,
+                background: "#f3f4f6",
+                borderRadius: 8,
+                color: "#374151",
+                textAlign: "center",
+                width: "100%",
+              }}
+            >
+              <span>No preview available for this file type.</span>
+            </div>
+          )}
+          <div
+            style={{
+              fontSize: 12,
+              color: "#6b7280",
+              marginTop: 16,
+              textAlign: "center",
+              width: "100%",
+            }}
+          >
+            <span style={{ marginRight: 8 }}>
+              Uploaded:{" "}
+              {viewDoc && new Date(viewDoc.uploadedAt).toLocaleDateString()}
+            </span>
+            <span>
+              Size: {viewDoc && (viewDoc.fileSize / 1024 / 1024).toFixed(2)} MB
+            </span>
+          </div>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <MuiButton
+            variant="outlined"
+            size="small"
+            startIcon={
+              downloading ? (
+                <CircularProgress size={16} />
+              ) : (
+                <i className="pi pi-download" />
+              )
+            }
+            onClick={() => handleModalDownload(viewDoc)}
+            disabled={downloading}
+          >
+            Download
+          </MuiButton>
+          <MuiButton
+            variant="contained"
+            color="error"
+            size="small"
+            startIcon={<i className="pi pi-trash" />}
+            onClick={() => {
+              setDeleteDoc(viewDoc);
+              setViewDoc(null);
+            }}
+          >
+            Delete
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      {deleteDoc && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 relative">
-            <h2 className="text-lg font-bold mb-4">Delete Document</h2>
-            <p className="mb-6">
-              Are you sure you want to delete{" "}
-              <span className="font-semibold">{deleteDoc.originalName}</span>?
-            </p>
-            <div className="flex justify-end gap-4">
-              <Button
-                label="Cancel"
-                className="p-button-text"
-                onClick={() => setDeleteDoc(null)}
-              />
-              <Button
-                label="Delete"
-                className="p-button-danger"
-                onClick={() => handleDeleteDocument(deleteDoc._id)}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog
+        open={!!deleteDoc}
+        onClose={() => setDeleteDoc(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{ style: { borderRadius: 16, padding: 0 } }}
+      >
+        <DialogTitle>Delete Document</DialogTitle>
+        <DialogContent>
+          <p>
+            Are you sure you want to delete{" "}
+            <span style={{ fontWeight: 600 }}>{deleteDoc?.originalName}</span>?
+          </p>
+        </DialogContent>
+        <DialogActions
+          sx={{ gap: 2, justifyContent: "flex-end", px: 3, pb: 2 }}
+        >
+          <MuiButton
+            onClick={() => setDeleteDoc(null)}
+            variant="contained"
+            style={{
+              background: "#e5e7eb",
+              color: "#222",
+              fontWeight: 500,
+              borderRadius: 8,
+              minWidth: 90,
+              height: 40,
+              padding: "6px 16px",
+              fontSize: 16,
+              boxShadow: "none",
+              border: "1px solid #e0e0e0",
+              cursor: "pointer",
+              textTransform: "none",
+              transition: "all 0.2s cubic-bezier(.4,2,.6,1)",
+            }}
+            sx={{
+              "&:hover": {
+                background: "#cbd5e1",
+                boxShadow: "0 4px 16px 0 rgba(0,0,0,0.10)",
+                transform: "scale(1.05)",
+                fontWeight: 600,
+              },
+            }}
+          >
+            Cancel
+          </MuiButton>
+          <MuiButton
+            onClick={() => handleDeleteDocument(deleteDoc._id)}
+            color="error"
+            variant="contained"
+            style={{
+              borderRadius: 8,
+              minWidth: 90,
+              height: 40,
+              padding: "6px 16px",
+              fontWeight: 500,
+              fontSize: 16,
+              boxShadow: "none",
+              textTransform: "none",
+              transition: "all 0.2s cubic-bezier(.4,2,.6,1)",
+            }}
+            sx={{
+              "&:hover": {
+                background: "#b91c1c",
+                boxShadow: "0 4px 16px 0 rgba(185,28,28,0.15)",
+                transform: "scale(1.05)",
+                fontWeight: 600,
+              },
+            }}
+          >
+            Delete
+          </MuiButton>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
