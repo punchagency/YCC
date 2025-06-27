@@ -1,23 +1,17 @@
-import { React } from "react";
-import DocumentSearch from "./documentsearch";
+import React, { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import DocumentBox from "./documentbox";
+
 const Document = () => {
+  const outletContext = useOutletContext();
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Crew Documents");
+    }
+  }, [outletContext]);
+
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "40px",
-              }}
-            >
-              Crew Documents
-            </h3>
-          </div>
-        </div>
-      </div>
       {/* <DocumentSearch /> */}
       <DocumentBox />
     </>

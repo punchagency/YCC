@@ -76,6 +76,8 @@ import { AuthProvider } from "./context/authContext";
 import TestApi from "./components/TestApi";
 import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
 import OrderDetails from "./pages/crew/order/details";
+import DocumentList from "./pages/crew/document/documentlist";
+import DocumentView from "./pages/crew/document/documentview";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -351,6 +353,22 @@ function App() {
                   <Route
                     path="/crew/quotes/:quoteId/payment"
                     element={<QuotePayment />}
+                  />
+                  <Route
+                    path="/crew/document-management/list"
+                    element={
+                      <ProtectedRoute requiredRoles={["crew_member"]}>
+                        <DocumentList />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/crew/document/view/:documentId"
+                    element={
+                      <ProtectedRoute requiredRoles={["crew_member"]}>
+                        <DocumentView />
+                      </ProtectedRoute>
+                    }
                   />
                 </Route>
 

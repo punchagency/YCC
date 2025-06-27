@@ -18,17 +18,7 @@ const Location = () => {
           }}
         >
           <div style={{ minWidth: 0, flex: 1 }}>
-            <h2
-              style={{
-                marginLeft: "20px",
-                wordBreak: "break-word",
-                fontSize: 22,
-                marginBottom: 8,
-                maxWidth: "100%",
-              }}
-            >
-              Crew Accomodation
-            </h2>
+            {/* Removed <h2>Crew Accomodation</h2> to avoid duplicate page title */}
           </div>
           <div
             style={{

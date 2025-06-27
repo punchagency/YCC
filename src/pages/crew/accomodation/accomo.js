@@ -1,24 +1,19 @@
-import { React } from "react";
+import React, { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import Location from "./location";
 import Rooms from "./rooms";
 
 const Accomodation = () => {
+  const outletContext = useOutletContext();
+
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Crew Accommodation");
+    }
+  }, [outletContext]);
+
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "40px",
-              }}
-            >
-              Accomodation
-            </h3>
-          </div>
-        </div>
-      </div>
       <Location />
       <Rooms />
     </>
