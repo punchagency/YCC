@@ -38,6 +38,7 @@ import { getOrderById } from "../../../services/crew/crewOrderService"
 import { formatCurrency } from "../../../utils/formatters"
 import { exportOrderToPDF } from "../../../utils/pdfUtils"
 import { useToast } from "../../../context/toast/toastContext"
+import OrderDetailsSkeleton from '../../../components/CrewOrderSkeletons/OrderDetailsSkeleton'
 
 // Styled components for custom design
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -258,18 +259,7 @@ const OrderDetails = () => {
   }
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "400px",
-        }}
-      >
-        <CircularProgress sx={{ color: "#0387D9" }} />
-      </Box>
-    )
+    return <OrderDetailsSkeleton />;
   }
 
   // Error state
