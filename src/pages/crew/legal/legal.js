@@ -1,26 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import LegalSearch from "./legalsearch";
 import LegalBoxes from "./legalboxes";
 
 const Inventory = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const outletContext = useOutletContext();
+
+  // Set the page title using the shared layout context if available
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Legal Resources");
+    }
+  }, [outletContext]);
+
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "40px",
-              }}
-            >
-              Crew Portal
-            </h3>
-          </div>
-        </div>
-      </div>
       <LegalSearch
         selectedCountry={selectedCountry}
         setSelectedCountry={setSelectedCountry}

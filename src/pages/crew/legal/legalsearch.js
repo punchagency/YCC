@@ -128,7 +128,7 @@ const LegalSearch = ({
             className="legal-search-header"
             style={{ width: "95%", marginLeft: "20px" }}
           >
-            <h2>Legal Resources</h2>
+            {/* Removed <h2>Legal Resources</h2> to avoid double title bar */}
           </div>
           <div className="flex align-items-center">
             <div
