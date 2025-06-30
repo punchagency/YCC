@@ -13,10 +13,12 @@ import {
 import { Close as CloseIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { searchProducts, addToCart, getProductCategories } from '../../../../services/crew/cartService';
+import { useCart } from "../../../../context/cart/cartContext";
 import SearchInterface from './SearchInterface';
 
 const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const navigate = useNavigate();
+  const { addToCart: addToCartContext } = useCart();
   
   // Search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,11 +120,9 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
       });
 
       if (response.status) {
+        // Update cart context with the new quantity
+        addToCartContext(quantity);
         showNotification('Product added to cart successfully', 'success');
-        // You can emit an event to update cart badge in header
-        if (window.updateCartBadge) {
-          window.updateCartBadge();
-        }
       } else {
         showNotification(response.message || 'Failed to add to cart', 'error');
       }

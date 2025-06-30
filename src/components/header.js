@@ -12,6 +12,7 @@ import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
 import { Store, Bell, ShoppingCart } from "lucide-react";
 import { useUser } from "../context/userContext";
+import { useCart } from "../context/cart/cartContext";
 import { checkPendingVendors } from "../services/admin/adminService";
 import { getNotifications } from "../services/notification/notificationService";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -20,6 +21,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
+  const { cartCount, loading: cartCountLoading } = useCart();
 
   // Debug: Log user data
   console.log("Header - User data:", {
@@ -495,27 +497,47 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                       color: "#0387D9",
                     }}
                   />
-                  {/* Cart item count badge - will be implemented later */}
-                  {/* <div
-                    style={{
-                      position: "absolute",
-                      top: "8px",
-                      right: "4px",
-                      width: "12px",
-                      height: "12px",
-                      backgroundColor: "#FF4B4B",
-                      borderRadius: "50%",
-                      border: "2px solid #fff",
-                      fontSize: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    0
-                  </div> */}
+                  {/* Cart item count badge */}
+                  {cartCountLoading ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "2px",
+                        width: "16px",
+                        height: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                    </div>
+                  ) : cartCount > 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "2px",
+                        minWidth: "16px",
+                        height: "16px",
+                        backgroundColor: "#FF4B4B",
+                        borderRadius: "50%",
+                        border: "2px solid #fff",
+                        fontSize: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: "bold",
+                        padding: "0 4px",
+                        zIndex: 2,
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </div>
+                  )}
                 </button>
               )}
 
@@ -801,27 +823,47 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 color: "#0387D9",
               }}
             />
-            {/* Cart item count badge - will be implemented later */}
-            {/* <div
-              style={{
-                position: "absolute",
-                top: "8px",
-                right: "4px",
-                width: "12px",
-                height: "12px",
-                backgroundColor: "#FF4B4B",
-                borderRadius: "50%",
-                border: "2px solid #fff",
-                fontSize: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontWeight: "bold",
-              }}
-            >
-              0
-            </div> */}
+            {/* Cart item count badge */}
+            {cartCountLoading ? (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "6px",
+                  right: "2px",
+                  width: "16px",
+                  height: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+              </div>
+            ) : cartCount > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "6px",
+                  right: "2px",
+                  minWidth: "16px",
+                  height: "16px",
+                  backgroundColor: "#FF4B4B",
+                  borderRadius: "50%",
+                  border: "2px solid #fff",
+                  fontSize: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                  padding: "0 4px",
+                  zIndex: 2,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                }}
+              >
+                {cartCount > 99 ? '99+' : cartCount}
+              </div>
+            )}
           </button>
         )}
 
