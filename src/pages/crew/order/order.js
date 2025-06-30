@@ -173,9 +173,9 @@ const Order = () => {
   return (
     <>
       <div className="lg:p-4">
-        {/* <div className="text-right">
+        <div className="text-right">
           {createOrdersButton()}
-        </div> */}
+        </div>
 
         {/* ActiveOrders component with status counts */}
         <ActiveOrders 
