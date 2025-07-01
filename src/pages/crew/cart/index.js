@@ -22,6 +22,7 @@ import {
   CircularProgress,
   useTheme,
   useMediaQuery,
+  Tooltip,
 } from '@mui/material';
 import {
   ShoppingCart as ShoppingCartIcon,
@@ -47,6 +48,14 @@ import {
 import { useToast } from '../../../context/toast/toastContext';
 import { useCart } from '../../../context/cart/cartContext';
 import CartSkeleton from '../../../components/CartSkeleton';
+import { keyframes } from '@mui/system';
+
+// Pulse animation for badge
+const pulse = keyframes`
+  0% { box-shadow: 0 0 0 0 rgba(3,135,217,0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(3,135,217,0); }
+  100% { box-shadow: 0 0 0 0 rgba(3,135,217,0); }
+`;
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -430,21 +439,22 @@ const CartPage = () => {
         gap: 2
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600, color: '#111827' }}>
-            Shopping Cart
-          </Typography>
-          <Badge 
-            badgeContent={cart.totalItems} 
-            color="primary"
-            sx={{
-              '& .MuiBadge-badge': {
-                backgroundColor: '#0387D9',
-                color: 'white',
-              }
-            }}
-          >
-            <ShoppingCartIcon sx={{ color: '#0387D9' }} />
-          </Badge>
+          <Tooltip title={`You have ${cart.totalItems} item${cart.totalItems !== 1 ? 's' : ''} in your cart`} arrow>
+            <Badge
+              badgeContent={cart.totalItems}
+              color="primary"
+              sx={{
+                '& .MuiBadge-badge': {
+                  backgroundColor: '#0387D9',
+                  color: 'white',
+                  animation: cart.totalItems > 0 ? `${pulse} 1.2s infinite` : 'none',
+                  boxShadow: cart.totalItems > 0 ? '0 0 0 4px rgba(3,135,217,0.15)' : 'none',
+                }
+              }}
+            >
+              <ShoppingCartIcon sx={{ color: '#0387D9' }} />
+            </Badge>
+          </Tooltip>
         </Box>
         
         <Button
