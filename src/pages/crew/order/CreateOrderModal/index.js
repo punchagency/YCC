@@ -12,7 +12,8 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { searchProducts, addToCart, getProductCategories } from '../../../../services/crew/cartService';
+import { addToCart } from '../../../../services/crew/cartService';
+import { searchProducts, getProductCategories } from '../../../../services/order/orderService';
 import { useCart } from "../../../../context/cart/cartContext";
 import SearchInterface from './SearchInterface';
 
