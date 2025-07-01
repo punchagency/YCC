@@ -264,7 +264,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
           </Box>
         </DialogTitle>
         
-        <DialogContent sx={{ p: 0 }}>
+        <DialogContent sx={{ p: { xs: 1, md: 0 } }}>
           <SearchInterface
             searchQuery={searchQuery}
             searchResults={searchResults}

@@ -363,7 +363,7 @@ const CartPage = () => {
   // Error state
   if (error) {
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
+      <Box sx={{ p: { xs: 2, md: 3 }, textAlign: 'center' }}>
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
@@ -382,7 +382,7 @@ const CartPage = () => {
   if (!cart || cart.supplierGroups.length === 0) {
     return (
       <Box sx={{ 
-        p: 3, 
+        p: { xs: 2, md: 3 }, 
         display: 'flex', 
         flexDirection: 'column', 
         alignItems: 'center', 
@@ -392,7 +392,7 @@ const CartPage = () => {
         <Box sx={{ 
           textAlign: 'center', 
           maxWidth: 400,
-          p: 4,
+          p: { xs: 3, md: 4 },
           borderRadius: 3,
           backgroundColor: 'rgba(255, 255, 255, 0.7)',
           backdropFilter: 'blur(8px)',
@@ -428,7 +428,7 @@ const CartPage = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1, md: 3 } }}>
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
@@ -482,7 +482,7 @@ const CartPage = () => {
             <StyledCard key={supplierIndex}>
               <CardContent sx={{ p: 0 }}>
                 {/* Supplier Header */}
-                <Box sx={{ p: 3, pb: 2 }}>
+                <Box sx={{ p: { xs: 2, md: 3 }, pb: { xs: 1, md: 2 } }}>
                   <Box sx={{ 
                     display: 'flex', 
                     justifyContent: 'space-between', 
@@ -524,7 +524,7 @@ const CartPage = () => {
                       <Box sx={{ 
                         display: 'flex', 
                         alignItems: 'center', 
-                        p: 2, 
+                        p: { xs: 1.5, md: 2 }, 
                         gap: 2,
                         flexWrap: 'wrap'
                       }}>

@@ -19,7 +19,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 const CartItemSkeleton = () => (
-  <Box sx={{ display: "flex", alignItems: "center", p: 2, gap: 2 }}>
+  <Box sx={{ display: "flex", alignItems: "center", p: { xs: 1.5, md: 2 }, gap: 2 }}>
     <Skeleton
       variant="rectangular"
       width={80}
@@ -45,7 +45,7 @@ const CartItemSkeleton = () => (
 const SupplierGroupSkeleton = () => (
   <StyledCard>
     <CardContent sx={{ p: 0 }}>
-      <Box sx={{ p: 3, pb: 2 }}>
+      <Box sx={{ p: { xs: 2, md: 3 }, pb: { xs: 1, md: 2 } }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Box sx={{ flex: 1 }}>
             <Skeleton variant="text" width="40%" height={28} sx={{ mb: 1 }} />
@@ -104,7 +104,7 @@ const CartSummarySkeleton = () => (
 
 const CartSkeleton = () => {
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 1, md: 3 } }}>
       {/* Header Skeleton */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>

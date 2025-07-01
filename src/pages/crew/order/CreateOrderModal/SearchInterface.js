@@ -88,7 +88,7 @@ const SearchInterface = ({
         alignItems: 'center',
         justifyContent: 'center',
         py: 8,
-        px: 3,
+        px: 1,
         textAlign: 'center',
         minHeight: 300
       }}
