@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
-import { Menu } from "primereact/menu";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTheme } from "../context/theme/themeContext";
@@ -9,12 +8,11 @@ import TopNav from "./TopNav";
 import GlobalSearchModal from "./GlobalSearchModal";
 import hamburger from "../assets/images/crew/hamburger.png";
 import searchLogo from "../assets/images/crew/searchLogo.png";
-import share from "../assets/images/crew/share.png";
-import icon from "../assets/images/crew/Icon.png";
 import manprofile from "../assets/images/crew/manprofile.png";
 import "./header.css";
-import { Store, Bell } from "lucide-react";
+import { Store, Bell, ShoppingCart } from "lucide-react";
 import { useUser } from "../context/userContext";
+import { useCart } from "../context/cart/cartContext";
 import { checkPendingVendors } from "../services/admin/adminService";
 import { getNotifications } from "../services/notification/notificationService";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -23,6 +21,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
+  const { cartCount, loading: cartCountLoading } = useCart();
 
   // Debug: Log user data
   console.log("Header - User data:", {
@@ -470,6 +469,78 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                 </button>
               )}
 
+              {/* Cart Icon - Only show for crew members */}
+              {userRole === "crew_member" && (
+                <button
+                  onClick={() => navigate("/crew/cart")}
+                  className="cart-btn"
+                  aria-label="Shopping Cart"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "40px",
+                    height: "40px",
+                    background: "transparent",
+                    border: "none",
+                    borderRadius: "50%",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    padding: "8px",
+                    position: "relative",
+                  }}
+                >
+                  <ShoppingCart
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      color: "#0387D9",
+                    }}
+                  />
+                  {/* Cart item count badge */}
+                  {cartCountLoading ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "2px",
+                        width: "16px",
+                        height: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                    </div>
+                  ) : cartCount > 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "6px",
+                        right: "2px",
+                        minWidth: "16px",
+                        height: "16px",
+                        backgroundColor: "#FF4B4B",
+                        borderRadius: "50%",
+                        border: "2px solid #fff",
+                        fontSize: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontWeight: "bold",
+                        padding: "0 4px",
+                        zIndex: 2,
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                      }}
+                    >
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </div>
+                  )}
+                </button>
+              )}
+
               {/* Bell Icon */}
               <button
                 className="notifications-btn"
@@ -720,6 +791,78 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   border: "2px solid #fff",
                 }}
               />
+            )}
+          </button>
+        )}
+
+        {/* Cart Icon - Only show on desktop for crew members */}
+        {!isMobile && userRole === "crew_member" && (
+          <button
+            onClick={() => navigate("/crew/cart")}
+            className="cart-btn"
+            aria-label="Shopping Cart"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "40px",
+              height: "40px",
+              background: "transparent",
+              border: "none",
+              borderRadius: "50%",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              padding: "8px",
+              position: "relative",
+            }}
+          >
+            <ShoppingCart
+              style={{
+                width: "24px",
+                height: "24px",
+                color: "#0387D9",
+              }}
+            />
+            {/* Cart item count badge */}
+            {cartCountLoading ? (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "6px",
+                  right: "2px",
+                  width: "16px",
+                  height: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+              </div>
+            ) : cartCount > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "6px",
+                  right: "2px",
+                  minWidth: "16px",
+                  height: "16px",
+                  backgroundColor: "#FF4B4B",
+                  borderRadius: "50%",
+                  border: "2px solid #fff",
+                  fontSize: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                  padding: "0 4px",
+                  zIndex: 2,
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                }}
+              >
+                {cartCount > 99 ? '99+' : cartCount}
+              </div>
             )}
           </button>
         )}
