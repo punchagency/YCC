@@ -1198,63 +1198,66 @@ const Order = () => {
   const observer = useRef();
 
   // Modify the fetchSuppliers function to support infinite scroll
-  const fetchSuppliers = useCallback(async (page = 1, append = false) => {
-    try {
-      setLoadingSuppliers(true);
-      const response = await getSuppliersWithInventories({
-        page,
-        limit: supplierPagination.pageSize,
-      });
-
-      if (response.status) {
-        console.log("Received suppliers data:", response.data);
-        const validatedSuppliers = response.data.map((supplier) => {
-          console.log("Processing supplier:", supplier);
-          return {
-            _id: supplier?._id,
-            businessName: supplier?.businessName || "Unnamed Business",
-            user: {
-              email: supplier?.user?.email || "No email available",
-            },
-            serviceAreas: supplier?.serviceAreas || [],
-            department: supplier?.department || "No department",
-            totalProducts: supplier?.totalProducts || 0,
-            totalStock: supplier?.totalStock || 0,
-            inventories:
-              supplier?.inventories?.map((inv) => ({
-                _id: inv?._id,
-                product: {
-                  _id: inv?.product?._id,
-                  name: inv?.product?.name || "Unnamed Product",
-                  category: inv?.product?.category || "No category",
-                  sku: inv?.product?.sku || "No SKU",
-                  description: inv?.product?.description,
-                  serviceArea: inv?.product?.serviceArea,
-                },
-                price: inv?.price || 0,
-                quantity: inv?.quantity || 0,
-                productImage: inv?.productImage,
-              })) || [],
-          };
+  const fetchSuppliers = useCallback(
+    async (page = 1, append = false) => {
+      try {
+        setLoadingSuppliers(true);
+        const response = await getSuppliersWithInventories({
+          page,
+          limit: supplierPagination.pageSize,
         });
 
-        setSuppliers((prev) =>
-          append ? [...prev, ...validatedSuppliers] : validatedSuppliers
-        );
-        setSupplierPagination(response.pagination);
-        setHasMore(
-          response.pagination.currentPage < response.pagination.totalPages
-        );
-      } else {
-        showError(response.error || "Failed to fetch suppliers");
+        if (response.status) {
+          console.log("Received suppliers data:", response.data);
+          const validatedSuppliers = response.data.map((supplier) => {
+            console.log("Processing supplier:", supplier);
+            return {
+              _id: supplier?._id,
+              businessName: supplier?.businessName || "Unnamed Business",
+              user: {
+                email: supplier?.user?.email || "No email available",
+              },
+              serviceAreas: supplier?.serviceAreas || [],
+              department: supplier?.department || "No department",
+              totalProducts: supplier?.totalProducts || 0,
+              totalStock: supplier?.totalStock || 0,
+              inventories:
+                supplier?.inventories?.map((inv) => ({
+                  _id: inv?._id,
+                  product: {
+                    _id: inv?.product?._id,
+                    name: inv?.product?.name || "Unnamed Product",
+                    category: inv?.product?.category || "No category",
+                    sku: inv?.product?.sku || "No SKU",
+                    description: inv?.product?.description,
+                    serviceArea: inv?.product?.serviceArea,
+                  },
+                  price: inv?.price || 0,
+                  quantity: inv?.quantity || 0,
+                  productImage: inv?.productImage,
+                })) || [],
+            };
+          });
+
+          setSuppliers((prev) =>
+            append ? [...prev, ...validatedSuppliers] : validatedSuppliers
+          );
+          setSupplierPagination(response.pagination);
+          setHasMore(
+            response.pagination.currentPage < response.pagination.totalPages
+          );
+        } else {
+          showError(response.error || "Failed to fetch suppliers");
+        }
+      } catch (error) {
+        console.error("Error fetching suppliers:", error);
+        showError("Failed to fetch suppliers");
+      } finally {
+        setLoadingSuppliers(false);
       }
-    } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      showError("Failed to fetch suppliers");
-    } finally {
-      setLoadingSuppliers(false);
-    }
-  }, [supplierPagination.pageSize, showError]); // Add dependencies
+    },
+    [supplierPagination.pageSize, showError]
+  ); // Add dependencies
 
   // Add this function to handle infinite scroll
   const lastSupplierElementRef = useCallback(
@@ -1492,8 +1495,24 @@ const Order = () => {
   };
 
   const { setPageTitle } = useOutletContext() || {};
+
+  // Set page title and add event listener for create order button
   useEffect(() => {
     if (setPageTitle) setPageTitle("Orders");
+
+    // Add event listener for create order button in title bar
+    const handleCreateOrderModal = () => {
+      handleCreateOrderClick();
+    };
+
+    window.addEventListener("openCreateOrderModal", handleCreateOrderModal);
+
+    return () => {
+      window.removeEventListener(
+        "openCreateOrderModal",
+        handleCreateOrderModal
+      );
+    };
   }, [setPageTitle]);
 
   return loading ? (
@@ -1514,16 +1533,6 @@ const Order = () => {
           backgroundColor: "#F8FBFF",
         }}
       >
-        <div className="create-order-button-container">
-          <button
-            onClick={handleCreateOrderClick}
-            className="create-order-button"
-          >
-            <img src={neworder} alt="neworder" />
-            <span>Create New Order</span>
-          </button>
-        </div>
-
         <div>
           {isMobile ? (
             // Mobile view for summary boxes

@@ -78,6 +78,7 @@ import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
 import OrderDetails from "./pages/crew/order/details";
 import DocumentList from "./pages/crew/document/documentlist";
 import DocumentView from "./pages/crew/document/documentview";
+import EditInventory from "./pages/invent/edit-inventory";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -205,6 +206,10 @@ function App() {
                   <Route
                     path="/admin/inventory-management/:inventoryId"
                     element={<Invent />}
+                  />
+                  <Route
+                    path="/admin/inventory-management/edit/:id"
+                    element={<EditInventory />}
                   />
                   <Route
                     path="/admin/financial-management"

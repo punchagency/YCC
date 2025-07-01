@@ -1,16 +1,56 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
 import {
   useNavigate,
   useParams,
   useLocation,
   useOutletContext,
 } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
 
-import { InputText } from "primereact/inputtext";
-import { Toast } from "primereact/toast";
+import sort from "../../assets/images/crew/sort.png";
+import editLogo from "../../assets/images/crew/editLogo.png";
+import deleteLogo from "../../assets/images/crew/deleteLogo.png";
+import eyesIn from "../../assets/images/crew/eyes-in.png";
+import { useTheme } from "../../context/theme/themeContext";
+
+import { TableSkeleton } from "../../components/TableSkeleton";
+import { Pagination } from "../../components/pagination";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  IconButton,
+  Paper,
+  Tooltip,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Button,
+  Autocomplete,
+} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import RemoveIcon from "@mui/icons-material/Remove";
+
 import {
   createInventoryData,
   getAllInventories,
@@ -18,19 +58,8 @@ import {
   deleteInventoryItem,
   getInventoryItemById,
   sendInventoryEmail,
+  getAllSuppliers,
 } from "../../services/inventory/inventoryService";
-
-import sort from "../../assets/images/crew/sort.png";
-import editLogo from "../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../assets/images/crew/deleteLogo.png";
-// import plus from "../../assets/images/crew/plus.png";
-import eyesIn from "../../assets/images/crew/eyes-in.png";
-// import { ProgressSpinner } from "primereact/progressspinner";
-import { useTheme } from "../../context/theme/themeContext";
-import { Paginator } from "primereact/paginator";
-import { Dropdown } from "primereact/dropdown";
-
-import { TableSkeleton } from "../../components/TableSkeleton";
 
 const InventoryTableSkeleton = () => {
   const { theme } = useTheme();
@@ -66,7 +95,6 @@ const InventoryTableSkeleton = () => {
 };
 
 const Invent = () => {
-  const toast = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { inventoryId } = useParams(); // Get inventory ID from URL params
@@ -107,7 +135,12 @@ const Invent = () => {
     serviceArea: "",
     stockQuantity: "",
     price: "",
+    supplier: "",
   });
+
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [suppliersLoading, setSuppliersLoading] = useState(false);
 
   const { theme } = useTheme();
 
@@ -124,13 +157,74 @@ const Invent = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   // Add these state variables
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observer = useRef();
   const [totalItems, setTotalItems] = useState(0);
 
   const { setPageTitle } = useOutletContext() || {};
+
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+
+  const [saveError, setSaveError] = useState("");
+
+  // Add after other useState declarations
+  const [stockStatusFilter, setStockStatusFilter] = useState("all");
+
+  // Add this state variable for the dropdown open/close
+  const [stockStatusDropdownOpen, setStockStatusDropdownOpen] = useState(false);
+
+  // Add this state to the Invent component
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  // Helper to get stock status
+  const getStockStatus = (quantity) => {
+    if (quantity >= 100) return "high";
+    if (quantity >= 50) return "medium";
+    return "low";
+  };
+
+  // Filtered items based on stock status
+  const filteredInventoryItems =
+    stockStatusFilter === "all"
+      ? inventoryItems
+      : inventoryItems.filter(
+          (item) => getStockStatus(item.stockQuantity) === stockStatusFilter
+        );
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedItems(inventoryItems.map((item) => item.id));
+      setSelectAll(true);
+    } else {
+      setSelectedItems([]);
+      setSelectAll(false);
+    }
+  };
+
+  const handleSelectItem = (id) => {
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  const onPageChange = (event, newPage) => {
+    setPage(newPage);
+    // Fetch new page data here if needed
+  };
+
+  const onRowsPerPageChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+    // Fetch new page data here if needed
+  };
 
   // Add this function to handle infinite scroll
   const lastInventoryElementRef = useCallback(
@@ -228,48 +322,38 @@ const Invent = () => {
 
         console.log("Formatted Items:", formattedItems);
 
+        if (formattedItems.length === 0 && pageNum > 1) {
+          setPage(pageNum - 2); // Go back to previous page (zero-based)
+          return;
+        }
+
         if (pageNum === 1) {
           setInventoryItems(formattedItems);
         } else {
           setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
         }
 
-        // Update total items count
-        setTotalItems(result.total || 0);
+        // Update total items count from pagination data
+        const totalItems = result.pagination?.totalItems || 0;
+        setTotalItems(totalItems);
 
-        // Check if we have more items to load
-        const hasMoreItems =
-          formattedItems.length === 10 && pageNum * 10 < (result.total || 0);
+        // Check if we have more items to load using pagination data
+        const hasMoreItems = result.pagination?.hasNextPage || false;
         setHasMore(hasMoreItems);
         setPage(pageNum);
 
         console.log("Updated state:", {
           items: formattedItems.length,
-          total: result.total,
+          total: totalItems,
           hasMore: hasMoreItems,
           currentPage: pageNum,
+          pagination: result.pagination,
         });
       } else {
         console.error("Failed to load inventory data:", result.error);
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to load inventory data",
-            life: 3000,
-          });
-        }
       }
     } catch (error) {
       console.error("Error fetching inventory data:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An error occurred while fetching inventory data",
-          life: 3000,
-        });
-      }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -303,13 +387,6 @@ const Invent = () => {
       </div>
     );
   };
-
-  // const goCrewDashboardPage = () => {
-  //   navigate("/crew/dashboard");
-  // };
-  // const goInventorySummaryPage = () => {
-  //   navigate("/crew/inventory/summary");
-  // };
 
   // Handle window resize
   useEffect(() => {
@@ -369,38 +446,12 @@ const Invent = () => {
         updatedItems[editItem.index] = updatedItem;
         setInventoryItems(updatedItems);
 
-        // Show success message
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product updated successfully",
-            life: 3000,
-          });
-        }
-
         setShowEditModal(false);
       } else {
-        // Show error message
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to update product",
-            life: 3000,
-          });
-        }
+        console.error("Failed to update product:", result.error);
       }
     } catch (error) {
       console.error("Error updating product:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while updating the product",
-          life: 3000,
-        });
-      }
     } finally {
       setIsLoading(false);
     }
@@ -426,29 +477,11 @@ const Invent = () => {
         setInventoryItems((prevItems) =>
           prevItems.filter((_, index) => index !== itemToDelete.index)
         );
-
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Product deleted successfully",
-          life: 3000,
-        });
       } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to delete product",
-          life: 3000,
-        });
+        console.error("Failed to delete product:", result.error);
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while deleting the product",
-        life: 3000,
-      });
     } finally {
       setIsLoading(false);
       setShowDeleteConfirmation(false);
@@ -457,7 +490,11 @@ const Invent = () => {
   };
 
   const handleAddProduct = () => {
+    console.log("=== handleAddProduct called ===");
+    console.log("Current showAddModal state:", showAddModal);
+    console.log("Setting showAddModal to true");
     setShowAddModal(true);
+    console.log("showAddModal should now be true");
   };
 
   // Add this function to handle image selection
@@ -478,20 +515,12 @@ const Invent = () => {
   // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
     if (!newItem.productName || !newItem.category || !newItem.serviceArea) {
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Product name, category, and service area are required",
-          life: 3000,
-        });
-      } else {
-        alert("Product name, category, and service area are required");
-      }
+      setSaveError("Product name, category, and service area are required");
       return;
     }
 
     setIsLoading(true);
+    setSaveError("");
 
     try {
       // Create a FormData object for file upload
@@ -501,6 +530,9 @@ const Invent = () => {
       formData.append("serviceArea", newItem.serviceArea);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
+      if (newItem.supplier) {
+        formData.append("supplierId", newItem.supplier);
+      }
 
       // Append the image file if one was selected
       if (productImage) {
@@ -513,18 +545,6 @@ const Invent = () => {
       const result = await createInventoryData(formData);
 
       if (result.success) {
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Inventory added successfully",
-            life: 3000,
-          });
-        } else {
-          alert("Inventory added successfully");
-        }
-
-        // Add the new product to the beginning of the array instead of the end
         const responseData = result.data.data;
         const product = {
           id: responseData._id,
@@ -551,29 +571,14 @@ const Invent = () => {
 
         setShowAddModal(false);
       } else {
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to add inventory",
-            life: 3000,
-          });
-        } else {
-          alert(result.error || "Failed to add inventory");
-        }
+        setSaveError(
+          result.error || "Failed to add inventory. Please try again."
+        );
+        console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
+      setSaveError("An unexpected error occurred. Please try again.");
       console.error("Error adding inventory:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An error occurred while adding inventory",
-          life: 3000,
-        });
-      } else {
-        alert("An error occurred while adding inventory");
-      }
     } finally {
       setIsLoading(false);
     }
@@ -645,21 +650,10 @@ const Invent = () => {
         setViewItem(item);
         setShowViewModal(true);
       } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to load inventory item",
-          life: 3000,
-        });
+        console.error("Failed to load inventory item:", result.error);
       }
     } catch (error) {
       console.error("Error fetching inventory item:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error loading inventory item",
-        life: 3000,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -693,13 +687,8 @@ const Invent = () => {
   };
 
   const handleEmailSubmit = async () => {
-    if (!emailData.to || !emailData.subject || !emailData.message) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Please fill in all required fields",
-        life: 3000,
-      });
+    if (!emailData.to || !emailData.subject || !emailData.message.trim()) {
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -712,34 +701,25 @@ const Invent = () => {
       );
 
       if (result.success) {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Email sent successfully",
-          life: 3000,
-        });
         setShowEmailModal(false);
-        setEmailData({
-          to: "",
-          subject: "",
-          message: "",
-          productName: "",
+        setEmailData({ to: "", subject: "", message: "", productName: "" });
+        setSnackbar({
+          open: true,
+          message: "Email sent successfully!",
+          severity: "success",
         });
       } else {
-        toast.current.show({
+        setSnackbar({
+          open: true,
+          message: "Failed to send email.",
           severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to send email",
-          life: 3000,
         });
       }
     } catch (error) {
-      console.error("Error sending email:", error);
-      toast.current.show({
+      setSnackbar({
+        open: true,
+        message: "An error occurred while sending email.",
         severity: "error",
-        summary: "Error",
-        detail: "An error occurred while sending the email",
-        life: 3000,
       });
     } finally {
       setIsSendingEmail(false);
@@ -750,124 +730,134 @@ const Invent = () => {
   const renderMobileInventoryCards = () => {
     return (
       <div style={{ padding: "0 10px" }}>
-        {inventoryItems.map((item, index) => (
-          <div
-            key={index}
-            ref={
-              index === inventoryItems.length - 1
-                ? lastInventoryElementRef
-                : null
-            }
-            style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "12px",
-              marginBottom: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-            }}
-          >
+        {inventoryItems
+          .slice(page * pageSize, page * pageSize + pageSize)
+          .map((item, index) => (
             <div
+              key={index}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "8px",
+                backgroundColor: "white",
+                borderRadius: "8px",
+                padding: "12px",
+                marginBottom: "10px",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                }}
-              >
-                {item.productName}
-              </h3>
               <div
                 style={{
                   display: "flex",
-                  gap: "10px",
+                  justifyContent: "space-between",
+                  marginBottom: "8px",
                 }}
               >
-                <img
-                  src={eyesIn}
-                  alt="view"
+                <h3
                   style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
+                    margin: 0,
+                    fontSize: "16px",
+                    fontWeight: "bold",
                   }}
-                  onClick={() => handleViewItem(item)}
-                />
-                <img
-                  src={editLogo}
-                  alt="edit"
+                >
+                  {item.productName}
+                </h3>
+                <div
                   style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
+                    display: "flex",
+                    gap: "10px",
                   }}
-                  onClick={() => handleEdit(index)}
-                />
-                <img
-                  src={deleteLogo}
-                  alt="delete"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleDelete(index)}
-                />
+                >
+                  <img
+                    src={eyesIn}
+                    alt="view"
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleViewItem(item)}
+                  />
+                  <img
+                    src={editLogo}
+                    alt="edit"
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleEdit(index)}
+                  />
+                  <img
+                    src={deleteLogo}
+                    alt="delete"
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleDelete(index)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "8px",
-                fontSize: "14px",
-              }}
-            >
-              <div>
-                <span style={{ color: "#666" }}>Category: </span>
-                <span>{item.category}</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Area: </span>
-                <span>{item.serviceArea}</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Stock: </span>
-                <span>{item.stockQuantity} units</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Price: </span>
-                <span>${item.price.toFixed(2)}</span>
-              </div>
-            </div>
-
-            {/* Add Send Email button */}
-            <div style={{ marginTop: "10px" }}>
-              <button
+              <div
                 style={{
-                  padding: "8px 12px",
-                  borderRadius: "5px",
-                  backgroundColor: "#0387D9",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  width: "100%",
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "8px",
+                  fontSize: "14px",
                 }}
-                onClick={() => handleSendEmail(item)}
               >
-                Send Email
-              </button>
+                <div>
+                  <span style={{ color: "#666" }}>Category: </span>
+                  <span>{item.category}</span>
+                </div>
+                <div>
+                  <span style={{ color: "#666" }}>Area: </span>
+                  <span>{item.serviceArea}</span>
+                </div>
+                <div>
+                  <span style={{ color: "#666" }}>Stock: </span>
+                  <span>{item.stockQuantity} units</span>
+                </div>
+                <div>
+                  <span style={{ color: "#666" }}>Price: </span>
+                  <span>${item.price.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Add Send Email button */}
+              <div style={{ marginTop: "10px" }}>
+                <button
+                  style={{
+                    padding: "8px 12px",
+                    borderRadius: "5px",
+                    backgroundColor: "#0387D9",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                    width: "100%",
+                  }}
+                  onClick={() => handleSendEmail(item)}
+                >
+                  Send Email
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+
+        {/* Pagination always visible with margin */}
+        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Pagination
+            currentPage={page + 1}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            onPageChange={(newPage) => setPage(newPage - 1)}
+            isMobile={true}
+          />
+        </Box>
+
         {renderLoadingIndicator()}
       </div>
     );
@@ -898,17 +888,6 @@ const Invent = () => {
           style={{ textAlign: "center", padding: "2rem" }}
         >
           <p>No inventory items found. Add your first product!</p>
-          <Button
-            label="Add New Product"
-            icon="pi pi-plus"
-            onClick={handleAddProduct}
-            style={{
-              backgroundColor: "#0387D9",
-              border: "none",
-              borderRadius: "5px",
-              marginTop: "1rem",
-            }}
-          />
         </div>
       );
     }
@@ -956,258 +935,410 @@ const Invent = () => {
   // Modify the desktop view to include the loading indicator
   const renderDesktopView = () => {
     return (
-      <div className="inventory-summary">
-        <table className="inventory-header-table">
-          <thead>
-            <tr>
-              <th
-                style={{
-                  width: "20%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
+      <>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+          <span style={{ fontWeight: 500 }}>Stock Status:</span>
+          <Box
+            className="custom-dropdown"
+            sx={{ minWidth: 160, position: "relative" }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setStockStatusDropdownOpen((open) => !open)}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                border: "1px solid #e2e8f0",
+                background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              {stockStatusFilter === "all" && "All"}
+              {stockStatusFilter === "high" && (
+                <>
+                  <RadioButtonUncheckedIcon
+                    sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                  />
+                  <span style={{ color: "#059669" }}>High</span>
+                </>
+              )}
+              {stockStatusFilter === "medium" && (
+                <>
+                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18, mr: 1 }} />
+                  <span style={{ color: "#D97706" }}>Medium</span>
+                </>
+              )}
+              {stockStatusFilter === "low" && (
+                <>
+                  <ErrorOutlineIcon
+                    sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                  />
+                  <span style={{ color: "#DC2626" }}>Low</span>
+                </>
+              )}
+              <span style={{ marginLeft: 8, fontSize: 12, color: "#6b7280" }}>
+                ▼
+              </span>
+            </Button>
+            {stockStatusDropdownOpen && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  background: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  zIndex: 10,
+                  mt: 0.5,
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Product Name
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Category
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Service Area
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Stock Quantity
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Price</p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Manage</p>
-                </div>
-              </th>
-            </tr>
-          </thead>
-        </table>
-
-        <table className="inventory-table">
-          <tbody>
-            {inventoryItems.map((item, index) => (
-              <tr
-                key={index}
-                ref={
-                  index === inventoryItems.length - 1
-                    ? lastInventoryElementRef
-                    : null
-                }
-              >
-                <td
-                  style={{
-                    width: "20%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.productName}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.category}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.serviceArea}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.stockQuantity} units
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  ${item.price.toFixed(2)}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div
-                    style={{
+                {[
+                  { key: "all", label: "All" },
+                  {
+                    key: "high",
+                    label: "High",
+                    icon: (
+                      <RadioButtonUncheckedIcon
+                        sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "medium",
+                    label: "Medium",
+                    icon: (
+                      <RemoveIcon
+                        sx={{ color: "#D97706", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "low",
+                    label: "Low",
+                    icon: (
+                      <ErrorOutlineIcon
+                        sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                ].map((opt) => (
+                  <Box
+                    key={opt.key}
+                    className={`custom-dropdown-item${
+                      stockStatusFilter === opt.key ? " active" : ""
+                    }`}
+                    sx={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "10px",
+                      gap: 1,
+                      px: 2,
+                      py: 1,
+                      cursor: "pointer",
+                      borderRadius: 1,
+                      fontWeight: stockStatusFilter === opt.key ? 600 : 400,
+                      color:
+                        opt.key === "high"
+                          ? "#059669"
+                          : opt.key === "medium"
+                          ? "#D97706"
+                          : opt.key === "low"
+                          ? "#DC2626"
+                          : "#374151",
+                      background:
+                        stockStatusFilter === opt.key ? "#eff6ff" : undefined,
+                      "&:hover": { background: "#f8fafc" },
+                    }}
+                    onClick={() => {
+                      setStockStatusFilter(opt.key);
+                      setStockStatusDropdownOpen(false);
                     }}
                   >
-                    <img
-                      src={eyesIn}
-                      alt="view"
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleViewItem(item)}
-                    />
-                    <button
-                      style={{
-                        padding: "10px 16px",
-                        borderRadius: "5px",
-                        backgroundColor: "#0387D9",
-                        color: "#fff",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        marginLeft: "10px",
-                      }}
-                      onClick={() => handleSendEmail(item)}
-                    >
-                      Send Email
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {renderLoadingIndicator()}
-      </div>
+                    {opt.icon && opt.icon}
+                    <span>{opt.label}</span>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+        </Box>
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 2,
+            boxShadow: 0,
+            border: "1px solid #EAECF0",
+            mt: 2,
+          }}
+        >
+          <Table>
+            <TableHead sx={{ backgroundColor: "#F9FAFB" }}>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    inputProps={{ "aria-label": "select all products" }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Product ID
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Product Name
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Category
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Service Area
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Stock Quantity
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Price
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    Actions
+                    <IconButton size="small">
+                      <FilterListIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredInventoryItems
+                .slice(page * pageSize, page * pageSize + pageSize)
+                .map((item, idx) => (
+                  <TableRow
+                    key={item.id}
+                    hover
+                    selected={selectedItems.includes(item.id)}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onChange={() => handleSelectItem(item.id)}
+                        inputProps={{
+                          "aria-label": `select product ${item.productName}`,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      #{item.productId || item.id?.slice(-6) || idx + 1}
+                    </TableCell>
+                    <TableCell>{item.productName}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell>{item.serviceArea}</TableCell>
+                    <TableCell>
+                      <span
+                        style={{
+                          backgroundColor:
+                            getStockStatus(item.stockQuantity) === "high"
+                              ? "#ECFDF3"
+                              : getStockStatus(item.stockQuantity) === "medium"
+                              ? "#FFFAEB"
+                              : "#FEF3F2",
+                          color:
+                            getStockStatus(item.stockQuantity) === "high"
+                              ? "#027A48"
+                              : getStockStatus(item.stockQuantity) === "medium"
+                              ? "#B54708"
+                              : "#B42318",
+                          padding: "2px 8px",
+                          borderRadius: "16px",
+                          fontSize: "12px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {item.stockQuantity} Liters
+                      </span>
+                    </TableCell>
+                    <TableCell>${item.price?.toFixed(2)}/L</TableCell>
+                    <TableCell>
+                      <Tooltip title="View">
+                        <IconButton onClick={() => handleViewItem(item)}>
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Edit">
+                        <IconButton
+                          onClick={() =>
+                            navigate(
+                              `/admin/inventory-management/edit/${item.id}`
+                            )
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton onClick={() => handleDelete(idx)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Send Email">
+                        <IconButton onClick={() => handleSendEmail(item)}>
+                          <i
+                            className="pi pi-envelope"
+                            style={{ color: "#0387D9" }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Pagination always visible with margin */}
+        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Pagination
+            currentPage={page + 1}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            onPageChange={(newPage) => setPage(newPage - 1)}
+          />
+        </Box>
+      </>
     );
   };
 
+  // Add debugging for modal state
   useEffect(() => {
-    if (setPageTitle) setPageTitle("Inventory Management");
+    console.log("=== showAddModal state changed to:", showAddModal);
+  }, [showAddModal]);
+
+  // Fetch suppliers for the dropdown
+  const fetchSuppliers = async () => {
+    try {
+      setSuppliersLoading(true);
+      const result = await getAllSuppliers();
+      if (result.success && Array.isArray(result.data)) {
+        setSuppliers(result.data);
+      } else {
+        console.error("Invalid suppliers data:", result.data);
+        setSuppliers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      setSuppliers([]);
+    } finally {
+      setSuppliersLoading(false);
+    }
+  };
+
+  // Set page title and add event listener for create inventory button
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Inventory");
+
+    // Fetch suppliers when component mounts
+    fetchSuppliers();
+
+    // Add event listener for create inventory button in title bar
+    const handleCreateInventoryModal = () => {
+      handleAddProduct();
+    };
+
+    window.addEventListener(
+      "openCreateInventoryModal",
+      handleCreateInventoryModal
+    );
+
+    return () => {
+      window.removeEventListener(
+        "openCreateInventoryModal",
+        handleCreateInventoryModal
+      );
+    };
   }, [setPageTitle]);
+
+  const categoryOptions = [
+    {
+      label: "Captain",
+      value: "Captain",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/captain1.png",
+    },
+    {
+      label: "Crew",
+      value: "Crew",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/crew1.png",
+    },
+    {
+      label: "Exterior",
+      value: "Exterior",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/exterior1.png",
+    },
+    {
+      label: "Engineering",
+      value: "Engineering",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/Engineering1.png",
+    },
+    {
+      label: "Gallery",
+      value: "Gallery",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/GALLERY1.png",
+    },
+    {
+      label: "Interior",
+      value: "Interior",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/Interior1.png",
+    },
+  ];
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setSaveError("");
+    setSelectedSupplier(null);
+    setNewItem({
+      productName: "",
+      category: "",
+      serviceArea: "",
+      stockQuantity: "",
+      price: "",
+      supplier: "",
+    });
+  };
 
   return (
     <>
@@ -1234,27 +1365,27 @@ const Invent = () => {
 
       {renderInventoryItems()}
 
-      <Toast ref={toast} />
-
       <Dialog
-        visible={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        header="Update Stock"
-        className="edit-inventory-modal"
-        modal
-        dismissableMask
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "35vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
         }}
+        onEnter={() => console.log("=== Modal entering ===")}
+        onEntered={() => console.log("=== Modal entered ===")}
       >
         <div className="edit-form">
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="productName">Product Name</label>
-              <InputText
+              <TextField
                 id="productName"
                 value={editItem.productName}
                 onChange={(e) =>
@@ -1264,7 +1395,7 @@ const Invent = () => {
             </div>
             <div className="form-group">
               <label htmlFor="category">Category</label>
-              <InputText
+              <TextField
                 id="category"
                 value={editItem.category}
                 onChange={(e) =>
@@ -1277,7 +1408,7 @@ const Invent = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="serviceArea">Service Area</label>
-              <InputText
+              <TextField
                 id="serviceArea"
                 value={editItem.serviceArea}
                 onChange={(e) =>
@@ -1287,7 +1418,7 @@ const Invent = () => {
             </div>
             <div className="form-group">
               <label htmlFor="stockQuantity">Stock Quantity</label>
-              <InputText
+              <TextField
                 id="stockQuantity"
                 type="number"
                 value={editItem.stockQuantity}
@@ -1301,7 +1432,7 @@ const Invent = () => {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="price">Price</label>
-              <InputText
+              <TextField
                 id="price"
                 type="number"
                 step="0.01"
@@ -1350,424 +1481,577 @@ const Invent = () => {
       </Dialog>
 
       <Dialog
-        visible={showAddModal}
-        onHide={() => setShowAddModal(false)}
-        header="Add New Product"
-        className="add-inventory-modal"
-        modal
-        dismissableMask
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "35vw" }}
-        contentStyle={{ overflow: "visible" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        open={showAddModal}
+        onClose={handleCloseAddModal}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
         }}
+        onEnter={() => console.log("=== Modal entering ===")}
+        onEntered={() => console.log("=== Modal entered ===")}
       >
-        <div className="add-form" style={{ overflow: "hidden" }}>
-          <div className="form-row">
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="productName">Product Name</label>
-              <InputText
-                id="productName"
-                value={newItem.productName}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, productName: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="category">Category</label>
-              <InputText
-                id="category"
-                value={newItem.category}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, category: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div
-              className="form-group-1"
-              style={{ display: "block", marginBottom: "15px", border: "none" }}
-            >
-              <label htmlFor="serviceArea">Service Area</label>
-              <Dropdown
-                id="serviceArea"
-                value={newItem.serviceArea}
-                options={serviceAreaOptions}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, serviceArea: e.value })
-                }
-                placeholder="Select a service area"
-                style={{
-                  width: "100%",
-                  height: "45px",
-                  alignContent: "center",
-                }}
-                inputStyle={dropdownStyles}
-                className="no-border-dropdown"
-              />
-            </div>
-
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="stockQuantity">Stock Quantity</label>
-              <InputText
-                id="stockQuantity"
-                type="number"
-                value={newItem.stockQuantity}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, stockQuantity: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="price">Price</label>
-              <InputText
-                id="price"
-                type="number"
-                step="0.01"
-                value={newItem.price}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, price: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div
-            className="form-row"
-            style={{ display: "block", marginBottom: "15px" }}
+        {console.log(
+          "=== Dialog component rendering, showAddModal:",
+          showAddModal
+        )}
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            fontSize: 22,
+            pb: 0,
+            pr: 5,
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          Add New Product
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseAddModal}
+            sx={{ position: "absolute", right: 16, top: 16 }}
           >
-            <label htmlFor="productImage">Product Image</label>
-            <div style={{ marginTop: "8px" }}>
-              {imagePreview && (
-                <div style={{ marginBottom: "10px" }}>
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "200px",
-                      borderRadius: "4px",
-                      border: "1px solid #ced4da",
-                    }}
-                  />
-                  <Button
-                    icon="pi pi-times"
-                    className="p-button-rounded p-button-danger p-button-text"
-                    onClick={() => {
-                      setProductImage(null);
-                      setImagePreview(null);
-                    }}
-                    style={{ position: "absolute", top: "5px", right: "5px" }}
-                    tooltip="Remove image"
-                  />
-                </div>
-              )}
-              <input
-                type="file"
-                id="productImage"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "none" }}
-              />
-              <Button
-                label={imagePreview ? "Change Image" : "Upload Image"}
-                icon="pi pi-upload"
-                onClick={() => document.getElementById("productImage").click()}
-                className="p-button-outlined"
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div
-            className="button-row"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <TextField
+            label="Product Name"
+            placeholder="Enter Product Name"
+            value={newItem.productName}
+            onChange={(e) =>
+              setNewItem({ ...newItem, productName: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={newItem.category}
+              label="Category"
+              onChange={(e) =>
+                setNewItem({ ...newItem, category: e.target.value })
+              }
+              renderValue={(selected) => {
+                const option = categoryOptions.find(
+                  (opt) => opt.value === selected
+                );
+                return option ? (
+                  <span
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    />
+                    {option.label}
+                  </span>
+                ) : (
+                  ""
+                );
+              }}
+              MenuProps={{
+                disablePortal: true,
+                PaperProps: {
+                  sx: {
+                    width: 240,
+                  },
+                },
+              }}
+            >
+              {categoryOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  <span
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
+                    <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    />
+                    {option.label}
+                  </span>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <TextField
+            label="Price"
+            placeholder="Enter Price"
+            type="number"
+            inputProps={{ min: 1, step: 1 }}
+            value={newItem.price}
+            onChange={(e) => {
+              const val = e.target.value;
+              // Allow empty string for clearing
+              if (val === "") {
+                setNewItem({ ...newItem, price: "" });
+              } else {
+                setNewItem({ ...newItem, price: val });
+              }
             }}
-          >
-            <Button
-              label="Cancel"
-              onClick={() => setShowAddModal(false)}
-              className="p-button-text"
-              autoFocus={false}
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                width: "200px",
-                outline: "none",
-              }}
-            />
-            <Button
-              label={isLoading ? "Saving..." : "Save Product"}
-              icon="pi pi-check"
-              onClick={handleSaveProduct}
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={showDeleteConfirmation}
-        onHide={() => setShowDeleteConfirmation(false)}
-        header="Confirm Deletion"
-        modal
-        dismissableMask
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
-        }}
-        footer={
-          <div
-            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
-          >
-            <Button
-              label="Cancel"
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                border: "1px solid #EF4444",
-                width: "100px",
-                outline: "none",
-              }}
-              onClick={() => setShowDeleteConfirmation(false)}
-              className="p-button-text"
-              disabled={isLoading}
-            />
-            <Button
-              label={isLoading ? "Deleting..." : "Yes"}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                border: "1px solid #0387D9",
-                width: "100px",
-                outline: "none",
-              }}
-              onClick={confirmDelete}
-              className="p-button-danger"
-              disabled={isLoading}
-            />
-          </div>
-        }
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
-          ></i>
-          <span>Are you sure you want to delete this product?</span>
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={showViewModal}
-        onHide={handleCloseViewModal}
-        header="Inventory Summary"
-        className="view-inventory-modal"
-        style={{ width: "80%", maxWidth: "800px" }}
-        modal
-        dismissableMask
-        blockScroll
-      >
-        <div className="view-form">
-          {/* Product Image and Name Section */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "24px",
-              padding: "12px",
-              backgroundColor: "#F9FAFB",
-              borderRadius: "8px",
+            onBlur={(e) => {
+              const val = Number(e.target.value);
+              if (val < 1 || isNaN(val)) {
+                setNewItem({ ...newItem, price: 1 });
+              }
             }}
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Availability"
+            placeholder="In Stock"
+            value={newItem.availability || ""}
+            onChange={(e) =>
+              setNewItem({ ...newItem, availability: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2, mb: 1 }}
           >
-            {viewItem.productImage ? (
-              <img
-                src={viewItem.productImage}
-                alt={viewItem.productName}
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "4px",
-                  objectFit: "cover",
-                }}
+            <TextField
+              label="Upload File"
+              placeholder="Browse File Here..."
+              value={newItem.fileName || ""}
+              InputProps={{
+                readOnly: true,
+                endAdornment: (
+                  <IconButton component="label">
+                    <CloudUploadIcon />
+                    <input
+                      type="file"
+                      hidden
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        setNewItem({
+                          ...newItem,
+                          fileName: file ? file.name : "",
+                        });
+                      }}
+                    />
+                  </IconButton>
+                ),
+              }}
+              fullWidth
+            />
+          </Box>
+          <Autocomplete
+            options={Array.isArray(suppliers) ? suppliers : []}
+            getOptionLabel={(option) =>
+              typeof option === "string" ? option : option.email || ""
+            }
+            filterOptions={(options, { inputValue }) => {
+              if (!Array.isArray(options)) return [];
+              const searchTerm = inputValue.toLowerCase();
+              return options.filter((option) => {
+                const email = option.email?.toLowerCase() || "";
+                const businessName = option.businessName?.toLowerCase() || "";
+                const companyName = option.companyName?.toLowerCase() || "";
+                const name = option.name?.toLowerCase() || "";
+
+                return (
+                  email.includes(searchTerm) ||
+                  businessName.includes(searchTerm) ||
+                  companyName.includes(searchTerm) ||
+                  name.includes(searchTerm)
+                );
+              });
+            }}
+            value={selectedSupplier}
+            onChange={(event, newValue) => {
+              setSelectedSupplier(newValue);
+              setNewItem({
+                ...newItem,
+                supplier: newValue ? newValue._id : "",
+              });
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search Supplier"
+                placeholder={
+                  suppliersLoading
+                    ? "Loading suppliers..."
+                    : "Type supplier email or business name..."
+                }
+                margin="normal"
+                helperText={
+                  suppliersLoading
+                    ? "Loading suppliers..."
+                    : "Search by email, business name, or company name"
+                }
               />
-            ) : (
-              <div
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "4px",
-                  backgroundColor: "#E5E7EB",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <i
-                  className="pi pi-image"
-                  style={{ fontSize: "24px", color: "#9CA3AF" }}
-                ></i>
-              </div>
             )}
-            <div>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600" }}>
-                {viewItem.productName}
-              </h3>
-              <p
-                style={{
-                  margin: "4px 0 0 0",
-                  fontSize: "14px",
-                  color: "#6B7280",
-                }}
-              >
-                {viewItem.category}
-              </p>
-            </div>
+            renderOption={(props, option) => (
+              <Box component="li" {...props}>
+                <Box>
+                  <Box sx={{ fontWeight: "bold" }}>
+                    {option.businessName || option.companyName || option.name}
+                  </Box>
+                  <Box sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
+                    {option.email}
+                  </Box>
+                </Box>
+              </Box>
+            )}
+            isOptionEqualToValue={(option, value) => option._id === value._id}
+            noOptionsText={
+              suppliersLoading ? "Loading..." : "No suppliers found"
+            }
+            loading={suppliersLoading}
+            disabled={suppliersLoading}
+          />
+          <TextField
+            label="Service Area"
+            placeholder="Caribbean"
+            value={newItem.serviceArea || ""}
+            onChange={(e) =>
+              setNewItem({ ...newItem, serviceArea: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Description"
+            placeholder="Enter Product Description"
+            value={newItem.description || ""}
+            onChange={(e) =>
+              setNewItem({ ...newItem, description: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+            multiline
+            minRows={2}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+          <Button
+            onClick={handleCloseAddModal}
+            variant="contained"
+            color="error"
+            startIcon={<CloseIcon />}
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveProduct}
+            variant="contained"
+            color="primary"
+            startIcon={<CloudUploadIcon />}
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+            disabled={isLoading}
+          >
+            Save Product
+          </Button>
+        </DialogActions>
+        {saveError && (
+          <div
+            style={{
+              color: "red",
+              textAlign: "center",
+              marginTop: 8,
+              marginBottom: 16,
+            }}
+          >
+            {saveError}
           </div>
-
-          {/* Details Grid */}
-          <div style={{ display: "grid", gap: "16px" }}>
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Product Name
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.productName}
-              </span>
-            </div>
-
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Category
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.category}
-              </span>
-            </div>
-
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>Price</span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.price}
-              </span>
-            </div>
-
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Availability
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.stockQuantity}
-              </span>
-            </div>
-
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Service Area
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.serviceArea}
-              </span>
-            </div>
-          </div>
-        </div>
+        )}
       </Dialog>
 
-      {/* Add Email Modal */}
       <Dialog
-        visible={showEmailModal}
-        onHide={() => setShowEmailModal(false)}
-        header="Send Email"
-        className="email-modal"
-        modal
-        dismissableMask
-        style={{ width: "50vw" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        open={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
         }}
       >
-        <div className="email-form" style={{ padding: "20px" }}>
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            fontSize: 22,
+            pb: 0,
+            pr: 5,
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          Confirm Deletion
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowDeleteConfirmation(false)}
+            sx={{ position: "absolute", right: 16, top: 16 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <p>Are you sure you want to delete this product?</p>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+          <Button
+            onClick={() => setShowDeleteConfirmation(false)}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={showViewModal}
+        onClose={handleCloseViewModal}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            fontSize: 22,
+            pb: 0,
+            pr: 5,
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          Inventory Summary
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseViewModal}
+            sx={{ position: "absolute", right: 16, top: 16 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Box
+            sx={{
+              border: "1px solid #E5E7EB",
+              borderRadius: 2,
+              background: "#FAFAFA",
+              p: 2,
+              mb: 3,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                mb: 2,
+              }}
+            >
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ fontWeight: 500, color: "#222", fontSize: 16 }}>
+                  {viewItem.productName || "Yacht"}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>ID</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  #{viewItem.id?.slice?.(-6) || viewItem.id || "—"}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Product Name</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  {viewItem.productName}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Category</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  {viewItem.category}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Price</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  {viewItem.price ? `$${viewItem.price}` : "—"}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Availability</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  {viewItem.stockQuantity || "In Stock"}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Supplier</Box>
+                <Box
+                  sx={{
+                    color: "#111827",
+                    fontWeight: 500,
+                    fontSize: 14,
+                    mb: 1,
+                  }}
+                >
+                  {typeof viewItem.supplier === "object"
+                    ? viewItem.supplier.businessName ||
+                      viewItem.supplier.user?.email ||
+                      "Not available"
+                    : typeof viewItem.supplier === "string" &&
+                      viewItem.supplier.trim() !== ""
+                    ? viewItem.supplier
+                    : "Not available"}
+                </Box>
+                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Service Area</Box>
+                <Box sx={{ color: "#111827", fontWeight: 500, fontSize: 14 }}>
+                  {viewItem.serviceArea}
+                </Box>
+              </Box>
+              <Box>
+                {viewItem.productImage ? (
+                  <img
+                    src={viewItem.productImage}
+                    alt={viewItem.productName}
+                    style={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 8,
+                      objectFit: "cover",
+                      marginLeft: 16,
+                    }}
+                  />
+                ) : (
+                  <Box
+                    sx={{
+                      width: 64,
+                      height: 64,
+                      borderRadius: 8,
+                      background: "#E5E7EB",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginLeft: 2,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#9CA3AF",
+                        fontSize: 12,
+                        textAlign: "center",
+                      }}
+                    >
+                      Not available
+                    </span>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <Box sx={{ fontWeight: 500, color: "#222", mb: 1 }}>
+              Description
+            </Box>
+            <TextField
+              fullWidth
+              multiline
+              minRows={3}
+              variant="outlined"
+              InputProps={{ style: { background: "#FAFAFA", borderRadius: 8 } }}
+              value={
+                viewItem.description ? viewItem.description : "Not available"
+              }
+              disabled
+            />
+          </Box>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            fontSize: 22,
+            pb: 0,
+            pr: 5,
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          Send Email
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowEmailModal(false)}
+            sx={{ position: "absolute", right: 16, top: 16 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
           <div className="form-group" style={{ marginBottom: "20px" }}>
             <label
               htmlFor="to"
@@ -1779,7 +2063,7 @@ const Invent = () => {
             >
               To
             </label>
-            <InputText
+            <TextField
               id="to"
               value={emailData.to}
               onChange={(e) =>
@@ -1801,7 +2085,7 @@ const Invent = () => {
             >
               Subject
             </label>
-            <InputText
+            <TextField
               id="subject"
               value={emailData.subject}
               onChange={(e) =>
@@ -1838,37 +2122,51 @@ const Invent = () => {
                 resize: "vertical",
               }}
               placeholder="Enter your message"
+              required
             />
           </div>
-
-          <div
-            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+          <Button
+            onClick={() => setShowEmailModal(false)}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
           >
-            <Button
-              label="Cancel"
-              onClick={() => setShowEmailModal(false)}
-              className="p-button-text"
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                border: "1px solid #EF4444",
-                width: "100px",
-              }}
-            />
-            <Button
-              label={isSendingEmail ? "Sending..." : "Send Email"}
-              onClick={handleEmailSubmit}
-              disabled={isSendingEmail}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                border: "1px solid #0387D9",
-                width: "100px",
-              }}
-            />
-          </div>
-        </div>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleEmailSubmit}
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+            disabled={
+              !emailData.to ||
+              !emailData.subject ||
+              !emailData.message ||
+              !emailData.message.trim() ||
+              isSendingEmail
+            }
+          >
+            Send Email
+          </Button>
+        </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
