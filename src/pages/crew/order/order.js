@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import ActiveOrders from "./active";
 import OrderTable from "./table";
+import CreateOrderModal from "./CreateOrderModal";
 import { getOrders } from "../../../services/crew/crewOrderService";
 import "./order.css";
 import { useOutletContext, useSearchParams } from "react-router-dom";
@@ -9,6 +10,9 @@ const Order = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isHovered, setIsHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
   
   // Data fetching states
   const [orders, setOrders] = useState([]);
@@ -43,42 +47,43 @@ const Order = () => {
     }));
   }, []); // Only run once on mount
 
+  // Fetch orders data function
+  const fetchOrdersData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await getOrders({
+        page: pagination.page,
+        limit: pagination.limit,
+        status: currentStatus,
+      });
+      
+      if (response.status) {
+        const { data, statusCounts: counts, pagination: paginationData } = response.data;
+        
+        // Update state with fetched data
+        setOrders(data);
+        setStatusCounts(counts);
+        setPagination(prev => ({
+          ...prev,
+          total: paginationData.totalItems,
+          totalPages: paginationData.totalPages,
+        }));
+        
+      } else {
+        setError(response.error);
+      }
+    } catch (error) {
+      console.error("Error in fetchOrdersData:", error);
+      setError(error.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch orders data when component mounts, pagination changes, or status filter changes
   useEffect(() => {
-    const fetchOrdersData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await getOrders({
-          page: pagination.page,
-          limit: pagination.limit,
-          status: currentStatus,
-        });
-        
-        if (response.status) {
-          const { data, statusCounts: counts, pagination: paginationData } = response.data;
-          
-          // Update state with fetched data
-          setOrders(data);
-          setStatusCounts(counts);
-          setPagination(prev => ({
-            ...prev,
-            total: paginationData.totalItems,
-            totalPages: paginationData.totalPages,
-          }));
-          
-        } else {
-          setError(response.error);
-        }
-      } catch (error) {
-        console.error("Error in fetchOrdersData:", error);
-        setError(error.message || "An unexpected error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrdersData();
   }, [pagination.page, pagination.limit, currentStatus]);
 
@@ -143,14 +148,18 @@ const Order = () => {
     setSearchParams(newSearchParams);
   };
 
+  // Handle order created
+  const handleOrderCreated = (newOrder) => {
+    setShowCreateModal(false);
+    // Refresh orders list
+    fetchOrdersData();
+  };
+
   // Create Orders Button
   const createOrdersButton = () => {
     return (
         <button
-          onClick={() => {
-            // Button click handler removed - will be implemented later
-            console.log("Create Order button clicked");
-          }}
+          onClick={() => setShowCreateModal(true)}
           style={{
             backgroundColor: "#0387D9",
             color: "white",
@@ -173,9 +182,9 @@ const Order = () => {
   return (
     <>
       <div className="lg:p-4">
-        {/* <div className="text-right">
+        <div className="text-right">
           {createOrdersButton()}
-        </div> */}
+        </div>
 
         {/* ActiveOrders component with status counts */}
         <ActiveOrders 
@@ -195,6 +204,13 @@ const Order = () => {
           onLimitChange={handleLimitChange}
         />
       </div>
+
+      {/* Create Order Modal */}
+      <CreateOrderModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onOrderCreated={handleOrderCreated}
+      />
     </>
   );
 };
