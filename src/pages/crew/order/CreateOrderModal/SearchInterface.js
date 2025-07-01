@@ -28,6 +28,7 @@ const SearchInterface = ({
   onSearch,
   onAddToCart,
   onPageChange,
+  addToCartLoadingId,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -234,7 +235,7 @@ const SearchInterface = ({
                   <ProductCard
                     product={product}
                     onAddToCart={onAddToCart}
-                    loading={loading}
+                    loading={addToCartLoadingId === product.inventoryId}
                   />
                 </Grid>
               ))}

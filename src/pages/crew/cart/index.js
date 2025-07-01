@@ -574,11 +574,13 @@ const CartPage = () => {
                             >
                               <RemoveIcon sx={{ fontSize: 16 }} />
                             </QuantityButton>
-                            
-                            <Typography variant="body1" sx={{ minWidth: 40, textAlign: 'center', fontWeight: 600 }}>
-                              {product.quantity}
-                            </Typography>
-                            
+                            {updatingItem === `${supplierIndex}-${productIndex}` ? (
+                              <CircularProgress size={20} sx={{ mx: 1 }} />
+                            ) : (
+                              <Typography variant="body1" sx={{ minWidth: 40, textAlign: 'center', fontWeight: 600 }}>
+                                {product.quantity}
+                              </Typography>
+                            )}
                             <QuantityButton
                               onClick={() => handleQuantityChange(supplierIndex, productIndex, product.quantity + 1)}
                               disabled={updatingItem === `${supplierIndex}-${productIndex}`}
@@ -586,10 +588,6 @@ const CartPage = () => {
                               <AddIcon sx={{ fontSize: 16 }} />
                             </QuantityButton>
                           </Box>
-                          
-                          {updatingItem === `${supplierIndex}-${productIndex}` && (
-                            <CircularProgress size={16} />
-                          )}
                         </Box>
 
                         {/* Total Price */}

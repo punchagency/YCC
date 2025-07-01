@@ -44,6 +44,9 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
     severity: 'success'
   });
 
+  // Add to cart states
+  const [addToCartLoadingId, setAddToCartLoadingId] = useState(null);
+
   // Fetch categories on modal open
   useEffect(() => {
     if (open) {
@@ -114,14 +117,12 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   // Handle add to cart
   const handleAddToCart = async (product, quantity = 1) => {
     try {
-      setLoading(true);
+      setAddToCartLoadingId(product.inventoryId);
       const response = await addToCart({
         inventoryId: product.inventoryId,
         quantity,
       });
-
       if (response.status) {
-        // Update cart context with the new quantity
         addToCartContext(quantity);
         showNotification('Product added to cart successfully', 'success');
       } else {
@@ -131,7 +132,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
       console.error('Add to cart error:', error);
       showNotification('Failed to add product to cart', 'error');
     } finally {
-      setLoading(false);
+      setAddToCartLoadingId(null);
     }
   };
 
@@ -269,12 +270,13 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
             searchResults={searchResults}
             categories={categories}
             selectedCategory={selectedCategory}
-            loading={loading}
+            loading={false}
             searchLoading={searchLoading}
             pagination={pagination}
             onSearch={handleSearch}
             onAddToCart={handleAddToCart}
             onPageChange={handlePageChange}
+            addToCartLoadingId={addToCartLoadingId}
           />
         </DialogContent>
       </Dialog>
