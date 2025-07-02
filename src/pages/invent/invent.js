@@ -170,6 +170,7 @@ const Invent = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
 
   // Add after other useState declarations
   const [stockStatusFilter, setStockStatusFilter] = useState("all");
@@ -183,6 +184,15 @@ const Invent = () => {
     message: "",
     severity: "success",
   });
+
+  // Add state for supplier search and pagination
+  const [supplierSearch, setSupplierSearch] = useState("");
+  const [supplierPage, setSupplierPage] = useState(1);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
+  const SUPPLIERS_PER_PAGE = 10;
+
+  // Add state for controlling the supplier dropdown open state
+  const [supplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
 
   // Helper to get stock status
   const getStockStatus = (quantity) => {
@@ -234,7 +244,6 @@ const Invent = () => {
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && hasMore) {
-            console.log("Loading more items...");
             loadMoreData();
           }
         },
@@ -304,7 +313,6 @@ const Invent = () => {
     }
 
     try {
-      console.log("Fetching page:", pageNum);
       const result = await getAllInventories(pageNum, 10);
 
       if (result.success) {
@@ -320,8 +328,6 @@ const Invent = () => {
           userInfo: item.userInfo,
         }));
 
-        console.log("Formatted Items:", formattedItems);
-
         if (formattedItems.length === 0 && pageNum > 1) {
           setPage(pageNum - 2); // Go back to previous page (zero-based)
           return;
@@ -329,26 +335,17 @@ const Invent = () => {
 
         if (pageNum === 1) {
           setInventoryItems(formattedItems);
+          setTotalItems(result.pagination?.total || formattedItems.length);
+          setHasMore(result.pagination?.hasNextPage || false);
+          setTotalPages(result.pagination?.totalPages || 1);
         } else {
           setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
+          setTotalItems(result.pagination?.total || formattedItems.length);
+          setHasMore(result.pagination?.hasNextPage || false);
+          setTotalPages(result.pagination?.totalPages || 1);
         }
 
-        // Update total items count from pagination data
-        const totalItems = result.pagination?.totalItems || 0;
-        setTotalItems(totalItems);
-
-        // Check if we have more items to load using pagination data
-        const hasMoreItems = result.pagination?.hasNextPage || false;
-        setHasMore(hasMoreItems);
         setPage(pageNum);
-
-        console.log("Updated state:", {
-          items: formattedItems.length,
-          total: totalItems,
-          hasMore: hasMoreItems,
-          currentPage: pageNum,
-          pagination: result.pagination,
-        });
       } else {
         console.error("Failed to load inventory data:", result.error);
       }
@@ -421,13 +418,10 @@ const Invent = () => {
         productName: editItem.productName,
         category: editItem.category,
         serviceArea: editItem.serviceArea,
-        quantity: parseInt(editItem.stockQuantity),
-        price: parseFloat(editItem.price),
+        stockQuantity: editItem.stockQuantity,
+        price: editItem.price,
       };
 
-      console.log("Sending update with data:", updateData);
-
-      // Call the API to update the item
       const result = await updateInventoryItem(editItem.id, updateData);
 
       if (result.success) {
@@ -490,11 +484,7 @@ const Invent = () => {
   };
 
   const handleAddProduct = () => {
-    console.log("=== handleAddProduct called ===");
-    console.log("Current showAddModal state:", showAddModal);
-    console.log("Setting showAddModal to true");
     setShowAddModal(true);
-    console.log("showAddModal should now be true");
   };
 
   // Add this function to handle image selection
@@ -519,6 +509,12 @@ const Invent = () => {
       return;
     }
 
+    // Validate quantity
+    if (!newItem.stockQuantity || newItem.stockQuantity <= 0) {
+      setSaveError("Stock quantity must be greater than 0");
+      return;
+    }
+
     setIsLoading(true);
     setSaveError("");
 
@@ -527,7 +523,7 @@ const Invent = () => {
       const formData = new FormData();
       formData.append("productName", newItem.productName);
       formData.append("category", newItem.category);
-      formData.append("serviceArea", newItem.serviceArea);
+      formData.append("serviceArea", newItem.serviceArea.toLowerCase()); // Convert to lowercase
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
       if (newItem.supplier) {
@@ -537,10 +533,7 @@ const Invent = () => {
       // Append the image file if one was selected
       if (productImage) {
         formData.append("inventoryImage", productImage);
-        console.log("Adding image to form data:", productImage.name);
       }
-
-      console.log("Submitting inventory with image:", !!productImage);
 
       const result = await createInventoryData(formData);
 
@@ -565,15 +558,20 @@ const Invent = () => {
           serviceArea: "",
           stockQuantity: "",
           price: "",
+          supplier: "",
         });
         setProductImage(null);
         setImagePreview(null);
+        setSelectedSupplier(null);
 
         setShowAddModal(false);
+        setSaveSuccess("Product added successfully!");
+        setSaveError(""); // Clear any previous errors
       } else {
         setSaveError(
           result.error || "Failed to add inventory. Please try again."
         );
+        setSaveSuccess(""); // Clear any previous success messages
         console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
@@ -665,18 +663,7 @@ const Invent = () => {
     const supplierEmail =
       item.supplier?.user?.email || item.userInfo?.email || "";
 
-    console.log("Clicked Item Data:", item);
-    console.log("Supplier Email:", supplierEmail);
-    console.log("Product Name:", item.productName);
-
     setEmailData({
-      to: supplierEmail,
-      subject: `Regarding your product: ${item.productName}`,
-      message: "",
-      productName: item.productName,
-    });
-
-    console.log("Email Modal Data:", {
       to: supplierEmail,
       subject: `Regarding your product: ${item.productName}`,
       message: "",
@@ -1244,17 +1231,15 @@ const Invent = () => {
     );
   };
 
-  // Add debugging for modal state
-  useEffect(() => {
-    console.log("=== showAddModal state changed to:", showAddModal);
-  }, [showAddModal]);
-
   // Fetch suppliers for the dropdown
   const fetchSuppliers = async () => {
     try {
       setSuppliersLoading(true);
       const result = await getAllSuppliers();
-      if (result.success && Array.isArray(result.data)) {
+      // Fix: handle paginated and non-paginated responses
+      if (result.success && Array.isArray(result.data?.result)) {
+        setSuppliers(result.data.result);
+      } else if (result.success && Array.isArray(result.data)) {
         setSuppliers(result.data);
       } else {
         console.error("Invalid suppliers data:", result.data);
@@ -1329,6 +1314,7 @@ const Invent = () => {
   const handleCloseAddModal = () => {
     setShowAddModal(false);
     setSaveError("");
+    setSaveSuccess("");
     setSelectedSupplier(null);
     setNewItem({
       productName: "",
@@ -1339,6 +1325,23 @@ const Invent = () => {
       supplier: "",
     });
   };
+
+  // Filter and paginate suppliers when supplierSearch or suppliers changes
+  useEffect(() => {
+    const searchTerm = supplierSearch.toLowerCase();
+    const filtered = suppliers.filter((option) => {
+      const match =
+        (option.businessName &&
+          option.businessName.toLowerCase().includes(searchTerm)) ||
+        (option.companyName &&
+          option.companyName.toLowerCase().includes(searchTerm)) ||
+        (option.name && option.name.toLowerCase().includes(searchTerm)) ||
+        (option.user?.email &&
+          option.user.email.toLowerCase().includes(searchTerm));
+      return match;
+    });
+    setFilteredSuppliers(filtered.slice(0, supplierPage * SUPPLIERS_PER_PAGE));
+  }, [supplierSearch, suppliers, supplierPage]);
 
   return (
     <>
@@ -1378,8 +1381,6 @@ const Invent = () => {
             border: "2px solid #0387D9",
           },
         }}
-        onEnter={() => console.log("=== Modal entering ===")}
-        onEntered={() => console.log("=== Modal entered ===")}
       >
         <div className="edit-form">
           <div className="form-row">
@@ -1493,13 +1494,7 @@ const Invent = () => {
             border: "2px solid #0387D9",
           },
         }}
-        onEnter={() => console.log("=== Modal entering ===")}
-        onEntered={() => console.log("=== Modal entered ===")}
       >
-        {console.log(
-          "=== Dialog component rendering, showAddModal:",
-          showAddModal
-        )}
         <DialogTitle
           sx={{
             fontWeight: 600,
@@ -1566,8 +1561,11 @@ const Invent = () => {
                 },
               }}
             >
-              {categoryOptions.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
+              {categoryOptions.map((option, index) => (
+                <MenuItem
+                  key={option.value || option.label || index}
+                  value={option.value}
+                >
                   <span
                     style={{ display: "flex", alignItems: "center", gap: 8 }}
                   >
@@ -1610,9 +1608,11 @@ const Invent = () => {
           <TextField
             label="Availability"
             placeholder="In Stock"
-            value={newItem.availability || ""}
+            type="number"
+            inputProps={{ min: 1, step: 1 }}
+            value={newItem.stockQuantity || ""}
             onChange={(e) =>
-              setNewItem({ ...newItem, availability: e.target.value })
+              setNewItem({ ...newItem, stockQuantity: e.target.value })
             }
             fullWidth
             margin="normal"
@@ -1647,27 +1647,20 @@ const Invent = () => {
             />
           </Box>
           <Autocomplete
-            options={Array.isArray(suppliers) ? suppliers : []}
+            options={filteredSuppliers}
             getOptionLabel={(option) =>
-              typeof option === "string" ? option : option.email || ""
+              option.businessName ||
+              option.companyName ||
+              option.name ||
+              option.user?.email ||
+              ""
             }
-            filterOptions={(options, { inputValue }) => {
-              if (!Array.isArray(options)) return [];
-              const searchTerm = inputValue.toLowerCase();
-              return options.filter((option) => {
-                const email = option.email?.toLowerCase() || "";
-                const businessName = option.businessName?.toLowerCase() || "";
-                const companyName = option.companyName?.toLowerCase() || "";
-                const name = option.name?.toLowerCase() || "";
-
-                return (
-                  email.includes(searchTerm) ||
-                  businessName.includes(searchTerm) ||
-                  companyName.includes(searchTerm) ||
-                  name.includes(searchTerm)
-                );
-              });
-            }}
+            filterOptions={(options) => options}
+            onInputChange={(event, value) => setSupplierSearch(value)}
+            open={supplierDropdownOpen}
+            onOpen={() => setSupplierDropdownOpen(true)}
+            onClose={() => setSupplierDropdownOpen(false)}
+            openOnFocus
             value={selectedSupplier}
             onChange={(event, newValue) => {
               setSelectedSupplier(newValue);
@@ -1676,6 +1669,7 @@ const Invent = () => {
                 supplier: newValue ? newValue._id : "",
               });
             }}
+            disablePortal
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -1683,24 +1677,34 @@ const Invent = () => {
                 placeholder={
                   suppliersLoading
                     ? "Loading suppliers..."
-                    : "Type supplier email or business name..."
+                    : "Type supplier name, company, or email..."
                 }
                 margin="normal"
                 helperText={
                   suppliersLoading
                     ? "Loading suppliers..."
-                    : "Search by email, business name, or company name"
+                    : "Search by business name, company name, or email"
                 }
               />
             )}
-            renderOption={(props, option) => (
-              <Box component="li" {...props}>
+            renderOption={(props, option, { index }) => (
+              <Box
+                component="li"
+                {...props}
+                key={
+                  option._id ||
+                  option.email ||
+                  option.businessName ||
+                  option.name ||
+                  index
+                }
+              >
                 <Box>
                   <Box sx={{ fontWeight: "bold" }}>
                     {option.businessName || option.companyName || option.name}
                   </Box>
                   <Box sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
-                    {option.email}
+                    {option.user?.email}
                   </Box>
                 </Box>
               </Box>
@@ -1766,6 +1770,19 @@ const Invent = () => {
             }}
           >
             {saveError}
+          </div>
+        )}
+        {saveSuccess && (
+          <div
+            style={{
+              color: "green",
+              textAlign: "center",
+              marginTop: 8,
+              marginBottom: 16,
+              fontWeight: "bold",
+            }}
+          >
+            {saveSuccess}
           </div>
         )}
       </Dialog>
