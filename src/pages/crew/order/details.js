@@ -568,9 +568,45 @@ const OrderDetails = () => {
                       Delivery Address
                     </Typography>
                   </Box>
-                  <Typography variant="body1" sx={{ color: "#111827", pl: 3.5, fontWeight: 500, fontSize: "15px", lineHeight: 1.5 }}>
-                    {order.deliveryAddress || "Not specified"}
-                  </Typography>
+                  {order.deliveryAddress ? (
+                    <Box sx={{
+                      pl: 3.5,
+                      py: 1.5,
+                      backgroundColor: "#f3f4f6",
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                      fontSize: "15px",
+                      fontWeight: 500,
+                      color: "#111827",
+                      lineHeight: 1.7,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 0.5,
+                    }}>
+                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#111827', fontSize: '15px' }}>
+                        {order.deliveryAddress.recipientName}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                        {order.deliveryAddress.recipientStreet}{order.deliveryAddress.recipientStreet2 ? `, ${order.deliveryAddress.recipientStreet2}` : ''}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                        {order.deliveryAddress.recipientCity}, {order.deliveryAddress.recipientState} {order.deliveryAddress.recipientZip}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                        {order.deliveryAddress.recipientCountry}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                        {order.deliveryAddress.recipientPhone}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                        {order.deliveryAddress.recipientEmail}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="body1" sx={{ color: "#111827", pl: 3.5, fontWeight: 500, fontSize: "15px", lineHeight: 1.5 }}>
+                      Not specified
+                    </Typography>
+                  )}
                 </Box>
 
                 {order.additionalNotes && (
