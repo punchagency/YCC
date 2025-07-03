@@ -313,7 +313,9 @@ const Invent = () => {
     }
 
     try {
-      const result = await getAllInventories(pageNum, 10);
+      // Ensure the backend always receives a one-based page number
+      const apiPageNum = pageNum < 1 ? 1 : pageNum + (pageNum === 0 ? 1 : 0);
+      const result = await getAllInventories(apiPageNum, 10);
 
       if (result.success) {
         const formattedItems = result.data.map((item) => ({
