@@ -342,7 +342,7 @@ const CartPage = () => {
         });
         clearCartContext();
         // Navigate to order details
-        navigate(`/crew/orders-management/${response.data.orderId}`);
+        navigate(`/crew/orders-management/${response.data._id}`);
       } else {
         toast.current.show({
           severity: 'error',
