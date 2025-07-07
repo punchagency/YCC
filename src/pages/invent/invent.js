@@ -1345,6 +1345,11 @@ const Invent = () => {
     setFilteredSuppliers(filtered.slice(0, supplierPage * SUPPLIERS_PER_PAGE));
   }, [supplierSearch, suppliers, supplierPage]);
 
+  // Fetch new data when page changes
+  useEffect(() => {
+    fetchInventoryData(page + 1);
+  }, [page]);
+
   return (
     <>
       <div
