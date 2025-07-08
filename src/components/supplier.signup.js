@@ -15,6 +15,7 @@ import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
 import countryList from "react-select-country-list";
 
@@ -138,6 +139,8 @@ const SupplierSignUpForm = ({
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] =
     useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Ensure formData includes departments as an array
   const [localFormData, setLocalFormData] = useState({
@@ -189,6 +192,13 @@ const SupplierSignUpForm = ({
     setLocalFormData(updated);
     setFormData(updated);
   };
+  // Password validation helper
+  const isPasswordValid = () => {
+    if (!formData.password || !formData.confirmPassword) return false;
+    if (formData.password.length < 8) return false;
+    if (formData.password !== formData.confirmPassword) return false;
+    return true;
+  };
 
   const handleAddressChange = (field, value) => {
     const updatedAddress = {
@@ -199,11 +209,23 @@ const SupplierSignUpForm = ({
   };
 
   const handleSignup = async () => {
+    // Password validation
+    if (!formData.password || !formData.confirmPassword) {
+      setError("Please enter and confirm your password.");
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     if (!formData.acceptTerms) {
       setError("Please accept the Supplier Agreement to continue.");
       return;
     }
-
     if (!formData.acceptPrivacyTerms) {
       setError(
         "Please accept the Privacy Policy and Terms & Conditions to continue."
@@ -220,6 +242,8 @@ const SupplierSignUpForm = ({
       // Add basic fields
       formDataObj.append("email", formData.email);
       formDataObj.append("role", "supplier");
+      formDataObj.append("password", formData.password);
+      formDataObj.append("confirmPassword", formData.confirmPassword);
 
       // Add supplier details
       const getServiceAreaArray = () => {
@@ -825,6 +849,116 @@ const SupplierSignUpForm = ({
           </div>
         </div>
       </div>
+      {/* Password */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="password">Password</label>
+          </div>
+          <div className="inputBorder" style={{ position: "relative" }}>
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="password"
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={formData.password || ""}
+              onChange={(e) => handleInputChange("password", e.target.value)}
+              placeholder="Enter password"
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
+              }}
+              minLength={8}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                outline: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <VisibilityOffIcon style={{ fontSize: 18, color: "#034D92" }} />
+              ) : (
+                <VisibilityIcon style={{ fontSize: 18, color: "#034D92" }} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Confirm Password */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="confirmPassword">Confirm Password</label>
+          </div>
+          <div className="inputBorder" style={{ position: "relative" }}>
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="confirm password"
+            />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              value={formData.confirmPassword || ""}
+              onChange={(e) =>
+                handleInputChange("confirmPassword", e.target.value)
+              }
+              placeholder="Confirm password"
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
+              }}
+              minLength={8}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                outline: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? (
+                <VisibilityOffIcon style={{ fontSize: 18, color: "#034D92" }} />
+              ) : (
+                <VisibilityIcon style={{ fontSize: 18, color: "#034D92" }} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Supplier Agreement */}
       <div className="form-group1">
@@ -894,33 +1028,6 @@ const SupplierSignUpForm = ({
                   Supplier Agreement
                 </span>
               </label>
-              <button
-                type="button"
-                onClick={() => setIsTermsModalOpen(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "24px",
-                  height: "24px",
-                  border: "none",
-                  borderRadius: "4px",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f0f0f0";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-                title="View Supplier Agreement"
-              >
-                <VisibilityIcon
-                  style={{ fontSize: "18px", color: "#034D92" }}
-                />
-              </button>
             </div>
           </div>
         </div>
