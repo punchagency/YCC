@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import inputLogo from "../assets/images/nameinput.png";
 import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
@@ -14,8 +14,9 @@ import { signup } from "../services/authService";
 import roleLogo from "../assets/images/roleLogo.png";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
+import countryList from "react-select-country-list";
 
 // Replace the static supplierTypeOptions with a mapping of departments to their options
 const departmentSupplierTypes = {
@@ -122,6 +123,8 @@ const serviceAreaOptions = [
   { value: "Both", label: "Both" },
 ];
 
+const countryOptions = countryList().getData();
+
 const SupplierSignUpForm = ({
   setStep,
   currentStep,
@@ -133,13 +136,29 @@ const SupplierSignUpForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] = useState(false);
+  const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] =
+    useState(false);
 
   // Ensure formData includes departments as an array
   const [localFormData, setLocalFormData] = useState({
     ...formData,
     departments: formData.departments || [],
   });
+
+  // Add effect to initialize address object if not present
+  useEffect(() => {
+    if (!formData.address || typeof formData.address !== "object") {
+      handleInputChange("address", {
+        street: "",
+        street2: "",
+        city: "",
+        state: "",
+        zip: "",
+        country: "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Add effect to update supplier type options when department changes
   useEffect(() => {
@@ -171,6 +190,14 @@ const SupplierSignUpForm = ({
     setFormData(updated);
   };
 
+  const handleAddressChange = (field, value) => {
+    const updatedAddress = {
+      ...formData.address,
+      [field]: value,
+    };
+    handleInputChange("address", updatedAddress);
+  };
+
   const handleSignup = async () => {
     if (!formData.acceptTerms) {
       setError("Please accept the Supplier Agreement to continue.");
@@ -178,7 +205,9 @@ const SupplierSignUpForm = ({
     }
 
     if (!formData.acceptPrivacyTerms) {
-      setError("Please accept the Privacy Policy and Terms & Conditions to continue.");
+      setError(
+        "Please accept the Privacy Policy and Terms & Conditions to continue."
+      );
       return;
     }
 
@@ -202,7 +231,7 @@ const SupplierSignUpForm = ({
       };
       const supplierDetails = {
         businessName: formData.businessName || "",
-        departments: formData.departments?.map(dept => dept.value) || [],
+        departments: formData.departments?.map((dept) => dept.value) || [],
         phone: formData.phone || "",
         address: formData.address || "",
         website: normalizeWebsiteUrl(formData.website || ""),
@@ -283,7 +312,9 @@ const SupplierSignUpForm = ({
               type="text"
               id="businessName"
               value={formData.businessName || ""}
-              onChange={(e) => handleInputChange("businessName", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("businessName", e.target.value)
+              }
               placeholder="Enter your business name"
             />
           </div>
@@ -317,10 +348,26 @@ const SupplierSignUpForm = ({
       <div className="form-group1">
         <div className="input-field">
           <label htmlFor="departments">Departments Served</label>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f8f8", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              background: "#f8f8f8",
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              marginBottom: "8px",
+            }}
+          >
             <img
               src={departmentLogo}
-              style={{ width: "18px", height: "18px", flexShrink: 0, marginRight: "6px" }}
+              style={{
+                width: "18px",
+                height: "18px",
+                flexShrink: 0,
+                marginRight: "6px",
+              }}
               alt="department"
             />
             <div style={{ flex: 1 }}>
@@ -329,11 +376,18 @@ const SupplierSignUpForm = ({
                 name="departments"
                 options={departmentOptions}
                 value={localFormData.departments}
-                onChange={(selected) => handleInputChange("departments", selected)}
+                onChange={(selected) =>
+                  handleInputChange("departments", selected)
+                }
                 classNamePrefix="select"
                 placeholder="Select departments"
                 styles={{
-                  control: (base) => ({ ...base, border: "none", boxShadow: "none", background: "transparent" }),
+                  control: (base) => ({
+                    ...base,
+                    border: "none",
+                    boxShadow: "none",
+                    background: "transparent",
+                  }),
                   valueContainer: (base) => ({ ...base, padding: 0 }),
                   input: (base) => ({ ...base, margin: 0 }),
                   indicatorsContainer: (base) => ({ ...base, height: "32px" }),
@@ -356,12 +410,14 @@ const SupplierSignUpForm = ({
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.background =
+              "linear-gradient(to right, #023a7a, #0366b3)";
             e.target.style.transform = "translateY(-2px)";
             e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.background =
+              "linear-gradient(to right, #034d92, #0487d9)";
             e.target.style.transform = "translateY(0)";
             e.target.style.boxShadow = "none";
           }}
@@ -415,13 +471,14 @@ const SupplierSignUpForm = ({
         </div>
       </div>
 
-      {/* Address */}
+      {/* Address - Detailed Fields */}
       <div className="form-group1">
         <div className="input-field">
           <div>
             <label htmlFor="address">Business Address</label>
           </div>
-          <div className="inputBorder">
+          {/* Street Address 1 */}
+          <div className="inputBorder" style={{ marginBottom: 12 }}>
             <img
               src={location}
               style={{ width: "12px", height: "12px" }}
@@ -429,11 +486,150 @@ const SupplierSignUpForm = ({
             />
             <input
               type="text"
-              id="address"
-              value={formData.address || ""}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-              placeholder="Enter your business address"
+              id="street"
+              value={formData.address?.street || ""}
+              onChange={(e) => handleAddressChange("street", e.target.value)}
+              placeholder="Street Address"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                flex: 1,
+              }}
+              required
             />
+          </div>
+          {/* Street Address 2 (optional) */}
+          <div className="inputBorder" style={{ marginBottom: 12 }}>
+            <img
+              src={location}
+              style={{ width: "12px", height: "12px" }}
+              alt="location"
+            />
+            <input
+              type="text"
+              id="street2"
+              value={formData.address?.street2 || ""}
+              onChange={(e) => handleAddressChange("street2", e.target.value)}
+              placeholder="Street Address 2 (optional)"
+              style={{
+                border: "none",
+                outline: "none",
+                background: "transparent",
+                flex: 1,
+              }}
+            />
+          </div>
+          {/* City and State */}
+          <div style={{ display: "flex", gap: "8px", marginBottom: 12 }}>
+            <div className="inputBorder" style={{ flex: 1 }}>
+              <img
+                src={location}
+                style={{ width: "12px", height: "12px" }}
+                alt="location"
+              />
+              <input
+                type="text"
+                id="city"
+                value={formData.address?.city || ""}
+                onChange={(e) => handleAddressChange("city", e.target.value)}
+                placeholder="City"
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  flex: 1,
+                }}
+                required
+              />
+            </div>
+            <div className="inputBorder" style={{ flex: 1 }}>
+              <img
+                src={location}
+                style={{ width: "12px", height: "12px" }}
+                alt="location"
+              />
+              <input
+                type="text"
+                id="state"
+                value={formData.address?.state || ""}
+                onChange={(e) => handleAddressChange("state", e.target.value)}
+                placeholder="State/Province/Region"
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  flex: 1,
+                }}
+                required
+              />
+            </div>
+          </div>
+          {/* Zip and Country */}
+          <div style={{ display: "flex", gap: "8px", marginBottom: 12 }}>
+            <div className="inputBorder" style={{ flex: 1 }}>
+              <img
+                src={location}
+                style={{ width: "12px", height: "12px" }}
+                alt="location"
+              />
+              <input
+                type="text"
+                id="zip"
+                value={formData.address?.zip || ""}
+                onChange={(e) => handleAddressChange("zip", e.target.value)}
+                placeholder="Zip/Postal Code"
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  flex: 1,
+                }}
+                required
+              />
+            </div>
+            <div
+              className="inputBorder"
+              style={{ flex: 1, padding: 0, background: "#f8f8f8" }}
+            >
+              <img
+                src={location}
+                style={{ width: "12px", height: "12px", marginLeft: 8 }}
+                alt="location"
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Select
+                  options={countryOptions}
+                  value={
+                    countryOptions.find(
+                      (c) => c.value === formData.address?.country
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    handleAddressChange("country", option ? option.value : "")
+                  }
+                  placeholder="Select country..."
+                  isSearchable
+                  classNamePrefix="select"
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      border: "none",
+                      boxShadow: "none",
+                      background: "transparent",
+                      minHeight: 32,
+                    }),
+                    valueContainer: (base) => ({ ...base, padding: 0 }),
+                    input: (base) => ({ ...base, margin: 0 }),
+                    indicatorsContainer: (base) => ({
+                      ...base,
+                      height: "32px",
+                    }),
+                  }}
+                  required
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -466,8 +662,8 @@ const SupplierSignUpForm = ({
         <button
           className="prev-button"
           onClick={() => setStep(1)}
-          style={{ 
-            width: "48%", 
+          style={{
+            width: "48%",
             background: "#f0f0f0",
             transition: "all 0.3s ease",
             cursor: "pointer",
@@ -495,12 +691,14 @@ const SupplierSignUpForm = ({
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.background =
+              "linear-gradient(to right, #023a7a, #0366b3)";
             e.target.style.transform = "translateY(-2px)";
             e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.background =
+              "linear-gradient(to right, #034d92, #0487d9)";
             e.target.style.transform = "translateY(0)";
             e.target.style.boxShadow = "none";
           }}
@@ -579,10 +777,26 @@ const SupplierSignUpForm = ({
       <div className="form-group1">
         <div className="input-field">
           <label htmlFor="serviceArea">Service Area</label>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f8f8", border: "1px solid #e0e0e0", borderRadius: "8px", padding: "10px 14px", marginBottom: "8px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              background: "#f8f8f8",
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
+              padding: "10px 14px",
+              marginBottom: "8px",
+            }}
+          >
             <img
               src={location}
-              style={{ width: "18px", height: "18px", flexShrink: 0, marginRight: "6px" }}
+              style={{
+                width: "18px",
+                height: "18px",
+                flexShrink: 0,
+                marginRight: "6px",
+              }}
               alt="location"
             />
             <div style={{ flex: 1 }}>
@@ -590,11 +804,18 @@ const SupplierSignUpForm = ({
                 name="serviceArea"
                 options={serviceAreaOptions}
                 value={formData.serviceArea}
-                onChange={(selected) => handleInputChange("serviceArea", selected)}
+                onChange={(selected) =>
+                  handleInputChange("serviceArea", selected)
+                }
                 classNamePrefix="select"
                 placeholder="Select service area"
                 styles={{
-                  control: (base) => ({ ...base, border: "none", boxShadow: "none", background: "transparent" }),
+                  control: (base) => ({
+                    ...base,
+                    border: "none",
+                    boxShadow: "none",
+                    background: "transparent",
+                  }),
                   valueContainer: (base) => ({ ...base, padding: 0 }),
                   input: (base) => ({ ...base, margin: 0 }),
                   indicatorsContainer: (base) => ({ ...base, height: "32px" }),
@@ -609,36 +830,45 @@ const SupplierSignUpForm = ({
       <div className="form-group1">
         <div className="input-field">
           <div
-            className="checkbox-field" 
+            className="checkbox-field"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "5px 0 2px 0"
+              padding: "5px 0 2px 0",
             }}
           >
             <input
               type="checkbox"
               id="terms"
               checked={formData.acceptTerms}
-              onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
+              onChange={(e) =>
+                handleInputChange("acceptTerms", e.target.checked)
+              }
               style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             />
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-              <label 
-                htmlFor="terms" 
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                flex: 1,
+              }}
+            >
+              <label
+                htmlFor="terms"
                 style={{
                   cursor: "pointer",
                   fontSize: "14px",
                   color: "#333",
                   margin: "0",
                   lineHeight: "1.4",
-                  flex: 1
+                  flex: 1,
                 }}
               >
                 I agree to the{" "}
@@ -687,7 +917,9 @@ const SupplierSignUpForm = ({
                 }}
                 title="View Supplier Agreement"
               >
-                <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
+                <VisibilityIcon
+                  style={{ fontSize: "18px", color: "#034D92" }}
+                />
               </button>
             </div>
           </div>
@@ -698,36 +930,45 @@ const SupplierSignUpForm = ({
       <div className="form-group1">
         <div className="input-field">
           <div
-            className="checkbox-field" 
+            className="checkbox-field"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "5px 0 2px 0"
+              padding: "5px 0 2px 0",
             }}
           >
             <input
               type="checkbox"
               id="privacyTerms"
               checked={formData.acceptPrivacyTerms}
-              onChange={(e) => handleInputChange("acceptPrivacyTerms", e.target.checked)}
+              onChange={(e) =>
+                handleInputChange("acceptPrivacyTerms", e.target.checked)
+              }
               style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             />
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-              <label 
-                htmlFor="privacyTerms" 
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                flex: 1,
+              }}
+            >
+              <label
+                htmlFor="privacyTerms"
                 style={{
                   cursor: "pointer",
                   fontSize: "14px",
                   color: "#333",
                   margin: "0",
                   lineHeight: "1.4",
-                  flex: 1
+                  flex: 1,
                 }}
               >
                 I agree to the{" "}
@@ -751,8 +992,8 @@ const SupplierSignUpForm = ({
                   }}
                 >
                   Privacy Policy
-                </span>
-                {" "}and{" "}
+                </span>{" "}
+                and{" "}
                 <span
                   onClick={(e) => {
                     e.preventDefault();
@@ -781,59 +1022,61 @@ const SupplierSignUpForm = ({
       </div>
 
       {/* Navigation Buttons */}
-        <div className="button-group">
-          <button
-            className="prev-button"
+      <div className="button-group">
+        <button
+          className="prev-button"
           onClick={() => setStep(2)}
-            style={{ 
-              width: "48%", 
-              background: "#f0f0f0",
-              transition: "all 0.3s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "#e0e0e0";
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "#f0f0f0";
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "none";
-            }}
-          >
-            Previous
-          </button>
-          <button
-            className="next-button"
-            onClick={handleSignup}
+          style={{
+            width: "48%",
+            background: "#f0f0f0",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = "#e0e0e0";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = "#f0f0f0";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
+          }}
+        >
+          Previous
+        </button>
+        <button
+          className="next-button"
+          onClick={handleSignup}
           disabled={isSubmitting}
-            style={{
-              width: "48%",
+          style={{
+            width: "48%",
             background: !isSubmitting
-                  ? "linear-gradient(to right, #034d92, #0487d9)"
-                  : "#ccc",
+              ? "linear-gradient(to right, #034d92, #0487d9)"
+              : "#ccc",
             cursor: !isSubmitting ? "pointer" : "not-allowed",
             opacity: !isSubmitting ? 1 : 0.7,
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              if (!isSubmitting) {
-                e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
-                e.target.style.transform = "translateY(-2px)";
-                e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isSubmitting) {
-                e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
-                e.target.style.transform = "translateY(0)";
-                e.target.style.boxShadow = "none";
-              }
-            }}
-          >
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting) {
+              e.target.style.background =
+                "linear-gradient(to right, #023a7a, #0366b3)";
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting) {
+              e.target.style.background =
+                "linear-gradient(to right, #034d92, #0487d9)";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
+            }
+          }}
+        >
           {isSubmitting ? "Submitting..." : "Submit Application"}
-          </button>
+        </button>
       </div>
 
       {/* Terms Modal */}
