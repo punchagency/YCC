@@ -38,6 +38,8 @@ import {
   FormControl,
   Button,
   Autocomplete,
+  Typography,
+  Stack,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
@@ -50,6 +52,7 @@ import Alert from "@mui/material/Alert";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveIcon from "@mui/icons-material/Remove";
+import CloudUpload from "@mui/icons-material/CloudUpload";
 
 import {
   createInventoryData,
@@ -128,12 +131,15 @@ const Invent = () => {
     price: "",
   });
 
+  // Add description to newItem state
   const [newItem, setNewItem] = useState({
     productName: "",
     category: "",
     stockQuantity: "",
     price: "",
     supplier: "",
+    description: "",
+    fileName: "",
   });
 
   const [suppliers, setSuppliers] = useState([]);
@@ -436,39 +442,60 @@ const Invent = () => {
 
   const handleUpdate = async () => {
     setIsLoading(true);
-
     try {
-      // Format the data for the API - make sure this matches your API's expected structure
-      const updateData = {
-        productName: editItem.productName,
-        category: editItem.category,
-        stockQuantity: editItem.stockQuantity,
-        price: editItem.price,
-      };
-
-      const result = await updateInventoryItem(editItem.id, updateData);
-
-      if (result.success) {
-        // Update the local state with the updated item
-        const updatedItems = [...inventoryItems];
-        const updatedItem = {
-          id: editItem.id,
+      let updateData;
+      let isFormData = false;
+      if (editItem.productImage && editItem.productImage instanceof File) {
+        updateData = new FormData();
+        updateData.append("productName", editItem.productName);
+        updateData.append("category", editItem.category);
+        updateData.append("stockQuantity", editItem.stockQuantity);
+        updateData.append("price", editItem.price);
+        updateData.append("description", editItem.description);
+        updateData.append("productImage", editItem.productImage);
+        isFormData = true;
+      } else {
+        updateData = {
           productName: editItem.productName,
           category: editItem.category,
-          stockQuantity: parseInt(editItem.stockQuantity),
-          price: parseFloat(editItem.price),
-          productImage: editItem.productImage,
+          stockQuantity: editItem.stockQuantity,
+          price: editItem.price,
+          description: editItem.description,
         };
-
-        updatedItems[editItem.index] = updatedItem;
-        setInventoryItems(updatedItems);
-
+      }
+      const result = await updateInventoryItem(
+        editItem.id,
+        updateData,
+        isFormData
+      );
+      if (result.success) {
+        // Update UI with new data
+        setInventoryItems((prev) =>
+          prev.map((item) =>
+            item.id === editItem.id
+              ? {
+                  ...item,
+                  ...editItem,
+                  productImage: imagePreview || item.productImage,
+                }
+              : item
+          )
+        );
         setShowEditModal(false);
+        setSnackbar({
+          open: true,
+          message: "Product updated successfully!",
+          severity: "success",
+        });
       } else {
-        console.error("Failed to update product:", result.error);
+        setSnackbar({
+          open: true,
+          message: result.error || "Update failed",
+          severity: "error",
+        });
       }
     } catch (error) {
-      console.error("Error updating product:", error);
+      setSnackbar({ open: true, message: "Update failed", severity: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -508,6 +535,19 @@ const Invent = () => {
 
   const handleAddProduct = () => {
     setShowAddModal(true);
+    setNewItem({
+      productName: "",
+      category: "",
+      stockQuantity: "",
+      price: "",
+      supplier: "",
+      description: "",
+      fileName: "",
+    });
+    setProductImage(null);
+    setImagePreview(null);
+    setSaveSuccess("");
+    setSaveError("");
   };
 
   // Add this function to handle image selection
@@ -515,13 +555,8 @@ const Invent = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProductImage(file);
-
-      // Create a preview URL for the selected image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setNewItem({ ...newItem, fileName: file.name });
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -548,12 +583,15 @@ const Invent = () => {
       formData.append("category", newItem.category);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
+      // In handleSaveProduct, always send description (backend will ignore if not needed)
+      formData.append("description", newItem.description);
       if (newItem.supplier) {
         formData.append("supplierId", newItem.supplier);
       }
 
       // Append the image file if one was selected
       if (productImage) {
+        console.log("Appending inventoryImage to FormData:", productImage);
         formData.append("inventoryImage", productImage);
       }
 
@@ -581,13 +619,22 @@ const Invent = () => {
           stockQuantity: "",
           price: "",
           supplier: "",
+          description: "",
+          fileName: "",
         });
         setProductImage(null);
         setImagePreview(null);
         setSelectedSupplier(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        // Also reset the file input by setting its value to null
+        if (fileInputRef.current) fileInputRef.current.value = null;
 
         setShowAddModal(false);
-        setSaveSuccess("Product added successfully!");
+        setSnackbar({
+          open: true,
+          message: "Product added successfully!",
+          severity: "success",
+        });
         setSaveError(""); // Clear any previous errors
       } else {
         setSaveError(
@@ -666,6 +713,7 @@ const Invent = () => {
           stockQuantity: result.data.quantity || 0,
           price: result.data.price || 0,
           productImage: result.data.productImage || null,
+          product: result.data.product, // <-- full product object
         };
 
         setViewItem(item);
@@ -740,8 +788,10 @@ const Invent = () => {
   const renderMobileInventoryCards = () => {
     return (
       <div style={{ padding: "0 10px" }}>
-        <div
-          style={{ display: "flex", alignItems: "center", marginBottom: 12 }}
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={1}
+          sx={{ mb: 2, width: "100%" }}
         >
           <Box
             className="custom-dropdown"
@@ -759,7 +809,9 @@ const Invent = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: 1,
+                width: "100%",
               }}
+              fullWidth
             >
               {stockStatusFilter === "all" && "All"}
               {stockStatusFilter === "high" && (
@@ -873,21 +925,12 @@ const Invent = () => {
               </Box>
             )}
           </Box>
-          <input
-            type="text"
+          <TextField
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             placeholder="Search by product name..."
-            style={{
-              marginLeft: 8,
-              padding: "8px 12px",
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              fontSize: "14px",
-              minWidth: "150px",
-              height: "36px",
-              flex: 1,
-            }}
+            fullWidth
+            size="small"
           />
           <Button
             variant="contained"
@@ -896,16 +939,12 @@ const Invent = () => {
               setAppliedStockStatus(stockStatusFilter);
               setAppliedSearchText(searchText);
             }}
-            style={{
-              marginLeft: 8,
-              height: "36px",
-              padding: "8px 16px",
-              fontSize: "14px",
-            }}
+            fullWidth
+            sx={{ minWidth: { sm: 120 } }}
           >
             Search
           </Button>
-        </div>
+        </Stack>
         {inventoryItems.map((item, index) => (
           <div
             key={index}
@@ -990,7 +1029,12 @@ const Invent = () => {
               </div>
               <div>
                 <span style={{ color: "#666" }}>Price: </span>
-                <span>${item.price.toFixed(2)}</span>
+                <span>
+                  $
+                  {!isNaN(Number(item.price))
+                    ? Number(item.price).toFixed(2)
+                    : "0.00"}
+                </span>
               </div>
             </div>
 
@@ -1015,6 +1059,17 @@ const Invent = () => {
             </div>
           </div>
         ))}
+        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Pagination
+            currentPage={page + 1}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            onPageChange={(newPage) => {
+              setPage(newPage - 1);
+            }}
+          />
+        </Box>
       </div>
     );
   };
@@ -1125,6 +1180,7 @@ const Invent = () => {
                 alignItems: "center",
                 gap: 1,
               }}
+              fullWidth
             >
               {stockStatusFilter === "all" && "All"}
               {stockStatusFilter === "high" && (
@@ -1238,37 +1294,36 @@ const Invent = () => {
               </Box>
             )}
           </Box>
-          <input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search by product name..."
-            style={{
-              marginLeft: 8,
-              padding: "8px 12px",
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              fontSize: "14px",
-              minWidth: "200px",
-              height: "36px",
-            }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setAppliedStockStatus(stockStatusFilter);
-              setAppliedSearchText(searchText);
-            }}
-            style={{
-              marginLeft: 8,
-              height: "36px",
-              padding: "8px 16px",
-              fontSize: "14px",
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: "stretch",
+              gap: 1,
+              mb: 2,
             }}
           >
-            Search
-          </Button>
+            <TextField
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search by product name..."
+              fullWidth
+              size="small"
+              sx={{ mb: { xs: 1, sm: 0 } }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setAppliedStockStatus(stockStatusFilter);
+                setAppliedSearchText(searchText);
+              }}
+              fullWidth
+              sx={{ minWidth: { sm: 120 } }}
+            >
+              Search
+            </Button>
+          </Box>
         </Box>
         <TableContainer
           component={Paper}
@@ -1391,7 +1446,13 @@ const Invent = () => {
                         {item.stockQuantity} Liters
                       </span>
                     </TableCell>
-                    <TableCell>${item.price?.toFixed(2)}/L</TableCell>
+                    <TableCell>
+                      $
+                      {!isNaN(Number(item.price))
+                        ? Number(item.price).toFixed(2)
+                        : "0.00"}
+                      /L
+                    </TableCell>
                     <TableCell>
                       <Tooltip title="View">
                         <IconButton onClick={() => handleViewItem(item)}>
@@ -1528,8 +1589,8 @@ const Invent = () => {
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);
-    setSaveError("");
     setSaveSuccess("");
+    setSaveError("");
     setSelectedSupplier(null);
     setNewItem({
       productName: "",
@@ -1537,6 +1598,8 @@ const Invent = () => {
       stockQuantity: "",
       price: "",
       supplier: "",
+      description: "",
+      fileName: "",
     });
   };
 
@@ -1556,6 +1619,8 @@ const Invent = () => {
     });
     setFilteredSuppliers(filtered.slice(0, supplierPage * SUPPLIERS_PER_PAGE));
   }, [supplierSearch, suppliers, supplierPage]);
+
+  const fileInputRef = useRef(null);
 
   return (
     <>
@@ -1619,36 +1684,82 @@ const Invent = () => {
             zIndex: 9999,
             backgroundColor: "#ffffff",
             border: "2px solid #0387D9",
+            maxWidth: "100vw",
+            width: "100%",
+            height: "100vh",
+            overflowY: "auto",
+            m: 0,
+            p: { xs: 1.5, sm: 4 },
+            borderRadius: { xs: 0, sm: 3 },
+            boxShadow: 4,
+            position: "relative",
           },
         }}
       >
-        <div className="edit-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="productName">Product Name</label>
+        <IconButton
+          aria-label="close"
+          onClick={() => setShowEditModal(false)}
+          sx={{
+            position: "absolute",
+            right: 16,
+            top: 16,
+            zIndex: 10,
+            fontSize: 32,
+          }}
+        >
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+        <Box sx={{ mt: 5, pb: 10 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Product Name
+              </Typography>
               <TextField
                 id="productName"
                 value={editItem.productName}
                 onChange={(e) =>
                   setEditItem({ ...editItem, productName: e.target.value })
                 }
+                fullWidth
+                variant="outlined"
+                size="small"
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Category
+              </Typography>
               <TextField
                 id="category"
                 value={editItem.category}
                 onChange={(e) =>
                   setEditItem({ ...editItem, category: e.target.value })
                 }
+                fullWidth
+                variant="outlined"
+                size="small"
               />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="stockQuantity">Stock Quantity</label>
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Stock Quantity
+              </Typography>
               <TextField
                 id="stockQuantity"
                 type="number"
@@ -1656,13 +1767,20 @@ const Invent = () => {
                 onChange={(e) =>
                   setEditItem({ ...editItem, stockQuantity: e.target.value })
                 }
+                fullWidth
+                variant="outlined"
+                size="small"
               />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="price">Price</label>
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Price
+              </Typography>
               <TextField
                 id="price"
                 type="number"
@@ -1671,44 +1789,142 @@ const Invent = () => {
                 onChange={(e) =>
                   setEditItem({ ...editItem, price: e.target.value })
                 }
+                fullWidth
+                variant="outlined"
+                size="small"
               />
-            </div>
-          </div>
-
-          <div
-            className="button-row"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Description
+              </Typography>
+              <TextField
+                id="description"
+                value={editItem.description || ""}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, description: e.target.value })
+                }
+                fullWidth
+                variant="outlined"
+                size="small"
+                multiline
+                minRows={4}
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Product Image
+              </Typography>
+              <Box
+                sx={{
+                  border: "1px dashed #B0B7C3",
+                  borderRadius: 2,
+                  minHeight: 120,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#B0B7C3",
+                  flexDirection: "column",
+                  position: "relative",
+                  overflow: "hidden",
+                  mb: 1,
+                }}
+              >
+                {editItem.productImage || imagePreview ? (
+                  <img
+                    src={imagePreview || editItem.productImage}
+                    alt="Preview"
+                    style={{
+                      maxHeight: 120,
+                      maxWidth: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    <CloudUpload sx={{ fontSize: 40, color: "#B0B7C3" }} />
+                    <Typography variant="body2">
+                      Drag Or Browse Image
+                    </Typography>
+                  </Box>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                    left: 0,
+                    top: 0,
+                  }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setEditItem({ ...editItem, productImage: file });
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  title="Upload"
+                />
+              </Box>
+            </Paper>
+          </Box>
+        </Box>
+        {/* Sticky Save/Cancel Buttons */}
+        <Box
+          sx={{
+            position: { xs: "fixed", sm: "static" },
+            left: 0,
+            bottom: 0,
+            width: "100vw",
+            background: "rgba(255,255,255,0.97)",
+            boxShadow: "0 -2px 8px rgba(0,0,0,0.08)",
+            p: 2,
+            zIndex: 20,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+          }}
+        >
+          <Button
+            onClick={() => setShowEditModal(false)}
+            disabled={isLoading}
+            fullWidth
+            sx={{
+              mb: { xs: 1, sm: 0 },
+              backgroundColor: "#EF4444",
+              color: "#fff",
             }}
           >
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              onClick={() => setShowEditModal(false)}
-              className="p-button-text"
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-            <Button
-              label={isLoading ? "Updating..." : "Update Product"}
-              icon="pi pi-check"
-              onClick={handleUpdate}
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-          </div>
-        </div>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpdate}
+            disabled={isLoading}
+            fullWidth
+            sx={{ backgroundColor: "#0387D9", color: "#fff" }}
+          >
+            {isLoading ? "Updating..." : "Update Product"}
+          </Button>
+        </Box>
       </Dialog>
 
       <Dialog
@@ -1750,6 +1966,15 @@ const Invent = () => {
             value={newItem.productName}
             onChange={(e) =>
               setNewItem({ ...newItem, productName: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+          />
+          <TextField
+            label="Description"
+            value={newItem.description}
+            onChange={(e) =>
+              setNewItem({ ...newItem, description: e.target.value })
             }
             fullWidth
             margin="normal"
@@ -1862,13 +2087,8 @@ const Invent = () => {
                     <input
                       type="file"
                       hidden
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        setNewItem({
-                          ...newItem,
-                          fileName: file ? file.name : "",
-                        });
-                      }}
+                      onChange={handleImageChange}
+                      ref={fileInputRef}
                     />
                   </IconButton>
                 ),
@@ -1876,6 +2096,13 @@ const Invent = () => {
               fullWidth
             />
           </Box>
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              style={{ maxWidth: 120, maxHeight: 120, margin: "10px 0" }}
+            />
+          )}
           <Autocomplete
             options={filteredSuppliers}
             getOptionLabel={(option) =>
@@ -2231,10 +2458,9 @@ const Invent = () => {
               minRows={3}
               variant="outlined"
               InputProps={{ style: { background: "#FAFAFA", borderRadius: 8 } }}
-              value={
-                viewItem.description ? viewItem.description : "Not available"
-              }
+              value={viewItem.product?.description || "Not available"}
               disabled
+              InputProps={{ readOnly: true, style: { color: "#000" } }}
             />
           </Box>
         </DialogContent>

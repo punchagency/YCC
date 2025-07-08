@@ -16,8 +16,10 @@ import {
   Snackbar,
   Alert,
   Autocomplete,
+  IconButton,
 } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   getInventoryItemById,
   updateInventoryItem,
@@ -64,7 +66,6 @@ const EditInventory = () => {
             : data.product?.category
             ? [data.product.category]
             : [],
-          serviceArea: data.product?.serviceArea || "",
           stockQuantity: data.quantity || "",
           price: data.price || "",
           description: data.product?.description || "",
@@ -104,7 +105,6 @@ const EditInventory = () => {
       const formData = new FormData();
       formData.append("productName", form.productName);
       formData.append("category", JSON.stringify(form.category));
-      formData.append("serviceArea", form.serviceArea);
       formData.append("stockQuantity", form.stockQuantity);
       formData.append("price", form.price);
       formData.append("description", form.description);
@@ -168,51 +168,164 @@ const EditInventory = () => {
     <Box
       sx={{ p: { xs: 1, md: 4 }, background: "#F6F8FA", minHeight: "100vh" }}
     >
-      <Paper sx={{ p: 3, borderRadius: 3 }}>
-        <Grid container spacing={3} alignItems="stretch">
-          <Grid
-            item
-            xs={12}
-            md={6}
-            display="flex"
-            flexDirection="column"
-            gap={2}
-          >
-            <TextField
-              label="Product Name"
-              name="productName"
-              value={form.productName}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Service Area"
-              name="serviceArea"
-              value={form.serviceArea}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Price"
-              name="price"
-              value={form.price}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              InputProps={{
-                startAdornment: <span>$</span>,
-                endAdornment: <span>/L</span>,
-              }}
-            />
-            <Box
-              flex={1}
-              display="flex"
-              flexDirection="column"
-              justifyContent="flex-end"
-            >
-              <Typography fontWeight={500} mb={1}>
+      <Paper
+        elevation={3}
+        sx={{
+          maxWidth: "100vw",
+          width: "100%",
+          height: "100vh",
+          overflowY: "auto",
+          m: 0,
+          p: { xs: 1.5, sm: 4 },
+          borderRadius: { xs: 0, sm: 3 },
+          boxShadow: 4,
+          position: "relative",
+        }}
+      >
+        <IconButton
+          aria-label="close"
+          onClick={() => navigate(-1)}
+          sx={{
+            position: "absolute",
+            right: 16,
+            top: 16,
+            zIndex: 10,
+            fontSize: 32,
+          }}
+        >
+          <CloseIcon fontSize="inherit" />
+        </IconButton>
+        <Box sx={{ mt: 5 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Product Name
+              </Typography>
+              <TextField
+                name="productName"
+                value={form.productName}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                size="small"
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Category
+              </Typography>
+              <Autocomplete
+                multiple
+                freeSolo
+                options={categoryOptions}
+                value={form.category}
+                onChange={handleCategoryChange}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                      onDelete={() => {
+                        const newCategories = value.filter(
+                          (_, i) => i !== index
+                        );
+                        setForm((prev) => ({
+                          ...prev,
+                          category: newCategories,
+                        }));
+                      }}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Type or select categories..."
+                    size="small"
+                  />
+                )}
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Stock Quantity
+              </Typography>
+              <TextField
+                name="stockQuantity"
+                value={form.stockQuantity}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                size="small"
+                InputProps={{ endAdornment: <span>Liters</span> }}
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Price
+              </Typography>
+              <TextField
+                name="price"
+                value={form.price}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                size="small"
+                InputProps={{
+                  startAdornment: <span>$</span>,
+                  endAdornment: <span>/L</span>,
+                }}
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
+                Description
+              </Typography>
+              <TextField
+                name="description"
+                value={form.description || "Not available"}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                size="small"
+                multiline
+                minRows={4}
+                placeholder="Write Your Message Here"
+              />
+            </Paper>
+            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color="text.secondary"
+                mb={0.5}
+              >
                 Upload Photo Here
               </Typography>
               <Box
@@ -220,13 +333,11 @@ const EditInventory = () => {
                   border: "1px dashed #B0B7C3",
                   borderRadius: 2,
                   minHeight: 120,
-                  height: "100%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#B0B7C3",
                   flexDirection: "column",
-                  mb: 2,
                   position: "relative",
                   overflow: "hidden",
                 }}
@@ -270,81 +381,32 @@ const EditInventory = () => {
                   title="Upload"
                 />
               </Box>
-            </Box>
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            md={6}
-            display="flex"
-            flexDirection="column"
-            gap={2}
-          >
-            <Autocomplete
-              multiple
-              freeSolo
-              options={categoryOptions}
-              value={form.category}
-              onChange={handleCategoryChange}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    variant="outlined"
-                    label={option}
-                    {...getTagProps({ index })}
-                    onDelete={() => {
-                      const newCategories = value.filter((_, i) => i !== index);
-                      setForm((prev) => ({ ...prev, category: newCategories }));
-                    }}
-                  />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Category"
-                  placeholder="Type or select categories..."
-                  margin="normal"
-                />
-              )}
-            />
-            <TextField
-              label="Stock Quantity"
-              name="stockQuantity"
-              value={form.stockQuantity}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              InputProps={{ endAdornment: <span>Liters</span> }}
-            />
-            <Box
-              flex={1}
-              display="flex"
-              flexDirection="column"
-              justifyContent="flex-end"
-            >
-              <TextField
-                label="Description"
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                multiline
-                minRows={6}
-                placeholder="Write Your Message Here"
-                sx={{ height: "100%" }}
-                InputProps={{ style: { height: "100%" } }}
-              />
-            </Box>
-          </Grid>
-        </Grid>
-        <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
+            </Paper>
+          </Box>
+        </Box>
+        {/* Sticky Save/Cancel Buttons */}
+        <Box
+          sx={{
+            position: { xs: "fixed", sm: "static" },
+            left: 0,
+            bottom: 0,
+            width: "100vw",
+            background: "#fff",
+            boxShadow: { xs: "0 -2px 8px rgba(0,0,0,0.08)", sm: "none" },
+            p: 2,
+            zIndex: 20,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+          }}
+        >
           <Button
             variant="contained"
             color="error"
             onClick={() => navigate(-1)}
             disabled={saving}
+            fullWidth
+            sx={{ mb: { xs: 1, sm: 0 } }}
           >
             Cancel
           </Button>
@@ -356,6 +418,7 @@ const EditInventory = () => {
             startIcon={
               saving ? <CircularProgress size={20} color="inherit" /> : null
             }
+            fullWidth
           >
             {saving ? "Saving..." : "Save"}
           </Button>
