@@ -74,6 +74,9 @@ const ProfilePage = () => {
   const [picLoading, setPicLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const [replyToEmail, setReplyToEmail] = useState(
+    user?.replyToEmail || user?.email || ""
+  );
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -102,6 +105,7 @@ const ProfilePage = () => {
           country: formData.location,
           yearsOfExperience: formData.yearsOfExperience,
           position: formData.department,
+          replyToEmail: replyToEmail,
         };
 
         const response = await updateCrewProfile(updateData);
@@ -127,6 +131,7 @@ const ProfilePage = () => {
         email: formData.email,
         location: formData.location,
         phone: formData.phone.replace(/^\+/, ""), // Remove + prefix for backend
+        replyToEmail: replyToEmail,
       };
 
       console.log("Updating admin profile with:", updateData);
@@ -504,6 +509,23 @@ const ProfilePage = () => {
               </div>
             </>
           )}
+          <div className="form-group">
+            <label htmlFor="replyToEmail">Reply-To Email</label>
+            <input
+              type="email"
+              id="replyToEmail"
+              name="replyToEmail"
+              value={replyToEmail}
+              onChange={(e) => setReplyToEmail(e.target.value)}
+              disabled={!isEditing}
+              placeholder="Enter a custom reply-to email or leave as your signup email"
+              style={{ width: "100%", padding: "8px", marginTop: "4px" }}
+            />
+            <small style={{ color: "#888" }}>
+              This email will be used as the reply-to address for calendar
+              invites. Default is your signup email: <b>{user?.email}</b>
+            </small>
+          </div>
         </div>
         {isEditing && (
           <div className="form-actions">

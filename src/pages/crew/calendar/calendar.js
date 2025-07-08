@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Dialog } from "primereact/dialog";
+import { Dialog as PrimeDialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 // import { useNavigate } from "react-router-dom";
 // import { TabView, TabPanel } from "primereact/tabview";
@@ -26,6 +26,12 @@ import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
 // import more from "../../assets/images/crew/more.png";
 import { useOutletContext } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 const EventCard = ({
   title,
@@ -38,6 +44,18 @@ const EventCard = ({
   onAddGuest,
 }) => {
   const menuRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Safe menu toggle function
+  const safeMenuToggle = (event) => {
+    try {
+      if (menuRef.current && typeof menuRef.current.toggle === "function") {
+        menuRef.current.toggle(event);
+      }
+    } catch (error) {
+      console.warn("Error toggling menu:", error);
+    }
+  };
 
   const getEventMenuItems = () => [
     {
@@ -106,13 +124,33 @@ const EventCard = ({
   return (
     <div
       className="profiles"
-      style={{ display: "flex", alignItems: "flex-start", padding: "10px 0" }}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        padding: "10px 0",
+        transition: "all 0.3s ease",
+        transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+        boxShadow: isHovered
+          ? "0 4px 12px rgba(0,0,0,0.1)"
+          : "0 2px 4px rgba(0,0,0,0.05)",
+        borderRadius: "8px",
+        backgroundColor: isHovered ? "#f8f9fa" : "transparent",
+        cursor: "pointer",
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <div style={{ marginRight: "12px" }}>
         <img
           src={profilenoti}
           alt="profile"
-          style={{ width: "40px", height: "40px", borderRadius: "50%" }}
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            transition: "transform 0.3s ease",
+            transform: isHovered ? "scale(1.1)" : "scale(1)",
+          }}
         />
       </div>
       <div
@@ -124,13 +162,44 @@ const EventCard = ({
         }}
       >
         <div>
-          <h3 style={{ margin: "0 0 5px 0", fontSize: "16px" }}>{title}</h3>
-          <p style={{ margin: "0 0 5px 0", color: "#666" }}>
+          <h3
+            style={{
+              margin: "0 0 5px 0",
+              fontSize: "16px",
+              color: isHovered ? "#0387D9" : "#333",
+              transition: "color 0.3s ease",
+            }}
+          >
+            {title}
+          </h3>
+          <p
+            style={{
+              margin: "0 0 5px 0",
+              color: "#666",
+              transition: "color 0.3s ease",
+            }}
+          >
             {formatEventTime(start)}
           </p>
-          <p style={{ margin: 0, color: "#666" }}>{formatLocation(location)}</p>
+          <p
+            style={{
+              margin: 0,
+              color: "#666",
+              transition: "color 0.3s ease",
+            }}
+          >
+            {formatLocation(location)}
+          </p>
           {description && (
-            <p style={{ margin: "5px 0 0 0", color: "#666" }}>{description}</p>
+            <p
+              style={{
+                margin: "5px 0 0 0",
+                color: "#666",
+                transition: "color 0.3s ease",
+              }}
+            >
+              {description}
+            </p>
           )}
 
           {/* Add this to show guest count */}
@@ -142,6 +211,8 @@ const EventCard = ({
                 marginTop: "5px",
                 color: "#0387D9",
                 fontSize: "12px",
+                transition: "all 0.3s ease",
+                opacity: isHovered ? 1 : 0.8,
               }}
             >
               <i className="pi pi-users" style={{ marginRight: "5px" }}></i>
@@ -156,14 +227,25 @@ const EventCard = ({
           <img
             src={three}
             alt="menu"
-            style={{ cursor: "pointer" }}
-            onClick={(e) => menuRef.current.toggle(e)}
+            style={{
+              cursor: "pointer",
+              transition: "transform 0.3s ease",
+              transform: isHovered ? "scale(1.2)" : "scale(1)",
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              safeMenuToggle(e);
+            }}
           />
           <Menu
             model={getEventMenuItems()}
             popup
             ref={menuRef}
             style={{ width: "150px" }}
+            onHide={() => {
+              // Clean up ref when menu is hidden
+              menuRef.current = null;
+            }}
           />
         </div>
       </div>
@@ -183,6 +265,23 @@ const DayEventsModal = ({
   // Track which menu is open
   const menuRefs = useRef([]);
 
+  // Clean up all open menus when modal closes
+  const handleModalHide = () => {
+    // Hide all open menus before closing modal
+    if (menuRefs.current) {
+      menuRefs.current.forEach((ref) => {
+        if (ref && typeof ref.hide === "function") {
+          try {
+            ref.hide();
+          } catch (error) {
+            console.warn("Error hiding menu:", error);
+          }
+        }
+      });
+    }
+    onHide();
+  };
+
   const getEventMenuItems = (event) => [
     {
       label: "Update Event",
@@ -201,191 +300,240 @@ const DayEventsModal = ({
     },
   ];
 
-  return (
-    <Dialog
-      visible={visible}
-      onHide={onHide}
-      header={`Events for ${selectedDate?.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}`}
-      style={{ width: "600px" }}
-    >
-      <div className="day-events-content">
-        {events.length === 0 ? (
-          <p>No events scheduled for this day.</p>
-        ) : (
-          events.map((event, index) => (
-            <div
-              key={event._id}
-              className="event-item"
-              style={{
-                position: "relative",
-                marginBottom: 24,
-                borderBottom: "1px solid #eee",
-                paddingBottom: 16,
-              }}
-            >
-              {/* Three-dot image at top right with menu */}
-              <img
-                src={three}
-                alt="menu"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  cursor: "pointer",
-                }}
-                onClick={(e) => menuRefs.current[index].toggle(e)}
-              />
-              <Menu
-                model={getEventMenuItems(event)}
-                popup
-                ref={(el) => (menuRefs.current[index] = el)}
-                style={{ width: "150px" }}
-              />
-              <h3
-                style={{
-                  margin: "0 0 10px 0",
-                  fontSize: "18px",
-                  color: "#344054",
-                }}
-              >
-                {event.title}
-              </h3>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "5px",
-                }}
-              >
-                <i
-                  className="pi pi-calendar"
-                  style={{ marginRight: "8px", color: "#667085" }}
-                ></i>
-                <span style={{ fontSize: "14px", color: "#475467" }}>
-                  {new Date(event.start).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                  })}
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "5px",
-                }}
-              >
-                <i
-                  className="pi pi-map-marker"
-                  style={{ marginRight: "8px", color: "#667085" }}
-                ></i>
-                <span style={{ fontSize: "14px", color: "#475467" }}>
-                  {event.location}
-                </span>
-              </div>
-              {event.description && (
-                <p
-                  style={{
-                    margin: "10px 0 0 0",
-                    fontSize: "14px",
-                    color: "#475467",
-                    padding: "10px",
-                    backgroundColor: "#fff",
-                    borderRadius: "4px",
-                  }}
-                >
-                  {event.description}
-                </p>
-              )}
+  // Safe menu toggle function (PrimeReact Menu, keep for now)
+  const safeMenuToggle = (index, event) => {
+    try {
+      if (
+        menuRefs.current &&
+        menuRefs.current[index] &&
+        typeof menuRefs.current[index].toggle === "function"
+      ) {
+        menuRefs.current[index].toggle(event);
+      }
+    } catch (error) {
+      console.warn("Error toggling menu:", error);
+    }
+  };
 
-              {/* Add this section to display guests */}
-              {(event.guests?.length > 0 || event.guestEmails?.length > 0) && (
-                <div
-                  className="event-guests"
+  return (
+    <Dialog open={visible} onClose={handleModalHide} maxWidth="md" fullWidth>
+      <DialogTitle
+        sx={{
+          m: 0,
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        {`Events for ${selectedDate?.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        })}`}
+        <IconButton
+          aria-label="close"
+          onClick={handleModalHide}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers>
+        <div className="day-events-content">
+          {events.length === 0 ? (
+            <p>No events scheduled for this day.</p>
+          ) : (
+            events.map((event, index) => (
+              <div
+                key={event._id}
+                className="event-item"
+                style={{
+                  position: "relative",
+                  marginBottom: 24,
+                  borderBottom: "1px solid #eee",
+                  paddingBottom: 16,
+                }}
+              >
+                {/* Three-dot image at top right with menu (PrimeReact Menu, keep for now) */}
+                <img
+                  src={three}
+                  alt="menu"
                   style={{
-                    marginTop: "15px",
-                    padding: "10px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "4px",
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => safeMenuToggle(index, e)}
+                />
+                <Menu
+                  model={getEventMenuItems(event)}
+                  popup
+                  ref={(el) => (menuRefs.current[index] = el)}
+                  style={{ width: "150px" }}
+                  onHide={() => {
+                    // Clean up ref when menu is hidden
+                    if (menuRefs.current && menuRefs.current[index]) {
+                      menuRefs.current[index] = null;
+                    }
+                  }}
+                />
+                <h3
+                  style={{
+                    margin: "0 0 10px 0",
+                    fontSize: "18px",
+                    color: "#344054",
                   }}
                 >
-                  <h4
+                  {event.title}
+                </h3>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "5px",
+                  }}
+                >
+                  <i
+                    className="pi pi-calendar"
+                    style={{ marginRight: "8px", color: "#667085" }}
+                  ></i>
+                  <span style={{ fontSize: "14px", color: "#475467" }}>
+                    {new Date(event.start).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "5px",
+                  }}
+                >
+                  <i
+                    className="pi pi-map-marker"
+                    style={{ marginRight: "8px", color: "#667085" }}
+                  ></i>
+                  <span style={{ fontSize: "14px", color: "#475467" }}>
+                    {event.location}
+                  </span>
+                </div>
+                {event.description && (
+                  <p
                     style={{
+                      margin: "10px 0 0 0",
                       fontSize: "14px",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                      color: "#344054",
+                      color: "#475467",
+                      padding: "10px",
+                      backgroundColor: "#fff",
+                      borderRadius: "4px",
                     }}
                   >
-                    Guests
-                  </h4>
+                    {event.description}
+                  </p>
+                )}
 
-                  <div className="guest-list">
-                    {event.guestEmails &&
-                      event.guestEmails.map((email, idx) => (
-                        <div
-                          key={`email-${idx}`}
-                          className="guest-item"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <i
-                            className="pi pi-envelope"
-                            style={{
-                              marginRight: "8px",
-                              color: "#667085",
-                              fontSize: "12px",
-                            }}
-                          ></i>
-                          <span style={{ fontSize: "13px", color: "#475467" }}>
-                            {email}
-                          </span>
-                        </div>
-                      ))}
+                {/* Add this section to display guests */}
+                {(event.guests?.length > 0 ||
+                  event.guestEmails?.length > 0) && (
+                  <div
+                    className="event-guests"
+                    style={{
+                      marginTop: "15px",
+                      padding: "10px",
+                      backgroundColor: "#f8f9fa",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        marginBottom: "8px",
+                        color: "#344054",
+                      }}
+                    >
+                      Guests
+                    </h4>
 
-                    {event.guests &&
-                      event.guests.map((guest, idx) => (
-                        <div
-                          key={`guest-${idx}`}
-                          className="guest-item"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <i
-                            className="pi pi-user"
+                    <div className="guest-list">
+                      {event.guestEmails &&
+                        event.guestEmails.map((email, idx) => (
+                          <div
+                            key={"email-" + idx}
                             style={{
-                              marginRight: "8px",
-                              color: "#667085",
-                              fontSize: "12px",
+                              display: "flex",
+                              alignItems: "center",
+                              marginBottom: "5px",
                             }}
-                          ></i>
-                          <span style={{ fontSize: "13px", color: "#475467" }}>
-                            {guest.email || guest.name || `Guest ${idx + 1}`}
-                          </span>
-                        </div>
-                      ))}
+                          >
+                            <i
+                              className="pi pi-envelope"
+                              style={{
+                                marginRight: "8px",
+                                color: "#667085",
+                                fontSize: "12px",
+                              }}
+                            ></i>
+                            <span
+                              style={{ fontSize: "13px", color: "#475467" }}
+                            >
+                              {email}
+                            </span>
+                          </div>
+                        ))}
+
+                      {event.guests &&
+                        event.guests.map((guest, idx) => (
+                          <div
+                            key={"guest-" + idx}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            <i
+                              className="pi pi-user"
+                              style={{
+                                marginRight: "8px",
+                                color: "#667085",
+                                fontSize: "12px",
+                              }}
+                            ></i>
+                            <span
+                              style={{ fontSize: "13px", color: "#475467" }}
+                            >
+                              {guest.email || guest.name || `Guest ${idx + 1}`}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleModalHide} color="primary">
+          Close
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
@@ -479,12 +627,14 @@ const AllEventsModal = ({
 
   return (
     <>
-      <Dialog
+      <PrimeDialog
         visible={visible}
         onHide={onHide}
         header="All Events"
         className="day-events-modal"
         style={{ width: "500px" }}
+        maskClosable={true}
+        closable={true}
       >
         <div className="day-events-content">
           {events.map((event, index) => (
@@ -512,10 +662,10 @@ const AllEventsModal = ({
             </React.Fragment>
           ))}
         </div>
-      </Dialog>
+      </PrimeDialog>
 
       {/* Update Event Modal */}
-      <Dialog
+      <PrimeDialog
         visible={showUpdateEventModal}
         onHide={() => {
           setShowUpdateEventModal(false);
@@ -523,6 +673,8 @@ const AllEventsModal = ({
         }}
         header="Update Event"
         style={{ width: "500px" }}
+        maskClosable={true}
+        closable={true}
       >
         {selectedEvent && (
           <div className="update-event-form">
@@ -662,14 +814,16 @@ const AllEventsModal = ({
             </div>
           </div>
         )}
-      </Dialog>
+      </PrimeDialog>
 
       {/* Delete Confirmation Modal */}
-      <Dialog
+      <PrimeDialog
         visible={showDeleteEventModal}
         onHide={() => setShowDeleteEventModal(false)}
         header="Confirm Delete"
         style={{ width: "400px" }}
+        maskClosable={true}
+        closable={true}
       >
         <div className="confirmation-content">
           <i
@@ -697,7 +851,7 @@ const AllEventsModal = ({
             className="p-button-danger"
           />
         </div>
-      </Dialog>
+      </PrimeDialog>
 
       <Toast ref={toast} />
     </>
@@ -712,7 +866,6 @@ export default function CrewCalendarPage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [activeView, setActiveView] = useState("events");
   const [calendarEvents, setCalendarEvents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
   const toast = useRef(null);
@@ -733,9 +886,307 @@ export default function CrewCalendarPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showAddGuestModal, setShowAddGuestModal] = useState(false);
   const [guestEmails, setGuestEmails] = useState([""]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [dragOverDay, setDragOverDay] = useState(null);
+  const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Form states
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventStart, setEventStart] = useState(null);
+  const [eventEnd, setEventEnd] = useState(null);
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [eventType, setEventType] = useState("");
+
+  // Refs
+  const calendarRef = useRef(null);
+
+  // Success animation component
+  const SuccessAnimation = ({ message, visible, onComplete }) => {
+    useEffect(() => {
+      if (visible) {
+        const timer = setTimeout(() => {
+          onComplete();
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
+    }, [visible, onComplete]);
+
+    if (!visible) return null;
+
+    return (
+      <div
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          backgroundColor: "#4CAF50",
+          color: "white",
+          padding: "20px 30px",
+          borderRadius: "10px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+          zIndex: 9999,
+          animation: "slideInOut 2s ease-in-out",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <i className="pi pi-check-circle" style={{ fontSize: "24px" }}></i>
+        <span style={{ fontSize: "16px", fontWeight: "500" }}>{message}</span>
+        <style>
+          {`
+            @keyframes slideInOut {
+              0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+              20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+              80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+              100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            }
+          `}
+        </style>
+      </div>
+    );
+  };
+
+  // Loading spinner component
+  const LoadingSpinner = ({ size = "medium" }) => {
+    const sizeMap = {
+      small: "16px",
+      medium: "24px",
+      large: "32px",
+    };
+
+    return (
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: sizeMap[size],
+          height: sizeMap[size],
+        }}
+      >
+        <i
+          className="pi pi-spin pi-spinner"
+          style={{
+            fontSize: sizeMap[size],
+            color: "#0387D9",
+          }}
+        ></i>
+      </div>
+    );
+  };
+
+  // Enhanced calendar day component with drag and drop hints
+  const CalendarDay = ({
+    day,
+    events,
+    isCurrentMonth,
+    isToday,
+    onClick,
+    onDragOver,
+    onDrop,
+  }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const handleDragOver = (e) => {
+      e.preventDefault();
+      setIsDragOver(true);
+      onDragOver?.(day);
+    };
+
+    const handleDragLeave = () => {
+      setIsDragOver(false);
+    };
+
+    const handleDrop = (e) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      onDrop?.(day, e);
+    };
+
+    return (
+      <div
+        className={`calendar-day ${
+          isCurrentMonth ? "current-month" : "other-month"
+        } ${isToday ? "today" : ""} ${isDragOver ? "drag-over" : ""}`}
+        onClick={() => onClick(day)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        style={{
+          position: "relative",
+          minHeight: "120px",
+          padding: "8px",
+          border: "1px solid #e0e0e0",
+          cursor: "pointer",
+          transition: "all 0.3s ease",
+          backgroundColor: isDragOver
+            ? "#e3f2fd"
+            : isHovered
+            ? "#f5f5f5"
+            : "transparent",
+          transform: isHovered ? "scale(1.02)" : "scale(1)",
+          boxShadow: isHovered ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
+          borderRadius: "8px",
+          borderColor: isDragOver ? "#0387D9" : "#e0e0e0",
+        }}
+      >
+        <div
+          style={{
+            fontWeight: isToday ? "bold" : "normal",
+            color: isCurrentMonth ? "#333" : "#ccc",
+            fontSize: "14px",
+            marginBottom: "5px",
+            transition: "color 0.3s ease",
+          }}
+        >
+          {day.getDate()}
+        </div>
+
+        {events.length > 0 && (
+          <div style={{ marginTop: "5px" }}>
+            {events.slice(0, 2).map((event, index) => (
+              <div
+                key={index}
+                style={{
+                  backgroundColor: "#0387D9",
+                  color: "white",
+                  padding: "2px 6px",
+                  borderRadius: "4px",
+                  fontSize: "10px",
+                  marginBottom: "2px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  transition: "all 0.3s ease",
+                  transform: isHovered ? "scale(1.05)" : "scale(1)",
+                }}
+                title={event.title}
+              >
+                {event.title}
+              </div>
+            ))}
+            {events.length > 2 && (
+              <div
+                style={{
+                  color: "#0387D9",
+                  fontSize: "10px",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  transition: "color 0.3s ease",
+                }}
+              >
+                +{events.length - 2} more
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Drag and drop hint */}
+        {isDragOver && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "rgba(3, 135, 217, 0.9)",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              zIndex: 10,
+              animation: "pulse 1s infinite",
+            }}
+          >
+            Drop here
+            <style>
+              {`
+                @keyframes pulse {
+                  0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+                  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+                  100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+                }
+              `}
+            </style>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Clean up function for modals
+  const cleanupModals = () => {
+    setShowEventModal(false);
+    setShowDayEventsModal(false);
+    setShowAllEventsModal(false);
+    setShowUpdateEventModal(false);
+    setShowDeleteEventModal(false);
+    setShowAddGuestModal(false);
+    setSelectedEvent(null);
+    setSelectedDateEvents([]);
+    setSelectedModalDate(null);
+  };
+
+  // Safe modal hide handlers
+  const handleDayEventsModalHide = () => {
+    setShowDayEventsModal(false);
+    setSelectedDateEvents([]);
+    setSelectedModalDate(null);
+  };
+
+  const handleAllEventsModalHide = () => {
+    setShowAllEventsModal(false);
+  };
+
+  const handleEventModalHide = () => {
+    setShowEventModal(false);
+    setNewEvent({
+      title: "",
+      description: "",
+      start: null,
+      end: null,
+      location: "",
+    });
+  };
+
+  const handleUpdateEventModalHide = () => {
+    setShowUpdateEventModal(false);
+    setSelectedEvent(null);
+  };
+
+  const handleDeleteEventModalHide = () => {
+    setShowDeleteEventModal(false);
+    setSelectedEvent(null);
+  };
+
+  const handleAddGuestModalHide = () => {
+    setShowAddGuestModal(false);
+    setSelectedEvent(null);
+    setGuestEmails([""]);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupModals();
+    };
+  }, []);
 
   const loadEvents = useCallback(async () => {
-    setIsLoading(true);
+    console.log("Loading events...");
+    setLoading(true);
     try {
       const firstDay = new Date(
         currentDate.getFullYear(),
@@ -750,12 +1201,14 @@ export default function CrewCalendarPage() {
         59,
         59
       );
+      console.log("Fetching events from", firstDay, "to", lastDay);
       const response = await fetchEvents(firstDay, lastDay);
-      console.log("response", response);
+      console.log("API response:", response);
       if (response.success) {
-        console.log("fetched events", response.data);
+        console.log("Successfully fetched events:", response.data);
         setCalendarEvents(response.data);
       } else {
+        console.error("Failed to fetch events:", response.error);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -764,21 +1217,30 @@ export default function CrewCalendarPage() {
         });
       }
     } catch (error) {
+      console.error("Exception in loadEvents:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",
         detail: "An unexpected error occurred",
         life: 3000,
       });
-      console.error("Error fetching events:", error);
     } finally {
-      setIsLoading(false);
+      console.log("Setting loading to false");
+      setLoading(false);
     }
   }, [currentDate]);
 
   useEffect(() => {
-    console.log("currentDate", currentDate);
+    console.log("currentDate changed:", currentDate);
     loadEvents();
+
+    // Fallback: ensure loading is set to false after 10 seconds
+    const timeout = setTimeout(() => {
+      console.log("Fallback: forcing loading to false");
+      setLoading(false);
+    }, 10000);
+
+    return () => clearTimeout(timeout);
   }, [currentDate, loadEvents]);
 
   // Handle window resize
@@ -957,10 +1419,15 @@ export default function CrewCalendarPage() {
       return;
     }
 
+    setSaving(true);
     try {
       const response = await createEvent(newEvent);
 
       if (response.success) {
+        // Show success animation
+        setSuccessMessage("Event created successfully!");
+        setShowSuccessAnimation(true);
+
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -994,17 +1461,21 @@ export default function CrewCalendarPage() {
         detail: "An unexpected error occurred",
         life: 3000,
       });
+    } finally {
+      setSaving(false);
     }
   };
 
   const renderEventModal = () => {
     return (
-      <Dialog
+      <PrimeDialog
         visible={showEventModal}
         onHide={() => setShowEventModal(false)}
         header="Add New Event"
         className="event-modal"
         style={{ width: "500px" }}
+        maskClosable={true}
+        closable={true}
       >
         <div className="event-form p-fluid">
           <div className="field">
@@ -1077,10 +1548,16 @@ export default function CrewCalendarPage() {
               className="p-button-text"
               onClick={() => setShowEventModal(false)}
             />
-            <Button label="Save" icon="pi pi-check" onClick={handleSaveEvent} />
+            <Button
+              label={saving ? "Saving..." : "Save"}
+              icon={saving ? null : "pi pi-check"}
+              onClick={handleSaveEvent}
+              disabled={saving}
+              loading={saving}
+            />
           </div>
         </div>
-      </Dialog>
+      </PrimeDialog>
     );
   };
 
@@ -1173,10 +1650,15 @@ export default function CrewCalendarPage() {
         return;
       }
 
+      setInviting(true);
       // Call API to send invites
       const result = await inviteGuests(selectedEvent._id, validEmails);
 
       if (result.success) {
+        // Show success animation
+        setSuccessMessage("Invitations sent successfully!");
+        setShowSuccessAnimation(true);
+
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -1199,6 +1681,8 @@ export default function CrewCalendarPage() {
         summary: "Error",
         detail: "An error occurred while sending invitations",
       });
+    } finally {
+      setInviting(false);
     }
   };
 
@@ -1240,9 +1724,14 @@ export default function CrewCalendarPage() {
 
   // Confirm delete event from main modal
   const handleDeleteEventConfirm = async () => {
+    setDeleting(true);
     try {
       const result = await deleteEvent(selectedEvent._id);
       if (result.success) {
+        // Show success animation
+        setSuccessMessage("Event deleted successfully!");
+        setShowSuccessAnimation(true);
+
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -1267,6 +1756,8 @@ export default function CrewCalendarPage() {
         summary: "Error",
         detail: "An error occurred while deleting the event",
       });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -1299,6 +1790,18 @@ export default function CrewCalendarPage() {
           className="p-button-primary"
           icon="pi pi-plus"
           onClick={() => setShowEventModal(true)}
+          style={{
+            transition: "all 0.3s ease",
+            transform: "scale(1)",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "scale(1.05)";
+            e.target.style.boxShadow = "0 4px 12px rgba(3, 135, 217, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "scale(1)";
+            e.target.style.boxShadow = "none";
+          }}
         />
       </div>
 
@@ -1368,10 +1871,30 @@ export default function CrewCalendarPage() {
             </h3> */}
           </div>
 
-          {isLoading ? (
-            <div>Loading events...</div>
+          {loading ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "40px",
+                color: "#666",
+              }}
+            >
+              <LoadingSpinner size="large" />
+              <span style={{ marginLeft: "10px" }}>Loading events...</span>
+            </div>
           ) : !calendarEvents?.data?.length ? (
-            <div>No events found</div>
+            <div
+              style={{
+                textAlign: "center",
+                padding: "40px",
+                color: "#666",
+                fontStyle: "italic",
+              }}
+            >
+              No events found. Create your first event!
+            </div>
           ) : (
             <>
               {/* Show only first 2 events */}
@@ -1619,151 +2142,68 @@ export default function CrewCalendarPage() {
               ))}
 
               {/* Previous Month Days */}
-              {prevMonthDays.map((day, index) => (
-                <div
-                  key={`prev-${index}`}
-                  style={{
-                    backgroundColor: "#F2F4F7",
-                    padding: isMobile ? "4px 2px" : "8px",
-                    position: "relative",
-                    cursor: "pointer",
-                    fontSize: isMobile ? "11px" : "inherit",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#98A2B3",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: isMobile ? "20px" : "28px",
-                      height: isMobile ? "20px" : "28px",
-                      borderRadius: "50%",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {day}
-                  </span>
-                </div>
-              ))}
+              {prevMonthDays.map((day, index) => {
+                const prevMonthDate = new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth() - 1,
+                  day
+                );
+                return (
+                  <CalendarDay
+                    key={`prev-${index}`}
+                    day={prevMonthDate}
+                    events={[]}
+                    isCurrentMonth={false}
+                    isToday={false}
+                    onClick={() => {}}
+                  />
+                );
+              })}
 
               {/* Current Month Days */}
               {currentMonthDays.map((day) => {
+                const currentMonthDate = new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth(),
+                  day
+                );
                 const dayEvents = getEventsForDay(day);
 
                 return (
-                  <div
+                  <CalendarDay
                     key={`current-${day}`}
-                    style={{
-                      backgroundColor: "white",
-                      padding: isMobile ? "4px 2px" : "8px",
-                      position: "relative",
-                      cursor: "pointer",
-                      border:
-                        day === selectedDay ? "1px solid #0387D9" : "none",
-                      // backgroundColor:
-                      //   day === selectedDay
-                      //     ? "rgba(3, 135, 217, 0.1)"
-                      //     : "white",
-                      fontSize: isMobile ? "11px" : "inherit",
-                      overflow: "hidden",
-                    }}
+                    day={currentMonthDate}
+                    events={dayEvents}
+                    isCurrentMonth={true}
+                    isToday={isToday(day)}
                     onClick={() => handleDayClick(day)}
-                  >
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: isMobile ? "20px" : "28px",
-                        height: isMobile ? "20px" : "28px",
-                        borderRadius: "50%",
-                        fontWeight: 500,
-                        backgroundColor: isToday(day)
-                          ? "#0387D9"
-                          : "transparent",
-                        color: isToday(day) ? "white" : "inherit",
-                      }}
-                    >
-                      {day}
-                    </span>
-
-                    {/* Show actual events instead of static ones */}
-                    {!isMobile &&
-                      dayEvents.map((event, index) => (
-                        <div
-                          key={event._id}
-                          style={{ marginTop: index === 0 ? "5px" : "2px" }}
-                        >
-                          <div
-                            style={{
-                              marginBottom: "3px",
-                              padding: "3px 6px",
-                              borderRadius: "4px",
-                              fontSize: "11px",
-                              whiteSpace: "nowrap",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              color: "white",
-                              backgroundColor:
-                                event.type === "meeting"
-                                  ? "#0387D9"
-                                  : event.type === "presentation"
-                                  ? "#7F56D9"
-                                  : event.type === "workshop"
-                                  ? "#F79009"
-                                  : "#F04438",
-                            }}
-                          >
-                            {event.title}
-                          </div>
-                        </div>
-                      ))}
-
-                    {/* For mobile, just show a dot if there are events */}
-                    {isMobile && dayEvents.length > 0 && (
-                      <div
-                        style={{
-                          width: "4px",
-                          height: "4px",
-                          borderRadius: "50%",
-                          backgroundColor: "#0387D9",
-                          margin: "2px auto 0",
-                        }}
-                      ></div>
-                    )}
-                  </div>
+                    onDragOver={(day) => setDragOverDay(day)}
+                    onDrop={(day, e) => {
+                      // Handle drag and drop functionality here
+                      console.log("Dropped on day:", day);
+                    }}
+                  />
                 );
               })}
 
               {/* Next Month Days */}
-              {nextMonthDays.map((day, index) => (
-                <div
-                  key={`next-${index}`}
-                  style={{
-                    backgroundColor: "#F2F4F7",
-                    padding: isMobile ? "4px 2px" : "8px",
-                    position: "relative",
-                    cursor: "pointer",
-                    fontSize: isMobile ? "11px" : "inherit",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#98A2B3",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: isMobile ? "20px" : "28px",
-                      height: isMobile ? "20px" : "28px",
-                      borderRadius: "50%",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {day}
-                  </span>
-                </div>
-              ))}
+              {nextMonthDays.map((day, index) => {
+                const nextMonthDate = new Date(
+                  currentDate.getFullYear(),
+                  currentDate.getMonth() + 1,
+                  day
+                );
+                return (
+                  <CalendarDay
+                    key={`next-${index}`}
+                    day={nextMonthDate}
+                    events={[]}
+                    isCurrentMonth={false}
+                    isToday={false}
+                    onClick={() => {}}
+                  />
+                );
+              })}
             </div>
 
             {/* Calendar Footer with Legend */}
@@ -1815,7 +2255,7 @@ export default function CrewCalendarPage() {
 
       <DayEventsModal
         visible={showDayEventsModal}
-        onHide={() => setShowDayEventsModal(false)}
+        onHide={handleDayEventsModalHide}
         events={selectedDateEvents}
         selectedDate={selectedModalDate}
         onUpdate={handleEventUpdate}
@@ -1825,7 +2265,7 @@ export default function CrewCalendarPage() {
 
       <AllEventsModal
         visible={showAllEventsModal}
-        onHide={() => setShowAllEventsModal(false)}
+        onHide={handleAllEventsModalHide}
         events={calendarEvents?.data || []}
         onEventUpdate={loadEvents}
         onAddGuest={handleAddGuest}
@@ -1834,12 +2274,11 @@ export default function CrewCalendarPage() {
       {/* Add the Update and Delete Modals */}
       <Dialog
         visible={showUpdateEventModal}
-        onHide={() => {
-          setShowUpdateEventModal(false);
-          setSelectedEvent(null);
-        }}
+        onHide={handleUpdateEventModalHide}
         header="Update Event"
         style={{ width: "500px" }}
+        maskClosable={true}
+        closable={true}
       >
         {selectedEvent && (
           <div className="update-event-form">
@@ -1975,7 +2414,13 @@ export default function CrewCalendarPage() {
                 onClick={() => setShowUpdateEventModal(false)}
                 className="p-button-text"
               />
-              <Button label="Update" onClick={handleUpdateEventConfirm} />
+              <Button
+                label={saving ? "Updating..." : "Update"}
+                icon={saving ? null : "pi pi-check"}
+                onClick={handleUpdateEventConfirm}
+                disabled={saving}
+                loading={saving}
+              />
             </div>
           </div>
         )}
@@ -1983,9 +2428,11 @@ export default function CrewCalendarPage() {
 
       <Dialog
         visible={showDeleteEventModal}
-        onHide={() => setShowDeleteEventModal(false)}
+        onHide={handleDeleteEventModalHide}
         header="Confirm Delete"
         style={{ width: "400px" }}
+        maskClosable={true}
+        closable={true}
       >
         <div className="confirmation-content">
           <i
@@ -2008,21 +2455,23 @@ export default function CrewCalendarPage() {
             className="p-button-text"
           />
           <Button
-            label="Yes"
+            label={deleting ? "Deleting..." : "Yes"}
+            icon={deleting ? null : "pi pi-trash"}
             onClick={handleDeleteEventConfirm}
             className="p-button-danger"
+            disabled={deleting}
+            loading={deleting}
           />
         </div>
       </Dialog>
 
       <Dialog
         visible={showAddGuestModal}
-        onHide={() => {
-          setShowAddGuestModal(false);
-          setGuestEmails([""]);
-        }}
+        onHide={handleAddGuestModalHide}
         header="Add Guests"
         style={{ width: "500px" }}
+        maskClosable={true}
+        closable={true}
       >
         <div className="add-guest-form">
           {guestEmails.map((email, index) => (
@@ -2077,13 +2526,26 @@ export default function CrewCalendarPage() {
               className="p-button-text"
             />
             <Button
-              label="Send Invites"
+              label={inviting ? "Sending..." : "Send Invites"}
+              icon={inviting ? null : "pi pi-send"}
               onClick={handleInviteGuests}
-              disabled={guestEmails.every((email) => email.trim() === "")}
+              disabled={
+                guestEmails.every((email) => email.trim() === "") || inviting
+              }
+              loading={inviting}
             />
           </div>
         </div>
       </Dialog>
+
+      {/* Success Animation */}
+      {showSuccessAnimation && (
+        <SuccessAnimation
+          message={successMessage}
+          visible={showSuccessAnimation}
+          onComplete={() => setShowSuccessAnimation(false)}
+        />
+      )}
     </div>
   );
 }

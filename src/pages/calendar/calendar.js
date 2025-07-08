@@ -35,6 +35,24 @@ import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
 // import more from "../../assets/images/crew/more.png";
 import { useOutletContext } from "react-router-dom";
+import {
+  Dialog as MUIDialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Box,
+  Typography,
+  TextField,
+  IconButton,
+  Button as MUIButton,
+} from "@mui/material";
+import {
+  Close as CloseIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Send as SendIcon,
+} from "@mui/icons-material";
+import { Slide } from "@mui/material";
 
 const EventCard = ({
   title,
@@ -1938,75 +1956,121 @@ export default function CalendarPage() {
         </div>
       </Dialog>
 
-      <Dialog
-        visible={showAddGuestModal}
-        onHide={() => {
+      <MUIDialog
+        open={showAddGuestModal}
+        onClose={() => {
           setShowAddGuestModal(false);
           setGuestEmails([""]);
         }}
-        header="Add Guests"
-        style={{ width: "500px" }}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        transitionDuration={300}
       >
-        <div className="add-guest-form">
-          {guestEmails.map((email, index) => (
-            <div
-              key={index}
-              className="email-input-container"
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-                alignItems: "center",
-              }}
-            >
-              <InputText
-                value={email}
-                onChange={(e) => handleEmailChange(index, e.target.value)}
-                placeholder="Enter guest email"
-                className="w-full"
-                style={{ flex: 1 }}
-              />
-              {guestEmails.length > 1 && (
-                <Button
-                  icon="pi pi-times"
-                  onClick={() => removeEmailField(index)}
-                  className="p-button-rounded p-button-danger p-button-text"
-                />
-              )}
-            </div>
-          ))}
-
-          <Button
-            label="Add Another Guest"
-            icon="pi pi-plus"
-            onClick={addEmailField}
-            className="p-button-text"
-            style={{ marginBottom: "20px" }}
-          />
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.5rem",
-            }}
+        <DialogTitle>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
           >
-            <Button
-              label="Cancel"
+            <Typography variant="h6">
+              Invite Guests to "{selectedEvent?.title}"
+            </Typography>
+            <IconButton
               onClick={() => {
                 setShowAddGuestModal(false);
                 setGuestEmails([""]);
               }}
-              className="p-button-text"
-            />
-            <Button
-              label="Send Invites"
-              onClick={handleInviteGuests}
-              disabled={guestEmails.every((email) => email.trim() === "")}
-            />
-          </div>
-        </div>
-      </Dialog>
+              size="small"
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" gap={2} pt={1}>
+            <Typography variant="body2" color="text.secondary">
+              Add email addresses of guests you'd like to invite to this event.
+            </Typography>
+
+            {guestEmails.map((email, index) => (
+              <Box key={index} display="flex" gap={1} alignItems="center">
+                <TextField
+                  label={`Guest Email ${index + 1}`}
+                  value={email}
+                  onChange={(e) => handleEmailChange(index, e.target.value)}
+                  fullWidth
+                  type="email"
+                  variant="outlined"
+                  size="small"
+                />
+                <IconButton
+                  onClick={() => removeEmailField(index)}
+                  color="error"
+                  size="small"
+                  disabled={guestEmails.length === 1}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            ))}
+
+            <MUIButton
+              onClick={addEmailField}
+              startIcon={<AddIcon />}
+              variant="outlined"
+              sx={{
+                alignSelf: "flex-start",
+                color: "#003366",
+                borderColor: "#003366",
+                "&:hover": {
+                  borderColor: "#002855",
+                  backgroundColor: "#F0F4FF",
+                },
+              }}
+            >
+              Add Another Guest
+            </MUIButton>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <MUIButton
+            onClick={() => {
+              setShowAddGuestModal(false);
+              setGuestEmails([""]);
+            }}
+            variant="outlined"
+            sx={{
+              color: "#475467",
+              borderColor: "#D0D5DD",
+              "&:hover": {
+                borderColor: "#667085",
+                backgroundColor: "#F9FAFB",
+              },
+            }}
+          >
+            Cancel
+          </MUIButton>
+          <MUIButton
+            onClick={handleInviteGuests}
+            disabled={guestEmails.every((email) => email.trim() === "")}
+            startIcon={<SendIcon />}
+            variant="contained"
+            sx={{
+              backgroundColor: "#003366",
+              "&:hover": {
+                backgroundColor: "#002855",
+              },
+              "&:disabled": {
+                backgroundColor: "#E4E7EC",
+                color: "#98A2B3",
+              },
+            }}
+          >
+            Send Invites
+          </MUIButton>
+        </DialogActions>
+      </MUIDialog>
     </div>
   );
 }

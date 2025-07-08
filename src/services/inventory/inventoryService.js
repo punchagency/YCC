@@ -324,10 +324,36 @@ export const getInventoryItemById = async (id) => {
   }
 };
 
-export const getAllInventories = async (page = 1, limit = 10) => {
+export const getAllInventories = async (
+  page = 1,
+  limit = 10,
+  searchText = "",
+  stockStatus = "all"
+) => {
   try {
-    console.log("Fetching inventories with params:", { page, limit });
-    const url = `${API_URL}/inventory/all-inventories?page=${page}&limit=${limit}`;
+    console.log("Fetching inventories with params:", {
+      page,
+      limit,
+      searchText,
+      stockStatus,
+    });
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    // Add search parameters if provided
+    if (searchText && searchText.trim() !== "") {
+      params.append("searchText", searchText.trim());
+    }
+
+    if (stockStatus && stockStatus !== "all") {
+      params.append("stockStatus", stockStatus);
+    }
+
+    const url = `${API_URL}/inventory/all-inventories?${params.toString()}`;
     console.log("Request URL:", url);
 
     const response = await axios.get(url, {

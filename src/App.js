@@ -164,7 +164,10 @@ function App() {
                       element={<VendorAndServices />}
                     />
                     <Route path="/about-us" element={<AboutUs />} />
-                    <Route path="/resource-center" element={<ResourceCenter />} />
+                    <Route
+                      path="/resource-center"
+                      element={<ResourceCenter />}
+                    />
                     <Route path="/resource-center/test" element={<TestApi />} />
                     <Route path="/contact-us" element={<ContactUs />} />
                   </Route>
@@ -201,7 +204,10 @@ function App() {
                       path="/admin/bookings-management"
                       element={<Bookings />}
                     />
-                    <Route path="/admin/orders-management" element={<Order />} />
+                    <Route
+                      path="/admin/orders-management"
+                      element={<Order />}
+                    />
                     <Route
                       path="/admin/inventory-management"
                       element={<Invent />}
@@ -226,51 +232,54 @@ function App() {
                     <Route path="/admin/settings" element={<CrewSetting />} />
                     <Route path="/admin/approve" element={<ApprovePage />} />
                   </Route>
-                {/* Protected Routes - Require Authentication */}
-                {/* Admin Routes */}
-                <Route element={<AdminLayout />}>
-                  <Route path="/admin/profile" element={<Profile />} />
-                  <Route
-                    path="/admin/dashboard"
-                    element={
-                      <ProtectedRoute requiredRoles={["admin"]}>
-                        <AdminDashboard1 />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/bookings-management"
-                    element={<Bookings />}
-                  />
-                  <Route path="/admin/orders-management" element={<Order />} />
-                  <Route
-                    path="/admin/inventory-management"
-                    element={<Invent />}
-                  />
-                  <Route
-                    path="/admin/inventory-management/:inventoryId"
-                    element={<Invent />}
-                  />
-                  <Route
-                    path="/admin/inventory-management/edit/:id"
-                    element={<EditInventory />}
-                  />
-                  <Route
-                    path="/admin/financial-management"
-                    element={<AdminFinancialManagement />}
-                  />
-                  <Route
-                    path="/admin/calendar-management"
-                    element={<Calendar />}
-                  />
-                  <Route
-                    path="/admin/notifications"
-                    element={<Notifications />}
-                  />
-                  <Route path="/admin/reports" element={<Reports />} />
-                  <Route path="/admin/settings" element={<CrewSetting />} />
-                  <Route path="/admin/approve" element={<ApprovePage />} />
-                </Route>
+                  {/* Protected Routes - Require Authentication */}
+                  {/* Admin Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route path="/admin/profile" element={<Profile />} />
+                    <Route
+                      path="/admin/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["admin"]}>
+                          <AdminDashboard1 />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/bookings-management"
+                      element={<Bookings />}
+                    />
+                    <Route
+                      path="/admin/orders-management"
+                      element={<Order />}
+                    />
+                    <Route
+                      path="/admin/inventory-management"
+                      element={<Invent />}
+                    />
+                    <Route
+                      path="/admin/inventory-management/:inventoryId"
+                      element={<Invent />}
+                    />
+                    <Route
+                      path="/admin/inventory-management/edit/:id"
+                      element={<EditInventory />}
+                    />
+                    <Route
+                      path="/admin/financial-management"
+                      element={<AdminFinancialManagement />}
+                    />
+                    <Route
+                      path="/admin/calendar-management"
+                      element={<Calendar />}
+                    />
+                    <Route
+                      path="/admin/notifications"
+                      element={<Notifications />}
+                    />
+                    <Route path="/admin/reports" element={<Reports />} />
+                    <Route path="/admin/settings" element={<CrewSetting />} />
+                    <Route path="/admin/approve" element={<ApprovePage />} />
+                  </Route>
 
                   {/* Crew Routes */}
                   <Route element={<AdminLayout />}>
@@ -412,22 +421,22 @@ function App() {
                       element={<QuotePayment />}
                     />
                     <Route
-                    path="/crew/document-management/list"
-                    element={
-                      <ProtectedRoute requiredRoles={["crew_member"]}>
-                        <DocumentList />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/crew/document/view/:documentId"
-                    element={
-                      <ProtectedRoute requiredRoles={["crew_member"]}>
-                        <DocumentView />
-                      </ProtectedRoute>
-                    }
-                  />
-                </Route>
+                      path="/crew/document-management/list"
+                      element={
+                        <ProtectedRoute requiredRoles={["crew_member"]}>
+                          <DocumentList />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/crew/document/view/:documentId"
+                      element={
+                        <ProtectedRoute requiredRoles={["crew_member"]}>
+                          <DocumentView />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
 
                   {/* Onboarding Routes */}
                   <Route element={<OnboardingPageLayout />}>

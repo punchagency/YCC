@@ -2007,6 +2007,7 @@ const Order = () => {
             header="New Order"
             className="order-modal"
             dismissableMask={true}
+            hideOverlaysOnDocumentScrolling={false}
           >
             <div className="p-fluid" style={{ padding: "40px" }}>
               {/* Delivery Address */}
@@ -2125,6 +2126,7 @@ const Order = () => {
           onHide={() => setShowDeleteConfirmation(false)}
           header="Confirm Deletion"
           dismissableMask={true}
+          hideOverlaysOnDocumentScrolling={false}
           footer={
             <div
               style={{

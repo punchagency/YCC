@@ -11,6 +11,51 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/userContext";
 
+// Global error handler to suppress PrimeReact overlay errors
+const originalError = console.error;
+const originalWarn = console.warn;
+
+console.error = (...args) => {
+  const errorMessage = args[0];
+  if (
+    typeof errorMessage === "string" &&
+    (errorMessage.includes("hideOverlaysOnDocumentScrolling") ||
+      errorMessage.includes("Cannot read properties of undefined"))
+  ) {
+    return; // Suppress PrimeReact overlay errors
+  }
+  originalError.apply(console, args);
+};
+
+console.warn = (...args) => {
+  const warnMessage = args[0];
+  if (
+    typeof warnMessage === "string" &&
+    warnMessage.includes("hideOverlaysOnDocumentScrolling")
+  ) {
+    return; // Suppress PrimeReact warnings
+  }
+  originalWarn.apply(console, args);
+};
+
+// Global error event handler
+window.addEventListener('error', (event) => {
+  if (event.error && event.error.message && 
+      event.error.message.includes('hideOverlaysOnDocumentScrolling')) {
+    event.preventDefault();
+    return false;
+  }
+});
+
+// Global unhandled promise rejection handler
+window.addEventListener('unhandledrejection', (event) => {
+  if (event.reason && event.reason.message && 
+      event.reason.message.includes('hideOverlaysOnDocumentScrolling')) {
+    event.preventDefault();
+    return false;
+  }
+});
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

@@ -27,6 +27,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
+import { Pagination } from "../../../components/pagination";
 
 const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   const [sortField, setSortField] = useState(null);
@@ -106,14 +107,8 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   }, []);
 
   useEffect(() => {
-    // Initial fetch on component mount
     fetchLowStockItems();
-  }, [fetchLowStockItems]);
-
-  useEffect(() => {
-    // Fetch low stock items whenever inventory changes or refresh is triggered
-    fetchLowStockItems();
-  }, [refreshTrigger, fetchLowStockItems]);
+  }, []);
 
   const fetchInventoryData = useCallback(async () => {
     setLoading(true);
@@ -157,13 +152,21 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
 
   useEffect(() => {
     fetchInventoryData();
-  }, [fetchInventoryData, refreshTrigger]);
+  }, [pagination.page, refreshTrigger]);
 
   useEffect(() => {
     if (onRefresh) {
       onRefresh(fetchInventoryData);
     }
-  }, [fetchInventoryData, onRefresh]);
+  }, []);
+
+  // Handle page change for pagination
+  const handlePageChange = (newPage) => {
+    setPagination((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
+  };
 
   const displayItems = inventory.length > 0 ? inventory : [];
 
@@ -469,6 +472,32 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
 
   return (
     <>
+      {/* Loading Overlay */}
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              className="pi pi-spin pi-spinner"
+              style={{ fontSize: "2rem", marginBottom: "10px" }}
+            ></div>
+            <p>Loading inventory data...</p>
+          </div>
+        </div>
+      )}
+
       <div className="inventory-container">
         <div className="flex" style={{ height: "inherit" }}>
           <div style={{ width: "70%" }}>
@@ -851,6 +880,27 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
           </div>
         </div>
       </div>
+
+      {/* Pagination Component */}
+      {pagination.totalPages > 1 && (
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.total}
+            itemsPerPage={pagination.limit}
+            onPageChange={handlePageChange}
+            isMobile={window.innerWidth <= 768}
+            isTablet={window.innerWidth > 768 && window.innerWidth <= 1024}
+          />
+        </div>
+      )}
 
       <Dialog
         visible={deleteModalVisible}

@@ -124,7 +124,6 @@ const Invent = () => {
     index: null,
     productName: "",
     category: "",
-    serviceArea: "",
     stockQuantity: "",
     price: "",
   });
@@ -132,7 +131,6 @@ const Invent = () => {
   const [newItem, setNewItem] = useState({
     productName: "",
     category: "",
-    serviceArea: "",
     stockQuantity: "",
     price: "",
     supplier: "",
@@ -162,6 +160,7 @@ const Invent = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observer = useRef();
   const [totalItems, setTotalItems] = useState(0);
+  const isRequestInProgress = useRef(false); // Add this ref to track ongoing requests
 
   const { setPageTitle } = useOutletContext() || {};
 
@@ -194,20 +193,18 @@ const Invent = () => {
   // Add state for controlling the supplier dropdown open state
   const [supplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
 
+  // 1. Add state for search text and applied filters
+  const [searchText, setSearchText] = useState("");
+  const [appliedStockStatus, setAppliedStockStatus] =
+    useState(stockStatusFilter);
+  const [appliedSearchText, setAppliedSearchText] = useState("");
+
   // Helper to get stock status
   const getStockStatus = (quantity) => {
     if (quantity >= 100) return "high";
     if (quantity >= 50) return "medium";
     return "low";
   };
-
-  // Filtered items based on stock status
-  const filteredInventoryItems =
-    stockStatusFilter === "all"
-      ? inventoryItems
-      : inventoryItems.filter(
-          (item) => getStockStatus(item.stockQuantity) === stockStatusFilter
-        );
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
@@ -220,13 +217,23 @@ const Invent = () => {
   };
 
   const handleSelectItem = (id) => {
-    setSelectedItems((prev) =>
-      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
-    );
+    setSelectedItems((prev) => {
+      const newSelected = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      // If not all items are selected, uncheck selectAll
+      if (newSelected.length !== inventoryItems.length) {
+        setSelectAll(false);
+      } else {
+        setSelectAll(true);
+      }
+      return newSelected;
+    });
   };
 
   const onPageChange = (event, newPage) => {
-    setPage(newPage);
+    console.log("Pagination clicked, newPage:", newPage);
+    setPage(newPage - 1);
     // Fetch new page data here if needed
   };
 
@@ -285,84 +292,101 @@ const Invent = () => {
 
   // Add scroll event handler
   useEffect(() => {
+    let scrollTimeout;
+
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop ===
-        document.documentElement.offsetHeight
-      ) {
-        if (hasMore && !isLoadingMore) {
-          loadMoreData();
-        }
+      // Clear any existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
       }
+
+      // Debounce the scroll event
+      scrollTimeout = setTimeout(() => {
+        if (
+          window.innerHeight + document.documentElement.scrollTop >=
+          document.documentElement.offsetHeight - 100 // Trigger 100px before bottom
+        ) {
+          if (hasMore && !isLoadingMore) {
+            loadMoreData();
+          }
+        }
+      }, 150); // 150ms debounce
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, isLoadingMore]);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [hasMore, isLoadingMore, page]); // Add page to dependencies to prevent stale closures
 
-  // Initial data fetch
+  // Combined useEffect for initial load and search parameter changes
   useEffect(() => {
-    fetchInventoryData(1);
-  }, []);
+    fetchInventoryData(page + 1);
+  }, [page, pageSize, appliedSearchText, appliedStockStatus]);
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setPage(0);
+  }, [appliedSearchText, appliedStockStatus]);
 
   const fetchInventoryData = async (pageNum = 1) => {
-    if (pageNum === 1) {
-      setIsLoading(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
+    setIsLoading(true);
     try {
-      // Ensure the backend always receives a one-based page number
-      const apiPageNum = pageNum < 1 ? 1 : pageNum + (pageNum === 0 ? 1 : 0);
-      const result = await getAllInventories(apiPageNum, 10);
-
+      const result = await getAllInventories(
+        pageNum,
+        pageSize,
+        appliedSearchText,
+        appliedStockStatus
+      );
       if (result.success) {
         const formattedItems = result.data.map((item) => ({
           id: item._id,
           productName: item.product?.name || "Unknown Product",
           category: item.product?.category || "Uncategorized",
-          serviceArea: item.product?.serviceArea || "Not specified",
+          description: item.product?.description || "Not available",
+          supplier: item.supplier || "Not available",
           stockQuantity: item.quantity || 0,
           price: item.price || 0,
           productImage: item.productImage || null,
-          supplier: item.supplier,
-          userInfo: item.userInfo,
         }));
-
-        if (formattedItems.length === 0 && pageNum > 1) {
-          setPage(pageNum - 2); // Go back to previous page (zero-based)
-          return;
-        }
-
-        if (pageNum === 1) {
-          setInventoryItems(formattedItems);
-          setTotalItems(result.pagination?.total || formattedItems.length);
-          setHasMore(result.pagination?.hasNextPage || false);
-          setTotalPages(result.pagination?.totalPages || 1);
-        } else {
-          setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
-          setTotalItems(result.pagination?.total || formattedItems.length);
-          setHasMore(result.pagination?.hasNextPage || false);
-          setTotalPages(result.pagination?.totalPages || 1);
-        }
-
-        setPage(pageNum);
+        setInventoryItems(formattedItems);
+        setTotalItems(result.pagination?.totalItems || formattedItems.length);
+        setTotalPages(result.pagination?.totalPages || 1);
       } else {
+        setInventoryItems([]);
+        setTotalItems(0);
+        setTotalPages(1);
         console.error("Failed to load inventory data:", result.error);
       }
     } catch (error) {
+      setInventoryItems([]);
+      setTotalItems(0);
+      setTotalPages(1);
       console.error("Error fetching inventory data:", error);
     } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
     }
   };
 
   const loadMoreData = async () => {
-    if (!hasMore || isLoadingMore) return;
-    const nextPage = page + 1;
-    await fetchInventoryData(nextPage);
+    if (!hasMore || isLoadingMore || isRequestInProgress.current) return;
+
+    // Set loading state and mark request as in progress
+    setIsLoadingMore(true);
+    isRequestInProgress.current = true;
+
+    try {
+      const nextPage = page + 1;
+      await fetchInventoryData(nextPage);
+    } catch (error) {
+      console.error("Error loading more data:", error);
+    } finally {
+      setIsLoadingMore(false);
+      isRequestInProgress.current = false;
+    }
   };
 
   // Add loading indicator component
@@ -404,7 +428,6 @@ const Invent = () => {
       index: index,
       productName: item.productName,
       category: item.category,
-      serviceArea: item.serviceArea,
       stockQuantity: item.stockQuantity.toString(),
       price: item.price.toFixed(2),
     });
@@ -419,7 +442,6 @@ const Invent = () => {
       const updateData = {
         productName: editItem.productName,
         category: editItem.category,
-        serviceArea: editItem.serviceArea,
         stockQuantity: editItem.stockQuantity,
         price: editItem.price,
       };
@@ -433,7 +455,6 @@ const Invent = () => {
           id: editItem.id,
           productName: editItem.productName,
           category: editItem.category,
-          serviceArea: editItem.serviceArea,
           stockQuantity: parseInt(editItem.stockQuantity),
           price: parseFloat(editItem.price),
           productImage: editItem.productImage,
@@ -506,8 +527,8 @@ const Invent = () => {
 
   // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
-    if (!newItem.productName || !newItem.category || !newItem.serviceArea) {
-      setSaveError("Product name, category, and service area are required");
+    if (!newItem.productName || !newItem.category) {
+      setSaveError("Product name and category are required");
       return;
     }
 
@@ -525,7 +546,6 @@ const Invent = () => {
       const formData = new FormData();
       formData.append("productName", newItem.productName);
       formData.append("category", newItem.category);
-      formData.append("serviceArea", newItem.serviceArea.toLowerCase()); // Convert to lowercase
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
       if (newItem.supplier) {
@@ -545,7 +565,8 @@ const Invent = () => {
           id: responseData._id,
           productName: responseData.product.name,
           category: responseData.product.category,
-          serviceArea: responseData.product.serviceArea,
+          description: responseData.product.description || "Not available",
+          supplier: responseData.supplier || "Not available",
           stockQuantity: responseData.quantity,
           price: responseData.price,
           productImage: responseData.productImage || null,
@@ -557,7 +578,6 @@ const Invent = () => {
         setNewItem({
           productName: "",
           category: "",
-          serviceArea: "",
           stockQuantity: "",
           price: "",
           supplier: "",
@@ -641,7 +661,8 @@ const Invent = () => {
           id: result.data._id,
           productName: result.data.product?.name || "Unknown Product",
           category: result.data.product?.category || "Uncategorized",
-          serviceArea: result.data.product?.serviceArea || "Not specified",
+          description: result.data.product?.description || "Not available",
+          supplier: result.data.supplier || "Not available",
           stockQuantity: result.data.quantity || 0,
           price: result.data.price || 0,
           productImage: result.data.productImage || null,
@@ -719,135 +740,281 @@ const Invent = () => {
   const renderMobileInventoryCards = () => {
     return (
       <div style={{ padding: "0 10px" }}>
-        {inventoryItems
-          .slice(page * pageSize, page * pageSize + pageSize)
-          .map((item, index) => (
-            <div
-              key={index}
-              style={{
-                backgroundColor: "white",
-                borderRadius: "8px",
-                padding: "12px",
-                marginBottom: "10px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        <div
+          style={{ display: "flex", alignItems: "center", marginBottom: 12 }}
+        >
+          <Box
+            className="custom-dropdown"
+            sx={{ minWidth: 160, position: "relative" }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setStockStatusDropdownOpen((open) => !open)}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                border: "1px solid #e2e8f0",
+                background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
               }}
             >
+              {stockStatusFilter === "all" && "All"}
+              {stockStatusFilter === "high" && (
+                <>
+                  <RadioButtonUncheckedIcon
+                    sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                  />
+                  <span style={{ color: "#059669" }}>High</span>
+                </>
+              )}
+              {stockStatusFilter === "medium" && (
+                <>
+                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18, mr: 1 }} />
+                  <span style={{ color: "#D97706" }}>Medium</span>
+                </>
+              )}
+              {stockStatusFilter === "low" && (
+                <>
+                  <ErrorOutlineIcon
+                    sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                  />
+                  <span style={{ color: "#DC2626" }}>Low</span>
+                </>
+              )}
+              <span style={{ marginLeft: 8, fontSize: 12, color: "#6b7280" }}>
+                ▼
+              </span>
+            </Button>
+            {stockStatusDropdownOpen && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  background: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  zIndex: 10,
+                  mt: 0.5,
+                }}
+              >
+                {[
+                  { key: "all", label: "All" },
+                  {
+                    key: "high",
+                    label: "High",
+                    icon: (
+                      <RadioButtonUncheckedIcon
+                        sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "medium",
+                    label: "Medium",
+                    icon: (
+                      <RemoveIcon
+                        sx={{ color: "#D97706", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "low",
+                    label: "Low",
+                    icon: (
+                      <ErrorOutlineIcon
+                        sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                      />
+                    ),
+                  },
+                ].map((opt) => (
+                  <Box
+                    key={opt.key}
+                    className={`custom-dropdown-item${
+                      stockStatusFilter === opt.key ? " active" : ""
+                    }`}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 2,
+                      py: 1,
+                      cursor: "pointer",
+                      borderRadius: 1,
+                      fontWeight: stockStatusFilter === opt.key ? 600 : 400,
+                      color:
+                        opt.key === "high"
+                          ? "#059669"
+                          : opt.key === "medium"
+                          ? "#D97706"
+                          : opt.key === "low"
+                          ? "#DC2626"
+                          : "#374151",
+                      background:
+                        stockStatusFilter === opt.key ? "#eff6ff" : undefined,
+                      "&:hover": { background: "#f8fafc" },
+                    }}
+                    onClick={() => {
+                      setStockStatusFilter(opt.key);
+                      setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
+                      setPage(0); // Optionally reset to first page
+                      setStockStatusDropdownOpen(false);
+                    }}
+                  >
+                    {opt.icon && opt.icon}
+                    <span>{opt.label}</span>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search by product name..."
+            style={{
+              marginLeft: 8,
+              padding: "8px 12px",
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              fontSize: "14px",
+              minWidth: "150px",
+              height: "36px",
+              flex: 1,
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setAppliedStockStatus(stockStatusFilter);
+              setAppliedSearchText(searchText);
+            }}
+            style={{
+              marginLeft: 8,
+              height: "36px",
+              padding: "8px 16px",
+              fontSize: "14px",
+            }}
+          >
+            Search
+          </Button>
+        </div>
+        {inventoryItems.map((item, index) => (
+          <div
+            key={index}
+            style={{
+              backgroundColor: "white",
+              borderRadius: "8px",
+              padding: "12px",
+              marginBottom: "10px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
+                {item.productName}
+              </h3>
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "8px",
+                  gap: "10px",
                 }}
               >
-                <h3
+                <img
+                  src={eyesIn}
+                  alt="view"
                   style={{
-                    margin: 0,
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {item.productName}
-                </h3>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                  }}
-                >
-                  <img
-                    src={eyesIn}
-                    alt="view"
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleViewItem(item)}
-                  />
-                  <img
-                    src={editLogo}
-                    alt="edit"
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleEdit(index)}
-                  />
-                  <img
-                    src={deleteLogo}
-                    alt="delete"
-                    style={{
-                      width: "18px",
-                      height: "18px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleDelete(index)}
-                  />
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "8px",
-                  fontSize: "14px",
-                }}
-              >
-                <div>
-                  <span style={{ color: "#666" }}>Category: </span>
-                  <span>{item.category}</span>
-                </div>
-                <div>
-                  <span style={{ color: "#666" }}>Area: </span>
-                  <span>{item.serviceArea}</span>
-                </div>
-                <div>
-                  <span style={{ color: "#666" }}>Stock: </span>
-                  <span>{item.stockQuantity} units</span>
-                </div>
-                <div>
-                  <span style={{ color: "#666" }}>Price: </span>
-                  <span>${item.price.toFixed(2)}</span>
-                </div>
-              </div>
-
-              {/* Add Send Email button */}
-              <div style={{ marginTop: "10px" }}>
-                <button
-                  style={{
-                    padding: "8px 12px",
-                    borderRadius: "5px",
-                    backgroundColor: "#0387D9",
-                    color: "#fff",
-                    border: "none",
+                    width: "18px",
+                    height: "18px",
                     cursor: "pointer",
-                    fontSize: "12px",
-                    fontWeight: "bold",
-                    width: "100%",
                   }}
-                  onClick={() => handleSendEmail(item)}
-                >
-                  Send Email
-                </button>
+                  onClick={() => handleViewItem(item)}
+                />
+                <img
+                  src={editLogo}
+                  alt="edit"
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleEdit(index)}
+                />
+                <img
+                  src={deleteLogo}
+                  alt="delete"
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleDelete(index)}
+                />
               </div>
             </div>
-          ))}
 
-        {/* Pagination always visible with margin */}
-        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
-          <Pagination
-            currentPage={page + 1}
-            totalPages={Math.ceil(totalItems / pageSize)}
-            totalItems={totalItems}
-            itemsPerPage={pageSize}
-            onPageChange={(newPage) => setPage(newPage - 1)}
-            isMobile={true}
-          />
-        </Box>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "8px",
+                fontSize: "14px",
+              }}
+            >
+              <div>
+                <span style={{ color: "#666" }}>Category: </span>
+                <span>{item.category}</span>
+              </div>
+              <div>
+                <span style={{ color: "#666" }}>Stock: </span>
+                <span>{item.stockQuantity} units</span>
+              </div>
+              <div>
+                <span style={{ color: "#666" }}>Price: </span>
+                <span>${item.price.toFixed(2)}</span>
+              </div>
+            </div>
 
-        {renderLoadingIndicator()}
+            {/* Add Send Email button */}
+            <div style={{ marginTop: "10px" }}>
+              <button
+                style={{
+                  padding: "8px 12px",
+                  borderRadius: "5px",
+                  backgroundColor: "#0387D9",
+                  color: "#fff",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  width: "100%",
+                }}
+                onClick={() => handleSendEmail(item)}
+              >
+                Send Email
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     );
   };
@@ -925,7 +1092,21 @@ const Invent = () => {
   const renderDesktopView = () => {
     return (
       <>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            mb: 2,
+            p: 2,
+            backgroundColor: "#fff",
+            borderRadius: 2,
+            border: "1px solid #EAECF0",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+          }}
+        >
           <span style={{ fontWeight: 500 }}>Stock Status:</span>
           <Box
             className="custom-dropdown"
@@ -1045,6 +1226,8 @@ const Invent = () => {
                     }}
                     onClick={() => {
                       setStockStatusFilter(opt.key);
+                      setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
+                      setPage(0); // Optionally reset to first page
                       setStockStatusDropdownOpen(false);
                     }}
                   >
@@ -1055,6 +1238,37 @@ const Invent = () => {
               </Box>
             )}
           </Box>
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search by product name..."
+            style={{
+              marginLeft: 8,
+              padding: "8px 12px",
+              borderRadius: 4,
+              border: "1px solid #ccc",
+              fontSize: "14px",
+              minWidth: "200px",
+              height: "36px",
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setAppliedStockStatus(stockStatusFilter);
+              setAppliedSearchText(searchText);
+            }}
+            style={{
+              marginLeft: 8,
+              height: "36px",
+              padding: "8px 16px",
+              fontSize: "14px",
+            }}
+          >
+            Search
+          </Button>
         </Box>
         <TableContainer
           component={Paper}
@@ -1101,14 +1315,6 @@ const Invent = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    Service Area
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
                     Stock Quantity
                     <IconButton size="small">
                       <FilterListIcon fontSize="inherit" />
@@ -1134,9 +1340,14 @@ const Invent = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInventoryItems
-                .slice(page * pageSize, page * pageSize + pageSize)
-                .map((item, idx) => (
+              {inventoryItems.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    No products match your filter or search.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                inventoryItems.map((item, idx) => (
                   <TableRow
                     key={item.id}
                     hover
@@ -1152,11 +1363,10 @@ const Invent = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      #{item.productId || item.id?.slice(-6) || idx + 1}
+                      #{item.id?.slice?.(-6) || item.id || idx + 1}
                     </TableCell>
                     <TableCell>{item.productName}</TableCell>
                     <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.serviceArea}</TableCell>
                     <TableCell>
                       <span
                         style={{
@@ -1214,19 +1424,22 @@ const Invent = () => {
                       </Tooltip>
                     </TableCell>
                   </TableRow>
-                ))}
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
 
-        {/* Pagination always visible with margin */}
         <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
           <Pagination
             currentPage={page + 1}
             totalPages={Math.ceil(totalItems / pageSize)}
             totalItems={totalItems}
             itemsPerPage={pageSize}
-            onPageChange={(newPage) => setPage(newPage - 1)}
+            onPageChange={(newPage) => {
+              console.log("Pagination clicked, newPage:", newPage);
+              setPage(newPage - 1);
+            }}
           />
         </Box>
       </>
@@ -1321,7 +1534,6 @@ const Invent = () => {
     setNewItem({
       productName: "",
       category: "",
-      serviceArea: "",
       stockQuantity: "",
       price: "",
       supplier: "",
@@ -1345,13 +1557,34 @@ const Invent = () => {
     setFilteredSuppliers(filtered.slice(0, supplierPage * SUPPLIERS_PER_PAGE));
   }, [supplierSearch, suppliers, supplierPage]);
 
-  // Fetch new data when page changes
-  useEffect(() => {
-    fetchInventoryData(page + 1);
-  }, [page]);
-
   return (
     <>
+      {/* Loading Overlay for Initial Load */}
+      {isLoading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              className="pi pi-spin pi-spinner"
+              style={{ fontSize: "2rem", marginBottom: "10px" }}
+            ></div>
+            <p>Loading inventory data...</p>
+          </div>
+        </div>
+      )}
+
       <div
         className="inventory-wrapper"
         style={{
@@ -1414,16 +1647,6 @@ const Invent = () => {
           </div>
 
           <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="serviceArea">Service Area</label>
-              <TextField
-                id="serviceArea"
-                value={editItem.serviceArea}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, serviceArea: e.target.value })
-                }
-              />
-            </div>
             <div className="form-group">
               <label htmlFor="stockQuantity">Stock Quantity</label>
               <TextField
@@ -1723,28 +1946,6 @@ const Invent = () => {
             loading={suppliersLoading}
             disabled={suppliersLoading}
           />
-          <TextField
-            label="Service Area"
-            placeholder="Caribbean"
-            value={newItem.serviceArea || ""}
-            onChange={(e) =>
-              setNewItem({ ...newItem, serviceArea: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            placeholder="Enter Product Description"
-            value={newItem.description || ""}
-            onChange={(e) =>
-              setNewItem({ ...newItem, description: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-            multiline
-            minRows={2}
-          />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
           <Button
@@ -1978,10 +2179,6 @@ const Invent = () => {
                       viewItem.supplier.trim() !== ""
                     ? viewItem.supplier
                     : "Not available"}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Service Area</Box>
-                <Box sx={{ color: "#111827", fontWeight: 500, fontSize: 14 }}>
-                  {viewItem.serviceArea}
                 </Box>
               </Box>
               <Box>
