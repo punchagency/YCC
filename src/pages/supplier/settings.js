@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useUser } from "../../context/userContext";
 import { useTheme } from "../../context/theme/themeContext";
+import { useOutletContext } from "react-router-dom";
 import {
   Box,
   Card,
@@ -35,6 +36,10 @@ const SupplierSettings = () => {
     message: "",
     severity: "success",
   });
+  const { setPageTitle } = useOutletContext() || {};
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Settings");
+  }, [setPageTitle]);
 
   const [formData, setFormData] = useState({
     businessName: "",
@@ -140,63 +145,7 @@ const SupplierSettings = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box
-        sx={{
-          mb: 4,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            Settings
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Manage your business settings and preferences
-          </Typography>
-        </Box>
-        <Box>
-          {isEditing ? (
-            <Box sx={{ display: "flex", gap: 2 }}>
-              <Button
-                variant="outlined"
-                onClick={handleCancel}
-                sx={{
-                  borderColor: theme === "light" ? "#666" : "#999",
-                  color: theme === "light" ? "#666" : "#999",
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={handleSave}
-                sx={{
-                  bgcolor: "#003366",
-                  "&:hover": { bgcolor: "#002244" },
-                }}
-              >
-                Save Changes
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={() => setIsEditing(true)}
-              sx={{
-                bgcolor: "#003366",
-                "&:hover": { bgcolor: "#002244" },
-              }}
-            >
-              Edit Settings
-            </Button>
-          )}
-        </Box>
-      </Box>
+      {/* Removed static header, use shared SupplierLayout title bar */}
 
       <Grid container spacing={3}>
         {/* Business Information */}

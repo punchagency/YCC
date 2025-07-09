@@ -422,17 +422,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       },
     },
     {
-      label: "Profile",
-      icon: <img src={settingsLogo} alt="Profile" width={15} height={15} />,
-      className:
-        location.pathname === "/supplier/profile"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => {
-        navigate("/supplier/profile");
-      },
-    },
-    {
       separator: true,
       style: { margin: "15px 0" },
     },
