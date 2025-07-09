@@ -222,12 +222,14 @@ const SupplierSignup = () => {
                   minHeight: 0,
                 }}
               >
-                <SupplierSignUpForm
-                  setStep={setStep}
-                  currentStep={step}
-                  formData={formData}
-                  setFormData={handleFormDataChange}
-                />
+                <div className="form-scroll-inner" style={{ paddingRight: 20 }}>
+                  <SupplierSignUpForm
+                    setStep={setStep}
+                    currentStep={step}
+                    formData={formData}
+                    setFormData={handleFormDataChange}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -21,6 +21,33 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
 
+// Custom scrollbar styles for supplier and service provider forms
+if (
+  typeof window !== "undefined" &&
+  !document.getElementById("custom-scrollbar-style-vendor")
+) {
+  const style = document.createElement("style");
+  style.id = "custom-scrollbar-style-vendor";
+  style.innerHTML = `
+    .login-form.vendor-login-form::-webkit-scrollbar {
+      width: 7px;
+      background: transparent;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 8px;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb:hover {
+      background: #b0b8c1;
+    }
+    .login-form.vendor-login-form {
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -99,9 +126,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       }
       if (formData.liabilityInsurance) {
         formDataObj.append("liabilityInsurance", formData.liabilityInsurance);
-      }
-      if (formData.pricingStructure) {
-        formDataObj.append("pricingStructure", formData.pricingStructure);
       }
 
       const vendorDetails = {
@@ -194,7 +218,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [pricingFile, setPricingFile] = useState(null);
 
   const handleFileUpload = async (file, type) => {
     if (!file) return;
@@ -226,10 +249,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       switch (type) {
-        case "pricing":
-          setPricingFile(file);
-          handleInputChange("pricingStructure", file);
-          break;
         case "license":
           setLicenseFile(file);
           handleInputChange("licenseFile", file);
@@ -726,7 +745,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
-          margin: "0 auto 27px auto",
+          margin: "0 auto 8px auto",
           maxWidth: "600px",
         }}
       >
@@ -987,42 +1006,23 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Pricing Structure */}
-      {/* Pricing Structure */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Pricing Structure</label>
-          <div className="upload-input">
-            <input
-              type="text"
-              placeholder="Upload Pricing Structure"
-              value={pricingFile ? pricingFile.name : ""}
-              readOnly
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              className="upload-icon"
-              onClick={() => document.getElementById("pricingInput").click()}
-            />
-            <input
-              type="file"
-              id="pricingInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "pricing")}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
       {/* Availability */}
       <div className="form-group1">
         <div className="input-field">
           <div>
             <label htmlFor="availability">Availability</label>
           </div>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <div style={{ flex: 1 }}>
+          <div
+            className="inputBorder"
+            style={{
+              display: "flex",
+              gap: "12px",
+              alignItems: "center",
+              flexWrap: "wrap",
+              marginBottom: 0,
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
               <Select
                 options={[
                   { value: "mon-fri", label: "Monday - Friday" },
@@ -1048,7 +1048,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     background: "transparent",
                     border: "none",
                     boxShadow: "none",
-                    minHeight: "35px",
                   }),
                   container: (provided) => ({
                     ...provided,
@@ -1081,7 +1080,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 }}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <Select
                 options={[
                   { value: "9am-5pm", label: "9:00 AM - 5:00 PM" },
@@ -1103,7 +1102,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     background: "transparent",
                     border: "none",
                     boxShadow: "none",
-                    minHeight: "35px",
                   }),
                   container: (provided) => ({
                     ...provided,

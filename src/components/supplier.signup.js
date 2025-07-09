@@ -1246,35 +1246,64 @@ const SupplierSignUpForm = ({
     </motion.div>
   );
 
+  // Custom scrollbar styles for supplier and service provider forms
+  const style = document.createElement("style");
+  style.innerHTML = `
+    .login-form.vendor-login-form::-webkit-scrollbar {
+      width: 7px;
+      background: transparent;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 8px;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb:hover {
+      background: #b0b8c1;
+    }
+    .login-form.vendor-login-form {
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+  `;
+  if (
+    typeof window !== "undefined" &&
+    !document.getElementById("custom-scrollbar-style")
+  ) {
+    style.id = "custom-scrollbar-style";
+    document.head.appendChild(style);
+  }
+
   return (
     <div className="form-container">
-      <AnimatePresence mode="wait" initial={false}>
-        {currentStep === 1 && renderStep1()}
-        {currentStep === 2 && renderStep2()}
-        {currentStep === 3 && renderStep3()}
-        {currentStep === 4 && renderStep4()}
-      </AnimatePresence>
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            className="error-message"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            style={{
-              position: "fixed",
-              bottom: 20,
-              right: 20,
-              background: "#ffdddd",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              color: "red",
-            }}
-          >
-            {error}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="form-scroll-inner" style={{ paddingRight: 20 }}>
+        <AnimatePresence mode="wait" initial={false}>
+          {currentStep === 1 && renderStep1()}
+          {currentStep === 2 && renderStep2()}
+          {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
+        </AnimatePresence>
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              className="error-message"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              style={{
+                position: "fixed",
+                bottom: 20,
+                right: 20,
+                background: "#ffdddd",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                color: "red",
+              }}
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
