@@ -33,14 +33,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const { user } = useUser();
-  
+
   // Get role name from object or string
   let userRole = user?.role;
-  if (typeof userRole === 'object' && userRole.name) {
+  if (typeof userRole === "object" && userRole.name) {
     userRole = userRole.name;
   }
-  
+
   const isCrewMember = userRole === "crew_member";
+  const isSupplier = userRole === "supplier";
 
   const handleLogout = () => {
     confirmDialog({
@@ -386,7 +387,58 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
     },
   ];
 
-  const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
+  const supplierMenuItems = [
+    {
+      label: "Dashboard",
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/dashboard");
+      },
+    },
+    {
+      label: "Inventory Management",
+      icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/inventory"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/inventory");
+      },
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/settings");
+      },
+    },
+    {
+      label: "Profile",
+      icon: <img src={settingsLogo} alt="Profile" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/profile"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/profile");
+      },
+    },
+    {
+      separator: true,
+      style: { margin: "15px 0" },
+    },
+  ];
+
+  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : adminMenuItems;
 
   menuItems.forEach((item) => {
     if (item.label) {

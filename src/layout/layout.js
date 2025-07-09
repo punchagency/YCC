@@ -18,8 +18,19 @@ import "../styles/layout.css";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import DashboardTitleBar from "../components/dashboard/title-bar";
+import { useUser } from "../context/userContext";
 
 const AdminLayout = ({ role }) => {
+  const { user } = useUser();
+
+  // Get role name from object or string
+  let userRole = user?.role;
+  if (typeof userRole === "object" && userRole.name) {
+    userRole = userRole.name;
+  }
+
+  // Determine the actual role to use
+  const actualRole = role || userRole;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
   const [backArrow, setBackArrow] = useState(false);
@@ -244,7 +255,7 @@ const AdminLayout = ({ role }) => {
                           <main className="flex page relative wrapper">
                             {!shouldHideLeftPanel && (
                               <LeftMenu
-                                role={role}
+                                role={actualRole}
                                 isCollapsed={isCollapsed}
                                 setIsCollapsed={setIsCollapsed}
                               />

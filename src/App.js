@@ -53,6 +53,9 @@ import SupplierOnboardingStep2 from "./components/onboarding/supplier/supplier-o
 import VendorOnboarding from "./pages/onboarding/vendor-onboarding";
 import VendorOnboardingStep2 from "./components/onboarding/vendor/vendor-onboarding-step2";
 import CrewDashboard from "./pages/dashboard/crew/dashboard";
+import SupplierDashboard from "./pages/dashboard/supplier/dashboard";
+import SupplierSettings from "./pages/supplier/settings";
+import SupplierProfile from "./pages/supplier/profile";
 import CrewCalendar from "./pages/crew/calendar/calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CrewFinancialManagement from "./pages/crew/financial-management/financial-management";
@@ -433,6 +436,50 @@ function App() {
                       element={
                         <ProtectedRoute requiredRoles={["crew_member"]}>
                           <DocumentView />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
+
+                  {/* Supplier Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route
+                      path="/supplier/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/inventory"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <Invent />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/inventory/:inventoryId"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <Invent />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/settings"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierSettings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/profile"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierProfile />
                         </ProtectedRoute>
                       }
                     />
