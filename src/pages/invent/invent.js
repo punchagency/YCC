@@ -52,7 +52,6 @@ import Alert from "@mui/material/Alert";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveIcon from "@mui/icons-material/Remove";
-import CloudUpload from "@mui/icons-material/CloudUpload";
 
 import {
   createInventoryData,
@@ -1857,7 +1856,7 @@ const Invent = () => {
                     alignItems="center"
                     gap={1}
                   >
-                    <CloudUpload sx={{ fontSize: 40, color: "#B0B7C3" }} />
+                    <CloudUploadIcon sx={{ fontSize: 40, color: "#B0B7C3" }} />
                     <Typography variant="body2">
                       Drag Or Browse Image
                     </Typography>
@@ -2459,8 +2458,7 @@ const Invent = () => {
               variant="outlined"
               InputProps={{ style: { background: "#FAFAFA", borderRadius: 8 } }}
               value={viewItem.product?.description || "Not available"}
-              disabled
-              InputProps={{ readOnly: true, style: { color: "#000" } }}
+              inputProps={{ readOnly: true, style: { color: "#000" } }}
             />
           </Box>
         </DialogContent>
