@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useNavigate, useOutletContext } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, useOutletContext } from "react-router-dom";
 import {
   Box,
   Typography,
   Button,
-  CircularProgress,
   Chip,
   Divider,
   Grid,
@@ -21,7 +20,8 @@ import {
   TableHead,
   TableRow,
   Paper,
-} from "@mui/material"
+  Fade,
+} from "@mui/material";
 import {
   CopyIcon,
   CheckIcon,
@@ -32,13 +32,26 @@ import {
   TruckIcon,
   ClockIcon,
   DownloadIcon,
-} from "lucide-react"
-import { styled } from "@mui/material/styles"
-import { getOrderById } from "../../../services/crew/crewOrderService"
-import { formatCurrency } from "../../../utils/formatters"
-import { exportOrderToPDF } from "../../../utils/pdfUtils"
-import { useToast } from "../../../context/toast/toastContext"
-import OrderDetailsSkeleton from '../../../components/CrewOrderSkeletons/OrderDetailsSkeleton'
+} from "lucide-react";
+import { styled } from "@mui/material/styles";
+import { getOrderById } from "../../../services/crew/crewOrderService";
+import { formatCurrency } from "../../../utils/formatters";
+import { exportOrderToPDF } from "../../../utils/pdfUtils";
+import { useToast } from "../../../context/toast/toastContext";
+import OrderDetailsSkeleton from "../../../components/CrewOrderSkeletons/OrderDetailsSkeleton";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // Styled components for custom design
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -47,7 +60,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: "rgba(255, 255, 255, 0.7)",
   backdropFilter: "blur(8px)",
   borderRadius: "12px",
-}))
+}));
 
 const StyledButton = styled(Button)(({ theme }) => ({
   height: "32px",
@@ -60,7 +73,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
     backgroundColor: "#e5e7eb",
     transform: "scale(1.1)",
   },
-}))
+}));
 
 const CopyIconStyled = styled(CopyIcon)(({ theme, copied }) => ({
   fontSize: "16px",
@@ -70,7 +83,7 @@ const CopyIconStyled = styled(CopyIcon)(({ theme, copied }) => ({
     color: "#0387D9",
     transform: "rotate(12deg) scale(1.1)",
   },
-}))
+}));
 
 const CheckIconStyled = styled(CheckIcon)(({ theme }) => ({
   fontSize: "16px",
@@ -84,77 +97,81 @@ const CheckIconStyled = styled(CheckIcon)(({ theme }) => ({
       transform: "scale(1)",
     },
   },
-}))
+}));
 
 const ProductCard = styled(Box)(({ theme }) => ({
   background: "linear-gradient(to right, #f8fafc, rgba(59, 130, 246, 0.05))",
   borderRadius: "8px",
   padding: "16px",
   border: "1px solid #e5e7eb",
-}))
+}));
 
 const OrderDetails = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const { setPageTitle } = useOutletContext() || {}
-  const { toast } = useToast()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { setPageTitle } = useOutletContext() || {};
+  const { toast } = useToast();
 
-  const [order, setOrder] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [copied, setCopied] = useState(false)
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success")
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
+  // Add to state
+  const [selectedRates, setSelectedRates] = useState({});
+  const [isSelecting, setIsSelecting] = useState(false);
 
   // Set page title when component mounts
   useEffect(() => {
-    if (setPageTitle) setPageTitle("Order Details")
-  }, [setPageTitle])
+    if (setPageTitle) setPageTitle("Order Details");
+  }, [setPageTitle]);
 
   // Fetch order details
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-        setLoading(true)
-        setError(null)
+        setLoading(true);
+        setError(null);
 
-        const response = await getOrderById(id)
+        const response = await getOrderById(id);
 
         if (response.status) {
-          setOrder(response.data.data)
+          setOrder(response.data.data);
         } else {
-          setError(response.error || "Failed to fetch order details")
+          setError(response.error || "Failed to fetch order details");
         }
       } catch (error) {
-        console.error("Error fetching order details:", error)
-        setError("An unexpected error occurred")
+        console.error("Error fetching order details:", error);
+        setError("An unexpected error occurred");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (id) {
-      fetchOrderDetails()
+      fetchOrderDetails();
     }
-  }, [id])
+  }, [id]);
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A"
+    if (!dateString) return "N/A";
     try {
-      const date = new Date(dateString)
-      if (isNaN(date.getTime())) return "Invalid Date"
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Invalid Date";
       return date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-      })
+      });
     } catch (error) {
-      return "Invalid Date"
+      return "Invalid Date";
     }
-  }
+  };
 
   const getStatusConfig = (status) => {
     const configs = {
@@ -221,42 +238,78 @@ const OrderDetails = () => {
         },
         icon: ClockIcon,
       },
-    }
-    return configs[status] || configs.default
-  }
+    };
+    return configs[status] || configs.default;
+  };
 
   const copyOrderId = async () => {
     try {
-      await navigator.clipboard.writeText(order.orderId || order._id)
-      setCopied(true)
-      setSnackbarMessage("Order ID copied to clipboard")
-      setSnackbarSeverity("success")
-      setSnackbarOpen(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(order.orderId || order._id);
+      setCopied(true);
+      setSnackbarMessage("Order ID copied to clipboard");
+      setSnackbarSeverity("success");
+      setSnackbarOpen(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      setSnackbarMessage("Failed to copy Order ID")
-      setSnackbarSeverity("error")
-      setSnackbarOpen(true)
+      setSnackbarMessage("Failed to copy Order ID");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
-  }
+  };
 
   const handleExportPDF = () => {
     try {
-      exportOrderToPDF(order)
+      exportOrderToPDF(order);
       toast.current.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'PDF exported successfully!'
-      })
+        severity: "success",
+        summary: "Success",
+        detail: "PDF exported successfully!",
+      });
     } catch (error) {
-      console.error("PDF export error:", error)
+      console.error("PDF export error:", error);
       toast.current.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to export PDF'
-      })
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to export PDF",
+      });
     }
-  }
+  };
+
+  // Add function to handle selection
+  const handleRateChange = (subOrderId, rateId) => {
+    setSelectedRates((prev) => ({ ...prev, [subOrderId]: rateId }));
+  };
+
+  const handleConfirmSelection = async (subOrderId) => {
+    setIsSelecting(true);
+    try {
+      // Assuming a service function selectShipmentRate(subOrderId, rateId)
+      // This function needs to be implemented in your backend/services
+      // For now, we'll simulate a successful call
+      console.log(
+        `Selecting rate for subOrderId: ${subOrderId}, rateId: ${selectedRates[subOrderId]}`
+      );
+      // await selectShipmentRate(subOrderId, selectedRates[subOrderId]);
+      // Refresh order data
+      const response = await getOrderById(id);
+      if (response.status) {
+        setOrder(response.data.data);
+      }
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Rate selected successfully",
+      });
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to select rate",
+      });
+    } finally {
+      setIsSelecting(false);
+    }
+  };
 
   if (loading) {
     return <OrderDetailsSkeleton />;
@@ -276,7 +329,10 @@ const OrderDetails = () => {
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111827", mb: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, color: "#111827", mb: 1 }}
+          >
             Error Loading Order Details
           </Typography>
           <Typography variant="body2" sx={{ color: "#6b7280" }}>
@@ -291,7 +347,7 @@ const OrderDetails = () => {
           Back to Orders
         </Button>
       </Box>
-    )
+    );
   }
 
   // No order found
@@ -308,11 +364,15 @@ const OrderDetails = () => {
         }}
       >
         <Box sx={{ textAlign: "center" }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, color: "#111827", mb: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, color: "#111827", mb: 1 }}
+          >
             Order Not Found
           </Typography>
           <Typography variant="body2" sx={{ color: "#6b7280" }}>
-            The order you're looking for doesn't exist or you don't have permission to view it.
+            The order you're looking for doesn't exist or you don't have
+            permission to view it.
           </Typography>
         </Box>
         <Button
@@ -323,19 +383,26 @@ const OrderDetails = () => {
           Back to Orders
         </Button>
       </Box>
-    )
+    );
   }
 
   // Calculate total product count
   const totalProductCount =
     order.subOrders?.reduce((total, subOrder) => {
-      return total + (subOrder.products?.reduce((subTotal, product) => subTotal + product.quantity, 0) || 0)
-    }, 0) || 0
+      return (
+        total +
+        (subOrder.products?.reduce(
+          (subTotal, product) => subTotal + product.quantity,
+          0
+        ) || 0)
+      );
+    }, 0) || 0;
 
   return (
     <Box
       sx={{
-        background: "linear-gradient(to bottom right, #f8fafc, rgba(59, 130, 246, 0.05))",
+        background:
+          "linear-gradient(to bottom right, #f8fafc, rgba(59, 130, 246, 0.05))",
         minHeight: "100vh",
         p: { md: 3 },
       }}
@@ -375,9 +442,14 @@ const OrderDetails = () => {
             {/* Order Summary */}
             <StyledCard>
               <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}
+                >
                   <PackageIcon size={24} stroke="#0387D9" />
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: "#111827" }}>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 700, color: "#111827" }}
+                  >
                     Order Summary
                   </Typography>
                 </Box>
@@ -385,10 +457,27 @@ const OrderDetails = () => {
                 <Grid container spacing={4}>
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", mb: 1, textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          mb: 1,
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Order Date
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "#111827", fontWeight: 500, fontSize: "16px" }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#111827",
+                          fontWeight: 500,
+                          fontSize: "16px",
+                        }}
+                      >
                         {formatDate(order.createdAt)}
                       </Typography>
                     </Box>
@@ -396,10 +485,27 @@ const OrderDetails = () => {
 
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", mb: 1, textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          mb: 1,
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Total Amount
                       </Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 800, color: "#0387D9", fontSize: { xs: "24px", md: "28px" } }}>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 800,
+                          color: "#0387D9",
+                          fontSize: { xs: "24px", md: "28px" },
+                        }}
+                      >
                         {formatCurrency(order.totalPrice)}
                       </Typography>
                     </Box>
@@ -407,11 +513,23 @@ const OrderDetails = () => {
 
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", mb: 1, textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          mb: 1,
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Order Status
                       </Typography>
                       <Chip
-                        icon={<CheckIcon sx={{ fontSize: "14px !important" }} />}
+                        icon={
+                          <CheckIcon sx={{ fontSize: "14px !important" }} />
+                        }
                         label={order.overallStatus || "pending"}
                         sx={{
                           ...getStatusConfig(order.overallStatus).sx,
@@ -431,10 +549,27 @@ const OrderDetails = () => {
 
                   <Grid item xs={12} sm={6}>
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", mb: 1, textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          mb: 1,
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Products Count
                       </Typography>
-                      <Typography variant="body1" sx={{ color: "#111827", fontWeight: 500, fontSize: "16px" }}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#111827",
+                          fontWeight: 500,
+                          fontSize: "16px",
+                        }}
+                      >
                         {totalProductCount} products
                       </Typography>
                     </Box>
@@ -447,38 +582,82 @@ const OrderDetails = () => {
             {order.subOrders && order.subOrders.length > 0 && (
               <StyledCard>
                 <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                      mb: 4,
+                    }}
+                  >
                     <PackageIcon size={24} stroke="#0387D9" />
-                    <Typography variant="h5" sx={{ fontWeight: 700, color: "#111827" }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: 700, color: "#111827" }}
+                    >
                       Order Items ({order.subOrders.length})
                     </Typography>
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 4 }}
+                  >
                     {order.subOrders.map((subOrder, index) => {
-                      const subStatusConfig = getStatusConfig(subOrder.status)
-                      const SubStatusIcon = subStatusConfig.icon
+                      const subStatusConfig = getStatusConfig(subOrder.status);
+                      const SubStatusIcon = subStatusConfig.icon;
 
                       return (
                         <Box key={subOrder._id}>
                           <Box
-                            sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                              mb: 3,
+                            }}
                           >
                             <Box>
-                              <Typography variant="h6" sx={{ fontWeight: 700, color: "#111827", mb: 1, fontSize: "18px" }}>
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "#111827",
+                                  mb: 1,
+                                  fontSize: "18px",
+                                }}
+                              >
                                 Item {index + 1}
                               </Typography>
                               {subOrder.supplier && (
-                                <Typography variant="body2" sx={{ color: "#6b7280", mb: 1, fontWeight: 500, fontSize: "14px" }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    color: "#6b7280",
+                                    mb: 1,
+                                    fontWeight: 500,
+                                    fontSize: "14px",
+                                  }}
+                                >
                                   Supplier: {subOrder.supplier.businessName}
                                 </Typography>
                               )}
-                              <Typography variant="h5" sx={{ fontWeight: 700, color: "#0387D9", fontSize: "20px" }}>
+                              <Typography
+                                variant="h5"
+                                sx={{
+                                  fontWeight: 700,
+                                  color: "#0387D9",
+                                  fontSize: "20px",
+                                }}
+                              >
                                 {formatCurrency(subOrder.subTotal)}
                               </Typography>
                             </Box>
                             <Chip
-                              icon={<SubStatusIcon sx={{ fontSize: "14px !important" }} />}
+                              icon={
+                                <SubStatusIcon
+                                  sx={{ fontSize: "14px !important" }}
+                                />
+                              }
                               label={subOrder.status || "pending"}
                               sx={{
                                 ...subStatusConfig.sx,
@@ -494,57 +673,260 @@ const OrderDetails = () => {
                           </Box>
 
                           {/* Products */}
-                          {subOrder.products && subOrder.products.length > 0 && (
-                            <Box sx={{ mb: 3 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 700, color: "#374151", mb: 2, textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
-                                Products:
-                              </Typography>
-                              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                                {subOrder.products.map((productItem, productIndex) => (
-                                  <ProductCard key={productItem._id || productIndex}>
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "flex-start",
-                                        mb: 1.5,
-                                      }}
-                                    >
-                                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#111827", fontSize: "16px" }}>
-                                        {productItem.product?.name || "Product Name N/A"}
-                                      </Typography>
-                                      <Typography variant="h6" sx={{ fontWeight: 700, color: "#0387D9", fontSize: "18px" }}>
-                                        {formatCurrency(productItem.quantity * productItem.price)}
-                                      </Typography>
-                                    </Box>
+                          {subOrder.products &&
+                            subOrder.products.length > 0 && (
+                              <Box sx={{ mb: 3 }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 700,
+                                    color: "#374151",
+                                    mb: 2,
+                                    textTransform: "uppercase",
+                                    fontSize: "12px",
+                                    letterSpacing: "0.5px",
+                                  }}
+                                >
+                                  Products:
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 2,
+                                  }}
+                                >
+                                  {subOrder.products.map(
+                                    (productItem, productIndex) => (
+                                      <ProductCard
+                                        key={productItem._id || productIndex}
+                                      >
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "flex-start",
+                                            mb: 1.5,
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="subtitle1"
+                                            sx={{
+                                              fontWeight: 600,
+                                              color: "#111827",
+                                              fontSize: "16px",
+                                            }}
+                                          >
+                                            {productItem.product?.name ||
+                                              "Product Name N/A"}
+                                          </Typography>
+                                          <Typography
+                                            variant="h6"
+                                            sx={{
+                                              fontWeight: 700,
+                                              color: "#0387D9",
+                                              fontSize: "18px",
+                                            }}
+                                          >
+                                            {formatCurrency(
+                                              productItem.quantity *
+                                                productItem.price
+                                            )}
+                                          </Typography>
+                                        </Box>
 
-                                    <Box
-                                      sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}
-                                    >
-                                      <Typography variant="body2" sx={{ color: "#6b7280", fontWeight: 500, fontSize: "14px" }}>
-                                        Qty: {productItem.quantity} × {formatCurrency(productItem.price)}
-                                      </Typography>
-                                    </Box>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            mb: 1,
+                                          }}
+                                        >
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              color: "#6b7280",
+                                              fontWeight: 500,
+                                              fontSize: "14px",
+                                            }}
+                                          >
+                                            Qty: {productItem.quantity} ×{" "}
+                                            {formatCurrency(productItem.price)}
+                                          </Typography>
+                                        </Box>
 
-                                    {productItem.product?.description && (
-                                      <Typography variant="body2" sx={{ color: "#6b7280", mt: 1.5, fontSize: "14px", lineHeight: 1.5 }}>
-                                        {productItem.product.description}
-                                      </Typography>
-                                    )}
-                                  </ProductCard>
-                                ))}
+                                        {productItem.product?.description && (
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              color: "#6b7280",
+                                              mt: 1.5,
+                                              fontSize: "14px",
+                                              lineHeight: 1.5,
+                                            }}
+                                          >
+                                            {productItem.product.description}
+                                          </Typography>
+                                        )}
+                                      </ProductCard>
+                                    )
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
-                          )}
+                            )}
 
-                          {index < order.subOrders.length - 1 && <Divider sx={{ my: 4 }} />}
+                          {index < order.subOrders.length - 1 && (
+                            <Divider sx={{ my: 4 }} />
+                          )}
                         </Box>
-                      )
+                      );
                     })}
                   </Box>
                 </CardContent>
               </StyledCard>
             )}
+
+            {/* Shipping Options */}
+            {order.subOrders &&
+              order.subOrders.some(
+                (so) =>
+                  so.shipment &&
+                  so.shipment.rates?.length > 0 &&
+                  !so.shipment.selectedRate
+              ) && (
+                <StyledCard>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mb: 4,
+                      }}
+                    >
+                      <TruckIcon size={24} stroke="#0387D9" />
+                      <Typography
+                        variant="h5"
+                        sx={{ fontWeight: 700, color: "#111827" }}
+                      >
+                        Shipping Options
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                    >
+                      {order.subOrders.map((subOrder) => {
+                        if (
+                          !subOrder.shipment ||
+                          !subOrder.shipment.rates?.length ||
+                          subOrder.shipment.selectedRate
+                        )
+                          return null;
+                        return (
+                          <Fade in={true} key={subOrder._id}>
+                            <Accordion>
+                              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                <Typography>
+                                  Shipping for{" "}
+                                  {subOrder.supplier?.businessName ||
+                                    "Supplier"}{" "}
+                                  - Select Rate
+                                </Typography>
+                              </AccordionSummary>
+                              <AccordionDetails>
+                                <FormControl component="fieldset">
+                                  <RadioGroup
+                                    value={selectedRates[subOrder._id] || ""}
+                                    onChange={(e) =>
+                                      handleRateChange(
+                                        subOrder._id,
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    <TableContainer component={Paper}>
+                                      <Table>
+                                        <TableHead>
+                                          <TableRow>
+                                            <TableCell></TableCell>
+                                            <TableCell>Carrier</TableCell>
+                                            <TableCell>Service</TableCell>
+                                            <TableCell>Price</TableCell>
+                                            <TableCell>Est. Days</TableCell>
+                                          </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                          {subOrder.shipment.rates.map(
+                                            (rate) => (
+                                              <TableRow key={rate.id}>
+                                                <TableCell>
+                                                  <FormControlLabel
+                                                    value={rate.id}
+                                                    control={<Radio />}
+                                                    label=""
+                                                  />
+                                                </TableCell>
+                                                <TableCell>
+                                                  <LocalShippingIcon
+                                                    sx={{
+                                                      verticalAlign: "middle",
+                                                      mr: 1,
+                                                    }}
+                                                  />{" "}
+                                                  {rate.carrier}
+                                                </TableCell>
+                                                <TableCell>
+                                                  {rate.service}
+                                                </TableCell>
+                                                <TableCell>
+                                                  <AttachMoneyIcon
+                                                    sx={{
+                                                      verticalAlign: "middle",
+                                                      mr: 1,
+                                                    }}
+                                                  />{" "}
+                                                  {formatCurrency(rate.rate)}
+                                                </TableCell>
+                                                <TableCell>
+                                                  <AccessTimeIcon
+                                                    sx={{
+                                                      verticalAlign: "middle",
+                                                      mr: 1,
+                                                    }}
+                                                  />{" "}
+                                                  {rate.deliveryDays}
+                                                </TableCell>
+                                              </TableRow>
+                                            )
+                                          )}
+                                        </TableBody>
+                                      </Table>
+                                    </TableContainer>
+                                  </RadioGroup>
+                                  <Button
+                                    variant="contained"
+                                    disabled={
+                                      !selectedRates[subOrder._id] ||
+                                      isSelecting
+                                    }
+                                    onClick={() =>
+                                      handleConfirmSelection(subOrder._id)
+                                    }
+                                    sx={{ mt: 2 }}
+                                  >
+                                    Confirm Selection
+                                  </Button>
+                                </FormControl>
+                              </AccordionDetails>
+                            </Accordion>
+                          </Fade>
+                        );
+                      })}
+                    </Box>
+                  </CardContent>
+                </StyledCard>
+              )}
           </Box>
         </Grid>
 
@@ -554,56 +936,115 @@ const OrderDetails = () => {
             {/* Order Information */}
             <StyledCard>
               <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}
+                >
                   <FileTextIcon size={24} stroke="#0387D9" />
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: "#111827" }}>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 700, color: "#111827" }}
+                  >
                     Order Information
                   </Typography>
                 </Box>
 
                 <Box sx={{ mb: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.5,
+                      mb: 1,
+                    }}
+                  >
                     <MapPinIcon size={18} stroke="#0387D9" />
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        color: "#6b7280",
+                        textTransform: "uppercase",
+                        fontSize: "12px",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
                       Delivery Address
                     </Typography>
                   </Box>
                   {order.deliveryAddress ? (
-                    <Box sx={{
-                      pl: 3.5,
-                      py: 1.5,
-                      backgroundColor: "#f3f4f6",
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      fontSize: "15px",
-                      fontWeight: 500,
-                      color: "#111827",
-                      lineHeight: 1.7,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 0.5,
-                    }}>
-                      <Typography variant="body1" sx={{ fontWeight: 600, color: '#111827', fontSize: '15px' }}>
+                    <Box
+                      sx={{
+                        pl: 3.5,
+                        py: 1.5,
+                        backgroundColor: "#f3f4f6",
+                        borderRadius: "8px",
+                        border: "1px solid #e5e7eb",
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        color: "#111827",
+                        lineHeight: 1.7,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#111827",
+                          fontSize: "15px",
+                        }}
+                      >
                         {order.deliveryAddress.recipientName}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
-                        {order.deliveryAddress.recipientStreet}{order.deliveryAddress.recipientStreet2 ? `, ${order.deliveryAddress.recipientStreet2}` : ''}
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#374151", fontSize: "14px" }}
+                      >
+                        {order.deliveryAddress.recipientStreet}
+                        {order.deliveryAddress.recipientStreet2
+                          ? `, ${order.deliveryAddress.recipientStreet2}`
+                          : ""}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
-                        {order.deliveryAddress.recipientCity}, {order.deliveryAddress.recipientState} {order.deliveryAddress.recipientZip}
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#374151", fontSize: "14px" }}
+                      >
+                        {order.deliveryAddress.recipientCity},{" "}
+                        {order.deliveryAddress.recipientState}{" "}
+                        {order.deliveryAddress.recipientZip}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#374151", fontSize: "14px" }}
+                      >
                         {order.deliveryAddress.recipientCountry}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#374151", fontSize: "14px" }}
+                      >
                         {order.deliveryAddress.recipientPhone}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: '#374151', fontSize: '14px' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#374151", fontSize: "14px" }}
+                      >
                         {order.deliveryAddress.recipientEmail}
                       </Typography>
                     </Box>
                   ) : (
-                    <Typography variant="body1" sx={{ color: "#111827", pl: 3.5, fontWeight: 500, fontSize: "15px", lineHeight: 1.5 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: "#111827",
+                        pl: 3.5,
+                        fontWeight: 500,
+                        fontSize: "15px",
+                        lineHeight: 1.5,
+                      }}
+                    >
                       Not specified
                     </Typography>
                   )}
@@ -611,9 +1052,25 @@ const OrderDetails = () => {
 
                 {order.additionalNotes && (
                   <Box sx={{ mb: 3 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                        mb: 1,
+                      }}
+                    >
                       <FileTextIcon size={18} stroke="#0387D9" />
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Additional Notes
                       </Typography>
                     </Box>
@@ -626,7 +1083,14 @@ const OrderDetails = () => {
                         border: "1px solid rgba(3, 135, 217, 0.1)",
                       }}
                     >
-                      <Typography variant="body2" sx={{ color: "#111827", fontSize: "15px", lineHeight: 1.6 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#111827",
+                          fontSize: "15px",
+                          lineHeight: 1.6,
+                        }}
+                      >
                         {order.additionalNotes}
                       </Typography>
                     </Box>
@@ -635,28 +1099,78 @@ const OrderDetails = () => {
 
                 <Divider sx={{ my: 3 }} />
 
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                    >
                       <CalendarIcon size={18} stroke="#0387D9" />
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          color: "#6b7280",
+                          textTransform: "uppercase",
+                          fontSize: "12px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
                         Created
                       </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: "#111827", fontWeight: 500, fontSize: "14px" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#111827",
+                        fontWeight: 500,
+                        fontSize: "14px",
+                      }}
+                    >
                       {formatDate(order.createdAt)}
                     </Typography>
                   </Box>
 
                   {order.updatedAt && order.updatedAt !== order.createdAt && (
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
+                      >
                         <ClockIcon size={18} stroke="#0387D9" />
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: "#6b7280", textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
+                            color: "#6b7280",
+                            textTransform: "uppercase",
+                            fontSize: "12px",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
                           Updated
                         </Typography>
                       </Box>
-                      <Typography variant="body2" sx={{ color: "#111827", fontWeight: 500, fontSize: "14px" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#111827",
+                          fontWeight: 500,
+                          fontSize: "14px",
+                        }}
+                      >
                         {formatDate(order.updatedAt)}
                       </Typography>
                     </Box>
@@ -668,7 +1182,15 @@ const OrderDetails = () => {
             {/* Quick Actions */}
             <StyledCard>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 3, color: "#111827", fontSize: "18px" }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 3,
+                    color: "#111827",
+                    fontSize: "18px",
+                  }}
+                >
                   Quick Actions
                 </Typography>
                 <Button
@@ -707,12 +1229,16 @@ const OrderDetails = () => {
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
-  )
-}
+  );
+};
 
-export default OrderDetails
+export default OrderDetails;
