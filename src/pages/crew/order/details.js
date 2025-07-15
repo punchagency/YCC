@@ -33,6 +33,7 @@ import { useToast } from "../../../context/toast/toastContext";
 import OrderDetailsSkeleton from "../../../components/CrewOrderSkeletons/OrderDetailsSkeleton";
 
 import ShipmentRates from "./shipmentRates";
+import SelectedShipmentRates from "./selectedShipmentRates";
 
 // Styled components for custom design
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -739,6 +740,11 @@ const OrderDetails = () => {
                   refreshOrder={fetchOrderDetails}
                 />
               )}
+            {/* Purchased Labels */}
+            {order.subOrders &&
+              order.subOrders.some(
+                (so) => so.shipment && so.shipment.selectedRate
+              ) && <SelectedShipmentRates subOrders={order.subOrders} />}
           </Box>
         </Grid>
 

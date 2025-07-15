@@ -4,9 +4,6 @@ import {
   AccordionSummary,
   AccordionDetails,
   Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
   Table,
   TableBody,
   TableCell,
@@ -22,14 +19,14 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { styled } from "@mui/material/styles";
 import { formatCurrency } from "../../../utils/formatters";
 import { useState } from "react";
-import axios from "axios";
 
 import { TruckIcon } from "lucide-react";
+import { buyLabels } from "../../../services/crew/shipmentService";
+import { useToast } from "../../../context/toast/toastContext";
 
 // Styled components if needed (copy from details.js if any)
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -41,10 +38,9 @@ const StyledCard = styled(Card)(({ theme }) => ({
 }));
 
 function ShipmentRates({ subOrders, refreshOrder }) {
+  const { toast } = useToast();
   const [selectedRates, setSelectedRates] = useState({});
-  const [loading, setLoading] = useState({});
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+  const [buying, setBuying] = useState(false);
 
   const eligibleSubOrders = subOrders.filter(
     (so) =>
@@ -53,16 +49,20 @@ function ShipmentRates({ subOrders, refreshOrder }) {
 
   if (eligibleSubOrders.length === 0) return null;
 
-  const handleRateChange = (subOrderId, rateId) => {
+  const handleRateChange = (shipmentId, rateId) => {
     setSelectedRates((prev) => {
-      const newRates = { ...prev, [subOrderId]: rateId };
+      const newRates = { ...prev, [shipmentId]: rateId };
       return newRates;
     });
+    console.log(
+      "This is the selected rates that will be sent to the server:",
+      selectedRates
+    );
   };
 
   // Helper function to get selected rate details for display
   const getSelectedRateDetails = (subOrder) => {
-    const selectedRateId = selectedRates[subOrder._id];
+    const selectedRateId = selectedRates[subOrder.shipment._id];
     if (!selectedRateId) return null;
 
     const selectedRate = subOrder.shipment.rates.find((rate) => {
@@ -74,28 +74,38 @@ function ShipmentRates({ subOrders, refreshOrder }) {
     return selectedRate;
   };
 
-  const handleConfirmSelection = async (subOrderId) => {
-    const rateId = selectedRates[subOrderId];
-    if (!rateId) return;
-    setLoading((prev) => ({ ...prev, [subOrderId]: true }));
-    setError(null);
-    setSuccess(null);
+  const handleConfirmAll = async () => {
+    const selections = Object.entries(selectedRates).map(
+      ([shipmentId, rateId]) => ({ shipmentId, rateId })
+    );
+    if (selections.length === 0) return;
+    setBuying(true);
     try {
-      // Simulate API call (replace with real API when backend is ready)
-      // await axios.post(`/api/crew-orders/suborders/${subOrderId}/select-rate`, { rateId });
-      // For now, just wait a bit
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setSuccess("Rate selected successfully");
-      setSelectedRates((prev) => {
-        const newSelected = { ...prev };
-        delete newSelected[subOrderId];
-        return newSelected;
-      });
+      const data = await buyLabels(selections);
+      const failed = (data.results || []).filter((r) => !r.success);
+      if (failed.length === 0) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Labels purchased successfully",
+        });
+      } else {
+        toast.current.show({
+          severity: "warn",
+          summary: "Partial",
+          detail: `${failed.length} label(s) failed to purchase`,
+        });
+      }
+      setSelectedRates({});
       if (refreshOrder) await refreshOrder();
     } catch (err) {
-      setError("Failed to select rate");
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: err.message || "Failed to buy labels",
+      });
     } finally {
-      setLoading((prev) => ({ ...prev, [subOrderId]: false }));
+      setBuying(false);
     }
   };
 
@@ -180,10 +190,14 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                                 <TableCell>
                                   <Radio
                                     checked={
-                                      selectedRates[subOrder._id] === rateId
+                                      selectedRates[subOrder.shipment._id] ===
+                                      rateId
                                     }
                                     onClick={() => {
-                                      handleRateChange(subOrder._id, rateId);
+                                      handleRateChange(
+                                        subOrder.shipment._id,
+                                        rateId
+                                      );
                                     }}
                                     value={rateId}
                                     name={`shipment-rate-${subOrder._id}`}
@@ -224,23 +238,23 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                         </TableBody>
                       </Table>
                     </TableContainer>
-                    <Button
-                      variant="contained"
-                      disabled={
-                        !selectedRates[subOrder._id] || loading[subOrder._id]
-                      }
-                      onClick={() => handleConfirmSelection(subOrder._id)}
-                      sx={{ mt: 2 }}
-                    >
-                      {loading[subOrder._id]
-                        ? "Confirming..."
-                        : "Confirm Selection"}
-                    </Button>
                   </AccordionDetails>
                 </Accordion>
               </Fade>
             );
           })}
+        </Box>
+        <Box sx={{ mt: 3, textAlign: "right" }}>
+          <Button
+            variant="contained"
+            disabled={
+              buying ||
+              Object.keys(selectedRates).length !== eligibleSubOrders.length
+            }
+            onClick={handleConfirmAll}
+          >
+            {buying ? "Purchasing..." : "Confirm All"}
+          </Button>
         </Box>
       </CardContent>
     </StyledCard>
