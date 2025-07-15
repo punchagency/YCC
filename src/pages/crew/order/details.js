@@ -13,14 +13,6 @@ import {
   CardContent,
   Snackbar,
   Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Fade,
 } from "@mui/material";
 import {
   CopyIcon,
@@ -39,19 +31,8 @@ import { formatCurrency } from "../../../utils/formatters";
 import { exportOrderToPDF } from "../../../utils/pdfUtils";
 import { useToast } from "../../../context/toast/toastContext";
 import OrderDetailsSkeleton from "../../../components/CrewOrderSkeletons/OrderDetailsSkeleton";
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+
+import ShipmentRates from "./shipmentRates";
 
 // Styled components for custom design
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -120,37 +101,31 @@ const OrderDetails = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-  // Add to state
-  const [selectedRates, setSelectedRates] = useState({});
-  const [isSelecting, setIsSelecting] = useState(false);
-
   // Set page title when component mounts
   useEffect(() => {
     if (setPageTitle) setPageTitle("Order Details");
   }, [setPageTitle]);
 
   // Fetch order details
-  useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await getOrderById(id);
-
-        if (response.status) {
-          setOrder(response.data.data);
-        } else {
-          setError(response.error || "Failed to fetch order details");
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        setError("An unexpected error occurred");
-      } finally {
-        setLoading(false);
+  const fetchOrderDetails = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getOrderById(id);
+      if (response.status) {
+        setOrder(response.data.data);
+      } else {
+        setError(response.error || "Failed to fetch order details");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      setError("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchOrderDetails();
     }
@@ -272,42 +247,6 @@ const OrderDetails = () => {
         summary: "Error",
         detail: "Failed to export PDF",
       });
-    }
-  };
-
-  // Add function to handle selection
-  const handleRateChange = (subOrderId, rateId) => {
-    setSelectedRates((prev) => ({ ...prev, [subOrderId]: rateId }));
-  };
-
-  const handleConfirmSelection = async (subOrderId) => {
-    setIsSelecting(true);
-    try {
-      // Assuming a service function selectShipmentRate(subOrderId, rateId)
-      // This function needs to be implemented in your backend/services
-      // For now, we'll simulate a successful call
-      console.log(
-        `Selecting rate for subOrderId: ${subOrderId}, rateId: ${selectedRates[subOrderId]}`
-      );
-      // await selectShipmentRate(subOrderId, selectedRates[subOrderId]);
-      // Refresh order data
-      const response = await getOrderById(id);
-      if (response.status) {
-        setOrder(response.data.data);
-      }
-      toast.current.show({
-        severity: "success",
-        summary: "Success",
-        detail: "Rate selected successfully",
-      });
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to select rate",
-      });
-    } finally {
-      setIsSelecting(false);
     }
   };
 
@@ -795,137 +734,10 @@ const OrderDetails = () => {
                   so.shipment.rates?.length > 0 &&
                   !so.shipment.selectedRate
               ) && (
-                <StyledCard>
-                  <CardContent sx={{ p: 3 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        mb: 4,
-                      }}
-                    >
-                      <TruckIcon size={24} stroke="#0387D9" />
-                      <Typography
-                        variant="h5"
-                        sx={{ fontWeight: 700, color: "#111827" }}
-                      >
-                        Shipping Options
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-                    >
-                      {order.subOrders.map((subOrder) => {
-                        if (
-                          !subOrder.shipment ||
-                          !subOrder.shipment.rates?.length ||
-                          subOrder.shipment.selectedRate
-                        )
-                          return null;
-                        return (
-                          <Fade in={true} key={subOrder._id}>
-                            <Accordion>
-                              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography>
-                                  Shipping for{" "}
-                                  {subOrder.supplier?.businessName ||
-                                    "Supplier"}{" "}
-                                  - Select Rate
-                                </Typography>
-                              </AccordionSummary>
-                              <AccordionDetails>
-                                <FormControl component="fieldset">
-                                  <RadioGroup
-                                    value={selectedRates[subOrder._id] || ""}
-                                    onChange={(e) =>
-                                      handleRateChange(
-                                        subOrder._id,
-                                        e.target.value
-                                      )
-                                    }
-                                  >
-                                    <TableContainer component={Paper}>
-                                      <Table>
-                                        <TableHead>
-                                          <TableRow>
-                                            <TableCell></TableCell>
-                                            <TableCell>Carrier</TableCell>
-                                            <TableCell>Service</TableCell>
-                                            <TableCell>Price</TableCell>
-                                            <TableCell>Est. Days</TableCell>
-                                          </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                          {subOrder.shipment.rates.map(
-                                            (rate) => (
-                                              <TableRow key={rate.id}>
-                                                <TableCell>
-                                                  <FormControlLabel
-                                                    value={rate.id}
-                                                    control={<Radio />}
-                                                    label=""
-                                                  />
-                                                </TableCell>
-                                                <TableCell>
-                                                  <LocalShippingIcon
-                                                    sx={{
-                                                      verticalAlign: "middle",
-                                                      mr: 1,
-                                                    }}
-                                                  />{" "}
-                                                  {rate.carrier}
-                                                </TableCell>
-                                                <TableCell>
-                                                  {rate.service}
-                                                </TableCell>
-                                                <TableCell>
-                                                  <AttachMoneyIcon
-                                                    sx={{
-                                                      verticalAlign: "middle",
-                                                      mr: 1,
-                                                    }}
-                                                  />{" "}
-                                                  {formatCurrency(rate.rate)}
-                                                </TableCell>
-                                                <TableCell>
-                                                  <AccessTimeIcon
-                                                    sx={{
-                                                      verticalAlign: "middle",
-                                                      mr: 1,
-                                                    }}
-                                                  />{" "}
-                                                  {rate.deliveryDays}
-                                                </TableCell>
-                                              </TableRow>
-                                            )
-                                          )}
-                                        </TableBody>
-                                      </Table>
-                                    </TableContainer>
-                                  </RadioGroup>
-                                  <Button
-                                    variant="contained"
-                                    disabled={
-                                      !selectedRates[subOrder._id] ||
-                                      isSelecting
-                                    }
-                                    onClick={() =>
-                                      handleConfirmSelection(subOrder._id)
-                                    }
-                                    sx={{ mt: 2 }}
-                                  >
-                                    Confirm Selection
-                                  </Button>
-                                </FormControl>
-                              </AccordionDetails>
-                            </Accordion>
-                          </Fade>
-                        );
-                      })}
-                    </Box>
-                  </CardContent>
-                </StyledCard>
+                <ShipmentRates
+                  subOrders={order.subOrders}
+                  refreshOrder={fetchOrderDetails}
+                />
               )}
           </Box>
         </Grid>
