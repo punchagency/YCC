@@ -8,6 +8,7 @@ export const buyLabels = async (selections) => {
       { selections },
       {
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }

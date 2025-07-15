@@ -16,6 +16,11 @@ import {
   Box,
   Card,
   CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
@@ -41,6 +46,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
   const { toast } = useToast();
   const [selectedRates, setSelectedRates] = useState({});
   const [buying, setBuying] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const eligibleSubOrders = subOrders.filter(
     (so) =>
@@ -70,7 +76,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
     return selectedRate;
   };
 
-  const handleConfirmAll = async () => {
+  const triggerPurchase = async () => {
     const selections = Object.entries(selectedRates).map(
       ([shipmentId, rateId]) => ({ shipmentId, rateId })
     );
@@ -91,6 +97,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
           summary: "Partial",
           detail: `${failed.length} label(s) failed to purchase`,
         });
+        console.log('Failed to purchase labels:', failed);
       }
       setSelectedRates({});
       if (refreshOrder) await refreshOrder();
@@ -102,7 +109,12 @@ function ShipmentRates({ subOrders, refreshOrder }) {
       });
     } finally {
       setBuying(false);
+      setConfirmOpen(false);
     }
+  };
+
+  const handleConfirmAllClick = () => {
+    setConfirmOpen(true);
   };
 
   return (
@@ -247,11 +259,34 @@ function ShipmentRates({ subOrders, refreshOrder }) {
               buying ||
               Object.keys(selectedRates).length !== eligibleSubOrders.length
             }
-            onClick={handleConfirmAll}
+            onClick={handleConfirmAllClick}
           >
             {buying ? "Purchasing..." : "Confirm All"}
           </Button>
         </Box>
+        {/** Confirmation Dialog */}
+        <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+          <DialogTitle>Purchase Shipping Labels</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              This will buy labels for all selected shipment rates. You will be
+              charged immediately by the carriers. Continue?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmOpen(false)} disabled={buying}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={triggerPurchase}
+              disabled={buying}
+              autoFocus
+            >
+              {buying ? "Purchasing..." : "Confirm"}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </CardContent>
     </StyledCard>
   );
