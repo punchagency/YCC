@@ -54,7 +54,24 @@ function ShipmentRates({ subOrders, refreshOrder }) {
   if (eligibleSubOrders.length === 0) return null;
 
   const handleRateChange = (subOrderId, rateId) => {
-    setSelectedRates((prev) => ({ ...prev, [subOrderId]: rateId }));
+    setSelectedRates((prev) => {
+      const newRates = { ...prev, [subOrderId]: rateId };
+      return newRates;
+    });
+  };
+
+  // Helper function to get selected rate details for display
+  const getSelectedRateDetails = (subOrder) => {
+    const selectedRateId = selectedRates[subOrder._id];
+    if (!selectedRateId) return null;
+
+    const selectedRate = subOrder.shipment.rates.find((rate) => {
+      const rateId =
+        rate.id || rate._id || `rate-${subOrder.shipment.rates.indexOf(rate)}`;
+      return rateId === selectedRateId;
+    });
+
+    return selectedRate;
   };
 
   const handleConfirmSelection = async (subOrderId) => {
@@ -94,47 +111,85 @@ function ShipmentRates({ subOrders, refreshOrder }) {
           }}
         >
           <TruckIcon size={24} stroke="#0387D9" />
-          <Typography variant="h5" sx={{ fontWeight: 700, color: "#111827" }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: "#374151" }}>
             Shipping Options
           </Typography>
         </Box>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {eligibleSubOrders.map((subOrder) => (
-            <Fade in={true} key={subOrder._id}>
-              <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>
-                    Shipping for {subOrder.supplier?.businessName || "Supplier"}{" "}
-                    - Select Rate
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <FormControl component="fieldset">
-                    <RadioGroup
-                      value={selectedRates[subOrder._id] || ""}
-                      onChange={(e) =>
-                        handleRateChange(subOrder._id, e.target.value)
-                      }
-                    >
-                      <TableContainer component={Paper}>
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell></TableCell>
-                              <TableCell>Carrier</TableCell>
-                              <TableCell>Service</TableCell>
-                              <TableCell>Est. Delivery</TableCell>
-                              <TableCell>Price</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {subOrder.shipment.rates.map((rate) => (
-                              <TableRow key={rate.id}>
+          {eligibleSubOrders.map((subOrder) => {
+            const selectedRate = getSelectedRateDetails(subOrder);
+            return (
+              <Fade in={true} key={subOrder._id}>
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>
+                      Shipping for{" "}
+                      {subOrder.supplier?.businessName || "Supplier"} -
+                      {selectedRate ? (
+                        <span
+                          style={{
+                            color: "#0387D9",
+                            fontWeight: 600,
+                            marginLeft: "8px",
+                          }}
+                        >
+                          {selectedRate.carrier} {selectedRate.service} -{" "}
+                          {formatCurrency(selectedRate.rate)}
+                        </span>
+                      ) : (
+                        <span style={{ color: "#6b7280", marginLeft: "8px" }}>
+                          Select Rate
+                        </span>
+                      )}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell></TableCell>
+                            <TableCell
+                              sx={{ color: "#374151", fontWeight: 600 }}
+                            >
+                              Carrier
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#374151", fontWeight: 600 }}
+                            >
+                              Service
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#374151", fontWeight: 600 }}
+                            >
+                              Est. Delivery
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#374151", fontWeight: 600 }}
+                            >
+                              Price
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {subOrder.shipment.rates.map((rate, index) => {
+                            const rateId =
+                              rate.id || rate._id || `rate-${index}`;
+                            return (
+                              <TableRow key={rateId}>
                                 <TableCell>
-                                  <FormControlLabel
-                                    value={rate.id}
-                                    control={<Radio />}
-                                    label=""
+                                  <Radio
+                                    checked={
+                                      selectedRates[subOrder._id] === rateId
+                                    }
+                                    onClick={() => {
+                                      handleRateChange(subOrder._id, rateId);
+                                    }}
+                                    value={rateId}
+                                    name={`shipment-rate-${subOrder._id}`}
+                                    inputProps={{
+                                      "aria-label": `Select ${rate.carrier} ${rate.service}`,
+                                    }}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -142,6 +197,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                                     sx={{
                                       verticalAlign: "middle",
                                       mr: 1,
+                                      color: "#0387D9",
                                     }}
                                   />{" "}
                                   {rate.carrier}
@@ -152,6 +208,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                                     sx={{
                                       verticalAlign: "middle",
                                       mr: 1,
+                                      color: "#0387D9",
                                     }}
                                   />{" "}
                                   {rate.deliveryDays
@@ -159,20 +216,14 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                                     : "N/A"}
                                 </TableCell>
                                 <TableCell>
-                                  <AttachMoneyIcon
-                                    sx={{
-                                      verticalAlign: "middle",
-                                      mr: 1,
-                                    }}
-                                  />{" "}
                                   {formatCurrency(rate.rate)}
                                 </TableCell>
                               </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </RadioGroup>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
                     <Button
                       variant="contained"
                       disabled={
@@ -181,13 +232,15 @@ function ShipmentRates({ subOrders, refreshOrder }) {
                       onClick={() => handleConfirmSelection(subOrder._id)}
                       sx={{ mt: 2 }}
                     >
-                      Confirm Selection
+                      {loading[subOrder._id]
+                        ? "Confirming..."
+                        : "Confirm Selection"}
                     </Button>
-                  </FormControl>
-                </AccordionDetails>
-              </Accordion>
-            </Fade>
-          ))}
+                  </AccordionDetails>
+                </Accordion>
+              </Fade>
+            );
+          })}
         </Box>
       </CardContent>
     </StyledCard>

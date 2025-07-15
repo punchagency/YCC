@@ -387,7 +387,7 @@ const OrderDetails = () => {
                   <PackageIcon size={24} stroke="#0387D9" />
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700, color: "#111827" }}
+                    sx={{ fontWeight: 700, color: "#374151" }}
                   >
                     Order Summary
                   </Typography>
@@ -532,7 +532,7 @@ const OrderDetails = () => {
                     <PackageIcon size={24} stroke="#0387D9" />
                     <Typography
                       variant="h5"
-                      sx={{ fontWeight: 700, color: "#111827" }}
+                      sx={{ fontWeight: 700, color: "#374151" }}
                     >
                       Order Items ({order.subOrders.length})
                     </Typography>
@@ -560,7 +560,7 @@ const OrderDetails = () => {
                                 variant="h6"
                                 sx={{
                                   fontWeight: 700,
-                                  color: "#111827",
+                                  color: "#3741517",
                                   mb: 1,
                                   fontSize: "18px",
                                 }}
@@ -754,7 +754,7 @@ const OrderDetails = () => {
                   <FileTextIcon size={24} stroke="#0387D9" />
                   <Typography
                     variant="h5"
-                    sx={{ fontWeight: 700, color: "#111827" }}
+                    sx={{ fontWeight: 700, color: "#374151" }}
                   >
                     Order Information
                   </Typography>
@@ -774,7 +774,7 @@ const OrderDetails = () => {
                       variant="body2"
                       sx={{
                         fontWeight: 600,
-                        color: "#6b7280",
+                        color: "#374151",
                         textTransform: "uppercase",
                         fontSize: "12px",
                         letterSpacing: "0.5px",
