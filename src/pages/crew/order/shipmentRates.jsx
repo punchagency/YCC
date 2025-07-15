@@ -54,10 +54,6 @@ function ShipmentRates({ subOrders, refreshOrder }) {
       const newRates = { ...prev, [shipmentId]: rateId };
       return newRates;
     });
-    console.log(
-      "This is the selected rates that will be sent to the server:",
-      selectedRates
-    );
   };
 
   // Helper function to get selected rate details for display
