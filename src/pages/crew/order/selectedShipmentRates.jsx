@@ -10,9 +10,11 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { TruckIcon } from "lucide-react";
+import { TruckIcon, EyeIcon } from "lucide-react";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { formatCurrency } from "../../../utils/formatters";
@@ -32,7 +34,7 @@ export default function SelectedShipmentRates({ subOrders }) {
   if (items.length === 0) return null;
 
   return (
-    <StyledCard sx={{ mt: 3 }}>
+    <StyledCard sx={{ mt: 1 }}>
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
           <TruckIcon size={24} stroke="#0387D9" />
@@ -47,9 +49,10 @@ export default function SelectedShipmentRates({ subOrders }) {
                 <TableCell sx={{ fontWeight: 600 }}>Supplier</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Carrier</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Service</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Est. Delivery</TableCell>
+                {/* <TableCell sx={{ fontWeight: 600 }}>Est. Delivery</TableCell> */}
                 <TableCell sx={{ fontWeight: 600 }}>Price</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Tracking</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Tracking Code</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Label</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -71,7 +74,7 @@ export default function SelectedShipmentRates({ subOrders }) {
                       {r.carrier}
                     </TableCell>
                     <TableCell>{r.service}</TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <AccessTimeIcon
                         sx={{
                           verticalAlign: "middle",
@@ -80,9 +83,31 @@ export default function SelectedShipmentRates({ subOrders }) {
                         }}
                       />
                       {r.deliveryDays ? `${r.deliveryDays} days` : "N/A"}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>{formatCurrency(r.rate)}</TableCell>
                     <TableCell>{so.shipment.trackingCode || "-"}</TableCell>
+                    <TableCell>
+                      {so.shipment.labelUrl ? (
+                        <Tooltip title="View shipping label">
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              window.open(so.shipment.labelUrl, "_blank")
+                            }
+                            sx={{
+                              color: "#0387D9",
+                              "&:hover": {
+                                backgroundColor: "rgba(3, 135, 217, 0.1)",
+                              },
+                            }}
+                          >
+                            <EyeIcon size={18} />
+                          </IconButton>
+                        </Tooltip>
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
                   </TableRow>
                 );
               })}
