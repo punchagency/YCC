@@ -50,7 +50,6 @@
 
 .inventory-container {
   position: relative;
-  padding-bottom: 70px; /* Make room for pagination */
 }
 
 /* View Item Modal Styles */

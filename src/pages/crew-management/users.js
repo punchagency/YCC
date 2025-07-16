@@ -48,7 +48,12 @@ const Users = () => {
         className="p-button-rounded p-button-text"
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
+      <OverlayPanel 
+        ref={menuRef} 
+        dismissable 
+        className="datatable-overlaypanel"
+        hideOverlaysOnDocumentScrolling={false}
+      >
         <Button
           label="Edit"
           icon="pi pi-pencil"

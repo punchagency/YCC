@@ -13,6 +13,7 @@ import {
 } from "../../../services/crew/crewInventoryService";
 import { useUser } from "../../../context/userContext";
 import { useOutletContext } from "react-router-dom";
+import "./inventory.css";
 
 const Inventory = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -35,7 +36,24 @@ const Inventory = () => {
 
   const { setPageTitle } = useOutletContext() || {};
   useEffect(() => {
-    if (setPageTitle) setPageTitle("Inventory Management");
+    if (setPageTitle) setPageTitle("Inventory");
+
+    // Add event listener for create inventory button in title bar
+    const handleCreateInventoryModal = () => {
+      handleAddProduct();
+    };
+
+    window.addEventListener(
+      "openCreateInventoryModal",
+      handleCreateInventoryModal
+    );
+
+    return () => {
+      window.removeEventListener(
+        "openCreateInventoryModal",
+        handleCreateInventoryModal
+      );
+    };
   }, [setPageTitle]);
 
   const categories = [

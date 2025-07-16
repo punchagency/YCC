@@ -7,7 +7,22 @@ const API_URL = process.env.REACT_APP_API_URL;
 // Add authentication token to requests
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  console.log(
+    "Token from localStorage:",
+    token ? `Token exists (${token.substring(0, 10)}...)` : "No token found"
+  );
+
+  if (!token) {
+    console.warn("No authentication token found in localStorage");
+    console.log("Available localStorage keys:", Object.keys(localStorage));
+    return {};
+  }
+
+  const header = { Authorization: `Bearer ${token}` };
+  console.log("Auth header created:", {
+    Authorization: `Bearer ${token.substring(0, 10)}...`,
+  });
+  return header;
 };
 
 // Get user ID from localStorage with debugging
@@ -66,9 +81,14 @@ export const createInventoryData = async (inventoryData) => {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
 
+    console.log("Request headers:", headers);
+    console.log("API URL:", `${API_URL}/inventory`);
+
     const response = await axios.post(`${API_URL}/inventory`, inventoryData, {
       headers: headers,
     });
+
+    console.log("API Response:", response.data);
 
     return {
       success: true,
@@ -76,9 +96,15 @@ export const createInventoryData = async (inventoryData) => {
     };
   } catch (error) {
     console.error("Error creating inventory:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
+
     return {
       success: false,
-      error: error.response?.data?.message || "Failed to create inventory",
+      error:
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to create inventory",
     };
   }
 };
@@ -160,22 +186,23 @@ export const getAllInventoryItems = async () => {
     };
   }
 };
-export const updateInventoryItem = async (id, itemData, userId) => {
+export const updateInventoryItem = async (id, itemData) => {
   try {
-    // Ensure all fields are included in the update data
-    const updateData = {
-      ...itemData,
-      userId
+    // Check if we're dealing with FormData
+    const isFormData = itemData instanceof FormData;
+
+    // Set the appropriate headers
+    const headers = {
+      ...getAuthHeader(),
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
 
-    const response = await axios.patch(`${API_URL}/inventory/${id}`, updateData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
+      headers: headers,
     });
-    return { 
-      success: true, 
-      data: response.data 
+    return {
+      success: true,
+      data: response.data,
     };
   } catch (error) {
     console.error(`Error updating inventory item ${id}:`, error);
@@ -297,10 +324,36 @@ export const getInventoryItemById = async (id) => {
   }
 };
 
-export const getAllInventories = async (page = 1, limit = 10) => {
+export const getAllInventories = async (
+  page = 1,
+  limit = 10,
+  searchText = "",
+  stockStatus = "all"
+) => {
   try {
-    console.log("Fetching inventories with params:", { page, limit });
-    const url = `${API_URL}/inventory/all-inventories?page=${page}&limit=${limit}`;
+    console.log("Fetching inventories with params:", {
+      page,
+      limit,
+      searchText,
+      stockStatus,
+    });
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    // Add search parameters if provided
+    if (searchText && searchText.trim() !== "") {
+      params.append("searchText", searchText.trim());
+    }
+
+    if (stockStatus && stockStatus !== "all") {
+      params.append("stockStatus", stockStatus);
+    }
+
+    const url = `${API_URL}/inventory/all-inventories?${params.toString()}`;
     console.log("Request URL:", url);
 
     const response = await axios.get(url, {
@@ -355,14 +408,32 @@ export const sendInventoryEmail = async (to, subject, message) => {
 
     return {
       success: true,
-      data: response.data.data,
-      message: response.data.message,
+      data: response.data,
     };
   } catch (error) {
     console.error("Error sending inventory email:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to send email",
+    };
+  }
+};
+
+export const getAllSuppliers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/suppliers`, {
+      headers: getAuthHeader(),
+    });
+
+    return {
+      success: true,
+      data: response.data.data || response.data,
+    };
+  } catch (error) {
+    console.error("Error fetching suppliers:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch suppliers",
     };
   }
 };
