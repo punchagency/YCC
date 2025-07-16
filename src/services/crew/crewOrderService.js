@@ -29,6 +29,17 @@ export const createOrder = async (orderData) => {
     };
   } catch (error) {
     console.error("Error creating order:", error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to create order",
@@ -44,7 +55,7 @@ export const createOrder = async (orderData) => {
 export const getOrders = async (params = {}) => {
   try {
     console.log("Fetching orders with params:", params);
-    
+
     // Build query parameters
     const queryParams = {
       page: params.page || 1,
@@ -52,10 +63,10 @@ export const getOrders = async (params = {}) => {
     };
 
     // Add status filter if provided
-    if (params.status && params.status !== 'all') {
+    if (params.status && params.status !== "all") {
       queryParams.status = params.status;
     }
-    
+
     const response = await axios.get(`${API_URL}/crew-orders`, {
       params: queryParams,
       headers: {
@@ -105,7 +116,7 @@ export const getOrders = async (params = {}) => {
     console.log("Processed response data:", {
       ordersCount: ordersData.length,
       statusCounts,
-      pagination: paginationData
+      pagination: paginationData,
     });
 
     return {
@@ -118,19 +129,25 @@ export const getOrders = async (params = {}) => {
     };
   } catch (error) {
     console.error("Error fetching orders:", error);
-    
+
     // Enhanced error handling with specific error messages
     let errorMessage = "Failed to fetch orders";
-    
+
     if (error.response) {
       // Server responded with error status
       const status = error.response.status;
       const data = error.response.data;
-      
+
       switch (status) {
         case 401:
-          errorMessage = "Authentication required. Please log in again.";
-          break;
+          // For 401 errors, we want to throw the error so it can be handled by the component
+          // This allows for proper logout and redirect handling
+          const authError = new Error(
+            "Authentication required. Please log in again."
+          );
+          authError.status = 401;
+          authError.isAuthError = true;
+          throw authError;
         case 403:
           errorMessage = "You don't have permission to access orders.";
           break;
@@ -177,6 +194,17 @@ export const getOrderById = async (orderId) => {
     };
   } catch (error) {
     console.error(`Error fetching order ${orderId}:`, error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to fetch order",
@@ -209,6 +237,17 @@ export const updateOrder = async (orderId, orderData) => {
     };
   } catch (error) {
     console.error(`Error updating order ${orderId}:`, error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to update order",
@@ -235,6 +274,17 @@ export const deleteOrder = async (orderId) => {
     };
   } catch (error) {
     console.error(`Error deleting order ${orderId}:`, error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to delete order",
@@ -267,6 +317,17 @@ export const updateOrderStatus = async (orderId, status) => {
     };
   } catch (error) {
     console.error(`Error updating order status ${orderId}:`, error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error: error.response?.data?.message || "Failed to update order status",
@@ -292,6 +353,17 @@ export const getOrderStats = async () => {
     };
   } catch (error) {
     console.error("Error fetching order statistics:", error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error:
@@ -316,6 +388,17 @@ export const getProductsWithVendors = async () => {
     };
   } catch (error) {
     console.error("Error fetching products with vendors:", error);
+
+    // Handle 401 authentication errors
+    if (error.response?.status === 401) {
+      const authError = new Error(
+        "Authentication required. Please log in again."
+      );
+      authError.status = 401;
+      authError.isAuthError = true;
+      throw authError;
+    }
+
     return {
       status: false,
       error:

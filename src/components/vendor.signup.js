@@ -4,7 +4,7 @@ import Select from "react-select";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import inputLogo from "../assets/images/nameinput.png";
 import emailLogo from "../assets/images/emailinput.png";
 import location from "../assets/images/location.png";
@@ -17,8 +17,36 @@ import serviceLogo from "../assets/images/serviceLogo.png";
 import { signup } from "../services/authService";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
 import TermsModal from "./TermsModal";
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
+
+// Custom scrollbar styles for supplier and service provider forms
+if (
+  typeof window !== "undefined" &&
+  !document.getElementById("custom-scrollbar-style-vendor")
+) {
+  const style = document.createElement("style");
+  style.id = "custom-scrollbar-style-vendor";
+  style.innerHTML = `
+    .login-form.vendor-login-form::-webkit-scrollbar {
+      width: 7px;
+      background: transparent;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 8px;
+    }
+    .login-form.vendor-login-form::-webkit-scrollbar-thumb:hover {
+      background: #b0b8c1;
+    }
+    .login-form.vendor-login-form {
+      scrollbar-width: thin;
+      scrollbar-color: #d1d5db transparent;
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const navigate = useNavigate();
@@ -26,7 +54,10 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
-  const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] = useState(false);
+  const [isTermsConditionsModalOpen, setIsTermsConditionsModalOpen] =
+    useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Ensure email is always initialized in formData
   useEffect(() => {
@@ -37,13 +68,28 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   }, []);
 
   const handleSignup = async () => {
+    // Password validation
+    if (!formData.password || !formData.confirmPassword) {
+      setError("Please enter and confirm your password.");
+      return;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
     if (!formData.acceptTerms) {
       setError("Please accept the Service Provider Agreement to continue.");
       return;
     }
 
     if (!formData.acceptPrivacyTerms) {
-      setError("Please accept the Privacy Policy and Terms & Conditions to continue.");
+      setError(
+        "Please accept the Privacy Policy and Terms & Conditions to continue."
+      );
       return;
     }
 
@@ -65,13 +111,11 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       const formDataObj = new FormData();
       formDataObj.append("email", formData.email);
       formDataObj.append("role", "service_provider");
+      formDataObj.append("password", formData.password);
+      formDataObj.append("confirmPassword", formData.confirmPassword);
       formDataObj.append("businessName", formData.businessName);
       formDataObj.append("businessAddress", formData.businessAddress);
       formDataObj.append("phone", formData.phone);
-
-      const tempPassword = Math.random().toString(36).slice(-8);
-      formDataObj.append("password", tempPassword);
-      formDataObj.append("confirmPassword", tempPassword);
 
       // Append files if they exist
       if (formData.licenseFile) {
@@ -83,26 +127,29 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       if (formData.liabilityInsurance) {
         formDataObj.append("liabilityInsurance", formData.liabilityInsurance);
       }
-      if (formData.pricingStructure) {
-        formDataObj.append("pricingStructure", formData.pricingStructure);
-      }
 
       const vendorDetails = {
         businessName: formData.businessName,
         businessAddress: formData.businessAddress,
         phone: formData.phone,
         businessWebsite: normalizeWebsiteUrl(formData.businessWebsite),
-        departments: formData.departments?.map(dept => dept.value) || [],
-        services: formData.services?.map(service => service.value),
-        availability: formData.customAvailability || 
-          (formData.availabilityDays?.label && formData.availabilityHours?.label 
+        departments: formData.departments?.map((dept) => dept.value) || [],
+        services: formData.services?.map((service) => service.value),
+        availability:
+          formData.customAvailability ||
+          (formData.availabilityDays?.label && formData.availabilityHours?.label
             ? `${formData.availabilityDays.label}, ${formData.availabilityHours.label}`
             : formData.availability),
         bookingMethod: formData.bookingMethod?.value,
-        serviceArea: formData.serviceArea?.value === "both" 
-          ? ["United States", "Mediterranean"]
-          : formData.serviceArea?.value 
-            ? [formData.serviceArea.value === "usa" ? "United States" : "Mediterranean"]
+        serviceArea:
+          formData.serviceArea?.value === "both"
+            ? ["United States", "Mediterranean"]
+            : formData.serviceArea?.value
+            ? [
+                formData.serviceArea.value === "usa"
+                  ? "United States"
+                  : "Mediterranean",
+              ]
             : [],
         contactPerson: {
           fullName: formData.contactPerson?.fullName,
@@ -171,7 +218,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [licenseFile, setLicenseFile] = useState(null);
   const [taxIdFile, setTaxIdFile] = useState(null);
   const [insuranceFile, setInsuranceFile] = useState(null);
-  const [pricingFile, setPricingFile] = useState(null);
 
   const handleFileUpload = async (file, type) => {
     if (!file) return;
@@ -184,7 +230,12 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     }
 
     // Validate file type
-    const validTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    const validTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
     if (!validTypes.includes(file.type)) {
       setError("Please upload a PDF, JPG, or PNG file");
       return;
@@ -198,10 +249,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       switch (type) {
-        case "pricing":
-          setPricingFile(file);
-          handleInputChange("pricingStructure", file);
-          break;
         case "license":
           setLicenseFile(file);
           handleInputChange("licenseFile", file);
@@ -698,8 +745,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           width: "100%",
           justifyContent: "center",
           alignItems: "center",
-          margin: "0 auto 27px auto",
-          maxWidth: "600px"
+          margin: "0 auto 8px auto",
+          maxWidth: "600px",
         }}
       >
         {/* Phone Number */}
@@ -838,12 +885,14 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.background =
+              "linear-gradient(to right, #023a7a, #0366b3)";
             e.target.style.transform = "translateY(-2px)";
             e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.background =
+              "linear-gradient(to right, #034d92, #0487d9)";
             e.target.style.transform = "translateY(0)";
             e.target.style.boxShadow = "none";
           }}
@@ -957,42 +1006,23 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         </div>
       </div>
 
-      {/* Pricing Structure */}
-      {/* Pricing Structure */}
-      <div className="upload-group">
-        <div className="input-field">
-          <label>Pricing Structure</label>
-          <div className="upload-input">
-            <input
-              type="text"
-              placeholder="Upload Pricing Structure"
-              value={pricingFile ? pricingFile.name : ""}
-              readOnly
-            />
-            <img
-              src={uploadfileLogo}
-              alt="Upload"
-              className="upload-icon"
-              onClick={() => document.getElementById("pricingInput").click()}
-            />
-            <input
-              type="file"
-              id="pricingInput"
-              accept=".pdf,.jpg,.jpeg,.png"
-              onChange={(e) => handleFileUpload(e.target.files[0], "pricing")}
-              style={{ display: "none" }}
-            />
-          </div>
-        </div>
-      </div>
       {/* Availability */}
       <div className="form-group1">
         <div className="input-field">
           <div>
             <label htmlFor="availability">Availability</label>
           </div>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <div style={{ flex: 1 }}>
+          <div
+            className="inputBorder"
+            style={{
+              display: "flex",
+              gap: "12px",
+              alignItems: "center",
+              flexWrap: "wrap",
+              marginBottom: 0,
+            }}
+          >
+            <div style={{ flex: 1, minWidth: 0 }}>
               <Select
                 options={[
                   { value: "mon-fri", label: "Monday - Friday" },
@@ -1004,10 +1034,12 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   { value: "fri-tue", label: "Friday - Tuesday" },
                   { value: "sat-wed", label: "Saturday - Wednesday" },
                   { value: "sun-thu", label: "Sunday - Thursday" },
-                  { value: "custom", label: "Custom Schedule" }
+                  { value: "custom", label: "Custom Schedule" },
                 ]}
                 value={formData.availabilityDays}
-                onChange={(option) => handleInputChange("availabilityDays", option)}
+                onChange={(option) =>
+                  handleInputChange("availabilityDays", option)
+                }
                 placeholder="Select days"
                 classNamePrefix="select"
                 styles={{
@@ -1016,7 +1048,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     background: "transparent",
                     border: "none",
                     boxShadow: "none",
-                    minHeight: "35px",
                   }),
                   container: (provided) => ({
                     ...provided,
@@ -1049,7 +1080,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 }}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <Select
                 options={[
                   { value: "9am-5pm", label: "9:00 AM - 5:00 PM" },
@@ -1057,10 +1088,12 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   { value: "7am-7pm", label: "7:00 AM - 7:00 PM" },
                   { value: "10am-4pm", label: "10:00 AM - 4:00 PM" },
                   { value: "24/7", label: "24/7 Available" },
-                  { value: "custom", label: "Custom Hours" }
+                  { value: "custom", label: "Custom Hours" },
                 ]}
                 value={formData.availabilityHours}
-                onChange={(option) => handleInputChange("availabilityHours", option)}
+                onChange={(option) =>
+                  handleInputChange("availabilityHours", option)
+                }
                 placeholder="Select hours"
                 classNamePrefix="select"
                 styles={{
@@ -1069,7 +1102,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     background: "transparent",
                     border: "none",
                     boxShadow: "none",
-                    minHeight: "35px",
                   }),
                   container: (provided) => ({
                     ...provided,
@@ -1104,19 +1136,22 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             </div>
           </div>
           {/* Custom availability input for when users select custom */}
-          {(formData.availabilityDays?.value === "custom" || formData.availabilityHours?.value === "custom") && (
+          {(formData.availabilityDays?.value === "custom" ||
+            formData.availabilityHours?.value === "custom") && (
             <div style={{ marginTop: "12px" }}>
               <input
                 type="text"
                 placeholder="Enter custom availability (e.g., Mon-Fri 9AM-5PM, Sat 10AM-2PM)"
                 value={formData.customAvailability || ""}
-                onChange={(e) => handleInputChange("customAvailability", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("customAvailability", e.target.value)
+                }
                 style={{
                   width: "100%",
                   padding: "8px 12px",
                   border: "1px solid #ddd",
                   borderRadius: "4px",
-                  fontSize: "14px"
+                  fontSize: "14px",
                 }}
               />
             </div>
@@ -1232,7 +1267,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   ...provided,
                   width: "100%",
                   position: "relative",
-                  zIndex: 2
+                  zIndex: 2,
                 }),
                 menu: (provided) => ({
                   ...provided,
@@ -1240,27 +1275,27 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   zIndex: 9999,
                   backgroundColor: "white",
                   boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  position: "absolute"
+                  position: "absolute",
                 }),
                 menuList: (provided) => ({
                   ...provided,
                   maxHeight: "200px",
                   padding: "8px 0",
-                  "&::-webkit-scrollbar": { 
+                  "&::-webkit-scrollbar": {
                     width: "8px",
-                    display: "block"
+                    display: "block",
                   },
                   "&::-webkit-scrollbar-track": {
                     background: "#f1f1f1",
-                    borderRadius: "4px"
+                    borderRadius: "4px",
                   },
                   "&::-webkit-scrollbar-thumb": {
                     background: "#888",
-                    borderRadius: "4px"
+                    borderRadius: "4px",
                   },
                   "&::-webkit-scrollbar-thumb:hover": {
-                    background: "#555"
-                  }
+                    background: "#555",
+                  },
                 }),
                 option: (provided, state) => ({
                   ...provided,
@@ -1270,20 +1305,20 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   cursor: "pointer",
                   "&:hover": {
                     backgroundColor: "#f0f7ff",
-                    color: "#0387d9"
-                  }
+                    color: "#0387d9",
+                  },
                 }),
                 singleValue: (provided) => ({
                   ...provided,
                   display: "flex",
                   alignItems: "center",
-                  color: "#333"
+                  color: "#333",
                 }),
                 valueContainer: (provided) => ({
                   ...provided,
                   width: "100%",
-                  padding: "0 8px"
-                })
+                  padding: "0 8px",
+                }),
               }}
             />
           </div>
@@ -1295,8 +1330,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         <button
           className="prev-button"
           onClick={() => setStep(1)}
-          style={{ 
-            width: "48%", 
+          style={{
+            width: "48%",
             background: "#f0f0f0",
             transition: "all 0.3s ease",
             cursor: "pointer",
@@ -1324,12 +1359,14 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
             cursor: "pointer",
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+            e.target.style.background =
+              "linear-gradient(to right, #023a7a, #0366b3)";
             e.target.style.transform = "translateY(-2px)";
             e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+            e.target.style.background =
+              "linear-gradient(to right, #034d92, #0487d9)";
             e.target.style.transform = "translateY(0)";
             e.target.style.boxShadow = "none";
           }}
@@ -1403,6 +1440,116 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           </div>
         </div>
       </div>
+      {/* Password */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="password">Password</label>
+          </div>
+          <div className="inputBorder" style={{ position: "relative" }}>
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="password"
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={formData.password || ""}
+              onChange={(e) => handleInputChange("password", e.target.value)}
+              placeholder="Enter password"
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
+              }}
+              minLength={8}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                outline: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+              tabIndex={-1}
+            >
+              {showPassword ? (
+                <VisibilityOffIcon style={{ fontSize: 18, color: "#034D92" }} />
+              ) : (
+                <VisibilityIcon style={{ fontSize: 18, color: "#034D92" }} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Confirm Password */}
+      <div className="form-group1">
+        <div className="input-field">
+          <div>
+            <label htmlFor="confirmPassword">Confirm Password</label>
+          </div>
+          <div className="inputBorder" style={{ position: "relative" }}>
+            <img
+              src={inputLogo}
+              style={{ width: "12px", height: "12px" }}
+              alt="confirm password"
+            />
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              value={formData.confirmPassword || ""}
+              onChange={(e) =>
+                handleInputChange("confirmPassword", e.target.value)
+              }
+              placeholder="Confirm password"
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                background: "transparent",
+              }}
+              minLength={8}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                outline: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? (
+                <VisibilityOffIcon style={{ fontSize: 18, color: "#034D92" }} />
+              ) : (
+                <VisibilityIcon style={{ fontSize: 18, color: "#034D92" }} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Platform Fees Information */}
       {/* // Platform fees note and related UI removed as per client request */}
@@ -1410,37 +1557,46 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       {/* Service Provider Agreement checkbox */}
       <div className="form-group1">
         <div className="input-field">
-          <div 
-            className="checkbox-field" 
-            style={{ 
+          <div
+            className="checkbox-field"
+            style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "5px 0"
+              padding: "5px 0",
             }}
           >
             <input
               type="checkbox"
               id="terms"
               checked={formData.acceptTerms}
-              onChange={(e) => handleInputChange("acceptTerms", e.target.checked)}
-              style={{ 
+              onChange={(e) =>
+                handleInputChange("acceptTerms", e.target.checked)
+              }
+              style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             />
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-              <label 
-                htmlFor="terms" 
-                style={{ 
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                flex: 1,
+              }}
+            >
+              <label
+                htmlFor="terms"
+                style={{
                   cursor: "pointer",
                   fontSize: "14px",
                   color: "#333",
                   margin: "0",
                   lineHeight: "1.4",
-                  flex: 1
+                  flex: 1,
                 }}
               >
                 I agree to the{" "}
@@ -1466,31 +1622,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   Service Provider Agreement
                 </span>
               </label>
-              <button
-                type="button"
-                onClick={() => setIsTermsModalOpen(true)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "24px",
-                  height: "24px",
-                  border: "none",
-                  borderRadius: "4px",
-                  backgroundColor: "transparent",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#f0f0f0";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-                title="View Service Provider Agreement"
-              >
-                <VisibilityIcon style={{ fontSize: "18px", color: "#034D92" }} />
-              </button>
             </div>
           </div>
         </div>
@@ -1499,37 +1630,46 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       {/* Privacy Policy and Terms & Conditions */}
       <div className="form-group1">
         <div className="input-field">
-          <div 
-            className="checkbox-field" 
-            style={{ 
+          <div
+            className="checkbox-field"
+            style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "5px 0"
+              padding: "5px 0",
             }}
           >
             <input
               type="checkbox"
               id="privacyTerms"
               checked={formData.acceptPrivacyTerms}
-              onChange={(e) => handleInputChange("acceptPrivacyTerms", e.target.checked)}
-              style={{ 
+              onChange={(e) =>
+                handleInputChange("acceptPrivacyTerms", e.target.checked)
+              }
+              style={{
                 width: "18px",
                 height: "18px",
                 margin: "0",
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             />
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: 1 }}>
-              <label 
-                htmlFor="privacyTerms" 
-                style={{ 
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                flex: 1,
+              }}
+            >
+              <label
+                htmlFor="privacyTerms"
+                style={{
                   cursor: "pointer",
                   fontSize: "14px",
                   color: "#333",
                   margin: "0",
                   lineHeight: "1.4",
-                  flex: 1
+                  flex: 1,
                 }}
               >
                 I agree to the{" "}
@@ -1553,8 +1693,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   }}
                 >
                   Privacy Policy
-                </span>
-                {" "}and{" "}
+                </span>{" "}
+                and{" "}
                 <span
                   onClick={(e) => {
                     e.preventDefault();
@@ -1587,8 +1727,8 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         <button
           className="prev-button"
           onClick={() => setStep(3)}
-          style={{ 
-            width: "48%", 
+          style={{
+            width: "48%",
             background: "#f0f0f0",
             transition: "all 0.3s ease",
             cursor: "pointer",
@@ -1612,21 +1752,25 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           disabled={isSubmitting}
           style={{
             width: "48%",
-            background: isSubmitting ? "#ccc" : "linear-gradient(to right, #034d92, #0487d9)",
+            background: isSubmitting
+              ? "#ccc"
+              : "linear-gradient(to right, #034d92, #0487d9)",
             cursor: isSubmitting ? "not-allowed" : "pointer",
             opacity: isSubmitting ? 0.7 : 1,
             transition: "all 0.3s ease",
           }}
           onMouseEnter={(e) => {
             if (!isSubmitting) {
-              e.target.style.background = "linear-gradient(to right, #023a7a, #0366b3)";
+              e.target.style.background =
+                "linear-gradient(to right, #023a7a, #0366b3)";
               e.target.style.transform = "translateY(-2px)";
               e.target.style.boxShadow = "0 4px 12px rgba(3, 77, 146, 0.3)";
             }
           }}
           onMouseLeave={(e) => {
             if (!isSubmitting) {
-              e.target.style.background = "linear-gradient(to right, #034d92, #0487d9)";
+              e.target.style.background =
+                "linear-gradient(to right, #034d92, #0487d9)";
               e.target.style.transform = "translateY(0)";
               e.target.style.boxShadow = "none";
             }

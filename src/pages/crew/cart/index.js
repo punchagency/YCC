@@ -36,19 +36,20 @@ import {
   CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
   Notes as NotesIcon,
-} from "@mui/icons-material";
-import { styled } from "@mui/material/styles";
-import {
-  getCart,
-  updateCartQuantity,
-  removeFromCart,
-  clearCart,
-  checkout,
-} from "../../../services/crew/cartService";
-import { useToast } from "../../../context/toast/toastContext";
-import { useCart } from "../../../context/cart/cartContext";
-import CartSkeleton from "../../../components/CartSkeleton";
-import { keyframes } from "@mui/material/styles";
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
+import { 
+  getCart, 
+  updateCartQuantity, 
+  removeFromCart, 
+  clearCart, 
+  checkout 
+} from '../../../services/crew/cartService';
+import { useToast } from '../../../context/toast/toastContext';
+import { useCart } from '../../../context/cart/cartContext';
+import CartSkeleton from '../../../components/CartSkeleton';
+import { keyframes } from '@mui/system';
+import CheckoutDialog from './CheckoutDialog';
 
 // Pulse animation for badge
 const pulse = keyframes`
@@ -125,7 +126,12 @@ const CartPage = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [clearCartLoading, setClearCartLoading] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
-    deliveryAddress: "",
+    street1: '',
+    street2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: '',
     deliveryDate: null,
     additionalNotes: "",
   });
@@ -297,7 +303,7 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!checkoutData.deliveryAddress || !checkoutData.deliveryDate) {
+    if (!checkoutData.street1 || !checkoutData.city || !checkoutData.state || !checkoutData.zip || !checkoutData.country || !checkoutData.deliveryDate) {
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -311,7 +317,12 @@ const CartPage = () => {
       setCheckoutLoading(true);
 
       const response = await checkout({
-        deliveryAddress: checkoutData.deliveryAddress,
+        street1: checkoutData.street1,
+        street2: checkoutData.street2,
+        city: checkoutData.city,
+        state: checkoutData.state,
+        zip: checkoutData.zip,
+        country: checkoutData.country,
         deliveryDate: checkoutData.deliveryDate.toISOString(),
         additionalNotes: checkoutData.additionalNotes,
       });
@@ -325,13 +336,18 @@ const CartPage = () => {
         });
         setShowCheckoutDialog(false);
         setCheckoutData({
-          deliveryAddress: "",
+          street1: '',
+          street2: '',
+          city: '',
+          state: '',
+          zip: '',
+          country: '',
           deliveryDate: null,
           additionalNotes: "",
         });
         clearCartContext();
         // Navigate to order details
-        navigate(`/crew/orders-management/${response.data.orderId}`);
+        navigate(`/crew/orders-management/${response.data._id}`);
       } else {
         toast.current.show({
           severity: "error",
@@ -838,7 +854,7 @@ const CartPage = () => {
       </Grid>
 
       {/* Checkout Dialog */}
-      <Dialog
+      <CheckoutDialog
         open={showCheckoutDialog}
         onClose={() => setShowCheckoutDialog(false)}
         maxWidth="sm"

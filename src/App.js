@@ -84,6 +84,7 @@ import DocumentView from "./pages/crew/document/documentview";
 import CartPage from "./pages/crew/cart";
 import { CartProvider } from "./context/cart/cartContext";
 import EditInventory from "./pages/invent/edit-inventory";
+import SupplierOrderConfirmationPage from "./pages/supplier/SupplierOrderConfirmationPage";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -117,12 +118,13 @@ const AuthCheck = ({ children }) => {
     "/services/onboarding",
     "/services/onboarding/refresh-stripe-account",
     "/reset-password",
+    "/supplier/orders/confirm/:subOrderId/:token",
   ];
 
   // Check if the current path is a public route
   const isPublicRoute = publicRoutes.some((route) => {
-    // Convert route pattern to regex if it contains :id
-    const routePattern = route.replace(/:id/g, "[^/]+");
+    // Convert route pattern to regex if it contains parameters
+    const routePattern = route.replace(/:[^/]+/g, "[^/]+");
     const regex = new RegExp(`^${routePattern}$`);
     const matches =
       regex.test(location.pathname) ||
@@ -189,6 +191,10 @@ function App() {
                   <Route
                     path="/service/quotes/respond/:quoteId"
                     element={<RespondToQuote />}
+                  />
+                  <Route
+                    path="/supplier/orders/confirm/:subOrderId/:token"
+                    element={<SupplierOrderConfirmationPage />}
                   />
 
                   {/* Protected Routes - Require Authentication */}

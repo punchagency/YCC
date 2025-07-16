@@ -186,10 +186,22 @@ export const exportOrderToPDF = (order) => {
     doc.setTextColor(3, 135, 217);
     doc.setFont('helvetica', 'bold');
     doc.text('Delivery Address:', margin, yPosition);
+    yPosition += 6;
     doc.setTextColor(0, 0, 0);
     doc.setFont('helvetica', 'normal');
-    doc.text(order.deliveryAddress, margin + 40, yPosition);
-    yPosition += 8;
+    const addr = order.deliveryAddress;
+    const addressLines = [
+      addr.recipientName,
+      addr.recipientStreet + (addr.recipientStreet2 ? `, ${addr.recipientStreet2}` : ''),
+      `${addr.recipientCity}, ${addr.recipientState} ${addr.recipientZip}`,
+      addr.recipientCountry,
+      addr.recipientPhone,
+      addr.recipientEmail
+    ].filter(Boolean);
+    addressLines.forEach(line => {
+      doc.text(String(line), margin + 8, yPosition);
+      yPosition += 6;
+    });
   }
   
   if (order.notes || order.additionalNotes) {

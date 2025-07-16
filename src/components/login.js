@@ -4,7 +4,7 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Message } from "primereact/message";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { login } from "../services/authService";
 import { useUser } from "../context/userContext"; // Import UserContext
 import LandingPageChatbot from "./chatbot/landing-page-chatbot";
@@ -14,6 +14,7 @@ import { isMobile } from "./ResponsiveDevice";
 const LoginForm = ({ onClose }) => {
   // Define the options for the user roles
   const navigate = useNavigate(); // Add useNavigate hook
+  const location = useLocation(); // Add useLocation hook
 
   const [formData, setFormData] = useState({
     email: "",
@@ -35,6 +36,15 @@ const LoginForm = ({ onClose }) => {
 
   // Add this useState hook for loading state
   const [loading, setLoading] = useState(false);
+
+  // Check for session expiration message from navigation state
+  useEffect(() => {
+    if (location.state?.message) {
+      setError(location.state.message);
+      // Clear the message from state to prevent showing it again on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
 
   useEffect(() => {
     if (error) {
