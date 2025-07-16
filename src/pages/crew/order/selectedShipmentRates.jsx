@@ -34,7 +34,7 @@ export default function SelectedShipmentRates({ subOrders }) {
   if (items.length === 0) return null;
 
   return (
-    <StyledCard sx={{ mt: 1 }}>
+    <StyledCard sx={{ mt: 0 }}>
       <CardContent sx={{ p: 3 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}>
           <TruckIcon size={24} stroke="#0387D9" />
