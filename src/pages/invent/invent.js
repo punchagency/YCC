@@ -40,6 +40,9 @@ import {
   Autocomplete,
   Typography,
   Stack,
+  Grid,
+  Divider,
+  Chip,
 } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
@@ -52,6 +55,8 @@ import Alert from "@mui/material/Alert";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveIcon from "@mui/icons-material/Remove";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ImageIcon from "@mui/icons-material/Image";
 
 import {
   createInventoryData,
@@ -98,8 +103,6 @@ const InventoryTableSkeleton = () => {
 
 const Invent = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { inventoryId } = useParams(); // Get inventory ID from URL params
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -109,7 +112,9 @@ const Invent = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [viewItem, setViewItem] = useState({
     id: null,
+    productId: "",
     productName: "",
+    description: "",
     category: "",
     serviceArea: "",
     stockQuantity: "",
@@ -123,11 +128,14 @@ const Invent = () => {
 
   const [editItem, setEditItem] = useState({
     id: null,
-    index: null,
+    productId: null,
     productName: "",
+    description: "",
     category: "",
+    serviceArea: "",
     stockQuantity: "",
     price: "",
+    productImage: null,
   });
 
   // Add description to newItem state
@@ -150,9 +158,6 @@ const Invent = () => {
   // Add this state variable with your other state variables
   const [productImage, setProductImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-
-  // Add a state to track whether we should update the URL
-  const [shouldUpdateURL, setShouldUpdateURL] = useState(true);
 
   // Add these state variables with your other state declarations
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -287,14 +292,6 @@ const Invent = () => {
   });
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
-  // Add this useEffect to handle URL parameters
-  useEffect(() => {
-    // Check if we have an inventory ID in the URL
-    if (inventoryId) {
-      fetchInventoryItemById(inventoryId);
-    }
-  }, [inventoryId]);
-
   // Add scroll event handler
   useEffect(() => {
     let scrollTimeout;
@@ -346,17 +343,21 @@ const Invent = () => {
         appliedSearchText,
         appliedStockStatus
       );
+
       if (result.success) {
-        const formattedItems = result.data.map((item) => ({
-          id: item._id,
-          productName: item.product?.name || "Unknown Product",
-          category: item.product?.category || "Uncategorized",
-          description: item.product?.description || "Not available",
-          supplier: item.supplier || "Not available",
-          stockQuantity: item.quantity || 0,
-          price: item.price || 0,
-          productImage: item.productImage || null,
-        }));
+        const formattedItems = result.data.flatMap((item) =>
+          item.products?.map(product => ({
+            id: item._id,
+            productId: product.productId,
+            productName: product.productName || "Unknown Product",
+            category: product.category?.[0] || "Uncategorized",
+            description: product.description || "Not available",
+            supplier: item.supplier?.businessName || item.userInfo?.businessName || "Not available",
+            stockQuantity: product.quantity || 0,
+            price: product.price || 0,
+            productImage: product.productImage || null,
+          })) || []
+        );
         setInventoryItems(formattedItems);
         setTotalItems(result.pagination?.totalItems || formattedItems.length);
         setTotalPages(result.pagination?.totalPages || 1);
@@ -424,20 +425,7 @@ const Invent = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleEdit = (index) => {
-    const item = inventoryItems[index];
-    setEditItem({
-      id: item.id,
-      index: index,
-      productName: item.productName,
-      category: item.category,
-      stockQuantity: item.stockQuantity.toString(),
-      price: item.price.toFixed(2),
-    });
-    setShowEditModal(true);
-  };
+  }, []);;
 
   const handleUpdate = async () => {
     setIsLoading(true);
@@ -452,6 +440,7 @@ const Invent = () => {
         updateData.append("price", editItem.price);
         updateData.append("description", editItem.description);
         updateData.append("productImage", editItem.productImage);
+        updateData.append("productId", editItem.productId);
         isFormData = true;
       } else {
         updateData = {
@@ -460,6 +449,7 @@ const Invent = () => {
           stockQuantity: editItem.stockQuantity,
           price: editItem.price,
           description: editItem.description,
+          productId: editItem.productId,
         };
       }
       const result = await updateInventoryItem(
@@ -473,10 +463,10 @@ const Invent = () => {
           prev.map((item) =>
             item.id === editItem.id
               ? {
-                  ...item,
-                  ...editItem,
-                  productImage: imagePreview || item.productImage,
-                }
+                ...item,
+                ...editItem,
+                productImage: imagePreview || item.productImage,
+              }
               : item
           )
         );
@@ -600,13 +590,13 @@ const Invent = () => {
         const responseData = result.data.data;
         const product = {
           id: responseData._id,
-          productName: responseData.product.name,
-          category: responseData.product.category,
-          description: responseData.product.description || "Not available",
+          productName: responseData.products[0].product?.name,
+          category: responseData.products[0].product?.category,
+          description: responseData.products[0].product?.description || "Not available",
           supplier: responseData.supplier || "Not available",
-          stockQuantity: responseData.quantity,
-          price: responseData.price,
-          productImage: responseData.productImage || null,
+          stockQuantity: responseData.products[0].product?.quantity,
+          price: responseData.products[0].product?.price,
+          productImage: responseData.products[0].product?.productImage || null,
         };
 
         setInventoryItems([product, ...inventoryItems]);
@@ -643,8 +633,8 @@ const Invent = () => {
         console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
-      setSaveError("An unexpected error occurred. Please try again.");
       console.error("Error adding inventory:", error);
+      setSaveError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -654,77 +644,25 @@ const Invent = () => {
   const handleViewItem = (item) => {
     setViewItem(item);
     setShowViewModal(true);
-
-    // Only update URL if we should
-    if (shouldUpdateURL) {
-      navigate(`/admin/inventory-management/${item.id}`);
-    }
+  };
+  const handleEditModal = (item) => {
+    setEditItem(item);
+    setShowEditModal(true);
   };
 
   // Simplified modal close handler
   const handleCloseViewModal = () => {
-    // Disable URL updates temporarily to prevent race conditions
-    setShouldUpdateURL(false);
-
-    // Close the modal
     setShowViewModal(false);
-
-    // Navigate after a short delay
-    setTimeout(() => {
-      navigate("/admin/inventory-management", { replace: true });
-
-      // Re-enable URL updates after navigation
-      setTimeout(() => {
-        setShouldUpdateURL(true);
-      }, 50);
-    }, 50);
-  };
-
-  // Effect to handle URL parameters
-  useEffect(() => {
-    // If we have an ID in the URL and should update
-    if (inventoryId && shouldUpdateURL) {
-      fetchInventoryItemById(inventoryId);
-    }
-  }, [inventoryId, shouldUpdateURL]);
-
-  // Effect to handle browser navigation
-  useEffect(() => {
-    // If we navigate away and the modal is open
-    if (!inventoryId && showViewModal && shouldUpdateURL) {
-      setShowViewModal(false);
-    }
-  }, [inventoryId, showViewModal, shouldUpdateURL]);
-
-  // Function to fetch a single inventory item by ID
-  const fetchInventoryItemById = async (id) => {
-    try {
-      setIsLoading(true);
-      const result = await getInventoryItemById(id);
-
-      if (result.success) {
-        const item = {
-          id: result.data._id,
-          productName: result.data.product?.name || "Unknown Product",
-          category: result.data.product?.category || "Uncategorized",
-          description: result.data.product?.description || "Not available",
-          supplier: result.data.supplier || "Not available",
-          stockQuantity: result.data.quantity || 0,
-          price: result.data.price || 0,
-          productImage: result.data.productImage || null,
-          product: result.data.product, // <-- full product object
-        };
-
-        setViewItem(item);
-        setShowViewModal(true);
-      } else {
-        console.error("Failed to load inventory item:", result.error);
-      }
-    } catch (error) {
-      console.error("Error fetching inventory item:", error);
-    } finally {
-      setIsLoading(false);
-    }
+    setViewItem({
+      id: null,
+      productName: "",
+      description: "",
+      category: "",
+      serviceArea: "",
+      stockQuantity: "",
+      price: "",
+      productImage: null,
+    });
   };
 
   // Add email handling functions
@@ -886,9 +824,8 @@ const Invent = () => {
                 ].map((opt) => (
                   <Box
                     key={opt.key}
-                    className={`custom-dropdown-item${
-                      stockStatusFilter === opt.key ? " active" : ""
-                    }`}
+                    className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
+                      }`}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -902,10 +839,10 @@ const Invent = () => {
                         opt.key === "high"
                           ? "#059669"
                           : opt.key === "medium"
-                          ? "#D97706"
-                          : opt.key === "low"
-                          ? "#DC2626"
-                          : "#374151",
+                            ? "#D97706"
+                            : opt.key === "low"
+                              ? "#DC2626"
+                              : "#374151",
                       background:
                         stockStatusFilter === opt.key ? "#eff6ff" : undefined,
                       "&:hover": { background: "#f8fafc" },
@@ -995,7 +932,7 @@ const Invent = () => {
                     height: "18px",
                     cursor: "pointer",
                   }}
-                  onClick={() => handleEdit(index)}
+                  onClick={() => handleEditModal(item)}
                 />
                 <img
                   src={deleteLogo}
@@ -1029,9 +966,8 @@ const Invent = () => {
               <div>
                 <span style={{ color: "#666" }}>Price: </span>
                 <span>
-                  $
                   {!isNaN(Number(item.price))
-                    ? Number(item.price).toFixed(2)
+                    ? formatCurrency(Number(item.price)) + " per unit"
                     : "0.00"}
                 </span>
               </div>
@@ -1142,6 +1078,13 @@ const Invent = () => {
     };
   }, []);
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+    }).format(amount);
+  };
+
   // Modify the desktop view to include the loading indicator
   const renderDesktopView = () => {
     return (
@@ -1153,6 +1096,7 @@ const Invent = () => {
             gap: 2,
             mb: 2,
             p: 2,
+            marginTop: "28px",
             backgroundColor: "#fff",
             borderRadius: 2,
             border: "1px solid #EAECF0",
@@ -1255,9 +1199,8 @@ const Invent = () => {
                 ].map((opt) => (
                   <Box
                     key={opt.key}
-                    className={`custom-dropdown-item${
-                      stockStatusFilter === opt.key ? " active" : ""
-                    }`}
+                    className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
+                      }`}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -1271,10 +1214,10 @@ const Invent = () => {
                         opt.key === "high"
                           ? "#059669"
                           : opt.key === "medium"
-                          ? "#D97706"
-                          : opt.key === "low"
-                          ? "#DC2626"
-                          : "#374151",
+                            ? "#D97706"
+                            : opt.key === "low"
+                              ? "#DC2626"
+                              : "#374151",
                       background:
                         stockStatusFilter === opt.key ? "#eff6ff" : undefined,
                       "&:hover": { background: "#f8fafc" },
@@ -1428,29 +1371,32 @@ const Invent = () => {
                             getStockStatus(item.stockQuantity) === "high"
                               ? "#ECFDF3"
                               : getStockStatus(item.stockQuantity) === "medium"
-                              ? "#FFFAEB"
-                              : "#FEF3F2",
+                                ? "#FFFAEB"
+                                : "#FEF3F2",
                           color:
                             getStockStatus(item.stockQuantity) === "high"
                               ? "#027A48"
                               : getStockStatus(item.stockQuantity) === "medium"
-                              ? "#B54708"
-                              : "#B42318",
-                          padding: "2px 8px",
+                                ? "#B54708"
+                                : "#B42318",
+                          padding: "4px 8px",
                           borderRadius: "16px",
                           fontSize: "12px",
                           fontWeight: 500,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 'fit-content',
                         }}
                       >
-                        {item.stockQuantity} Liters
+                        {item.stockQuantity} units
                       </span>
                     </TableCell>
                     <TableCell>
-                      $
+
                       {!isNaN(Number(item.price))
-                        ? Number(item.price).toFixed(2)
+                        ? formatCurrency(Number(item.price)) + " per unit"
                         : "0.00"}
-                      /L
                     </TableCell>
                     <TableCell>
                       <Tooltip title="View">
@@ -1460,11 +1406,7 @@ const Invent = () => {
                       </Tooltip>
                       <Tooltip title="Edit">
                         <IconButton
-                          onClick={() =>
-                            navigate(
-                              `/admin/inventory-management/edit/${item.id}`
-                            )
-                          }
+                          onClick={() => handleEditModal(item)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -1673,8 +1615,20 @@ const Invent = () => {
       {renderInventoryItems()}
 
       <Dialog
-        open={showEditModal}
-        onClose={() => setShowEditModal(false)}
+        open={showEditModal && editItem.id}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditItem({
+            id: null,
+            productName: "",
+            category: "",
+            stockQuantity: "",
+            price: "",
+            description: "",
+            serviceArea: "",
+            productImage: null,
+          });
+        }}
         maxWidth="sm"
         fullWidth
         sx={{
@@ -1682,173 +1636,109 @@ const Invent = () => {
           "& .MuiDialog-paper": {
             zIndex: 9999,
             backgroundColor: "#ffffff",
-            border: "2px solid #0387D9",
-            maxWidth: "100vw",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
             width: "100%",
-            height: "100vh",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
             overflowY: "auto",
-            m: 0,
-            p: { xs: 1.5, sm: 4 },
-            borderRadius: { xs: 0, sm: 3 },
-            boxShadow: 4,
             position: "relative",
           },
         }}
       >
-        <IconButton
-          aria-label="close"
-          onClick={() => setShowEditModal(false)}
-          sx={{
-            position: "absolute",
-            right: 16,
-            top: 16,
-            zIndex: 10,
-            fontSize: 32,
-          }}
-        >
-          <CloseIcon fontSize="inherit" />
-        </IconButton>
-        <Box sx={{ mt: 5, pb: 10 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
-                Product Name
-              </Typography>
-              <TextField
-                id="productName"
-                value={editItem.productName}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, productName: e.target.value })
-                }
-                fullWidth
-                variant="outlined"
-                size="small"
-              />
-            </Paper>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
-                Category
-              </Typography>
-              <TextField
-                id="category"
-                value={editItem.category}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, category: e.target.value })
-                }
-                fullWidth
-                variant="outlined"
-                size="small"
-              />
-            </Paper>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
-                Stock Quantity
-              </Typography>
-              <TextField
-                id="stockQuantity"
-                type="number"
-                value={editItem.stockQuantity}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, stockQuantity: e.target.value })
-                }
-                fullWidth
-                variant="outlined"
-                size="small"
-              />
-            </Paper>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
-                Price
-              </Typography>
-              <TextField
-                id="price"
-                type="number"
-                step="0.01"
-                value={editItem.price}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, price: e.target.value })
-                }
-                fullWidth
-                variant="outlined"
-                size="small"
-              />
-            </Paper>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
-                Description
-              </Typography>
-              <TextField
-                id="description"
-                value={editItem.description || ""}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, description: e.target.value })
-                }
-                fullWidth
-                variant="outlined"
-                size="small"
-                multiline
-                minRows={4}
-              />
-            </Paper>
-            <Paper elevation={1} sx={{ p: 2, borderRadius: 2 }}>
-              <Typography
-                variant="caption"
-                fontWeight={700}
-                color="text.secondary"
-                mb={0.5}
-              >
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Edit Product
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowEditModal(false)}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
                 Product Image
               </Typography>
               <Box
                 sx={{
-                  border: "1px dashed #B0B7C3",
-                  borderRadius: 2,
-                  minHeight: 120,
+                  border: "1px dashed #D1D5DB",
+                  borderRadius: "12px",
+                  p: 2,
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: "#B0B7C3",
-                  flexDirection: "column",
+                  backgroundColor: "#F9FAFB",
                   position: "relative",
+                  cursor: "pointer",
+                  height: "160px",
                   overflow: "hidden",
-                  mb: 1,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#0387D9",
+                    backgroundColor: "#F0F9FF",
+                  },
                 }}
               >
                 {editItem.productImage || imagePreview ? (
-                  <img
-                    src={imagePreview || editItem.productImage}
-                    alt="Preview"
-                    style={{
-                      maxHeight: 120,
-                      maxWidth: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
+                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <img
+                      src={imagePreview || editItem.productImage}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        backgroundColor: "rgba(255,255,255,0.8)",
+                        "&:hover": { backgroundColor: "#fff" },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditItem({ ...editItem, productImage: null });
+                        setImagePreview(null);
+                        if (fileInputRef.current) fileInputRef.current.value = null;
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                 ) : (
                   <Box
                     display="flex"
@@ -1856,9 +1746,12 @@ const Invent = () => {
                     alignItems="center"
                     gap={1}
                   >
-                    <CloudUploadIcon sx={{ fontSize: 40, color: "#B0B7C3" }} />
-                    <Typography variant="body2">
-                      Drag Or Browse Image
+                    <CloudUploadIcon sx={{ fontSize: 40, color: "#9CA3AF" }} />
+                    <Typography variant="body2" color="#6B7280">
+                      Drag and drop or click to upload
+                    </Typography>
+                    <Typography variant="caption" color="#9CA3AF">
+                      Supports JPG, PNG or GIF up to 5MB
                     </Typography>
                   </Box>
                 )}
@@ -1881,36 +1774,246 @@ const Invent = () => {
                       setImagePreview(URL.createObjectURL(file));
                     }
                   }}
-                  title="Upload"
+                  ref={fileInputRef}
                 />
               </Box>
-            </Paper>
-          </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Name
+              </Typography>
+              <TextField
+                value={editItem.productName}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, productName: e.target.value })
+                }
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product name"
+                size="medium"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Category
+              </Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={editItem.category}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, category: e.target.value })
+                  }
+                  displayEmpty
+                  sx={{
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                  }}
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <Typography color="#9CA3AF">Select a category</Typography>;
+                    }
+                    return selected;
+                  }}
+                  MenuProps={{
+                    disablePortal: true,
+                    PaperProps: {
+                      sx: {
+                        width: 240,
+                      },
+                    },
+                  }}
+                >
+                  {categoryOptions.map((option, index) => (
+                    <MenuItem
+                      key={option.value || option.label || index}
+                      value={option.value}
+                    >
+                      <span
+                        style={{ display: "flex", alignItems: "center", gap: 8 }}
+                      >
+                        <img
+                          src={option.icon}
+                          alt={option.label}
+                          style={{ width: 24, height: 24, objectFit: "contain" }}
+                          loading="lazy"
+                        />
+                        {option.label}
+                      </span>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <TextField
+                value={editItem.description || ""}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, description: e.target.value })
+                }
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product description"
+                multiline
+                rows={4}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Price (per unit)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.price}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, price: e.target.value })
+                  }
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    startAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                        ₦
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Stock Quantity
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.stockQuantity}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, stockQuantity: e.target.value })
+                  }
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+          </Stack>
         </Box>
-        {/* Sticky Save/Cancel Buttons */}
+
+        {/* Sticky action buttons */}
         <Box
           sx={{
-            position: { xs: "fixed", sm: "static" },
-            left: 0,
+            position: "sticky",
             bottom: 0,
-            width: "100vw",
-            background: "rgba(255,255,255,0.97)",
-            boxShadow: "0 -2px 8px rgba(0,0,0,0.08)",
+            width: "100%",
+            backgroundColor: "#fff",
+            borderTop: "1px solid #f0f0f0",
             p: 2,
-            zIndex: 20,
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
             gap: 2,
+            mt: 2,
+            zIndex: 5,
           }}
         >
           <Button
             onClick={() => setShowEditModal(false)}
-            disabled={isLoading}
-            fullWidth
+            variant="outlined"
             sx={{
-              mb: { xs: 1, sm: 0 },
-              backgroundColor: "#EF4444",
-              color: "#fff",
+              borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
             }}
           >
             Cancel
@@ -1918,10 +2021,28 @@ const Invent = () => {
           <Button
             onClick={handleUpdate}
             disabled={isLoading}
-            fullWidth
-            sx={{ backgroundColor: "#0387D9", color: "#fff" }}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
           >
-            {isLoading ? "Updating..." : "Update Product"}
+            {isLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span>Updating...</span>
+              </Box>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </Box>
       </Dialog>
@@ -1936,348 +2057,678 @@ const Invent = () => {
           "& .MuiDialog-paper": {
             zIndex: 9999,
             backgroundColor: "#ffffff",
-            border: "2px solid #0387D9",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
+            overflowY: "auto",
+            position: "relative",
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            fontWeight: 600,
-            fontSize: 22,
-            pb: 0,
-            pr: 5,
-            backgroundColor: "#f0f8ff",
-          }}
-        >
-          Add New Product
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Add New Product
+          </Typography>
           <IconButton
             aria-label="close"
             onClick={handleCloseAddModal}
-            sx={{ position: "absolute", right: 16, top: 16 }}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
           >
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <TextField
-            label="Product Name"
-            placeholder="Enter Product Name"
-            value={newItem.productName}
-            onChange={(e) =>
-              setNewItem({ ...newItem, productName: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Description"
-            value={newItem.description}
-            onChange={(e) =>
-              setNewItem({ ...newItem, description: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={newItem.category}
-              label="Category"
-              onChange={(e) =>
-                setNewItem({ ...newItem, category: e.target.value })
-              }
-              renderValue={(selected) => {
-                const option = categoryOptions.find(
-                  (opt) => opt.value === selected
-                );
-                return option ? (
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 8 }}
-                  >
-                    <img
-                      src={option.icon}
-                      alt={option.label}
-                      style={{ width: 24, height: 24, objectFit: "contain" }}
-                      loading="lazy"
-                    />
-                    {option.label}
-                  </span>
-                ) : (
-                  ""
-                );
-              }}
-              MenuProps={{
-                disablePortal: true,
-                PaperProps: {
-                  sx: {
-                    width: 240,
-                  },
-                },
-              }}
-            >
-              {categoryOptions.map((option, index) => (
-                <MenuItem
-                  key={option.value || option.label || index}
-                  value={option.value}
-                >
-                  <span
-                    style={{ display: "flex", alignItems: "center", gap: 8 }}
-                  >
-                    <img
-                      src={option.icon}
-                      alt={option.label}
-                      style={{ width: 24, height: 24, objectFit: "contain" }}
-                      loading="lazy"
-                    />
-                    {option.label}
-                  </span>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            label="Price"
-            placeholder="Enter Price"
-            type="number"
-            inputProps={{ min: 1, step: 1 }}
-            value={newItem.price}
-            onChange={(e) => {
-              const val = e.target.value;
-              // Allow empty string for clearing
-              if (val === "") {
-                setNewItem({ ...newItem, price: "" });
-              } else {
-                setNewItem({ ...newItem, price: val });
-              }
-            }}
-            onBlur={(e) => {
-              const val = Number(e.target.value);
-              if (val < 1 || isNaN(val)) {
-                setNewItem({ ...newItem, price: 1 });
-              }
-            }}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Availability"
-            placeholder="In Stock"
-            type="number"
-            inputProps={{ min: 1, step: 1 }}
-            value={newItem.stockQuantity || ""}
-            onChange={(e) =>
-              setNewItem({ ...newItem, stockQuantity: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-          />
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2, mb: 1 }}
-          >
-            <TextField
-              label="Upload File"
-              placeholder="Browse File Here..."
-              value={newItem.fileName || ""}
-              InputProps={{
-                readOnly: true,
-                endAdornment: (
-                  <IconButton component="label">
-                    <CloudUploadIcon />
-                    <input
-                      type="file"
-                      hidden
-                      onChange={handleImageChange}
-                      ref={fileInputRef}
-                    />
-                  </IconButton>
-                ),
-              }}
-              fullWidth
-            />
-          </Box>
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              style={{ maxWidth: 120, maxHeight: 120, margin: "10px 0" }}
-            />
-          )}
-          <Autocomplete
-            options={filteredSuppliers}
-            getOptionLabel={(option) =>
-              option.businessName ||
-              option.companyName ||
-              option.name ||
-              option.user?.email ||
-              ""
-            }
-            filterOptions={(options) => options}
-            onInputChange={(event, value) => setSupplierSearch(value)}
-            open={supplierDropdownOpen}
-            onOpen={() => setSupplierDropdownOpen(true)}
-            onClose={() => setSupplierDropdownOpen(false)}
-            openOnFocus
-            value={selectedSupplier}
-            onChange={(event, newValue) => {
-              setSelectedSupplier(newValue);
-              setNewItem({
-                ...newItem,
-                supplier: newValue ? newValue._id : "",
-              });
-            }}
-            disablePortal
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search Supplier"
-                placeholder={
-                  suppliersLoading
-                    ? "Loading suppliers..."
-                    : "Type supplier name, company, or email..."
-                }
-                margin="normal"
-                helperText={
-                  suppliersLoading
-                    ? "Loading suppliers..."
-                    : "Search by business name, company name, or email"
-                }
-              />
-            )}
-            renderOption={(props, option, { index }) => (
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Image
+              </Typography>
               <Box
-                component="li"
-                {...props}
-                key={
-                  option._id ||
-                  option.email ||
-                  option.businessName ||
-                  option.name ||
-                  index
-                }
+                sx={{
+                  border: "1px dashed #D1D5DB",
+                  borderRadius: "12px",
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#F9FAFB",
+                  position: "relative",
+                  cursor: "pointer",
+                  height: "160px",
+                  overflow: "hidden",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#0387D9",
+                    backgroundColor: "#F0F9FF",
+                  },
+                }}
               >
-                <Box>
-                  <Box sx={{ fontWeight: "bold" }}>
-                    {option.businessName || option.companyName || option.name}
+                {imagePreview ? (
+                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        backgroundColor: "rgba(255,255,255,0.8)",
+                        "&:hover": { backgroundColor: "#fff" },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProductImage(null);
+                        setImagePreview(null);
+                        setNewItem({ ...newItem, fileName: "" });
+                        if (fileInputRef.current) fileInputRef.current.value = null;
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
                   </Box>
-                  <Box sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
-                    {option.user?.email}
+                ) : (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    <CloudUploadIcon sx={{ fontSize: 40, color: "#9CA3AF" }} />
+                    <Typography variant="body2" color="#6B7280">
+                      Drag and drop or click to upload
+                    </Typography>
+                    <Typography variant="caption" color="#9CA3AF">
+                      Supports JPG, PNG or GIF up to 5MB
+                    </Typography>
                   </Box>
-                </Box>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                    left: 0,
+                    top: 0,
+                  }}
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                />
               </Box>
-            )}
-            isOptionEqualToValue={(option, value) => option._id === value._id}
-            noOptionsText={
-              suppliersLoading ? "Loading..." : "No suppliers found"
-            }
-            loading={suppliersLoading}
-            disabled={suppliersLoading}
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Name
+              </Typography>
+              <TextField
+                value={newItem.productName}
+                onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product name"
+                size="medium"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <TextField
+                value={newItem.description}
+                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product description"
+                multiline
+                rows={4}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Category
+              </Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={newItem.category}
+                  onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                  displayEmpty
+                  sx={{
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                  }}
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <Typography color="#9CA3AF">Select a category</Typography>;
+                    }
+                    const option = categoryOptions.find((opt) => opt.value === selected);
+                    return option ? (
+                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <img
+                          src={option.icon}
+                          alt={option.label}
+                          style={{ width: 24, height: 24, objectFit: "contain" }}
+                          loading="lazy"
+                        />
+                        {option.label}
+                      </span>
+                    ) : selected;
+                  }}
+                  MenuProps={{
+                    disablePortal: true,
+                    PaperProps: {
+                      sx: {
+                        width: 240,
+                      },
+                    },
+                  }}
+                >
+                  {categoryOptions.map((option, index) => (
+                    <MenuItem
+                      key={option.value || option.label || index}
+                      value={option.value}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <img
+                          src={option.icon}
+                          alt={option.label}
+                          style={{ width: 24, height: 24, objectFit: "contain" }}
+                          loading="lazy"
+                        />
+                        {option.label}
+                      </span>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Price (per unit)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.price}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, price: "" });
+                    } else {
+                      setNewItem({ ...newItem, price: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, price: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    startAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                        ₦
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Stock Quantity
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.stockQuantity || ""}
+                  onChange={(e) => setNewItem({ ...newItem, stockQuantity: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Supplier
+              </Typography>
+              <Autocomplete
+                options={filteredSuppliers}
+                getOptionLabel={(option) =>
+                  option.businessName ||
+                  option.companyName ||
+                  option.name ||
+                  option.user?.email ||
+                  ""
+                }
+                filterOptions={(options) => options}
+                onInputChange={(event, value) => setSupplierSearch(value)}
+                open={supplierDropdownOpen}
+                onOpen={() => setSupplierDropdownOpen(true)}
+                onClose={() => setSupplierDropdownOpen(false)}
+                openOnFocus
+                value={selectedSupplier}
+                onChange={(event, newValue) => {
+                  setSelectedSupplier(newValue);
+                  setNewItem({
+                    ...newItem,
+                    supplier: newValue ? newValue._id : "",
+                  });
+                }}
+                disablePortal
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      suppliersLoading
+                        ? "Loading suppliers..."
+                        : "Type supplier name, company, or email..."
+                    }
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        backgroundColor: "#F9FAFB",
+                        "& fieldset": {
+                          borderColor: "#E5E7EB",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#D1D5DB",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#0387D9",
+                        },
+                      },
+                    }}
+                    helperText={
+                      suppliersLoading
+                        ? "Loading suppliers..."
+                        : "Search by business name, company name, or email"
+                    }
+                    FormHelperTextProps={{
+                      sx: { color: "#9CA3AF", mt: 0.5, ml: 1 }
+                    }}
+                  />
+                )}
+                renderOption={(props, option, { index }) => (
+                  <Box
+                    component="li"
+                    {...props}
+                    key={
+                      option._id ||
+                      option.email ||
+                      option.businessName ||
+                      option.name ||
+                      index
+                    }
+                    sx={{
+                      py: 1.5,
+                      borderBottom: index < filteredSuppliers.length - 1 ? "1px solid #F3F4F6" : "none"
+                    }}
+                  >
+                    <Box>
+                      <Box sx={{ fontWeight: "600", color: "#111827" }}>
+                        {option.businessName || option.companyName || option.name}
+                      </Box>
+                      <Box sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                        {option.user?.email}
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+                isOptionEqualToValue={(option, value) => option._id === value._id}
+                noOptionsText={
+                  suppliersLoading ? "Loading..." : "No suppliers found"
+                }
+                loading={suppliersLoading}
+                disabled={suppliersLoading}
+              />
+            </Box>
+          </Stack>
+        </Box>
+
+        {saveError && (
+          <Box sx={{
+            backgroundColor: "#FEF2F2",
+            color: "#B91C1C",
+            p: 2,
+            mx: 3,
+            mb: 2,
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: 1
+          }}>
+            <ErrorOutlineIcon fontSize="small" />
+            <Typography variant="body2">{saveError}</Typography>
+          </Box>
+        )}
+
+        {saveSuccess && (
+          <Box sx={{
+            backgroundColor: "#ECFDF5",
+            color: "#065F46",
+            p: 2,
+            mx: 3,
+            mb: 2,
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: 1
+          }}>
+            <CheckCircleIcon fontSize="small" />
+            <Typography variant="body2">{saveSuccess}</Typography>
+          </Box>
+        )}
+
+        {/* Sticky action buttons */}
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            width: "100%",
+            backgroundColor: "#fff",
+            borderTop: "1px solid #f0f0f0",
+            p: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
+            gap: 2,
+            zIndex: 5,
+          }}
+        >
           <Button
             onClick={handleCloseAddModal}
-            variant="contained"
-            color="error"
-            startIcon={<CloseIcon />}
-            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+            variant="outlined"
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
           >
             Cancel
           </Button>
           <Button
             onClick={handleSaveProduct}
-            variant="contained"
-            color="primary"
-            startIcon={<CloudUploadIcon />}
-            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
             disabled={isLoading}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
           >
-            Save Product
+            {isLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span>Saving...</span>
+              </Box>
+            ) : (
+              "Save Product"
+            )}
           </Button>
-        </DialogActions>
-        {saveError && (
-          <div
-            style={{
-              color: "red",
-              textAlign: "center",
-              marginTop: 8,
-              marginBottom: 16,
-            }}
-          >
-            {saveError}
-          </div>
-        )}
-        {saveSuccess && (
-          <div
-            style={{
-              color: "green",
-              textAlign: "center",
-              marginTop: 8,
-              marginBottom: 16,
-              fontWeight: "bold",
-            }}
-          >
-            {saveSuccess}
-          </div>
-        )}
+        </Box>
       </Dialog>
 
       <Dialog
         open={showDeleteConfirmation}
         onClose={() => setShowDeleteConfirmation(false)}
-        maxWidth="sm"
+        maxWidth="xs"
         fullWidth
         sx={{
           zIndex: 9999,
           "& .MuiDialog-paper": {
             zIndex: 9999,
             backgroundColor: "#ffffff",
-            border: "2px solid #0387D9",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "400px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            overflow: "hidden",
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            fontWeight: 600,
-            fontSize: 22,
-            pb: 0,
-            pr: 5,
-            backgroundColor: "#f0f8ff",
-          }}
-        >
-          Confirm Deletion
+        <Box sx={{
+          position: "relative",
+          backgroundColor: "#FEF2F2",
+          py: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Box
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              backgroundColor: "#FEE2E2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2
+            }}
+          >
+            <DeleteIcon sx={{ fontSize: 32, color: "#DC2626" }} />
+          </Box>
+          <Typography variant="h6" fontWeight="600" color="#111827" align="center">
+            Delete Product
+          </Typography>
           <IconButton
             aria-label="close"
             onClick={() => setShowDeleteConfirmation(false)}
-            sx={{ position: "absolute", right: 16, top: 16 }}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "rgba(107, 114, 128, 0.08)",
+              },
+            }}
           >
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <p>Are you sure you want to delete this product?</p>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
-          <Button
-            onClick={() => setShowDeleteConfirmation(false)}
-            variant="contained"
-            color="error"
-            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={confirmDelete}
-            variant="contained"
-            color="primary"
-            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
-          >
-            Yes
-          </Button>
-        </DialogActions>
+        </Box>
+
+        <Box sx={{ p: 3 }}>
+          <Typography variant="body1" align="center" color="#4B5563" sx={{ mb: 3 }}>
+            Are you sure you want to delete this product? This action cannot be undone.
+          </Typography>
+
+          <Box sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            justifyContent: "center"
+          }}>
+            <Button
+              onClick={() => setShowDeleteConfirmation(false)}
+              variant="outlined"
+              fullWidth
+              sx={{
+                borderRadius: "8px",
+                borderColor: "#D1D5DB",
+                color: "#374151",
+                fontWeight: 600,
+                py: 1.5,
+                "&:hover": {
+                  borderColor: "#9CA3AF",
+                  backgroundColor: "#F9FAFB",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              variant="contained"
+              fullWidth
+              sx={{
+                borderRadius: "8px",
+                backgroundColor: "#DC2626",
+                color: "#fff",
+                fontWeight: 600,
+                py: 1.5,
+                "&:hover": {
+                  backgroundColor: "#B91C1C",
+                },
+              }}
+            >
+              {isLoading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                  <span>Deleting...</span>
+                </Box>
+              ) : (
+                "Delete Product"
+              )}
+            </Button>
+          </Box>
+        </Box>
       </Dialog>
 
       <Dialog
-        open={showViewModal}
+        open={showViewModal && viewItem.id}
         onClose={handleCloseViewModal}
         maxWidth="sm"
         fullWidth
@@ -2286,182 +2737,280 @@ const Invent = () => {
           "& .MuiDialog-paper": {
             zIndex: 9999,
             backgroundColor: "#ffffff",
-            border: "2px solid #0387D9",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
+            overflowY: "auto",
+            position: "relative",
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            fontWeight: 600,
-            fontSize: 22,
-            pb: 0,
-            pr: 5,
-            backgroundColor: "#f0f8ff",
-          }}
-        >
-          Inventory Summary
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Product Details
+          </Typography>
           <IconButton
             aria-label="close"
             onClick={handleCloseViewModal}
-            sx={{ position: "absolute", right: 16, top: 16 }}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
           >
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <Box
-            sx={{
-              border: "1px solid #E5E7EB",
-              borderRadius: 2,
-              background: "#FAFAFA",
-              p: 2,
-              mb: 3,
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={3}>
+            <Box sx={{
               display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                mb: 2,
-              }}
-            >
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                <Box sx={{ fontWeight: 500, color: "#222", fontSize: 16 }}>
-                  {viewItem.productName || "Yacht"}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>ID</Box>
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 3,
+              alignItems: { xs: "flex-start", sm: "center" }
+            }}>
+              {viewItem.productImage ? (
                 <Box
                   sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
+                    width: { xs: "100%", sm: "120px" },
+                    height: { xs: "200px", sm: "120px" },
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "1px solid #E5E7EB",
+                    backgroundColor: "#F9FAFB",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                 >
-                  #{viewItem.id?.slice?.(-6) || viewItem.id || "—"}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Product Name</Box>
-                <Box
-                  sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
-                  }}
-                >
-                  {viewItem.productName}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Category</Box>
-                <Box
-                  sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
-                  }}
-                >
-                  {viewItem.category}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Price</Box>
-                <Box
-                  sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
-                  }}
-                >
-                  {viewItem.price ? `$${viewItem.price}` : "—"}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Availability</Box>
-                <Box
-                  sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
-                  }}
-                >
-                  {viewItem.stockQuantity || "In Stock"}
-                </Box>
-                <Box sx={{ color: "#6B7280", fontSize: 14 }}>Supplier</Box>
-                <Box
-                  sx={{
-                    color: "#111827",
-                    fontWeight: 500,
-                    fontSize: 14,
-                    mb: 1,
-                  }}
-                >
-                  {typeof viewItem.supplier === "object"
-                    ? viewItem.supplier.businessName ||
-                      viewItem.supplier.user?.email ||
-                      "Not available"
-                    : typeof viewItem.supplier === "string" &&
-                      viewItem.supplier.trim() !== ""
-                    ? viewItem.supplier
-                    : "Not available"}
-                </Box>
-              </Box>
-              <Box>
-                {viewItem.productImage ? (
                   <img
                     src={viewItem.productImage}
                     alt={viewItem.productName}
                     style={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 8,
-                      objectFit: "cover",
-                      marginLeft: 16,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
                     }}
                   />
-                ) : (
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: 8,
-                      background: "#E5E7EB",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginLeft: 2,
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: "#9CA3AF",
-                        fontSize: 12,
-                        textAlign: "center",
-                      }}
-                    >
-                      Not available
-                    </span>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "120px" },
+                    height: { xs: "200px", sm: "120px" },
+                    borderRadius: "12px",
+                    backgroundColor: "#F3F4F6",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#9CA3AF",
+                  }}
+                >
+                  <Box sx={{ textAlign: "center", p: 1 }}>
+                    <ImageIcon sx={{ fontSize: 40, mb: 1 }} />
+                    <Typography variant="caption" display="block">
+                      No image available
+                    </Typography>
                   </Box>
-                )}
+                </Box>
+              )}
+
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h5" fontWeight="600" color="#111827" gutterBottom>
+                  {viewItem.productName}
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 1 }}>
+                  <Chip
+                    label={viewItem.category}
+                    size="small"
+                    sx={{
+                      backgroundColor: "#F3F4F6",
+                      color: "#374151",
+                      fontWeight: 500,
+                      borderRadius: "6px"
+                    }}
+                  />
+                  <Chip
+                    label={`ID: ${viewItem.id?.slice?.(-6) || viewItem.id || "—"}`}
+                    size="small"
+                    sx={{
+                      backgroundColor: "#F3F4F6",
+                      color: "#374151",
+                      fontWeight: 500,
+                      borderRadius: "6px"
+                    }}
+                  />
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Price
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.price ? formatCurrency(Number(viewItem.price)) + " per unit" : "—"}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <Box sx={{ fontWeight: 500, color: "#222", mb: 1 }}>
-              Description
+
+            <Divider sx={{ my: 1 }} />
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Box>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Stock Quantity
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box
+                      sx={{
+                        backgroundColor:
+                          getStockStatus(viewItem.stockQuantity) === "high"
+                            ? "#ECFDF3"
+                            : getStockStatus(viewItem.stockQuantity) === "medium"
+                              ? "#FFFAEB"
+                              : "#FEF3F2",
+                        color:
+                          getStockStatus(viewItem.stockQuantity) === "high"
+                            ? "#059669"
+                            : getStockStatus(viewItem.stockQuantity) === "medium"
+                              ? "#D97706"
+                              : "#DC2626",
+                        py: 0.5,
+                        px: 1.5,
+                        borderRadius: "6px",
+                        display: "inline-block",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {viewItem.stockQuantity || 0} units
+                    </Box>
+                    <Typography variant="body2" color="#6B7280">
+                      {getStockStatus(viewItem.stockQuantity) === "high"
+                        ? "High stock"
+                        : getStockStatus(viewItem.stockQuantity) === "medium"
+                          ? "Medium stock"
+                          : "Low stock"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Box>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Supplier
+                  </Typography>
+                  <Typography variant="body1" fontWeight="500" color="#111827">
+                    {typeof viewItem.supplier === "object"
+                      ? viewItem.supplier.businessName ||
+                      viewItem.supplier.user?.email ||
+                      "Not available"
+                      : typeof viewItem.supplier === "string" &&
+                        viewItem.supplier.trim() !== ""
+                        ? viewItem.supplier
+                        : "Not available"}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: "10px",
+                  backgroundColor: "#F9FAFB",
+                  border: "1px solid #E5E7EB",
+                  minHeight: "100px",
+                }}
+              >
+                <Typography variant="body2" color="#4B5563" whiteSpace="pre-wrap">
+                  {viewItem.description || "No description available"}
+                </Typography>
+              </Paper>
             </Box>
-            <TextField
-              fullWidth
-              multiline
-              minRows={3}
-              variant="outlined"
-              InputProps={{ style: { background: "#FAFAFA", borderRadius: 8 } }}
-              value={viewItem.product?.description || "Not available"}
-              inputProps={{ readOnly: true, style: { color: "#000" } }}
-            />
-          </Box>
-        </DialogContent>
+          </Stack>
+        </Box>
+
+        {/* Action buttons */}
+        <Box
+          sx={{
+            borderTop: "1px solid #f0f0f0",
+            p: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          <Button
+            onClick={handleCloseViewModal}
+            variant="outlined"
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            onClick={() => {
+              handleCloseViewModal();
+              handleEditModal(viewItem);
+            }}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            Edit Product
+          </Button>
+        </Box>
       </Dialog>
 
       <Dialog

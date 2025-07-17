@@ -186,10 +186,10 @@ export const getAllInventoryItems = async () => {
     };
   }
 };
-export const updateInventoryItem = async (id, itemData) => {
+export const updateInventoryItem = async (id, itemData, isFormData = false) => {
   try {
     // Check if we're dealing with FormData
-    const isFormData = itemData instanceof FormData;
+    // const isFormData = itemData instanceof FormData;
 
     // Set the appropriate headers
     const headers = {

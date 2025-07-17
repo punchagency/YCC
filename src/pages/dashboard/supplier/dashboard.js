@@ -52,7 +52,7 @@ const SupplierDashboard = () => {
       activeOrders: 8,
       totalRevenue: 15420,
     });
-  }, [fetchLowInventory]);
+  }, []);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -75,13 +75,12 @@ const SupplierDashboard = () => {
         return "#4caf50";
     }
   };
-
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, paddingTop: "80px" }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          Welcome back, {user?.firstName || "Supplier"}!
+          Welcome back, {user?.supplierProfile?.contactPerson?.fullName || "Supplier"}!
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Manage your inventory and business operations
