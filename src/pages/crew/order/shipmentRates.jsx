@@ -32,6 +32,7 @@ import { useState } from "react";
 import { TruckIcon } from "lucide-react";
 import { buyLabels } from "../../../services/crew/shipmentService";
 import { useToast } from "../../../context/toast/toastContext";
+import { useUser } from "../../../context/userContext";
 
 // Styled components if needed (copy from details.js if any)
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -44,6 +45,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 function ShipmentRates({ subOrders, refreshOrder }) {
   const { toast } = useToast();
+  const { user } = useUser();
   const [selectedRates, setSelectedRates] = useState({});
   const [buying, setBuying] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -91,13 +93,27 @@ function ShipmentRates({ subOrders, refreshOrder }) {
           summary: "Success",
           detail: "Labels purchased successfully",
         });
+
+        // Call Rewardful conversion tracking after successful label purchase
+        if (window.rewardful && user?.email) {
+          try {
+            window.rewardful("convert", { email: user.email });
+            console.log("Rewardful conversion tracked for:", user.email);
+          } catch (rewardfulError) {
+            console.error(
+              "Error tracking Rewardful conversion:",
+              rewardfulError
+            );
+            // Don't show error to user since this is analytics tracking
+          }
+        }
       } else {
         toast.current.show({
           severity: "warn",
           summary: "Partial",
           detail: `${failed.length} label(s) failed to purchase`,
         });
-        console.log('Failed to purchase labels:', failed);
+        console.log("Failed to purchase labels:", failed);
       }
       setSelectedRates({});
       if (refreshOrder) await refreshOrder();
