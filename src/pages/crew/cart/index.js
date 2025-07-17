@@ -1015,7 +1015,7 @@ const CartPage = () => {
             {checkoutLoading ? "Processing..." : "Place Order"}
           </Button>
         </DialogActions>
-      </Dialog>
+      </CheckoutDialog>
 
       {/* Clear Cart Confirmation Dialog */}
       <Dialog
