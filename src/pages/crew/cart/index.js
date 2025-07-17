@@ -240,11 +240,11 @@ const CartPage = () => {
     try {
       setRemovingItem(`${supplierIndex}-${productIndex}`);
 
-      console.log('[CartPage] Removing product:', {
+      console.log("[CartPage] Removing product:", {
         inventoryId: product.inventoryId,
-        productId: product.productId
+        productId: product.productId,
       });
-      
+
       const response = await removeFromCart({
         inventoryId: product.inventoryId,
         productId: product.productId, // Now required!
@@ -641,11 +641,32 @@ const CartPage = () => {
                           >
                             {product.name}
                           </Typography>
-                          <Chip
-                            label={product.category}
-                            size="small"
-                            sx={{ mb: 1, backgroundColor: "#f3f4f6" }}
-                          />
+                          {/* Display categories - handle both array and string formats */}
+                          {Array.isArray(product.category) ? (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 0.5,
+                                mb: 1,
+                              }}
+                            >
+                              {product.category.map((cat, index) => (
+                                <Chip
+                                  key={index}
+                                  label={cat}
+                                  size="small"
+                                  sx={{ backgroundColor: "#f3f4f6" }}
+                                />
+                              ))}
+                            </Box>
+                          ) : (
+                            <Chip
+                              label={product.category}
+                              size="small"
+                              sx={{ mb: 1, backgroundColor: "#f3f4f6" }}
+                            />
+                          )}
                           {product.description && (
                             <Typography
                               variant="body2"

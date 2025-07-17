@@ -442,16 +442,41 @@ const SupplierOrderConfirmationPage = () => {
                               >
                                 {product.description}
                               </Typography>
-                              <Chip
-                                label={product.category}
-                                size="small"
-                                sx={{
-                                  backgroundColor: "#e9ecef",
-                                  color: "#495057",
-                                  fontWeight: 500,
-                                  fontSize: "0.75rem",
-                                }}
-                              />
+                              {/* Handle both array and string category formats */}
+                              {Array.isArray(product.category) ? (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 0.5,
+                                  }}
+                                >
+                                  {product.category.map((cat, index) => (
+                                    <Chip
+                                      key={index}
+                                      label={cat}
+                                      size="small"
+                                      sx={{
+                                        backgroundColor: "#e9ecef",
+                                        color: "#495057",
+                                        fontWeight: 500,
+                                        fontSize: "0.75rem",
+                                      }}
+                                    />
+                                  ))}
+                                </Box>
+                              ) : (
+                                <Chip
+                                  label={product.category}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: "#e9ecef",
+                                    color: "#495057",
+                                    fontWeight: 500,
+                                    fontSize: "0.75rem",
+                                  }}
+                                />
+                              )}
                             </Grid>
                             <Grid item xs={12} md={3}>
                               <Typography variant="body2" color="#6c757d">

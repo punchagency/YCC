@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,17 +8,17 @@ import {
   Chip,
   IconButton,
   useMediaQuery,
-  useTheme
-} from '@mui/material';
+  useTheme,
+} from "@mui/material";
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
-  Inventory as InventoryIcon
-} from '@mui/icons-material';
+  Inventory as InventoryIcon,
+} from "@mui/icons-material";
 
 const ProductCard = ({ product, onAddToCart, loading }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [quantity, setQuantity] = useState(1);
 
   // Handle quantity change
@@ -36,9 +36,9 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
 
   // Format price
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(price);
   };
 
@@ -46,91 +46,111 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
     <Card
       elevation={0}
       sx={{
-        border: '1px solid',
-        borderColor: 'divider',
+        border: "1px solid",
+        borderColor: "divider",
         borderRadius: 2,
-        overflow: 'hidden',
-        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-        background: 'background.paper',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        '&:hover': {
-          transform: 'translateY(-1px)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-        }
+        overflow: "hidden",
+        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+        background: "background.paper",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        "&:hover": {
+          transform: "translateY(-1px)",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+        },
       }}
     >
       {/* Product Image Placeholder */}
       <Box
         sx={{
           height: 120,
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderBottom: '1px solid',
-          borderColor: 'divider'
+          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderBottom: "1px solid",
+          borderColor: "divider",
         }}
       >
-        <InventoryIcon sx={{ fontSize: 48, color: 'text.secondary' }} />
+        <InventoryIcon sx={{ fontSize: 48, color: "text.secondary" }} />
       </Box>
 
       <CardContent
         sx={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          p: 2
+          display: "flex",
+          flexDirection: "column",
+          p: 2,
         }}
       >
         {/* Product Name */}
-        <Typography 
-          variant="h6" 
+        <Typography
+          variant="h6"
           component="h3"
           sx={{
             fontWeight: 600,
-            color: 'text.primary',
+            color: "text.primary",
             mb: 1,
-            fontSize: isMobile ? '1rem' : '1.125rem',
+            fontSize: isMobile ? "1rem" : "1.125rem",
             lineHeight: 1.4,
-            display: '-webkit-box',
+            display: "-webkit-box",
             WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
           {product.name}
         </Typography>
 
-        {/* Category */}
-        <Chip
-          label={product.category}
-          size="small"
-          sx={{
-            backgroundColor: 'grey.100',
-            color: 'text.primary',
-            fontSize: '0.75rem',
-            mb: 2,
-            '& .MuiChip-label': {
-              px: 1,
-            }
-          }}
-        />
+        {/* Category - handle both array and string formats */}
+        {Array.isArray(product.category) ? (
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
+            {product.category.map((cat, index) => (
+              <Chip
+                key={index}
+                label={cat}
+                size="small"
+                sx={{
+                  backgroundColor: "grey.100",
+                  color: "text.primary",
+                  fontSize: "0.75rem",
+                  "& .MuiChip-label": {
+                    px: 1,
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        ) : (
+          <Chip
+            label={product.category}
+            size="small"
+            sx={{
+              backgroundColor: "grey.100",
+              color: "text.primary",
+              fontSize: "0.75rem",
+              mb: 2,
+              "& .MuiChip-label": {
+                px: 1,
+              },
+            }}
+          />
+        )}
 
         {/* Description */}
         {product.description && (
-          <Typography 
+          <Typography
             variant="body2"
             sx={{
-              color: 'text.secondary',
+              color: "text.secondary",
               mb: 2,
-              fontSize: '0.875rem',
+              fontSize: "0.875rem",
               lineHeight: 1.5,
-              display: '-webkit-box',
+              display: "-webkit-box",
               WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
             }}
           >
             {product.description}
@@ -139,21 +159,21 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
 
         {/* Supplier Info */}
         <Box sx={{ mb: 2 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: 'text.primary', 
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
               fontWeight: 500,
-              fontSize: '0.875rem'
+              fontSize: "0.875rem",
             }}
           >
             {product.supplier.name}
           </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: 'text.secondary',
-              fontSize: '0.75rem'
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              fontSize: "0.75rem",
             }}
           >
             Stock: {product.quantity}
@@ -161,16 +181,16 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
         </Box>
 
         {/* Price and Actions */}
-        <Box sx={{ mt: 'auto' }}>
-          <Typography 
-            variant="h6" 
+        <Box sx={{ mt: "auto" }}>
+          <Typography
+            variant="h6"
             component="span"
             sx={{
-              color: 'primary.main',
+              color: "primary.main",
               fontWeight: 700,
-              fontSize: isMobile ? '1.125rem' : '1.25rem',
-              display: 'block',
-              mb: 1
+              fontSize: isMobile ? "1.125rem" : "1.25rem",
+              display: "block",
+              mb: 1,
             }}
           >
             {formatPrice(product.price)}
@@ -178,11 +198,11 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
 
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 1,
-              mb: 2
+              mb: 2,
             }}
           >
             <IconButton
@@ -190,29 +210,29 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
               onClick={() => handleQuantityChange(quantity - 1)}
               disabled={quantity <= 1 || loading}
               sx={{
-                border: '1px solid',
-                borderColor: 'divider',
+                border: "1px solid",
+                borderColor: "divider",
                 borderRadius: 1,
                 p: 0.5,
-                '&:hover': {
-                  backgroundColor: 'grey.50',
+                "&:hover": {
+                  backgroundColor: "grey.50",
                 },
-                '&:disabled': {
+                "&:disabled": {
                   opacity: 0.5,
-                }
+                },
               }}
             >
               <RemoveIcon sx={{ fontSize: 16 }} />
             </IconButton>
 
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                mx: 1, 
-                minWidth: 20, 
-                textAlign: 'center',
+            <Typography
+              variant="body1"
+              sx={{
+                mx: 1,
+                minWidth: 20,
+                textAlign: "center",
                 fontWeight: 600,
-                color: 'text.primary'
+                color: "text.primary",
               }}
             >
               {quantity}
@@ -223,16 +243,16 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
               onClick={() => handleQuantityChange(quantity + 1)}
               disabled={quantity >= product.quantity || loading}
               sx={{
-                border: '1px solid',
-                borderColor: 'divider',
+                border: "1px solid",
+                borderColor: "divider",
                 borderRadius: 1,
                 p: 0.5,
-                '&:hover': {
-                  backgroundColor: 'grey.50',
+                "&:hover": {
+                  backgroundColor: "grey.50",
                 },
-                '&:disabled': {
+                "&:disabled": {
                   opacity: 0.5,
-                }
+                },
               }}
             >
               <AddIcon sx={{ fontSize: 16 }} />
@@ -246,29 +266,33 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
             startIcon={<AddIcon />}
             fullWidth
             sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
+              backgroundColor: "primary.main",
+              color: "white",
               borderRadius: 2,
               py: 1,
               px: 2,
               fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '0.875rem',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-                transform: 'translateY(-1px)',
+              textTransform: "none",
+              fontSize: "0.875rem",
+              "&:hover": {
+                backgroundColor: "primary.dark",
+                transform: "translateY(-1px)",
                 boxShadow: theme.shadows[2],
               },
-              '&:disabled': {
-                backgroundColor: 'grey.300',
-                color: 'grey.500',
-                transform: 'none',
-                boxShadow: 'none',
+              "&:disabled": {
+                backgroundColor: "grey.300",
+                color: "grey.500",
+                transform: "none",
+                boxShadow: "none",
               },
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
-            {loading ? 'Adding...' : product.quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
+            {loading
+              ? "Adding..."
+              : product.quantity === 0
+              ? "Out of Stock"
+              : "Add to Cart"}
           </Button>
         </Box>
       </CardContent>
@@ -276,4 +300,4 @@ const ProductCard = ({ product, onAddToCart, loading }) => {
   );
 };
 
-export default ProductCard; 
+export default ProductCard;
