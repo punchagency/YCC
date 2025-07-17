@@ -231,7 +231,7 @@ const SupplierOrderConfirmationPage = () => {
 
   const handleConfirm = async () => {
     setConfirmLoading(true);
-    setConfirmError(null);
+    setConfirmError(null); // Clear any previous errors
     try {
       const baseUrl =
         process.env.REACT_APP_API_URL || "http://localhost:7000/api";
@@ -243,12 +243,25 @@ const SupplierOrderConfirmationPage = () => {
       });
       const data = await response.json();
       if (!response.ok || !data.status) {
-        throw new Error(data.message || "Failed to confirm order");
+        // Store the full error response for better error display
+        const errorData = {
+          message: data.message || "Failed to confirm order",
+          supportMessage: data.supportMessage,
+          supportContact: data.supportContact,
+          nextSteps: data.nextSteps,
+        };
+        throw new Error(JSON.stringify(errorData));
       }
       setAction("confirm");
       setTimeout(() => setShowResult(true), 300);
     } catch (err) {
-      setConfirmError(err.message || "Failed to confirm order");
+      // Try to parse structured error, fallback to simple message
+      try {
+        const errorData = JSON.parse(err.message);
+        setConfirmError(errorData);
+      } catch {
+        setConfirmError({ message: err.message || "Failed to confirm order" });
+      }
     } finally {
       setConfirmLoading(false);
     }
@@ -622,6 +635,86 @@ const SupplierOrderConfirmationPage = () => {
                     >
                       Confirm or Decline Order
                     </Typography>
+                    {confirmError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        <Typography variant="body2" fontWeight={600} mb={1}>
+                          {typeof confirmError === "string"
+                            ? confirmError
+                            : confirmError.message}
+                        </Typography>
+
+                        {confirmError.supportMessage && (
+                          <Typography variant="body2" color="#721c24" mb={1}>
+                            {confirmError.supportMessage}
+                          </Typography>
+                        )}
+
+                        {confirmError.supportContact && (
+                          <Box
+                            sx={{
+                              mt: 1,
+                              p: 2,
+                              backgroundColor: "rgba(114, 28, 36, 0.1)",
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              fontWeight={600}
+                              color="#721c24"
+                              mb={1}
+                            >
+                              📞 Support Contact:
+                            </Typography>
+                            <Typography variant="body2" color="#721c24">
+                              📧 {confirmError.supportContact.email}
+                            </Typography>
+                            {confirmError.supportContact.phone && (
+                              <Typography variant="body2" color="#721c24">
+                                📞 {confirmError.supportContact.phone}
+                              </Typography>
+                            )}
+                            {confirmError.supportContact.instructions && (
+                              <Typography
+                                variant="body2"
+                                color="#721c24"
+                                mt={0.5}
+                                fontStyle="italic"
+                              >
+                                {confirmError.supportContact.instructions}
+                              </Typography>
+                            )}
+                          </Box>
+                        )}
+
+                        {confirmError.nextSteps &&
+                          confirmError.nextSteps.length > 0 && (
+                            <Box sx={{ mt: 1 }}>
+                              <Typography
+                                variant="body2"
+                                fontWeight={600}
+                                color="#721c24"
+                                mb={1}
+                              >
+                                Next Steps:
+                              </Typography>
+                              <Box component="ol" sx={{ pl: 2, m: 0 }}>
+                                {confirmError.nextSteps.map((step, index) => (
+                                  <Typography
+                                    key={index}
+                                    component="li"
+                                    variant="body2"
+                                    color="#721c24"
+                                    sx={{ mb: 0.5 }}
+                                  >
+                                    {step}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            </Box>
+                          )}
+                      </Alert>
+                    )}
                     <Box display="flex" flexDirection="column" gap={2}>
                       <ActionButton
                         variant="contained"
