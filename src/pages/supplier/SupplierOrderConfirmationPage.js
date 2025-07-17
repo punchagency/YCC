@@ -246,9 +246,13 @@ const SupplierOrderConfirmationPage = () => {
         // Store the full error response for better error display
         const errorData = {
           message: data.message || "Failed to confirm order",
+          errorType: data.errorType,
+          retryable: data.retryable,
+          supportRequired: data.supportRequired,
           supportMessage: data.supportMessage,
           supportContact: data.supportContact,
           nextSteps: data.nextSteps,
+          technicalDetails: data.technicalDetails,
         };
         throw new Error(JSON.stringify(errorData));
       }
@@ -636,15 +640,75 @@ const SupplierOrderConfirmationPage = () => {
                       Confirm or Decline Order
                     </Typography>
                     {confirmError && (
-                      <Alert severity="error" sx={{ mb: 2 }}>
+                      <Alert
+                        severity={confirmError.retryable ? "warning" : "error"}
+                        sx={{ mb: 2 }}
+                      >
                         <Typography variant="body2" fontWeight={600} mb={1}>
                           {typeof confirmError === "string"
                             ? confirmError
                             : confirmError.message}
                         </Typography>
 
+                        {/* Show retry message for retryable errors */}
+                        {confirmError.retryable &&
+                          confirmError.errorType === "network" && (
+                            <Box
+                              sx={{
+                                mt: 1,
+                                p: 2,
+                                backgroundColor: "rgba(237, 108, 2, 0.1)",
+                                borderRadius: 1,
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                fontWeight={600}
+                                color="#ed6c02"
+                                mb={1}
+                              >
+                                🔄 This appears to be a temporary network issue
+                              </Typography>
+                              <Typography variant="body2" color="#ed6c02">
+                                You can try confirming the order again. Your
+                                confirmation link is still valid.
+                              </Typography>
+                            </Box>
+                          )}
+
+                        {confirmError.retryable &&
+                          confirmError.errorType === "rate_limit" && (
+                            <Box
+                              sx={{
+                                mt: 1,
+                                p: 2,
+                                backgroundColor: "rgba(237, 108, 2, 0.1)",
+                                borderRadius: 1,
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                fontWeight={600}
+                                color="#ed6c02"
+                                mb={1}
+                              >
+                                ⏱️ The shipping provider is temporarily busy
+                              </Typography>
+                              <Typography variant="body2" color="#ed6c02">
+                                Please wait a few minutes and try confirming
+                                again. Your confirmation link is still valid.
+                              </Typography>
+                            </Box>
+                          )}
+
                         {confirmError.supportMessage && (
-                          <Typography variant="body2" color="#721c24" mb={1}>
+                          <Typography
+                            variant="body2"
+                            color={
+                              confirmError.retryable ? "#ed6c02" : "#721c24"
+                            }
+                            mb={1}
+                          >
                             {confirmError.supportMessage}
                           </Typography>
                         )}
@@ -654,30 +718,46 @@ const SupplierOrderConfirmationPage = () => {
                             sx={{
                               mt: 1,
                               p: 2,
-                              backgroundColor: "rgba(114, 28, 36, 0.1)",
+                              backgroundColor: confirmError.retryable
+                                ? "rgba(237, 108, 2, 0.1)"
+                                : "rgba(114, 28, 36, 0.1)",
                               borderRadius: 1,
                             }}
                           >
                             <Typography
                               variant="body2"
                               fontWeight={600}
-                              color="#721c24"
+                              color={
+                                confirmError.retryable ? "#ed6c02" : "#721c24"
+                              }
                               mb={1}
                             >
                               📞 Support Contact:
                             </Typography>
-                            <Typography variant="body2" color="#721c24">
+                            <Typography
+                              variant="body2"
+                              color={
+                                confirmError.retryable ? "#ed6c02" : "#721c24"
+                              }
+                            >
                               📧 {confirmError.supportContact.email}
                             </Typography>
                             {confirmError.supportContact.phone && (
-                              <Typography variant="body2" color="#721c24">
+                              <Typography
+                                variant="body2"
+                                color={
+                                  confirmError.retryable ? "#ed6c02" : "#721c24"
+                                }
+                              >
                                 📞 {confirmError.supportContact.phone}
                               </Typography>
                             )}
                             {confirmError.supportContact.instructions && (
                               <Typography
                                 variant="body2"
-                                color="#721c24"
+                                color={
+                                  confirmError.retryable ? "#ed6c02" : "#721c24"
+                                }
                                 mt={0.5}
                                 fontStyle="italic"
                               >
@@ -693,7 +773,9 @@ const SupplierOrderConfirmationPage = () => {
                               <Typography
                                 variant="body2"
                                 fontWeight={600}
-                                color="#721c24"
+                                color={
+                                  confirmError.retryable ? "#ed6c02" : "#721c24"
+                                }
                                 mb={1}
                               >
                                 Next Steps:
@@ -704,7 +786,11 @@ const SupplierOrderConfirmationPage = () => {
                                     key={index}
                                     component="li"
                                     variant="body2"
-                                    color="#721c24"
+                                    color={
+                                      confirmError.retryable
+                                        ? "#ed6c02"
+                                        : "#721c24"
+                                    }
                                     sx={{ mb: 0.5 }}
                                   >
                                     {step}
