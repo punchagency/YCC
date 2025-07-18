@@ -33,6 +33,13 @@ import { TruckIcon } from "lucide-react";
 import { buyLabels } from "../../../services/crew/shipmentService";
 import { useToast } from "../../../context/toast/toastContext";
 import { useUser } from "../../../context/userContext";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import {
+  Dialog as MuiDialog,
+  DialogTitle as MuiDialogTitle,
+  DialogContent as MuiDialogContent,
+  DialogActions as MuiDialogActions,
+} from "@mui/material";
 
 // Styled components if needed (copy from details.js if any)
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -43,12 +50,14 @@ const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: "12px",
 }));
 
-function ShipmentRates({ subOrders, refreshOrder }) {
+function ShipmentRates({ subOrders }) {
   const { toast } = useToast();
   const { user } = useUser();
   const [selectedRates, setSelectedRates] = useState({});
   const [buying, setBuying] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [invoiceUrl, setInvoiceUrl] = useState(null);
 
   const eligibleSubOrders = subOrders.filter(
     (so) =>
@@ -88,13 +97,17 @@ function ShipmentRates({ subOrders, refreshOrder }) {
       const data = await buyLabels(selections);
       const failed = (data.results || []).filter((r) => !r.success);
       if (failed.length === 0) {
+        // Show modal with invoice link
+        if (data.invoiceUrl) {
+          setInvoiceUrl(data.invoiceUrl);
+          setInvoiceModalOpen(true);
+        }
         toast.current.show({
           severity: "success",
           summary: "Success",
           detail: "Labels purchased successfully",
         });
-
-        // Call Rewardful conversion tracking after successful label purchase
+        // Rewardful tracking (unchanged)
         if (window.rewardful && user?.email) {
           try {
             window.rewardful("convert", { email: user.email });
@@ -104,7 +117,6 @@ function ShipmentRates({ subOrders, refreshOrder }) {
               "Error tracking Rewardful conversion:",
               rewardfulError
             );
-            // Don't show error to user since this is analytics tracking
           }
         }
       } else {
@@ -116,7 +128,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
         console.log("Failed to purchase labels:", failed);
       }
       setSelectedRates({});
-      if (refreshOrder) await refreshOrder();
+      // No refreshOrder call here
     } catch (err) {
       toast.current.show({
         severity: "error",
@@ -132,6 +144,56 @@ function ShipmentRates({ subOrders, refreshOrder }) {
   const handleConfirmAllClick = () => {
     setConfirmOpen(true);
   };
+
+  // Modern Success Modal
+  const InvoiceModal = () => (
+    <MuiDialog
+      open={invoiceModalOpen}
+      onClose={() => setInvoiceModalOpen(false)}
+      maxWidth="xs"
+      fullWidth
+    >
+      <MuiDialogTitle sx={{ textAlign: "center", pt: 4 }}>
+        <CheckCircleIcon sx={{ fontSize: 60, color: "#38BDF8", mb: 1 }} />
+        <Typography variant="h5" sx={{ fontWeight: 700, mt: 2 }}>
+          Shipping Labels Purchased!
+        </Typography>
+      </MuiDialogTitle>
+      <MuiDialogContent sx={{ textAlign: "center", pb: 2 }}>
+        <Typography variant="body1" sx={{ color: "#374151", mb: 2 }}>
+          Your shipping labels have been purchased successfully.
+          <br />
+          An invoice has been sent to your email. You can also pay now to
+          complete your order.
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          size="large"
+          sx={{ mt: 2, borderRadius: 2, fontWeight: 600, px: 4, boxShadow: 2 }}
+          onClick={() => window.open(invoiceUrl, "_blank")}
+        >
+          Pay Invoice
+        </Button>
+        <Typography
+          variant="caption"
+          sx={{ display: "block", mt: 2, color: "#6b7280" }}
+        >
+          You can always find your invoice in your email if you want to pay
+          later.
+        </Typography>
+      </MuiDialogContent>
+      <MuiDialogActions sx={{ justifyContent: "center", pb: 2 }}>
+        <Button
+          onClick={() => setInvoiceModalOpen(false)}
+          color="inherit"
+          sx={{ fontWeight: 500 }}
+        >
+          Close
+        </Button>
+      </MuiDialogActions>
+    </MuiDialog>
+  );
 
   return (
     <StyledCard>
@@ -280,7 +342,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
             {buying ? "Purchasing..." : "Confirm All"}
           </Button>
         </Box>
-        {/** Confirmation Dialog */}
+        {/* Confirmation Dialog */}
         <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
           <DialogTitle>Purchase Shipping Labels</DialogTitle>
           <DialogContent>
@@ -303,6 +365,8 @@ function ShipmentRates({ subOrders, refreshOrder }) {
             </Button>
           </DialogActions>
         </Dialog>
+        {/* Modern Success Modal */}
+        <InvoiceModal />
       </CardContent>
     </StyledCard>
   );
