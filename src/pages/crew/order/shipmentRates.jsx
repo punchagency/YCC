@@ -94,19 +94,35 @@ function ShipmentRates({ subOrders }) {
     if (selections.length === 0) return;
     setBuying(true);
     try {
+      console.log("selections:", selections);
       const data = await buyLabels(selections);
+
+      // Check if this is an error response (invoice creation failed)
+      if (!data.status) {
+        toast.current.show({
+          severity: "error",
+          summary: "Invoice Error",
+          detail: data.message || "Failed to process order",
+        });
+        return;
+      }
+
       const failed = (data.results || []).filter((r) => !r.success);
+
       if (failed.length === 0) {
-        // Show modal with invoice link
-        if (data.invoiceUrl) {
-          setInvoiceUrl(data.invoiceUrl);
-          setInvoiceModalOpen(true);
-        }
+        // Labels purchased successfully
         toast.current.show({
           severity: "success",
           summary: "Success",
           detail: "Labels purchased successfully",
         });
+
+        // Show invoice modal if invoice was generated
+        if (data.invoiceUrl) {
+          setInvoiceUrl(data.invoiceUrl);
+          setInvoiceModalOpen(true);
+        }
+
         // Rewardful tracking (unchanged)
         if (window.rewardful && user?.email) {
           try {
