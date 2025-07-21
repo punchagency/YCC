@@ -260,6 +260,36 @@ const BookingDetails = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transition:
+                      "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                    boxShadow: "0 2px 8px rgba(26,158,109,0.10)",
+                    cursor: "pointer",
+                    outline: "none",
+                  }}
+                  onClick={() => alert("Message vendor")}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "#23c686";
+                    e.currentTarget.style.transform = "scale(1.04)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 16px rgba(26,158,109,0.18)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "#1A9E6D";
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(26,158,109,0.10)";
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = "2px solid #026bb3";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.outline = "none";
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.transform = "scale(0.98)";
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.transform = "scale(1.04)";
                   }}
                 >
                   <img
@@ -282,6 +312,36 @@ const BookingDetails = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transition:
+                      "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                    boxShadow: "0 2px 8px rgba(3,135,217,0.10)",
+                    cursor: "pointer",
+                    outline: "none",
+                  }}
+                  onClick={() => alert("Call vendor")}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = "#0baaff";
+                    e.currentTarget.style.transform = "scale(1.04)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 16px rgba(3,135,217,0.18)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = "#0387D9";
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(3,135,217,0.10)";
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = "2px solid #026bb3";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.outline = "none";
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.transform = "scale(0.98)";
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.transform = "scale(1.04)";
                   }}
                 >
                   <img
@@ -297,130 +357,7 @@ const BookingDetails = () => {
             </div>
           </div>
           <div className="flex flex-wrap gap-3 mb-4">
-            <button
-              className="booking-action-btn"
-              style={{
-                backgroundColor: "#D5D5D54D",
-                border: "1px solid #D5D5D54D",
-                borderRadius: "12px",
-                width: 150,
-                height: 42,
-                marginRight: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 600,
-                fontSize: 15,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                transition:
-                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
-                cursor: "pointer",
-                outline: "none",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = "#e5e7eb";
-                e.currentTarget.style.transform = "scale(1.04)";
-                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.10)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "#D5D5D54D";
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.outline = "2px solid #026bb3";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.outline = "none";
-              }}
-            >
-              <img
-                src={calendar}
-                alt="calendar"
-                width="18"
-                height="18"
-                className="mr-2"
-              />
-              Reschedule
-            </button>
-            <button
-              className="booking-action-btn"
-              style={{
-                backgroundColor: "#D5D5D54D",
-                border: "1px solid #D5D5D54D",
-                borderRadius: "12px",
-                width: 150,
-                height: 42,
-                marginRight: 8,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 600,
-                fontSize: 15,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-                transition:
-                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
-                cursor: "pointer",
-                outline: "none",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = "#e5e7eb";
-                e.currentTarget.style.transform = "scale(1.04)";
-                e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.10)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "#D5D5D54D";
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.outline = "2px solid #026bb3";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.outline = "none";
-              }}
-              onClick={handleNavigateToModifyService}
-            >
-              <img
-                src={editLogo}
-                alt="editLogo"
-                width="18"
-                height="18"
-                className="mr-2"
-              />
-              Modify Service
-            </button>
-            <button
-              className="booking-action-btn"
-              style={{
-                backgroundColor: "#EF444433",
-                border: "1px solid #EF444433",
-                borderRadius: "12px",
-                width: 150,
-                height: 42,
-                fontWeight: 600,
-                fontSize: 15,
-                boxShadow: "0 2px 8px rgba(239,68,68,0.10)",
-                transition:
-                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
-                cursor: "pointer",
-                outline: "none",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = "#fca5a5";
-                e.currentTarget.style.transform = "scale(1.04)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 16px rgba(239,68,68,0.18)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "#EF444433";
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(239,68,68,0.10)";
-              }}
-            >
-              Cancel
-            </button>
+            {/* Removed Reschedule, Modify Service, and Cancel buttons as requested */}
           </div>
         </div>
         <div
@@ -519,6 +456,35 @@ const BookingDetails = () => {
                 border: "1px solid #EF4444",
                 marginTop: "10px",
                 fontSize: isMobile ? 15 : 16,
+                transition:
+                  "background 0.18s, transform 0.18s, box-shadow 0.18s",
+                boxShadow: "0 2px 8px rgba(239,68,68,0.10)",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = "#f87171";
+                e.currentTarget.style.transform = "scale(1.04)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 16px rgba(239,68,68,0.18)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = "#EF4444";
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow =
+                  "0 2px 8px rgba(239,68,68,0.10)";
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.outline = "2px solid #026bb3";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.outline = "none";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "scale(0.98)";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "scale(1.04)";
               }}
             >
               Submit

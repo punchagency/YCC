@@ -587,6 +587,7 @@ const GlobalSearchModal = ({
       onHide={onHide}
       header={dialogHeader}
       className="global-search-modal"
+      hideOverlaysOnDocumentScrolling={false}
       style={{
         width: "80vw",
         maxWidth: "800px",

@@ -109,7 +109,7 @@ const LoginForm = ({ onClose }) => {
         } else if (userRole === "admin") {
           navigate("/admin/dashboard");
         } else if (userRole === "supplier") {
-          navigate("/supplier/onboarding");
+          navigate("/supplier/dashboard");
         } else if (userRole === "service_provider") {
           navigate("/vendor/onboarding");
         }

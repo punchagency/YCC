@@ -898,12 +898,165 @@ const CartPage = () => {
       <CheckoutDialog
         open={showCheckoutDialog}
         onClose={() => setShowCheckoutDialog(false)}
-        cart={cart}
-        onCheckout={handleCheckout}
-        loading={checkoutLoading}
-        checkoutData={checkoutData}
-        setCheckoutData={setCheckoutData}
-      />
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow:
+              "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, color: "#111827" }}>
+            Complete Your Order
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Delivery Address"
+              multiline
+              rows={3}
+              value={checkoutData.deliveryAddress}
+              onChange={(e) =>
+                setCheckoutData({
+                  ...checkoutData,
+                  deliveryAddress: e.target.value,
+                })
+              }
+              required
+              sx={{ mb: 3 }}
+            />
+
+            <TextField
+              fullWidth
+              label="Delivery Date"
+              type="date"
+              value={
+                checkoutData.deliveryDate
+                  ? checkoutData.deliveryDate.toISOString().split("T")[0]
+                  : ""
+              }
+              onChange={(e) =>
+                setCheckoutData({
+                  ...checkoutData,
+                  deliveryDate: e.target.value
+                    ? new Date(e.target.value)
+                    : null,
+                })
+              }
+              required
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 3 }}
+            />
+
+            <TextField
+              fullWidth
+              label="Additional Notes"
+              multiline
+              rows={3}
+              value={checkoutData.additionalNotes}
+              onChange={(e) =>
+                setCheckoutData({
+                  ...checkoutData,
+                  additionalNotes: e.target.value,
+                })
+              }
+              placeholder="Any special instructions or notes..."
+            />
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography
+              variant="h6"
+              sx={{ mb: 2, fontWeight: 600, color: "#111827" }}
+            >
+              Order Summary
+            </Typography>
+
+            <Box sx={{ mb: 2 }}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
+                <Typography variant="body1" sx={{ color: "#6b7280" }}>
+                  Total Items:
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {cart.totalItems}
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
+                <Typography variant="body1" sx={{ color: "#6b7280" }}>
+                  Subtotal:
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {formatCurrency(cart.totalPrice)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
+              >
+                <Typography variant="body1" sx={{ color: "#6b7280" }}>
+                  Platform Fee:
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {formatCurrency(cart.platformFee)}
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, color: "#111827" }}
+                >
+                  Grand Total:
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, color: "#0387D9" }}
+                >
+                  {formatCurrency(cart.grandTotal)}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={() => setShowCheckoutDialog(false)}
+            sx={{ color: "#6b7280" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleCheckout}
+            loading={checkoutLoading}
+            disabled={
+              !checkoutData.deliveryAddress ||
+              !checkoutData.deliveryDate ||
+              checkoutLoading
+            }
+            startIcon={
+              checkoutLoading ? <CircularProgress size={20} /> : <PaymentIcon />
+            }
+            sx={{
+              backgroundColor: "#0387D9",
+              "&:hover": {
+                backgroundColor: "#0277bd",
+              },
+            }}
+          >
+            {checkoutLoading ? "Processing..." : "Place Order"}
+          </Button>
+        </DialogActions>
+      </CheckoutDialog>
 
       {/* Clear Cart Confirmation Dialog */}
       <Dialog

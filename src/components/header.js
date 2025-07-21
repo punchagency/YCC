@@ -511,32 +511,45 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                         justifyContent: "center",
                       }}
                     >
-                      <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                      <span
+                        className="cart-badge-loading"
+                        style={{
+                          width: 14,
+                          height: 14,
+                          border: "2px solid #0387D9",
+                          borderTop: "2px solid #fff",
+                          borderRadius: "50%",
+                          display: "inline-block",
+                          animation: "spin 1s linear infinite",
+                        }}
+                      />
                     </div>
-                  ) : cartCount > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "6px",
-                        right: "2px",
-                        minWidth: "16px",
-                        height: "16px",
-                        backgroundColor: "#FF4B4B",
-                        borderRadius: "50%",
-                        border: "2px solid #fff",
-                        fontSize: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "white",
-                        fontWeight: "bold",
-                        padding: "0 4px",
-                        zIndex: 2,
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                      }}
-                    >
-                      {cartCount > 99 ? '99+' : cartCount}
-                    </div>
+                  ) : (
+                    cartCount > 0 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "6px",
+                          right: "2px",
+                          minWidth: "16px",
+                          height: "16px",
+                          backgroundColor: "#FF4B4B",
+                          borderRadius: "50%",
+                          border: "2px solid #fff",
+                          fontSize: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontWeight: "bold",
+                          padding: "0 4px",
+                          zIndex: 2,
+                          boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                        }}
+                      >
+                        {cartCount > 99 ? "99+" : cartCount}
+                      </div>
+                    )
                   )}
                 </button>
               )}
@@ -631,6 +644,7 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
         ref={overlayPanelRef}
         className="notification-overlay"
         style={{ width: "320px", padding: "16px" }}
+        hideOverlaysOnDocumentScrolling={false}
       >
         <div className="flex align-items-center justify-content-between mb-3">
           <div className="flex align-items-center">
@@ -837,32 +851,45 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
                   justifyContent: "center",
                 }}
               >
-                <span className="cart-badge-loading" style={{ width: 14, height: 14, border: '2px solid #0387D9', borderTop: '2px solid #fff', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }} />
+                <span
+                  className="cart-badge-loading"
+                  style={{
+                    width: 14,
+                    height: 14,
+                    border: "2px solid #0387D9",
+                    borderTop: "2px solid #fff",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                    animation: "spin 1s linear infinite",
+                  }}
+                />
               </div>
-            ) : cartCount > 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "6px",
-                  right: "2px",
-                  minWidth: "16px",
-                  height: "16px",
-                  backgroundColor: "#FF4B4B",
-                  borderRadius: "50%",
-                  border: "2px solid #fff",
-                  fontSize: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontWeight: "bold",
-                  padding: "0 4px",
-                  zIndex: 2,
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-                }}
-              >
-                {cartCount > 99 ? '99+' : cartCount}
-              </div>
+            ) : (
+              cartCount > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "6px",
+                    right: "2px",
+                    minWidth: "16px",
+                    height: "16px",
+                    backgroundColor: "#FF4B4B",
+                    borderRadius: "50%",
+                    border: "2px solid #fff",
+                    fontSize: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "white",
+                    fontWeight: "bold",
+                    padding: "0 4px",
+                    zIndex: 2,
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  {cartCount > 99 ? "99+" : cartCount}
+                </div>
+              )
             )}
           </button>
         )}

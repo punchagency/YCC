@@ -53,6 +53,9 @@ import SupplierOnboardingStep2 from "./components/onboarding/supplier/supplier-o
 import VendorOnboarding from "./pages/onboarding/vendor-onboarding";
 import VendorOnboardingStep2 from "./components/onboarding/vendor/vendor-onboarding-step2";
 import CrewDashboard from "./pages/dashboard/crew/dashboard";
+import SupplierDashboard from "./pages/dashboard/supplier/dashboard";
+import SupplierSettings from "./pages/supplier/settings";
+import SupplierProfile from "./pages/supplier/profile";
 import CrewCalendar from "./pages/crew/calendar/calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CrewFinancialManagement from "./pages/crew/financial-management/financial-management";
@@ -80,6 +83,7 @@ import DocumentList from "./pages/crew/document/documentlist";
 import DocumentView from "./pages/crew/document/documentview";
 import CartPage from "./pages/crew/cart";
 import { CartProvider } from "./context/cart/cartContext";
+import EditInventory from "./pages/invent/edit-inventory";
 import SupplierOrderConfirmationPage from "./pages/supplier/SupplierOrderConfirmationPage";
 
 // Add AuthCheck component
@@ -220,6 +224,54 @@ function App() {
                     <Route
                       path="/admin/inventory-management/:inventoryId"
                       element={<Invent />}
+                    />
+                    <Route
+                      path="/admin/financial-management"
+                      element={<AdminFinancialManagement />}
+                    />
+                    <Route
+                      path="/admin/calendar-management"
+                      element={<Calendar />}
+                    />
+                    <Route
+                      path="/admin/notifications"
+                      element={<Notifications />}
+                    />
+                    <Route path="/admin/reports" element={<Reports />} />
+                    <Route path="/admin/settings" element={<CrewSetting />} />
+                    <Route path="/admin/approve" element={<ApprovePage />} />
+                  </Route>
+                  {/* Protected Routes - Require Authentication */}
+                  {/* Admin Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route path="/admin/profile" element={<Profile />} />
+                    <Route
+                      path="/admin/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["admin"]}>
+                          <AdminDashboard1 />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/bookings-management"
+                      element={<Bookings />}
+                    />
+                    <Route
+                      path="/admin/orders-management"
+                      element={<Order />}
+                    />
+                    <Route
+                      path="/admin/inventory-management"
+                      element={<Invent />}
+                    />
+                    <Route
+                      path="/admin/inventory-management/:inventoryId"
+                      element={<Invent />}
+                    />
+                    <Route
+                      path="/admin/inventory-management/edit/:id"
+                      element={<EditInventory />}
                     />
                     <Route
                       path="/admin/financial-management"
@@ -390,6 +442,50 @@ function App() {
                       element={
                         <ProtectedRoute requiredRoles={["crew_member"]}>
                           <DocumentView />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
+
+                  {/* Supplier Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route
+                      path="/supplier/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/inventory"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <Invent />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/inventory/:inventoryId"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <Invent />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/settings"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierSettings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/profile"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierProfile />
                         </ProtectedRoute>
                       }
                     />

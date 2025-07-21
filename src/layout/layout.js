@@ -18,8 +18,19 @@ import "../styles/layout.css";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import DashboardTitleBar from "../components/dashboard/title-bar";
+import { useUser } from "../context/userContext";
 
 const AdminLayout = ({ role }) => {
+  const { user } = useUser();
+
+  // Get role name from object or string
+  let userRole = user?.role;
+  if (typeof userRole === "object" && userRole.name) {
+    userRole = userRole.name;
+  }
+
+  // Determine the actual role to use
+  const actualRole = role || userRole;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
   const [backArrow, setBackArrow] = useState(false);
@@ -117,6 +128,12 @@ const AdminLayout = ({ role }) => {
   // Determine if we should show the create booking button
   const shouldShowCreateBookingButton = pageTitle === "Bookings";
 
+  // Determine if we should show the create order button
+  const shouldShowCreateOrderButton = pageTitle === "Orders";
+
+  // Determine if we should show the create inventory button
+  const shouldShowCreateInventoryButton = pageTitle === "Inventory";
+
   // Create Booking button (using existing style and logic)
   const createBookingButton = (
     <button
@@ -170,6 +187,59 @@ const AdminLayout = ({ role }) => {
     </button>
   );
 
+  // Create Order button (similar style to booking button)
+  const createOrderButton = (
+    <button
+      onClick={() => {
+        // Trigger the existing modal in the order pages
+        const event = new CustomEvent("openCreateOrderModal");
+        window.dispatchEvent(event);
+      }}
+      style={{
+        backgroundColor: "#0387D9",
+        color: "white",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "background 0.2s, transform 0.2s",
+        outline: "none",
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor = "#026bb3";
+        e.currentTarget.style.transform = "scale(1.02)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = "#0387D9";
+        e.currentTarget.style.transform = "scale(1)";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = "2px solid #026bb3";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline = "none";
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Create Order
+    </button>
+  );
+
   return (
     <ThemeProvider>
       <ToastProvider>
@@ -185,7 +255,7 @@ const AdminLayout = ({ role }) => {
                           <main className="flex page relative wrapper">
                             {!shouldHideLeftPanel && (
                               <LeftMenu
-                                role={role}
+                                role={actualRole}
                                 isCollapsed={isCollapsed}
                                 setIsCollapsed={setIsCollapsed}
                               />
@@ -215,9 +285,80 @@ const AdminLayout = ({ role }) => {
                                   title={pageTitle}
                                   backArrow={backArrow}
                                   button={
-                                    shouldShowCreateBookingButton
-                                      ? createBookingButton
-                                      : null
+                                    shouldShowCreateBookingButton ? (
+                                      createBookingButton
+                                    ) : shouldShowCreateOrderButton ? (
+                                      createOrderButton
+                                    ) : shouldShowCreateInventoryButton ? (
+                                      <button
+                                        onClick={() => {
+                                          // Trigger the existing modal in the inventory pages
+                                          const event = new CustomEvent(
+                                            "openCreateInventoryModal"
+                                          );
+                                          window.dispatchEvent(event);
+                                        }}
+                                        style={{
+                                          backgroundColor: "#0387D9",
+                                          color: "white",
+                                          padding: "8px 16px",
+                                          borderRadius: "8px",
+                                          border: "none",
+                                          cursor: "pointer",
+                                          fontWeight: "600",
+                                          fontSize: "14px",
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "6px",
+                                          transition:
+                                            "background 0.2s, transform 0.2s",
+                                          outline: "none",
+                                        }}
+                                        onMouseOver={(e) => {
+                                          e.currentTarget.style.backgroundColor =
+                                            "#026bb3";
+                                          e.currentTarget.style.transform =
+                                            "scale(1.02)";
+                                        }}
+                                        onMouseOut={(e) => {
+                                          e.currentTarget.style.backgroundColor =
+                                            "#0387D9";
+                                          e.currentTarget.style.transform =
+                                            "scale(1)";
+                                        }}
+                                        onFocus={(e) => {
+                                          e.currentTarget.style.outline =
+                                            "2px solid #026bb3";
+                                        }}
+                                        onBlur={(e) => {
+                                          e.currentTarget.style.outline =
+                                            "none";
+                                        }}
+                                      >
+                                        <svg
+                                          width="16"
+                                          height="16"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                        >
+                                          <line
+                                            x1="12"
+                                            y1="5"
+                                            x2="12"
+                                            y2="19"
+                                          ></line>
+                                          <line
+                                            x1="5"
+                                            y1="12"
+                                            x2="19"
+                                            y2="12"
+                                          ></line>
+                                        </svg>
+                                        Add New Product
+                                      </button>
+                                    ) : null
                                   }
                                 />
                               </div>
