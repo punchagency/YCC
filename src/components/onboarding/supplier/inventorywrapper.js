@@ -40,11 +40,19 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
     setEditedItem({
       name: inventoryItem.product.name,
       category: inventoryItem.product.category,
-      serviceArea: inventoryItem.product.serviceArea || '',
+      serviceArea: inventoryItem.product.serviceArea || "",
       quantity: inventoryItem.quantity,
       sku: inventoryItem.product.sku,
       price: formatAmount(inventoryItem.price), // Format price for display
-      warehouseLocation: inventoryItem.warehouseLocation || '',
+      warehouseLocation: inventoryItem.warehouseLocation || "",
+      description: inventoryItem.product.description || "",
+      hsCode: inventoryItem.product.hsCode || "",
+      countryOfOrigin: inventoryItem.product.countryOfOrigin || "",
+      weight: inventoryItem.product.weight || "",
+      height: inventoryItem.product.height || "",
+      length: inventoryItem.product.length || "",
+      width: inventoryItem.product.width || "",
+      productImage: inventoryItem.product.productImage || "",
     });
     setOpen(true);
   };
@@ -66,11 +74,23 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
         serviceArea: editedItem.serviceArea,
         quantity: Number(editedItem.quantity),
         price: unformatAmount(editedItem.price), // Convert formatted price back to number
-        sku: editedItem.sku || '',
-        warehouseLocation: editedItem.warehouseLocation || '',
+        sku: editedItem.sku || "",
+        warehouseLocation: editedItem.warehouseLocation || "",
+        description: editedItem.description || "",
+        hsCode: editedItem.hsCode || "",
+        countryOfOrigin: editedItem.countryOfOrigin || "",
+        weight: Number(editedItem.weight) || "",
+        height: Number(editedItem.height) || "",
+        length: Number(editedItem.length) || "",
+        width: Number(editedItem.width) || "",
+        productImage: editedItem.productImage || "",
       };
 
-      const result = await updateInventoryItem(selectedItem._id, updateData, userId);
+      const result = await updateInventoryItem(
+        selectedItem._id,
+        updateData,
+        userId
+      );
 
       if (result.success) {
         // Update the local inventory data with the correct data structure
@@ -109,14 +129,14 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
 
   const handleChange = (field) => (event) => {
     const value = event.target.value;
-    
-    if (field === 'price') {
+
+    if (field === "price") {
       // Handle price formatting
       const formattedValue = formatAmount(value);
-      
+
       setEditedItem({
         ...editedItem,
-        [field]: formattedValue
+        [field]: formattedValue,
       });
     } else {
       setEditedItem({
@@ -127,48 +147,51 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
   };
 
   return (
-    <Box sx={{ 
-      display: "flex", 
-      flexDirection: "column", 
-      height: "100%", 
-      overflow: 'auto', 
-      gap: 2,
-      px: { xs: 2, sm: 3 }
-    }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        overflow: "auto",
+        gap: 2,
+        px: { xs: 2, sm: 3 },
+      }}
+    >
       <Toast ref={toast} />
-      <Alert 
-        severity="info" 
+      <Alert
+        severity="info"
         icon={<EditIcon />}
-        sx={{ 
+        sx={{
           flexShrink: 0,
-          '& .MuiAlert-message': {
-            fontSize: { xs: '14px', sm: '16px' }
-          }
+          "& .MuiAlert-message": {
+            fontSize: { xs: "14px", sm: "16px" },
+          },
         }}
       >
         <Typography variant="body1">
-          Click on any product row to see the full details or to edit its content.
+          Click on any product row to see the full details or to edit its
+          content.
         </Typography>
       </Alert>
 
-      <TableContainer 
+      <TableContainer
         component={Paper}
-        sx={{ 
-          height: '100%',
-          overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-            height: '8px',
+        sx={{
+          height: "100%",
+          overflow: "auto",
+          "&::-webkit-scrollbar": {
+            width: "8px",
+            height: "8px",
           },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '4px',
+          "&::-webkit-scrollbar-track": {
+            background: "#f1f1f1",
+            borderRadius: "4px",
           },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#888',
-            borderRadius: '4px',
-            '&:hover': {
-              background: '#555',
+          "&::-webkit-scrollbar-thumb": {
+            background: "#888",
+            borderRadius: "4px",
+            "&:hover": {
+              background: "#555",
             },
           },
         }}
@@ -176,69 +199,59 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  width: { xs: '50%', sm: '30%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  width: { xs: "50%", sm: "30%" },
                 }}
               >
                 Product Name
               </TableCell>
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  display: { xs: 'none', sm: 'table-cell' },
-                  width: { sm: '25%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  display: { xs: "none", sm: "table-cell" },
+                  width: { sm: "25%" },
                 }}
               >
-                Product Category
+                Category
               </TableCell>
-              {/* <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  display: { xs: 'none', sm: 'table-cell' },
-                  width: { sm: '20%' }
-                }}
-              >
-                Service Area
-              </TableCell> */}
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  width: { xs: '25%', sm: '10%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  width: { xs: "25%", sm: "10%" },
                 }}
               >
                 Quantity
               </TableCell>
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  display: { xs: 'none', sm: 'table-cell' },
-                  width: { sm: '15%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  display: { xs: "none", sm: "table-cell" },
+                  width: { sm: "15%" },
                 }}
               >
                 SKU
               </TableCell>
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  display: { xs: 'none', md: 'table-cell' },
-                  width: { md: '15%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  display: { xs: "none", md: "table-cell" },
+                  width: { md: "15%" },
                 }}
               >
-                Warehouse Location
+                HS Code
               </TableCell>
-              <TableCell 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  backgroundColor: '#f5f5f5',
-                  width: { xs: '25%', sm: '10%' }
+              <TableCell
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  width: { xs: "25%", sm: "10%" },
                 }}
               >
                 Price
@@ -258,78 +271,64 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
                   "&:last-child td, &:last-child th": { border: 0 },
                 }}
               >
-                <TableCell 
-                  sx={{ 
-                    maxWidth: { xs: '150px', sm: '200px' },
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                <TableCell
+                  sx={{
+                    maxWidth: { xs: "150px", sm: "200px" },
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                   title={item.product.name}
                 >
                   {item.product.name}
                 </TableCell>
-                <TableCell 
-                  sx={{ 
-                    display: { xs: 'none', sm: 'table-cell' },
-                    maxWidth: '150px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                <TableCell
+                  sx={{
+                    display: { xs: "none", sm: "table-cell" },
+                    maxWidth: "150px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                   title={item.product.category}
                 >
                   {item.product.category}
                 </TableCell>
-                {/* <TableCell 
-                  sx={{ 
-                    display: { xs: 'none', sm: 'table-cell' },
-                    maxWidth: '120px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
-                  title={item.product.serviceArea || "N/A"}
-                >
-                  {item.product.serviceArea || "N/A"}
-                </TableCell> */}
-                <TableCell>
-                  {item.quantity}
-                </TableCell>
-                <TableCell 
-                  sx={{ 
-                    display: { xs: 'none', sm: 'table-cell' },
-                    maxWidth: '120px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell
+                  sx={{
+                    display: { xs: "none", sm: "table-cell" },
+                    maxWidth: "120px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                   title={item.product.sku}
                 >
                   {item.product.sku}
                 </TableCell>
-                <TableCell 
-                  sx={{ 
-                    display: { xs: 'none', md: 'table-cell' },
-                    maxWidth: '120px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                <TableCell
+                  sx={{
+                    display: { xs: "none", md: "table-cell" },
+                    maxWidth: "120px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
-                  title={item.warehouseLocation || "N/A"}
+                  title={item.product.hsCode || "N/A"}
                 >
-                  {item.warehouseLocation || "N/A"}
+                  {item.product.hsCode || "N/A"}
                 </TableCell>
                 <TableCell
-                  sx={{ 
-                    maxWidth: { xs: '150px', sm: '100px' },
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
+                  sx={{
+                    maxWidth: { xs: "150px", sm: "100px" },
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
-                  title={`$${formatAmount(item.price)}`}
+                  title={`$${formatAmount(item.product.price)}`}
                 >
-                  ${formatAmount(item.price)}
+                  ${formatAmount(item.product.price)}
                 </TableCell>
               </TableRow>
             ))}
@@ -337,67 +336,123 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth disablePortal>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        disablePortal
+      >
         <DialogTitle>Edit Product Details</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
             <TextField
               label="Product Name"
-              value={editedItem?.name || ''}
-              onChange={handleChange('name')}
+              value={editedItem?.name || ""}
+              onChange={handleChange("name")}
               fullWidth
             />
             <TextField
               label="Product Category"
-              value={editedItem?.category || ''}
-              onChange={handleChange('category')}
+              value={editedItem?.category || ""}
+              onChange={handleChange("category")}
               fullWidth
             />
-            {/* <TextField
-              label="Service Area"
-              value={editedItem?.serviceArea || ''}
-              onChange={handleChange('serviceArea')}
+            <TextField
+              label="Description"
+              value={editedItem?.description || ""}
+              onChange={handleChange("description")}
               fullWidth
-            /> */}
+              multiline
+              minRows={2}
+            />
+            <TextField
+              label="HS Code"
+              value={editedItem?.hsCode || ""}
+              onChange={handleChange("hsCode")}
+              fullWidth
+            />
+            <TextField
+              label="Country of Origin"
+              value={editedItem?.countryOfOrigin || ""}
+              onChange={handleChange("countryOfOrigin")}
+              fullWidth
+            />
+            <TextField
+              label="Weight"
+              type="number"
+              value={editedItem?.weight || ""}
+              onChange={handleChange("weight")}
+              fullWidth
+            />
+            <TextField
+              label="Height"
+              type="number"
+              value={editedItem?.height || ""}
+              onChange={handleChange("height")}
+              fullWidth
+            />
+            <TextField
+              label="Length"
+              type="number"
+              value={editedItem?.length || ""}
+              onChange={handleChange("length")}
+              fullWidth
+            />
+            <TextField
+              label="Width"
+              type="number"
+              value={editedItem?.width || ""}
+              onChange={handleChange("width")}
+              fullWidth
+            />
             <TextField
               label="Quantity"
               type="number"
-              value={editedItem?.quantity || ''}
-              onChange={handleChange('quantity')}
+              value={editedItem?.quantity || ""}
+              onChange={handleChange("quantity")}
               fullWidth
             />
             <TextField
               label="SKU"
-              value={editedItem?.sku || ''}
-              onChange={handleChange('sku')}
+              value={editedItem?.sku || ""}
+              onChange={handleChange("sku")}
               fullWidth
             />
             <TextField
               label="Warehouse Location"
-              value={editedItem?.warehouseLocation || ''}
-              onChange={handleChange('warehouseLocation')}
+              value={editedItem?.warehouseLocation || ""}
+              onChange={handleChange("warehouseLocation")}
               fullWidth
             />
             <TextField
               label="Price"
-              value={editedItem?.price || ''}
-              onChange={handleChange('price')}
+              value={editedItem?.price || ""}
+              onChange={handleChange("price")}
               fullWidth
               InputProps={{
-                startAdornment: <span>$</span>
+                startAdornment: <span>$</span>,
               }}
+            />
+            <TextField
+              label="Product Image URL"
+              value={editedItem?.productImage || ""}
+              onChange={handleChange("productImage")}
+              fullWidth
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={isLoading}>Cancel</Button>
-          <Button 
-            onClick={handleSave} 
-            variant="contained" 
+          <Button onClick={handleClose} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
             disabled={isLoading}
             startIcon={isLoading ? <CircularProgress size={20} /> : null}
           >
-            {isLoading ? 'Saving...' : 'Save'}
+            {isLoading ? "Saving..." : "Save"}
           </Button>
         </DialogActions>
       </Dialog>
