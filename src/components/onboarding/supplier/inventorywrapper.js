@@ -24,7 +24,7 @@ import { Toast } from "primereact/toast";
 import { useParams } from "react-router-dom";
 import { formatAmount, unformatAmount } from "../../../utils/formatAmount";
 
-const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
+const InventoryWrapper = ({ inventoryData, onInventoryUpdate, role }) => {
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [editedItem, setEditedItem] = useState(null);
@@ -43,7 +43,7 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
       serviceArea: inventoryItem.product.serviceArea || "",
       quantity: inventoryItem.quantity,
       sku: inventoryItem.product.sku,
-      price: formatAmount(inventoryItem.price), // Format price for display
+      price: formatAmount(inventoryItem.product.price), // Format price for display
       warehouseLocation: inventoryItem.warehouseLocation || "",
       description: inventoryItem.product.description || "",
       hsCode: inventoryItem.product.hsCode || "",
@@ -69,25 +69,27 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
     setIsLoading(true);
     try {
       const updateData = {
-        productName: editedItem.name,
+        productId: selectedItem.product._id, // Ensure productId is included
+        name: editedItem.name,
+        description: editedItem.description,
         category: editedItem.category,
-        serviceArea: editedItem.serviceArea,
+        sku: editedItem.sku,
+        hsCode: editedItem.hsCode,
+        countryOfOrigin: editedItem.countryOfOrigin,
+        weight: editedItem.weight,
+        height: editedItem.height,
+        length: editedItem.length,
+        width: editedItem.width,
+        productImage: editedItem.productImage,
         quantity: Number(editedItem.quantity),
-        price: unformatAmount(editedItem.price), // Convert formatted price back to number
-        sku: editedItem.sku || "",
-        warehouseLocation: editedItem.warehouseLocation || "",
-        description: editedItem.description || "",
-        hsCode: editedItem.hsCode || "",
-        countryOfOrigin: editedItem.countryOfOrigin || "",
-        weight: Number(editedItem.weight) || "",
-        height: Number(editedItem.height) || "",
-        length: Number(editedItem.length) || "",
-        width: Number(editedItem.width) || "",
-        productImage: editedItem.productImage || "",
+        price: unformatAmount(editedItem.price),
+        warehouseLocation: editedItem.warehouseLocation,
+        userId,
+        role,
       };
 
       const result = await updateInventoryItem(
-        selectedItem._id,
+        selectedItem.inventoryId,
         updateData,
         userId
       );
@@ -95,10 +97,27 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
       if (result.success) {
         // Update the local inventory data with the correct data structure
         const updatedInventory = result.data.data;
-        if (onInventoryUpdate) {
-          onInventoryUpdate(updatedInventory);
+        // Find the updated product entry in the returned inventory
+        let updatedProductEntry = null;
+        if (updatedInventory && updatedInventory.products) {
+          updatedProductEntry = updatedInventory.products.find(
+            (p) => p.product && p.product._id === selectedItem.product._id
+          );
         }
-
+        if (onInventoryUpdate && updatedProductEntry) {
+          // Merge updated product and inventory fields for UI
+          onInventoryUpdate({
+            ...selectedItem,
+            ...updatedProductEntry,
+            product: {
+              ...selectedItem.product,
+              ...updatedProductEntry.product,
+            },
+            quantity: updatedProductEntry.quantity,
+            price: updatedProductEntry.product.price,
+            warehouseLocation: updatedInventory.warehouseLocation,
+          });
+        }
         toast.current.show({
           severity: "success",
           summary: "Success",
@@ -419,12 +438,12 @@ const InventoryWrapper = ({ inventoryData, onInventoryUpdate }) => {
               onChange={handleChange("sku")}
               fullWidth
             />
-            <TextField
+            {/* <TextField
               label="Warehouse Location"
               value={editedItem?.warehouseLocation || ""}
               onChange={handleChange("warehouseLocation")}
               fullWidth
-            />
+            /> */}
             <TextField
               label="Price"
               value={editedItem?.price || ""}
