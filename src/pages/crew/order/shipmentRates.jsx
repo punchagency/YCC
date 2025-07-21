@@ -50,7 +50,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: "12px",
 }));
 
-function ShipmentRates({ subOrders }) {
+function ShipmentRates({ subOrders, refreshOrder }) {
   const { toast } = useToast();
   const { user } = useUser();
   const [selectedRates, setSelectedRates] = useState({});
@@ -161,11 +161,18 @@ function ShipmentRates({ subOrders }) {
     setConfirmOpen(true);
   };
 
+  const handleInvoiceModalClose = () => {
+    setInvoiceModalOpen(false);
+    if (typeof refreshOrder === "function") {
+      refreshOrder();
+    }
+  };
+
   // Modern Success Modal
   const InvoiceModal = () => (
     <MuiDialog
       open={invoiceModalOpen}
-      onClose={() => setInvoiceModalOpen(false)}
+      onClose={handleInvoiceModalClose}
       maxWidth="xs"
       fullWidth
     >
@@ -201,7 +208,7 @@ function ShipmentRates({ subOrders }) {
       </MuiDialogContent>
       <MuiDialogActions sx={{ justifyContent: "center", pb: 2 }}>
         <Button
-          onClick={() => setInvoiceModalOpen(false)}
+          onClick={handleInvoiceModalClose}
           color="inherit"
           sx={{ fontWeight: 500 }}
         >
