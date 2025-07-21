@@ -1,11 +1,11 @@
-import axios from 'axios';
-import { buildApiUrl } from '../../utils/apiUtils';
+import axios from "axios";
+import { buildApiUrl } from "../../utils/apiUtils";
 
 /**
  * Get authentication headers
  */
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -13,19 +13,25 @@ const getAuthHeaders = () => {
  * Add product to cart
  * @param {Object} params - Add to cart parameters
  * @param {string} params.inventoryId - Inventory ID
+ * @param {string} params.productId - Product ID
  * @param {number} params.quantity - Quantity to add
  * @returns {Promise<Object>} Updated cart
  */
 export const addToCart = async (params) => {
   try {
-    const response = await axios.post(
-      buildApiUrl('carts/add'),
-      params,
-      { headers: getAuthHeaders() }
-    );
+    // Validate required parameters
+    if (!params.inventoryId || !params.productId) {
+      throw new Error("Both inventoryId and productId are required");
+    }
+
+    console.log("[CartService] Adding to cart:", params);
+
+    const response = await axios.post(buildApiUrl("carts/add"), params, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    console.error("Error adding to cart:", error);
     throw error;
   }
 };
@@ -36,13 +42,12 @@ export const addToCart = async (params) => {
  */
 export const getCart = async () => {
   try {
-    const response = await axios.get(
-      buildApiUrl('carts'),
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.get(buildApiUrl("carts"), {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching cart:', error);
+    console.error("Error fetching cart:", error);
     throw error;
   }
 };
@@ -53,13 +58,12 @@ export const getCart = async () => {
  */
 export const getCartSummary = async () => {
   try {
-    const response = await axios.get(
-      buildApiUrl('carts/summary'),
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.get(buildApiUrl("carts/summary"), {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching cart summary:', error);
+    console.error("Error fetching cart summary:", error);
     throw error;
   }
 };
@@ -68,19 +72,27 @@ export const getCartSummary = async () => {
  * Update product quantity in cart
  * @param {Object} params - Update parameters
  * @param {string} params.inventoryId - Inventory ID
+ * @param {string} params.productId - Product ID
  * @param {number} params.quantity - New quantity
  * @returns {Promise<Object>} Updated cart
  */
 export const updateCartQuantity = async (params) => {
   try {
+    // Validate required parameters
+    if (!params.inventoryId || !params.productId) {
+      throw new Error("Both inventoryId and productId are required");
+    }
+
+    console.log("[CartService] Updating cart quantity:", params);
+
     const response = await axios.put(
-      buildApiUrl('carts/update-quantity'),
+      buildApiUrl("carts/update-quantity"),
       params,
       { headers: getAuthHeaders() }
     );
     return response.data;
   } catch (error) {
-    console.error('Error updating cart quantity:', error);
+    console.error("Error updating cart quantity:", error);
     throw error;
   }
 };
@@ -89,20 +101,25 @@ export const updateCartQuantity = async (params) => {
  * Remove product from cart
  * @param {Object} params - Remove parameters
  * @param {string} params.inventoryId - Inventory ID
+ * @param {string} params.productId - Product ID
  * @returns {Promise<Object>} Updated cart
  */
 export const removeFromCart = async (params) => {
   try {
-    const response = await axios.delete(
-      buildApiUrl('carts/remove'),
-      { 
-        data: params,
-        headers: getAuthHeaders() 
-      }
-    );
+    // Validate required parameters
+    if (!params.inventoryId || !params.productId) {
+      throw new Error("Both inventoryId and productId are required");
+    }
+
+    console.log("[CartService] Removing from cart:", params);
+
+    const response = await axios.delete(buildApiUrl("carts/remove"), {
+      data: params,
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error removing from cart:', error);
+    console.error("Error removing from cart:", error);
     throw error;
   }
 };
@@ -113,13 +130,12 @@ export const removeFromCart = async (params) => {
  */
 export const clearCart = async () => {
   try {
-    const response = await axios.delete(
-      buildApiUrl('carts/clear'),
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.delete(buildApiUrl("carts/clear"), {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error clearing cart:', error);
+    console.error("Error clearing cart:", error);
     throw error;
   }
 };
@@ -134,14 +150,12 @@ export const clearCart = async () => {
  */
 export const checkout = async (params) => {
   try {
-    const response = await axios.post(
-      buildApiUrl('carts/checkout'),
-      params,
-      { headers: getAuthHeaders() }
-    );
+    const response = await axios.post(buildApiUrl("carts/checkout"), params, {
+      headers: getAuthHeaders(),
+    });
     return response.data;
   } catch (error) {
-    console.error('Error during checkout:', error);
+    console.error("Error during checkout:", error);
     throw error;
   }
-}; 
+};

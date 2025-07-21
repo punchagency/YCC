@@ -1,34 +1,40 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  IconButton, 
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
   Button,
   Snackbar,
   Alert,
   Box,
-  Typography
-} from '@mui/material';
-import { Close as CloseIcon, ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { addToCart } from '../../../../services/crew/cartService';
-import { searchProducts, getProductCategories } from '../../../../services/order/orderService';
+  Typography,
+} from "@mui/material";
+import {
+  Close as CloseIcon,
+  ShoppingCart as ShoppingCartIcon,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { addToCart } from "../../../../services/crew/cartService";
+import {
+  searchProducts,
+  getProductCategories,
+} from "../../../../services/order/orderService";
 import { useCart } from "../../../../context/cart/cartContext";
-import SearchInterface from './SearchInterface';
+import SearchInterface from "./SearchInterface";
 
 const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const navigate = useNavigate();
   const { addToCart: addToCartContext } = useCart();
-  
+
   // Search states
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-  
+
   // Pagination states
   const [pagination, setPagination] = useState({
     page: 1,
@@ -40,8 +46,8 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   // Notification states
   const [notification, setNotification] = useState({
     open: false,
-    message: '',
-    severity: 'success'
+    message: "",
+    severity: "success",
   });
 
   // Add to cart states
@@ -62,17 +68,22 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         setCategories(response.data);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
-      showNotification('Failed to load categories', 'error');
+      console.error("Error fetching categories:", error);
+      showNotification("Failed to load categories", "error");
     }
   };
 
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (query, category, page = 1) => {
-      if (!query.trim() && category === 'all') {
+      if (!query.trim() && category === "all") {
         setSearchResults([]);
-        setPagination(prev => ({ ...prev, page: 1, total: 0, totalPages: 0 }));
+        setPagination((prev) => ({
+          ...prev,
+          page: 1,
+          total: 0,
+          totalPages: 0,
+        }));
         return;
       }
 
@@ -80,25 +91,25 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         setSearchLoading(true);
         const response = await searchProducts({
           query: query.trim(),
-          category: category === 'all' ? undefined : category,
+          category: category === "all" ? undefined : category,
           page,
           limit: pagination.limit,
         });
 
         if (response.status) {
           setSearchResults(response.data.products);
-          setPagination(prev => ({
+          setPagination((prev) => ({
             ...prev,
             page: response.data.pagination.currentPage,
             total: response.data.pagination.totalItems,
             totalPages: response.data.pagination.totalPages,
           }));
         } else {
-          showNotification(response.message || 'Search failed', 'error');
+          showNotification(response.message || "Search failed", "error");
         }
       } catch (error) {
-        console.error('Search error:', error);
-        showNotification('Failed to search products', 'error');
+        console.error("Search error:", error);
+        showNotification("Failed to search products", "error");
         setSearchResults([]);
       } finally {
         setSearchLoading(false);
@@ -118,19 +129,31 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const handleAddToCart = async (product, quantity = 1) => {
     try {
       setAddToCartLoadingId(product.inventoryId);
-      const response = await addToCart({
+
+      console.log("[CreateOrderModal] Adding product to cart:", {
         inventoryId: product.inventoryId,
+        productId: product.productId,
         quantity,
       });
+
+      const response = await addToCart({
+        inventoryId: product.inventoryId,
+        productId: product.productId, // Now required!
+        quantity,
+      });
+
       if (response.status) {
         addToCartContext(quantity);
-        showNotification('Product added to cart successfully', 'success');
+        showNotification("Product added to cart successfully", "success");
       } else {
-        showNotification(response.message || 'Failed to add to cart', 'error');
+        showNotification(response.message || "Failed to add to cart", "error");
       }
     } catch (error) {
-      console.error('Add to cart error:', error);
-      showNotification('Failed to add product to cart', 'error');
+      console.error("Add to cart error:", error);
+      showNotification(
+        error.message || "Failed to add product to cart",
+        "error"
+      );
     } finally {
       setAddToCartLoadingId(null);
     }
@@ -139,7 +162,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   // Handle view cart
   const handleViewCart = () => {
     onClose();
-    navigate('/crew/cart');
+    navigate("/crew/cart");
   };
 
   // Handle page change
@@ -148,17 +171,17 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   };
 
   // Show notification
-  const showNotification = (message, severity = 'success') => {
+  const showNotification = (message, severity = "success") => {
     setNotification({
       open: true,
       message,
-      severity
+      severity,
     });
   };
 
   // Close notification
   const handleCloseNotification = () => {
-    setNotification(prev => ({ ...prev, open: false }));
+    setNotification((prev) => ({ ...prev, open: false }));
   };
 
   // Debounce utility function
@@ -184,22 +207,22 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            maxHeight: '90vh'
-          }
+            maxHeight: "90vh",
+          },
         }}
       >
         <DialogTitle sx={{ p: 0 }}>
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
               p: { xs: 2, md: 3 },
-              borderBottom: '1px solid',
-              borderColor: 'divider',
-              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-              flexDirection: { xs: 'column', md: 'row' },
-              gap: { xs: 2, md: 0 }
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+              flexDirection: { xs: "column", md: "row" },
+              gap: { xs: 2, md: 0 },
             }}
           >
             <Box>
@@ -207,9 +230,9 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
                 variant="h4"
                 sx={{
                   fontWeight: 700,
-                  color: 'text.primary',
+                  color: "text.primary",
                   mb: 0.5,
-                  fontSize: { xs: '1.5rem', md: '1.875rem' }
+                  fontSize: { xs: "1.5rem", md: "1.875rem" },
                 }}
               >
                 Search Products
@@ -217,21 +240,21 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
               <Typography
                 variant="body2"
                 sx={{
-                  color: 'text.secondary',
-                  fontSize: { xs: '0.875rem', md: '1rem' }
+                  color: "text.secondary",
+                  fontSize: { xs: "0.875rem", md: "1rem" },
                 }}
               >
                 Find and add products to your cart
               </Typography>
             </Box>
-            
+
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 1.5,
-                width: { xs: '100%', md: 'auto' },
-                justifyContent: { xs: 'space-between', md: 'flex-end' }
+                width: { xs: "100%", md: "auto" },
+                justifyContent: { xs: "space-between", md: "flex-end" },
               }}
             >
               <Button
@@ -239,12 +262,12 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
                 startIcon={<ShoppingCartIcon />}
                 onClick={handleViewCart}
                 sx={{
-                  borderColor: '#0387D9',
-                  color: '#0387D9',
-                  '&:hover': {
-                    borderColor: '#0277bd',
-                    backgroundColor: 'rgba(3, 135, 217, 0.04)'
-                  }
+                  borderColor: "#0387D9",
+                  color: "#0387D9",
+                  "&:hover": {
+                    borderColor: "#0277bd",
+                    backgroundColor: "rgba(3, 135, 217, 0.04)",
+                  },
                 }}
               >
                 View Cart
@@ -252,10 +275,10 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
               <IconButton
                 onClick={onClose}
                 sx={{
-                  color: 'text.secondary',
-                  '&:hover': {
-                    backgroundColor: 'rgba(107, 114, 128, 0.04)'
-                  }
+                  color: "text.secondary",
+                  "&:hover": {
+                    backgroundColor: "rgba(107, 114, 128, 0.04)",
+                  },
                 }}
               >
                 <CloseIcon />
@@ -263,7 +286,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
             </Box>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent sx={{ p: { xs: 1, md: 0 } }}>
           <SearchInterface
             searchQuery={searchQuery}
@@ -285,12 +308,12 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         open={notification.open}
         autoHideDuration={6000}
         onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
           onClose={handleCloseNotification}
           severity={notification.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {notification.message}
         </Alert>
@@ -299,4 +322,4 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   );
 };
 
-export default CreateOrderModal; 
+export default CreateOrderModal;

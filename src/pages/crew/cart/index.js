@@ -36,20 +36,20 @@ import {
   CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
   Notes as NotesIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import { 
-  getCart, 
-  updateCartQuantity, 
-  removeFromCart, 
-  clearCart, 
-  checkout 
-} from '../../../services/crew/cartService';
-import { useToast } from '../../../context/toast/toastContext';
-import { useCart } from '../../../context/cart/cartContext';
-import CartSkeleton from '../../../components/CartSkeleton';
-import { keyframes } from '@mui/system';
-import CheckoutDialog from './CheckoutDialog';
+} from "@mui/icons-material";
+import { styled } from "@mui/material/styles";
+import {
+  getCart,
+  updateCartQuantity,
+  removeFromCart,
+  clearCart,
+  checkout,
+} from "../../../services/crew/cartService";
+import { useToast } from "../../../context/toast/toastContext";
+import { useCart } from "../../../context/cart/cartContext";
+import CartSkeleton from "../../../components/CartSkeleton";
+import { keyframes } from "@mui/system";
+import CheckoutDialog from "./CheckoutDialog";
 
 // Pulse animation for badge
 const pulse = keyframes`
@@ -126,12 +126,12 @@ const CartPage = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [clearCartLoading, setClearCartLoading] = useState(false);
   const [checkoutData, setCheckoutData] = useState({
-    street1: '',
-    street2: '',
-    city: '',
-    state: '',
-    zip: '',
-    country: '',
+    street1: "",
+    street2: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
     deliveryDate: null,
     additionalNotes: "",
   });
@@ -191,8 +191,15 @@ const CartPage = () => {
     try {
       setUpdatingItem(`${supplierIndex}-${productIndex}`);
 
+      console.log("[CartPage] Updating quantity:", {
+        inventoryId: product.inventoryId,
+        productId: product.productId,
+        quantity: newQuantity,
+      });
+
       const response = await updateCartQuantity({
         inventoryId: product.inventoryId,
+        productId: product.productId, // Now required!
         quantity: newQuantity,
       });
 
@@ -233,8 +240,14 @@ const CartPage = () => {
     try {
       setRemovingItem(`${supplierIndex}-${productIndex}`);
 
+      console.log("[CartPage] Removing product:", {
+        inventoryId: product.inventoryId,
+        productId: product.productId,
+      });
+
       const response = await removeFromCart({
         inventoryId: product.inventoryId,
+        productId: product.productId, // Now required!
       });
 
       if (response.status) {
@@ -303,7 +316,14 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (!checkoutData.street1 || !checkoutData.city || !checkoutData.state || !checkoutData.zip || !checkoutData.country || !checkoutData.deliveryDate) {
+    if (
+      !checkoutData.street1 ||
+      !checkoutData.city ||
+      !checkoutData.state ||
+      !checkoutData.zip ||
+      !checkoutData.country ||
+      !checkoutData.deliveryDate
+    ) {
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -336,12 +356,12 @@ const CartPage = () => {
         });
         setShowCheckoutDialog(false);
         setCheckoutData({
-          street1: '',
-          street2: '',
-          city: '',
-          state: '',
-          zip: '',
-          country: '',
+          street1: "",
+          street2: "",
+          city: "",
+          state: "",
+          zip: "",
+          country: "",
           deliveryDate: null,
           additionalNotes: "",
         });
@@ -621,11 +641,32 @@ const CartPage = () => {
                           >
                             {product.name}
                           </Typography>
-                          <Chip
-                            label={product.category}
-                            size="small"
-                            sx={{ mb: 1, backgroundColor: "#f3f4f6" }}
-                          />
+                          {/* Display categories - handle both array and string formats */}
+                          {Array.isArray(product.category) ? (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 0.5,
+                                mb: 1,
+                              }}
+                            >
+                              {product.category.map((cat, index) => (
+                                <Chip
+                                  key={index}
+                                  label={cat}
+                                  size="small"
+                                  sx={{ backgroundColor: "#f3f4f6" }}
+                                />
+                              ))}
+                            </Box>
+                          ) : (
+                            <Chip
+                              label={product.category}
+                              size="small"
+                              sx={{ mb: 1, backgroundColor: "#f3f4f6" }}
+                            />
+                          )}
                           {product.description && (
                             <Typography
                               variant="body2"
