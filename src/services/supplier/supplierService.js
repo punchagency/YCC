@@ -144,3 +144,42 @@ export const getUserOrders = async (params = {}) => {
     };
   }
 };
+export const getSupplierDashboardStats = async ({supplierId}) => {
+  try {
+    const response = await axios.get(`${API_URL}/suppliers/analytics/${supplierId}`, {
+      headers: getAuthHeader(),
+    });
+    
+    return {
+      success: true,
+      data: response.data.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error("Error fetching supplier dashboard stats:", error.response?.data || error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch supplier dashboard stats",
+    };
+  }
+};
+
+export const updateSupplierProfile = async ({supplierId, data}) => {
+  // req.params.id, req.body
+  try {
+    const response = await axios.put(`${API_URL}/suppliers/${supplierId}`, data, {
+      headers: getAuthHeader(),
+    });
+    return {
+      success: true,
+      data: response.data,
+      message: response.data.message,
+    };
+  } catch (error) {
+    console.error("Error updating supplier profile:", error.response?.data || error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to update supplier profile",
+    };
+  }
+};

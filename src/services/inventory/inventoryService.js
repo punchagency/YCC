@@ -213,14 +213,19 @@ export const updateInventoryItem = async (id, itemData, isFormData = false) => {
   }
 };
 
-export const deleteInventoryItem = async (id) => {
+// Accepts inventoryId and productId, sends productId in request body
+export const deleteInventoryItem = async (inventoryId, productId) => {
   try {
-    const response = await axios.delete(`${API_URL}/inventory/${id}`, {
-      headers: getAuthHeader(),
-    });
+    // Send productId as a query parameter
+    const response = await axios.delete(
+      `${API_URL}/inventory/${inventoryId}?productId=${encodeURIComponent(productId)}`,
+      {
+        headers: getAuthHeader(),
+      }
+    );
     return { success: true, data: response.data };
   } catch (error) {
-    console.error(`Error deleting inventory item ${id}:`, error);
+    console.error(`Error deleting inventory item ${inventoryId}:`, error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete inventory item",

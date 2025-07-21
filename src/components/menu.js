@@ -28,6 +28,7 @@ import { ConfirmDialog } from "primereact/confirmdialog";
 import "../styles/menu.css";
 import CustomButton from "./Button";
 
+
 const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
@@ -408,6 +409,17 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => {
         navigate("/supplier/inventory");
+      },
+    },
+    {
+      label: "Orders",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/orders"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/orders");
       },
     },
     {
