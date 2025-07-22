@@ -52,6 +52,18 @@ const Order = () => {
     if (setPageTitle) setPageTitle("Orders");
   }, [setPageTitle]);
 
+  // Listen for the custom event to open the CreateOrderModal from layout
+  useEffect(() => {
+    const handleOpenCreateOrderModal = () => setShowCreateModal(true);
+    window.addEventListener("openCreateOrderModal", handleOpenCreateOrderModal);
+    return () => {
+      window.removeEventListener(
+        "openCreateOrderModal",
+        handleOpenCreateOrderModal
+      );
+    };
+  }, []);
+
   // Initialize pagination state from URL
   useEffect(() => {
     setPagination((prev) => ({
@@ -61,18 +73,18 @@ const Order = () => {
     }));
   }, []); // Only run once on mount
 
-    // Fetch orders data function
+  // Fetch orders data function
   const fetchOrdersData = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await getOrders({
         page: pagination.page,
         limit: pagination.limit,
         status: currentStatus,
       });
-      
+
       if (response.status) {
         const {
           data,
@@ -93,23 +105,23 @@ const Order = () => {
       }
     } catch (error) {
       console.error("Error in fetchOrdersData:", error);
-      
+
       // Handle 401 authentication errors
       if (error.isAuthError && error.status === 401) {
         // Show toast notification about session expiration
         showError("Your session has expired. Please log in again.");
-        
+
         // Clear user data and redirect to login
         logoutUser();
-        navigate("/login", { 
-          state: { 
+        navigate("/login", {
+          state: {
             from: "/crew/order",
-            message: "Your session has expired. Please log in again."
-          } 
+            message: "Your session has expired. Please log in again.",
+          },
         });
         return;
       }
-      
+
       setError(error.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
@@ -192,35 +204,35 @@ const Order = () => {
   };
 
   // Create Orders Button
-  const createOrdersButton = () => {
-    return (
-      <button
-        onClick={() => setShowCreateModal(true)}
-        style={{
-          backgroundColor: "#0387D9",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "5px",
-          cursor: "pointer",
-          border: "1px solid #0387D9",
-          boxShadow: isHovered
-            ? "0 6px 24px rgba(3,135,217,0.18)"
-            : "0 2px 8px rgba(3,135,217,0.08)",
-          transform: isHovered ? "translateY(-2px)" : "translateY(0)",
-          transition: "all 0.18s cubic-bezier(.4,0,.2,1)",
-        }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        Create Order
-      </button>
-    );
-  };
+  // const createOrdersButton = () => {
+  //   return (
+  //     <button
+  //       onClick={() => setShowCreateModal(true)}
+  //       style={{
+  //         backgroundColor: "#0387D9",
+  //         color: "white",
+  //         padding: "10px 20px",
+  //         borderRadius: "5px",
+  //         cursor: "pointer",
+  //         border: "1px solid #0387D9",
+  //         boxShadow: isHovered
+  //           ? "0 6px 24px rgba(3,135,217,0.18)"
+  //           : "0 2px 8px rgba(3,135,217,0.08)",
+  //         transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+  //         transition: "all 0.18s cubic-bezier(.4,0,.2,1)",
+  //       }}
+  //       onMouseEnter={() => setIsHovered(true)}
+  //       onMouseLeave={() => setIsHovered(false)}
+  //     >
+  //       Create Order
+  //     </button>
+  //   );
+  // };
 
   return (
     <>
       <div className="lg:p-4">
-        <div className="text-right">{createOrdersButton()}</div>
+        {/* <div className="text-right">{createOrdersButton()}</div> */}
 
         {/* ActiveOrders component with status counts */}
         <ActiveOrders

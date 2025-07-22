@@ -11,33 +11,34 @@ const DashboardTitleBar = ({ title, button, backArrow = false }) => {
   const { user } = useUser();
 
   const handleBackClick = () => {
-    // Check if we should go to dashboard instead of previous page
-    const shouldGoToDashboard =
-      sessionStorage.getItem("shouldGoToDashboard") === "true";
+    // // Check if we should go to dashboard instead of previous page
+    // const shouldGoToDashboard =
+    //   sessionStorage.getItem("shouldGoToDashboard") === "true";
 
-    if (shouldGoToDashboard) {
-      // Clear the navigation info
-      sessionStorage.removeItem("navigatedFromSection");
-      sessionStorage.removeItem("shouldGoToDashboard");
+    // if (shouldGoToDashboard) {
+    //   // Clear the navigation info
+    //   sessionStorage.removeItem("navigatedFromSection");
+    //   sessionStorage.removeItem("shouldGoToDashboard");
 
-      // Navigate to the correct dashboard based on user role
-      let userRole = user?.role;
-      if (typeof userRole === "object" && userRole.name) {
-        userRole = userRole.name;
-      }
+    //   // Navigate to the correct dashboard based on user role
+    //   let userRole = user?.role;
+    //   if (typeof userRole === "object" && userRole.name) {
+    //     userRole = userRole.name;
+    //   }
 
-      if (userRole === "crew_member") {
-        navigate("/crew/dashboard");
-      } else if (userRole === "admin") {
-        navigate("/admin/dashboard");
-      } else {
-        // Fallback to admin dashboard
-        navigate("/admin/dashboard");
-      }
-    } else {
-      // Normal back navigation
-      navigate(-1);
-    }
+    //   if (userRole === "crew_member") {
+    //     navigate("/crew/dashboard");
+    //   } else if (userRole === "admin") {
+    //     navigate("/admin/dashboard");
+    //   } else {
+    //     // Fallback to admin dashboard
+    //     navigate("/admin/dashboard");
+    //   }
+    // } else {
+    //   // Normal back navigation
+    //   navigate(-1);
+    // }
+    navigate(-1);
   };
 
   return (
