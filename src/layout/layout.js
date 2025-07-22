@@ -129,7 +129,7 @@ const AdminLayout = ({ role }) => {
   const shouldShowCreateBookingButton = pageTitle === "Bookings";
 
   // Determine if we should show the create order button
-  const shouldShowCreateOrderButton = pageTitle === "Orders";
+  const shouldShowCreateOrderButton = pageTitle === "Orders" && actualRole === "admin";
 
   // Determine if we should show the create inventory button
   const shouldShowCreateInventoryButton = pageTitle === "Inventory";

@@ -85,6 +85,7 @@ import CartPage from "./pages/crew/cart";
 import { CartProvider } from "./context/cart/cartContext";
 import EditInventory from "./pages/invent/edit-inventory";
 import SupplierOrderConfirmationPage from "./pages/supplier/SupplierOrderConfirmationPage";
+// import SupplierOrder from "./pages/supplier/order";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -489,6 +490,14 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                    {/* <Route
+                      path="/supplier/orders"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierOrder />
+                        </ProtectedRoute>
+                      }
+                    /> */}
                   </Route>
 
                   {/* Onboarding Routes */}
