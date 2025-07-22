@@ -16,14 +16,15 @@ import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { Pagination } from "../../../components/pagination";
 import { OrderTableSkeleton } from "../../../components/CrewOrderSkeletons";
 import { formatAmount } from "../../../utils/formatAmount";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 
-const OrderTable = ({ 
-  orders = [], 
-  loading = false, 
-  error = null, 
+const OrderTable = ({
+  orders = [],
+  loading = false,
+  error = null,
   pagination = { page: 1, limit: 10, total: 0, totalPages: 0 },
   onPageChange,
-  onLimitChange
+  onLimitChange,
 }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -89,32 +90,34 @@ const OrderTable = ({
         return (
           <span
             style={{
-              backgroundColor: order.overallStatus === "delivered"
-                ? "#ECFDF3"
-                : order.overallStatus === "confirmed"
-                ? "#F0F9FF"
-                : order.overallStatus === "shipped"
-                ? "#FFFAEB"
-                : order.overallStatus === "cancelled"
-                ? "#FEF3F2"
-                : order.overallStatus === "declined"
-                ? "#FEF3F2"
-                : order.overallStatus === "partially_confirmed"
-                ? "#F0F9FF"
-                : "#F2F4F7",
-              color: order.overallStatus === "delivered"
-                ? "#027A48"
-                : order.overallStatus === "confirmed"
-                ? "#0369A1"
-                : order.overallStatus === "shipped"
-                ? "#B54708"
-                : order.overallStatus === "cancelled"
-                ? "#B42318"
-                : order.overallStatus === "declined"
-                ? "#B42318"
-                : order.overallStatus === "partially_confirmed"
-                ? "#0369A1"
-                : "#344054",
+              backgroundColor:
+                order.overallStatus === "delivered"
+                  ? "#ECFDF3"
+                  : order.overallStatus === "confirmed"
+                  ? "#F0F9FF"
+                  : order.overallStatus === "shipped"
+                  ? "#FFFAEB"
+                  : order.overallStatus === "cancelled"
+                  ? "#FEF3F2"
+                  : order.overallStatus === "declined"
+                  ? "#FEF3F2"
+                  : order.overallStatus === "partially_confirmed"
+                  ? "#F0F9FF"
+                  : "#F2F4F7",
+              color:
+                order.overallStatus === "delivered"
+                  ? "#027A48"
+                  : order.overallStatus === "confirmed"
+                  ? "#0369A1"
+                  : order.overallStatus === "shipped"
+                  ? "#B54708"
+                  : order.overallStatus === "cancelled"
+                  ? "#B42318"
+                  : order.overallStatus === "declined"
+                  ? "#B42318"
+                  : order.overallStatus === "partially_confirmed"
+                  ? "#0369A1"
+                  : "#344054",
               padding: "2px 8px",
               borderRadius: "16px",
               fontSize: "12px",
@@ -131,23 +134,44 @@ const OrderTable = ({
       case "actions":
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Link 
+            <Link
               to={`/crew/orders-management/${order._id}`}
-              style={{ textDecoration: 'none' }}
+              style={{ textDecoration: "none" }}
             >
               <Button
                 icon={<FiEye size={18} />}
                 className="p-button-outlined p-button-sm"
-                style={{ 
-                  border: "1px solid #D0D5DD", 
-                  color: "#344054", 
-                  backgroundColor: "white", 
+                style={{
+                  border: "1px solid #D0D5DD",
+                  color: "#344054",
+                  backgroundColor: "white",
                   borderRadius: 8,
-                  transition: "all 0.2s ease"
+                  transition: "all 0.2s ease",
                 }}
                 tooltip="See Details"
               />
             </Link>
+            {order.invoiceUrl && (
+              <a
+                href={order.invoiceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  icon={<ReceiptLongIcon style={{ fontSize: 18 }} />}
+                  className="p-button-outlined p-button-sm"
+                  style={{
+                    border: "1px solid #D0D5DD",
+                    color: "#344054",
+                    backgroundColor: "white",
+                    borderRadius: 8,
+                    transition: "all 0.2s ease",
+                  }}
+                  tooltip="View Invoice"
+                />
+              </a>
+            )}
           </Box>
         );
       default:
@@ -164,15 +188,19 @@ const OrderTable = ({
   if (error) {
     return (
       <Box sx={{ p: 4, textAlign: "center", color: "#dc3545" }}>
-        <Box sx={{ mb: 2, fontSize: 18, fontWeight: 600 }}>Error Loading Orders</Box>
+        <Box sx={{ mb: 2, fontSize: 18, fontWeight: 600 }}>
+          Error Loading Orders
+        </Box>
         <Box sx={{ fontSize: 14, color: "#666" }}>{error}</Box>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2}}>
-      <Paper sx={{ width: "100%", overflow: "auto", borderRadius: 2, boxShadow: 1 }}>
+    <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2 }}>
+      <Paper
+        sx={{ width: "100%", overflow: "auto", borderRadius: 2, boxShadow: 1 }}
+      >
         <TableContainer>
           <Table stickyHeader aria-label="orders table">
             <TableHead>
@@ -192,16 +220,37 @@ const OrderTable = ({
                       letterSpacing: 0.1,
                     }}
                     onClick={
-                      ["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id)
+                      [
+                        "orderId",
+                        "totalPrice",
+                        "overallStatus",
+                        "orderDate",
+                      ].includes(column.id)
                         ? () => handleSort(column.id)
                         : undefined
                     }
-                    style={{ cursor: ["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id) ? "pointer" : "default" }}
+                    style={{
+                      cursor: [
+                        "orderId",
+                        "totalPrice",
+                        "overallStatus",
+                        "orderDate",
+                      ].includes(column.id)
+                        ? "pointer"
+                        : "default",
+                    }}
                   >
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       {column.label}
-                      {["orderId", "totalPrice", "overallStatus", "orderDate"].includes(column.id) && (
-                        <span style={{ marginLeft: 4 }}>{getSortIcon(column.id)}</span>
+                      {[
+                        "orderId",
+                        "totalPrice",
+                        "overallStatus",
+                        "orderDate",
+                      ].includes(column.id) && (
+                        <span style={{ marginLeft: 4 }}>
+                          {getSortIcon(column.id)}
+                        </span>
                       )}
                     </Box>
                   </TableCell>
@@ -211,13 +260,25 @@ const OrderTable = ({
             <TableBody>
               {orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} align="center" sx={{ py: 4, color: "#667085" }}>
+                  <TableCell
+                    colSpan={columns.length}
+                    align="center"
+                    sx={{ py: 4, color: "#667085" }}
+                  >
                     No orders found
                   </TableCell>
                 </TableRow>
               ) : (
                 orders.map((order, idx) => (
-                  <TableRow key={order._id || idx} hover sx={{ transition: "background 0.2s", backgroundColor: "#fff", '&:hover': { backgroundColor: '#F3F4F6' } }}>
+                  <TableRow
+                    key={order._id || idx}
+                    hover
+                    sx={{
+                      transition: "background 0.2s",
+                      backgroundColor: "#fff",
+                      "&:hover": { backgroundColor: "#F3F4F6" },
+                    }}
+                  >
                     {columns.map((column) => (
                       <TableCell
                         key={column.id}
@@ -229,7 +290,7 @@ const OrderTable = ({
                           fontSize: isTablet ? 13 : 15,
                           borderBottom: "1px solid #EAECF0",
                           padding: isTablet ? "10px 16px" : "12px 24px",
-                          backgroundColor: '#fff',
+                          backgroundColor: "#fff",
                         }}
                       >
                         {renderCell(order, column)}
@@ -242,7 +303,7 @@ const OrderTable = ({
           </Table>
         </TableContainer>
       </Paper>
-      
+
       {/* Pagination component */}
       {pagination.totalPages > 1 && (
         <Pagination
