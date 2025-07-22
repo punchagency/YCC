@@ -240,6 +240,60 @@ const AdminLayout = ({ role }) => {
     </button>
   );
 
+  // Add Import from CSV button for Inventory page
+  const importCSVButton = (
+    <button
+      onClick={() => {
+        // Trigger the import CSV modal in the inventory pages
+        const event = new CustomEvent("openImportInventoryCSVModal");
+        window.dispatchEvent(event);
+      }}
+      style={{
+        backgroundColor: "#fff",
+        color: "#0387D9",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "1px solid #0387D9",
+        cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "background 0.2s, transform 0.2s",
+        outline: "none",
+        marginLeft: "8px"
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor = "#e6f4fd";
+        e.currentTarget.style.transform = "scale(1.02)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor = "#fff";
+        e.currentTarget.style.transform = "scale(1)";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = "2px solid #026bb3";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline = "none";
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#0387D9"
+        strokeWidth="2"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" fill="#e6f4fd" stroke="#0387D9"/>
+        <path d="M8 12h8M12 8v8" stroke="#0387D9" strokeWidth="2"/>
+      </svg>
+      Import from CSV
+    </button>
+  );
+
   return (
     <ThemeProvider>
       <ToastProvider>
@@ -290,74 +344,77 @@ const AdminLayout = ({ role }) => {
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton
                                     ) : shouldShowCreateInventoryButton ? (
-                                      <button
-                                        onClick={() => {
-                                          // Trigger the existing modal in the inventory pages
-                                          const event = new CustomEvent(
-                                            "openCreateInventoryModal"
-                                          );
-                                          window.dispatchEvent(event);
-                                        }}
-                                        style={{
-                                          backgroundColor: "#0387D9",
-                                          color: "white",
-                                          padding: "8px 16px",
-                                          borderRadius: "8px",
-                                          border: "none",
-                                          cursor: "pointer",
-                                          fontWeight: "600",
-                                          fontSize: "14px",
-                                          display: "flex",
-                                          alignItems: "center",
-                                          gap: "6px",
-                                          transition:
-                                            "background 0.2s, transform 0.2s",
-                                          outline: "none",
-                                        }}
-                                        onMouseOver={(e) => {
-                                          e.currentTarget.style.backgroundColor =
-                                            "#026bb3";
-                                          e.currentTarget.style.transform =
-                                            "scale(1.02)";
-                                        }}
-                                        onMouseOut={(e) => {
-                                          e.currentTarget.style.backgroundColor =
-                                            "#0387D9";
-                                          e.currentTarget.style.transform =
-                                            "scale(1)";
-                                        }}
-                                        onFocus={(e) => {
-                                          e.currentTarget.style.outline =
-                                            "2px solid #026bb3";
-                                        }}
-                                        onBlur={(e) => {
-                                          e.currentTarget.style.outline =
-                                            "none";
-                                        }}
-                                      >
-                                        <svg
-                                          width="16"
-                                          height="16"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
+                                      <div style={{ display: "flex", alignItems: "center" }}>
+                                        <button
+                                          onClick={() => {
+                                            // Trigger the existing modal in the inventory pages
+                                            const event = new CustomEvent(
+                                              "openCreateInventoryModal"
+                                            );
+                                            window.dispatchEvent(event);
+                                          }}
+                                          style={{
+                                            backgroundColor: "#0387D9",
+                                            color: "white",
+                                            padding: "8px 16px",
+                                            borderRadius: "8px",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            fontWeight: "600",
+                                            fontSize: "14px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "6px",
+                                            transition:
+                                              "background 0.2s, transform 0.2s",
+                                            outline: "none",
+                                          }}
+                                          onMouseOver={(e) => {
+                                            e.currentTarget.style.backgroundColor =
+                                              "#026bb3";
+                                            e.currentTarget.style.transform =
+                                              "scale(1.02)";
+                                          }}
+                                          onMouseOut={(e) => {
+                                            e.currentTarget.style.backgroundColor =
+                                              "#0387D9";
+                                            e.currentTarget.style.transform =
+                                              "scale(1)";
+                                          }}
+                                          onFocus={(e) => {
+                                            e.currentTarget.style.outline =
+                                              "2px solid #026bb3";
+                                          }}
+                                          onBlur={(e) => {
+                                            e.currentTarget.style.outline =
+                                              "none";
+                                          }}
                                         >
-                                          <line
-                                            x1="12"
-                                            y1="5"
-                                            x2="12"
-                                            y2="19"
-                                          ></line>
-                                          <line
-                                            x1="5"
-                                            y1="12"
-                                            x2="19"
-                                            y2="12"
-                                          ></line>
-                                        </svg>
-                                        Add New Product
-                                      </button>
+                                          <svg
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                          >
+                                            <line
+                                              x1="12"
+                                              y1="5"
+                                              x2="12"
+                                              y2="19"
+                                            ></line>
+                                            <line
+                                              x1="5"
+                                              y1="12"
+                                              x2="19"
+                                              y2="12"
+                                            ></line>
+                                          </svg>
+                                          Add New Product
+                                        </button>
+                                        {importCSVButton}
+                                      </div>
                                     ) : null
                                   }
                                 />
