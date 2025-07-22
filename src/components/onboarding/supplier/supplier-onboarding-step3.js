@@ -8,14 +8,17 @@ import { useParams, useLocation } from "react-router-dom";
 const SupplierOnboardingStep3 = ({ handleNext }) => {
   const { id: userId } = useParams();
   const location = useLocation();
-  const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
+  const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } =
+    useUser();
   //const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [inventoryData, setInventoryData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Determine role based on URL path
-  const role = location.pathname.includes('/vendors/onboarding/') ? 'supplier' : 'service_provider';
+  const role = location.pathname.includes("/vendors/onboarding/")
+    ? "supplier"
+    : "service_provider";
 
   useEffect(() => {
     // if (hasRunRef.current) return; // prevent second run
@@ -25,7 +28,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
       try {
         //check onboarding status
         const status = await checkOnboardingStatus(userId, role);
-        if(status === true){
+        if (status === true) {
           //console.log('Step 3 - Onboarding status is true');
           handleNext();
           return;
@@ -38,10 +41,23 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
 
         const data = await verifyOnboardingStep1(userId, role);
         //console.log('Step 3 - Verification response:', data);
-        
-        if (data?.data?.length > 0) {
-          setInventoryData(data.data);
+
+        // --- Transform inventory data to flat product array ---
+        let flatProducts = [];
+        if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
+          const inventory = data.data[0];
+          if (inventory.products && Array.isArray(inventory.products)) {
+            flatProducts = inventory.products
+              .filter((p) => p.product) // filter out any missing products
+              .map((p) => ({
+                ...p,
+                inventoryId: inventory._id,
+                // Optionally, add supplier or other info if needed
+              }));
+          }
         }
+        setInventoryData(flatProducts);
+        // --- End transformation ---
       } catch (error) {
         //console.error('Step 3 - Verification error:', error);
         toast.current.show({
@@ -80,8 +96,8 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
   };
 
   const handleInventoryUpdate = (updatedInventory) => {
-    setInventoryData(prevData => 
-      prevData.map(item => 
+    setInventoryData((prevData) =>
+      prevData.map((item) =>
         item._id === updatedInventory._id ? updatedInventory : item
       )
     );
@@ -101,38 +117,40 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
           width: "100%",
           maxWidth: "1200px",
           mx: "auto",
-          px: { xs: 2, sm: 3 }
+          px: { xs: 2, sm: 3 },
         }}
       >
-        <Typography 
-          sx={{ 
+        <Typography
+          sx={{
             fontSize: { xs: "20px", sm: "24px" },
-            fontWeight: "bold"
+            fontWeight: "bold",
           }}
         >
           Confirm Inventory Data
         </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           onClick={handleFinish}
           sx={{
             minWidth: { xs: "100%", sm: "120px" },
-            height: "40px"
+            height: "40px",
           }}
         >
           Finish
         </Button>
       </Box>
       {inventoryData && inventoryData.length > 0 && (
-        <Box sx={{ 
-          height: "100%", 
-          maxHeight: { xs: "50vh", sm: "60vh" }, 
-          overflowY: "auto",
-          mb: { xs: 2, sm: 0 }
-        }}>
-          <InventoryWrapper 
-            inventoryData={inventoryData} 
+        <Box
+          sx={{
+            height: "100%",
+            maxHeight: { xs: "50vh", sm: "60vh" },
+            overflowY: "auto",
+            mb: { xs: 2, sm: 0 },
+          }}
+        >
+          <InventoryWrapper
+            inventoryData={inventoryData}
             onInventoryUpdate={handleInventoryUpdate}
           />
         </Box>
@@ -145,7 +163,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
             maxHeight: { xs: "50vh", sm: "60vh" },
             flexDirection: "column",
             gap: 2,
-            mb: { xs: 0, sm: 0 }
+            mb: { xs: 0, sm: 0 },
           }}
         >
           <Skeleton variant="rectangular" height="30px" width="100%" />

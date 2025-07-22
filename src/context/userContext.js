@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getUserSettings } from '../services/crewSettings/crewsettings';
+import { getUserSettings } from "../services/crewSettings/crewsettings";
 
 // Create the context
 export const UserContext = createContext();
@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
   // Load user from API on mount (for real info)
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
         // If no token, try to load from localStorage as fallback
         const savedUser = localStorage.getItem("user");
@@ -38,19 +38,28 @@ export const UserProvider = ({ children }) => {
         }
         return;
       }
-      
+
       try {
         const response = await getUserSettings();
         if (response.status && response.data && response.data.user) {
-          console.log('Updating user context with:', response.data.user);
-          console.log('User profilePicture field:', response.data.user.profilePicture);
-          console.log('Complete user object keys:', Object.keys(response.data.user));
-          console.log('User object JSON:', JSON.stringify(response.data.user, null, 2));
+          console.log("Updating user context with:", response.data.user);
+          console.log(
+            "User profilePicture field:",
+            response.data.user.profilePicture
+          );
+          console.log(
+            "Complete user object keys:",
+            Object.keys(response.data.user)
+          );
+          console.log(
+            "User object JSON:",
+            JSON.stringify(response.data.user, null, 2)
+          );
           setUser(response.data.user);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
+          localStorage.setItem("user", JSON.stringify(response.data.user));
           return response.data.user;
         } else {
-          console.log('Invalid response format:', response);
+          console.log("Invalid response format:", response);
         }
       } catch (e) {
         // fallback to localStorage if API fails
@@ -89,30 +98,39 @@ export const UserProvider = ({ children }) => {
 
   // Function to refresh user data
   const refreshUser = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      console.log('No token found, cannot refresh user');
+      console.log("No token found, cannot refresh user");
       return;
     }
-    
+
     try {
-      console.log('Refreshing user data...');
+      console.log("Refreshing user data...");
       const response = await getUserSettings();
-      console.log('Refresh response:', response);
-      
+      console.log("Refresh response:", response);
+
       if (response.status && response.data && response.data.user) {
-        console.log('Updating user context with:', response.data.user);
-        console.log('User profilePicture field:', response.data.user.profilePicture);
-        console.log('Complete user object keys:', Object.keys(response.data.user));
-        console.log('User object JSON:', JSON.stringify(response.data.user, null, 2));
+        console.log("Updating user context with:", response.data.user);
+        console.log(
+          "User profilePicture field:",
+          response.data.user.profilePicture
+        );
+        console.log(
+          "Complete user object keys:",
+          Object.keys(response.data.user)
+        );
+        console.log(
+          "User object JSON:",
+          JSON.stringify(response.data.user, null, 2)
+        );
         setUser(response.data.user);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         return response.data.user;
       } else {
-        console.log('Invalid response format:', response);
+        console.log("Invalid response format:", response);
       }
     } catch (e) {
-      console.error('Error refreshing user data:', e);
+      console.error("Error refreshing user data:", e);
     }
   };
 
@@ -139,17 +157,20 @@ export const UserProvider = ({ children }) => {
   const getStripeAccount = async (userId, role) => {
     //console.log('userContext - getStripeAccount called with:', { userId, role });
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify({ userId, role })
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/stripe/get-stripe-account`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+          body: JSON.stringify({ userId, role }),
+        }
+      );
       const data = await response.json();
       //console.log('userContext - getStripeAccount response:', data);
-      
+
       if (!data.status) {
         // Only set to null if account truly doesn't exist
         if (response.status === 404) {
@@ -169,39 +190,45 @@ export const UserProvider = ({ children }) => {
 
   const createStripeAccount = async (userId, role) => {
     //console.log('userContext - createStripeAccount called with:', { userId, role });
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      },
-      body: JSON.stringify({ userId, role })
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/stripe/create-stripe-account`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({ userId, role }),
+      }
+    );
     const data = await response.json();
     //console.log('userContext - createStripeAccount response:', data);
-    if(data.status){
+    if (data.status) {
       window.location.href = data.data.url;
     }
     return data;
-  }
+  };
 
   const refreshStripeAccountLink = async (userId, role) => {
     //console.log('userContext - refreshStripeAccountLink called with:', { userId, role });
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      },
-      body: JSON.stringify({ userId, role })
-    });
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/stripe/refresh-stripe-account-link`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({ userId, role }),
+      }
+    );
     const data = await response.json();
     //console.log('userContext - refreshStripeAccountLink response:', data);
-    if(data.status){
+    if (data.status) {
       window.location.href = data.data.url;
     }
     return data;
-  }
+  };
 
   const uploadInventoryData = async (selectedFile, userId) => {
     const formData = new FormData();
@@ -209,22 +236,36 @@ export const UserProvider = ({ children }) => {
     formData.append("userId", userId);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/inventory/upload`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          ...getAuthHeader()
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/inventory/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            ...getAuthHeader(),
+          },
+        }
+      );
       const data = await response.json();
 
       if (!data.status) {
-        const error = data.message;
-        throw new Error(error);
+        // Handle detailed error responses from the new backend validation
+        let errorMessage = data.message || "Upload failed";
+
+        // If there's a specific error field, append it for more detail
+        if (data.error) {
+          errorMessage = `${errorMessage}: ${data.error}`;
+        }
+
+        throw new Error(errorMessage);
       }
 
       //console.log("Upload successful:", data);
-      return data.status;
+      return {
+        status: data.status,
+        message: data.message,
+        data: data.data, // Include detailed success data
+      };
     } catch (err) {
       //console.error("Upload failed:", err.message);
       throw err;
@@ -237,13 +278,16 @@ export const UserProvider = ({ children }) => {
     formData.append("userId", userId);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/services/upload`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          ...getAuthHeader()
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/services/upload`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            ...getAuthHeader(),
+          },
+        }
+      );
       const data = await response.json();
 
       if (!data.status) {
@@ -262,27 +306,33 @@ export const UserProvider = ({ children }) => {
   const verifyOnboardingStep1 = async (userId, role) => {
     //console.log('userContext - verifyOnboardingStep1 called with userId:', userId);
     try {
-      if(role === "supplier"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      if (role === "supplier") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/suppliers/verify/inventory-upload`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - verifyOnboardingStep1 response:', data);
         return data;
-      }else if(role === "service_provider"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      } else if (role === "service_provider") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/vendors/verify/services-upload`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - verifyOnboardingStep1 response:', data);
         return data;
@@ -291,7 +341,7 @@ export const UserProvider = ({ children }) => {
       //console.error('userContext - verifyOnboardingStep1 error:', error);
       throw error;
     }
-  }
+  };
 
   const getAuthHeader = () => {
     const token = localStorage.getItem("token");
@@ -301,27 +351,33 @@ export const UserProvider = ({ children }) => {
   const completeOnboarding = async (userId, role) => {
     //console.log('userContext - completeOnboarding called with:', { userId, role });
     try {
-      if(role === "supplier"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      if (role === "supplier") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/suppliers/complete/onboarding`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - completeOnboarding response:', data);
         return data.status;
-      }else if(role === "service_provider"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      } else if (role === "service_provider") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/vendors/complete/onboarding`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - completeOnboarding response:', data);
         return data.status;
@@ -330,32 +386,38 @@ export const UserProvider = ({ children }) => {
       //console.error('userContext - completeOnboarding error:', error);
       throw error;
     }
-  }
+  };
 
   const checkOnboardingStatus = async (userId, role) => {
     //console.log('userContext - checkOnboardingStatus called with:', { userId, role });
     try {
-      if(role === "supplier"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      if (role === "supplier") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/suppliers/onboarding/status`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - checkOnboardingStatus response:', data);
         return data.data;
-      }else if(role === "service_provider"){
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/vendors/onboarding/status`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeader()
-          },
-          body: JSON.stringify({ userId })
-        });
+      } else if (role === "service_provider") {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/vendors/onboarding/status`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+            body: JSON.stringify({ userId }),
+          }
+        );
         const data = await response.json();
         //console.log('userContext - checkOnboardingStatus response:', data);
         return data.data;
@@ -364,7 +426,7 @@ export const UserProvider = ({ children }) => {
       //console.error('userContext - checkOnboardingStatus error:', error);
       throw error;
     }
-  }
+  };
 
   return (
     <UserContext.Provider
@@ -385,7 +447,7 @@ export const UserProvider = ({ children }) => {
         verifyOnboardingStep1,
         completeOnboarding,
         checkOnboardingStatus,
-        refreshUser
+        refreshUser,
       }}
     >
       {children}

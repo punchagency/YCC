@@ -1,3 +1,3 @@
-Product Name,SKU,Category,Supplier,Price,Current Quantity,productStockLevel,Percentage Available,Warehouse Location
-Champagne Bottle,BEV-CHAMP-001,Beverages,Luxury Liquor Co.,$120.00,50,50,50.00%,Cellar-1
-Marine First Aid Kit,SAFETY-KIT-007,Safety Equipment,Marine Essentials Inc.,$33.45,36,50,36.00%,MedBay-2
+Product Name,SKU,Category,Description,Price,Quantity,HS Code,Country of Origin,Warehouse Location,Weight (ounces),Height (inches),Length (inches),Width (inches),Product Image Url
+Champagne Bottle,BEV-CHAMP-001,Beverages,A bottle of champagne,120.00,500,2204.1,France,Warehouse-1,16,12,10,10,https://tse3.mm.bing.net/th/id/OIP.caEYlp7WHARd2U7BAZ_hXAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3
+Marine First Aid Kit,SAFETY-KIT-007,Safety Equipment,A first aid kit for the marine environment,33.45,360,3006.5,United States,Warehouse-2,12,12,10,10,https://tse4.mm.bing.net/th/id/OIP.oxGPo9sN1XhhTWpt6jDuvgHaE8?rs=1&pid=ImgDetMain&o=7&rm=3
