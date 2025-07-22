@@ -102,7 +102,6 @@ const InventoryTableSkeleton = () => {
 };
 
 const Invent = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
