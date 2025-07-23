@@ -85,7 +85,9 @@ import CartPage from "./pages/crew/cart";
 import { CartProvider } from "./context/cart/cartContext";
 import EditInventory from "./pages/invent/edit-inventory";
 import SupplierOrderConfirmationPage from "./pages/supplier/SupplierOrderConfirmationPage";
-// import SupplierOrder from "./pages/supplier/order";
+import SupplierOrder from "./pages/supplier/order";
+import SupplierOrderDetails from "./pages/supplier/OrderDetails";
+import SupplierTransaction from "./pages/supplier/transaction";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -490,14 +492,30 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                    {/* <Route
+                    <Route
                       path="/supplier/orders"
                       element={
                         <ProtectedRoute requiredRoles={["supplier"]}>
                           <SupplierOrder />
                         </ProtectedRoute>
                       }
-                    /> */}
+                    />
+                    <Route
+                      path="/supplier/orders-details"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierOrderDetails />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/supplier/transactions"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <SupplierTransaction />
+                        </ProtectedRoute>
+                      }
+                    />
                   </Route>
 
                   {/* Onboarding Routes */}

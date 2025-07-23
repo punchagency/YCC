@@ -25,6 +25,7 @@ import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { ConfirmDialog } from "primereact/confirmdialog";
+import transactionLogo from "../assets/images/crew/inventory-icon.png";
 import "../styles/menu.css";
 import CustomButton from "./Button";
 
@@ -420,6 +421,17 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => {
         navigate("/supplier/orders");
+      },
+    },
+    {
+      label: "Transactions",
+      icon: <img src={transactionLogo} alt="Transactions" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/transactions"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/transactions");
       },
     },
     {

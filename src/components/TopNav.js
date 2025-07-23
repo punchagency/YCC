@@ -16,6 +16,7 @@ import reportLogo from "../assets/images/crew/report-icon.png";
 import logoutLogo from "../assets/images/crew/logout.png";
 import PeopleIcon from "@mui/icons-material/People";
 import { useUser } from "../context/userContext";
+import transactionLogo from "../assets/images/crew/inventory-icon.png";
 
 const TopNav = ({ isOpen, onClose, role = "admin" }) => {
   const navigate = useNavigate();
@@ -299,6 +300,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       label: "Orders",
       icon: orderLogo,
       path: "/supplier/orders"
+    },
+    {
+      label: "Transactions",
+      icon: transactionLogo,
+      path: "/supplier/transactions",
     },
     {
       label: "Settings",
