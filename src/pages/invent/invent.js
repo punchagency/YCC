@@ -120,6 +120,12 @@ const Invent = () => {
     stockQuantity: "",
     price: "",
     productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -137,6 +143,12 @@ const Invent = () => {
     stockQuantity: "",
     price: "",
     productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
 
   // Add description to newItem state
@@ -148,6 +160,12 @@ const Invent = () => {
     supplier: "",
     description: "",
     fileName: "",
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
 
   const [suppliers, setSuppliers] = useState([]);
@@ -357,6 +375,12 @@ const Invent = () => {
             stockQuantity: product.quantity || 0,
             price: product.price || 0,
             productImage: product.productImage || null,
+            hsCode: product.hsCode || "",
+            countryOfOrigin: product.countryOfOrigin || "",
+            height: product.height || 0,
+            width: product.width || 0,
+            length: product['length'] || 0,
+            weight: product.weight || 0,
           })) || []
         );
         setInventoryItems(formattedItems);
@@ -442,6 +466,12 @@ const Invent = () => {
         updateData.append("description", editItem.description);
         updateData.append("productImage", editItem.productImage);
         updateData.append("productId", editItem.productId);
+        updateData.append("hsCode", editItem.hsCode);
+        updateData.append("countryOfOrigin", editItem.countryOfOrigin);
+        updateData.append("height", editItem.height);
+        updateData.append("width", editItem.width);
+        updateData.append("length", editItem.length_);
+        updateData.append("weight", editItem.weight);
         isFormData = true;
       } else {
         updateData = {
@@ -451,36 +481,93 @@ const Invent = () => {
           price: editItem.price,
           description: editItem.description,
           productId: editItem.productId,
+          hsCode: editItem.hsCode,
+          countryOfOrigin: editItem.countryOfOrigin,
+          height: editItem.height,
+          width: editItem.width,
+          length: editItem.length_,
+          weight: editItem.weight
         };
       }
-      const result = await updateInventoryItem(
-        editItem.id,
-        updateData,
-        isFormData
-      );
-      if (result.success) {
-        // Update UI with new data
-        setInventoryItems((prev) =>
-          prev.map((item) =>
-            item.id === editItem.id
-              ? {
-                ...item,
-                ...editItem,
-                productImage: imagePreview || item.productImage,
-              }
-              : item
-          )
+      try {
+        const result = await updateInventoryItem(
+          editItem.id,
+          updateData,
+          isFormData
         );
-        setShowEditModal(false);
+
+        console.log("Update result:", result);
+
+        if (result.success) {
+          // Handle the nested response structure
+          const responseData = result.data?.data || result.data;
+
+          if (!responseData) {
+            throw new Error('Invalid response structure');
+          }
+
+          // Update UI with new data
+          const inventory = responseData;
+
+          // Enhanced formatting with better error handling
+          const formattedItems = inventory.products.map((prod) => {
+            // Handle category as array or string
+            let categoryValue = "Uncategorized";
+            if (Array.isArray(prod.category) && prod.category.length > 0) {
+              categoryValue = prod.category[0];
+            } else if (typeof prod.category === 'string') {
+              categoryValue = prod.category;
+            }
+
+            return {
+              id: inventory._id,
+              productId: prod.productId, // Use productId from response instead of nested product._id
+              productName: prod.productName || "Unknown Product",
+              category: categoryValue,
+              description: prod.description || "Not available",
+              supplier: inventory.supplier?.businessName || "Not available",
+              stockQuantity: Number(prod.quantity) || 0,
+              price: Number(prod.price) || 0,
+              productImage: prod.productImage || null,
+              sku: prod.sku || "",
+              hsCode: prod.hsCode || "",
+              countryOfOrigin: prod.countryOfOrigin || "",
+              height: Number(prod.height) || 0, // Changed default from 1 to 0 to match API
+              width: Number(prod.width) || 0,
+              length: Number(prod['length']) || 0, // Fixed typo: was length_
+              weight: Number(prod.weight) || 0,
+              // Additional fields that might be useful
+              warehouseLocation: inventory.warehouseLocation || "",
+              createdAt: inventory.createdAt,
+              updatedAt: inventory.updatedAt
+            };
+          });
+
+          // Update the inventory items state
+          setInventoryItems(formattedItems);
+
+          // Close modal and show success message
+          setShowEditModal(false);
+          setSnackbar({
+            open: true,
+            message: result.data?.message || "Product updated successfully!",
+            severity: "success",
+          });
+
+        } else {
+          // Handle failure case
+          setSnackbar({
+            open: true,
+            message: result.error || result.message || "Update failed",
+            severity: "error",
+          });
+        }
+
+      } catch (error) {
+        console.error("Error updating inventory:", error);
         setSnackbar({
           open: true,
-          message: "Product updated successfully!",
-          severity: "success",
-        });
-      } else {
-        setSnackbar({
-          open: true,
-          message: result.error || "Update failed",
+          message: error.message || "An unexpected error occurred",
           severity: "error",
         });
       }
@@ -555,13 +642,21 @@ const Invent = () => {
   // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
     if (!newItem.productName || !newItem.category) {
-      setSaveError("Product name and category are required");
+      setSnackbar({
+        message: "Product name and category are required",
+        open: true,
+        severity: "error",
+      });
       return;
     }
 
     // Validate quantity
     if (!newItem.stockQuantity || newItem.stockQuantity <= 0) {
-      setSaveError("Stock quantity must be greater than 0");
+      setSnackbar({
+        message: "Stock quantity must be greater than 0",
+        open: true,
+        severity: "error",
+      });
       return;
     }
 
@@ -575,6 +670,13 @@ const Invent = () => {
       formData.append("category", newItem.category);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
+      formData.append("hsCode", newItem.hsCode);
+      formData.append("countryOfOrigin", newItem.countryOfOrigin);
+      formData.append("height", newItem.height);
+      formData.append("width", newItem.width);
+      formData.append("length", newItem.length_);
+      formData.append("weight", newItem.weight);
+
       // In handleSaveProduct, always send description (backend will ignore if not needed)
       formData.append("description", newItem.description);
       if (newItem.supplier) {
@@ -600,6 +702,12 @@ const Invent = () => {
           stockQuantity: prod.quantity || 0,
           price: prod.product.price || 0,
           productImage: prod.product.productImage || null,
+          hsCode: prod.product.hsCode || "",
+          countryOfOrigin: prod.product.countryOfOrigin || "",
+          height: prod.product.height || 1,
+          width: prod.product.width || 1,
+          length: prod.product['length'] || 1,
+          weight: prod.product.weight || 1,
         }));
         setInventoryItems(formattedItems);
         setTotalItems(result.pagination?.totalItems || formattedItems.length);
@@ -628,17 +736,21 @@ const Invent = () => {
           message: "Product added successfully!",
           severity: "success",
         });
-        setSaveError(""); // Clear any previous errors
       } else {
-        setSaveError(
-          result.error || "Failed to add inventory. Please try again."
-        );
-        setSaveSuccess(""); // Clear any previous success messages
+        setSnackbar({
+          message: result.error || "Failed to add inventory. Please try again.",
+          open: true,
+          severity: "error",
+        });
         console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
       console.error("Error adding inventory:", error);
-      setSaveError("An unexpected error occurred. Please try again.");
+      setSnackbar({
+        message: "An unexpected error occurred. Please try again.",
+        open: true,
+        severity: "error"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -646,11 +758,11 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
-    setViewItem(item);
+    setViewItem({ ...item, length_: item['length'] });
     setShowViewModal(true);
   };
   const handleEditModal = (item) => {
-    setEditItem(item);
+    setEditItem({ ...item, length_: item['length'] });
     setShowEditModal(true);
   };
 
@@ -666,6 +778,12 @@ const Invent = () => {
       stockQuantity: "",
       price: "",
       productImage: null,
+      hsCode: '',
+      countryOfOrigin: '',
+      height: 1,
+      width: 1,
+      length_: 1,
+      weight: 1,
     });
   };
 
@@ -729,11 +847,11 @@ const Invent = () => {
   const renderMobileInventoryCards = () => {
     return (
       <Box sx={{ px: 2 }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 2, 
-            mb: 3, 
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
             borderRadius: 3,
             border: '1px solid #e2e8f0',
             background: theme === "light" ? '#fff' : '#1a1a1a',
@@ -859,10 +977,10 @@ const Invent = () => {
                                 ? "#DC2626"
                                 : "#374151",
                         background:
-                          stockStatusFilter === opt.key ? 
-                            theme === "light" ? "#eff6ff" : "#1e293b" : 
+                          stockStatusFilter === opt.key ?
+                            theme === "light" ? "#eff6ff" : "#1e293b" :
                             undefined,
-                        "&:hover": { 
+                        "&:hover": {
                           background: theme === "light" ? "#f8fafc" : "#1e293b",
                         },
                       }}
@@ -903,7 +1021,7 @@ const Invent = () => {
                 setAppliedStockStatus(stockStatusFilter);
                 setAppliedSearchText(searchText);
               }}
-              sx={{ 
+              sx={{
                 minWidth: { sm: 120 },
                 height: 40,
                 borderRadius: 2,
@@ -914,15 +1032,15 @@ const Invent = () => {
             </Button>
           </Stack>
         </Paper>
-        
+
         {inventoryItems.map((item, index) => {
           // Determine stock status color
           const stockStatus = getStockStatus(item.stockQuantity);
-          const statusColor = 
-            stockStatus === 'high' ? '#059669' : 
-            stockStatus === 'medium' ? '#D97706' : 
-            '#DC2626';
-          
+          const statusColor =
+            stockStatus === 'high' ? '#059669' :
+              stockStatus === 'medium' ? '#D97706' :
+                '#DC2626';
+
           return (
             <Paper
               key={index}
@@ -941,47 +1059,47 @@ const Invent = () => {
               }}
             >
               {/* Status indicator line at top */}
-              <Box 
-                sx={{ 
-                  height: '4px', 
-                  width: '100%', 
+              <Box
+                sx={{
+                  height: '4px',
+                  width: '100%',
                   bgcolor: statusColor,
                 }}
               />
-              
+
               <Box sx={{ p: 2 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
                   <Typography variant="subtitle1" fontWeight={600}>
                     {item.productName}
                   </Typography>
                   <Stack direction="row" spacing={1}>
-                    <IconButton 
-                      size="small" 
+                    <IconButton
+                      size="small"
                       onClick={() => handleViewItem(item)}
-                      sx={{ 
-                        bgcolor: 'rgba(0, 102, 204, 0.1)', 
+                      sx={{
+                        bgcolor: 'rgba(0, 102, 204, 0.1)',
                         color: '#0066cc',
                         '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
                       }}
                     >
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
-                    <IconButton 
-                      size="small" 
+                    <IconButton
+                      size="small"
                       onClick={() => handleEditModal(item)}
-                      sx={{ 
-                        bgcolor: 'rgba(5, 150, 105, 0.1)', 
+                      sx={{
+                        bgcolor: 'rgba(5, 150, 105, 0.1)',
                         color: '#059669',
                         '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
                       }}
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton 
-                      size="small" 
+                    <IconButton
+                      size="small"
                       onClick={() => handleDelete(index)}
-                      sx={{ 
-                        bgcolor: 'rgba(220, 38, 38, 0.1)', 
+                      sx={{
+                        bgcolor: 'rgba(220, 38, 38, 0.1)',
                         color: '#DC2626',
                         '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
                       }}
@@ -1004,8 +1122,8 @@ const Invent = () => {
                     <Typography variant="caption" color="text.secondary" fontWeight={500}>
                       Stock
                     </Typography>
-                    <Typography 
-                      variant="body2" 
+                    <Typography
+                      variant="body2"
                       fontWeight={600}
                       sx={{ color: statusColor }}
                     >
@@ -1029,7 +1147,7 @@ const Invent = () => {
                   fullWidth
                   startIcon={<EmailIcon />}
                   onClick={() => handleSendEmail(item)}
-                  sx={{ 
+                  sx={{
                     borderRadius: 2,
                     textTransform: 'none',
                     py: 1,
@@ -1046,13 +1164,13 @@ const Invent = () => {
             </Paper>
           );
         })}
-        
+
         {inventoryItems.length === 0 && !isLoading && (
-          <Paper 
+          <Paper
             elevation={0}
-            sx={{ 
-              p: 4, 
-              borderRadius: 3, 
+            sx={{
+              p: 4,
+              borderRadius: 3,
               textAlign: 'center',
               border: '1px dashed #cbd5e1',
               bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
@@ -1065,11 +1183,11 @@ const Invent = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               Add your first product to get started
             </Typography>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               color="primary"
               onClick={handleAddProduct}
-              sx={{ 
+              sx={{
                 borderRadius: 2,
                 textTransform: 'none',
                 px: 3,
@@ -1079,7 +1197,7 @@ const Invent = () => {
             </Button>
           </Paper>
         )}
-        
+
         {inventoryItems.length > 0 && (
           <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
             <Pagination
@@ -1112,11 +1230,11 @@ const Invent = () => {
 
     if (inventoryItems.length === 0) {
       return (
-        <Paper 
+        <Paper
           elevation={0}
-          sx={{ 
-            p: 6, 
-            borderRadius: 3, 
+          sx={{
+            p: 6,
+            borderRadius: 3,
             textAlign: 'center',
             border: '1px dashed #cbd5e1',
             bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
@@ -1132,12 +1250,12 @@ const Invent = () => {
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
             Start by adding your first product to manage your inventory effectively
           </Typography>
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             color="primary"
             onClick={handleAddProduct}
             startIcon={<AddIcon />}
-            sx={{ 
+            sx={{
               borderRadius: 2,
               textTransform: 'none',
               px: 4,
@@ -1151,7 +1269,7 @@ const Invent = () => {
         </Paper>
       );
     }
-    
+
     // Return null when there are items (they'll be rendered by desktop or mobile view)
     return null;
   };
@@ -1228,11 +1346,11 @@ const Invent = () => {
             <FilterListIcon color="primary" fontSize="small" />
             <Typography variant="subtitle2" fontWeight={600}>Filters:</Typography>
           </Stack>
-          
+
           <Box
             className="custom-dropdown"
-            sx={{ 
-              minWidth: 180, 
+            sx={{
+              minWidth: 180,
               position: "relative",
               flex: { xs: '1 1 100%', sm: '0 1 auto' },
               mt: { xs: 1, sm: 0 },
@@ -1348,10 +1466,10 @@ const Invent = () => {
                               ? "#DC2626"
                               : "#374151",
                       background:
-                        stockStatusFilter === opt.key ? 
-                          theme === "light" ? "#eff6ff" : "#1e293b" : 
+                        stockStatusFilter === opt.key ?
+                          theme === "light" ? "#eff6ff" : "#1e293b" :
                           undefined,
-                      "&:hover": { 
+                      "&:hover": {
                         background: theme === "light" ? "#f8fafc" : "#1e293b",
                       },
                     }}
@@ -1369,7 +1487,7 @@ const Invent = () => {
               </Box>
             )}
           </Box>
-          
+
           <Box sx={{ display: 'flex', gap: 2, flex: 1, maxWidth: { xs: '100%', md: '50%' } }}>
             <TextField
               value={searchText}
@@ -1377,7 +1495,7 @@ const Invent = () => {
               placeholder="Search by product name..."
               fullWidth
               size="small"
-              sx={{ 
+              sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                   height: 40,
@@ -1394,7 +1512,7 @@ const Invent = () => {
                 setAppliedStockStatus(stockStatusFilter);
                 setAppliedSearchText(searchText);
               }}
-              sx={{ 
+              sx={{
                 minWidth: 100,
                 height: 40,
                 borderRadius: 2,
@@ -1405,7 +1523,7 @@ const Invent = () => {
             </Button>
           </Box>
         </Paper>
-        
+
         <TableContainer
           component={Paper}
           sx={{
@@ -1416,7 +1534,7 @@ const Invent = () => {
           }}
         >
           <Table>
-            <TableHead sx={{ 
+            <TableHead sx={{
               backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
               borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
             }}>
@@ -1426,7 +1544,7 @@ const Invent = () => {
                     checked={selectAll}
                     onChange={handleSelectAll}
                     inputProps={{ "aria-label": "select all products" }}
-                    sx={{ 
+                    sx={{
                       color: theme === "light" ? "#94a3b8" : "#64748b",
                       '&.Mui-checked': {
                         color: '#0066cc',
@@ -1499,15 +1617,15 @@ const Invent = () => {
               ) : (
                 inventoryItems.map((item, idx) => {
                   const stockStatus = getStockStatus(item.stockQuantity);
-                  const statusColor = 
-                    stockStatus === 'high' ? '#059669' : 
-                    stockStatus === 'medium' ? '#D97706' : 
-                    '#DC2626';
-                  const statusBgColor = 
-                    stockStatus === 'high' ? '#ECFDF3' : 
-                    stockStatus === 'medium' ? '#FFFAEB' : 
-                    '#FEF3F2';
-                    
+                  const statusColor =
+                    stockStatus === 'high' ? '#059669' :
+                      stockStatus === 'medium' ? '#D97706' :
+                        '#DC2626';
+                  const statusBgColor =
+                    stockStatus === 'high' ? '#ECFDF3' :
+                      stockStatus === 'medium' ? '#FFFAEB' :
+                        '#FEF3F2';
+
                   return (
                     <TableRow
                       key={item.id}
@@ -1533,7 +1651,7 @@ const Invent = () => {
                           inputProps={{
                             "aria-label": `select product ${item.productName}`,
                           }}
-                          sx={{ 
+                          sx={{
                             color: theme === "light" ? "#94a3b8" : "#64748b",
                             '&.Mui-checked': {
                               color: '#0066cc',
@@ -1542,10 +1660,10 @@ const Invent = () => {
                         />
                       </TableCell>
                       <TableCell sx={{ color: theme === "light" ? "#374151" : "#e2e8f0" }}>
-                        <Chip 
-                          label={`#${item.id?.slice?.(-6) || item.id || idx + 1}`}
+                        <Chip
+                          label={`#${item.productId?.slice?.(-6) || item.productId || idx + 1}`}
                           size="small"
-                          sx={{ 
+                          sx={{
                             bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
                             color: theme === "light" ? '#334155' : '#94a3b8',
                             fontWeight: 500,
@@ -1558,10 +1676,10 @@ const Invent = () => {
                         {item.productName}
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={item.category}
                           size="small"
-                          sx={{ 
+                          sx={{
                             bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
                             color: theme === "light" ? '#334155' : '#94a3b8',
                             fontWeight: 500,
@@ -1599,50 +1717,53 @@ const Invent = () => {
                       </TableCell>
                       <TableCell>
                         <Stack direction="row" spacing={1}>
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             onClick={() => handleViewItem(item)}
-                            sx={{ 
-                              bgcolor: 'rgba(0, 102, 204, 0.1)', 
+                            sx={{
+                              bgcolor: 'rgba(0, 102, 204, 0.1)',
                               color: '#0066cc',
                               '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
                             }}
                           >
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             onClick={() => handleEditModal(item)}
-                            sx={{ 
-                              bgcolor: 'rgba(5, 150, 105, 0.1)', 
+                            sx={{
+                              bgcolor: 'rgba(5, 150, 105, 0.1)',
                               color: '#059669',
                               '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
                             }}
                           >
                             <EditIcon fontSize="small" />
                           </IconButton>
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             onClick={() => handleDelete(idx)}
-                            sx={{ 
-                              bgcolor: 'rgba(220, 38, 38, 0.1)', 
+                            sx={{
+                              bgcolor: 'rgba(220, 38, 38, 0.1)',
                               color: '#DC2626',
                               '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => handleSendEmail(item)}
-                            sx={{ 
-                              bgcolor: 'rgba(79, 70, 229, 0.1)', 
-                              color: '#4F46E5',
-                              '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.2)' },
-                            }}
-                          >
-                            <EmailIcon fontSize="small" />
-                          </IconButton>
+                          {user.role.name === 'admin' && (
+                            <IconButton
+                              size="small"
+                              onClick={() => handleSendEmail(item)}
+                              sx={{
+                                bgcolor: 'rgba(79, 70, 229, 0.1)',
+                                color: '#4F46E5',
+                                '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.2)' },
+                              }}
+                            >
+                              <EmailIcon fontSize="small" />
+                            </IconButton>
+                          )}
+
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -1860,6 +1981,13 @@ const Invent = () => {
             description: "",
             serviceArea: "",
             productImage: null,
+            fileName: "",
+            height: 1,
+            hsCode: '',
+            countryOfOrigin: '',
+            weight: 1,
+            width: 1,
+            length_: 1,
           });
         }}
         maxWidth="sm"
@@ -2040,6 +2168,7 @@ const Invent = () => {
                     },
                   },
                 }}
+                disabled
               />
             </Box>
 
@@ -2191,6 +2320,248 @@ const Invent = () => {
                     endAdornment: (
                       <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
                         units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, hsCode: "" });
+                    } else {
+                      setEditItem({ ...editItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
+
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.countryOfOrigin || ""}
+                  onChange={(e) => setEditItem({ ...editItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, height: "" });
+                    } else {
+                      setEditItem({ ...editItem, height: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, height: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.width || ""}
+                  onChange={(e) => setEditItem({ ...editItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, weight: "" });
+                    } else {
+                      setEditItem({ ...editItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.length_ || ""}
+                  onChange={(e) => setEditItem({ ...editItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
                       </Typography>
                     ),
                   }}
@@ -2554,7 +2925,6 @@ const Invent = () => {
                 </Select>
               </FormControl>
             </Box>
-
             <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
@@ -2641,6 +3011,248 @@ const Invent = () => {
                 />
               </Box>
             </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, hsCode: "" });
+                    } else {
+                      setNewItem({ ...newItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
+
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.countryOfOrigin || ""}
+                  onChange={(e) => setNewItem({ ...newItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, height: "" });
+                    } else {
+                      setNewItem({ ...newItem, height: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, height: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.width || ""}
+                  onChange={(e) => setNewItem({ ...newItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, weight: "" });
+                    } else {
+                      setNewItem({ ...newItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.length_ || ""}
+                  onChange={(e) => setNewItem({ ...newItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
             {user?.role?.name === 'admin' && (
               <Box>
                 <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
@@ -3088,7 +3700,7 @@ const Invent = () => {
                     }}
                   />
                   <Chip
-                    label={`ID: ${viewItem.id?.slice?.(-6) || viewItem.id || "—"}`}
+                    label={`ID: ${viewItem.productId?.slice?.(-6) || viewItem.productId || "—"}`}
                     size="small"
                     sx={{
                       backgroundColor: "#F3F4F6",
@@ -3157,7 +3769,7 @@ const Invent = () => {
                   <Typography variant="body2" color="#6B7280" gutterBottom>
                     Supplier
                   </Typography>
-                  <Typography variant="body1" fontWeight="500" color="#111827">
+                  <Typography variant="body1" fontWeight="600" color="#111827">
                     {typeof viewItem.supplier === "object"
                       ? viewItem.supplier.businessName ||
                       viewItem.supplier.user?.email ||
@@ -3168,6 +3780,25 @@ const Invent = () => {
                         : "Not available"}
                   </Typography>
                 </Box>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  HS Code
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.hsCode || "—"}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  Country of Origin
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.countryOfOrigin || "—"}
+                </Typography>
               </Grid>
             </Grid>
 
@@ -3190,6 +3821,48 @@ const Invent = () => {
                 </Typography>
               </Paper>
             </Box>
+
+            {/* Physical Attributes Section */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Physical Attributes
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Weight
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.weight ? `${viewItem.weight} oz` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Height
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.height ? `${viewItem.height} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Width
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.width ? `${viewItem.width} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Length
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.length_ ? `${viewItem.length_} in` : "—"}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
           </Stack>
         </Box>
 
@@ -3384,9 +4057,10 @@ const Invent = () => {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{zIndex: 1000000}}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
