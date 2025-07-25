@@ -115,7 +115,7 @@ const Invent = () => {
     productId: "",
     productName: "",
     description: "",
-    category: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
@@ -138,7 +138,7 @@ const Invent = () => {
     productId: null,
     productName: "",
     description: "",
-    category: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
@@ -227,6 +227,9 @@ const Invent = () => {
   const [appliedStockStatus, setAppliedStockStatus] =
     useState(stockStatusFilter);
   const [appliedSearchText, setAppliedSearchText] = useState("");
+
+  // Add this state to the Invent component
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   // Helper to get stock status
   const getStockStatus = (quantity) => {
@@ -369,7 +372,7 @@ const Invent = () => {
             id: item._id,
             productId: product.productId,
             productName: product.productName || "Unknown Product",
-            category: product.category?.[0] || "Uncategorized",
+            category: typeof product.category === 'string' ? [product.category] : Array.isArray(product.category) ? product.category : ["Uncategorized"],
             description: product.description || "Not available",
             supplier: item.supplier?.businessName || item.userInfo?.businessName || "Not available",
             stockQuantity: product.quantity || 0,
@@ -511,19 +514,12 @@ const Invent = () => {
 
           // Enhanced formatting with better error handling
           const formattedItems = inventory.products.map((prod) => {
-            // Handle category as array or string
-            let categoryValue = "Uncategorized";
-            if (Array.isArray(prod.category) && prod.category.length > 0) {
-              categoryValue = prod.category[0];
-            } else if (typeof prod.category === 'string') {
-              categoryValue = prod.category;
-            }
 
             return {
               id: inventory._id,
               productId: prod.productId, // Use productId from response instead of nested product._id
               productName: prod.productName || "Unknown Product",
-              category: categoryValue,
+              category: Array.isArray(prod.category) ? prod.category : typeof prod.category === 'string' ? [prod.category] : ["Uncategorized"],
               description: prod.description || "Not available",
               supplier: inventory.supplier?.businessName || "Not available",
               stockQuantity: Number(prod.quantity) || 0,
@@ -696,7 +692,7 @@ const Invent = () => {
           id: inventory._id,
           productId: prod.product._id,
           productName: prod.product.name || "Unknown Product",
-          category: prod.product.category?.[0] || "Uncategorized",
+          category: Array.isArray(prod.product.category) ? prod.product.category : typeof prod.product.category === 'string' ? [prod.product.category] : ["Uncategorized"],
           description: prod.product.description || "Not available",
           supplier: inventory.supplier?.businessName || "Not available",
           stockQuantity: prod.quantity || 0,
@@ -758,6 +754,7 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
+    console.log("Selected Item t be viewed:c ", item)
     setViewItem({ ...item, length_: item['length'] });
     setShowViewModal(true);
   };
@@ -1114,8 +1111,8 @@ const Invent = () => {
                     <Typography variant="caption" color="text.secondary" fontWeight={500}>
                       Category
                     </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {item.category}
+                    <Typography variant="body2">
+                      {item.category && item.category.length > 0 && item.category.slice(0, 1).map(cat => cat).join(", ")}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
@@ -1675,18 +1672,21 @@ const Invent = () => {
                       <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
                         {item.productName}
                       </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={item.category}
-                          size="small"
-                          sx={{
-                            bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
-                            color: theme === "light" ? '#334155' : '#94a3b8',
-                            fontWeight: 500,
-                            fontSize: '0.75rem',
-                            height: 24,
-                          }}
-                        />
+                      <TableCell sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {item.category && item.category.length > 0 && item.category.slice(0, 2).map((cat) => (
+                          <Chip
+                            key={cat}
+                            label={cat}
+                            size="small"
+                            sx={{
+                              bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
+                              color: theme === "light" ? '#334155' : '#94a3b8',
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              height: 24,
+                            }}
+                          />
+                        ))}
                       </TableCell>
                       <TableCell>
                         <Box
@@ -1851,34 +1851,104 @@ const Invent = () => {
 
   const categoryOptions = [
     {
-      label: "Captain",
-      value: "Captain",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/captain1.png",
+      label: "Navigation Equipment",
+      value: "Navigation Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/navigation1.png",
     },
     {
-      label: "Crew",
-      value: "Crew",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/crew1.png",
+      label: "Safety Gear",
+      value: "Safety Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/safety1.png",
     },
     {
-      label: "Exterior",
-      value: "Exterior",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/exterior1.png",
+      label: "Marine Electronics",
+      value: "Marine Electronics",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electronics1.png",
     },
     {
-      label: "Engineering",
-      value: "Engineering",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/Engineering1.png",
+      label: "Deck Equipment",
+      value: "Deck_Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/deck1.png",
     },
     {
-      label: "Gallery",
-      value: "Gallery",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/GALLERY1.png",
+      label: "Engine & Propulsion",
+      value: "Engine & Propulsion",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/engine1.png",
     },
     {
-      label: "Interior",
-      value: "Interior",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/Interior1.png",
+      label: "Anchoring System",
+      value: "Anchoring System",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/anchor1.png",
+    },
+    {
+      label: "Sailing Equipment",
+      value: "Sailing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sailing1.png",
+    },
+    {
+      label: "Water Sports Gear",
+      value: "Water Sports Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sports1.png",
+    },
+    {
+      label: "Fishing Equipment",
+      value: "Fishing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/fishing1.png",
+    },
+    {
+      label: "Marine Furniture",
+      value: "Marine Furniture",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/furniture1.png",
+    },
+    {
+      label: "Galley Equipment",
+      value: "Galley Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/galley1.png",
+    },
+    {
+      label: "Refrigeration",
+      value: "Refrigeration",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/refrigeration1.png",
+    },
+    {
+      label: "Water Systems",
+      value: "Water Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/water1.png",
+    },
+    {
+      label: "Electrical Systems",
+      value: "Electrical Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electrical1.png",
+    },
+    {
+      label: "Hull Maintenance",
+      value: "Hull Maintenance",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/maintenance1.png",
+    },
+    {
+      label: "Mooring Equipment",
+      value: "Mooring Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/mooring1.png",
+    },
+    {
+      label: "Communication Systems",
+      value: "Communication Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/communication1.png",
+    },
+    {
+      label: "Sea Food Storage",
+      value: "Sea Food Storage",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/food_storage1.png",
+    },
+    {
+      label: "Bilge Systems",
+      value: "Bilge Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/bilge1.png",
+    },
+    {
+      label: "HVAC Systems",
+      value: "HVAC Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/hvac1.png",
     },
   ];
 
@@ -1975,7 +2045,7 @@ const Invent = () => {
           setEditItem({
             id: null,
             productName: "",
-            category: "",
+            category: [], // always an array
             stockQuantity: "",
             price: "",
             description: "",
@@ -2176,61 +2246,100 @@ const Invent = () => {
               <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
                 Category
               </Typography>
-              <FormControl fullWidth>
-                <Select
-                  value={editItem.category}
-                  onChange={(e) =>
-                    setEditItem({ ...editItem, category: e.target.value })
-                  }
-                  displayEmpty
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor: "#F9FAFB",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#E5E7EB",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D1D5DB",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#0387D9",
-                    },
-                  }}
-                  renderValue={(selected) => {
-                    if (!selected) {
-                      return <Typography color="#9CA3AF">Select a category</Typography>;
+              <Autocomplete
+                multiple
+                options={categoryOptions}
+                getOptionLabel={(option) => option.label}
+                filterOptions={(options, state) =>
+                  options.filter(opt =>
+                    !editItem.category.includes(opt.value) &&
+                    (!state.inputValue ||
+                      opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                  )
+                }
+                open={categoryDropdownOpen}
+                onOpen={() => setCategoryDropdownOpen(true)}
+                onClose={() => setCategoryDropdownOpen(false)}
+                openOnFocus
+                value={categoryOptions.filter(opt => editItem.category.includes(opt.value))}
+                onChange={(event, newValue) => {
+                  setEditItem({
+                    ...editItem,
+                    category: newValue.map(opt => opt.value),
+                  });
+                }}
+                disablePortal
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      categoryOptions.length === 0
+                        ? "No categories available"
+                        : "Select categories..."
                     }
-                    return selected;
-                  }}
-                  MenuProps={{
-                    disablePortal: true,
-                    PaperProps: {
-                      sx: {
-                        width: 240,
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        backgroundColor: "#F9FAFB",
+                        "& fieldset": {
+                          borderColor: "#E5E7EB",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#D1D5DB",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#0387D9",
+                        },
                       },
-                    },
-                  }}
-                >
-                  {categoryOptions.map((option, index) => (
-                    <MenuItem
-                      key={option.value || option.label || index}
-                      value={option.value}
-                    >
-                      <span
-                        style={{ display: "flex", alignItems: "center", gap: 8 }}
-                      >
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    }}
+                  />
+                )}
+                renderOption={(props, option, { index }) => (
+                  <Box
+                    component="li"
+                    {...props}
+                    key={option.value || index}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      py: 1.5,
+                      borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                    }}
+                  >
+                    {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                    <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                  </Box>
+                )}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => (
+                    <Chip
+                      key={option.value}
+                      label={option.label}
+                      // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                      {...getTagProps({ index })}
+                      sx={{
+                        bgcolor: '#f1f5f9',
+                        color: '#334155',
+                        fontWeight: 500,
+                        fontSize: '0.8rem',
+                        height: 24,
+                        borderRadius: '6px',
+                        mr: 0.5,
+                      }}
+                    />
+                  ))
+                }
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                disabled={categoryOptions.length === 0}
+              />
             </Box>
 
             <Box>
@@ -2863,66 +2972,100 @@ const Invent = () => {
                 Category
               </Typography>
               <FormControl fullWidth>
-                <Select
-                  value={newItem.category}
-                  onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                  displayEmpty
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor: "#F9FAFB",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#E5E7EB",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D1D5DB",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#0387D9",
-                    },
+                <Autocomplete
+                  multiple
+                  options={categoryOptions}
+                  getOptionLabel={(option) => option.label}
+                  filterOptions={(options, state) =>
+                    options.filter(opt =>
+                      !newItem.category.includes(opt.value) &&
+                      (!state.inputValue ||
+                        opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                    )
+                  }
+                  open={categoryDropdownOpen}
+                  onOpen={() => setCategoryDropdownOpen(true)}
+                  onClose={() => setCategoryDropdownOpen(false)}
+                  openOnFocus
+                  value={categoryOptions.filter(opt => newItem.category.includes(opt.value))}
+                  onChange={(event, newValue) => {
+                    setNewItem({
+                      ...newItem,
+                      category: newValue.map(opt => opt.value),
+                    });
                   }}
-                  renderValue={(selected) => {
-                    if (!selected) {
-                      return <Typography color="#9CA3AF">Select a category</Typography>;
-                    }
-                    const option = categoryOptions.find((opt) => opt.value === selected);
-                    return option ? (
-                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    ) : selected;
-                  }}
-                  MenuProps={{
-                    disablePortal: true,
-                    PaperProps: {
-                      sx: {
-                        width: 240,
-                      },
-                    },
-                  }}
-                >
-                  {categoryOptions.map((option, index) => (
-                    <MenuItem
-                      key={option.value || option.label || index}
-                      value={option.value}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={
+                        categoryOptions.length === 0
+                          ? "No categories available"
+                          : "Select categories..."
+                      }
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                          backgroundColor: "#F9FAFB",
+                          "& fieldset": {
+                            borderColor: "#E5E7EB",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#D1D5DB",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#0387D9",
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option, { index }) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={option.value || index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 1.5,
+                        borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                      }}
                     >
-                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    </MenuItem>
-                  ))}
-                </Select>
+                      {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                      <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                    </Box>
+                  )}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip
+                        key={option.value}
+                        label={option.label}
+                        // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                        {...getTagProps({ index })}
+                        sx={{
+                          bgcolor: '#f1f5f9',
+                          color: '#334155',
+                          fontWeight: 500,
+                          fontSize: '0.8rem',
+                          height: 24,
+                          borderRadius: '6px',
+                          mr: 0.5,
+                        }}
+                      />
+                    ))
+                  }
+                  isOptionEqualToValue={(option, value) => option.value === value.value}
+                  noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                  disabled={categoryOptions.length === 0}
+                />
               </FormControl>
             </Box>
             <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
@@ -3688,17 +3831,20 @@ const Invent = () => {
                 <Typography variant="h5" fontWeight="600" color="#111827" gutterBottom>
                   {viewItem.productName}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 1 }}>
-                  <Chip
-                    label={viewItem.category}
-                    size="small"
-                    sx={{
-                      backgroundColor: "#F3F4F6",
-                      color: "#374151",
-                      fontWeight: 500,
-                      borderRadius: "6px"
-                    }}
-                  />
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                  {viewItem.category && viewItem.category.length > 0 && viewItem.category.map((cat) => (
+                    <Chip
+                      key={cat}
+                      label={cat}
+                      size="small"
+                      sx={{
+                        backgroundColor: "#F3F4F6",
+                        color: "#374151",
+                        fontWeight: 500,
+                        borderRadius: "6px"
+                      }}
+                    />
+                  ))}
                   <Chip
                     label={`ID: ${viewItem.productId?.slice?.(-6) || viewItem.productId || "—"}`}
                     size="small"
@@ -4060,7 +4206,7 @@ const Invent = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        sx={{zIndex: 1000000}}
+        sx={{ zIndex: 1000000 }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}
