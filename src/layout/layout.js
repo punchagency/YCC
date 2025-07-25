@@ -31,6 +31,7 @@ const AdminLayout = ({ role }) => {
 
   // Determine the actual role to use
   const actualRole = role || userRole;
+  const normalizedRole = (actualRole || "").toString().toLowerCase();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [pageTitle, setPageTitle] = useState("");
   const [backArrow, setBackArrow] = useState(false);
@@ -129,7 +130,8 @@ const AdminLayout = ({ role }) => {
   const shouldShowCreateBookingButton = pageTitle === "Bookings";
 
   // Determine if we should show the create order button
-  const shouldShowCreateOrderButton = pageTitle === "Orders" && actualRole === "admin";
+  const shouldShowCreateOrderButton =
+    pageTitle === "Orders" && normalizedRole === "crew_member";
 
   // Determine if we should show the create inventory button
   const shouldShowCreateInventoryButton = pageTitle === "Inventory";
@@ -262,7 +264,7 @@ const AdminLayout = ({ role }) => {
         gap: "6px",
         transition: "background 0.2s, transform 0.2s",
         outline: "none",
-        marginLeft: "8px"
+        marginLeft: "8px",
       }}
       onMouseOver={(e) => {
         e.currentTarget.style.backgroundColor = "#e6f4fd";
@@ -287,8 +289,16 @@ const AdminLayout = ({ role }) => {
         stroke="#0387D9"
         strokeWidth="2"
       >
-        <rect x="3" y="3" width="18" height="18" rx="2" fill="#e6f4fd" stroke="#0387D9"/>
-        <path d="M8 12h8M12 8v8" stroke="#0387D9" strokeWidth="2"/>
+        <rect
+          x="3"
+          y="3"
+          width="18"
+          height="18"
+          rx="2"
+          fill="#e6f4fd"
+          stroke="#0387D9"
+        />
+        <path d="M8 12h8M12 8v8" stroke="#0387D9" strokeWidth="2" />
       </svg>
       Import from CSV
     </button>
@@ -344,7 +354,12 @@ const AdminLayout = ({ role }) => {
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton
                                     ) : shouldShowCreateInventoryButton ? (
-                                      <div style={{ display: "flex", alignItems: "center" }}>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                        }}
+                                      >
                                         <button
                                           onClick={() => {
                                             // Trigger the existing modal in the inventory pages

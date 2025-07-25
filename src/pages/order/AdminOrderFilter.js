@@ -102,9 +102,12 @@ const AdminOrderFilter = ({
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search by Order ID..."
+          placeholder="Search by order id, first name, last name, or email..."
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => {
+            setSearchValue(e.target.value);
+            if (onSearch) onSearch(e.target.value);
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

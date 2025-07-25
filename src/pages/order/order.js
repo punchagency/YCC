@@ -7,7 +7,10 @@ import {
   useSearchParams,
   useNavigate,
 } from "react-router-dom";
-import { getAdminOrders } from "../../services/admin/adminOrderService";
+import {
+  getAdminOrders,
+  searchAdminOrders,
+} from "../../services/admin/adminOrderService";
 
 const AdminOrder = () => {
   const { setPageTitle } = useOutletContext() || {};
@@ -30,16 +33,65 @@ const AdminOrder = () => {
     if (setPageTitle) setPageTitle("Orders");
   }, [setPageTitle]);
 
-  // Fetch orders from backend
+  // On mount, set filterCriteria, page, limit, and searchValue from URL params
+  useEffect(() => {
+    const urlStatus = searchParams.get("status") || "all";
+    let criteria = {};
+    if (["active", "completed", "pending"].includes(urlStatus)) {
+      criteria = { status: urlStatus };
+    } else {
+      criteria = {};
+    }
+    setFilterCriteria(criteria);
+    // Set page and limit from URL
+    const urlPage = parseInt(searchParams.get("page")) || 1;
+    const urlLimit = parseInt(searchParams.get("limit")) || 10;
+    setPagination((prev) => ({ ...prev, page: urlPage, limit: urlLimit }));
+    // Set search value from URL
+    const urlQ = searchParams.get("q") || "";
+    setSearchValue(urlQ);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update the URL query string with the status filter, page, limit, and search (q)
+  const updateUrlParams = (status, page, limit, q) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (status === "all") {
+      newSearchParams.delete("status");
+    } else {
+      newSearchParams.set("status", status);
+    }
+    newSearchParams.set("page", page.toString());
+    newSearchParams.set("limit", limit.toString());
+    if (q && q.trim() !== "") {
+      newSearchParams.set("q", q);
+    } else {
+      newSearchParams.delete("q");
+    }
+    setSearchParams(newSearchParams);
+  };
+
+  // Fetch orders from backend (search or normal)
   const fetchOrders = async (params = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getAdminOrders({
-        page: params.page || pagination.page,
-        limit: params.limit || pagination.limit,
-        ...params,
-      });
+      let response;
+      // If searchValue (q) is present, use search endpoint
+      if (searchValue && searchValue.trim() !== "") {
+        response = await searchAdminOrders({
+          q: searchValue,
+          page: params.page || pagination.page,
+          limit: params.limit || pagination.limit,
+          status: params.status || filterCriteria.status || "all",
+        });
+      } else {
+        response = await getAdminOrders({
+          page: params.page || pagination.page,
+          limit: params.limit || pagination.limit,
+          ...filterCriteria,
+        });
+      }
       if (response.status) {
         // Support both array and object data
         let ordersData = [];
@@ -85,8 +137,7 @@ const AdminOrder = () => {
     fetchOrders({
       page: pagination.page,
       limit: pagination.limit,
-      ...filterCriteria,
-      search: searchValue,
+      status: filterCriteria.status || "all",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page, pagination.limit, filterCriteria, searchValue]);
@@ -95,21 +146,45 @@ const AdminOrder = () => {
   const handleSearch = (value) => {
     setSearchValue(value);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
+    updateUrlParams(filterCriteria.status || "all", 1, pagination.limit, value);
   };
 
   // Handle filter change
   const handleFilterChange = (criteria) => {
-    setFilterCriteria(criteria);
+    // Map the filter to a single status string, just like the crew side
+    let status = "all";
+    if (criteria.status) {
+      if (Array.isArray(criteria.status)) {
+        if (criteria.status.includes("pending")) status = "pending";
+        else if (
+          criteria.status.includes("partially_confirmed") ||
+          criteria.status.includes("confirmed") ||
+          criteria.status.includes("shipped")
+        ) {
+          status = "active"; // FIX: should be 'active', not 'confirmed'
+        } else if (criteria.status.includes("delivered")) status = "completed";
+      } else {
+        status = criteria.status;
+      }
+    }
+    setFilterCriteria({ status });
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
+    updateUrlParams(status, 1, pagination.limit, searchValue);
   };
 
   // Handle page/limit change
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
+    // Update URL with new page
+    let status = filterCriteria.status || searchParams.get("status") || "all";
+    updateUrlParams(status, newPage, pagination.limit, searchValue);
   };
 
   const handleLimitChange = (newLimit) => {
     setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
+    // Update URL with new limit and reset to page 1
+    let status = filterCriteria.status || searchParams.get("status") || "all";
+    updateUrlParams(status, 1, newLimit, searchValue);
   };
 
   return (

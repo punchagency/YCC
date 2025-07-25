@@ -45,3 +45,25 @@ export async function getAdminOrderById(id) {
     return { status: false, message: error.message };
   }
 }
+
+/**
+ * Search orders for admin (paginated, by orderId, _id, user email, crew name)
+ * @param {Object} params - { q, status, page, limit }
+ * @returns {Promise}
+ */
+export async function searchAdminOrders(params = {}) {
+  try {
+    const response = await axios.get(buildApiUrl("/admin/orders/search"), {
+      params,
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return { status: false, message: error.message };
+  }
+}
