@@ -88,6 +88,7 @@ import SupplierOrderConfirmationPage from "./pages/supplier/SupplierOrderConfirm
 import SupplierOrder from "./pages/supplier/order";
 import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
+import AdminOrderDetails from "./pages/order/adminOrderDetails";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -219,6 +220,10 @@ function App() {
                     <Route
                       path="/admin/orders-management"
                       element={<Order />}
+                    />
+                    <Route
+                      path="/admin/orders-management/:id"
+                      element={<AdminOrderDetails />}
                     />
                     <Route
                       path="/admin/inventory-management"

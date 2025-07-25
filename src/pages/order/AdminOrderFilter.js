@@ -102,9 +102,12 @@ const AdminOrderFilter = ({
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Search by Order ID..."
+          placeholder="Search by order id, first name, last name, or email..."
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => {
+            setSearchValue(e.target.value);
+            if (onSearch) onSearch(e.target.value);
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -122,14 +125,15 @@ const AdminOrderFilter = ({
               "& fieldset": {
                 border: "1.5px solid #e2e8f0",
                 borderRadius: "8px",
-                transition: "border-color 0.2s",
+                transition: "border-color 0.2s, box-shadow 0.2s",
               },
               "&:hover fieldset": {
                 borderColor: "#b6c2d6",
               },
               "&.Mui-focused fieldset": {
                 borderColor: "#0387D9",
-                borderWidth: "2px",
+                borderWidth: "2.5px",
+                boxShadow: "0 0 0 2px #0387D933", // subtle blue ring effect
               },
             },
             input: {

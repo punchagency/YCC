@@ -15,7 +15,7 @@ import {
   fetchCrewNotifications,
   markNotificationAsRead,
 } from "../../../services/crew/crewNotificationService";
-import { TableSkeleton } from "../../../components/TableSkeleton";
+import NotificationsSkeleton from "../../../components/NotificationsSkeleton";
 import { useToast } from "../../../components/Toast";
 import { Pagination } from "../../../components/pagination";
 import React from "react";
@@ -909,17 +909,7 @@ export default function Notifications({ role }) {
           onStatusFilterChange={handleStatusFilterClick}
           isMobile={isMobile}
         />
-        <TableSkeleton
-          columns={[
-            { width: isMobile ? "80px" : "100px" }, // Priority
-            { width: isMobile ? "120px" : "150px" }, // Type
-            { width: isMobile ? "200px" : "300px" }, // Description
-            { width: isMobile ? "120px" : "150px" }, // Status
-            { width: isMobile ? "100px" : "120px" }, // Action
-          ]}
-          rows={5}
-          showHeader={true}
-        />
+        <NotificationsSkeleton />
       </div>
     );
   }

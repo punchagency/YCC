@@ -1,13 +1,8 @@
 import axios from "axios";
+import { getAuthHeader } from "../../utils/authHeader";
 
 // Use the base API URL
 const API_URL = process.env.REACT_APP_API_URL;
-
-// Add authentication token to requests
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
 
 /**
  * Create a new order
