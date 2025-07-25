@@ -15,7 +15,7 @@ import {
   getNotifications,
   markNotificationAsRead,
 } from "../../services/notification/notificationService";
-import { TableSkeleton } from "../../components/TableSkeleton";
+import NotificationsSkeleton from "../../components/NotificationsSkeleton";
 import { useToast } from "../../components/Toast";
 import { Pagination } from "../../components/pagination";
 import React from "react";
@@ -899,12 +899,7 @@ export default function Notifications({ role }) {
           paddingTop: isMobile ? "67px" : "0",
         }}
       >
-        <div
-          className="error-message"
-          style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}
-        >
-          Loading...
-        </div>
+        <NotificationsSkeleton />
       </div>
     );
   }
