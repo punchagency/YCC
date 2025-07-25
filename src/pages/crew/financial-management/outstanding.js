@@ -5,7 +5,7 @@ import { Calendar } from "primereact/calendar";
 
 import manprofile from "../../../assets/images/crew/manprofile.png";
 
-const Outstanding = () => {
+const Outstanding = ({financeData, fetchData, setFinanceData}) => {
   // New expense modal state
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [newExpense, setNewExpense] = useState({
@@ -57,6 +57,13 @@ const Outstanding = () => {
       date: null,
       description: "",
     });
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
   };
 
   return (

@@ -1,15 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import lockLogo from "../../../assets/images/crew/lockLogo.png";
-import dropdown from "../../../assets/images/crew/dropdown.png";
-import profileReport from "../../../assets/images/crew/profile-report.png";
-import downloadIcon from "../../../assets/images/crew/downloadIcon.png";
-import sortIcon from "../../../assets/images/crew/sort.png";
-import {
-  getInventoryHealthReport,
-  getSystemChartData,
-  getSystemMetrics,
-} from "../../../services/reports/reports";
-// Import and register Chart.js components
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,10 +11,8 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-
-import { getDashboardSummary } from "../../../services/crew/crewReport";
-
-import { jsPDF } from "jspdf";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { getDashboardSummary, generateReport } from "../../../services/crew/crewReport";
 import "jspdf-autotable";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
@@ -42,12 +29,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import Chip from "@mui/material/Chip";
 import LockIcon from "@mui/icons-material/Lock";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { Button, Select, MenuItem } from "@mui/material";
-import DownloadIcon from "@mui/icons-material/Download";
-import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import { Button, Select, MenuItem, Skeleton } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { useOutletContext } from "react-router-dom";
 
@@ -82,19 +64,55 @@ const TableHeaderCell = ({ children }) => (
   </TableCell>
 );
 
+// Skeleton components
+const StatsSkeleton = () => (
+  <Grid container spacing={2}>
+    {[...Array(6)].map((_, index) => (
+      <Grid item xs={4} lg={2} key={index}>
+        <Skeleton variant="text" width={60} height={16} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width={40} height={24} />
+      </Grid>
+    ))}
+  </Grid>
+);
+
+const TableSkeleton = () => (
+  <TableBody>
+    {[...Array(5)].map((_, index) => (
+      <TableRow key={index}>
+        {[...Array(7)].map((_, cellIndex) => (
+          <TableCell key={cellIndex}>
+            <Skeleton variant="text" width={cellIndex === 4 ? 60 : 80} height={20} />
+          </TableCell>
+        ))}
+      </TableRow>
+    ))}
+  </TableBody>
+);
+
 const Reports = () => {
   const { setPageTitle } = useOutletContext() || {};
   React.useEffect(() => {
     if (setPageTitle) setPageTitle("Reports");
   }, [setPageTitle]);
+  const [orderStatsPeriod, setOrderStatsPeriod] = React.useState({
+    orderPeriod: 'all',
+    orderStartDate: null,
+    orderEndDate: null
+  });
+  const [bookingStatsPeriod, setBookingStatsPeriod] = React.useState({
+    bookingPeriod: 'all',
+    bookingStartDate: null,
+    bookingEndDate: null
+  });
+  const [activityStatsPeriod, setActivityStatsPeriod] = React.useState({
+    activityPeriod: 'all',
+    activityStartDate: null,
+    activityEndDate: null
+  });
 
   // Move all state hooks and functions inside the component
   const [dashboardSummary, setDashboardSummary] = useState({
-    inventory: {
-      inProgress: 0,
-      pending: 0,
-      completed: 0,
-    },
     bookings: {
       inProgress: 0,
       pending: 0,
@@ -112,61 +130,7 @@ const Reports = () => {
     },
     customerSatisfaction: 0,
   });
-
-  const [view, setView] = useState("month");
-  const [ordersDateRange, setOrdersDateRange] = useState("week");
-  const [inventoryDateRange, setInventoryDateRange] = useState("week");
-  const [bookingsDateRange, setBookingsDateRange] = useState("week");
-  const [financialDateRange, setFinancialDateRange] = useState("week");
-
-  const handleViewChange = (event, newView) => {
-    if (newView !== null) {
-      setView(newView);
-    }
-  };
-
-  const reportsData = [
-    {
-      id: 1,
-      name: "Maintenance Report",
-      date: "2023-10-28",
-      status: "Paid",
-      amount: 500.0,
-      invoiceId: "INV-001",
-    },
-    {
-      id: 2,
-      name: "Fuel Consumption",
-      date: "2023-10-27",
-      status: "Pending",
-      amount: 1200.5,
-      invoiceId: "INV-002",
-    },
-    {
-      id: 3,
-      name: "Inventory Check",
-      date: "2023-10-26",
-      status: "Overdue",
-      amount: 350.75,
-      invoiceId: "INV-003",
-    },
-    {
-      id: 4,
-      name: "Crew Payroll",
-      date: "2023-10-25",
-      status: "Paid",
-      amount: 8500.0,
-      invoiceId: "INV-004",
-    },
-    {
-      id: 5,
-      name: "Supplier Payment",
-      date: "2023-10-24",
-      status: "Pending",
-      amount: 2300.0,
-      invoiceId: "INV-005",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
 
   const getStatusChip = (status) => {
     let sxProps = {};
@@ -220,667 +184,85 @@ const Reports = () => {
     );
   };
 
-  const fetchDashboardSummary = async () => {
+  const fetchDashboardSummary = async (params = {}) => {
     try {
-      console.log("Fetching summary dashboard summary...");
-      const response = await getDashboardSummary();
+      setLoading(true);
+      console.log("Fetching dashboard summary...", params);
+      const response = await getDashboardSummary(params);
       console.log("Dashboard Response:", response);
 
-      // The response has a nested structure, so we need to navigate to the correct data
       if (response.status && response.data && response.data.data) {
-        console.log("Setting dashboard data:", response.data.data);
         setDashboardSummary(response.data.data);
+        if (!startDate && response.data.data.startDate) {
+          setStartDate(response.data.data.startDate);
+        }
       }
     } catch (error) {
       console.error("Error fetching dashboard summary:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // All useEffect hooks must be inside the component
+  // Fetch dashboard summary with filters
   useEffect(() => {
-    fetchDashboardSummary();
-  }, []);
-
-  const [activityData, setActivityData] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Bookings",
-        data: [],
-        backgroundColor: "#4318FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-      {
-        label: "Orders",
-        data: [],
-        backgroundColor: "#6AD2FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-    ],
-  });
-
-  const [healthReports, setHealthReports] = useState({
-    stockLevels: { rate: 0, correct: 0 },
-    supplierAvailability: { rate: 0, correct: 0 },
-    customerSatisfaction: { rate: 0, correct: 0 },
-    loading: true,
-    error: null,
-  });
-
-  const [systemMetrics, setSystemMetrics] = useState([]);
-
-  // Add refs for your charts
-  const barChartRef = useRef(null);
-  const lineChartRefs = useRef([]);
-
-  useEffect(() => {
-    fetchHealthReports();
-    fetchSystemActivity();
-    fetchSystemMetrics();
-
-    // Copy refs to local variables for proper cleanup
-    const currentBarChart = barChartRef.current;
-    const currentLineCharts = [...lineChartRefs.current];
-
-    // Cleanup function to destroy charts when component unmounts
-    return () => {
-      if (currentBarChart) {
-        currentBarChart.destroy();
-      }
-
-      currentLineCharts.forEach((chart) => {
-        if (chart) chart.destroy();
-      });
-    };
-  }, []);
-
-  const fetchHealthReports = async () => {
-    try {
-      const response = await getInventoryHealthReport();
-      console.log("Response", response);
-      if (response.success) {
-        setHealthReports({
-          stockLevels: {
-            rate: Math.round(response.data.data.stockLevels) || 0,
-          },
-          supplierAvailability: {
-            rate: Math.round(response.data.data.supplierAvailability) || 0,
-          },
-          customerSatisfaction: {
-            rate: Math.round(response.data.data.customerSatisfaction) || 0,
-          },
-          loading: false,
-          error: null,
-        });
-      } else {
-        setHealthReports((prev) => ({
-          ...prev,
-          loading: false,
-          error: response.error || "Failed to fetch inventory health report",
-        }));
-      }
-    } catch (error) {
-      setHealthReports((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error.message ||
-          "An error occurred while fetching inventory health report",
-      }));
+    const params = {};
+    
+    // Add order filters
+    if (orderStatsPeriod.orderPeriod !== 'all') {
+      params.orderPeriod = orderStatsPeriod.orderPeriod;
     }
-  };
-
-  const fetchSystemActivity = async () => {
-    try {
-      const response = await getSystemChartData();
-      if (response.success) {
-        const chartData = response.data;
-
-        setActivityData({
-          labels: chartData.map((item) => item.month),
-          datasets: [
-            {
-              label: "Bookings",
-              data: chartData.map((item) => item.bookings),
-              backgroundColor: "#4318FF",
-              borderRadius: 8,
-              barThickness: 15,
-              maxBarThickness: 8,
-            },
-            {
-              label: "Orders",
-              data: chartData.map((item) => item.orders),
-              backgroundColor: "#6AD2FF",
-              borderRadius: 8,
-              barThickness: 15,
-              maxBarThickness: 8,
-            },
-          ],
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching system activity:", error);
+    if (orderStatsPeriod.orderStartDate) {
+      params.orderStartDate = orderStatsPeriod.orderStartDate.toISOString().split('T')[0];
     }
-  };
-
-  const fetchSystemMetrics = async () => {
-    try {
-      const response = await getSystemMetrics();
-      if (response.success) {
-        // Map the titles to your preferred display names
-        const mappedMetrics = response.data.map((metric) => {
-          const customTitles = {
-            Users: "Active Users",
-            "Customer Satisfaction": "Customer Rating",
-            "Resolved Complaints": "Issues Resolved",
-            "Total Revenue": "Revenue",
-          };
-
-          return {
-            ...metric,
-            title: customTitles[metric.title] || metric.title,
-          };
-        });
-
-        setSystemMetrics(mappedMetrics);
-      }
-    } catch (error) {
-      console.error("Error fetching system metrics:", error);
+    if (orderStatsPeriod.orderEndDate) {
+      params.orderEndDate = orderStatsPeriod.orderEndDate.toISOString().split('T')[0];
     }
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 5,
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        grid: {
-          color: "#F4F7FE",
-          drawBorder: false,
-        },
-        border: {
-          display: false,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        border: {
-          display: false,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#ffffff",
-        titleColor: "#000000",
-        bodyColor: "#000000",
-        borderColor: "#F4F7FE",
-        borderWidth: 1,
-        padding: 12,
-        titleFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-        bodyFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-      },
-    },
-  };
-
-  const sparklineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { display: false },
-      y: {
-        display: false,
-        min: 0,
-        max: 10,
-      },
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false },
-    },
-    elements: {
-      point: { radius: 0 },
-      line: {
-        tension: 0.4,
-        borderWidth: 1.5,
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
-      },
-    },
-  };
-
-  const sparklineData = {
-    labels: ["", "", "", "", "", "", "", "", "", "", "", ""],
-    datasets: [
-      {
-        data: [5, 6, 4, 7, 5, 6, 8, 7, 6, 7, 8, 9],
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
-      },
-    ],
-  };
+    
+    // Add booking filters
+    if (bookingStatsPeriod.bookingPeriod !== 'all') {
+      params.bookingPeriod = bookingStatsPeriod.bookingPeriod;
+    }
+    if (bookingStatsPeriod.bookingStartDate) {
+      params.bookingStartDate = bookingStatsPeriod.bookingStartDate.toISOString().split('T')[0];
+    }
+    if (bookingStatsPeriod.bookingEndDate) {
+      params.bookingEndDate = bookingStatsPeriod.bookingEndDate.toISOString().split('T')[0];
+    }
+    
+    // Add activity filters
+    if (activityStatsPeriod.activityPeriod !== 'all') {
+      params.activityPeriod = activityStatsPeriod.activityPeriod;
+    }
+    if (activityStatsPeriod.activityStartDate) {
+      params.activityStartDate = activityStatsPeriod.activityStartDate.toISOString().split('T')[0];
+    }
+    if (activityStatsPeriod.activityEndDate) {
+      params.activityEndDate = activityStatsPeriod.activityEndDate.toISOString().split('T')[0];
+    }
+    
+    fetchDashboardSummary(params);
+  }, [orderStatsPeriod, bookingStatsPeriod, activityStatsPeriod]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [reportType, setReportType] = useState(null);
-  const [frequency, setFrequency] = useState(null);
+  const [fileType, setFileType] = useState(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const toast = useRef(null);
 
   const reportTypeOptions = [
-    { label: "Inventory", value: "Inventory" },
-    { label: "Bookings", value: "Bookings" },
-    { label: "Orders", value: "Orders" },
+    { label: "All", value: "all" },
+    { label: "Bookings", value: "bookings" },
+    { label: "Orders", value: "orders" },
+    { label: "Activities", value: "activities" },
   ];
 
-  const frequencyOptions = [
-    { label: "One-Time", value: "One-Time" },
-    { label: "Daily", value: "Daily" },
-    { label: "Weekly", value: "Weekly" },
-    { label: "Monthly", value: "Monthly" },
+  const fileTypeOption = [
+    { label: "CSV", value: "csv" },
+    { label: "PDF", value: "pdf" },
   ];
-
-  const generatePDFReport = (data) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let yPosition = 20;
-
-    // Add company logo or header
-    doc.setFontSize(24);
-    doc.setTextColor(3, 135, 217);
-    doc.text("YCC Reports", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 15;
-
-    // Add report title
-    doc.setFontSize(20);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`${reportType.toUpperCase()} REPORT`, pageWidth / 2, yPosition, {
-      align: "center",
-    });
-    yPosition += 15;
-
-    // Add report details
-    doc.setFontSize(12);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, yPosition);
-    yPosition += 10;
-    doc.text(
-      `Date Range: ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
-      margin,
-      yPosition
-    );
-    yPosition += 10;
-    doc.text(`Frequency: ${frequency}`, margin, yPosition);
-    yPosition += 20;
-
-    // Add summary section
-    doc.setFontSize(16);
-    doc.text("Summary", margin, yPosition);
-    yPosition += 10;
-
-    // Add summary data based on report type
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        generateOrdersPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-      case "bookings":
-        generateBookingsPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-      case "inventory":
-        generateInventoryPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-    }
-
-    // Save the PDF
-    const filename = `${reportType}_Report_${
-      startDate.toISOString().split("T")[0]
-    }_to_${endDate.toISOString().split("T")[0]}.pdf`;
-    doc.save(filename);
-  };
-
-  const generateOrdersPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Total Orders", data.orders?.total || 0],
-      ["Confirmed Orders", data.orders?.confirmed || 0],
-      ["Pending Orders", data.orders?.pending || 0],
-    ];
-
-    // Create table manually
-    doc.setFontSize(12);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add recent orders if available
-    const recentOrders = data.recentActivity?.orders || [];
-    if (recentOrders.length > 0) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(16);
-      doc.text("Recent Orders", margin, yPosition);
-      yPosition += 15;
-
-      // Calculate column widths for wider table
-      const colWidths = [
-        (pageWidth - margin * 2) * 0.15, // ID
-        (pageWidth - margin * 2) * 0.25, // Product
-        (pageWidth - margin * 2) * 0.25, // Vendor
-        (pageWidth - margin * 2) * 0.15, // Date
-        (pageWidth - margin * 2) * 0.2, // Total
-      ];
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      let currentX = margin;
-      colWidths.forEach((width) => {
-        doc.rect(currentX, yPosition, width, 10, "F");
-        currentX += width;
-      });
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      currentX = margin;
-      doc.text("ID", currentX + 5, yPosition + 7);
-      currentX += colWidths[0];
-      doc.text("Product", currentX + 5, yPosition + 7);
-      currentX += colWidths[1];
-      doc.text("Vendor", currentX + 5, yPosition + 7);
-      currentX += colWidths[2];
-      doc.text("Date", currentX + 5, yPosition + 7);
-      currentX += colWidths[3];
-      doc.text("Total", currentX + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      recentOrders.forEach((order) => {
-        currentX = margin;
-        colWidths.forEach((width) => {
-          doc.rect(currentX, yPosition, width, 10);
-          currentX += width;
-        });
-
-        currentX = margin;
-        doc.text(order._id.substring(0, 8), currentX + 5, yPosition + 7);
-        currentX += colWidths[0];
-        doc.text(
-          order.products?.[0]?.name || "Product",
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[1];
-        doc.text(order.vendorName, currentX + 5, yPosition + 7);
-        currentX += colWidths[2];
-        doc.text(
-          new Date(order.createdAt).toLocaleDateString(),
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[3];
-        doc.text(`$${order.totalPrice || 0}`, currentX + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const generateBookingsPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Total Bookings", data.bookings?.total || 0],
-      ["Confirmed Bookings", data.bookings?.confirmed || 0],
-      ["Pending Bookings", data.bookings?.pending || 0],
-    ];
-
-    // Create table manually
-    doc.setFontSize(12);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add recent bookings if available
-    const recentBookings = data.recentActivity?.bookings || [];
-    if (recentBookings.length > 0) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(10);
-      doc.text("Recent Bookings", margin, yPosition);
-      yPosition += 15;
-
-      // Calculate column widths for wider table
-      const colWidths = [
-        (pageWidth - margin * 2) * 0.15, // ID
-        (pageWidth - margin * 2) * 0.25, // Service
-        (pageWidth - margin * 2) * 0.25, // Vendor
-        (pageWidth - margin * 2) * 0.15, // Date
-        (pageWidth - margin * 2) * 0.2, // Total
-      ];
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      let currentX = margin;
-      colWidths.forEach((width) => {
-        doc.rect(currentX, yPosition, width, 10, "F");
-        currentX += width;
-      });
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      currentX = margin;
-      doc.text("ID", currentX + 5, yPosition + 7);
-      currentX += colWidths[0];
-      doc.text("Service", currentX + 5, yPosition + 7);
-      currentX += colWidths[1];
-      doc.text("Vendor", currentX + 5, yPosition + 7);
-      currentX += colWidths[2];
-      doc.text("Date", currentX + 5, yPosition + 7);
-      currentX += colWidths[3];
-      doc.text("Total", currentX + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      recentBookings.forEach((booking) => {
-        currentX = margin;
-        colWidths.forEach((width) => {
-          doc.rect(currentX, yPosition, width, 10);
-          currentX += width;
-        });
-
-        currentX = margin;
-        doc.text(booking._id.substring(0, 8), currentX + 5, yPosition + 7);
-        currentX += colWidths[0];
-        doc.text(
-          booking.services?.[0]?.name || "Service",
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[1];
-        doc.text(booking.vendorName, currentX + 5, yPosition + 7);
-        currentX += colWidths[2];
-        doc.text(
-          new Date(booking.createdAt).toLocaleDateString(),
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[3];
-        doc.text(`$${booking.totalAmount || 0}`, currentX + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const generateInventoryPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Low Stock Items", data.inventory?.lowStockItems || 0],
-      ["Total Items", data.inventory?.totalItems || 0],
-      ["Total Value", `$${data.inventory?.totalValue || 0}`],
-    ];
-
-    // Create table manually
-    doc.setFontSize(10);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add health metrics if available
-    if (data.healthReports) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(10);
-      doc.text("Inventory Health Metrics", margin, yPosition);
-      yPosition += 15;
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      doc.rect(margin, yPosition, colWidth1, 10, "F");
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      doc.text("Metric", margin + 5, yPosition + 7);
-      doc.text("Rate", margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      const healthData = [
-        ["Stock Levels", `${data.healthReports.stockLevels?.rate || 0}%`],
-        [
-          "Supplier Availability",
-          `${data.healthReports.supplierAvailability?.rate || 0}%`,
-        ],
-        [
-          "Customer Satisfaction",
-          `${data.healthReports.customerSatisfaction?.rate || 0}%`,
-        ],
-      ];
-
-      healthData.forEach((row) => {
-        doc.rect(margin, yPosition, colWidth1, 10);
-        doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-        doc.text(row[0], margin + 5, yPosition + 7);
-        doc.text(row[1], margin + colWidth1 + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     if (!startDate || !endDate) {
       toast.current.show({
         severity: "error",
@@ -901,218 +283,80 @@ const Reports = () => {
       return;
     }
 
-    if (!frequency) {
+    if (!fileType) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please select a frequency",
+        detail: "Please select a file to generate the report into.",
         life: 3000,
       });
       return;
     }
 
-    // Filter data based on date range
-    const filteredData = {
-      ...dashboardSummary,
-      recentActivity: {
-        orders:
-          dashboardSummary.recentActivity?.orders?.filter((order) => {
-            const orderDate = new Date(order.createdAt);
-            return orderDate >= startDate && orderDate <= endDate;
-          }) || [],
-        bookings:
-          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
-            const bookingDate = new Date(booking.createdAt);
-            return bookingDate >= startDate && bookingDate <= endDate;
-          }) || [],
-      },
-    };
+    setIsGeneratingReport(true);
+    try {
+      const params = {
+        reportType: reportType.toLowerCase(),
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        fileType: fileType
+      };
 
-    // Calculate summary statistics for the filtered data
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        filteredData.orders = {
-          total: filteredData.recentActivity.orders.length,
-          confirmed: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Pending"
-          ).length,
-        };
-        break;
-      case "bookings":
-        filteredData.bookings = {
-          total: filteredData.recentActivity.bookings.length,
-          confirmed: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Pending"
-          ).length,
-        };
-        break;
-      case "inventory":
-        // For inventory, we'll keep the current stats but you might want to filter these based on your business logic
-        filteredData.inventory = {
-          ...dashboardSummary.inventory,
-          // Add any date-based filtering for inventory if needed
-        };
-        break;
-    }
-
-    // Generate PDF using the filtered data
-    generatePDFReport(filteredData);
-  };
-
-  const handleExport = () => {
-    if (!startDate || !endDate) {
+      const response = await generateReport(params);
+      
+      if (response.status) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: response.message,
+          life: 3000,
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: response.message,
+          life: 3000,
+        });
+      }
+    } catch (error) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please select both start and end dates",
+        detail: "Failed to generate report",
         life: 3000,
       });
-      return;
+    } finally {
+      setIsGeneratingReport(false);
     }
-
-    // Use the same filtering logic as handleGenerateReport
-    const filteredData = {
-      ...dashboardSummary,
-      recentActivity: {
-        orders:
-          dashboardSummary.recentActivity?.orders?.filter((order) => {
-            const orderDate = new Date(order.createdAt);
-            return orderDate >= startDate && orderDate <= endDate;
-          }) || [],
-        bookings:
-          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
-            const bookingDate = new Date(booking.createdAt);
-            return bookingDate >= startDate && bookingDate <= endDate;
-          }) || [],
-      },
-    };
-
-    // Calculate summary statistics for the filtered data
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        filteredData.orders = {
-          total: filteredData.recentActivity.orders.length,
-          confirmed: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Pending"
-          ).length,
-        };
-        break;
-      case "bookings":
-        filteredData.bookings = {
-          total: filteredData.recentActivity.bookings.length,
-          confirmed: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Pending"
-          ).length,
-        };
-        break;
-      case "inventory":
-        filteredData.inventory = {
-          ...dashboardSummary.inventory,
-          // Add any date-based filtering for inventory if needed
-        };
-        break;
-    }
-
-    // Generate PDF using the filtered data
-    generatePDFReport(filteredData);
   };
-
-  // Add the renderInventoryStats function
-  const renderInventoryStats = () => {
-    if (!dashboardSummary || !dashboardSummary.inventory) {
-      return (
-        <div className="pending-order-container">
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Low Stock</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Total Items</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Total value</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-        </div>
-      );
-    }
-
-    const { lowStockItems, totalItems, totalValue } =
-      dashboardSummary.inventory;
-
-    return (
-      <div className="pending-order-container">
-        <div style={{ marginRight: "5px" }}>
-          <p
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              minWidth: "50px",
-              fontSize: "13px",
-            }}
-          >
-            Low Stock
-          </p>
-          <p style={{ fontSize: "12px" }}>{lowStockItems || 0}</p>
-        </div>
-        <div style={{ marginRight: "5px" }}>
-          <p style={{ fontSize: "13px" }}>Total Items</p>
-          <p style={{ fontSize: "12px" }}>{totalItems || 0}</p>
-        </div>
-        <div style={{ marginRight: "5px" }}>
-          <p style={{ fontSize: "13px" }}>Total value</p>
-          <p style={{ fontSize: "12px" }}>
-            ${totalValue ? totalValue.toLocaleString() : 0}
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   // Add this function to format the recent activity data for the table
   const formatRecentActivity = () => {
     if (!dashboardSummary || !dashboardSummary.recentActivity) {
       return [];
     }
 
-    // Combine orders and bookings into one array
-    const orders =
-      dashboardSummary.recentActivity.orders?.map((order) => ({
-        type: "Order",
-        id: order._id,
-        name: order.products?.[0]?.name || "Product",
-        vendor: order.vendorName,
-        total: order.totalPrice || 0,
-        status: order.status || "Pending",
-        date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
-        tracking: order.trackingId || "N/A",
-      })) || [];
+    // Format orders
+    const orders = dashboardSummary.recentActivity.orders?.map((order) => ({
+      type: "Order",
+      id: order.orderId || order._id,
+      name: order.subOrders?.[0]?.supplier?.businessName || "Order",
+      vendor: order.subOrders?.[0]?.supplier?.businessName || "Unknown Vendor",
+      total: order.totalPrice || 0,
+      status: order.overallStatus || order.subOrders?.[0]?.status || "Pending",
+      date: new Date(order.orderDate || order.createdAt).toLocaleDateString(),
+    })) || [];
 
-    const bookings =
-      dashboardSummary.recentActivity.bookings?.map((booking) => ({
-        type: "Booking",
-        id: booking._id,
-        name: booking.services?.[0]?.name || "Service",
-        vendor: booking.vendorName,
-        total: booking.totalAmount || 0,
-        status: booking.status || "Pending",
-        date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
-        tracking: "N/A",
-      })) || [];
+    // Format bookings
+    const bookings = dashboardSummary.recentActivity.bookings?.map((booking) => ({
+      type: "Booking",
+      id: booking.bookingId || booking._id,
+      name: booking.serviceName || booking.services?.[0]?.name || "Service",
+      vendor: booking.vendorName || booking.vendor?.businessName || "Unknown Vendor",
+      total: booking.totalAmount || booking.totalPrice || 0,
+      status: booking.status || "Pending",
+      date: new Date(booking.bookingDate || booking.createdAt).toLocaleDateString(),
+    })) || [];
 
     // Combine and sort by date (newest first)
     return [...orders, ...bookings].sort(
@@ -1120,23 +364,31 @@ const Reports = () => {
     );
   };
 
+  React.useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   return (
     <div>
       <Toast ref={toast} />
-      <Box sx={{ p: { xs: 2, md: 3 } }}>
-        <Grid container spacing={3}>
+      {/* Export Summary Section */}
+      <Box sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+        <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
           {/* Date Range Section */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ mb: 1 }}>
-              <h3>Date Range</h3>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                Date Range
+              </Typography>
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 1,
-                  flexWrap: { xs: "wrap", sm: "nowrap" },
+                  gap: { xs: 0.5, sm: 1 },
+                  flexDirection: { xs: "column", sm: "row" },
+                  width: "100%",
                 }}
               >
                 <Calendar
@@ -1147,8 +399,12 @@ const Reports = () => {
                   showIcon
                   minDate={new Date(2000, 0, 1)}
                   maxDate={endDate || new Date(2100, 11, 31)}
+                  icon={<CalendarMonthIcon width={18} height={18} />}
+                  style={{ width: '100%' }}
                 />
-                <span className="font-bold">to</span>
+                <Typography sx={{ fontSize: { xs: '12px', sm: '14px' }, fontWeight: 600, py: { xs: 0.5, sm: 0 } }}>
+                  to
+                </Typography>
                 <Calendar
                   value={endDate}
                   onChange={(e) => setEndDate(e.value)}
@@ -1157,24 +413,28 @@ const Reports = () => {
                   showIcon
                   minDate={startDate || new Date(2000, 0, 1)}
                   maxDate={new Date(2100, 11, 31)}
+                  icon={<CalendarMonthIcon width={18} height={18} />}
+                  style={{ width: '100%' }}
                 />
               </Box>
-              <small style={{ color: "#666", fontSize: "12px" }}>
+              <Typography sx={{ color: "#666", fontSize: { xs: '11px', sm: '12px' } }}>
                 Select both start and end dates to generate report
-              </small>
+              </Typography>
             </Box>
           </Grid>
 
           {/* Report Type Section */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ mb: 1 }}>
-              <h3>Report Type</h3>
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                Report Type
+              </Typography>
             </Box>
             <Box
               sx={{
                 border: "1px solid #e0e0e0",
                 borderRadius: "10px",
-                p: 1,
+                p: { xs: 0.8, sm: 1 },
               }}
             >
               <Dropdown
@@ -1187,73 +447,66 @@ const Reports = () => {
             </Box>
           </Grid>
 
-          {/* Frequency Section */}
-          <Grid item xs={12} md={4}>
-            <Box sx={{ mb: 1 }}>
-              <h3>Frequency</h3>
+          {/* File Type selection Section */}
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                File Type
+              </Typography>
             </Box>
             <Box
               sx={{
                 border: "1px solid #e0e0e0",
                 borderRadius: "10px",
-                p: 1,
+                p: { xs: 0.8, sm: 1 },
               }}
             >
               <Dropdown
-                value={frequency}
-                onChange={(e) => setFrequency(e.value)}
-                options={frequencyOptions}
-                placeholder="Select Frequency"
+                value={fileType}
+                onChange={(e) => setFileType(e.value)}
+                options={fileTypeOption}
+                placeholder="Select file type"
                 className="w-full"
               />
             </Box>
           </Grid>
 
           {/* Action Buttons */}
-          <Grid
-            item
-            xs={12}
-            sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}
-          >
-            <Button
-              variant="outlined"
-              startIcon={<DownloadIcon />}
-              onClick={handleExport}
+          <Grid item xs={12}>
+            <Box
               sx={{
-                width: "180px",
-                textTransform: "none",
-                borderColor: "#e0e0e0",
-                color: "#333",
-                transition:
-                  "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-                "&:hover": {
-                  backgroundColor: "#f5f5f5",
-                  borderColor: "#bdbdbd",
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
-                },
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: { xs: 1.5, sm: 2 },
+                flexDirection: { xs: "column", sm: "row" },
+                mt: { xs: 1, sm: 0 },
               }}
             >
-              Export
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleGenerateReport}
-              sx={{
-                width: "180px",
-                textTransform: "none",
-                backgroundColor: "#0387D9",
-                transition:
-                  "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
-                "&:hover": {
-                  backgroundColor: "#0277bd",
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
-                },
-              }}
-            >
-              Generate Report
-            </Button>
+              <Button
+                variant="contained"
+                onClick={handleGenerateReport}
+                disabled={isGeneratingReport}
+                sx={{
+                  width: { xs: "100%", sm: "160px", md: "180px" },
+                  height: { xs: "44px", sm: "40px" },
+                  textTransform: "none",
+                  fontSize: { xs: '14px', sm: '15px' },
+                  backgroundColor: "#0387D9",
+                  transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                  "&:hover": {
+                    backgroundColor: "#0277bd",
+                    transform: { xs: "none", sm: "scale(1.05)" },
+                    boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                  },
+                  "&:disabled": {
+                    backgroundColor: "#ccc",
+                    color: "#666",
+                  },
+                }}
+              >
+                {isGeneratingReport ? "Generating..." : "Generate Report"}
+              </Button>
+            </Box>
           </Grid>
         </Grid>
       </Box>
@@ -1269,7 +522,7 @@ const Reports = () => {
 
         <Grid container spacing={3}>
           {/* All Orders Card */}
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} lg={6}>
             <Paper
               elevation={0}
               sx={{
@@ -1300,8 +553,8 @@ const Reports = () => {
                   </Typography>
                 </Box>
                 <Select
-                  value={ordersDateRange}
-                  onChange={(e) => setOrdersDateRange(e.target.value)}
+                  value={orderStatsPeriod.orderPeriod}
+                  onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderPeriod: e.target.value }))}
                   variant="standard"
                   disableUnderline
                   sx={{
@@ -1321,167 +574,115 @@ const Reports = () => {
                     },
                   }}
                 >
-                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="all">All time</MenuItem>
+                  <MenuItem value="today">Today</MenuItem>
                   <MenuItem value="week">This week</MenuItem>
                   <MenuItem value="month">This month</MenuItem>
                   <MenuItem value="year">This year</MenuItem>
+                  <MenuItem value="custom">Custom</MenuItem>
                 </Select>
               </Box>
 
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Confirmed
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.orders?.confirmed || 0}
-                  </Typography>
+              {loading ? (
+                <StatsSkeleton />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={4} lg={2} >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Confirmed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.confirmed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Pending
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.pending || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Shipped
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.shipped || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Delivered
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.delivered || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Cancelled
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.cancelled || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Total
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.total || 0}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Pending
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.orders?.pending || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Total
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : (dashboardSummary.orders?.confirmed || 0) +
-                        (dashboardSummary.orders?.pending || 0)}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-
-          {/* Inventory Card */}
-          <Grid item xs={12} sm={6} lg={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                height: "100%",
-                borderRadius: 2,
-                border: "1px solid #E0E7ED",
-                transition:
-                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 3,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
-                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
-                    Inventory
-                  </Typography>
+              )}
+              
+              {/* Custom Date Range for Orders */}
+              {orderStatsPeriod.orderPeriod === 'custom' && (
+                <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+                  <Calendar
+                    value={orderStatsPeriod.orderStartDate}
+                    onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderStartDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="Start Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
+                  <span style={{ fontSize: '12px' }}>to</span>
+                  <Calendar
+                    value={orderStatsPeriod.orderEndDate}
+                    onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderEndDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="End Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
                 </Box>
-                <Select
-                  value={inventoryDateRange}
-                  onChange={(e) => setInventoryDateRange(e.target.value)}
-                  variant="standard"
-                  disableUnderline
-                  sx={{
-                    bgcolor: "#F8FAFC",
-                    borderRadius: 1,
-                    px: 1,
-                    py: 0.5,
-                    "& .MuiSelect-select": {
-                      color: "#64748B",
-                      fontSize: "caption.fontSize",
-                      paddingRight: "24px !important",
-                      display: "flex",
-                      alignItems: "center",
-                    },
-                    "& .MuiSvgIcon-root": {
-                      color: "#64748B",
-                    },
-                  }}
-                >
-                  <MenuItem value="day">This day</MenuItem>
-                  <MenuItem value="week">This week</MenuItem>
-                  <MenuItem value="month">This month</MenuItem>
-                  <MenuItem value="year">This year</MenuItem>
-                </Select>
-              </Box>
-
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Low Stock
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.inventory?.lowStockItems || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Total Items
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.inventory?.totalItems || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Total value
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    $
-                    {dashboardSummary.loading
-                      ? "--"
-                      : (
-                          dashboardSummary.inventory?.totalValue || 0
-                        ).toLocaleString()}
-                  </Typography>
-                </Grid>
-              </Grid>
+              )}
             </Paper>
           </Grid>
 
           {/* Bookings Card */}
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} lg={6}>
             <Paper
               elevation={0}
               sx={{
@@ -1512,8 +713,8 @@ const Reports = () => {
                   </Typography>
                 </Box>
                 <Select
-                  value={bookingsDateRange}
-                  onChange={(e) => setBookingsDateRange(e.target.value)}
+                  value={bookingStatsPeriod.bookingPeriod}
+                  onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingPeriod: e.target.value }))}
                   variant="standard"
                   disableUnderline
                   sx={{
@@ -1533,356 +734,207 @@ const Reports = () => {
                     },
                   }}
                 >
-                  <MenuItem value="day">This day</MenuItem>
+                  <MenuItem value="all">All time</MenuItem>
+                  <MenuItem value="today">Today</MenuItem>
                   <MenuItem value="week">This week</MenuItem>
                   <MenuItem value="month">This month</MenuItem>
                   <MenuItem value="year">This year</MenuItem>
+                  <MenuItem value="custom">Custom</MenuItem>
                 </Select>
               </Box>
 
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Confirmed
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.bookings?.confirmed || 0}
-                  </Typography>
+              {loading ? (
+                <StatsSkeleton />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Confirmed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.confirmed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Pending
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.pending || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Completed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.completed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Cancelled
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.cancelled || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Declined
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.declined || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Total
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.total || 0}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Pending
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : dashboardSummary.bookings?.pending || 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Total
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    {dashboardSummary.loading
-                      ? "--"
-                      : (dashboardSummary.bookings?.confirmed || 0) +
-                        (dashboardSummary.bookings?.pending || 0)}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-
-          {/* Financial Card */}
-          <Grid item xs={12} sm={6} lg={3}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                height: "100%",
-                borderRadius: 2,
-                border: "1px solid #E0E7ED",
-                transition:
-                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mb: 3,
-                }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
-                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
-                    Financial
-                  </Typography>
+              )}
+              
+              {/* Custom Date Range for Bookings */}
+              {bookingStatsPeriod.bookingPeriod === 'custom' && (
+                <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+                  <Calendar
+                    value={bookingStatsPeriod.bookingStartDate}
+                    onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingStartDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="Start Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
+                  <span style={{ fontSize: '12px' }}>to</span>
+                  <Calendar
+                    value={bookingStatsPeriod.bookingEndDate}
+                    onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingEndDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="End Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
                 </Box>
-                <Select
-                  value={financialDateRange}
-                  onChange={(e) => setFinancialDateRange(e.target.value)}
-                  variant="standard"
-                  disableUnderline
-                  sx={{
-                    bgcolor: "#F8FAFC",
-                    borderRadius: 1,
-                    px: 1,
-                    py: 0.5,
-                    "& .MuiSelect-select": {
-                      color: "#64748B",
-                      fontSize: "caption.fontSize",
-                      paddingRight: "24px !important",
-                      display: "flex",
-                      alignItems: "center",
-                    },
-                    "& .MuiSvgIcon-root": {
-                      color: "#64748B",
-                    },
-                  }}
-                >
-                  <MenuItem value="day">This day</MenuItem>
-                  <MenuItem value="week">This week</MenuItem>
-                  <MenuItem value="month">This month</MenuItem>
-                  <MenuItem value="year">This year</MenuItem>
-                </Select>
-              </Box>
-
-              <Grid container spacing={2}>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    In progress
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    0
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Pending
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    0
-                  </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "#64748B", display: "block", mb: 0.5 }}
-                  >
-                    Completed
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
-                    0
-                  </Typography>
-                </Grid>
-              </Grid>
+              )}
             </Paper>
           </Grid>
         </Grid>
-      </Box>
-
-      {/* Weekly & Monthly Reports Section */}
-      <Box sx={{ p: 3, mt: 3, backgroundColor: "white" }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 3,
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Typography variant="h6" sx={{ color: "#101828", fontWeight: 600 }}>
-            Weekly & Monthly Reports
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              flexWrap: "wrap",
-            }}
-          >
-            <ToggleButtonGroup
-              value={view}
-              exclusive
-              onChange={handleViewChange}
-              aria-label="text alignment"
-              sx={{
-                height: "40px",
-                "& .MuiToggleButton-root": {
-                  textTransform: "none",
-                  fontWeight: 500,
-                  borderRadius: "8px",
-                  padding: "8px 16px",
-                  border: "1px solid #D0D5DD",
-                  color: "#344054",
-                  transition: "background-color 0.3s, color 0.3s",
-                  "&.Mui-selected": {
-                    backgroundColor: "#0387D9",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "#0277bd",
-                    },
+        
+        {/* Recent Activities Section with Filter */}
+        <Box sx={{ mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ color: "#0A2647", fontWeight: 600 }}>
+              Recent Activities
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Select
+                value={activityStatsPeriod.activityPeriod}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityPeriod: e.target.value }))}
+                variant="standard"
+                disableUnderline
+                sx={{
+                  bgcolor: "#F8FAFC",
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5,
+                  "& .MuiSelect-select": {
+                    color: "#64748B",
+                    fontSize: "caption.fontSize",
+                    paddingRight: "24px !important",
+                    display: "flex",
+                    alignItems: "center",
                   },
-                  "&:not(.Mui-selected):hover": {
-                    backgroundColor: "#F9FAFB",
+                  "& .MuiSvgIcon-root": {
+                    color: "#64748B",
                   },
-                },
-              }}
-            >
-              <ToggleButton value="day" aria-label="left aligned">
-                Day
-              </ToggleButton>
-              <ToggleButton value="week" aria-label="centered">
-                Week
-              </ToggleButton>
-              <ToggleButton value="month" aria-label="right aligned">
-                Month
-              </ToggleButton>
-            </ToggleButtonGroup>
+                }}
+              >
+                <MenuItem value="all">All time</MenuItem>
+                <MenuItem value="today">Today</MenuItem>
+                <MenuItem value="week">This week</MenuItem>
+                <MenuItem value="month">This month</MenuItem>
+                <MenuItem value="year">This year</MenuItem>
+                <MenuItem value="custom">Custom</MenuItem>
+              </Select>
+            </Box>
           </Box>
-        </Box>
-
-        <Box sx={{ overflowX: "auto" }}>
-          <TableContainer
-            component={Paper}
-            elevation={0}
-            sx={{
-              border: "1px solid #EAECF0",
-              borderRadius: 2,
-              minWidth: { xs: "100%", sm: "800px" },
-            }}
-          >
+          
+          {/* Custom Date Range for Activities */}
+          {activityStatsPeriod.activityPeriod === 'custom' && (
+            <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Calendar
+                value={activityStatsPeriod.activityStartDate}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityStartDate: e.value }))}
+                dateFormat="yy-mm-dd"
+                placeholder="Start Date"
+                showIcon
+                icon={<CalendarMonthIcon width={18} height={18} />}
+              />
+              <span style={{ fontSize: '12px' }}>to</span>
+              <Calendar
+                value={activityStatsPeriod.activityEndDate}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityEndDate: e.value }))}
+                dateFormat="yy-mm-dd"
+                placeholder="End Date"
+                showIcon
+                icon={<CalendarMonthIcon width={18} height={18} />}
+              />
+            </Box>
+          )}
+          
+          {/* Recent Activities Table */}
+          <TableContainer component={Paper} sx={{ borderRadius: 2, border: "1px solid #E0E7ED" }}>
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableHeaderCell>Type</TableHeaderCell>
+                  <TableHeaderCell>ID</TableHeaderCell>
+                  <TableHeaderCell>Name</TableHeaderCell>
                   <TableHeaderCell>Vendor</TableHeaderCell>
-                  <TableHeaderCell>Order ID</TableHeaderCell>
-                  <TableHeaderCell>Invoices No.</TableHeaderCell>
-                  <TableHeaderCell>Payment Status</TableHeaderCell>
-                  <TableHeaderCell>Bookings</TableHeaderCell>
-                  <TableHeaderCell>Purchased Supplies</TableHeaderCell>
+                  <TableHeaderCell>Total</TableHeaderCell>
                   <TableHeaderCell>Status</TableHeaderCell>
+                  <TableHeaderCell>Date</TableHeaderCell>
                 </TableRow>
               </TableHead>
-              <TableBody>
-                {dashboardSummary && dashboardSummary.recentActivity ? (
-                  formatRecentActivity().length > 0 ? (
-                    formatRecentActivity().map((activity, index) => {
-                      const statuses = [
-                        "Confirmed",
-                        "In Progress",
-                        "Completed",
-                        "Pending",
-                        "Flagged",
-                      ];
-                      const mockStatus = statuses[index % statuses.length];
-                      const paymentStatus =
-                        index % 2 === 0 ? "Paid" : "Pending";
-                      const bookingStatus =
-                        activity.type === "Booking"
-                          ? index % 3 === 0
-                            ? "Completed"
-                            : "Processing"
-                          : "N/A";
-
-                      return (
-                        <TableRow
-                          key={activity.id || index}
-                          sx={{ "&:hover": { backgroundColor: "#F9FAFB" } }}
-                        >
-                          <TableCell
-                            sx={{
-                              fontWeight: 500,
-                              color: "#101828",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {activity.vendor}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#475467",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {`OR-${activity.id.slice(-5)}`}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#475467",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {`INV-${activity.id.slice(-4)}`}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#475467",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {paymentStatus}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#475467",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {bookingStatus}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#475467",
-                              borderBottom: "1px solid #EAECF0",
-                            }}
-                          >
-                            {activity.name}
-                          </TableCell>
-                          <TableCell sx={{ borderBottom: "1px solid #EAECF0" }}>
-                            {getStatusChip(mockStatus)}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={7}
-                        align="center"
-                        sx={{
-                          py: 4,
-                          color: "#64748B",
-                          borderBottom: "1px solid #EAECF0",
-                        }}
-                      >
-                        No recent activity found.
-                      </TableCell>
+              {loading ? (
+                <TableSkeleton />
+              ) : (
+                <TableBody>
+                  {formatRecentActivity().slice(0, 10).map((activity, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{activity.type}</TableCell>
+                      <TableCell>{activity.id.substring(0, 8)}</TableCell>
+                      <TableCell>{activity.name}</TableCell>
+                      <TableCell>{activity.vendor}</TableCell>
+                      <TableCell>${activity.total}</TableCell>
+                      <TableCell>{getStatusChip(activity.status)}</TableCell>
+                      <TableCell>{activity.date}</TableCell>
                     </TableRow>
-                  )
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      align="center"
-                      sx={{
-                        py: 4,
-                        color: "#64748B",
-                        borderBottom: "1px solid #EAECF0",
-                      }}
-                    >
-                      Loading data...
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+                  ))}
+                </TableBody>
+              )}
             </Table>
           </TableContainer>
         </Box>
@@ -1891,6 +943,7 @@ const Reports = () => {
   );
 };
 
+export default Reports;
 // Create and add a stylesheet element for responsive design
 const responsiveStyle = document.createElement("style");
 responsiveStyle.innerHTML = `
@@ -2015,5 +1068,3 @@ responsiveStyle.innerHTML = `
 if (typeof document !== "undefined") {
   document.head.appendChild(responsiveStyle);
 }
-
-export default Reports;
