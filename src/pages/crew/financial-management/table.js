@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   FaSortAmountDown,
   FaSortAmountUp,
-  FaChevronDown,
 } from "react-icons/fa";
 import sort from "../../../assets/images/crew/sort.png";
 import eyesIn from "../../../assets/images/crew/eyes-in.png";

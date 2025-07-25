@@ -108,45 +108,45 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           ? "active-menu-item menu-red-background"
           : "",
       items: [
-        {
-          label: "Legal Resources",
-          icon: (
-            <img
-              src={reportLogo}
-              alt="Legal Resources"
-              width={15}
-              height={15}
-            />
-          ),
-          className:
-            location.pathname === "/crew/legal-resources"
-              ? "active-menu-item menu-red-background"
-              : "",
-          command: () => navigate("/crew/legal-resources"),
-        },
-        {
-          label: "Crew Training",
-          icon: (
-            <img src={calendarLogo} alt="Training" width={15} height={15} />
-          ),
-          className: location.pathname === "/crew/training",
+        // {
+        //   label: "Legal Resources",
+        //   icon: (
+        //     <img
+        //       src={reportLogo}
+        //       alt="Legal Resources"
+        //       width={15}
+        //       height={15}
+        //     />
+        //   ),
+        //   className:
+        //     location.pathname === "/crew/legal-resources"
+        //       ? "active-menu-item menu-red-background"
+        //       : "",
+        //   command: () => navigate("/crew/legal-resources"),
+        // },
+        // {
+        //   label: "Crew Training",
+        //   icon: (
+        //     <img src={calendarLogo} alt="Training" width={15} height={15} />
+        //   ),
+        //   className: location.pathname === "/crew/training",
 
-          command: () => navigate("/crew/training"),
-        },
-        {
-          label: "Accommodation",
-          icon: (
-            <img
-              src={settingsLogo}
-              alt="Accommodation"
-              width={15}
-              height={15}
-            />
-          ),
-          className: location.pathname === "/crew/accommodation",
+        //   command: () => navigate("/crew/training"),
+        // },
+        // {
+        //   label: "Accommodation",
+        //   icon: (
+        //     <img
+        //       src={settingsLogo}
+        //       alt="Accommodation"
+        //       width={15}
+        //       height={15}
+        //     />
+        //   ),
+        //   className: location.pathname === "/crew/accommodation",
 
-          command: () => navigate("/crew/accomodation"),
-        },
+        //   command: () => navigate("/crew/accomodation"),
+        // },
         {
           label: "Document Management",
           icon: (
@@ -174,47 +174,47 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => navigate("/crew/calendar"),
     },
-    {
-      label: "Financial Management",
-      icon: (
-        <img
-          src={financeLogo}
-          alt="Financial Management"
-          width={15}
-          height={15}
-        />
-      ),
-      className:
-        location.pathname === "/crew/financial-management"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/financial-management"),
-    },
-    {
-      label: "Bookings",
-      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
-      className:
-        location.pathname === "/crew/booking"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/booking"),
-    },
-    {
-      label: "Inventory Management",
-      icon: (
-        <img
-          src={inventoryLogo}
-          alt="Inventory Management"
-          width={15}
-          height={15}
-        />
-      ),
-      className:
-        location.pathname === "/crew/inventory-management"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/inventory-management"),
-    },
+    // {
+    //   label: "Financial Management",
+    //   icon: (
+    //     <img
+    //       src={financeLogo}
+    //       alt="Financial Management"
+    //       width={15}
+    //       height={15}
+    //     />
+    //   ),
+    //   className:
+    //     location.pathname === "/crew/financial-management"
+    //       ? "active-menu-item menu-red-background"
+    //       : "",
+    //   command: () => navigate("/crew/financial-management"),
+    // },
+    // {
+    //   label: "Bookings",
+    //   icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
+    //   className:
+    //     location.pathname === "/crew/booking"
+    //       ? "active-menu-item menu-red-background"
+    //       : "",
+    //   command: () => navigate("/crew/booking"),
+    // },
+    // {
+    //   label: "Inventory Management",
+    //   icon: (
+    //     <img
+    //       src={inventoryLogo}
+    //       alt="Inventory Management"
+    //       width={15}
+    //       height={15}
+    //     />
+    //   ),
+    //   className:
+    //     location.pathname === "/crew/inventory-management"
+    //       ? "active-menu-item menu-red-background"
+    //       : "",
+    //   command: () => navigate("/crew/inventory-management"),
+    // },
     {
       label: "Orders",
       icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,

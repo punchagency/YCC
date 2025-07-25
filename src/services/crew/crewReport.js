@@ -172,12 +172,15 @@ export const exportReportCSV = async (reportType, params = {}) => {
 
 
 /**
- * Generate and download report as PDF
- * @param {Object} params - Report parameters (reportType, startDate, endDate, frequency)
- * @returns {Promise<Object>} - Report data and PDF download
+ * Generate and download report
+ * @param {Object} params - Report parameters (reportType, startDate, endDate, frequency, fileType)
+ * @returns {Promise<Object>} - Report data and file download
  */
 export const generateReport = async (params = {}) => {
   try {
+    const { fileType = 'pdf' } = params;
+    const responseType = fileType === 'csv' ? 'text' : 'arraybuffer';
+    
     const response = await axios.post(
       `${API_URL}/crew-reports/generate`,
       params,
@@ -185,23 +188,41 @@ export const generateReport = async (params = {}) => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        responseType: "blob", // Important for PDF download
+        responseType,
       }
     );
-
-    // Create a download link for the PDF file
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${params.reportType}_report.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    return {
-      status: true,
-      message: `${params.reportType} report generated and downloaded successfully`,
-    };
+    console.log(response.data);
+    if (fileType === 'csv') {
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${params.reportType}_report.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      return {
+        status: true,
+        message: `${params.reportType} CSV report downloaded successfully`,
+      };
+    } else if(fileType === 'pdf') {
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${params.reportType}_report.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return {
+        status: true,
+        message: `${params.reportType} PDF report downloaded successfully`,
+      };
+    } else {
+      return {
+        status: false,
+        message: `Invalid file type: ${fileType}`,
+      };
+    }
   } catch (error) {
     console.error(`Error generating ${params.reportType} report:`, error);
     return {
