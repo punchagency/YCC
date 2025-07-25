@@ -40,6 +40,7 @@ const AdminOrder = () => {
   const handlePageChange = (newPage) => {
     setPagination((prev) => ({ ...prev, page: newPage }));
   };
+
   const handleLimitChange = (newLimit) => {
     setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
   };
@@ -56,6 +57,7 @@ const AdminOrder = () => {
         mx: "auto",
         mt: { md: 2 },
         p: { md: 2 },
+        px: { md: 2 },
       }}
     >
       {/* Admin Filter/Search Bar */}
