@@ -16,20 +16,22 @@ import reportLogo from "../assets/images/crew/report-icon.png";
 import logoutLogo from "../assets/images/crew/logout.png";
 import PeopleIcon from "@mui/icons-material/People";
 import { useUser } from "../context/userContext";
+import transactionLogo from "../assets/images/crew/inventory-icon.png";
 
 const TopNav = ({ isOpen, onClose, role = "admin" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme } = useTheme();
   const { user } = useUser();
-  
+
   // Get role name from object or string (consistent with menu component)
   let userRole = user?.role;
   if (typeof userRole === 'object' && userRole.name) {
     userRole = userRole.name;
   }
-  
+
   const isCrewMember = userRole === "crew_member";
+  const isSupplier = userRole === "supplier";
 
   // Prevent scrolling when menu is open
   useEffect(() => {
@@ -57,7 +59,7 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
         localStorage.removeItem("token");
         navigate("/login");
       },
-      reject: () => {},
+      reject: () => { },
       footer: (options) => (
         <div
           style={{
@@ -283,8 +285,42 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
     },
   ];
 
+  const supplierMenuItems = [
+    {
+      label: "Dashboard",
+      icon: dashboardLogo,
+      path: '/supplier/dashboard',
+    },
+    {
+      label: "Inventory Management",
+      icon: inventoryLogo,
+      path: "/supplier/inventory",
+    },
+    {
+      label: "Orders",
+      icon: orderLogo,
+      path: "/supplier/orders"
+    },
+    {
+      label: "Transactions",
+      icon: transactionLogo,
+      path: "/supplier/transactions",
+    },
+    {
+      label: "Settings",
+      icon: settingsLogo,
+      path: "/supplier/settings"
+    },
+    {
+      label: "Log Out",
+      icon: logoutLogo,
+      onClick: handleLogout,
+      divider: true,
+    },
+  ];
+
   // Choose menu items based on user role
-  const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
+  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : adminMenuItems;
 
   const handleNavigation = (path, onClick, subItems) => {
     if (onClick) {
@@ -325,8 +361,8 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
           marginBottom: "30px",
         }}
       >
-        <div 
-          className="logo-container" 
+        <div
+          className="logo-container"
           onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         >
@@ -357,9 +393,8 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
             )}
 
             <div
-              className={`menu-item ${
-                location.pathname === item.path ? "active" : ""
-              }`}
+              className={`menu-item ${location.pathname === item.path ? "active" : ""
+                }`}
               style={{
                 display: "flex",
                 alignItems: "center",

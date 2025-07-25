@@ -6,12 +6,9 @@ import {
   useOutletContext,
 } from "react-router-dom";
 
-import sort from "../../assets/images/crew/sort.png";
-import editLogo from "../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../assets/images/crew/deleteLogo.png";
-import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { useTheme } from "../../context/theme/themeContext";
-
+import AddIcon from "@mui/icons-material/Add";
+import InventoryIcon from '@mui/icons-material/Inventory';
 import { TableSkeleton } from "../../components/TableSkeleton";
 import { Pagination } from "../../components/pagination";
 
@@ -57,6 +54,9 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ImageIcon from "@mui/icons-material/Image";
+import EmailIcon from "@mui/icons-material/Email";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
 
 import {
   createInventoryData,
@@ -102,6 +102,7 @@ const InventoryTableSkeleton = () => {
 };
 
 const Invent = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -114,12 +115,19 @@ const Invent = () => {
     productId: "",
     productName: "",
     description: "",
-    category: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
     productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Initialize with empty array
@@ -130,11 +138,17 @@ const Invent = () => {
     productId: null,
     productName: "",
     description: "",
-    category: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
     productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
 
   // Add description to newItem state
@@ -146,6 +160,12 @@ const Invent = () => {
     supplier: "",
     description: "",
     fileName: "",
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
 
   const [suppliers, setSuppliers] = useState([]);
@@ -207,6 +227,9 @@ const Invent = () => {
   const [appliedStockStatus, setAppliedStockStatus] =
     useState(stockStatusFilter);
   const [appliedSearchText, setAppliedSearchText] = useState("");
+
+  // Add this state to the Invent component
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   // Helper to get stock status
   const getStockStatus = (quantity) => {
@@ -349,12 +372,18 @@ const Invent = () => {
             id: item._id,
             productId: product.productId,
             productName: product.productName || "Unknown Product",
-            category: product.category?.[0] || "Uncategorized",
+            category: typeof product.category === 'string' ? [product.category] : Array.isArray(product.category) ? product.category : ["Uncategorized"],
             description: product.description || "Not available",
             supplier: item.supplier?.businessName || item.userInfo?.businessName || "Not available",
             stockQuantity: product.quantity || 0,
             price: product.price || 0,
             productImage: product.productImage || null,
+            hsCode: product.hsCode || "",
+            countryOfOrigin: product.countryOfOrigin || "",
+            height: product.height || 0,
+            width: product.width || 0,
+            length: product['length'] || 0,
+            weight: product.weight || 0,
           })) || []
         );
         setInventoryItems(formattedItems);
@@ -435,50 +464,106 @@ const Invent = () => {
         updateData = new FormData();
         updateData.append("productName", editItem.productName);
         updateData.append("category", editItem.category);
-        updateData.append("stockQuantity", editItem.stockQuantity);
+        updateData.append("quantity", editItem.stockQuantity);
         updateData.append("price", editItem.price);
         updateData.append("description", editItem.description);
         updateData.append("productImage", editItem.productImage);
         updateData.append("productId", editItem.productId);
+        updateData.append("hsCode", editItem.hsCode);
+        updateData.append("countryOfOrigin", editItem.countryOfOrigin);
+        updateData.append("height", editItem.height);
+        updateData.append("width", editItem.width);
+        updateData.append("length", editItem.length_);
+        updateData.append("weight", editItem.weight);
         isFormData = true;
       } else {
         updateData = {
           productName: editItem.productName,
           category: editItem.category,
-          stockQuantity: editItem.stockQuantity,
+          quantity: editItem.stockQuantity,
           price: editItem.price,
           description: editItem.description,
           productId: editItem.productId,
+          hsCode: editItem.hsCode,
+          countryOfOrigin: editItem.countryOfOrigin,
+          height: editItem.height,
+          width: editItem.width,
+          length: editItem.length_,
+          weight: editItem.weight
         };
       }
-      const result = await updateInventoryItem(
-        editItem.id,
-        updateData,
-        isFormData
-      );
-      if (result.success) {
-        // Update UI with new data
-        setInventoryItems((prev) =>
-          prev.map((item) =>
-            item.id === editItem.id
-              ? {
-                ...item,
-                ...editItem,
-                productImage: imagePreview || item.productImage,
-              }
-              : item
-          )
+      try {
+        const result = await updateInventoryItem(
+          editItem.id,
+          updateData,
+          isFormData
         );
-        setShowEditModal(false);
+
+        console.log("Update result:", result);
+
+        if (result.success) {
+          // Handle the nested response structure
+          const responseData = result.data?.data || result.data;
+
+          if (!responseData) {
+            throw new Error('Invalid response structure');
+          }
+
+          // Update UI with new data
+          const inventory = responseData;
+
+          // Enhanced formatting with better error handling
+          const formattedItems = inventory.products.map((prod) => {
+
+            return {
+              id: inventory._id,
+              productId: prod.productId, // Use productId from response instead of nested product._id
+              productName: prod.productName || "Unknown Product",
+              category: Array.isArray(prod.category) ? prod.category : typeof prod.category === 'string' ? [prod.category] : ["Uncategorized"],
+              description: prod.description || "Not available",
+              supplier: inventory.supplier?.businessName || "Not available",
+              stockQuantity: Number(prod.quantity) || 0,
+              price: Number(prod.price) || 0,
+              productImage: prod.productImage || null,
+              sku: prod.sku || "",
+              hsCode: prod.hsCode || "",
+              countryOfOrigin: prod.countryOfOrigin || "",
+              height: Number(prod.height) || 0, // Changed default from 1 to 0 to match API
+              width: Number(prod.width) || 0,
+              length: Number(prod['length']) || 0, // Fixed typo: was length_
+              weight: Number(prod.weight) || 0,
+              // Additional fields that might be useful
+              warehouseLocation: inventory.warehouseLocation || "",
+              createdAt: inventory.createdAt,
+              updatedAt: inventory.updatedAt
+            };
+          });
+
+          // Update the inventory items state
+          setInventoryItems(formattedItems);
+
+          // Close modal and show success message
+          setShowEditModal(false);
+          setSnackbar({
+            open: true,
+            message: result.data?.message || "Product updated successfully!",
+            severity: "success",
+          });
+
+        } else {
+          // Handle failure case
+          setSnackbar({
+            open: true,
+            message: result.error || result.message || "Update failed",
+            severity: "error",
+          });
+        }
+
+      } catch (error) {
+        console.error("Error updating inventory:", error);
         setSnackbar({
           open: true,
-          message: "Product updated successfully!",
-          severity: "success",
-        });
-      } else {
-        setSnackbar({
-          open: true,
-          message: result.error || "Update failed",
+          message: error.message || "An unexpected error occurred",
           severity: "error",
         });
       }
@@ -492,7 +577,8 @@ const Invent = () => {
   const handleDelete = (index) => {
     const item = inventoryItems[index];
     setItemToDelete({
-      id: item.id,
+      inventoryId: item.id, // inventory document id
+      productId: item.productId, // product id inside inventory
       index: index,
     });
     setShowDeleteConfirmation(true);
@@ -503,7 +589,8 @@ const Invent = () => {
 
     setIsLoading(true);
     try {
-      const result = await deleteInventoryItem(itemToDelete.id);
+      // Call deleteInventoryItem with inventoryId and productId
+      const result = await deleteInventoryItem(itemToDelete.inventoryId, itemToDelete.productId);
       if (result.success) {
         // Remove the deleted item from the state
         setInventoryItems((prevItems) =>
@@ -551,13 +638,21 @@ const Invent = () => {
   // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
     if (!newItem.productName || !newItem.category) {
-      setSaveError("Product name and category are required");
+      setSnackbar({
+        message: "Product name and category are required",
+        open: true,
+        severity: "error",
+      });
       return;
     }
 
     // Validate quantity
     if (!newItem.stockQuantity || newItem.stockQuantity <= 0) {
-      setSaveError("Stock quantity must be greater than 0");
+      setSnackbar({
+        message: "Stock quantity must be greater than 0",
+        open: true,
+        severity: "error",
+      });
       return;
     }
 
@@ -571,6 +666,13 @@ const Invent = () => {
       formData.append("category", newItem.category);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
+      formData.append("hsCode", newItem.hsCode);
+      formData.append("countryOfOrigin", newItem.countryOfOrigin);
+      formData.append("height", newItem.height);
+      formData.append("width", newItem.width);
+      formData.append("length", newItem.length_);
+      formData.append("weight", newItem.weight);
+
       // In handleSaveProduct, always send description (backend will ignore if not needed)
       formData.append("description", newItem.description);
       if (newItem.supplier) {
@@ -584,21 +686,28 @@ const Invent = () => {
       }
 
       const result = await createInventoryData(formData);
-
       if (result.success) {
-        const responseData = result.data.data;
-        const product = {
-          id: responseData._id,
-          productName: responseData.products[0].product?.name,
-          category: responseData.products[0].product?.category,
-          description: responseData.products[0].product?.description || "Not available",
-          supplier: responseData.supplier || "Not available",
-          stockQuantity: responseData.products[0].product?.quantity,
-          price: responseData.products[0].product?.price,
-          productImage: responseData.products[0].product?.productImage || null,
-        };
-
-        setInventoryItems([product, ...inventoryItems]);
+        const inventory = result.data.data;
+        const formattedItems = inventory.products.map((prod) => ({
+          id: inventory._id,
+          productId: prod.product._id,
+          productName: prod.product.name || "Unknown Product",
+          category: Array.isArray(prod.product.category) ? prod.product.category : typeof prod.product.category === 'string' ? [prod.product.category] : ["Uncategorized"],
+          description: prod.product.description || "Not available",
+          supplier: inventory.supplier?.businessName || "Not available",
+          stockQuantity: prod.quantity || 0,
+          price: prod.product.price || 0,
+          productImage: prod.product.productImage || null,
+          hsCode: prod.product.hsCode || "",
+          countryOfOrigin: prod.product.countryOfOrigin || "",
+          height: prod.product.height || 1,
+          width: prod.product.width || 1,
+          length: prod.product['length'] || 1,
+          weight: prod.product.weight || 1,
+        }));
+        setInventoryItems(formattedItems);
+        setTotalItems(result.pagination?.totalItems || formattedItems.length);
+        setTotalPages(result.pagination?.totalPages || 1);
 
         // Reset the form including the image
         setNewItem({
@@ -623,17 +732,21 @@ const Invent = () => {
           message: "Product added successfully!",
           severity: "success",
         });
-        setSaveError(""); // Clear any previous errors
       } else {
-        setSaveError(
-          result.error || "Failed to add inventory. Please try again."
-        );
-        setSaveSuccess(""); // Clear any previous success messages
+        setSnackbar({
+          message: result.error || "Failed to add inventory. Please try again.",
+          open: true,
+          severity: "error",
+        });
         console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
       console.error("Error adding inventory:", error);
-      setSaveError("An unexpected error occurred. Please try again.");
+      setSnackbar({
+        message: "An unexpected error occurred. Please try again.",
+        open: true,
+        severity: "error"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -641,11 +754,12 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
-    setViewItem(item);
+    console.log("Selected Item t be viewed:c ", item)
+    setViewItem({ ...item, length_: item['length'] });
     setShowViewModal(true);
   };
   const handleEditModal = (item) => {
-    setEditItem(item);
+    setEditItem({ ...item, length_: item['length'] });
     setShowEditModal(true);
   };
 
@@ -661,6 +775,12 @@ const Invent = () => {
       stockQuantity: "",
       price: "",
       productImage: null,
+      hsCode: '',
+      countryOfOrigin: '',
+      height: 1,
+      width: 1,
+      length_: 1,
+      weight: 1,
     });
   };
 
@@ -723,319 +843,432 @@ const Invent = () => {
   // Render mobile card view for inventory items
   const renderMobileInventoryCards = () => {
     return (
-      <div style={{ padding: "0 10px" }}>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={1}
-          sx={{ mb: 2, width: "100%" }}
+      <Box sx={{ px: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 3,
+            border: '1px solid #e2e8f0',
+            background: theme === "light" ? '#fff' : '#1a1a1a',
+          }}
         >
-          <Box
-            className="custom-dropdown"
-            sx={{ minWidth: 160, position: "relative" }}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ width: "100%" }}
           >
-            <Button
-              variant="outlined"
-              onClick={() => setStockStatusDropdownOpen((open) => !open)}
-              sx={{
-                textTransform: "none",
-                borderRadius: 2,
-                border: "1px solid #e2e8f0",
-                background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
-                fontWeight: 500,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                width: "100%",
-              }}
-              fullWidth
+            <Box
+              className="custom-dropdown"
+              sx={{ minWidth: 160, position: "relative" }}
             >
-              {stockStatusFilter === "all" && "All"}
-              {stockStatusFilter === "high" && (
-                <>
-                  <RadioButtonUncheckedIcon
-                    sx={{ color: "#059669", fontSize: 18, mr: 1 }}
-                  />
-                  <span style={{ color: "#059669" }}>High</span>
-                </>
+              <Button
+                variant="outlined"
+                onClick={() => setStockStatusDropdownOpen((open) => !open)}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  border: "1px solid #e2e8f0",
+                  background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  px: 2,
+                  py: 1,
+                  width: "100%",
+                  height: 40,
+                }}
+                fullWidth
+                endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
+              >
+                {stockStatusFilter === "all" && "All Status"}
+                {stockStatusFilter === "high" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RadioButtonUncheckedIcon
+                      sx={{ color: "#059669", fontSize: 18 }}
+                    />
+                    <span style={{ color: "#059669" }}>High Stock</span>
+                  </Box>
+                )}
+                {stockStatusFilter === "medium" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
+                    <span style={{ color: "#D97706" }}>Medium Stock</span>
+                  </Box>
+                )}
+                {stockStatusFilter === "low" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ErrorOutlineIcon
+                      sx={{ color: "#DC2626", fontSize: 18 }}
+                    />
+                    <span style={{ color: "#DC2626" }}>Low Stock</span>
+                  </Box>
+                )}
+              </Button>
+              {stockStatusDropdownOpen && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    background: theme === "light" ? "#fff" : "#1a1a1a",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 2,
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                    zIndex: 10,
+                    mt: 0.5,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {[
+                    { key: "all", label: "All Status" },
+                    {
+                      key: "high",
+                      label: "High Stock",
+                      icon: (
+                        <RadioButtonUncheckedIcon
+                          sx={{ color: "#059669", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                    {
+                      key: "medium",
+                      label: "Medium Stock",
+                      icon: (
+                        <RemoveIcon
+                          sx={{ color: "#D97706", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                    {
+                      key: "low",
+                      label: "Low Stock",
+                      icon: (
+                        <ErrorOutlineIcon
+                          sx={{ color: "#DC2626", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                  ].map((opt) => (
+                    <Box
+                      key={opt.key}
+                      className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
+                        }`}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        px: 2,
+                        py: 1.5,
+                        cursor: "pointer",
+                        fontWeight: stockStatusFilter === opt.key ? 600 : 400,
+                        color:
+                          opt.key === "high"
+                            ? "#059669"
+                            : opt.key === "medium"
+                              ? "#D97706"
+                              : opt.key === "low"
+                                ? "#DC2626"
+                                : "#374151",
+                        background:
+                          stockStatusFilter === opt.key ?
+                            theme === "light" ? "#eff6ff" : "#1e293b" :
+                            undefined,
+                        "&:hover": {
+                          background: theme === "light" ? "#f8fafc" : "#1e293b",
+                        },
+                      }}
+                      onClick={() => {
+                        setStockStatusFilter(opt.key);
+                        setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
+                        setPage(0); // Optionally reset to first page
+                        setStockStatusDropdownOpen(false);
+                      }}
+                    >
+                      {opt.icon && opt.icon}
+                      <span>{opt.label}</span>
+                    </Box>
+                  ))}
+                </Box>
               )}
-              {stockStatusFilter === "medium" && (
-                <>
-                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18, mr: 1 }} />
-                  <span style={{ color: "#D97706" }}>Medium</span>
-                </>
-              )}
-              {stockStatusFilter === "low" && (
-                <>
-                  <ErrorOutlineIcon
-                    sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
-                  />
-                  <span style={{ color: "#DC2626" }}>Low</span>
-                </>
-              )}
-              <span style={{ marginLeft: 8, fontSize: 12, color: "#6b7280" }}>
-                ▼
-              </span>
+            </Box>
+            <TextField
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search by product name..."
+              fullWidth
+              size="small"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  height: 40,
+                  '&.Mui-focused': {
+                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setAppliedStockStatus(stockStatusFilter);
+                setAppliedSearchText(searchText);
+              }}
+              sx={{
+                minWidth: { sm: 120 },
+                height: 40,
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
+            >
+              Search
             </Button>
-            {stockStatusDropdownOpen && (
+          </Stack>
+        </Paper>
+
+        {inventoryItems.map((item, index) => {
+          // Determine stock status color
+          const stockStatus = getStockStatus(item.stockQuantity);
+          const statusColor =
+            stockStatus === 'high' ? '#059669' :
+              stockStatus === 'medium' ? '#D97706' :
+                '#DC2626';
+
+          return (
+            <Paper
+              key={index}
+              elevation={1}
+              sx={{
+                borderRadius: 3,
+                overflow: 'hidden',
+                mb: 2,
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                },
+                position: 'relative',
+                background: theme === "light" ? '#fff' : '#1a1a1a',
+              }}
+            >
+              {/* Status indicator line at top */}
               <Box
                 sx={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  right: 0,
-                  background: "#fff",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: 2,
-                  boxShadow: 3,
-                  zIndex: 10,
-                  mt: 0.5,
+                  height: '4px',
+                  width: '100%',
+                  bgcolor: statusColor,
                 }}
-              >
-                {[
-                  { key: "all", label: "All" },
-                  {
-                    key: "high",
-                    label: "High",
-                    icon: (
-                      <RadioButtonUncheckedIcon
-                        sx={{ color: "#059669", fontSize: 18, mr: 1 }}
-                      />
-                    ),
-                  },
-                  {
-                    key: "medium",
-                    label: "Medium",
-                    icon: (
-                      <RemoveIcon
-                        sx={{ color: "#D97706", fontSize: 18, mr: 1 }}
-                      />
-                    ),
-                  },
-                  {
-                    key: "low",
-                    label: "Low",
-                    icon: (
-                      <ErrorOutlineIcon
-                        sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
-                      />
-                    ),
-                  },
-                ].map((opt) => (
-                  <Box
-                    key={opt.key}
-                    className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
-                      }`}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 2,
-                      py: 1,
-                      cursor: "pointer",
-                      borderRadius: 1,
-                      fontWeight: stockStatusFilter === opt.key ? 600 : 400,
-                      color:
-                        opt.key === "high"
-                          ? "#059669"
-                          : opt.key === "medium"
-                            ? "#D97706"
-                            : opt.key === "low"
-                              ? "#DC2626"
-                              : "#374151",
-                      background:
-                        stockStatusFilter === opt.key ? "#eff6ff" : undefined,
-                      "&:hover": { background: "#f8fafc" },
-                    }}
-                    onClick={() => {
-                      setStockStatusFilter(opt.key);
-                      setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
-                      setPage(0); // Optionally reset to first page
-                      setStockStatusDropdownOpen(false);
-                    }}
-                  >
-                    {opt.icon && opt.icon}
-                    <span>{opt.label}</span>
-                  </Box>
-                ))}
+              />
+
+              <Box sx={{ p: 2 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {item.productName}
+                  </Typography>
+                  <Stack direction="row" spacing={1}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleViewItem(item)}
+                      sx={{
+                        bgcolor: 'rgba(0, 102, 204, 0.1)',
+                        color: '#0066cc',
+                        '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                      }}
+                    >
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditModal(item)}
+                      sx={{
+                        bgcolor: 'rgba(5, 150, 105, 0.1)',
+                        color: '#059669',
+                        '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDelete(index)}
+                      sx={{
+                        bgcolor: 'rgba(220, 38, 38, 0.1)',
+                        color: '#DC2626',
+                        '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+
+                <Grid container spacing={1} sx={{ mb: 2 }}>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Category
+                    </Typography>
+                    <Typography variant="body2">
+                      {item.category && item.category.length > 0 && item.category.slice(0, 1).map(cat => cat).join(", ")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Stock
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      sx={{ color: statusColor }}
+                    >
+                      {item.stockQuantity} units
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Price
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {!isNaN(Number(item.price))
+                        ? formatCurrency(Number(item.price)) + " per unit"
+                        : "$0.00"}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<EmailIcon />}
+                  onClick={() => handleSendEmail(item)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    py: 1,
+                    background: 'linear-gradient(135deg, #0066cc 0%, #0044aa 100%)',
+                    boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgba(0, 102, 204, 0.3)',
+                    },
+                  }}
+                >
+                  Contact Supplier
+                </Button>
               </Box>
-            )}
+            </Paper>
+          );
+        })}
+
+        {inventoryItems.length === 0 && !isLoading && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              textAlign: 'center',
+              border: '1px dashed #cbd5e1',
+              bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+            }}
+          >
+            <InventoryIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
+            <Typography variant="h6" fontWeight={600} color="text.secondary">
+              No inventory items found
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Add your first product to get started
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddProduct}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                px: 3,
+              }}
+            >
+              Add Product
+            </Button>
+          </Paper>
+        )}
+
+        {inventoryItems.length > 0 && (
+          <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+            <Pagination
+              currentPage={page + 1}
+              totalPages={Math.ceil(totalItems / pageSize)}
+              totalItems={totalItems}
+              itemsPerPage={pageSize}
+              onPageChange={(newPage) => {
+                setPage(newPage - 1);
+              }}
+            />
           </Box>
-          <TextField
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search by product name..."
-            fullWidth
-            size="small"
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              setAppliedStockStatus(stockStatusFilter);
-              setAppliedSearchText(searchText);
-            }}
-            fullWidth
-            sx={{ minWidth: { sm: 120 } }}
-          >
-            Search
-          </Button>
-        </Stack>
-        {inventoryItems.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "12px",
-              marginBottom: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "8px",
-              }}
-            >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                }}
-              >
-                {item.productName}
-              </h3>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                }}
-              >
-                <img
-                  src={eyesIn}
-                  alt="view"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleViewItem(item)}
-                />
-                <img
-                  src={editLogo}
-                  alt="edit"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleEditModal(item)}
-                />
-                <img
-                  src={deleteLogo}
-                  alt="delete"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleDelete(index)}
-                />
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "8px",
-                fontSize: "14px",
-              }}
-            >
-              <div>
-                <span style={{ color: "#666" }}>Category: </span>
-                <span>{item.category}</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Stock: </span>
-                <span>{item.stockQuantity} units</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Price: </span>
-                <span>
-                  {!isNaN(Number(item.price))
-                    ? formatCurrency(Number(item.price)) + " per unit"
-                    : "0.00"}
-                </span>
-              </div>
-            </div>
-
-            {/* Add Send Email button */}
-            <div style={{ marginTop: "10px" }}>
-              <button
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "5px",
-                  backgroundColor: "#0387D9",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  width: "100%",
-                }}
-                onClick={() => handleSendEmail(item)}
-              >
-                Send Email
-              </button>
-            </div>
-          </div>
-        ))}
-        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
-          <Pagination
-            currentPage={page + 1}
-            totalPages={Math.ceil(totalItems / pageSize)}
-            totalItems={totalItems}
-            itemsPerPage={pageSize}
-            onPageChange={(newPage) => {
-              setPage(newPage - 1);
-            }}
-          />
-        </Box>
-      </div>
+        )}
+      </Box>
     );
   };
 
   // Render inventory items with loading state
   const renderInventoryItems = () => {
-    if (isDataLoading) {
-      // return (
-      //   <div
-      //     className="loading-container"
-      //     style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-      //   >
-      //     <ProgressSpinner
-      //       style={{ width: "50px", height: "50px" }}
-      //       strokeWidth="4"
-      //       fill="var(--surface-ground)"
-      //       animationDuration=".5s"
-      //     />
-      //   </div>
-      // );
+    if (isLoading) {
+      return (
+        <Box sx={{ p: 4, textAlign: 'center' }}>
+          <CircularProgress size={40} thickness={4} />
+          <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+            Loading inventory items...
+          </Typography>
+        </Box>
+      );
     }
 
     if (inventoryItems.length === 0) {
       return (
-        <div
-          className="empty-state"
-          style={{ textAlign: "center", padding: "2rem" }}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 6,
+            borderRadius: 3,
+            textAlign: 'center',
+            border: '1px dashed #cbd5e1',
+            bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+            maxWidth: 600,
+            mx: 'auto',
+            mt: 4
+          }}
         >
-          <p>No inventory items found. Add your first product!</p>
-        </div>
+          <InventoryIcon sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
+          <Typography variant="h5" fontWeight={600} color="text.secondary">
+            No inventory items found
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
+            Start by adding your first product to manage your inventory effectively
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddProduct}
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              px: 4,
+              py: 1.5,
+              fontWeight: 600,
+              boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+            }}
+          >
+            Add Your First Product
+          </Button>
+        </Paper>
       );
     }
+
+    // Return null when there are items (they'll be rendered by desktop or mobile view)
+    return null;
   };
 
   // Add this style to your component
@@ -1078,9 +1311,9 @@ const Invent = () => {
   }, []);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-NG', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'NGN',
+      currency: 'USD',
     }).format(amount);
   };
 
@@ -1088,26 +1321,37 @@ const Invent = () => {
   const renderDesktopView = () => {
     return (
       <>
-        <Box
+        <Paper
+          elevation={0}
           sx={{
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
             gap: 2,
-            mb: 2,
+            mb: 3,
             p: 2,
             marginTop: "28px",
-            backgroundColor: "#fff",
-            borderRadius: 2,
+            backgroundColor: theme === "light" ? "#fff" : "#1a1a1a",
+            borderRadius: 3,
             border: "1px solid #EAECF0",
             position: "sticky",
             top: 0,
             zIndex: 10,
           }}
         >
-          <span style={{ fontWeight: 500 }}>Stock Status:</span>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <FilterListIcon color="primary" fontSize="small" />
+            <Typography variant="subtitle2" fontWeight={600}>Filters:</Typography>
+          </Stack>
+
           <Box
             className="custom-dropdown"
-            sx={{ minWidth: 160, position: "relative" }}
+            sx={{
+              minWidth: 180,
+              position: "relative",
+              flex: { xs: '1 1 100%', sm: '0 1 auto' },
+              mt: { xs: 1, sm: 0 },
+            }}
           >
             <Button
               variant="outlined"
@@ -1116,40 +1360,41 @@ const Invent = () => {
                 textTransform: "none",
                 borderRadius: 2,
                 border: "1px solid #e2e8f0",
-                background: "linear-gradient(135deg, #fff 0%, #f8fafc 100%)",
+                background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
                 fontWeight: 500,
                 display: "flex",
                 alignItems: "center",
-                gap: 1,
+                justifyContent: "space-between",
+                px: 2,
+                py: 1,
+                height: 40,
               }}
               fullWidth
+              endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
             >
-              {stockStatusFilter === "all" && "All"}
+              {stockStatusFilter === "all" && "All Status"}
               {stockStatusFilter === "high" && (
-                <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <RadioButtonUncheckedIcon
-                    sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                    sx={{ color: "#059669", fontSize: 18 }}
                   />
-                  <span style={{ color: "#059669" }}>High</span>
-                </>
+                  <span style={{ color: "#059669" }}>High Stock</span>
+                </Box>
               )}
               {stockStatusFilter === "medium" && (
-                <>
-                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18, mr: 1 }} />
-                  <span style={{ color: "#D97706" }}>Medium</span>
-                </>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
+                  <span style={{ color: "#D97706" }}>Medium Stock</span>
+                </Box>
               )}
               {stockStatusFilter === "low" && (
-                <>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <ErrorOutlineIcon
-                    sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                    sx={{ color: "#DC2626", fontSize: 18 }}
                   />
-                  <span style={{ color: "#DC2626" }}>Low</span>
-                </>
+                  <span style={{ color: "#DC2626" }}>Low Stock</span>
+                </Box>
               )}
-              <span style={{ marginLeft: 8, fontSize: 12, color: "#6b7280" }}>
-                ▼
-              </span>
             </Button>
             {stockStatusDropdownOpen && (
               <Box
@@ -1158,40 +1403,41 @@ const Invent = () => {
                   top: "100%",
                   left: 0,
                   right: 0,
-                  background: "#fff",
+                  background: theme === "light" ? "#fff" : "#1a1a1a",
                   border: "1px solid #e2e8f0",
                   borderRadius: 2,
-                  boxShadow: 3,
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                   zIndex: 10,
                   mt: 0.5,
+                  overflow: 'hidden',
                 }}
               >
                 {[
-                  { key: "all", label: "All" },
+                  { key: "all", label: "All Status" },
                   {
                     key: "high",
-                    label: "High",
+                    label: "High Stock",
                     icon: (
                       <RadioButtonUncheckedIcon
-                        sx={{ color: "#059669", fontSize: 18, mr: 1 }}
+                        sx={{ color: "#059669", fontSize: 18 }}
                       />
                     ),
                   },
                   {
                     key: "medium",
-                    label: "Medium",
+                    label: "Medium Stock",
                     icon: (
                       <RemoveIcon
-                        sx={{ color: "#D97706", fontSize: 18, mr: 1 }}
+                        sx={{ color: "#D97706", fontSize: 18 }}
                       />
                     ),
                   },
                   {
                     key: "low",
-                    label: "Low",
+                    label: "Low Stock",
                     icon: (
                       <ErrorOutlineIcon
-                        sx={{ color: "#DC2626", fontSize: 18, mr: 1 }}
+                        sx={{ color: "#DC2626", fontSize: 18 }}
                       />
                     ),
                   },
@@ -1205,9 +1451,8 @@ const Invent = () => {
                       alignItems: "center",
                       gap: 1,
                       px: 2,
-                      py: 1,
+                      py: 1.5,
                       cursor: "pointer",
-                      borderRadius: 1,
                       fontWeight: stockStatusFilter === opt.key ? 600 : 400,
                       color:
                         opt.key === "high"
@@ -1218,8 +1463,12 @@ const Invent = () => {
                               ? "#DC2626"
                               : "#374151",
                       background:
-                        stockStatusFilter === opt.key ? "#eff6ff" : undefined,
-                      "&:hover": { background: "#f8fafc" },
+                        stockStatusFilter === opt.key ?
+                          theme === "light" ? "#eff6ff" : "#1e293b" :
+                          undefined,
+                      "&:hover": {
+                        background: theme === "light" ? "#f8fafc" : "#1e293b",
+                      },
                     }}
                     onClick={() => {
                       setStockStatusFilter(opt.key);
@@ -1235,22 +1484,23 @@ const Invent = () => {
               </Box>
             )}
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: "stretch",
-              gap: 1,
-              mb: 2,
-            }}
-          >
+
+          <Box sx={{ display: 'flex', gap: 2, flex: 1, maxWidth: { xs: '100%', md: '50%' } }}>
             <TextField
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               placeholder="Search by product name..."
               fullWidth
               size="small"
-              sx={{ mb: { xs: 1, sm: 0 } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  height: 40,
+                  '&.Mui-focused': {
+                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  },
+                },
+              }}
             />
             <Button
               variant="contained"
@@ -1259,78 +1509,89 @@ const Invent = () => {
                 setAppliedStockStatus(stockStatusFilter);
                 setAppliedSearchText(searchText);
               }}
-              fullWidth
-              sx={{ minWidth: { sm: 120 } }}
+              sx={{
+                minWidth: 100,
+                height: 40,
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
             >
               Search
             </Button>
           </Box>
-        </Box>
+        </Paper>
+
         <TableContainer
           component={Paper}
           sx={{
-            borderRadius: 2,
-            boxShadow: 0,
-            border: "1px solid #EAECF0",
-            mt: 2,
+            borderRadius: 3,
+            boxShadow: theme === "light" ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+            border: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+            overflow: 'hidden',
           }}
         >
           <Table>
-            <TableHead sx={{ backgroundColor: "#F9FAFB" }}>
+            <TableHead sx={{
+              backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
+              borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+            }}>
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectAll}
                     onChange={handleSelectAll}
                     inputProps={{ "aria-label": "select all products" }}
+                    sx={{
+                      color: theme === "light" ? "#94a3b8" : "#64748b",
+                      '&.Mui-checked': {
+                        color: '#0066cc',
+                      },
+                    }}
                   />
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Product ID
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Product Name
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Category
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Stock Quantity
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Price
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Actions
-                    <IconButton size="small">
-                      <FilterListIcon fontSize="inherit" />
-                    </IconButton>
                   </Box>
                 </TableCell>
               </TableRow>
@@ -1338,94 +1599,176 @@ const Invent = () => {
             <TableBody>
               {inventoryItems.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">
-                    No products match your filter or search.
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+                      <InventoryIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
+                      <Typography variant="h6" fontWeight={600} color="text.secondary">
+                        No products match your filter or search
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        Try adjusting your search or filter criteria
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : (
-                inventoryItems.map((item, idx) => (
-                  <TableRow
-                    key={item.id}
-                    hover
-                    selected={selectedItems.includes(item.id)}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={selectedItems.includes(item.id)}
-                        onChange={() => handleSelectItem(item.id)}
-                        inputProps={{
-                          "aria-label": `select product ${item.productName}`,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      #{item.id?.slice?.(-6) || item.id || idx + 1}
-                    </TableCell>
-                    <TableCell>{item.productName}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>
-                      <span
-                        style={{
-                          backgroundColor:
-                            getStockStatus(item.stockQuantity) === "high"
-                              ? "#ECFDF3"
-                              : getStockStatus(item.stockQuantity) === "medium"
-                                ? "#FFFAEB"
-                                : "#FEF3F2",
-                          color:
-                            getStockStatus(item.stockQuantity) === "high"
-                              ? "#027A48"
-                              : getStockStatus(item.stockQuantity) === "medium"
-                                ? "#B54708"
-                                : "#B42318",
-                          padding: "4px 8px",
-                          borderRadius: "16px",
-                          fontSize: "12px",
-                          fontWeight: 500,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 'fit-content',
-                        }}
-                      >
-                        {item.stockQuantity} units
-                      </span>
-                    </TableCell>
-                    <TableCell>
+                inventoryItems.map((item, idx) => {
+                  const stockStatus = getStockStatus(item.stockQuantity);
+                  const statusColor =
+                    stockStatus === 'high' ? '#059669' :
+                      stockStatus === 'medium' ? '#D97706' :
+                        '#DC2626';
+                  const statusBgColor =
+                    stockStatus === 'high' ? '#ECFDF3' :
+                      stockStatus === 'medium' ? '#FFFAEB' :
+                        '#FEF3F2';
 
-                      {!isNaN(Number(item.price))
-                        ? formatCurrency(Number(item.price)) + " per unit"
-                        : "0.00"}
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title="View">
-                        <IconButton onClick={() => handleViewItem(item)}>
-                          <VisibilityIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit">
-                        <IconButton
-                          onClick={() => handleEditModal(item)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete">
-                        <IconButton onClick={() => handleDelete(idx)}>
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Send Email">
-                        <IconButton onClick={() => handleSendEmail(item)}>
-                          <i
-                            className="pi pi-envelope"
-                            style={{ color: "#0387D9" }}
+                  return (
+                    <TableRow
+                      key={item.id}
+                      hover
+                      selected={selectedItems.includes(item.id)}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.04)' : 'rgba(0, 102, 204, 0.08)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.08)' : 'rgba(0, 102, 204, 0.12)',
+                          '&:hover': {
+                            backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.12)' : 'rgba(0, 102, 204, 0.16)',
+                          },
+                        },
+                        borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+                      }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedItems.includes(item.id)}
+                          onChange={() => handleSelectItem(item.id)}
+                          inputProps={{
+                            "aria-label": `select product ${item.productName}`,
+                          }}
+                          sx={{
+                            color: theme === "light" ? "#94a3b8" : "#64748b",
+                            '&.Mui-checked': {
+                              color: '#0066cc',
+                            },
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                        <Chip
+                          label={`#${item.productId?.slice?.(-6) || item.productId || idx + 1}`}
+                          size="small"
+                          sx={{
+                            bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
+                            color: theme === "light" ? '#334155' : '#94a3b8',
+                            fontWeight: 500,
+                            fontSize: '0.75rem',
+                            height: 24,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {item.productName}
+                      </TableCell>
+                      <TableCell sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {item.category && item.category.length > 0 && item.category.slice(0, 2).map((cat) => (
+                          <Chip
+                            key={cat}
+                            label={cat}
+                            size="small"
+                            sx={{
+                              bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
+                              color: theme === "light" ? '#334155' : '#94a3b8',
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              height: 24,
+                            }}
                           />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            backgroundColor: statusBgColor,
+                            color: statusColor,
+                            py: 0.5,
+                            px: 1.5,
+                            borderRadius: 2,
+                            display: "inline-flex",
+                            alignItems: 'center',
+                            gap: 0.5,
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            width: 'fit-content',
+                          }}
+                        >
+                          {stockStatus === 'high' && <RadioButtonUncheckedIcon sx={{ fontSize: 14 }} />}
+                          {stockStatus === 'medium' && <RemoveIcon sx={{ fontSize: 14 }} />}
+                          {stockStatus === 'low' && <ErrorOutlineIcon sx={{ fontSize: 14 }} />}
+                          {item.stockQuantity} units
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {!isNaN(Number(item.price))
+                          ? formatCurrency(Number(item.price))
+                          : "$0.00"}
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewItem(item)}
+                            sx={{
+                              bgcolor: 'rgba(0, 102, 204, 0.1)',
+                              color: '#0066cc',
+                              '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                            }}
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditModal(item)}
+                            sx={{
+                              bgcolor: 'rgba(5, 150, 105, 0.1)',
+                              color: '#059669',
+                              '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                            }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(idx)}
+                            sx={{
+                              bgcolor: 'rgba(220, 38, 38, 0.1)',
+                              color: '#DC2626',
+                              '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                          {user.role.name === 'admin' && (
+                            <IconButton
+                              size="small"
+                              onClick={() => handleSendEmail(item)}
+                              sx={{
+                                bgcolor: 'rgba(79, 70, 229, 0.1)',
+                                color: '#4F46E5',
+                                '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.2)' },
+                              }}
+                            >
+                              <EmailIcon fontSize="small" />
+                            </IconButton>
+                          )}
+
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -1469,6 +1812,9 @@ const Invent = () => {
     }
   };
 
+  const handleImportFromCSV = () => {
+    navigate(`/vendors/onboarding/${user._id}`);
+  };
   // Set page title and add event listener for create inventory button
   useEffect(() => {
     if (setPageTitle) setPageTitle("Inventory");
@@ -1485,45 +1831,124 @@ const Invent = () => {
       "openCreateInventoryModal",
       handleCreateInventoryModal
     );
+    window.addEventListener(
+      "openImportInventoryCSVModal",
+      handleImportFromCSV
+    );
 
     return () => {
       window.removeEventListener(
         "openCreateInventoryModal",
         handleCreateInventoryModal
       );
+      window.removeEventListener(
+        "openImportInventoryCSVModal",
+        handleImportFromCSV
+      );
     };
   }, [setPageTitle]);
 
+
   const categoryOptions = [
     {
-      label: "Captain",
-      value: "Captain",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/captain1.png",
+      label: "Navigation Equipment",
+      value: "Navigation Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/navigation1.png",
     },
     {
-      label: "Crew",
-      value: "Crew",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/crew1.png",
+      label: "Safety Gear",
+      value: "Safety Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/safety1.png",
     },
     {
-      label: "Exterior",
-      value: "Exterior",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/exterior1.png",
+      label: "Marine Electronics",
+      value: "Marine Electronics",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electronics1.png",
     },
     {
-      label: "Engineering",
-      value: "Engineering",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/Engineering1.png",
+      label: "Deck Equipment",
+      value: "Deck_Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/deck1.png",
     },
     {
-      label: "Gallery",
-      value: "Gallery",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/GALLERY1.png",
+      label: "Engine & Propulsion",
+      value: "Engine & Propulsion",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/engine1.png",
     },
     {
-      label: "Interior",
-      value: "Interior",
-      icon: process.env.PUBLIC_URL + "/RescourceIcon/Interior1.png",
+      label: "Anchoring System",
+      value: "Anchoring System",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/anchor1.png",
+    },
+    {
+      label: "Sailing Equipment",
+      value: "Sailing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sailing1.png",
+    },
+    {
+      label: "Water Sports Gear",
+      value: "Water Sports Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sports1.png",
+    },
+    {
+      label: "Fishing Equipment",
+      value: "Fishing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/fishing1.png",
+    },
+    {
+      label: "Marine Furniture",
+      value: "Marine Furniture",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/furniture1.png",
+    },
+    {
+      label: "Galley Equipment",
+      value: "Galley Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/galley1.png",
+    },
+    {
+      label: "Refrigeration",
+      value: "Refrigeration",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/refrigeration1.png",
+    },
+    {
+      label: "Water Systems",
+      value: "Water Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/water1.png",
+    },
+    {
+      label: "Electrical Systems",
+      value: "Electrical Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electrical1.png",
+    },
+    {
+      label: "Hull Maintenance",
+      value: "Hull Maintenance",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/maintenance1.png",
+    },
+    {
+      label: "Mooring Equipment",
+      value: "Mooring Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/mooring1.png",
+    },
+    {
+      label: "Communication Systems",
+      value: "Communication Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/communication1.png",
+    },
+    {
+      label: "Sea Food Storage",
+      value: "Sea Food Storage",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/food_storage1.png",
+    },
+    {
+      label: "Bilge Systems",
+      value: "Bilge Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/bilge1.png",
+    },
+    {
+      label: "HVAC Systems",
+      value: "HVAC Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/hvac1.png",
     },
   ];
 
@@ -1620,12 +2045,19 @@ const Invent = () => {
           setEditItem({
             id: null,
             productName: "",
-            category: "",
+            category: [], // always an array
             stockQuantity: "",
             price: "",
             description: "",
             serviceArea: "",
             productImage: null,
+            fileName: "",
+            height: 1,
+            hsCode: '',
+            countryOfOrigin: '',
+            weight: 1,
+            width: 1,
+            length_: 1,
           });
         }}
         maxWidth="sm"
@@ -1806,6 +2238,7 @@ const Invent = () => {
                     },
                   },
                 }}
+                disabled
               />
             </Box>
 
@@ -1813,61 +2246,100 @@ const Invent = () => {
               <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
                 Category
               </Typography>
-              <FormControl fullWidth>
-                <Select
-                  value={editItem.category}
-                  onChange={(e) =>
-                    setEditItem({ ...editItem, category: e.target.value })
-                  }
-                  displayEmpty
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor: "#F9FAFB",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#E5E7EB",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D1D5DB",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#0387D9",
-                    },
-                  }}
-                  renderValue={(selected) => {
-                    if (!selected) {
-                      return <Typography color="#9CA3AF">Select a category</Typography>;
+              <Autocomplete
+                multiple
+                options={categoryOptions}
+                getOptionLabel={(option) => option.label}
+                filterOptions={(options, state) =>
+                  options.filter(opt =>
+                    !editItem.category.includes(opt.value) &&
+                    (!state.inputValue ||
+                      opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                  )
+                }
+                open={categoryDropdownOpen}
+                onOpen={() => setCategoryDropdownOpen(true)}
+                onClose={() => setCategoryDropdownOpen(false)}
+                openOnFocus
+                value={categoryOptions.filter(opt => editItem.category.includes(opt.value))}
+                onChange={(event, newValue) => {
+                  setEditItem({
+                    ...editItem,
+                    category: newValue.map(opt => opt.value),
+                  });
+                }}
+                disablePortal
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      categoryOptions.length === 0
+                        ? "No categories available"
+                        : "Select categories..."
                     }
-                    return selected;
-                  }}
-                  MenuProps={{
-                    disablePortal: true,
-                    PaperProps: {
-                      sx: {
-                        width: 240,
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        backgroundColor: "#F9FAFB",
+                        "& fieldset": {
+                          borderColor: "#E5E7EB",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#D1D5DB",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#0387D9",
+                        },
                       },
-                    },
-                  }}
-                >
-                  {categoryOptions.map((option, index) => (
-                    <MenuItem
-                      key={option.value || option.label || index}
-                      value={option.value}
-                    >
-                      <span
-                        style={{ display: "flex", alignItems: "center", gap: 8 }}
-                      >
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                    }}
+                  />
+                )}
+                renderOption={(props, option, { index }) => (
+                  <Box
+                    component="li"
+                    {...props}
+                    key={option.value || index}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      py: 1.5,
+                      borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                    }}
+                  >
+                    {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                    <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                  </Box>
+                )}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => (
+                    <Chip
+                      key={option.value}
+                      label={option.label}
+                      // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                      {...getTagProps({ index })}
+                      sx={{
+                        bgcolor: '#f1f5f9',
+                        color: '#334155',
+                        fontWeight: 500,
+                        fontSize: '0.8rem',
+                        height: 24,
+                        borderRadius: '6px',
+                        mr: 0.5,
+                      }}
+                    />
+                  ))
+                }
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                disabled={categoryOptions.length === 0}
+              />
             </Box>
 
             <Box>
@@ -1919,7 +2391,7 @@ const Invent = () => {
                   InputProps={{
                     startAdornment: (
                       <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
-                        ₦
+                        $
                       </Typography>
                     ),
                   }}
@@ -1957,6 +2429,248 @@ const Invent = () => {
                     endAdornment: (
                       <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
                         units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, hsCode: "" });
+                    } else {
+                      setEditItem({ ...editItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
+
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.countryOfOrigin || ""}
+                  onChange={(e) => setEditItem({ ...editItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, height: "" });
+                    } else {
+                      setEditItem({ ...editItem, height: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, height: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.width || ""}
+                  onChange={(e) => setEditItem({ ...editItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, weight: "" });
+                    } else {
+                      setEditItem({ ...editItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.length_ || ""}
+                  onChange={(e) => setEditItem({ ...editItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
                       </Typography>
                     ),
                   }}
@@ -2258,69 +2972,102 @@ const Invent = () => {
                 Category
               </Typography>
               <FormControl fullWidth>
-                <Select
-                  value={newItem.category}
-                  onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                  displayEmpty
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor: "#F9FAFB",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#E5E7EB",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D1D5DB",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#0387D9",
-                    },
+                <Autocomplete
+                  multiple
+                  options={categoryOptions}
+                  getOptionLabel={(option) => option.label}
+                  filterOptions={(options, state) =>
+                    options.filter(opt =>
+                      !newItem.category.includes(opt.value) &&
+                      (!state.inputValue ||
+                        opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                    )
+                  }
+                  open={categoryDropdownOpen}
+                  onOpen={() => setCategoryDropdownOpen(true)}
+                  onClose={() => setCategoryDropdownOpen(false)}
+                  openOnFocus
+                  value={categoryOptions.filter(opt => newItem.category.includes(opt.value))}
+                  onChange={(event, newValue) => {
+                    setNewItem({
+                      ...newItem,
+                      category: newValue.map(opt => opt.value),
+                    });
                   }}
-                  renderValue={(selected) => {
-                    if (!selected) {
-                      return <Typography color="#9CA3AF">Select a category</Typography>;
-                    }
-                    const option = categoryOptions.find((opt) => opt.value === selected);
-                    return option ? (
-                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    ) : selected;
-                  }}
-                  MenuProps={{
-                    disablePortal: true,
-                    PaperProps: {
-                      sx: {
-                        width: 240,
-                      },
-                    },
-                  }}
-                >
-                  {categoryOptions.map((option, index) => (
-                    <MenuItem
-                      key={option.value || option.label || index}
-                      value={option.value}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={
+                        categoryOptions.length === 0
+                          ? "No categories available"
+                          : "Select categories..."
+                      }
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                          backgroundColor: "#F9FAFB",
+                          "& fieldset": {
+                            borderColor: "#E5E7EB",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#D1D5DB",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#0387D9",
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option, { index }) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={option.value || index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 1.5,
+                        borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                      }}
                     >
-                      <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <img
-                          src={option.icon}
-                          alt={option.label}
-                          style={{ width: 24, height: 24, objectFit: "contain" }}
-                          loading="lazy"
-                        />
-                        {option.label}
-                      </span>
-                    </MenuItem>
-                  ))}
-                </Select>
+                      {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                      <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                    </Box>
+                  )}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip
+                        key={option.value}
+                        label={option.label}
+                        // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                        {...getTagProps({ index })}
+                        sx={{
+                          bgcolor: '#f1f5f9',
+                          color: '#334155',
+                          fontWeight: 500,
+                          fontSize: '0.8rem',
+                          height: 24,
+                          borderRadius: '6px',
+                          mr: 0.5,
+                        }}
+                      />
+                    ))
+                  }
+                  isOptionEqualToValue={(option, value) => option.value === value.value}
+                  noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                  disabled={categoryOptions.length === 0}
+                />
               </FormControl>
             </Box>
-
             <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
               <Box sx={{ flex: 1 }}>
                 <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
@@ -2350,7 +3097,7 @@ const Invent = () => {
                   InputProps={{
                     startAdornment: (
                       <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
-                        ₦
+                        $
                       </Typography>
                     ),
                   }}
@@ -2407,103 +3154,347 @@ const Invent = () => {
                 />
               </Box>
             </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, hsCode: "" });
+                    } else {
+                      setNewItem({ ...newItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
 
-            <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
-                Supplier
-              </Typography>
-              <Autocomplete
-                options={filteredSuppliers}
-                getOptionLabel={(option) =>
-                  option.businessName ||
-                  option.companyName ||
-                  option.name ||
-                  option.user?.email ||
-                  ""
-                }
-                filterOptions={(options) => options}
-                onInputChange={(event, value) => setSupplierSearch(value)}
-                open={supplierDropdownOpen}
-                onOpen={() => setSupplierDropdownOpen(true)}
-                onClose={() => setSupplierDropdownOpen(false)}
-                openOnFocus
-                value={selectedSupplier}
-                onChange={(event, newValue) => {
-                  setSelectedSupplier(newValue);
-                  setNewItem({
-                    ...newItem,
-                    supplier: newValue ? newValue._id : "",
-                  });
-                }}
-                disablePortal
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder={
-                      suppliersLoading
-                        ? "Loading suppliers..."
-                        : "Type supplier name, company, or email..."
-                    }
-                    variant="outlined"
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "10px",
-                        backgroundColor: "#F9FAFB",
-                        "& fieldset": {
-                          borderColor: "#E5E7EB",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#D1D5DB",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#0387D9",
-                        },
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
                       },
-                    }}
-                    helperText={
-                      suppliersLoading
-                        ? "Loading suppliers..."
-                        : "Search by business name, company name, or email"
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.countryOfOrigin || ""}
+                  onChange={(e) => setNewItem({ ...newItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, height: "" });
+                    } else {
+                      setNewItem({ ...newItem, height: val });
                     }
-                    FormHelperTextProps={{
-                      sx: { color: "#9CA3AF", mt: 0.5, ml: 1 }
-                    }}
-                  />
-                )}
-                renderOption={(props, option, { index }) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    key={
-                      option._id ||
-                      option.email ||
-                      option.businessName ||
-                      option.name ||
-                      index
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, height: 1 });
                     }
-                    sx={{
-                      py: 1.5,
-                      borderBottom: index < filteredSuppliers.length - 1 ? "1px solid #F3F4F6" : "none"
-                    }}
-                  >
-                    <Box>
-                      <Box sx={{ fontWeight: "600", color: "#111827" }}>
-                        {option.businessName || option.companyName || option.name}
-                      </Box>
-                      <Box sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
-                        {option.user?.email}
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.width || ""}
+                  onChange={(e) => setNewItem({ ...newItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, weight: "" });
+                    } else {
+                      setNewItem({ ...newItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.length_ || ""}
+                  onChange={(e) => setNewItem({ ...newItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {user?.role?.name === 'admin' && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Supplier
+                </Typography>
+                <Autocomplete
+                  options={filteredSuppliers}
+                  getOptionLabel={(option) =>
+                    option.businessName ||
+                    option.companyName ||
+                    option.name ||
+                    option.user?.email ||
+                    ""
+                  }
+                  filterOptions={(options) => options}
+                  onInputChange={(event, value) => setSupplierSearch(value)}
+                  open={supplierDropdownOpen}
+                  onOpen={() => setSupplierDropdownOpen(true)}
+                  onClose={() => setSupplierDropdownOpen(false)}
+                  openOnFocus
+                  value={selectedSupplier}
+                  onChange={(event, newValue) => {
+                    setSelectedSupplier(newValue);
+                    setNewItem({
+                      ...newItem,
+                      supplier: newValue ? newValue._id : "",
+                    });
+                  }}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={
+                        suppliersLoading
+                          ? "Loading suppliers..."
+                          : "Type supplier name, company, or email..."
+                      }
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                          backgroundColor: "#F9FAFB",
+                          "& fieldset": {
+                            borderColor: "#E5E7EB",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#D1D5DB",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#0387D9",
+                          },
+                        },
+                      }}
+                      helperText={
+                        suppliersLoading
+                          ? "Loading suppliers..."
+                          : "Search by business name, company name, or email"
+                      }
+                      FormHelperTextProps={{
+                        sx: { color: "#9CA3AF", mt: 0.5, ml: 1 }
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option, { index }) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={
+                        option._id ||
+                        option.email ||
+                        option.businessName ||
+                        option.name ||
+                        index
+                      }
+                      sx={{
+                        py: 1.5,
+                        borderBottom: index < filteredSuppliers.length - 1 ? "1px solid #F3F4F6" : "none"
+                      }}
+                    >
+                      <Box>
+                        <Box sx={{ fontWeight: "600", color: "#111827" }}>
+                          {option.businessName || option.companyName || option.name}
+                        </Box>
+                        <Box sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                          {option.user?.email}
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
-                )}
-                isOptionEqualToValue={(option, value) => option._id === value._id}
-                noOptionsText={
-                  suppliersLoading ? "Loading..." : "No suppliers found"
-                }
-                loading={suppliersLoading}
-                disabled={suppliersLoading}
-              />
-            </Box>
+                  )}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  noOptionsText={
+                    suppliersLoading ? "Loading..." : "No suppliers found"
+                  }
+                  loading={suppliersLoading}
+                  disabled={suppliersLoading}
+                />
+              </Box>
+            )}
+
           </Stack>
         </Box>
 
@@ -2840,19 +3831,22 @@ const Invent = () => {
                 <Typography variant="h5" fontWeight="600" color="#111827" gutterBottom>
                   {viewItem.productName}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 1 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                  {viewItem.category && viewItem.category.length > 0 && viewItem.category.map((cat) => (
+                    <Chip
+                      key={cat}
+                      label={cat}
+                      size="small"
+                      sx={{
+                        backgroundColor: "#F3F4F6",
+                        color: "#374151",
+                        fontWeight: 500,
+                        borderRadius: "6px"
+                      }}
+                    />
+                  ))}
                   <Chip
-                    label={viewItem.category}
-                    size="small"
-                    sx={{
-                      backgroundColor: "#F3F4F6",
-                      color: "#374151",
-                      fontWeight: 500,
-                      borderRadius: "6px"
-                    }}
-                  />
-                  <Chip
-                    label={`ID: ${viewItem.id?.slice?.(-6) || viewItem.id || "—"}`}
+                    label={`ID: ${viewItem.productId?.slice?.(-6) || viewItem.productId || "—"}`}
                     size="small"
                     sx={{
                       backgroundColor: "#F3F4F6",
@@ -2921,7 +3915,7 @@ const Invent = () => {
                   <Typography variant="body2" color="#6B7280" gutterBottom>
                     Supplier
                   </Typography>
-                  <Typography variant="body1" fontWeight="500" color="#111827">
+                  <Typography variant="body1" fontWeight="600" color="#111827">
                     {typeof viewItem.supplier === "object"
                       ? viewItem.supplier.businessName ||
                       viewItem.supplier.user?.email ||
@@ -2932,6 +3926,25 @@ const Invent = () => {
                         : "Not available"}
                   </Typography>
                 </Box>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  HS Code
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.hsCode || "—"}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  Country of Origin
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.countryOfOrigin || "—"}
+                </Typography>
               </Grid>
             </Grid>
 
@@ -2954,6 +3967,48 @@ const Invent = () => {
                 </Typography>
               </Paper>
             </Box>
+
+            {/* Physical Attributes Section */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Physical Attributes
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Weight
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.weight ? `${viewItem.weight} oz` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Height
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.height ? `${viewItem.height} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Width
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.width ? `${viewItem.width} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Length
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.length_ ? `${viewItem.length_} in` : "—"}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
           </Stack>
         </Box>
 
@@ -3148,9 +4203,10 @@ const Invent = () => {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{ zIndex: 1000000 }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}

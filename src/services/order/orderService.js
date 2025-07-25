@@ -355,3 +355,24 @@ export const getProductCategories = async () => {
     throw error;
   }
 };
+
+export const getSupplierOrders = async (status) => {
+    try {
+        const response = await axios.get(`${API_URL}/orders/supplier-orders?status=${status}`, {
+            headers: getAuthHeader(),
+        });
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (error) {
+        console.error(
+            "Error fetching supplier orders:",
+            error.response?.data || error.message
+        );
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to fetch supplier orders",
+        };
+    }
+}
