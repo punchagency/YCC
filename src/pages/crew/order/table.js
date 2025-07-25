@@ -25,6 +25,8 @@ const OrderTable = ({
   pagination = { page: 1, limit: 10, total: 0, totalPages: 0 },
   onPageChange,
   onLimitChange,
+  showUserColumn = false, // <-- new prop
+  detailsBasePath = "/crew/orders-management/", // <-- new prop for details route
 }) => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
@@ -73,6 +75,7 @@ const OrderTable = ({
   // Table columns
   const columns = [
     { id: "orderId", label: "Order ID", minWidth: 120 },
+    ...(showUserColumn ? [{ id: "user", label: "User", minWidth: 140 }] : []),
     { id: "totalPrice", label: "Total Price", minWidth: 120 },
     { id: "overallStatus", label: "Overall Status", minWidth: 140 },
     { id: "orderDate", label: "Order Date", minWidth: 140 },
@@ -84,6 +87,25 @@ const OrderTable = ({
     switch (column.id) {
       case "orderId":
         return order.orderId || "N/A";
+      case "user": {
+        const userValue = order.user?.name || order.user?.email || "N/A";
+        return (
+          <span
+            style={{
+              display: "inline-block",
+              maxWidth: 160,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              verticalAlign: "middle",
+              cursor: "pointer",
+            }}
+            title={userValue}
+          >
+            {userValue}
+          </span>
+        );
+      }
       case "totalPrice":
         return `$${formatAmount(order.totalPrice)}`;
       case "overallStatus":
@@ -134,23 +156,19 @@ const OrderTable = ({
       case "actions":
         return (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Link
-              to={`/crew/orders-management/${order._id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Button
-                icon={<FiEye size={18} />}
-                className="p-button-outlined p-button-sm"
-                style={{
-                  border: "1px solid #D0D5DD",
-                  color: "#344054",
-                  backgroundColor: "white",
-                  borderRadius: 8,
-                  transition: "all 0.2s ease",
-                }}
-                tooltip="See Details"
-              />
-            </Link>
+            <Button
+              icon={<FiEye size={18} />}
+              className="p-button-outlined p-button-sm"
+              style={{
+                border: "1px solid #D0D5DD",
+                color: "#344054",
+                backgroundColor: "white",
+                borderRadius: 8,
+                transition: "all 0.2s ease",
+              }}
+              tooltip="See Details"
+              onClick={() => navigate(`${detailsBasePath}${order._id}`)}
+            />
             {order.invoiceUrl && (
               <a
                 href={order.invoiceUrl}
@@ -245,6 +263,7 @@ const OrderTable = ({
                       {[
                         "orderId",
                         "totalPrice",
+                        "user",
                         "overallStatus",
                         "orderDate",
                       ].includes(column.id) && (
