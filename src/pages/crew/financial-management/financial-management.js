@@ -8,15 +8,19 @@ import { Pagination } from "../../../components/pagination";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useOutletContext } from "react-router-dom";
+import { CrewFinancialManagement } from '../../../services/crew/crewFinancialManagement.js'
+import { Toast } from "primereact/toast";
 
 const FinancialManagement = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const { setPageTitle } = useOutletContext();
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [financeData, setFinanceData] = React.useState({});
+  const toast = React.useRef(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -36,9 +40,29 @@ const FinancialManagement = () => {
     setSearchQuery(query);
   };
 
+  const fetchFinanceData = async () => {
+    try {
+      const response = await CrewFinancialManagement();
+      console.log("Response:", response);
+      setFinanceData(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Failed to fetch data. Please try again later.",
+        life: 3000,
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchFinanceData();
+  }, []);
+
   return (
     <>
-      <Outstanding />
+      <Outstanding financeData={financeData} setFinanceData={setFinanceData} fetchData={fetchFinanceData} />
       <SearchFilters
         onFilterChange={handleFilterChange}
         onSearchChange={handleSearchChange}

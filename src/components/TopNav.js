@@ -170,18 +170,18 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       ),
       path: "/crew",
       subItems: [
-        {
-          label: "Legal Resources",
-          path: "/crew/legal-resources",
-        },
-        {
-          label: "Crew Training",
-          path: "/crew/training",
-        },
-        {
-          label: "Accommodation",
-          path: "/crew/accomodation",
-        },
+        // {
+        //   label: "Legal Resources",
+        //   path: "/crew/legal-resources",
+        // },
+        // {
+        //   label: "Crew Training",
+        //   path: "/crew/training",
+        // },
+        // {
+        //   label: "Accommodation",
+        //   path: "/crew/accomodation",
+        // },
         {
           label: "Document Management",
           path: "/crew/document-management",
@@ -193,26 +193,26 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       icon: calendarLogo,
       path: "/crew/calendar",
     },
-    {
-      label: "Inventory Management",
-      icon: inventoryLogo,
-      path: "/crew/inventory-management",
-    },
+    // {
+    //   label: "Inventory Management",
+    //   icon: inventoryLogo,
+    //   path: "/crew/inventory-management",
+    // },
     {
       label: "Orders",
       icon: orderLogo,
       path: "/crew/orders-management",
     },
-    {
-      label: "Bookings",
-      icon: bookingLogo,
-      path: "/crew/booking",
-    },
-    {
-      label: "Financial Management",
-      icon: financeLogo,
-      path: "/crew/financial-management",
-    },
+    // {
+    //   label: "Bookings",
+    //   icon: bookingLogo,
+    //   path: "/crew/booking",
+    // },
+    // {
+    //   label: "Financial Management",
+    //   icon: financeLogo,
+    //   path: "/crew/financial-management",
+    // },
     {
       label: "Notifications",
       icon: notificationLogo,
