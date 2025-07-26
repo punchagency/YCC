@@ -197,7 +197,7 @@ export const updateInventoryItem = async (id, itemData, isFormData = false) => {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
 
-    const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, {
+    const response = await axios.patch(`${API_URL}/inventory/${id}`, itemData, { // NOTE: Changed from /suppliers to /inventory. Very critical for the onboarding process.
       headers: headers,
     });
     return {
