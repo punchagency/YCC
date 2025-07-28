@@ -1,128 +1,201 @@
-import React from "react";
-import { FiFilter, FiChevronDown, FiSearch } from "react-icons/fi";
+import React, { useState } from "react";
+import {
+  Box,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
+  TextField,
+  InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  useTheme,
+  useMediaQuery,
+  Stack,
+  Chip
+} from "@mui/material";
+import {
+  Search,
+  FilterList,
+  ExpandMore
+} from "@mui/icons-material";
 
 const SearchFilters = ({
   onFilterChange = () => {},
   onSearchChange = () => {},
   activeFilter = "all",
 }) => {
-  const handleFilterClick = (filter) => {
-    if (onFilterChange) {
-      onFilterChange(filter);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [filterDropdown, setFilterDropdown] = useState('');
+
+  const handleFilterClick = (event, newFilter) => {
+    if (newFilter !== null) {
+      onFilterChange(newFilter);
     }
   };
 
+  const filters = [
+    { value: 'all', label: 'All' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'upcoming', label: 'Upcoming' }
+  ];
+
+  if (isMobile) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Stack spacing={2}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {filters.map((filter) => (
+              <Chip
+                key={filter.value}
+                label={filter.label}
+                onClick={() => onFilterChange(filter.value)}
+                variant={activeFilter === filter.value ? 'filled' : 'outlined'}
+                color={activeFilter === filter.value ? 'primary' : 'default'}
+                sx={{
+                  borderRadius: 2,
+                  fontSize: '0.75rem',
+                  height: 32
+                }}
+              />
+            ))}
+          </Box>
+          <TextField
+            placeholder="Search Transactions"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search sx={{ color: '#666', fontSize: 20 }} />
+                </InputAdornment>
+              ),
+              sx: {
+                borderRadius: 2,
+                bgcolor: 'white',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#e0e0e0'
+                }
+              }
+            }}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+          />
+        </Stack>
+      </Box>
+    );
+  }
+
   return (
-    <>
-      <div className="">
-        <div className="flex justify-content-between align-items-center w-full">
-          <div style={{ width: "40%" }}>
-            <div
-              className="flex justify-content-between align-items-center bg-white ml-5 mt-4 p-2"
-              style={{ borderRadius: "10px", height: "100%" }}
-            >
-              <div
-                style={{
-                  backgroundColor:
-                    activeFilter === "all" ? "#0387D9" : "transparent",
-                  borderRadius: "10px",
-                  padding: "5px",
-                  color: activeFilter === "all" ? "white" : "black",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-                onClick={() => handleFilterClick("all")}
-              >
-                All
-              </div>
-              <div
-                style={{
-                  backgroundColor:
-                    activeFilter === "pending" ? "#0387D9" : "transparent",
-                  borderRadius: "10px",
-                  padding: "5px",
-                  color: activeFilter === "pending" ? "white" : "black",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-                onClick={() => handleFilterClick("pending")}
-              >
-                Pending Invoices
-              </div>
-              <div
-                style={{
-                  backgroundColor:
-                    activeFilter === "completed" ? "#0387D9" : "transparent",
-                  borderRadius: "10px",
-                  padding: "5px",
-                  color: activeFilter === "completed" ? "white" : "black",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-                onClick={() => handleFilterClick("completed")}
-              >
-                Completed Payment
-              </div>
-              <div
-                style={{
-                  backgroundColor:
-                    activeFilter === "upcoming" ? "#0387D9" : "transparent",
-                  borderRadius: "10px",
-                  padding: "5px",
-                  color: activeFilter === "upcoming" ? "white" : "black",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-                onClick={() => handleFilterClick("upcoming")}
-              >
-                Upcoming Expenses
-              </div>
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        flexWrap: { xs: 'wrap', lg: 'nowrap' },
+        gap: 2
+      }}>
+        <Paper
+          sx={{
+            p: 0.5,
+            borderRadius: 3,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            minWidth: { xs: '100%', lg: 'auto' },
+            flex: { lg: 1 }
+          }}
+        >
+          <ToggleButtonGroup
+            value={activeFilter}
+            exclusive
+            onChange={handleFilterClick}
+            sx={{
+              '& .MuiToggleButton-root': {
+                border: 'none',
+                borderRadius: 2,
+                px: { xs: 1.5, md: 2 },
+                py: 0.75,
+                fontSize: { xs: '0.75rem', md: '0.875rem' },
+                textTransform: 'none',
+                fontWeight: 500,
+                color: '#666',
+                '&.Mui-selected': {
+                  bgcolor: '#0387D9',
+                  color: 'white',
+                  '&:hover': {
+                    bgcolor: '#0277BD'
+                  }
+                },
+                '&:hover': {
+                  bgcolor: '#f5f5f5'
+                }
+              }
             }}
           >
-            <div
-              style={{
-                width: "300px",
-                height: "40px",
-                marginRight: "10px",
-                marginTop: "7px",
-              }}
+            <ToggleButton value="all">All</ToggleButton>
+            <ToggleButton value="pending">Pending</ToggleButton>
+            <ToggleButton value="completed">Completed</ToggleButton>
+            <ToggleButton value="upcoming">Upcoming</ToggleButton>
+          </ToggleButtonGroup>
+        </Paper>
+
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 2, 
+          alignItems: 'center',
+          minWidth: { xs: '100%', lg: 'auto' }
+        }}>
+          <FormControl 
+            size="small" 
+            sx={{ 
+              minWidth: { xs: 140, md: 180 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'white'
+              }
+            }}
+          >
+            <InputLabel>Filter</InputLabel>
+            <Select
+              value={filterDropdown}
+              label="Filter"
+              onChange={(e) => setFilterDropdown(e.target.value)}
+              IconComponent={ExpandMore}
             >
-              <div
-                className="flex items-center justify-between bg-white border border-gray-300 rounded-[10px] px-3 shadow-sm p-2"
-                style={{ borderRadius: "6px" }}
-              >
-                <FiFilter className="text-gray-500 text-sm mr-2" />
-                <span className="text-gray-500 text-sm flex-1">
-                  Select Filter
-                </span>
-                <FiChevronDown className="text-gray-500 text-sm" />
-              </div>
-            </div>
-            <div
-              className="flex items-center bg-white border border-gray-300 rounded-[10px] px-3 shadow-sm p-2 mr-5"
-              style={{ borderRadius: "6px" }}
-            >
-              <FiSearch className="text-gray-400 text-sm mr-2" />
-              <input
-                type="text"
-                placeholder="Search Transactions"
-                className="flex-1 text-sm text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent border-none outline-none h-full"
-                onChange={(e) =>
-                  onSearchChange && onSearchChange(e.target.value)
+              <MenuItem value="date">Date Range</MenuItem>
+              <MenuItem value="amount">Amount Range</MenuItem>
+              <MenuItem value="vendor">Vendor</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            placeholder="Search Transactions"
+            variant="outlined"
+            size="small"
+            sx={{
+              minWidth: { xs: 200, md: 280 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'white',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#e0e0e0'
                 }
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
+              }
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search sx={{ color: '#666', fontSize: 20 }} />
+                </InputAdornment>
+              )
+            }}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+          />
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

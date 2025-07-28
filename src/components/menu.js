@@ -174,22 +174,22 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => navigate("/crew/calendar"),
     },
-    // {
-    //   label: "Financial Management",
-    //   icon: (
-    //     <img
-    //       src={financeLogo}
-    //       alt="Financial Management"
-    //       width={15}
-    //       height={15}
-    //     />
-    //   ),
-    //   className:
-    //     location.pathname === "/crew/financial-management"
-    //       ? "active-menu-item menu-red-background"
-    //       : "",
-    //   command: () => navigate("/crew/financial-management"),
-    // },
+    {
+      label: "Financial Management",
+      icon: (
+        <img
+          src={financeLogo}
+          alt="Financial Management"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/crew/financial-management"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/financial-management"),
+    },
     // {
     //   label: "Bookings",
     //   icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
