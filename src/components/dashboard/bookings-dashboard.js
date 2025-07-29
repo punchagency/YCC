@@ -16,8 +16,6 @@ import { useTheme } from "../../context/theme/themeContext";
 import { useOrder } from "../../context/order/orderContext";
 import { useInvoice } from "../../context/invoice/invoiceContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
-import { Link } from "react-router-dom";
-import AddBoxIcon from "@mui/icons-material/AddBox";
 
 const BookingsDashboard = () => {
   const { theme } = useTheme();
@@ -66,8 +64,8 @@ const BookingsDashboard = () => {
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-        <Grid2 item xs={12} md={6} lg={6} width="100%">
-          {/* Low Inventories */}
+        {/* <Grid2 item xs={12} md={6} lg={6} width="100%">
+         
           {lowInventory && lowInventory.length > 0 ? (
             <Box
               sx={{
@@ -315,7 +313,11 @@ const BookingsDashboard = () => {
               </Link>
             </Box>
           )}
-        </Grid2>
+        </Grid2> */}
+        <Box width={{ xs: "100%", lg: "55%" }}>
+          {/* Current Order Summary */}
+          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
+        </Box>
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Financial Summary */}
@@ -421,15 +423,12 @@ const BookingsDashboard = () => {
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-        <Box width={{ xs: "100%", lg: "55%" }}>
-          {/* Current Order Summary */}
-          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
-        </Box>
+        
 
-        <Box width={{ xs: "100%", lg: "45%" }}>
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Booking Summary */}
           <BookingSummary />
-        </Box>
+        </Grid2>
       </Box>
     </Box>
   );
