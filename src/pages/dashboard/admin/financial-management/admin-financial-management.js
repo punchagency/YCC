@@ -387,38 +387,44 @@ const AdminFinancialManagement = () => {
       setError(null);
 
       // For now, use dummy data instead of API call
-      // const response = await getAdminInvoices(page, 5); // Changed limit to 5
+      const response = await getAdminInvoices(page, 5); // Changed limit to 5
 
       // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Use dummy data with pagination
-      const itemsPerPage = 5;
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedInvoices = dummyInvoices.slice(startIndex, endIndex);
+      // // Use dummy data with pagination
+      // const itemsPerPage = 5;
+      // const startIndex = (page - 1) * itemsPerPage;
+      // const endIndex = startIndex + itemsPerPage;
+      // const paginatedInvoices = dummyInvoices.slice(startIndex, endIndex);
 
-      // Update pagination data based on current page
-      const updatedPagination = {
-        currentPage: page,
-        totalPages: 2,
-        totalInvoices: 10,
-        hasNextPage: page < 2,
-        hasPrevPage: page > 1,
-      };
+      // // Update pagination data based on current page
+      // const updatedPagination = {
+      //   currentPage: page,
+      //   totalPages:
+      //     dummyInvoices.length > 0
+      //       ? Math.ceil(dummyInvoices.length / itemsPerPage)
+      //       : 1,
+      //   totalInvoices: dummyInvoices.length,
+      //   hasNextPage:
+      //     dummyInvoices.length > 0
+      //       ? page < Math.ceil(dummyInvoices.length / itemsPerPage)
+      //       : false,
+      //   hasPrevPage: page > 1,
+      // };
 
-      setInvoices(paginatedInvoices);
-      setPagination(updatedPagination);
-      setSummary(dummySummary);
+      // setInvoices(paginatedInvoices);
+      // setPagination(updatedPagination);
+      // setSummary(dummySummary);
 
       // Uncomment below when you want to use real API
-      // if (response.status) {
-      //   setInvoices(response.data.invoices);
-      //   setPagination(response.data.pagination);
-      //   setSummary(response.data.summary);
-      // } else {
-      //   setError("Failed to fetch invoice data");
-      // }
+      if (response.status) {
+        setInvoices(response.data.invoices);
+        setPagination(response.data.pagination);
+        setSummary(response.data.summary);
+      } else {
+        setError("Failed to fetch invoice data");
+      }
     } catch (err) {
       console.error("Error fetching invoices:", err);
       setError("Failed to load financial data. Please try again.");
@@ -472,7 +478,7 @@ const AdminFinancialManagement = () => {
       <Grid container spacing={3}>
         {/* Summary Cards - Full Width */}
         <Grid item xs={12}>
-          <SummaryCards summary={summary} />
+          <SummaryCards summary={summary} loading={loading} />
         </Grid>
 
         {/* Type Breakdown and Invoice Table */}
@@ -480,6 +486,7 @@ const AdminFinancialManagement = () => {
           <TypeBreakdown
             byType={summary?.byType}
             totalAmount={summary?.totalAmount}
+            loading={loading}
           />
         </Grid>
 

@@ -13,11 +13,17 @@ import {
   AccountBalance,
   Payment,
 } from "@mui/icons-material";
+import { SummaryCardsSkeleton } from "../../../../components/FinancialManagementSkeletons";
 
-const SummaryCards = ({ summary }) => {
+const SummaryCards = ({ summary, loading }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
+  // Show skeleton if loading
+  if (loading) {
+    return <SummaryCardsSkeleton />;
+  }
 
   // Format currency
   const formatCurrency = (amount) => {
@@ -136,7 +142,7 @@ const SummaryCards = ({ summary }) => {
               sx={{
                 color: "#6b7280",
                 fontWeight: 500,
-                fontSize: isMobile ? "0.875rem" : "1rem",
+                fontSize: isMobile ? "0.75rem" : "0.875rem",
               }}
             >
               {card.title}
