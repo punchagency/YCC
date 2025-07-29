@@ -20,8 +20,8 @@ import { useInventory } from "../../context/inventory/inventoryContext";
 const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("monthly");
-  const { orderSummary, fetchOrderSummary } = useOrder();
+  const [value, setValue] = useState("all");
+  const { orderSummary, fetchOrderSummary, orderSummaryLoading } = useOrder();
   const { invoices, fetchInvoices } = useInvoice();
   const { lowInventory, fetchLowInventory } = useInventory();
   const handleOpen = () => setOpen(true);
@@ -29,26 +29,45 @@ const BookingsDashboard = () => {
 
   useEffect(() => {
     fetchOrderSummary();
-    fetchInvoices();
+    fetchInvoices({ status: undefined, type: undefined, period: value });
     fetchLowInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    fetchInvoices({ status: undefined, type: undefined, period: value });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   console.log("lowInventory", lowInventory);
   const menuItems = [
     {
-      label: "Monthly",
-      value: "monthly",
+      label: "All",
+      value: "all",
     },
     {
-      label: "Yearly",
-      value: "yearly",
+      label: "Today",
+      value: "today",
     },
     {
       label: "Weekly",
-      value: "weekly",
+      value: "week",
+    },
+    {
+      label: "Monthly",
+      value: "month",
+    },
+    {
+      label: "Yearly",
+      value: "year",
     },
   ];
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
 
   return (
     <Box
@@ -314,10 +333,10 @@ const BookingsDashboard = () => {
             </Box>
           )}
         </Grid2> */}
-        <Box width={{ xs: "100%", lg: "55%" }}>
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Current Order Summary */}
-          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
-        </Box>
+          <CurrentOrderSummary orderSummary={orderSummary} fetchOrderSummary={fetchOrderSummary} />
+        </Grid2>
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Financial Summary */}
@@ -368,7 +387,7 @@ const BookingsDashboard = () => {
                   marginTop: "10px",
                 }}
               >
-                {invoices.map((item, index) => (
+                {invoices.length > 0 ? invoices.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -393,23 +412,38 @@ const BookingsDashboard = () => {
                         Invoice {item.invoiceId}
                       </FinancialSummaryDescriptionText>
                       <FinancialSummaryDescriptionText mode={theme}>
-                        Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} -
+                        Amount: ${formatCurrency(item.amount)} -
                         Due:{" "}
                         {
-                          new Date(item.invoiceDueDate)
-                            .toISOString()
-                            .split("T")[0]
+                          new Date(item.dueDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
                         }
                       </FinancialSummaryDescriptionText>
                     </Box>
 
                     <Box>
-                      <FinancialSummaryButton mode={theme}>
+                      <FinancialSummaryButton mode={theme}
+                        onClick={()=>{
+                          window.open(item.invoiceUrl, "_blank");
+                        }}
+                      >
                         <ViewButtonText mode={theme}>View</ViewButtonText>
                       </FinancialSummaryButton>
                     </Box>
                   </Box>
-                ))}
+                )) : (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
+                      No Invoices Found
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#999' }}>
+                      There are no invoices to display at the moment.
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           )}
@@ -423,7 +457,7 @@ const BookingsDashboard = () => {
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-        
+
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Booking Summary */}

@@ -57,7 +57,7 @@ const SearchInterface = ({
     // Always fetch when category changes, even if query is empty
     if (category === "all") {
       setLocalSearchQuery("");
-      onSearch("", "all", 1);
+      onSearch(localSearchQuery, "all", 1);
     } else {
       onSearch(localSearchQuery, category, 1);
     }

@@ -76,22 +76,11 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (query, category, page = 1) => {
-      if (!query.trim() && category === "all") {
-        setSearchResults([]);
-        setPagination((prev) => ({
-          ...prev,
-          page: 1,
-          total: 0,
-          totalPages: 0,
-        }));
-        return;
-      }
-
       try {
         setSearchLoading(true);
         const response = await searchProducts({
           query: query.trim(),
-          category: category === "all" ? undefined : category,
+          category: category === "all" ? 'all' : category,
           page,
           limit: pagination.limit,
         });

@@ -110,7 +110,7 @@ const UpdatedCalendar = () => {
             initialView="dayGridMonth"
             datesSet={handleCalendarChange}
             events={events}
-            height="280px"
+            height="auto"
             initialDate={currentDate}
             dayHeaders={false}
             dayCellClassNames={({ date }) => {
