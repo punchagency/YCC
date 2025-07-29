@@ -77,7 +77,7 @@ const TypeBreakdown = ({ byType, totalAmount }) => {
             fontSize: isMobile ? "1.125rem" : "1.25rem",
           }}
         >
-          Revenue by Type
+          Invoices by Type
         </Typography>
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

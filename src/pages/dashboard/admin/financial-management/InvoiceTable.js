@@ -12,10 +12,11 @@ import {
   TableRow,
   Chip,
   IconButton,
+  Tooltip,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { OpenInNew } from "@mui/icons-material";
+import { Visibility } from "@mui/icons-material";
 import { Pagination } from "../../../../components/pagination";
 
 const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
@@ -282,21 +283,23 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
                           {formatDate(invoice.invoiceDate)}
                         </TableCell>
                         <TableCell>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              handleViewInvoice(invoice.invoiceUrl)
-                            }
-                            disabled={!invoice.invoiceUrl}
-                            sx={{
-                              color: "#0387D9",
-                              "&:hover": {
-                                backgroundColor: "rgba(3, 135, 217, 0.1)",
-                              },
-                            }}
-                          >
-                            <OpenInNew sx={{ fontSize: 18 }} />
-                          </IconButton>
+                          <Tooltip title="View Invoice">
+                            <IconButton
+                              size="small"
+                              onClick={() =>
+                                handleViewInvoice(invoice.invoiceUrl)
+                              }
+                              disabled={!invoice.invoiceUrl}
+                              sx={{
+                                color: "#0387D9",
+                                "&:hover": {
+                                  backgroundColor: "rgba(3, 135, 217, 0.1)",
+                                },
+                              }}
+                            >
+                              <Visibility sx={{ fontSize: 18 }} />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     );
@@ -310,7 +313,7 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
                 currentPage={pagination.currentPage}
                 totalPages={pagination.totalPages}
                 totalItems={pagination.totalInvoices}
-                itemsPerPage={20}
+                itemsPerPage={5}
                 onPageChange={onPageChange}
                 isMobile={isMobile}
                 isTablet={isTablet}

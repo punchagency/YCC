@@ -30,7 +30,7 @@ const SummaryCards = ({ summary }) => {
 
   const cards = [
     {
-      title: "Total Revenue",
+      title: "Total Invoices",
       value: formatCurrency(summary?.totalAmount || 0),
       icon: <AccountBalance sx={{ fontSize: 28, color: "#0387D9" }} />,
       color: "#0387D9",
@@ -69,7 +69,7 @@ const SummaryCards = ({ summary }) => {
           ? "repeat(2, 1fr)"
           : "repeat(4, 1fr)",
         gap: isMobile ? 2 : 3,
-        mb: 4,
+        mb: 1,
       }}
     >
       {cards.map((card, index) => (
