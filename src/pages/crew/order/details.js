@@ -82,10 +82,72 @@ const CheckIconStyled = styled(CheckIcon)(({ theme }) => ({
 }));
 
 const ProductCard = styled(Box)(({ theme }) => ({
-  background: "linear-gradient(to right, #f8fafc, rgba(59, 130, 246, 0.05))",
-  borderRadius: "8px",
-  padding: "16px",
+  background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+  borderRadius: "16px",
+  padding: "24px",
   border: "1px solid #e5e7eb",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  position: "relative",
+  overflow: "hidden",
+  "&::before": {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "3px",
+    background: "linear-gradient(90deg, #0387D9, #3b82f6)",
+    opacity: 0,
+    transition: "opacity 0.3s ease",
+  },
+  "&:hover": {
+    boxShadow: "0 8px 25px rgba(0, 0, 0, 0.12)",
+    transform: "translateY(-4px)",
+    borderColor: "#d1d5db",
+    "&::before": {
+      opacity: 1,
+    },
+  },
+}));
+
+const ProductImageContainer = styled(Box)(({ theme }) => ({
+  width: "90px",
+  height: "90px",
+  borderRadius: "12px",
+  overflow: "hidden",
+  backgroundColor: "#f8fafc",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "2px solid #e5e7eb",
+  flexShrink: 0,
+  transition: "all 0.3s ease",
+  "&:hover": {
+    borderColor: "#0387D9",
+    transform: "scale(1.02)",
+  },
+}));
+
+const ProductImage = styled("img")(({ theme }) => ({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+  transition: "transform 0.3s ease",
+  "&:hover": {
+    transform: "scale(1.05)",
+  },
+}));
+
+const PlaceholderIcon = styled(Box)(({ theme }) => ({
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#f1f5f9",
+  color: "#64748b",
+  fontSize: "28px",
+  borderRadius: "10px",
 }));
 
 const OrderDetails = () => {
@@ -633,7 +695,7 @@ const OrderDetails = () => {
                                   sx={{
                                     display: "flex",
                                     flexDirection: "column",
-                                    gap: 2,
+                                    gap: 3,
                                   }}
                                 >
                                   {subOrder.products.map(
@@ -644,30 +706,131 @@ const OrderDetails = () => {
                                         <Box
                                           sx={{
                                             display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "flex-start",
+                                            alignItems: "center",
+                                            gap: 2,
                                             mb: 1.5,
                                           }}
                                         >
-                                          <Typography
-                                            variant="subtitle1"
+                                          <ProductImageContainer>
+                                            {productItem.product
+                                              ?.productImage ? (
+                                              <ProductImage
+                                                src={
+                                                  productItem.product
+                                                    .productImage
+                                                }
+                                                alt={
+                                                  productItem.product?.name ||
+                                                  "Product Image"
+                                                }
+                                                onError={(e) => {
+                                                  e.target.style.display =
+                                                    "none";
+                                                  e.target.nextSibling.style.display =
+                                                    "flex";
+                                                }}
+                                              />
+                                            ) : null}
+                                            <PlaceholderIcon
+                                              sx={{
+                                                display: productItem.product
+                                                  ?.productImage
+                                                  ? "none"
+                                                  : "flex",
+                                              }}
+                                            >
+                                              <PackageIcon size={24} />
+                                            </PlaceholderIcon>
+                                          </ProductImageContainer>
+                                          <Box
                                             sx={{
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              flex: 1,
+                                              minWidth: 0,
+                                            }}
+                                          >
+                                            <Typography
+                                              variant="subtitle1"
+                                              sx={{
+                                                fontWeight: 600,
+                                                color: "#111827",
+                                                fontSize: "16px",
+                                                mb: 0.5,
+                                                lineHeight: 1.3,
+                                              }}
+                                            >
+                                              {productItem.product?.name ||
+                                                "Product Name N/A"}
+                                            </Typography>
+                                            <Typography
+                                              variant="h6"
+                                              sx={{
+                                                fontWeight: 700,
+                                                color: "#0387D9",
+                                                fontSize: "18px",
+                                                lineHeight: 1.2,
+                                              }}
+                                            >
+                                              {formatCurrency(
+                                                productItem.quantity *
+                                                  productItem.price
+                                              )}
+                                            </Typography>
+                                          </Box>
+                                        </Box>
+
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            mb: 1,
+                                            mt: 1,
+                                          }}
+                                        >
+                                          <Box
+                                            sx={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                              gap: 1,
+                                            }}
+                                          >
+                                            <Chip
+                                              label={`Qty: ${productItem.quantity}`}
+                                              size="small"
+                                              sx={{
+                                                backgroundColor:
+                                                  "rgba(3, 135, 217, 0.1)",
+                                                color: "#0387D9",
+                                                fontWeight: 600,
+                                                fontSize: "12px",
+                                                height: "24px",
+                                              }}
+                                            />
+                                            <Typography
+                                              variant="body2"
+                                              sx={{
+                                                color: "#6b7280",
+                                                fontWeight: 500,
+                                                fontSize: "14px",
+                                              }}
+                                            >
+                                              ×{" "}
+                                              {formatCurrency(
+                                                productItem.price
+                                              )}
+                                            </Typography>
+                                          </Box>
+                                          <Typography
+                                            variant="body2"
+                                            sx={{
+                                              color: "#374151",
                                               fontWeight: 600,
-                                              color: "#111827",
-                                              fontSize: "16px",
+                                              fontSize: "14px",
                                             }}
                                           >
-                                            {productItem.product?.name ||
-                                              "Product Name N/A"}
-                                          </Typography>
-                                          <Typography
-                                            variant="h6"
-                                            sx={{
-                                              fontWeight: 700,
-                                              color: "#0387D9",
-                                              fontSize: "18px",
-                                            }}
-                                          >
+                                            Total:{" "}
                                             {formatCurrency(
                                               productItem.quantity *
                                                 productItem.price
@@ -678,37 +841,47 @@ const OrderDetails = () => {
                                         <Box
                                           sx={{
                                             display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            mb: 1,
+                                            flexDirection: "column",
+                                            gap: 1,
+                                            mt: 1.5,
                                           }}
                                         >
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              color: "#6b7280",
-                                              fontWeight: 500,
-                                              fontSize: "14px",
-                                            }}
-                                          >
-                                            Qty: {productItem.quantity} ×{" "}
-                                            {formatCurrency(productItem.price)}
-                                          </Typography>
+                                          {productItem.product?.category && 
+                                           Array.isArray(productItem.product.category) && 
+                                           productItem.product.category.length > 0 && (
+                                            <Box sx={{ display: "flex", gap: 0.5 }}>
+                                              {productItem.product.category.slice(0, 2).map((cat, idx) => (
+                                                <Chip
+                                                  key={idx}
+                                                  label={cat}
+                                                  size="small"
+                                                  sx={{
+                                                    backgroundColor: "rgba(59, 130, 246, 0.08)",
+                                                    color: "#1e40af",
+                                                    fontWeight: 500,
+                                                    fontSize: "11px",
+                                                    height: "20px",
+                                                    "& .MuiChip-label": {
+                                                      px: 1,
+                                                    },
+                                                  }}
+                                                />
+                                              ))}
+                                            </Box>
+                                          )}
+                                          {productItem.product?.description && (
+                                            <Typography
+                                              variant="body2"
+                                              sx={{
+                                                color: "#6b7280",
+                                                fontSize: "14px",
+                                                lineHeight: 1.5,
+                                              }}
+                                            >
+                                              {productItem.product.description}
+                                            </Typography>
+                                          )}
                                         </Box>
-
-                                        {productItem.product?.description && (
-                                          <Typography
-                                            variant="body2"
-                                            sx={{
-                                              color: "#6b7280",
-                                              mt: 1.5,
-                                              fontSize: "14px",
-                                              lineHeight: 1.5,
-                                            }}
-                                          >
-                                            {productItem.product.description}
-                                          </Typography>
-                                        )}
                                       </ProductCard>
                                     )
                                   )}
