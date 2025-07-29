@@ -208,11 +208,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
     //   icon: bookingLogo,
     //   path: "/crew/booking",
     // },
-    // {
-    //   label: "Financial Management",
-    //   icon: financeLogo,
-    //   path: "/crew/financial-management",
-    // },
+    {
+      label: "Financial Management",
+      icon: financeLogo,
+      path: "/crew/financial-management",
+    },
     {
       label: "Notifications",
       icon: notificationLogo,

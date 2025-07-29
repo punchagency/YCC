@@ -450,6 +450,7 @@ const Invent = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -1224,49 +1225,6 @@ const Invent = () => {
         </Box>
       );
     }
-
-    if (inventoryItems.length === 0) {
-      return (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 6,
-            borderRadius: 3,
-            textAlign: 'center',
-            border: '1px dashed #cbd5e1',
-            bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
-            maxWidth: 600,
-            mx: 'auto',
-            mt: 4
-          }}
-        >
-          <InventoryIcon sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
-          <Typography variant="h5" fontWeight={600} color="text.secondary">
-            No inventory items found
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
-            Start by adding your first product to manage your inventory effectively
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleAddProduct}
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: 2,
-              textTransform: 'none',
-              px: 4,
-              py: 1.5,
-              fontWeight: 600,
-              boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
-            }}
-          >
-            Add Your First Product
-          </Button>
-        </Paper>
-      );
-    }
-
     // Return null when there are items (they'll be rendered by desktop or mobile view)
     return null;
   };
@@ -1557,6 +1515,16 @@ const Invent = () => {
                     </IconButton>
                   </Box>
                 </TableCell>
+                {user.role.name === 'admin' && (
+                  <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      Supplier's Name
+                      <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                        <FilterListIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                )}
                 <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Product Name
@@ -1601,13 +1569,29 @@ const Invent = () => {
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
-                      <InventoryIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
-                      <Typography variant="h6" fontWeight={600} color="text.secondary">
-                        No products match your filter or search
+                      <InventoryIcon sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
+                      <Typography variant="h5" fontWeight={600} color="text.secondary">
+                        No inventory items found
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Try adjusting your search or filter criteria
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
+                        Start by adding your first product to manage your inventory effectively
                       </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleAddProduct}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          px: 4,
+                          py: 1.5,
+                          fontWeight: 600,
+                          boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+                        }}
+                      >
+                        Add Your First Product
+                      </Button>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -1668,6 +1652,16 @@ const Invent = () => {
                             height: 24,
                           }}
                         />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {typeof item.supplier === "object"
+                          ? item.supplier.businessName ||
+                          item.supplier.user?.email ||
+                          "Not available"
+                          : typeof item.supplier === "string" &&
+                            item.supplier.trim() !== ""
+                            ? item.supplier
+                            : "Not available"}
                       </TableCell>
                       <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
                         {item.productName}
@@ -1750,7 +1744,7 @@ const Invent = () => {
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
-                          {user.role.name === 'admin' && (
+                          {/* {user.role.name === 'admin' && (
                             <IconButton
                               size="small"
                               onClick={() => handleSendEmail(item)}
@@ -1762,7 +1756,7 @@ const Invent = () => {
                             >
                               <EmailIcon fontSize="small" />
                             </IconButton>
-                          )}
+                          )} */}
 
                         </Stack>
                       </TableCell>

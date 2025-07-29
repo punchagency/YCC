@@ -1,5 +1,23 @@
 import React, { useState } from "react";
-import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Chip,
+  Paper,
+  useTheme,
+  useMediaQuery,
+  Stack
+} from "@mui/material";
+import { visuallyHidden } from '@mui/utils';
 
 const History = () => {
   const [sortField, setSortField] = useState(null);
@@ -33,6 +51,9 @@ const History = () => {
     },
   ];
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -42,133 +63,208 @@ const History = () => {
     }
   };
 
-  const getSortIcon = (field) => {
-    if (sortField === field) {
-      return sortDirection === "asc" ? (
-        <FaSortAmountUp className="ml-1" />
-      ) : (
-        <FaSortAmountDown className="ml-1" />
-      );
-    }
-    return <FaSortAmountUp className="ml-1 opacity-30" />;
-  };
-
-  const getStatusBadgeClass = (status) => {
+  const getStatusColor = (status) => {
     switch (status) {
       case "In Progress":
-        return "bg-green-100 text-green-800";
+        return { color: 'success', bgcolor: '#e8f5e8', textColor: '#2e7d32' };
       case "Completed":
-        return "bg-blue-100 text-blue-800";
+        return { color: 'primary', bgcolor: '#e3f2fd', textColor: '#1976d2' };
       case "Pending":
-        return "bg-yellow-100 text-yellow-800";
+        return { color: 'warning', bgcolor: '#fff3e0', textColor: '#f57c00' };
       default:
-        return "bg-gray-100 text-gray-800";
+        return { color: 'default', bgcolor: '#f5f5f5', textColor: '#666' };
     }
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-6 mx-5 my-5" style={{width:"70%", height:"550px", borderRadius:"10px"}}>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-        Payment History
-      </h2>
-      <p className="text-gray-600 mb-6">
-        View detailed payment information, including status and payment method,
-        for full transparency.
-      </p>
+  const sortedPayments = [...payments].sort((a, b) => {
+    if (!sortField) return 0;
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    }
+    return aValue < bValue ? 1 : -1;
+  });
 
-      <div className="overflow-x-auto" style={{width:"100%"}}>
-        <table className="min-w-full border border-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("id")}
-              >
-                <div className="flex items-center">
-                  Inv No. {getSortIcon("id")}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("vendor")}
-              >
-                <div className="flex items-center">
-                  Vender {getSortIcon("vendor")}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("amount")}
-              >
-                <div className="flex items-center">
-                  Amount {getSortIcon("amount")}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("payMethod")}
-              >
-                <div className="flex items-center">
-                  Pay Method {getSortIcon("payMethod")}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("date")}
-              >
-                <div className="flex items-center">
-                  Date {getSortIcon("date")}
-                </div>
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer border border-gray-200"
-                onClick={() => handleSort("status")}
-              >
-                <div className="flex items-center">
-                  Status {getSortIcon("status")}
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white">
-            {payments.map((payment) => (
-              <tr key={payment.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border border-gray-200">
-                  {payment.id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">
-                  {payment.vendor}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">
-                  ${payment.amount.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">
-                  {payment.payMethod}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 border border-gray-200">
-                  {payment.date}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap border border-gray-200">
-                  <span
-                    className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                      payment.status
-                    )}`}
-                  >
-                    {payment.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  if (isMobile) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+              Payment History
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
+              View detailed payment information, including status and payment method, for full transparency.
+            </Typography>
+            
+            <Stack spacing={2}>
+              {sortedPayments.map((payment) => {
+                const statusStyle = getStatusColor(payment.status);
+                return (
+                  <Card key={payment.id} variant="outlined" sx={{ borderRadius: 2 }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {payment.id}
+                        </Typography>
+                        <Chip
+                          label={payment.status}
+                          size="small"
+                          sx={{
+                            bgcolor: statusStyle.bgcolor,
+                            color: statusStyle.textColor,
+                            fontWeight: 500,
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                        Vendor: {payment.vendor}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                        Amount: ${payment.amount.toFixed(2)}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                        Method: {payment.payMethod}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666' }}>
+                        Date: {payment.date}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </Stack>
+          </CardContent>
+        </Card>
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: '100%' }}>
+      <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+            Payment History
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
+            View detailed payment information, including status and payment method, for full transparency.
+          </Typography>
+
+          <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'id'}
+                      direction={sortField === 'id' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('id')}
+                    >
+                      Inv No.
+                      {sortField === 'id' ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'vendor'}
+                      direction={sortField === 'vendor' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('vendor')}
+                    >
+                      Vendor
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'amount'}
+                      direction={sortField === 'amount' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('amount')}
+                    >
+                      Amount
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'payMethod'}
+                      direction={sortField === 'payMethod' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('payMethod')}
+                    >
+                      Pay Method
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'date'}
+                      direction={sortField === 'date' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('date')}
+                    >
+                      Date
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'status'}
+                      direction={sortField === 'status' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('status')}
+                    >
+                      Status
+                    </TableSortLabel>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedPayments.map((payment) => {
+                  const statusStyle = getStatusColor(payment.status);
+                  return (
+                    <TableRow
+                      key={payment.id}
+                      sx={{
+                        '&:hover': { bgcolor: '#f8f9fa' },
+                        '&:last-child td, &:last-child th': { border: 0 }
+                      }}
+                    >
+                      <TableCell sx={{ fontWeight: 500, color: '#333' }}>
+                        {payment.id}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {payment.vendor}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666', fontWeight: 500 }}>
+                        ${payment.amount.toFixed(2)}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {payment.payMethod}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {payment.date}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={payment.status}
+                          size="small"
+                          sx={{
+                            bgcolor: statusStyle.bgcolor,
+                            color: statusStyle.textColor,
+                            fontWeight: 500,
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

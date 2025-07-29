@@ -428,7 +428,8 @@ const AdminLayout = ({ role }) => {
                                           </svg>
                                           Add New Product
                                         </button>
-                                        {importCSVButton}
+                                        {user.role.name === "supplier" &&
+                                          importCSVButton}
                                       </div>
                                     ) : null
                                   }
