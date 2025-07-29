@@ -721,10 +721,11 @@ export default function CalendarPage() {
         59,
         59
       );
+
       const response = await fetchEvents(firstDay, lastDay);
-      console.log("response", response);
+
       if (response.success) {
-        console.log("fetched events", response.data);
+        // Fix: Set calendarEvents to the events array directly
         setCalendarEvents(response.data);
       } else {
         toast.current.show({
@@ -748,7 +749,6 @@ export default function CalendarPage() {
   }, [currentDate]);
 
   useEffect(() => {
-    console.log("currentDate", currentDate);
     loadEvents();
   }, [currentDate, loadEvents]);
 
@@ -1057,7 +1057,7 @@ export default function CalendarPage() {
 
   // Add this helper function to get events for a specific day
   const getEventsForDay = (day) => {
-    if (!calendarEvents?.data) return [];
+    if (!calendarEvents) return [];
 
     const date = new Date(
       currentDate.getFullYear(),
@@ -1065,7 +1065,7 @@ export default function CalendarPage() {
       day
     );
 
-    return calendarEvents.data.filter((event) => {
+    return calendarEvents.filter((event) => {
       const eventDate = new Date(event.start);
       return (
         eventDate.getDate() === day &&
@@ -1077,12 +1077,10 @@ export default function CalendarPage() {
 
   // Add this helper function after getEventsForDay
   const getUniqueEventTypes = () => {
-    if (!calendarEvents?.data) return [];
+    if (!calendarEvents) return [];
 
     // Get unique event types from the events data
-    const types = new Set(
-      calendarEvents.data.map((event) => event.type || "other")
-    );
+    const types = new Set(calendarEvents.map((event) => event.type || "other"));
     return Array.from(types);
   };
 
@@ -1192,7 +1190,7 @@ export default function CalendarPage() {
       {renderMobileViewToggle()}
 
       {/* Add Event button at the top right of main content */}
-      <div
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -1206,7 +1204,7 @@ export default function CalendarPage() {
           icon="pi pi-plus"
           onClick={() => setShowEventModal(true)}
         />
-      </div>
+      </div> */}
 
       <div
         className="widget-container"
@@ -1274,124 +1272,133 @@ export default function CalendarPage() {
 
           {isLoading ? (
             <div>Loading events...</div>
-          ) : !calendarEvents?.data?.length ? (
-            <div>No events found</div>
           ) : (
-            <>
-              {/* Show only first 2 events */}
-              {calendarEvents.data.slice(0, 2).map((event, index) => (
-                <React.Fragment key={event._id}>
-                  {index > 0 && (
-                    <div
-                      className="event-divider"
-                      style={{
-                        height: "1px",
-                        background: "#E4E7EC",
-                        margin: "10px 0",
-                      }}
-                    ></div>
-                  )}
-                  <EventCard
-                    title={event.title}
-                    start={event.start}
-                    location={event.location}
-                    description={event.description}
-                    event={event}
-                    onUpdate={handleEventUpdate}
-                    onDelete={handleEventDelete}
-                    onAddGuest={handleAddGuest}
-                  />
-                </React.Fragment>
-              ))}
+            (() => {
+              if (!calendarEvents?.length) {
+                return <div>No events found</div>;
+              }
 
-              {/* Upcoming Reminders: show the three soonest upcoming events */}
-              <div>
-                <h4>Upcoming Reminders</h4>
-                <div>
-                  {calendarEvents?.data &&
-                    calendarEvents.data.length > 0 &&
-                    calendarEvents.data
-                      .filter((event) => new Date(event.start) > new Date())
-                      .sort((a, b) => new Date(a.start) - new Date(b.start))
-                      .slice(0, 3)
-                      .map((event, idx) => (
+              return (
+                <>
+                  {/* Show only first 2 events */}
+                  {calendarEvents.slice(0, 2).map((event, index) => (
+                    <React.Fragment key={event._id}>
+                      {index > 0 && (
                         <div
-                          key={event._id || idx}
-                          className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                          className="event-divider"
                           style={{
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                            height: "1px",
+                            background: "#E4E7EC",
+                            margin: "10px 0",
                           }}
-                        >
-                          <div className="flex items-center justify-center">
-                            <div>
-                              <h3 className="text-2xl font-bold">
-                                {new Date(event.start).getDate()}
-                              </h3>
-                            </div>
-                            <div className="mt-3 ml-3">
-                              <p>
-                                {new Date(event.start).toLocaleDateString(
-                                  undefined,
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )}
-                              </p>
-                              <p>{event.title}</p>
-                            </div>
-                          </div>
-                          <div className="mt-3">
-                            <div className="flex items-center justify-flex-end">
-                              <img
-                                src={three}
-                                alt="menu"
-                                style={{
-                                  cursor: "pointer",
-                                  marginBottom: "10px",
-                                  marginLeft: "55px",
-                                }}
-                              />
-                            </div>
-                            <span>
-                              <span>
-                                {new Date(event.start).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </span>
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                </div>
-              </div>
+                        ></div>
+                      )}
+                      <EventCard
+                        title={event.title}
+                        start={event.start}
+                        location={event.location}
+                        description={event.description}
+                        event={event}
+                        onUpdate={handleEventUpdate}
+                        onDelete={handleEventDelete}
+                        onAddGuest={handleAddGuest}
+                      />
+                    </React.Fragment>
+                  ))}
 
-              {/* Show See More button if there are more than 2 events */}
-              {calendarEvents.data.length > 2 && (
-                <div
-                  className="see-more-container"
-                  style={{ marginTop: "20px", textAlign: "center" }}
-                >
-                  <button
-                    className="see-more-button"
-                    onClick={handleSeeMore}
-                    style={{
-                      width: "100%",
-                      padding: "12px",
-                      background: "transparent",
-                      color: "#0387D9",
-                      border: "1px solid #0387D9",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontWeight: 500,
-                    }}
-                  >
-                    See More Events
-                  </button>
-                </div>
-              )}
-            </>
+                  {/* Upcoming Reminders: show the three soonest upcoming events */}
+                  <div>
+                    <h4>Upcoming Reminders</h4>
+                    <div>
+                      {calendarEvents &&
+                        calendarEvents.length > 0 &&
+                        calendarEvents
+                          .filter((event) => new Date(event.start) > new Date())
+                          .sort((a, b) => new Date(a.start) - new Date(b.start))
+                          .slice(0, 3)
+                          .map((event, idx) => (
+                            <div
+                              key={event._id || idx}
+                              className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                              style={{
+                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                              }}
+                            >
+                              <div className="flex items-center justify-center">
+                                <div>
+                                  <h3 className="text-2xl font-bold">
+                                    {new Date(event.start).getDate()}
+                                  </h3>
+                                </div>
+                                <div className="mt-3 ml-3">
+                                  <p>
+                                    {new Date(event.start).toLocaleDateString(
+                                      undefined,
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                      }
+                                    )}
+                                  </p>
+                                  <p>{event.title}</p>
+                                </div>
+                              </div>
+                              <div className="mt-3">
+                                <div className="flex items-center justify-flex-end">
+                                  <img
+                                    src={three}
+                                    alt="menu"
+                                    style={{
+                                      cursor: "pointer",
+                                      marginBottom: "10px",
+                                      marginLeft: "55px",
+                                    }}
+                                  />
+                                </div>
+                                <span>
+                                  <span>
+                                    {new Date(event.start).toLocaleTimeString(
+                                      [],
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      }
+                                    )}
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                    </div>
+                  </div>
+
+                  {/* Show See More button if there are more than 2 events */}
+                  {calendarEvents.length > 2 && (
+                    <div
+                      className="see-more-container"
+                      style={{ marginTop: "20px", textAlign: "center" }}
+                    >
+                      <button
+                        className="see-more-button"
+                        onClick={handleSeeMore}
+                        style={{
+                          width: "100%",
+                          padding: "12px",
+                          background: "transparent",
+                          color: "#0387D9",
+                          border: "1px solid #0387D9",
+                          borderRadius: "6px",
+                          cursor: "pointer",
+                          fontWeight: 500,
+                        }}
+                      >
+                        See More Events
+                      </button>
+                    </div>
+                  )}
+                </>
+              );
+            })()
           )}
         </div>
 

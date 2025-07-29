@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -16,7 +16,12 @@ import {
   useTheme,
   useMediaQuery,
 } from "@mui/material";
-import { Visibility, Description } from "@mui/icons-material";
+import {
+  Visibility,
+  Description,
+  ContentCopy,
+  CheckCircle,
+} from "@mui/icons-material";
 import { Pagination } from "../../../../components/pagination";
 import { InvoiceTableSkeleton } from "../../../../components/FinancialManagementSkeletons";
 
@@ -25,17 +30,21 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Format currency
+  // State to track which invoice ID was just copied (for visual feedback)
+  const [copiedInvoiceId, setCopiedInvoiceId] = useState(null);
+
+  // Format currency for display
   const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return "N/A";
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(amount / 100); // Convert from cents to dollars
+    }).format(amount / 100);
   };
 
-  // Format date
+  // Format date for display
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -43,39 +52,60 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
     });
   };
 
-  // Get status color
+  // Get status color configuration
   const getStatusColor = (status) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case "paid":
-        return { color: "#10B981", bgColor: "rgba(16, 185, 129, 0.1)" };
+        return { bgColor: "#dcfce7", color: "#166534" };
       case "pending":
-        return { color: "#F59E0B", bgColor: "rgba(245, 158, 11, 0.1)" };
+        return { bgColor: "#fef3c7", color: "#92400e" };
       case "failed":
-        return { color: "#EF4444", bgColor: "rgba(239, 68, 68, 0.1)" };
-      case "cancelled":
-        return { color: "#6B7280", bgColor: "rgba(107, 114, 128, 0.1)" };
+        return { bgColor: "#fee2e2", color: "#991b1b" };
       default:
-        return { color: "#6B7280", bgColor: "rgba(107, 114, 128, 0.1)" };
+        return { bgColor: "#f3f4f6", color: "#374151" };
     }
   };
 
-  // Get type color
+  // Get type color configuration
   const getTypeColor = (type) => {
-    switch (type) {
+    switch (type?.toLowerCase()) {
       case "order":
-        return { color: "#0387D9", bgColor: "rgba(3, 135, 217, 0.1)" };
+        return { bgColor: "#dbeafe", color: "#1e40af" };
       case "booking":
-        return { color: "#10B981", bgColor: "rgba(16, 185, 129, 0.1)" };
+        return { bgColor: "#f3e8ff", color: "#7c3aed" };
       case "quote":
-        return { color: "#F59E0B", bgColor: "rgba(245, 158, 11, 0.1)" };
+        return { bgColor: "#ecfdf5", color: "#047857" };
       default:
-        return { color: "#6B7280", bgColor: "rgba(107, 114, 128, 0.1)" };
+        return { bgColor: "#f3f4f6", color: "#374151" };
     }
   };
 
+  // Handle invoice view action
   const handleViewInvoice = (invoiceUrl) => {
     if (invoiceUrl) {
       window.open(invoiceUrl, "_blank");
+    }
+  };
+
+  /**
+   * Copy text to clipboard with visual feedback
+   * @param {string} text - The text to copy
+   * @param {string} invoiceId - The invoice ID for feedback tracking
+   */
+  const handleCopyToClipboard = async (text, invoiceId) => {
+    try {
+      // Copy text to clipboard
+      await navigator.clipboard.writeText(text);
+
+      // Set visual feedback state
+      setCopiedInvoiceId(invoiceId);
+
+      // Clear feedback after 2 seconds
+      setTimeout(() => {
+        setCopiedInvoiceId(null);
+      }, 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
     }
   };
 
@@ -222,7 +252,68 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
                               fontWeight: 500,
                             }}
                           >
-                            {invoice.invoiceId}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
+                              <Tooltip title={invoice.invoiceId}>
+                                <Typography
+                                  sx={{
+                                    fontFamily: "monospace",
+                                    fontSize: isMobile ? "0.75rem" : "0.875rem",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    maxWidth: "120px",
+                                  }}
+                                >
+                                  {invoice.invoiceId}
+                                </Typography>
+                              </Tooltip>
+                              <Tooltip
+                                title={
+                                  copiedInvoiceId === invoice.invoiceId
+                                    ? "Copied!"
+                                    : "Copy Invoice ID"
+                                }
+                              >
+                                <IconButton
+                                  size="small"
+                                  onClick={() =>
+                                    handleCopyToClipboard(
+                                      invoice.invoiceId,
+                                      invoice.invoiceId
+                                    )
+                                  }
+                                  sx={{
+                                    color:
+                                      copiedInvoiceId === invoice.invoiceId
+                                        ? "#10b981"
+                                        : "#6b7280",
+                                    "&:hover": {
+                                      backgroundColor:
+                                        copiedInvoiceId === invoice.invoiceId
+                                          ? "rgba(16, 185, 129, 0.1)"
+                                          : "rgba(107, 114, 128, 0.1)",
+                                      color:
+                                        copiedInvoiceId === invoice.invoiceId
+                                          ? "#059669"
+                                          : "#374151",
+                                    },
+                                    transition: "all 0.2s ease-in-out",
+                                  }}
+                                >
+                                  {copiedInvoiceId === invoice.invoiceId ? (
+                                    <CheckCircle sx={{ fontSize: 16 }} />
+                                  ) : (
+                                    <ContentCopy sx={{ fontSize: 16 }} />
+                                  )}
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
                           </TableCell>
                           <TableCell
                             sx={{
@@ -230,7 +321,19 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
                               color: "#1f2937",
                             }}
                           >
-                            {invoice.customer?.name || "N/A"}
+                            <Tooltip title={invoice.customer?.email || "N/A"}>
+                              <Typography
+                                sx={{
+                                  fontSize: isMobile ? "0.75rem" : "0.875rem",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                  maxWidth: "150px",
+                                }}
+                              >
+                                {invoice.customer?.email || "N/A"}
+                              </Typography>
+                            </Tooltip>
                           </TableCell>
                           <TableCell
                             sx={{
