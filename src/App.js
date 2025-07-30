@@ -89,6 +89,7 @@ import SupplierOrder from "./pages/supplier/order";
 import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
 import AdminOrderDetails from "./pages/order/adminOrderDetails";
+import AdminDashboard from "./pages/adminDashboard";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -209,7 +210,8 @@ function App() {
                       path="/admin/dashboard"
                       element={
                         <ProtectedRoute requiredRoles={["admin"]}>
-                          <AdminDashboard1 />
+                          {/* <AdminDashboard1 /> */}
+                          <AdminDashboard />
                         </ProtectedRoute>
                       }
                     />
