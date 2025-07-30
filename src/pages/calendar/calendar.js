@@ -57,6 +57,7 @@ import {
   MoreVert as MoreVertIcon,
   Edit as EditIcon,
   PersonAdd as PersonAddIcon,
+  Event as EventIcon,
 } from "@mui/icons-material";
 import { Slide } from "@mui/material";
 
@@ -162,11 +163,25 @@ const EventCard = ({
       }}
     >
       <div style={{ marginRight: "12px" }}>
-        <img
-          src={profilenoti}
-          alt="profile"
-          style={{ width: "40px", height: "40px", borderRadius: "50%" }}
-        />
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            backgroundColor: "#F0F4FF",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            border: "1px solid #E4E7EC",
+          }}
+        >
+          <EventIcon
+            style={{
+              color: "#0387D9",
+              fontSize: "20px",
+            }}
+          />
+        </div>
       </div>
       <div
         style={{
@@ -208,7 +223,7 @@ const EventCard = ({
         <div className="event-actions">
           <div
             style={{
-              width: "32px", 
+              width: "32px",
               height: "32px",
               display: "flex",
               alignItems: "center",
@@ -216,7 +231,7 @@ const EventCard = ({
               borderRadius: "50%",
               cursor: "pointer",
               transition: "background-color 0.2s ease",
-              backgroundColor: "transparent", 
+              backgroundColor: "transparent",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "rgba(3, 135, 217, 0.08)";
@@ -226,7 +241,7 @@ const EventCard = ({
             }}
           >
             <MoreVertIcon
-              fontSize="small" 
+              fontSize="small"
               onClick={handleClick}
               style={{
                 color: "#667085",
@@ -330,164 +345,308 @@ const EventCard = ({
 
 const DayEventsModal = ({ visible, onHide, events, selectedDate }) => {
   return (
-    <Dialog
-      visible={visible}
-      onHide={onHide}
-      header={`Events for ${selectedDate?.toLocaleDateString("en-US", {
-        weekday: "long",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}`}
-      style={{ width: "600px" }}
+    <MUIDialog
+      open={visible}
+      onClose={onHide}
+      maxWidth="md"
+      fullWidth
+      TransitionComponent={Slide}
+      transitionDuration={300}
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
+        },
+      }}
     >
-      <div className="day-events-content">
+      <DialogTitle
+        sx={{
+          pb: 1,
+          borderBottom: "1px solid #E4E7EC",
+          backgroundColor: "#F8FBFF",
+          mb: 3,
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              color: "#344054",
+              fontSize: "1.25rem",
+            }}
+          >
+            Events for{" "}
+            {selectedDate?.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </Typography>
+          <IconButton
+            onClick={onHide}
+            size="small"
+            sx={{
+              color: "#667085",
+              "&:hover": {
+                backgroundColor: "rgba(3, 135, 217, 0.08)",
+                color: "#0387D9",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2, pb: 2 }}>
         {events.length === 0 ? (
-          <p>No events scheduled for this day.</p>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            py={4}
+            textAlign="center"
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: "#667085",
+                fontSize: "16px",
+                fontWeight: 500,
+              }}
+            >
+              No events scheduled for this day.
+            </Typography>
+          </Box>
         ) : (
-          events.map((event, index) => (
-            <div key={event._id} className="event-item">
-              <h3
-                style={{
-                  margin: "0 0 10px 0",
-                  fontSize: "18px",
-                  color: "#344054",
+          <Box display="flex" flexDirection="column" gap={3}>
+            {events.map((event, index) => (
+              <Box
+                key={event._id}
+                sx={{
+                  p: 3,
+                  border: "1px solid #E4E7EC",
+                  borderRadius: 2,
+                  backgroundColor: "#FFFFFF",
+                  "&:hover": {
+                    borderColor: "#0387D9",
+                    boxShadow: "0 2px 8px rgba(3, 135, 217, 0.08)",
+                  },
+                  transition: "all 0.2s ease",
                 }}
               >
-                {event.title}
-              </h3>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "5px",
-                }}
-              >
-                <i
-                  className="pi pi-calendar"
-                  style={{ marginRight: "8px", color: "#667085" }}
-                ></i>
-                <span style={{ fontSize: "14px", color: "#475467" }}>
-                  {new Date(event.start).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "numeric",
-                    minute: "numeric",
-                  })}
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "5px",
-                }}
-              >
-                <i
-                  className="pi pi-map-marker"
-                  style={{ marginRight: "8px", color: "#667085" }}
-                ></i>
-                <span style={{ fontSize: "14px", color: "#475467" }}>
-                  {event.location}
-                </span>
-              </div>
-              {event.description && (
-                <p
-                  style={{
-                    margin: "10px 0 0 0",
-                    fontSize: "14px",
-                    color: "#475467",
-                    padding: "10px",
-                    backgroundColor: "#fff",
-                    borderRadius: "4px",
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 600,
+                    color: "#344054",
+                    fontSize: "18px",
+                    mb: 2,
                   }}
                 >
-                  {event.description}
-                </p>
-              )}
+                  {event.title}
+                </Typography>
 
-              {/* Add this section to display guests */}
-              {(event.guests?.length > 0 || event.guestEmails?.length > 0) && (
-                <div
-                  className="event-guests"
-                  style={{
-                    marginTop: "15px",
-                    padding: "10px",
-                    backgroundColor: "#f8f9fa",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <h4
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      marginBottom: "8px",
-                      color: "#344054",
-                    }}
-                  >
-                    Guests
-                  </h4>
+                <Box display="flex" flexDirection="column" gap={1.5}>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <EventIcon
+                      sx={{
+                        fontSize: "16px",
+                        color: "#667085",
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: "14px",
+                        color: "#475467",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {new Date(event.start).toLocaleString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
+                    </Typography>
+                  </Box>
 
-                  <div className="guest-list">
-                    {event.guestEmails &&
-                      event.guestEmails.map((email, idx) => (
-                        <div
-                          key={`email-${idx}`}
-                          className="guest-item"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <i
-                            className="pi pi-envelope"
-                            style={{
-                              marginRight: "8px",
-                              color: "#667085",
-                              fontSize: "12px",
-                            }}
-                          ></i>
-                          <span style={{ fontSize: "13px", color: "#475467" }}>
-                            {email}
-                          </span>
-                        </div>
-                      ))}
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Box
+                      sx={{
+                        width: "16px",
+                        height: "16px",
+                        borderRadius: "50%",
+                        backgroundColor: "#F0F4FF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: "#0387D9",
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontSize: "14px",
+                        color: "#475467",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {event.location}
+                    </Typography>
+                  </Box>
 
-                    {event.guests &&
-                      event.guests.map((guest, idx) => (
-                        <div
-                          key={`guest-${idx}`}
-                          className="guest-item"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "5px",
-                          }}
-                        >
-                          <i
-                            className="pi pi-user"
-                            style={{
-                              marginRight: "8px",
-                              color: "#667085",
-                              fontSize: "12px",
-                            }}
-                          ></i>
-                          <span style={{ fontSize: "13px", color: "#475467" }}>
-                            {guest.email || guest.name || `Guest ${idx + 1}`}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))
+                  {event.description && (
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 2,
+                        backgroundColor: "#F8FBFF",
+                        borderRadius: 2,
+                        border: "1px solid #E4E7EC",
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "14px",
+                          color: "#475467",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        {event.description}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {(event.guests?.length > 0 ||
+                    event.guestEmails?.length > 0) && (
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 2,
+                        backgroundColor: "#F9FAFB",
+                        borderRadius: 2,
+                        border: "1px solid #E4E7EC",
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          color: "#344054",
+                          mb: 1.5,
+                        }}
+                      >
+                        Guests
+                      </Typography>
+
+                      <Box display="flex" flexDirection="column" gap={1}>
+                        {event.guestEmails &&
+                          event.guestEmails.map((email, idx) => (
+                            <Box
+                              key={`email-${idx}`}
+                              display="flex"
+                              alignItems="center"
+                              gap={1}
+                            >
+                              <Box
+                                sx={{
+                                  width: "12px",
+                                  height: "12px",
+                                  borderRadius: "50%",
+                                  backgroundColor: "#F0F4FF",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: "4px",
+                                    height: "4px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#0387D9",
+                                  }}
+                                />
+                              </Box>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontSize: "13px",
+                                  color: "#475467",
+                                }}
+                              >
+                                {email}
+                              </Typography>
+                            </Box>
+                          ))}
+
+                        {event.guests &&
+                          event.guests.map((guest, idx) => (
+                            <Box
+                              key={`guest-${idx}`}
+                              display="flex"
+                              alignItems="center"
+                              gap={1}
+                            >
+                              <Box
+                                sx={{
+                                  width: "12px",
+                                  height: "12px",
+                                  borderRadius: "50%",
+                                  backgroundColor: "#F0F4FF",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: "4px",
+                                    height: "4px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#0387D9",
+                                  }}
+                                />
+                              </Box>
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontSize: "13px",
+                                  color: "#475467",
+                                }}
+                              >
+                                {guest.email ||
+                                  guest.name ||
+                                  `Guest ${idx + 1}`}
+                              </Typography>
+                            </Box>
+                          ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+            ))}
+          </Box>
         )}
-      </div>
-    </Dialog>
+      </DialogContent>
+    </MUIDialog>
   );
 };
 
@@ -496,312 +655,108 @@ const AllEventsModal = ({
   onHide,
   events,
   onEventUpdate,
+  onEventDelete,
   onAddGuest,
 }) => {
-  const [showUpdateEventModal, setShowUpdateEventModal] = useState(false);
-  const [showDeleteEventModal, setShowDeleteEventModal] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const toast = useRef(null);
-
-  const handleUpdateClick = (event) => {
-    setSelectedEvent({ ...event }); // Create a copy of the event
-    setShowUpdateEventModal(true);
-  };
-
-  const handleDeleteClick = (event) => {
-    setSelectedEvent({ ...event });
-    setShowDeleteEventModal(true);
-  };
-
-  const handleUpdateEvent = async () => {
-    try {
-      const result = await updateEvent(selectedEvent._id, {
-        title: selectedEvent.title,
-        start: selectedEvent.start,
-        end: selectedEvent.end,
-        location: selectedEvent.location,
-        description: selectedEvent.description,
-        type: selectedEvent.type,
-      });
-
-      if (result.success) {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Event updated successfully",
-        });
-        setShowUpdateEventModal(false);
-        onHide(); // Close the all events modal
-        onEventUpdate(); // Refresh the events
-      } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to update event",
-        });
-      }
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while updating the event",
-      });
-    }
-  };
-
-  const handleDeleteEvent = async () => {
-    try {
-      const result = await deleteEvent(selectedEvent._id);
-
-      if (result.success) {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Event deleted successfully",
-        });
-        setShowDeleteEventModal(false);
-        onHide(); // Close the all events modal
-        onEventUpdate(); // Refresh the events list
-      } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to delete event",
-        });
-      }
-    } catch (error) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while deleting the event",
-      });
-    }
-  };
-
   return (
-    <>
-      <Dialog
-        visible={visible}
-        onHide={onHide}
-        header="All Events"
-        className="day-events-modal"
-        style={{ width: "500px" }}
-      >
-        <div className="day-events-content">
-          {events.map((event, index) => (
-            <React.Fragment key={event._id}>
-              {index > 0 && (
-                <div
-                  className="event-divider"
-                  style={{
-                    height: "1px",
-                    background: "#E4E7EC",
-                    margin: "10px 0",
-                  }}
-                ></div>
-              )}
-              <EventCard
-                title={event.title}
-                start={event.start}
-                location={event.location}
-                description={event.description}
-                event={event}
-                onUpdate={handleUpdateClick}
-                onDelete={handleDeleteClick}
-                onAddGuest={onAddGuest}
-              />
-            </React.Fragment>
-          ))}
-        </div>
-      </Dialog>
-
-      {/* Update Event Modal */}
-      <Dialog
-        visible={showUpdateEventModal}
-        onHide={() => {
-          setShowUpdateEventModal(false);
-          setSelectedEvent(null);
+    <MUIDialog
+      open={visible}
+      onClose={onHide}
+      maxWidth="md"
+      fullWidth
+      TransitionComponent={Slide}
+      transitionDuration={300}
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          pb: 1,
+          borderBottom: "1px solid #E4E7EC",
+          backgroundColor: "#F8FBFF",
+          mb: 3,
         }}
-        header="Update Event"
-        style={{ width: "500px" }}
       >
-        {selectedEvent && (
-          <div className="update-event-form">
-            <div className="field">
-              <label>Title</label>
-              <InputText
-                value={selectedEvent.title}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, title: e.target.value })
-                }
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Location</label>
-              <InputText
-                value={selectedEvent.location}
-                onChange={(e) =>
-                  setSelectedEvent({
-                    ...selectedEvent,
-                    location: e.target.value,
-                  })
-                }
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Description</label>
-              <InputTextarea
-                value={selectedEvent.description}
-                onChange={(e) =>
-                  setSelectedEvent({
-                    ...selectedEvent,
-                    description: e.target.value,
-                  })
-                }
-                rows={3}
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Start Date</label>
-              <Calendar
-                value={new Date(selectedEvent.start)}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, start: e.value })
-                }
-                showTime
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>End Date</label>
-              <Calendar
-                value={new Date(selectedEvent.end)}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, end: e.value })
-                }
-                showTime
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Current Guests</label>
-              <div
-                className="current-guests"
-                style={{
-                  padding: "10px",
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "4px",
-                  marginBottom: "15px",
-                }}
-              >
-                {selectedEvent.guestEmails &&
-                  selectedEvent.guestEmails.map((email, idx) => (
-                    <div
-                      key={`email-${idx}`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <i
-                        className="pi pi-envelope"
-                        style={{
-                          marginRight: "8px",
-                          color: "#667085",
-                          fontSize: "12px",
-                        }}
-                      ></i>
-                      <span style={{ fontSize: "13px", color: "#475467" }}>
-                        {email}
-                      </span>
-                    </div>
-                  ))}
-
-                {selectedEvent.guests &&
-                  selectedEvent.guests.map((guest, idx) => (
-                    <div
-                      key={`guest-${idx}`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <i
-                        className="pi pi-user"
-                        style={{
-                          marginRight: "8px",
-                          color: "#667085",
-                          fontSize: "12px",
-                        }}
-                      ></i>
-                      <span style={{ fontSize: "13px", color: "#475467" }}>
-                        {guest.email || guest.name || `Guest ${idx + 1}`}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "0.5rem",
-                marginTop: "1rem",
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              color: "#344054",
+              fontSize: "1.25rem",
+            }}
+          >
+            All Events
+          </Typography>
+          <IconButton
+            onClick={onHide}
+            size="small"
+            sx={{
+              color: "#667085",
+              "&:hover": {
+                backgroundColor: "rgba(3, 135, 217, 0.08)",
+                color: "#0387D9",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+      </DialogTitle>
+      <DialogContent sx={{ pt: 2, pb: 2 }}>
+        {events.length === 0 ? (
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            py={4}
+            textAlign="center"
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: "#667085",
+                fontSize: "16px",
+                fontWeight: 500,
               }}
             >
-              <Button
-                label="Cancel"
-                onClick={() => setShowUpdateEventModal(false)}
-                className="p-button-text"
-              />
-              <Button label="Update" onClick={handleUpdateEvent} />
-            </div>
-          </div>
+              No events found.
+            </Typography>
+          </Box>
+        ) : (
+          <Box display="flex" flexDirection="column" gap={2}>
+            {events.map((event, index) => (
+              <React.Fragment key={event._id}>
+                {index > 0 && (
+                  <Box
+                    sx={{
+                      height: "1px",
+                      background: "#E4E7EC",
+                      my: 2,
+                    }}
+                  />
+                )}
+                <EventCard
+                  title={event.title}
+                  start={event.start}
+                  location={event.location}
+                  description={event.description}
+                  event={event}
+                  onUpdate={onEventUpdate}
+                  onDelete={onEventDelete}
+                  onAddGuest={onAddGuest}
+                />
+              </React.Fragment>
+            ))}
+          </Box>
         )}
-      </Dialog>
-
-      {/* Delete Confirmation Modal */}
-      <Dialog
-        visible={showDeleteEventModal}
-        onHide={() => setShowDeleteEventModal(false)}
-        header="Confirm Delete"
-        style={{ width: "400px" }}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
-          />
-          <span>Are you sure you want to delete this event?</span>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "0.5rem",
-            marginTop: "1rem",
-          }}
-        >
-          <Button
-            label="No"
-            onClick={() => setShowDeleteEventModal(false)}
-            className="p-button-text"
-          />
-          <Button
-            label="Yes"
-            onClick={handleDeleteEvent}
-            className="p-button-danger"
-          />
-        </div>
-      </Dialog>
-
-      <Toast ref={toast} />
-    </>
+      </DialogContent>
+    </MUIDialog>
   );
 };
 
@@ -992,13 +947,12 @@ export default function CalendarPage() {
         style={{
           display: "flex",
           justifyContent: "center",
-          margin: "15px 0",
-          borderRadius: "8px",
+          margin: "12px 12px 16px 12px",
+          borderRadius: "12px",
           overflow: "hidden",
           border: "1px solid #E4E7EC",
-          // width: "97%",
-          // marginLeft: "5px",
-          // marginRight: "5px",
+          backgroundColor: "#FFFFFF",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
         }}
       >
         <button
@@ -1118,88 +1072,265 @@ export default function CalendarPage() {
 
   const renderEventModal = () => {
     return (
-      <Dialog
-        visible={showEventModal}
-        onHide={() => setShowEventModal(false)}
-        header="Add New Event"
-        className="event-modal"
-        style={{ width: "500px" }}
+      <MUIDialog
+        open={showEventModal}
+        onClose={() => setShowEventModal(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        transitionDuration={300}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+          },
+        }}
       >
-        <div className="event-form p-fluid">
-          <div className="field">
-            <label htmlFor="title">Title *</label>
-            <InputText
-              id="title"
+        <DialogTitle
+          sx={{
+            pb: 1,
+            borderBottom: "1px solid #E4E7EC",
+            backgroundColor: "#F8FBFF",
+            mb: 3,
+          }}
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#344054",
+                fontSize: "1.25rem",
+              }}
+            >
+              Add New Event
+            </Typography>
+            <IconButton
+              onClick={() => setShowEventModal(false)}
+              size="small"
+              sx={{
+                color: "#667085",
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                  color: "#0387D9",
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2, pb: 2 }}>
+          <Box display="flex" flexDirection="column" gap={2.5}>
+            <TextField
+              label="Event Title *"
               value={newEvent.title}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, title: e.target.value })
               }
               placeholder="Enter event title"
+              fullWidth
+              variant="outlined"
+              size="medium"
               required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
             />
-          </div>
 
-          <div className="field">
-            <label htmlFor="description">Description</label>
-            <InputTextarea
-              id="description"
+            <TextField
+              label="Description"
               value={newEvent.description}
               onChange={(e) =>
                 setNewEvent({ ...newEvent, description: e.target.value })
               }
-              rows={3}
               placeholder="Enter event description"
+              fullWidth
+              variant="outlined"
+              size="medium"
+              multiline
+              rows={3}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
             />
-          </div>
 
-          <div className="field">
-            <label htmlFor="start">Start Date & Time *</label>
-            <PrimeCalendar
-              id="start"
-              value={newEvent.start}
-              onChange={(e) => setNewEvent({ ...newEvent, start: e.value })}
-              showTime
-              showSeconds={false}
-              placeholder="Select start date and time"
-              required
-            />
-          </div>
+            <Box display="flex" gap={2}>
+              <TextField
+                label="Start Date & Time *"
+                value={
+                  newEvent.start
+                    ? new Date(newEvent.start).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  setNewEvent({ ...newEvent, start: e.target.value })
+                }
+                fullWidth
+                type="datetime-local"
+                variant="outlined"
+                size="medium"
+                required
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                      borderWidth: 2,
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#0387D9",
+                  },
+                }}
+              />
 
-          <div className="field">
-            <label htmlFor="end">End Date & Time</label>
-            <PrimeCalendar
-              id="end"
-              value={newEvent.end}
-              onChange={(e) => setNewEvent({ ...newEvent, end: e.value })}
-              showTime
-              showSeconds={false}
-              placeholder="Select end date and time"
-              minDate={newEvent.start}
-            />
-          </div>
+              <TextField
+                label="End Date & Time"
+                value={
+                  newEvent.end
+                    ? new Date(newEvent.end).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  setNewEvent({ ...newEvent, end: e.target.value })
+                }
+                fullWidth
+                type="datetime-local"
+                variant="outlined"
+                size="medium"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                      borderWidth: 2,
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#0387D9",
+                  },
+                }}
+              />
+            </Box>
 
-          <div className="field">
-            <label htmlFor="location">Location</label>
-            <Dropdown
-              id="location"
+            <TextField
+              select
+              label="Location"
               value={newEvent.location}
-              options={locationOptions}
-              onChange={(e) => setNewEvent({ ...newEvent, location: e.value })}
-              placeholder="Select location type"
-            />
-          </div>
-
-          <div className="field flex justify-content-end gap-2">
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              className="p-button-text"
-              onClick={() => setShowEventModal(false)}
-            />
-            <Button label="Save" icon="pi pi-check" onClick={handleSaveEvent} />
-          </div>
-        </div>
-      </Dialog>
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, location: e.target.value })
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
+            >
+              {locationOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
+          <MUIButton
+            onClick={() => setShowEventModal(false)}
+            variant="outlined"
+            sx={{
+              color: "#667085",
+              borderColor: "#D0D5DD",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": {
+                borderColor: "#667085",
+                backgroundColor: "#F9FAFB",
+              },
+            }}
+          >
+            Cancel
+          </MUIButton>
+          <MUIButton
+            onClick={handleSaveEvent}
+            variant="contained"
+            sx={{
+              backgroundColor: "#0387D9",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              boxShadow: "0 2px 8px rgba(3, 135, 217, 0.25)",
+              "&:hover": {
+                backgroundColor: "#056bb3",
+                boxShadow: "0 4px 16px rgba(3, 135, 217, 0.35)",
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            Save Event
+          </MUIButton>
+        </DialogActions>
+      </MUIDialog>
     );
   };
 
@@ -1331,37 +1462,20 @@ export default function CalendarPage() {
         flexDirection: "column",
         overflowX: "hidden",
         overflowY: "hidden",
+        marginTop: "10px",
       }}
     >
       <Toast ref={toast} />
 
       {renderMobileViewToggle()}
 
-      {/* Add Event button at the top right of main content */}
-      {/* <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          margin: "20px 20px 0 20px",
-        }}
-      >
-        <Button
-          label="Add Event"
-          className="p-button-primary"
-          icon="pi pi-plus"
-          onClick={() => setShowEventModal(true)}
-        />
-      </div> */}
-
       <div
         className="widget-container"
         style={{
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
-          // width: "100%",
-          gap: "20px",
-          //padding: "0 20px 20px 20px",
+          gap: isMobile ? "16px" : "20px",
+          padding: isMobile ? "0 12px 20px 12px" : "0",
           overflowY: "auto",
           flex: 1,
           "&::-webkit-scrollbar": {
@@ -1383,10 +1497,12 @@ export default function CalendarPage() {
             flex: isMobile ? "auto" : "0 0 350px",
             display: isMobile && activeView !== "events" ? "none" : "block",
             background: "#FFFFFF",
-            borderRadius: "10px",
-            padding: "20px",
-            boxShadow: "1px 1px 1px #0000001A",
-            marginBottom: "20px",
+            borderRadius: isMobile ? "16px" : "10px",
+            padding: isMobile ? "16px" : "20px",
+            boxShadow: isMobile
+              ? "0 4px 16px rgba(0, 0, 0, 0.08)"
+              : "1px 1px 1px #0000001A",
+            marginBottom: isMobile ? "0" : "20px",
           }}
         >
           <div className="new_event" style={{ marginBottom: "20px" }}>
@@ -1401,22 +1517,32 @@ export default function CalendarPage() {
                 background: "#0387D9",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 cursor: "pointer",
                 fontWeight: 500,
                 marginBottom: "20px",
-                borderRadius: "8px",
                 transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
                 boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
-                ":hover": {
-                  boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
-                  background: "#056bb3",
-                },
-                ":active": { transform: "scale(0.97)" },
-                ":focus": {
-                  outline: "2px solid #0387D9",
-                  outlineOffset: "2px",
-                },
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#056bb3";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 16px rgba(3,135,217,0.13)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#0387D9";
+                e.currentTarget.style.boxShadow =
+                  "0 2px 8px rgba(3,135,217,0.08)";
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = "scale(0.97)";
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.outline = "2px solid #0387D9";
+                e.currentTarget.style.outlineOffset = "2px";
               }}
             >
               <img
@@ -1441,8 +1567,8 @@ export default function CalendarPage() {
 
               return (
                 <>
-                  {/* Show only first 2 events */}
-                  {calendarEvents.slice(0, 2).map((event, index) => (
+                  {/* Show only first 3 events */}
+                  {calendarEvents.slice(0, 3).map((event, index) => (
                     <React.Fragment key={event._id}>
                       {index > 0 && (
                         <div
@@ -1467,74 +1593,8 @@ export default function CalendarPage() {
                     </React.Fragment>
                   ))}
 
-                  {/* Upcoming Reminders: show the three soonest upcoming events */}
-                  <div>
-                    <h4>Upcoming Reminders</h4>
-                    <div>
-                      {calendarEvents &&
-                        calendarEvents.length > 0 &&
-                        calendarEvents
-                          .filter((event) => new Date(event.start) > new Date())
-                          .sort((a, b) => new Date(a.start) - new Date(b.start))
-                          .slice(0, 3)
-                          .map((event, idx) => (
-                            <div
-                              key={event._id || idx}
-                              className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
-                              style={{
-                                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                              }}
-                            >
-                              <div className="flex items-center justify-center">
-                                <div>
-                                  <h3 className="text-2xl font-bold">
-                                    {new Date(event.start).getDate()}
-                                  </h3>
-                                </div>
-                                <div className="mt-3 ml-3">
-                                  <p>
-                                    {new Date(event.start).toLocaleDateString(
-                                      undefined,
-                                      {
-                                        month: "short",
-                                        day: "numeric",
-                                      }
-                                    )}
-                                  </p>
-                                  <p>{event.title}</p>
-                                </div>
-                              </div>
-                              <div className="mt-3">
-                                <div className="flex items-center justify-flex-end">
-                                  <img
-                                    src={three}
-                                    alt="menu"
-                                    style={{
-                                      cursor: "pointer",
-                                      marginBottom: "10px",
-                                      marginLeft: "55px",
-                                    }}
-                                  />
-                                </div>
-                                <span>
-                                  <span>
-                                    {new Date(event.start).toLocaleTimeString(
-                                      [],
-                                      {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      }
-                                    )}
-                                  </span>
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                    </div>
-                  </div>
-
-                  {/* Show See More button if there are more than 2 events */}
-                  {calendarEvents.length > 2 && (
+                  {/* Show See More button if there are more than 3 events */}
+                  {calendarEvents.length > 3 && (
                     <div
                       className="see-more-container"
                       style={{ marginTop: "20px", textAlign: "center" }}
@@ -1548,21 +1608,36 @@ export default function CalendarPage() {
                           background: "transparent",
                           color: "#0387D9",
                           border: "1px solid #0387D9",
-                          borderRadius: "6px",
+                          borderRadius: "8px",
                           cursor: "pointer",
                           fontWeight: 500,
-                          borderRadius: "8px",
                           transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
                           boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
-                          ":hover": {
-                            boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
-                            background: "#056bb3",
-                          },
-                          ":active": { transform: "scale(0.97)" },
-                          ":focus": {
-                            outline: "2px solid #0387D9",
-                            outlineOffset: "2px",
-                          },
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#0387D9";
+                          e.currentTarget.style.color = "white";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 16px rgba(3,135,217,0.13)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "#0387D9";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 8px rgba(3,135,217,0.08)";
+                        }}
+                        onMouseDown={(e) => {
+                          e.currentTarget.style.transform = "scale(0.97)";
+                        }}
+                        onMouseUp={(e) => {
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                        onFocus={(e) => {
+                          e.currentTarget.style.outline = "2px solid #0387D9";
+                          e.currentTarget.style.outlineOffset = "2px";
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.outline = "none";
                         }}
                       >
                         See More Events
@@ -1579,19 +1654,30 @@ export default function CalendarPage() {
           style={{
             flex: 1,
             background: "#FFFFFF",
-            borderRadius: "10px",
-            padding: "20px",
-            boxShadow: "1px 1px 1px #0000001A",
+            borderRadius: isMobile ? "16px" : "10px",
+            padding: isMobile ? "16px" : "20px",
+            boxShadow: isMobile
+              ? "0 4px 16px rgba(0, 0, 0, 0.08)"
+              : "1px 1px 1px #0000001A",
             display: isMobile && activeView !== "calendar" ? "none" : "block",
           }}
         >
-          <h3 style={{ fontSize: "18px", margin: "0 0 15px 0" }}>Calendar</h3>
+          <h3
+            style={{
+              fontSize: isMobile ? "20px" : "18px",
+              margin: "0 0 15px 0",
+              fontWeight: isMobile ? "600" : "500",
+              color: "#344054",
+            }}
+          >
+            Calendar
+          </h3>
 
           {/* Large Calendar Component */}
           <div
             style={{
               width: "100%",
-              height: isMobile ? "450px" : "600px",
+              height: isMobile ? "500px" : "600px",
               display: "flex",
               flexDirection: "column",
             }}
@@ -1610,9 +1696,10 @@ export default function CalendarPage() {
               <div>
                 <h2
                   style={{
-                    fontSize: isMobile ? "16px" : "20px",
+                    fontSize: isMobile ? "18px" : "20px",
                     margin: 0,
                     color: "#344054",
+                    fontWeight: isMobile ? "600" : "500",
                   }}
                 >
                   {months[currentDate.getMonth()]} {currentDate.getFullYear()}
@@ -1634,21 +1721,38 @@ export default function CalendarPage() {
                     border: "1px solid #E4E7EC",
                     color: "#344054",
                     padding: isMobile ? "6px 12px" : "8px 16px",
-                    borderRadius: "4px",
+                    borderRadius: "8px",
                     cursor: "pointer",
                     fontSize: isMobile ? "12px" : "14px",
-                    borderRadius: "8px",
                     transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
                     boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
-                    ":hover": {
-                      boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
-                      background: "#056bb3",
-                    },
-                    ":active": { transform: "scale(0.97)" },
-                    ":focus": {
-                      outline: "2px solid #0387D9",
-                      outlineOffset: "2px",
-                    },
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#0387D9";
+                    e.currentTarget.style.color = "white";
+                    e.currentTarget.style.borderColor = "#0387D9";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 16px rgba(3,135,217,0.13)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#F9FAFB";
+                    e.currentTarget.style.color = "#344054";
+                    e.currentTarget.style.borderColor = "#E4E7EC";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(3,135,217,0.08)";
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.transform = "scale(0.97)";
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = "2px solid #0387D9";
+                    e.currentTarget.style.outlineOffset = "2px";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.outline = "none";
                   }}
                 >
                   <i className="pi pi-chevron-left"></i>
@@ -1687,21 +1791,38 @@ export default function CalendarPage() {
                     border: "1px solid #E4E7EC",
                     color: "#344054",
                     padding: isMobile ? "6px 12px" : "8px 16px",
-                    borderRadius: "4px",
+                    borderRadius: "8px",
                     cursor: "pointer",
                     fontSize: isMobile ? "12px" : "14px",
-                    borderRadius: "8px",
                     transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
                     boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
-                    ":hover": {
-                      boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
-                      background: "#056bb3",
-                    },
-                    ":active": { transform: "scale(0.97)" },
-                    ":focus": {
-                      outline: "2px solid #0387D9",
-                      outlineOffset: "2px",
-                    },
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#0387D9";
+                    e.currentTarget.style.color = "white";
+                    e.currentTarget.style.borderColor = "#0387D9";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 16px rgba(3,135,217,0.13)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#F9FAFB";
+                    e.currentTarget.style.color = "#344054";
+                    e.currentTarget.style.borderColor = "#E4E7EC";
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(3,135,217,0.08)";
+                  }}
+                  onMouseDown={(e) => {
+                    e.currentTarget.style.transform = "scale(0.97)";
+                  }}
+                  onMouseUp={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.outline = "2px solid #0387D9";
+                    e.currentTarget.style.outlineOffset = "2px";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.outline = "none";
                   }}
                 >
                   <i className="pi pi-chevron-right"></i>
@@ -1943,8 +2064,9 @@ export default function CalendarPage() {
       <AllEventsModal
         visible={showAllEventsModal}
         onHide={() => setShowAllEventsModal(false)}
-        events={calendarEvents?.data || []}
-        onEventUpdate={loadEvents}
+        events={calendarEvents || []}
+        onEventUpdate={handleEventUpdate}
+        onEventDelete={handleEventDelete}
         onAddGuest={handleAddGuest}
       />
 
@@ -1972,7 +2094,6 @@ export default function CalendarPage() {
             pb: 1,
             borderBottom: "1px solid #E4E7EC",
             backgroundColor: "#F8FBFF",
-            mb: 3,
           }}
         >
           <Box
@@ -2009,7 +2130,12 @@ export default function CalendarPage() {
           </Box>
         </DialogTitle>
         <DialogContent sx={{ pt: 3, pb: 2 }}>
-          <Box display="flex" flexDirection="column" gap={2.5}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            gap={2.5}
+            sx={{ mb: 3, mt: 3 }}
+          >
             <TextField
               label="Event Title"
               value={selectedEvent?.title || ""}
