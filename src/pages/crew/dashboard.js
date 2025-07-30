@@ -142,7 +142,7 @@ const DashboardCrew = () => {
   const barData = {
     labels: [
       "Manuals",
-      "Schernatics",
+      "Schematics",
       "Technical Docs",
       "Maintenance Logs",
       "Inspection Reports",

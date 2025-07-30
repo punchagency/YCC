@@ -69,10 +69,7 @@ const FinancialManagement = () => {
         activeFilter={activeFilter}
       />
       <Table activeFilter={activeFilter} searchQuery={searchQuery} />
-      <div className="flex justify-content-between align-content-center">
-        <PaymentDetails />
-        <History />
-      </div>
+
       <Pagination
         currentPage={page}
         totalPages={totalPages}

@@ -1,9 +1,26 @@
 import React, { useState } from "react";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
-
-import manprofile from "../../../assets/images/crew/manprofile.png";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Avatar,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  Button,
+  MenuItem,
+  DialogActions,
+  useTheme,
+  useMediaQuery
+} from "@mui/material";
+import {
+  AccountBalanceWallet,
+  CheckCircle,
+  Schedule
+} from "@mui/icons-material";
 
 const Outstanding = ({financeData, fetchData, setFinanceData}) => {
   // New expense modal state
@@ -66,165 +83,203 @@ const Outstanding = ({financeData, fetchData, setFinanceData}) => {
     }).format(amount);
   };
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const cards = [
+    {
+      title: "Outstanding Invoices",
+      amount: "$4,000",
+      icon: <AccountBalanceWallet sx={{ fontSize: 40, color: '#ff9800' }} />,
+      color: '#fff3e0'
+    },
+    {
+      title: "Completed Payments",
+      amount: "$4,000",
+      icon: <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />,
+      color: '#e8f5e8'
+    },
+    {
+      title: "Upcoming Expenses",
+      amount: "$4,000",
+      icon: <Schedule sx={{ fontSize: 40, color: '#2196f3' }} />,
+      color: '#e3f2fd'
+    }
+  ];
+
   return (
     <>
-      <div className="flex flex-wrap justify-content-around align-items-center">
-        <div
-          style={{ width: "30%", borderRadius: "6px" }}
-          className="bg-white p-4 rounded ml-4 mt-4"
-        >
-          <div className="flex items-center space-x-2">
-            <div>
-              <img src={manprofile} alt="manprofile" className="mr-2" />
-            </div>
-            <div>
-              <p>Outstanding Invoices</p>
-              <p className="text-2xl font-bold">$4,000</p>
-            </div>
-          </div>
-        </div>
-        <div
-          style={{ width: "30%", borderRadius: "6px" }}
-          className="bg-white p-4 rounded ml-4 mt-4"
-        >
-          <div className="flex items-center space-x-2">
-            <div>
-              <img src={manprofile} alt="manprofile" className="mr-2" />
-            </div>
-            <div>
-              <p>Completed Payments</p>
-              <p className="text-2xl font-bold">$4,000</p>
-            </div>
-          </div>
-        </div>
-        <div
-          style={{ width: "30%", borderRadius: "6px" }}
-          className="bg-white p-4 rounded ml-4 mt-4 mr-4"
-        >
-          <div className="flex items-center space-x-2">
-            <div>
-              <img src={manprofile} alt="manprofile" className="mr-2" />
-            </div>
-            <div>
-              <p>Upcoming Expenses</p>
-              <p className="text-2xl font-bold">$4,000</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* New Expense Modal */}
-      <Dialog
-        visible={showExpenseModal}
-        onHide={() => setShowExpenseModal(false)}
-        header="Add New Expense"
-        modal
-        style={{ width: "500px" }}
-        contentStyle={{ padding: "20px" }}
-        headerStyle={{ borderBottom: "none", padding: "20px 20px 0 20px" }}
-        footer={null}
-      >
-        <div className="expense-form">
-          {/* Category */}
-          <div className="form-group mb-4">
-            <label className="block text-gray-700 mb-2">Category</label>
-            <div className="relative">
-              <select
-                name="category"
-                value={newExpense.category}
-                onChange={handleExpenseChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md appearance-none focus:outline-none"
-                style={{ backgroundColor: "white" }}
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
+        <Grid container spacing={3}>
+          {cards.map((card, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Card
+                sx={{
+                  height: '100%',
+                  background: `linear-gradient(135deg, ${card.color} 0%, #ffffff 100%)`,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                  borderRadius: 3,
+                  transition: 'transform 0.2s ease-in-out',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.15)'
+                  }
+                }}
               >
-                <option value="Exterior">Exterior</option>
-                {expenseCategories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Avatar
+                      sx={{
+                        bgcolor: 'transparent',
+                        width: 60,
+                        height: 60
+                      }}
+                    >
+                      {card.icon}
+                    </Avatar>
+                    <Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#666',
+                          fontWeight: 500,
+                          mb: 0.5
+                        }}
+                      >
+                        {card.title}
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 700,
+                          color: '#333',
+                          fontSize: { xs: '1.5rem', md: '2rem' }
+                        }}
+                      >
+                        {card.amount}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
 
-          {/* Amount */}
-          <div className="form-group mb-4">
-            <label className="block text-gray-700 mb-2">Amount</label>
-            <input
-              type="text"
+      <Dialog
+        open={showExpenseModal}
+        onClose={() => setShowExpenseModal(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 3,
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            pb: 1,
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            borderBottom: '1px solid #e0e0e0'
+          }}
+        >
+          Add New Expense
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              select
+              label="Category"
+              name="category"
+              value={newExpense.category}
+              onChange={handleExpenseChange}
+              fullWidth
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
+              }}
+            >
+              <MenuItem value="Exterior">Exterior</MenuItem>
+              {expenseCategories.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              label="Amount"
               name="amount"
               value={newExpense.amount}
               onChange={handleExpenseChange}
               placeholder="$45.00"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none"
-              style={{ border: "1px solid lightgrey", outline: "none" }}
-            />
-          </div>
-
-          {/* Date */}
-          <div className="form-group mb-4">
-            <label className="block text-gray-700 mb-2">Date</label>
-            <Calendar
-              id="date"
-              value={newExpense.date}
-              onChange={handleDateChange}
-              dateFormat="dd/mm/yy"
-              placeholder="Select a date"
-              showIcon
-              className="w-full"
-              style={{ width: "100%" }}
-              inputStyle={{
-                width: "100%",
-                padding: "0.75rem",
-                borderRadius: "0.375rem",
-
-                outline: "none",
+              fullWidth
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
               }}
             />
-          </div>
 
-          {/* Description */}
-          <div className="form-group mb-4">
-            <label className="block text-gray-700 mb-2">Description</label>
-            <input
-              type="text"
+            <TextField
+              label="Description"
               name="description"
               value={newExpense.description}
               onChange={handleExpenseChange}
               placeholder="Lunch With Client"
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none"
-              style={{ border: "1px solid lightgrey", outline: "none" }}
+              fullWidth
+              variant="outlined"
+              multiline
+              rows={3}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2
+                }
+              }}
             />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setShowExpenseModal(false)}
-              className="text-white px-4 py-2"
-              style={{
-                backgroundColor: "#f44336",
-                width: "50%",
-                marginRight: "10px",
-                border: "1px solid #f44336",
-                borderRadius: "4px",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSaveExpense}
-              className="text-white px-4 py-2"
-              style={{
-                backgroundColor: "#0387D9",
-                width: "50%",
-                border: "1px solid #0387D9",
-                borderRadius: "4px",
-              }}
-            >
-              Save Expense
-            </button>
-          </div>
-        </div>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 2 }}>
+          <Button
+            onClick={() => setShowExpenseModal(false)}
+            variant="outlined"
+            color="error"
+            fullWidth={isMobile}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              minWidth: isMobile ? 'auto' : 120
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveExpense}
+            variant="contained"
+            fullWidth={isMobile}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              bgcolor: '#0387D9',
+              minWidth: isMobile ? 'auto' : 120,
+              '&:hover': {
+                bgcolor: '#0277BD'
+              }
+            }}
+          >
+            Save Expense
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );
