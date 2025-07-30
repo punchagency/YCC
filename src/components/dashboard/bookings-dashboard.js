@@ -37,6 +37,7 @@ const BookingsDashboard = () => {
   }, []);
 
   console.log("lowInventory", lowInventory);
+  console.log("invoices", invoices);
   const menuItems = [
     {
       label: "Monthly",
@@ -366,48 +367,76 @@ const BookingsDashboard = () => {
                   marginTop: "10px",
                 }}
               >
-                {invoices.map((item, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "10px",
-                      justifyContent: "space-between",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "1px solid #EFEFEF",
-                      backgroundColor: theme === "light" ? "white" : "#03141F",
-                    }}
-                  >
+                {invoices && invoices.length > 0 ? (
+                  invoices.map((item, index) => (
                     <Box
+                      key={index}
                       sx={{
                         display: "flex",
-                        flexDirection: "column",
-                        gap: "8px",
+                        flexDirection: "row",
+                        gap: "10px",
+                        justifyContent: "space-between",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "1px solid #EFEFEF",
+                        backgroundColor:
+                          theme === "light" ? "white" : "#03141F",
                       }}
                     >
-                      <FinancialSummaryDescriptionText mode={theme}>
-                        Invoice {item.invoiceId}
-                      </FinancialSummaryDescriptionText>
-                      <FinancialSummaryDescriptionText mode={theme}>
-                        Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} -
-                        Due:{" "}
-                        {
-                          new Date(item.invoiceDueDate)
-                            .toISOString()
-                            .split("T")[0]
-                        }
-                      </FinancialSummaryDescriptionText>
-                    </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        }}
+                      >
+                        <FinancialSummaryDescriptionText mode={theme}>
+                          Invoice {item.invoiceId}
+                        </FinancialSummaryDescriptionText>
+                        <FinancialSummaryDescriptionText mode={theme}>
+                          Amount: ${parseFloat(item.amount || 0).toFixed(2)} -
+                          Due:{" "}
+                          {(() => {
+                            try {
+                              return item.dueDate
+                                ? new Date(item.dueDate)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : "N/A";
+                            } catch (error) {
+                              console.warn(
+                                "Invalid date format for invoice:",
+                                item.invoiceId,
+                                error
+                              );
+                              return "Invalid Date";
+                            }
+                          })()}
+                        </FinancialSummaryDescriptionText>
+                      </Box>
 
-                    <Box>
-                      <FinancialSummaryButton mode={theme}>
-                        <ViewButtonText mode={theme}>View</ViewButtonText>
-                      </FinancialSummaryButton>
+                      <Box>
+                        <FinancialSummaryButton mode={theme}>
+                          <ViewButtonText mode={theme}>View</ViewButtonText>
+                        </FinancialSummaryButton>
+                      </Box>
                     </Box>
+                  ))
+                ) : (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "20px",
+                      color: theme === "light" ? "#666" : "#ccc",
+                    }}
+                  >
+                    <Typography variant="body2">
+                      No invoices available
+                    </Typography>
                   </Box>
-                ))}
+                )}
               </Box>
             </Box>
           )}
