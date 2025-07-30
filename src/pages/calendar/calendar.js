@@ -31,7 +31,6 @@ import {
   deleteEvent,
   inviteGuests,
 } from "../../services/calendar/calendarService";
-import { Menu } from "primereact/menu";
 import { Calendar } from "primereact/calendar";
 // import more from "../../assets/images/crew/more.png";
 import { useOutletContext } from "react-router-dom";
@@ -45,12 +44,19 @@ import {
   TextField,
   IconButton,
   Button as MUIButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import {
   Close as CloseIcon,
   Delete as DeleteIcon,
   Add as AddIcon,
   Send as SendIcon,
+  MoreVert as MoreVertIcon,
+  Edit as EditIcon,
+  PersonAdd as PersonAddIcon,
 } from "@mui/icons-material";
 import { Slide } from "@mui/material";
 
@@ -64,25 +70,31 @@ const EventCard = ({
   onDelete,
   onAddGuest,
 }) => {
-  const menuRef = useRef(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
 
-  const getEventMenuItems = () => [
-    {
-      label: "Update Event",
-      icon: "pi pi-pencil",
-      command: () => onUpdate(event),
-    },
-    {
-      label: "Delete Event",
-      icon: "pi pi-trash",
-      command: () => onDelete(event),
-    },
-    {
-      label: "Add Guest",
-      icon: "pi pi-user-plus",
-      command: () => onAddGuest(event),
-    },
-  ];
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleUpdate = () => {
+    onUpdate(event);
+    handleClose();
+  };
+
+  const handleDelete = () => {
+    onDelete(event);
+    handleClose();
+  };
+
+  const handleAddGuest = () => {
+    onAddGuest(event);
+    handleClose();
+  };
 
   // Helper function to format the date/time
   const formatEventTime = (startDate) => {
@@ -133,7 +145,21 @@ const EventCard = ({
   return (
     <div
       className="profiles"
-      style={{ display: "flex", alignItems: "flex-start", padding: "10px 0" }}
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        padding: "10px 0",
+        boxShadow: "0 4px 16px rgba(3,135,217,0.08)",
+        borderRadius: "14px",
+        padding: "18px 20px",
+        marginBottom: "18px",
+        background: "#fff",
+        transition: "box-shadow 0.2s, transform 0.2s",
+        ":hover": {
+          boxShadow: "0 8px 24px rgba(3,135,217,0.13)",
+          transform: "translateY(-2px) scale(1.01)",
+        },
+      }}
     >
       <div style={{ marginRight: "12px" }}>
         <img
@@ -180,18 +206,122 @@ const EventCard = ({
           )}
         </div>
         <div className="event-actions">
-          <img
-            src={three}
-            alt="menu"
-            style={{ cursor: "pointer" }}
-            onClick={(e) => menuRef.current.toggle(e)}
-          />
+          <div
+            style={{
+              width: "32px", 
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: "50%",
+              cursor: "pointer",
+              transition: "background-color 0.2s ease",
+              backgroundColor: "transparent", 
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "rgba(3, 135, 217, 0.08)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+            }}
+          >
+            <MoreVertIcon
+              fontSize="small" 
+              onClick={handleClick}
+              style={{
+                color: "#667085",
+              }}
+            />
+          </div>
           <Menu
-            model={getEventMenuItems()}
-            popup
-            ref={menuRef}
-            style={{ width: "150px" }}
-          />
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            PaperProps={{
+              sx: {
+                borderRadius: 2,
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                border: "1px solid rgba(255, 255, 255, 0.18)",
+                minWidth: "180px",
+                mt: 1,
+              },
+            }}
+          >
+            <MenuItem
+              onClick={handleUpdate}
+              sx={{
+                py: 1.5,
+                px: 2,
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <EditIcon fontSize="small" sx={{ color: "#0387D9" }} />
+              </ListItemIcon>
+              <ListItemText
+                primary="Update Event"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#344054",
+                }}
+              />
+            </MenuItem>
+            <MenuItem
+              onClick={handleDelete}
+              sx={{
+                py: 1.5,
+                px: 2,
+                "&:hover": {
+                  backgroundColor: "rgba(240, 68, 56, 0.08)",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" sx={{ color: "#F04438" }} />
+              </ListItemIcon>
+              <ListItemText
+                primary="Delete Event"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#344054",
+                }}
+              />
+            </MenuItem>
+            <MenuItem
+              onClick={handleAddGuest}
+              sx={{
+                py: 1.5,
+                px: 2,
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                },
+              }}
+            >
+              <ListItemIcon>
+                <PersonAddIcon fontSize="small" sx={{ color: "#0387D9" }} />
+              </ListItemIcon>
+              <ListItemText
+                primary="Add Guest"
+                primaryTypographyProps={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#344054",
+                }}
+              />
+            </MenuItem>
+          </Menu>
         </div>
       </div>
     </div>
@@ -866,9 +996,9 @@ export default function CalendarPage() {
           borderRadius: "8px",
           overflow: "hidden",
           border: "1px solid #E4E7EC",
-          width: "97%",
-          marginLeft: "5px",
-          marginRight: "5px",
+          // width: "97%",
+          // marginLeft: "5px",
+          // marginRight: "5px",
         }}
       >
         <button
@@ -881,6 +1011,15 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            borderRadius: "8px",
+            transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+            boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+            ":hover": {
+              boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+              background: "#056bb3",
+            },
+            ":active": { transform: "scale(0.97)" },
+            ":focus": { outline: "2px solid #0387D9", outlineOffset: "2px" },
             // marginLeft:"5px"
           }}
         >
@@ -896,6 +1035,15 @@ export default function CalendarPage() {
             border: "none",
             cursor: "pointer",
             fontWeight: 500,
+            borderRadius: "8px",
+            transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+            boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+            ":hover": {
+              boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+              background: "#056bb3",
+            },
+            ":active": { transform: "scale(0.97)" },
+            ":focus": { outline: "2px solid #0387D9", outlineOffset: "2px" },
             // marginRight: "5px",
           }}
         >
@@ -1211,8 +1359,9 @@ export default function CalendarPage() {
         style={{
           display: "flex",
           flexDirection: isMobile ? "column" : "row",
+          // width: "100%",
           gap: "20px",
-          padding: "0 20px 20px 20px",
+          //padding: "0 20px 20px 20px",
           overflowY: "auto",
           flex: 1,
           "&::-webkit-scrollbar": {
@@ -1256,6 +1405,18 @@ export default function CalendarPage() {
                 cursor: "pointer",
                 fontWeight: 500,
                 marginBottom: "20px",
+                borderRadius: "8px",
+                transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+                ":hover": {
+                  boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+                  background: "#056bb3",
+                },
+                ":active": { transform: "scale(0.97)" },
+                ":focus": {
+                  outline: "2px solid #0387D9",
+                  outlineOffset: "2px",
+                },
               }}
             >
               <img
@@ -1390,6 +1551,18 @@ export default function CalendarPage() {
                           borderRadius: "6px",
                           cursor: "pointer",
                           fontWeight: 500,
+                          borderRadius: "8px",
+                          transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                          boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+                          ":hover": {
+                            boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+                            background: "#056bb3",
+                          },
+                          ":active": { transform: "scale(0.97)" },
+                          ":focus": {
+                            outline: "2px solid #0387D9",
+                            outlineOffset: "2px",
+                          },
                         }}
                       >
                         See More Events
@@ -1464,6 +1637,18 @@ export default function CalendarPage() {
                     borderRadius: "4px",
                     cursor: "pointer",
                     fontSize: isMobile ? "12px" : "14px",
+                    borderRadius: "8px",
+                    transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                    boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+                    ":hover": {
+                      boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+                      background: "#056bb3",
+                    },
+                    ":active": { transform: "scale(0.97)" },
+                    ":focus": {
+                      outline: "2px solid #0387D9",
+                      outlineOffset: "2px",
+                    },
                   }}
                 >
                   <i className="pi pi-chevron-left"></i>
@@ -1478,6 +1663,18 @@ export default function CalendarPage() {
                     borderRadius: "4px",
                     cursor: "pointer",
                     fontSize: isMobile ? "12px" : "14px",
+                    borderRadius: "8px",
+                    transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                    boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+                    ":hover": {
+                      boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+                      background: "#056bb3",
+                    },
+                    ":active": { transform: "scale(0.97)" },
+                    ":focus": {
+                      outline: "2px solid #0387D9",
+                      outlineOffset: "2px",
+                    },
                     flex: isMobile ? "1" : "none",
                   }}
                 >
@@ -1493,6 +1690,18 @@ export default function CalendarPage() {
                     borderRadius: "4px",
                     cursor: "pointer",
                     fontSize: isMobile ? "12px" : "14px",
+                    borderRadius: "8px",
+                    transition: "all 0.2s cubic-bezier(0.4,0,0.2,1)",
+                    boxShadow: "0 2px 8px rgba(3,135,217,0.08)",
+                    ":hover": {
+                      boxShadow: "0 4px 16px rgba(3,135,217,0.13)",
+                      background: "#056bb3",
+                    },
+                    ":active": { transform: "scale(0.97)" },
+                    ":focus": {
+                      outline: "2px solid #0387D9",
+                      outlineOffset: "2px",
+                    },
                   }}
                 >
                   <i className="pi pi-chevron-right"></i>
@@ -1740,206 +1949,431 @@ export default function CalendarPage() {
       />
 
       {/* Add the Update and Delete Modals */}
-      <Dialog
-        visible={showUpdateEventModal}
-        onHide={() => {
+      <MUIDialog
+        open={showUpdateEventModal}
+        onClose={() => {
           setShowUpdateEventModal(false);
           setSelectedEvent(null);
         }}
-        header="Update Event"
-        style={{ width: "500px" }}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        transitionDuration={300}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+          },
+        }}
       >
-        {selectedEvent && (
-          <div className="update-event-form">
-            <div className="field">
-              <label>Title</label>
-              <InputText
-                value={selectedEvent.title}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, title: e.target.value })
-                }
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Location</label>
-              <InputText
-                value={selectedEvent.location}
-                onChange={(e) =>
-                  setSelectedEvent({
-                    ...selectedEvent,
-                    location: e.target.value,
-                  })
-                }
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Description</label>
-              <InputTextarea
-                value={selectedEvent.description}
-                onChange={(e) =>
-                  setSelectedEvent({
-                    ...selectedEvent,
-                    description: e.target.value,
-                  })
-                }
-                rows={3}
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Start Date</label>
-              <Calendar
-                value={new Date(selectedEvent.start)}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, start: e.value })
-                }
-                showTime
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>End Date</label>
-              <Calendar
-                value={new Date(selectedEvent.end)}
-                onChange={(e) =>
-                  setSelectedEvent({ ...selectedEvent, end: e.value })
-                }
-                showTime
-                className="w-full"
-              />
-            </div>
-            <div className="field">
-              <label>Current Guests</label>
-              <div
-                className="current-guests"
-                style={{
-                  padding: "10px",
-                  backgroundColor: "#f8f9fa",
-                  borderRadius: "4px",
-                  marginBottom: "15px",
-                }}
-              >
-                {selectedEvent.guestEmails &&
-                  selectedEvent.guestEmails.map((email, idx) => (
-                    <div
-                      key={`email-${idx}`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <i
-                        className="pi pi-envelope"
-                        style={{
-                          marginRight: "8px",
-                          color: "#667085",
-                          fontSize: "12px",
-                        }}
-                      ></i>
-                      <span style={{ fontSize: "13px", color: "#475467" }}>
-                        {email}
-                      </span>
-                    </div>
-                  ))}
-
-                {selectedEvent.guests &&
-                  selectedEvent.guests.map((guest, idx) => (
-                    <div
-                      key={`guest-${idx}`}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      <i
-                        className="pi pi-user"
-                        style={{
-                          marginRight: "8px",
-                          color: "#667085",
-                          fontSize: "12px",
-                        }}
-                      ></i>
-                      <span style={{ fontSize: "13px", color: "#475467" }}>
-                        {guest.email || guest.name || `Guest ${idx + 1}`}
-                      </span>
-                    </div>
-                  ))}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "0.5rem",
-                marginTop: "1rem",
-              }}
-            >
-              <Button
-                label="Cancel"
-                onClick={() => setShowUpdateEventModal(false)}
-                className="p-button-text"
-              />
-              <Button
-                label="Update"
-                onClick={async () => {
-                  const result = await updateEvent(
-                    selectedEvent._id,
-                    selectedEvent
-                  );
-                  if (result.success) {
-                    toast.current.show({
-                      severity: "success",
-                      summary: "Success",
-                      detail: "Event updated successfully",
-                    });
-                    setShowUpdateEventModal(false);
-                    loadEvents();
-                  } else {
-                    toast.current.show({
-                      severity: "error",
-                      summary: "Error",
-                      detail: result.error || "Failed to update event",
-                    });
-                  }
-                }}
-              />
-            </div>
-          </div>
-        )}
-      </Dialog>
-
-      <Dialog
-        visible={showDeleteEventModal}
-        onHide={() => setShowDeleteEventModal(false)}
-        header="Confirm Delete"
-        style={{ width: "400px" }}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
-          />
-          <span>Are you sure you want to delete this event?</span>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "0.5rem",
-            marginTop: "1rem",
+        <DialogTitle
+          sx={{
+            pb: 1,
+            borderBottom: "1px solid #E4E7EC",
+            backgroundColor: "#F8FBFF",
+            mb: 3,
           }}
         >
-          <Button
-            label="No"
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#344054",
+                fontSize: "1.25rem",
+              }}
+            >
+              Update Event
+            </Typography>
+            <IconButton
+              onClick={() => {
+                setShowUpdateEventModal(false);
+                setSelectedEvent(null);
+              }}
+              size="small"
+              sx={{
+                color: "#667085",
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                  color: "#0387D9",
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          <Box display="flex" flexDirection="column" gap={2.5}>
+            <TextField
+              label="Event Title"
+              value={selectedEvent?.title || ""}
+              onChange={(e) =>
+                setSelectedEvent({ ...selectedEvent, title: e.target.value })
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
+            />
+
+            <TextField
+              label="Location"
+              value={selectedEvent?.location || ""}
+              onChange={(e) =>
+                setSelectedEvent({
+                  ...selectedEvent,
+                  location: e.target.value,
+                })
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
+            />
+
+            <TextField
+              label="Description"
+              value={selectedEvent?.description || ""}
+              onChange={(e) =>
+                setSelectedEvent({
+                  ...selectedEvent,
+                  description: e.target.value,
+                })
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+              multiline
+              rows={3}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#0387D9",
+                    borderWidth: 2,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#0387D9",
+                },
+              }}
+            />
+
+            <Box display="flex" gap={2}>
+              <TextField
+                label="Start Date & Time"
+                value={
+                  selectedEvent?.start
+                    ? new Date(selectedEvent.start).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, start: e.target.value })
+                }
+                fullWidth
+                type="datetime-local"
+                variant="outlined"
+                size="medium"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                      borderWidth: 2,
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#0387D9",
+                  },
+                }}
+              />
+
+              <TextField
+                label="End Date & Time"
+                value={
+                  selectedEvent?.end
+                    ? new Date(selectedEvent.end).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  setSelectedEvent({ ...selectedEvent, end: e.target.value })
+                }
+                fullWidth
+                type="datetime-local"
+                variant="outlined"
+                size="medium"
+                InputLabelProps={{ shrink: true }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    "&:hover .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                    },
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#0387D9",
+                      borderWidth: 2,
+                    },
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#0387D9",
+                  },
+                }}
+              />
+            </Box>
+
+            <TextField
+              label="Current Guests"
+              value={
+                selectedEvent?.guestEmails?.join(", ") +
+                (selectedEvent?.guests?.length > 0
+                  ? `, ${selectedEvent.guests
+                      .map((g) => g.email || g.name)
+                      .join(", ")}`
+                  : "")
+              }
+              fullWidth
+              variant="outlined"
+              size="medium"
+              disabled
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                  backgroundColor: "#F9FAFB",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "#667085",
+                },
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
+          <MUIButton
+            onClick={() => {
+              setShowUpdateEventModal(false);
+              setSelectedEvent(null);
+            }}
+            variant="outlined"
+            sx={{
+              color: "#667085",
+              borderColor: "#D0D5DD",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": {
+                borderColor: "#667085",
+                backgroundColor: "#F9FAFB",
+              },
+            }}
+          >
+            Cancel
+          </MUIButton>
+          <MUIButton
+            onClick={async () => {
+              const result = await updateEvent(
+                selectedEvent._id,
+                selectedEvent
+              );
+              if (result.success) {
+                toast.current.show({
+                  severity: "success",
+                  summary: "Success",
+                  detail: "Event updated successfully",
+                });
+                setShowUpdateEventModal(false);
+                loadEvents();
+              } else {
+                toast.current.show({
+                  severity: "error",
+                  summary: "Error",
+                  detail: result.error || "Failed to update event",
+                });
+              }
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: "#0387D9",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              boxShadow: "0 2px 8px rgba(3, 135, 217, 0.25)",
+              "&:hover": {
+                backgroundColor: "#056bb3",
+                boxShadow: "0 4px 16px rgba(3, 135, 217, 0.35)",
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            Update Event
+          </MUIButton>
+        </DialogActions>
+      </MUIDialog>
+
+      <MUIDialog
+        open={showDeleteEventModal}
+        onClose={() => setShowDeleteEventModal(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Slide}
+        transitionDuration={300}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            pb: 1,
+            borderBottom: "1px solid #E4E7EC",
+            backgroundColor: "#F8FBFF",
+            mb: 3,
+          }}
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#344054",
+                fontSize: "1.25rem",
+              }}
+            >
+              Delete Event
+            </Typography>
+            <IconButton
+              onClick={() => setShowDeleteEventModal(false)}
+              size="small"
+              sx={{
+                color: "#667085",
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                  color: "#0387D9",
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            gap={2}
+            alignItems="center"
+            textAlign="center"
+          >
+            <Box
+              sx={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                backgroundColor: "#FEF3F2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1,
+              }}
+            >
+              <DeleteIcon sx={{ fontSize: 32, color: "#F04438" }} />
+            </Box>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#344054",
+                mb: 1,
+              }}
+            >
+              Delete "{selectedEvent?.title}"?
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ maxWidth: 400 }}
+            >
+              This action cannot be undone. The event will be permanently
+              deleted from your calendar.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
+          <MUIButton
             onClick={() => setShowDeleteEventModal(false)}
-            className="p-button-text"
-          />
-          <Button
-            label="Yes"
+            variant="outlined"
+            sx={{
+              color: "#667085",
+              borderColor: "#D0D5DD",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": {
+                borderColor: "#667085",
+                backgroundColor: "#F9FAFB",
+              },
+            }}
+          >
+            Cancel
+          </MUIButton>
+          <MUIButton
             onClick={async () => {
               const result = await deleteEvent(selectedEvent._id);
               if (result.success) {
@@ -1958,10 +2392,30 @@ export default function CalendarPage() {
                 });
               }
             }}
-            className="p-button-danger"
-          />
-        </div>
-      </Dialog>
+            variant="contained"
+            sx={{
+              backgroundColor: "#F04438",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              boxShadow: "0 2px 8px rgba(240, 68, 56, 0.25)",
+              "&:hover": {
+                backgroundColor: "#D92D20",
+                boxShadow: "0 4px 16px rgba(240, 68, 56, 0.35)",
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
+              },
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
+            Delete Event
+          </MUIButton>
+        </DialogActions>
+      </MUIDialog>
 
       <MUIDialog
         open={showAddGuestModal}
@@ -1973,15 +2427,36 @@ export default function CalendarPage() {
         fullWidth
         TransitionComponent={Slide}
         transitionDuration={300}
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            border: "1px solid rgba(255, 255, 255, 0.18)",
+          },
+        }}
       >
-        <DialogTitle>
+        <DialogTitle
+          sx={{
+            pb: 1,
+            borderBottom: "1px solid #E4E7EC",
+            backgroundColor: "#F8FBFF",
+            mb: 3,
+          }}
+        >
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="h6">
-              Invite Guests to "{selectedEvent?.title}"
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 600,
+                color: "#344054",
+                fontSize: "1.25rem",
+              }}
+            >
+              Invite Guests
             </Typography>
             <IconButton
               onClick={() => {
@@ -1989,19 +2464,27 @@ export default function CalendarPage() {
                 setGuestEmails([""]);
               }}
               size="small"
+              sx={{
+                color: "#667085",
+                "&:hover": {
+                  backgroundColor: "rgba(3, 135, 217, 0.08)",
+                  color: "#0387D9",
+                },
+              }}
             >
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Box display="flex" flexDirection="column" gap={2} pt={1}>
-            <Typography variant="body2" color="text.secondary">
-              Add email addresses of guests you'd like to invite to this event.
+        <DialogContent sx={{ pt: 3, pb: 2 }}>
+          <Box display="flex" flexDirection="column" gap={2.5}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Add email addresses of guests you'd like to invite to "
+              {selectedEvent?.title}".
             </Typography>
 
             {guestEmails.map((email, index) => (
-              <Box key={index} display="flex" gap={1} alignItems="center">
+              <Box key={index} display="flex" gap={1.5} alignItems="center">
                 <TextField
                   label={`Guest Email ${index + 1}`}
                   value={email}
@@ -2009,13 +2492,39 @@ export default function CalendarPage() {
                   fullWidth
                   type="email"
                   variant="outlined"
-                  size="small"
+                  size="medium"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: 2,
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#0387D9",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#0387D9",
+                        borderWidth: 2,
+                      },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": {
+                      color: "#0387D9",
+                    },
+                  }}
                 />
                 <IconButton
                   onClick={() => removeEmailField(index)}
                   color="error"
                   size="small"
                   disabled={guestEmails.length === 1}
+                  sx={{
+                    backgroundColor: "#FEF3F2",
+                    color: "#F04438",
+                    "&:hover": {
+                      backgroundColor: "#FEE4E2",
+                    },
+                    "&:disabled": {
+                      backgroundColor: "#F9FAFB",
+                      color: "#D0D5DD",
+                    },
+                  }}
                 >
                   <DeleteIcon />
                 </IconButton>
@@ -2028,10 +2537,15 @@ export default function CalendarPage() {
               variant="outlined"
               sx={{
                 alignSelf: "flex-start",
-                color: "#003366",
-                borderColor: "#003366",
+                color: "#0387D9",
+                borderColor: "#0387D9",
+                borderRadius: 2,
+                px: 2,
+                py: 1,
+                textTransform: "none",
+                fontWeight: 500,
                 "&:hover": {
-                  borderColor: "#002855",
+                  borderColor: "#056bb3",
                   backgroundColor: "#F0F4FF",
                 },
               }}
@@ -2040,7 +2554,7 @@ export default function CalendarPage() {
             </MUIButton>
           </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 3, gap: 1.5 }}>
           <MUIButton
             onClick={() => {
               setShowAddGuestModal(false);
@@ -2048,8 +2562,13 @@ export default function CalendarPage() {
             }}
             variant="outlined"
             sx={{
-              color: "#475467",
+              color: "#667085",
               borderColor: "#D0D5DD",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
               "&:hover": {
                 borderColor: "#667085",
                 backgroundColor: "#F9FAFB",
@@ -2064,14 +2583,28 @@ export default function CalendarPage() {
             startIcon={<SendIcon />}
             variant="contained"
             sx={{
-              backgroundColor: "#003366",
+              backgroundColor: "#0387D9",
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              textTransform: "none",
+              fontWeight: 500,
+              boxShadow: "0 2px 8px rgba(3, 135, 217, 0.25)",
               "&:hover": {
-                backgroundColor: "#002855",
+                backgroundColor: "#056bb3",
+                boxShadow: "0 4px 16px rgba(3, 135, 217, 0.35)",
+                transform: "translateY(-1px)",
+              },
+              "&:active": {
+                transform: "translateY(0)",
               },
               "&:disabled": {
                 backgroundColor: "#E4E7EC",
                 color: "#98A2B3",
+                boxShadow: "none",
+                transform: "none",
               },
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           >
             Send Invites
