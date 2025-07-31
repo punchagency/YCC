@@ -135,13 +135,37 @@ const UserStatsRow = () => {
   }
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 4 }}>
+      {/* Header with refresh button */}
       <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        sx={{ mb: 1 }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 3,
+        }}
       >
+        <Box>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "1.5rem",
+              fontWeight: 600,
+              color: "#1f2937",
+            }}
+          >
+            User Statistics
+          </h2>
+          <p
+            style={{
+              margin: "4px 0 0 0",
+              color: "#6b7280",
+              fontSize: "0.875rem",
+            }}
+          >
+            Platform user overview
+          </p>
+        </Box>
         <Tooltip title="Refresh data">
           <IconButton
             onClick={handleRefresh}
