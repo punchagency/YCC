@@ -337,6 +337,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       path: "/service-provider/bookings"
     },
     {
+      label: "Calendar",
+      icon: calendarLogo,
+      path: "/service-provider/calendar"
+    },
+    {
       label: "Transactions",
       icon: transactionLogo,
       path: "/service-provider/transactions",

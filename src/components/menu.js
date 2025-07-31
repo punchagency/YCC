@@ -191,15 +191,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => navigate("/crew/financial-management"),
     },
-    // {
-    //   label: "Bookings",
-    //   icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
-    //   className:
-    //     location.pathname === "/crew/booking"
-    //       ? "active-menu-item menu-red-background"
-    //       : "",
-    //   command: () => navigate("/crew/booking"),
-    // },
+    {
+      label: "Bookings",
+      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/booking"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/booking"),
+    },
     // {
     //   label: "Inventory Management",
     //   icon: (
@@ -483,6 +483,17 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => {
         navigate("/service-provider/bookings");
+      },
+    },
+    {
+      label: "Calendar",
+      icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/calendar"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/calendar");
       },
     },
     {
