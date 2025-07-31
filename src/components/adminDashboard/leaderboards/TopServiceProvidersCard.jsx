@@ -135,6 +135,7 @@ const TopServiceProvidersCard = ({
                   "&:hover": {
                     backgroundColor: "rgba(0, 0, 0, 0.04)",
                     transform: "translateX(4px)",
+                    pr: 2, // Add right padding on hover
                   },
                 }}
                 onClick={() =>
@@ -154,14 +155,15 @@ const TopServiceProvidersCard = ({
                       sx={{
                         width: 40,
                         height: 40,
-                        backgroundColor: "warning.50",
-                        color: "warning.main",
+                        backgroundColor: "#f3f4f6",
+                        color: "#6b7280",
                         fontSize: "1rem",
                         fontWeight: 600,
                       }}
                     >
                       {provider.name?.charAt(0)?.toUpperCase() || "P"}
                     </Avatar>
+                    {/* Ranking badge - commented out for now
                     <Chip
                       label={badge.icon}
                       size="small"
@@ -180,6 +182,7 @@ const TopServiceProvidersCard = ({
                         },
                       }}
                     />
+                    */}
                   </Box>
                 </ListItemAvatar>
                 <ListItemText

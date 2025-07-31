@@ -4,6 +4,7 @@ import {
   Grid,
   Card,
   CardContent,
+  Typography,
   Alert,
   IconButton,
   Tooltip,
@@ -13,6 +14,7 @@ import { getPlatformTrends } from "../../services/admin/adminDashboardService";
 import OrdersChart from "./charts/OrdersChart";
 import InvoicesChart from "./charts/InvoicesChart";
 import UserGrowthChart from "./charts/UserGrowthChart";
+import ChartFilter from "./charts/ChartFilter";
 
 /**
  * PlatformTrendsRow Component
@@ -29,15 +31,17 @@ const PlatformTrendsRow = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedDays, setSelectedDays] = useState(30);
 
   /**
    * Fetch platform trends data from the API
+   * @param {number} days - Number of days to fetch data for
    */
-  const fetchChartData = async () => {
+  const fetchChartData = async (days = selectedDays) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getPlatformTrends();
+      const data = await getPlatformTrends(days);
       setChartData(data);
     } catch (err) {
       setError(err.message);
@@ -51,6 +55,15 @@ const PlatformTrendsRow = () => {
    */
   const handleRefresh = () => {
     fetchChartData();
+  };
+
+  /**
+   * Handle filter change
+   * @param {number} days - New number of days to filter by
+   */
+  const handleFilterChange = (days) => {
+    setSelectedDays(days);
+    fetchChartData(days);
   };
 
   /**
@@ -126,12 +139,14 @@ const PlatformTrendsRow = () => {
 
   return (
     <Box sx={{ mb: 4 }}>
-      {/* Header with refresh button */}
+      {/* Header with refresh button and filter */}
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
           justifyContent: "space-between",
+          gap: { xs: 2, sm: 0 },
           mb: 3,
         }}
       >
@@ -153,21 +168,35 @@ const PlatformTrendsRow = () => {
               fontSize: "0.875rem",
             }}
           >
-            Last 30 days overview
+            Data overview
           </p>
         </Box>
-        <Tooltip title="Refresh data">
-          <IconButton
-            onClick={handleRefresh}
-            disabled={loading}
-            sx={{
-              color: "primary.main",
-              "&:hover": { backgroundColor: "primary.50" },
-            }}
-          >
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            justifyContent: { xs: "space-between", sm: "flex-end" },
+            width: { xs: "100%", sm: "auto" },
+          }}
+        >
+          <ChartFilter
+            selectedDays={selectedDays}
+            onFilterChange={handleFilterChange}
+          />
+          <Tooltip title="Refresh data">
+            <IconButton
+              onClick={handleRefresh}
+              disabled={loading}
+              sx={{
+                color: "primary.main",
+                "&:hover": { backgroundColor: "primary.50" },
+              }}
+            >
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Charts Grid */}

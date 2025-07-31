@@ -35,12 +35,13 @@ export const getUserStats = async () => {
 
 /**
  * Fetch platform trends data for charts (second row)
+ * @param {number} days - Number of days to look back (default: 30)
  * @returns {Promise<{ordersChart: Object, invoicesChart: Object, userGrowthChart: Object}>}
  */
-export const getPlatformTrends = async () => {
+export const getPlatformTrends = async (days = 30) => {
   try {
     const response = await fetch(
-      buildApiUrl("admin/dashboard/platform-trends"),
+      buildApiUrl(`admin/dashboard/platform-trends?days=${days}`),
       {
         method: "GET",
         headers: {

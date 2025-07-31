@@ -136,6 +136,7 @@ const TopUsersCard = ({
                   "&:hover": {
                     backgroundColor: "rgba(0, 0, 0, 0.04)",
                     transform: "translateX(4px)",
+                    pr: 2, // Add right padding on hover
                   },
                 }}
                 onClick={() => onUserClick && onUserClick(user, index)}
@@ -153,14 +154,15 @@ const TopUsersCard = ({
                       sx={{
                         width: 40,
                         height: 40,
-                        backgroundColor: "primary.50",
-                        color: "primary.main",
+                        backgroundColor: "#f3f4f6",
+                        color: "#6b7280",
                         fontSize: "1rem",
                         fontWeight: 600,
                       }}
                     >
                       {user.name?.charAt(0)?.toUpperCase() || "U"}
                     </Avatar>
+                    {/* Ranking badge - commented out for now
                     <Chip
                       label={badge.icon}
                       size="small"
@@ -179,6 +181,7 @@ const TopUsersCard = ({
                         },
                       }}
                     />
+                    */}
                   </Box>
                 </ListItemAvatar>
                 <ListItemText
