@@ -136,6 +136,8 @@ const AdminLayout = ({ role }) => {
   // Determine if we should show the create inventory button
   const shouldShowCreateInventoryButton = pageTitle === "Inventory";
 
+  const showCreateServiceButton = pageTitle === "Service Management";
+
   // Create Booking button (using existing style and logic)
   const createBookingButton = (
     <button
@@ -303,6 +305,147 @@ const AdminLayout = ({ role }) => {
       Import from CSV
     </button>
   );
+  const AddNewProductButton = (
+    <button
+      onClick={() => {
+        // Trigger the existing modal in the inventory pages
+        const event = new CustomEvent(
+          "openCreateInventoryModal"
+        );
+        window.dispatchEvent(event);
+      }}
+      style={{
+        backgroundColor: "#0387D9",
+        color: "white",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition:
+          "background 0.2s, transform 0.2s",
+        outline: "none",
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor =
+          "#026bb3";
+        e.currentTarget.style.transform =
+          "scale(1.02)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor =
+          "#0387D9";
+        e.currentTarget.style.transform =
+          "scale(1)";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline =
+          "2px solid #026bb3";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline =
+          "none";
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <line
+          x1="12"
+          y1="5"
+          x2="12"
+          y2="19"
+        ></line>
+        <line
+          x1="5"
+          y1="12"
+          x2="19"
+          y2="12"
+        ></line>
+      </svg>
+      Add New Product
+    </button>
+  );
+
+  const CreateNewServiceButton = (
+    <button
+      onClick={() => {
+        // Trigger the existing modal in the inventory pages
+        const event = new CustomEvent(
+          "openCreateServiceModal"
+        );
+        window.dispatchEvent(event);
+      }}
+      style={{
+        backgroundColor: "#0387D9",
+        color: "white",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        fontWeight: "600",
+        fontSize: "14px",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition:
+          "background 0.2s, transform 0.2s",
+        outline: "none",
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.backgroundColor =
+          "#026bb3";
+        e.currentTarget.style.transform =
+          "scale(1.02)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.backgroundColor =
+          "#0387D9";
+        e.currentTarget.style.transform =
+          "scale(1)";
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline =
+          "2px solid #026bb3";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outline =
+          "none";
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <line
+          x1="12"
+          y1="5"
+          x2="12"
+          y2="19"
+        ></line>
+        <line
+          x1="5"
+          y1="12"
+          x2="19"
+          y2="12"
+        ></line>
+      </svg>
+      Add New Service
+    </button>
+  );
 
   return (
     <ThemeProvider>
@@ -349,7 +492,7 @@ const AdminLayout = ({ role }) => {
                                   title={pageTitle}
                                   backArrow={backArrow}
                                   button={
-                                    shouldShowCreateBookingButton ? (
+                                    shouldShowCreateBookingButton && user.role.name === 'crew' ? (
                                       createBookingButton
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton
@@ -360,78 +503,11 @@ const AdminLayout = ({ role }) => {
                                           alignItems: "center",
                                         }}
                                       >
-                                        <button
-                                          onClick={() => {
-                                            // Trigger the existing modal in the inventory pages
-                                            const event = new CustomEvent(
-                                              "openCreateInventoryModal"
-                                            );
-                                            window.dispatchEvent(event);
-                                          }}
-                                          style={{
-                                            backgroundColor: "#0387D9",
-                                            color: "white",
-                                            padding: "8px 16px",
-                                            borderRadius: "8px",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            fontWeight: "600",
-                                            fontSize: "14px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "6px",
-                                            transition:
-                                              "background 0.2s, transform 0.2s",
-                                            outline: "none",
-                                          }}
-                                          onMouseOver={(e) => {
-                                            e.currentTarget.style.backgroundColor =
-                                              "#026bb3";
-                                            e.currentTarget.style.transform =
-                                              "scale(1.02)";
-                                          }}
-                                          onMouseOut={(e) => {
-                                            e.currentTarget.style.backgroundColor =
-                                              "#0387D9";
-                                            e.currentTarget.style.transform =
-                                              "scale(1)";
-                                          }}
-                                          onFocus={(e) => {
-                                            e.currentTarget.style.outline =
-                                              "2px solid #026bb3";
-                                          }}
-                                          onBlur={(e) => {
-                                            e.currentTarget.style.outline =
-                                              "none";
-                                          }}
-                                        >
-                                          <svg
-                                            width="16"
-                                            height="16"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                          >
-                                            <line
-                                              x1="12"
-                                              y1="5"
-                                              x2="12"
-                                              y2="19"
-                                            ></line>
-                                            <line
-                                              x1="5"
-                                              y1="12"
-                                              x2="19"
-                                              y2="12"
-                                            ></line>
-                                          </svg>
-                                          Add New Product
-                                        </button>
+                                        {AddNewProductButton}
                                         {user.role.name === "supplier" &&
                                           importCSVButton}
                                       </div>
-                                    ) : null
+                                    ) : showCreateServiceButton ? CreateNewServiceButton : null
                                   }
                                 />
                               </div>

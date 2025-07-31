@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ActiveOrders from "./active";
 import OrderTable from "./table";
 import CreateOrderModal from "./CreateOrderModal";
@@ -43,7 +43,7 @@ const Order = () => {
   const { logoutUser } = useUser();
 
   // Get current status filter from URL
-  const currentStatus = searchParams.get("status") || "all";
+  const [currentStatus, setCurrentStatus] = React.useState(searchParams.get("status") || "all");
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const currentLimit = parseInt(searchParams.get("limit")) || 10;
 

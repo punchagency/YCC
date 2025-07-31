@@ -20,6 +20,7 @@ const FinancialManagement = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [financeData, setFinanceData] = React.useState({});
+  const [loading, setLoading] = React.useState(true);
   const toast = React.useRef(null);
 
   const theme = useTheme();
@@ -41,6 +42,7 @@ const FinancialManagement = () => {
   };
 
   const fetchFinanceData = async () => {
+    setLoading(true);
     try {
       const response = await CrewFinancialManagement();
       console.log("Response:", response);
@@ -53,6 +55,8 @@ const FinancialManagement = () => {
         detail: "Failed to fetch data. Please try again later.",
         life: 3000,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,13 +66,13 @@ const FinancialManagement = () => {
 
   return (
     <>
-      <Outstanding financeData={financeData} setFinanceData={setFinanceData} fetchData={fetchFinanceData} />
+      <Outstanding financeData={financeData} setFinanceData={setFinanceData} fetchData={fetchFinanceData} loading={loading} />
       <SearchFilters
         onFilterChange={handleFilterChange}
         onSearchChange={handleSearchChange}
         activeFilter={activeFilter}
       />
-      <Table activeFilter={activeFilter} searchQuery={searchQuery} />
+      <Table activeFilter={activeFilter} searchQuery={searchQuery} financeData={financeData.invoices} loading={loading} />
 
       <Pagination
         currentPage={page}
