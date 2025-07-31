@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { Box, Container } from "@mui/material";
 import UserStatsRow from "../../components/adminDashboard/UserStatsRow";
 import PlatformTrendsRow from "../../components/adminDashboard/PlatformTrendsRow";
+import LeaderboardsRow from "../../components/adminDashboard/LeaderboardsRow";
 
 export default function AdminDashboard() {
   const { setPageTitle } = useOutletContext() || {};
@@ -20,8 +21,8 @@ export default function AdminDashboard() {
         {/* Second Row: Charts */}
         <PlatformTrendsRow />
 
-        {/* Third Row: Leaderboards (coming soon) */}
-        {/* <LeaderboardsRow /> */}
+        {/* Third Row: Leaderboards */}
+        <LeaderboardsRow />
       </Box>
     </Container>
   );
