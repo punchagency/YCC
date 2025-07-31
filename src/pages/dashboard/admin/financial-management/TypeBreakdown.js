@@ -26,7 +26,7 @@ const TypeBreakdown = ({ byType, totalAmount, loading }) => {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 2,
-    }).format(amount / 100); // Convert from cents to dollars
+    }).format(amount); // Amount is already in dollars
   };
 
   // Calculate percentage

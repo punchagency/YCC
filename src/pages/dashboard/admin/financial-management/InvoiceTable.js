@@ -39,7 +39,7 @@ const InvoiceTable = ({ invoices, pagination, onPageChange, loading }) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
-    }).format(amount / 100);
+    }).format(amount);
   };
 
   // Format date for display
