@@ -1,17 +1,39 @@
 import React, { useState, useEffect } from "react";
 import {
-  FaSortAmountDown,
-  FaSortAmountUp,
-  FaChevronDown,
-} from "react-icons/fa";
-import sort from "../../../assets/images/crew/sort.png";
-import eyesIn from "../../../assets/images/crew/eyes-in.png";
-import editLogo from "../../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../../assets/images/crew/deleteLogo.png";
-import "../inventory/inventory.css"; // Reuse the inventory CSS
-import { Dialog } from "primereact/dialog";
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Chip,
+  Paper,
+  Checkbox,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Divider,
+  Stack,
+  useTheme,
+  useMediaQuery,
+  Pagination
+} from "@mui/material";
+import {
+  Visibility,
+  DeleteOutline
+} from "@mui/icons-material";
+import { Skeleton } from "@mui/material";
+import { visuallyHidden } from '@mui/utils';
 
-const Table = ({ activeFilter = "all", searchQuery = "" }) => {
+const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[], loading = false }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [selectedItems, setSelectedItems] = useState([]);
@@ -20,149 +42,26 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
 
-  // Sample invoice data
-  const invoices = [
-    {
-      id: "INV-001",
-      vendor: "John Doe",
-      date: "01/03/2025",
-      amount: 12000.0,
-      status: "In Progress",
-      details: {
-        invoiceNo: "INV-001",
-        serviceName: "Yacht Maintenance",
-        serviceFee: 11500,
-        taxRate: 5,
-        taxAmount: 575,
-        discount: 75,
-        total: 12000,
-        bookingDate: "01/03/2025",
-        paymentMethod: "Credit Card",
-        cardEnding: "4321",
-        paymentStatus: "In Progress",
-      },
-    },
-    {
-      id: "INV-002",
-      vendor: "Jane Smith",
-      date: "01/04/2025",
-      amount: 8500.0,
-      status: "Completed",
-      details: {
-        invoiceNo: "INV-002",
-        serviceName: "Crew Training",
-        serviceFee: 8000,
-        taxRate: 5,
-        taxAmount: 400,
-        discount: 0,
-        total: 8500,
-        bookingDate: "01/04/2025",
-        paymentMethod: "Bank Transfer",
-        cardEnding: "N/A",
-        paymentStatus: "Completed",
-      },
-    },
-    {
-      id: "INV-003",
-      vendor: "Alice Johnson",
-      date: "01/05/2025",
-      amount: 15200.0,
-      status: "Pending",
-      details: {
-        invoiceNo: "INV-003",
-        serviceName: "Engine Repair",
-        serviceFee: 14500,
-        taxRate: 5,
-        taxAmount: 725,
-        discount: 25,
-        total: 15200,
-        bookingDate: "01/05/2025",
-        paymentMethod: "Visa",
-        cardEnding: "7890",
-        paymentStatus: "Pending",
-      },
-    },
-    {
-      id: "INV-004",
-      vendor: "Bob Brown",
-      date: "01/06/2025",
-      amount: 9750.0,
-      status: "In Progress",
-      details: {
-        invoiceNo: "INV-004",
-        serviceName: "Interior Design",
-        serviceFee: 9500,
-        taxRate: 5,
-        taxAmount: 475,
-        discount: 225,
-        total: 9750,
-        bookingDate: "01/06/2025",
-        paymentMethod: "Mastercard",
-        cardEnding: "5678",
-        paymentStatus: "In Progress",
-      },
-    },
-    {
-      id: "INV-005",
-      vendor: "Carol White",
-      date: "01/07/2025",
-      amount: 22300.0,
-      status: "Completed",
-      details: {
-        invoiceNo: "INV-005",
-        serviceName: "Hull Painting",
-        serviceFee: 21000,
-        taxRate: 5,
-        taxAmount: 1050,
-        discount: 0,
-        total: 22300,
-        bookingDate: "01/07/2025",
-        paymentMethod: "American Express",
-        cardEnding: "9012",
-        paymentStatus: "Completed",
-      },
-    },
-    {
-      id: "INV-006",
-      vendor: "David Green",
-      date: "01/08/2025",
-      amount: 5600.0,
-      status: "Pending",
-      details: {
-        invoiceNo: "INV-006",
-        serviceName: "Safety Inspection",
-        serviceFee: 5500,
-        taxRate: 5,
-        taxAmount: 275,
-        discount: 175,
-        total: 5600,
-        bookingDate: "01/08/2025",
-        paymentMethod: "Visa",
-        cardEnding: "3456",
-        paymentStatus: "Pending",
-      },
-    },
-  ];
-
   // Initialize filteredInvoices with invoices data
   useEffect(() => {
-    setFilteredInvoices(invoices);
+    setFilteredInvoices(financeData);
   }, []);
 
   // Filter invoices when activeFilter or searchQuery changes
   useEffect(() => {
-    let filtered = [...invoices];
+    if(!financeData && financeData.length === 0) return;
+    let filtered = [...financeData];
 
     // Apply status filter
     if (activeFilter !== "all") {
       filtered = filtered.filter((invoice) => {
         switch (activeFilter) {
           case "pending":
-            return invoice.status === "Pending";
+            return invoice.status === "pending";
           case "completed":
-            return invoice.status === "Completed";
+            return invoice.status === "paid";
           case "upcoming":
-            return invoice.status === "In Progress";
+            return invoice.status === "failed" || invoice.status === "cancelled";
           default:
             return true;
         }
@@ -174,14 +73,16 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (invoice) =>
-          invoice.id.toLowerCase().includes(query) ||
-          invoice.vendor.toLowerCase().includes(query) ||
-          invoice.details?.serviceName.toLowerCase().includes(query)
+          invoice.invoiceId.toLowerCase().includes(query) ||
+          invoice.orderId.toLowerCase().includes(query) ||
+          invoice.type.toLowerCase().includes(query) ||
+          (invoice.suppliers && invoice.suppliers.some(supplier => supplier.toLowerCase().includes(query))) ||
+          (invoice.serviceProvider && invoice.serviceProvider.toLowerCase().includes(query))
       );
     }
 
     setFilteredInvoices(filtered);
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, searchQuery, financeData]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -192,29 +93,32 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
     }
   };
 
-  const getSortIcon = (field) => {
-    if (sortField === field) {
-      return sortDirection === "asc" ? (
-        <FaSortAmountUp className="ml-1" />
-      ) : (
-        <FaSortAmountDown className="ml-1" />
-      );
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "paid":
+        return { bgcolor: '#e8f5e8', color: '#2e7d32' };
+      case "pending":
+        return { bgcolor: '#fff3e0', color: '#f57c00' };
+      case "failed":
+        return { bgcolor: '#ffebee', color: '#d32f2f' };
+      case "cancelled":
+        return { bgcolor: '#f3e5f5', color: '#7b1fa2' };
+      case "refunded":
+        return { bgcolor: '#e0f2f1', color: '#00695c' };
+      default:
+        return { bgcolor: '#f5f5f5', color: '#666' };
     }
-    return <FaSortAmountUp className="ml-1 opacity-30" />;
   };
 
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "In Progress":
-        return "bg-green-100 text-green-800";
-      case "Completed":
-        return "bg-blue-100 text-blue-800";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+  const sortedInvoices = [...filteredInvoices].sort((a, b) => {
+    if (!sortField) return 0;
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
     }
-  };
+    return aValue < bValue ? 1 : -1;
+  });
 
   // Handle select all checkbox
   const handleSelectAll = (e) => {
@@ -223,7 +127,7 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
 
     if (checked) {
       // Select all items
-      const allItemIds = invoices.map((item) => item.id);
+      const allItemIds = financeData.map((item) => item.invoiceId);
       setSelectedItems(allItemIds);
     } else {
       // Deselect all
@@ -266,632 +170,421 @@ const Table = ({ activeFilter = "all", searchQuery = "" }) => {
     setSelectedInvoice(null);
   };
 
-  // Edit handler
-  const handleEdit = (index) => {
-    console.log("Editing item:", invoices[index]);
-    // Implement edit functionality
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
   };
 
-  // Delete handler
-  const handleDelete = (index) => {
-    console.log("Deleting item:", invoices[index]);
-    // Implement delete functionality
-  };
+  const SkeletonCard = () => (
+    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+      <CardContent sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+          <Skeleton variant="text" width="40%" height={20} />
+          <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
+        </Box>
+        <Skeleton variant="text" width="80%" height={16} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="70%" height={16} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="60%" height={16} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width="50%" height={16} sx={{ mb: 1 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 1 }} />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
+  const SkeletonRow = () => (
+    <TableRow>
+      <TableCell padding="checkbox"><Skeleton variant="rectangular" width={20} height={20} /></TableCell>
+      <TableCell><Skeleton variant="text" width="80%" /></TableCell>
+      <TableCell><Skeleton variant="text" width="60%" /></TableCell>
+      <TableCell><Skeleton variant="text" width="70%" /></TableCell>
+      <TableCell><Skeleton variant="text" width="50%" /></TableCell>
+      <TableCell><Skeleton variant="text" width="60%" /></TableCell>
+      <TableCell><Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} /></TableCell>
+    </TableRow>
+  );
+
+  if (isMobile) {
+    return (
+      <Box sx={{ p: 2 }}>
+        <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+          <CardContent sx={{ p: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+              Payment & Invoice Tracker
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
+              Monitor outstanding invoices, track completed payments, and manage upcoming expenses.
+            </Typography>
+            
+            <Stack spacing={2}>
+              {loading ? (
+                Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)
+              ) : sortedInvoices && sortedInvoices.length > 0 ? (
+                sortedInvoices.map((invoice) => {
+                  const statusStyle = getStatusColor(invoice.status);
+                  return (
+                    <Card key={invoice.invoiceId} variant="outlined" sx={{ borderRadius: 2 }}>
+                      <CardContent sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                            {invoice.invoiceId}
+                          </Typography>
+                          <Chip
+                            label={invoice?.status}
+                            size="small"
+                            sx={{
+                              bgcolor: statusStyle.bgcolor,
+                              color: statusStyle.color,
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              textTransform: 'capitalize'
+                            }}
+                          />
+                        </Box>
+                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                          Type: {invoice.type} | Order: {invoice.orderId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                          Vendor: {invoice.type === 'booking' ? invoice.serviceProvider : invoice.suppliers?.join(', ') || 'N/A'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                          Amount: {formatCurrency(invoice.amount)}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                          Date: {new Date(invoice.invoiceDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) || 'N/A'} | Due: {new Date(invoice.dueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) || 'N/A'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                          <IconButton size="small" sx={{ fontSize: '14px' }} onClick={() => handleViewItem(invoice)}>
+                            <Visibility fontSize="small" />
+                            View Details
+                          </IconButton>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              ) : (
+                <Box sx={{ textAlign: 'center', py: 6 }}>
+                  <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
+                    No Invoices Found
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#999' }}>
+                    There are no invoices to display at the moment.
+                  </Typography>
+                </Box>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+        {renderDetailsModal()}
+      </Box>
+    );
+  }
 
   return (
-    <>
-      <div className="p-6 bg-white rounded-xl shadow-sm mx-5 my-5">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-          Payment & Invoice Tracker
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Monitor outstanding invoices, track completed payments, and manage
-          upcoming expenses. Use filters and sorting options for easy navigation
-          and quick access to financial details.
-        </p>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+            Payment & Invoice Tracker
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
+            Monitor outstanding invoices, track completed payments, and manage upcoming expenses. Use filters and sorting options for easy navigation and quick access to financial details.
+          </Typography>
 
-        <div className="overflow-hidden">
-          <table
-            className="inventory-header-table"
-            style={{
-              width: "100%",
-              tableLayout: "fixed",
-              borderCollapse: "collapse",
-              marginBottom: "0",
-            }}
-          >
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    width: "5%",
-                    textAlign: "center",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectAll}
-                      onChange={handleSelectAll}
-                      style={{
-                        margin: 0,
-                        width: "17px",
-                        height: "17px",
-                      }}
-                    />
-                    {selectedItems.length > 0 && (
-                      <i
-                        className="pi pi-trash"
-                        style={{
-                          cursor: "pointer",
-                          color: "#ff4d4f",
-                          marginLeft: "8px",
-                        }}
-                        onClick={handleBulkDelete}
-                      ></i>
-                    )}
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "15%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={sort}
-                      alt="sort"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        marginRight: "5px",
-                      }}
-                    />
-                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+          <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Checkbox
+                        checked={selectAll}
+                        onChange={handleSelectAll}
+                        size="small"
+                      />
+                      {selectedItems.length > 0 && (
+                        <IconButton
+                          size="small"
+                          onClick={handleBulkDelete}
+                          sx={{ color: '#f44336' }}
+                        >
+                          <DeleteOutline fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Box>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'invoiceId'}
+                      direction={sortField === 'invoiceId' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('invoiceId')}
+                    >
                       Inv. No.
-                    </p>
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "20%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={sort}
-                      alt="sort"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        marginRight: "5px",
-                      }}
-                    />
-                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                      Vendor
-                    </p>
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "15%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={sort}
-                      alt="sort"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        marginRight: "5px",
-                      }}
-                    />
-                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Date</p>
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "15%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={sort}
-                      alt="sort"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        marginRight: "5px",
-                      }}
-                    />
-                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                      {sortField === 'invoiceId' ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'type'}
+                      direction={sortField === 'type' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('type')}
+                    >
+                      Type
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    Vendor/Provider
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'invoiceDate'}
+                      direction={sortField === 'invoiceDate' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('invoiceDate')}
+                    >
+                      Date
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'amount'}
+                      direction={sortField === 'amount' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('amount')}
+                    >
                       Amount
-                    </p>
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "15%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={sort}
-                      alt="sort"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        marginRight: "5px",
-                      }}
-                    />
-                    <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                    <TableSortLabel
+                      active={sortField === 'status'}
+                      direction={sortField === 'status' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('status')}
+                    >
                       Status
-                    </p>
-                  </div>
-                </th>
-                <th
-                  style={{
-                    width: "15%",
-                    textAlign: "left",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <p
-                      style={{
-                        margin: 0,
-                        flex: 1,
-                        fontSize: "12px",
-                        textAlign: "center",
-                      }}
-                    >
-                      Actions
-                    </p>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-          </table>
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 600, color: '#555' }}>
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-          <table
-            className="inventory-table"
-            style={{
-              width: "100%",
-              tableLayout: "fixed",
-              borderCollapse: "collapse",
-              marginTop: "0",
-            }}
-          >
-            <tbody>
-              {filteredInvoices.map((invoice, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td
-                    style={{
-                      width: "5%",
-                      padding: "10px",
-                      textAlign: "center",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.includes(invoice.id)}
-                      onChange={(e) => handleSelectItem(e, invoice.id)}
-                      style={{
-                        width: "16px",
-                        height: "16px",
-                      }}
-                    />
-                  </td>
-                  <td
-                    style={{
-                      width: "15%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    {invoice.id}
-                  </td>
-                  <td
-                    style={{
-                      width: "20%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    {invoice.vendor}
-                  </td>
-                  <td
-                    style={{
-                      width: "15%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    {invoice.date}
-                  </td>
-                  <td
-                    style={{
-                      width: "15%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    $
-                    {invoice.amount.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td
-                    style={{
-                      width: "15%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    <span
-                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                        invoice.status
-                      )}`}
-                    >
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      width: "15%",
-                      padding: "10px",
-                      borderBottom: "1px solid #eee",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <img
-                        src={eyesIn}
-                        alt="view"
-                        style={{
-                          width: "18px",
-                          height: "18px",
-                          cursor: "pointer",
+              <TableBody>
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, index) => <SkeletonRow key={index} />)
+                ) : sortedInvoices.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 8 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                        <Typography variant="h6" sx={{ color: '#666', fontWeight: 500 }}>
+                          No Invoices Found
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#999' }}>
+                          There are no invoices to display at the moment.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  sortedInvoices.map((invoice, index) => {
+                    const statusStyle = getStatusColor(invoice.status);
+                    return (
+                      <TableRow
+                        key={invoice.invoiceId}
+                        sx={{
+                          '&:hover': { bgcolor: '#f8f9fa' },
+                          '&:last-child td, &:last-child th': { border: 0 }
                         }}
-                        onClick={() => handleViewItem(invoice)}
-                      />
-                      <img
-                        src={editLogo}
-                        alt="edit"
-                        style={{
-                          width: "18px",
-                          height: "18px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleEdit(index)}
-                      />
-                      <img
-                        src={deleteLogo}
-                        alt="delete"
-                        style={{
-                          width: "18px",
-                          height: "18px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleDelete(index)}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      >
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedItems.includes(invoice.invoiceId)}
+                            onChange={(e) => handleSelectItem(e, invoice.invoiceId)}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 500, color: '#333' }}>
+                          {invoice.invoiceId}
+                        </TableCell>
+                        <TableCell sx={{ color: '#666', textTransform: 'capitalize' }}>
+                          {invoice.type}
+                        </TableCell>
+                        <TableCell sx={{ color: '#666' }}>
+                          {invoice.type === 'booking' ? invoice.serviceProvider : invoice.suppliers?.join(', ') || 'N/A'}
+                        </TableCell>
+                        <TableCell sx={{ color: '#666' }}>
+                          {new Date(invoice.invoiceDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          }) || 'N/A'}
+                        </TableCell>
+                        <TableCell sx={{ color: '#666', fontWeight: 500 }}>
+                          {formatCurrency(invoice.amount)}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={invoice.status}
+                            size="small"
+                            sx={{
+                              bgcolor: statusStyle.bgcolor,
+                              color: statusStyle.color,
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              textTransform: 'capitalize'
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewItem(invoice)}
+                            sx={{ fontSize: '14px' }}
+                          >
+                            <Visibility fontSize="small" />
+                            View Details
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-          {/* Pagination footer */}
-          <div
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4"
-            style={{ height: "50px" }}
-          >
-            <div></div>
-            <div className="flex flex-1 justify-between sm:hidden">
-              <div className="text-xs text-gray-700">
-                Page <span className="font-medium">1</span> of{" "}
-                <span className="font-medium">10</span>
-              </div>
-            </div>
-
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
-                  of{" "}
-                  <span className="font-medium">{filteredInvoices.length}</span>{" "}
-                  results
-                </p>
-              </div>
-              <div>
-                <nav
-                  className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                  aria-label="Pagination"
-                >
-                  <button className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                    <span className="sr-only">Previous</span>
-                    <FaChevronDown className="h-3 w-3 rotate-90" />
-                  </button>
-                  <button className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 bg-blue-50">
-                    1
-                  </button>
-                  <button className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
-                    <span className="sr-only">Next</span>
-                    <FaChevronDown className="h-3 w-3 -rotate-90" />
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Invoice Details Modal */}
-        <Dialog
-          visible={showDetailsModal}
-          onHide={closeDetailsModal}
-          header="Payment & Invoice Tracker Details"
-          modal
-          style={{ width: "500px" }}
-          contentStyle={{ padding: 0 }}
-          headerStyle={{ borderBottom: "1px solid #e5e7eb", padding: "1rem" }}
-          footer={null}
-        >
-          {selectedInvoice && (
-            <div className="invoice-details">
-              {/* Invoice Number */}
-              <div
-                className="detail-row"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <div
-                  className="label"
-                  style={{ fontWeight: 500, color: "#4b5563" }}
-                >
-                  Invoice No.
-                </div>
-                <div className="value" style={{ color: "#111827" }}>
-                  {selectedInvoice.details?.invoiceNo || selectedInvoice.id}
-                </div>
-              </div>
-
-              {/* Service Name */}
-              <div
-                className="detail-row"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <div
-                  className="label"
-                  style={{ fontWeight: 500, color: "#4b5563" }}
-                >
-                  Service Name
-                </div>
-                <div className="value" style={{ color: "#111827" }}>
-                  {selectedInvoice.details?.serviceName ||
-                    "Service details not available"}
-                </div>
-              </div>
-
-              {/* Amount Breakdown Section */}
-              <div
-                className="amount-breakdown"
-                style={{ padding: "1rem", borderBottom: "1px solid #e5e7eb" }}
-              >
-                <div
-                  className="section-title"
-                  style={{ fontWeight: 600, marginBottom: "0.75rem" }}
-                >
-                  Amount Breakdown
-                </div>
-
-                {/* Service Fee */}
-                <div
-                  className="breakdown-row"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <div className="label">1. Service Fee</div>
-                  <div className="value">
-                    $
-                    {selectedInvoice.details?.serviceFee ||
-                      selectedInvoice.amount}
-                  </div>
-                </div>
-
-                {/* Tax */}
-                <div
-                  className="breakdown-row"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <div className="label">
-                    2. Tax ({selectedInvoice.details?.taxRate || 5}%)
-                  </div>
-                  <div className="value">
-                    ${selectedInvoice.details?.taxAmount || 0}
-                  </div>
-                </div>
-
-                {/* Discount */}
-                <div
-                  className="breakdown-row"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <div className="label">3. Discount Applied</div>
-                  <div className="value" style={{ color: "#ef4444" }}>
-                    -${selectedInvoice.details?.discount || 0}
-                  </div>
-                </div>
-
-                {/* Total */}
-                <div
-                  className="breakdown-row"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontWeight: 600,
-                  }}
-                >
-                  <div className="label">4. Total</div>
-                  <div className="value">${selectedInvoice.amount}</div>
-                </div>
-              </div>
-
-              {/* Linked Booking Date */}
-              <div
-                className="detail-row"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <div
-                  className="label"
-                  style={{ fontWeight: 500, color: "#4b5563" }}
-                >
-                  Linked Booking Date
-                </div>
-                <div className="value" style={{ color: "#111827" }}>
-                  {selectedInvoice.details?.bookingDate || selectedInvoice.date}
-                </div>
-              </div>
-
-              {/* Payment Method */}
-              <div
-                className="detail-row"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem",
-                  borderBottom: "1px solid #e5e7eb",
-                }}
-              >
-                <div
-                  className="label"
-                  style={{ fontWeight: 500, color: "#4b5563" }}
-                >
-                  Payment Method
-                </div>
-                <div className="value" style={{ color: "#111827" }}>
-                  {selectedInvoice.details?.paymentMethod
-                    ? `${selectedInvoice.details.paymentMethod}${
-                        selectedInvoice.details.cardEnding !== "N/A"
-                          ? ` - Ending ${selectedInvoice.details.cardEnding}`
-                          : ""
-                      }`
-                    : "Payment method not specified"}
-                </div>
-              </div>
-
-              {/* Payment Status */}
-              <div
-                className="detail-row"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "1rem",
-                }}
-              >
-                <div
-                  className="label"
-                  style={{ fontWeight: 500, color: "#4b5563" }}
-                >
-                  Payment Status
-                </div>
-                <div className="value">
-                  <span
-                    style={{
-                      backgroundColor:
-                        selectedInvoice.status === "Completed"
-                          ? "#e0f2fe"
-                          : selectedInvoice.status === "In Progress"
-                          ? "#dcfce7"
-                          : "#fef9c3",
-                      color:
-                        selectedInvoice.status === "Completed"
-                          ? "#0369a1"
-                          : selectedInvoice.status === "In Progress"
-                          ? "#166534"
-                          : "#854d0e",
-                      padding: "0.25rem 0.75rem",
-                      borderRadius: "0.25rem",
-                      fontSize: "0.875rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {selectedInvoice.status}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-        </Dialog>
-      </div>
-    </>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={Math.ceil(filteredInvoices.length / 10)}
+              page={1}
+              onChange={() => {}}
+              color="primary"
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  borderRadius: 2
+                }
+              }}
+            />
+          </Box>
+        </CardContent>
+      </Card>
+      {renderDetailsModal()}
+    </Box>
   );
+
+  function renderDetailsModal() {
+    return (
+
+      <Dialog
+        open={showDetailsModal}
+        onClose={closeDetailsModal}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 3,
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            pb: 1,
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            borderBottom: '1px solid #e0e0e0'
+          }}
+        >
+          Payment & Invoice Tracker Details
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          {selectedInvoice && (
+            <Box>
+              {/* Invoice Details */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Invoice No.</Typography>
+                <Typography sx={{ color: '#333' }}>{selectedInvoice.invoiceId}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Order ID</Typography>
+                <Typography sx={{ color: '#333' }}>{selectedInvoice.orderId}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Type</Typography>
+                <Typography sx={{ color: '#333', textTransform: 'capitalize' }}>{selectedInvoice.type}</Typography>
+              </Box>
+
+              {/* Vendor/Provider */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>
+                  {selectedInvoice.type === 'booking' ? 'Service Provider' : 'Suppliers'}
+                </Typography>
+                <Typography sx={{ color: '#333' }}>
+                  {selectedInvoice.type === 'booking' 
+                    ? selectedInvoice.serviceProvider || 'N/A'
+                    : selectedInvoice.suppliers?.join(', ') || 'N/A'
+                  }
+                </Typography>
+              </Box>
+
+              {/* Amount */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Amount</Typography>
+                <Typography sx={{ color: '#333', fontWeight: 600 }}>
+                  {formatCurrency(selectedInvoice.amount)}
+                </Typography>
+              </Box>
+
+              {/* Dates */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Invoice Date</Typography>
+                <Typography sx={{ color: '#333' }}>{new Date(selectedInvoice.invoiceDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                }) || 'N/A'}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Due Date</Typography>
+                <Typography sx={{ color: '#333' }}>{new Date(selectedInvoice.dueDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                }) || 'N/A'}</Typography>
+              </Box>
+
+              {/* Status */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Status</Typography>
+                <Chip
+                  label={selectedInvoice.status}
+                  size="small"
+                  sx={{
+                    ...getStatusColor(selectedInvoice.status),
+                    fontWeight: 500,
+                    textTransform: 'capitalize'
+                  }}
+                />
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
+    );
+  }
 };
 
-export default Table;
+export default FinancialTable;

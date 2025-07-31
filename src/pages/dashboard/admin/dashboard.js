@@ -3,8 +3,15 @@ import Dashboard1 from "../../../components/dashboard/bookings-dashboard";
 // import DashboardSidebar from "../../../components/dashboard/sidebar";
 // import DashboardHeader from "../../../components/dashboard/header";
 import DashboardTitleBar from "../../../components/dashboard/title-bar";
+import { useOutletContext } from "react-router-dom";
+import React from "react";
 
 const AdminDashboard1 = () => {
+  const { setPageTitle } = useOutletContext() || {};
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Dashboard");
+  }, [setPageTitle]);
+
   return (
     <Box
       sx={{
@@ -12,12 +19,12 @@ const AdminDashboard1 = () => {
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
         backgroundColor: "white",
       }}
     >
-      <DashboardTitleBar title="Dashboard" />
+      {/* <DashboardTitleBar title="Dashboard" /> */}
       <Dashboard1 />
     </Box>
   );

@@ -16,14 +16,11 @@ import { useTheme } from "../../context/theme/themeContext";
 import { useOrder } from "../../context/order/orderContext";
 import { useInvoice } from "../../context/invoice/invoiceContext";
 import { useInventory } from "../../context/inventory/inventoryContext";
-import { Link } from "react-router-dom";
-import AddBoxIcon from "@mui/icons-material/AddBox";
-import DashboardTitleBar from './title-bar'
 
 const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("monthly");
+  const [value, setValue] = useState("all");
   const { orderSummary, fetchOrderSummary } = useOrder();
   const { invoices, fetchInvoices } = useInvoice();
   const { lowInventory, fetchLowInventory } = useInventory();
@@ -32,44 +29,62 @@ const BookingsDashboard = () => {
 
   useEffect(() => {
     fetchOrderSummary();
-    fetchInvoices();
+    fetchInvoices({ status: undefined, type: undefined, period: value });
     fetchLowInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    fetchInvoices({ status: undefined, type: undefined, period: value });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   console.log("lowInventory", lowInventory);
   const menuItems = [
     {
-      label: "Monthly",
-      value: "monthly",
+      label: "All",
+      value: "all",
     },
     {
-      label: "Yearly",
-      value: "yearly",
+      label: "Today",
+      value: "today",
     },
     {
       label: "Weekly",
-      value: "weekly",
+      value: "week",
+    },
+    {
+      label: "Monthly",
+      value: "month",
+    },
+    {
+      label: "Yearly",
+      value: "year",
     },
   ];
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
   return (
     <Box
-      paddingTop={{ xs: 9, md: 0 }}
-      paddingBottom={5} 
-      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+      paddingTop={{ xs: 0, md: 2 }}
+      paddingBottom={0}
+      className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen w-full max-w-full"
     >
-      <DashboardTitleBar title="Bookings Dashboard" />
       <Box
-        paddingTop={5}
-        paddingX={{ xs: 2, sm: 3 }}
+        paddingTop={{ xs: 0, md: 2 }}
+        paddingX={{ xs: 0, sm: 3 }}
         spacing={{ xs: 1, sm: 1.5, md: 2 }}
         display="flex"
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-        <Grid2 item xs={12} md={6} lg={6} width="100%">
-          {/* Low Inventories */}
+        {/* <Grid2 item xs={12} md={6} lg={6} width="100%">
+         
           {lowInventory && lowInventory.length > 0 ? (
             <Box
               sx={{
@@ -317,6 +332,10 @@ const BookingsDashboard = () => {
               </Link>
             </Box>
           )}
+        </Grid2> */}
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
+          {/* Current Order Summary */}
+          <CurrentOrderSummary orderSummary={orderSummary} fetchOrderSummary={fetchOrderSummary} />
         </Grid2>
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
@@ -368,7 +387,7 @@ const BookingsDashboard = () => {
                   marginTop: "10px",
                 }}
               >
-                {invoices.map((item, index) => (
+                {invoices.length > 0 ? invoices.map((item, index) => (
                   <Box
                     key={index}
                     sx={{
@@ -393,39 +412,57 @@ const BookingsDashboard = () => {
                         Invoice {item.invoiceId}
                       </FinancialSummaryDescriptionText>
                       <FinancialSummaryDescriptionText mode={theme}>
-                        Amount: ${parseFloat(item.invoiceAmount).toFixed(2)} -
+                        Amount: ${formatCurrency(item.amount)} -
                         Due:{" "}
                         {
-                          new Date(item.invoiceDueDate)
-                            .toISOString()
-                            .split("T")[0]
+                          new Date(item.dueDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })
                         }
                       </FinancialSummaryDescriptionText>
                     </Box>
 
                     <Box>
-                      <FinancialSummaryButton mode={theme}>
+                      <FinancialSummaryButton mode={theme}
+                        onClick={()=>{
+                          window.open(item.invoiceUrl, "_blank");
+                        }}
+                      >
                         <ViewButtonText mode={theme}>View</ViewButtonText>
                       </FinancialSummaryButton>
                     </Box>
                   </Box>
-                ))}
+                )) : (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
+                      No Invoices Found
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#999' }}>
+                      There are no invoices to display at the moment.
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
           )}
         </Grid2>
       </Box>
 
-      <Box paddingX={{ xs: 2, sm: 3 }} paddingTop={{ xs: 1, sm: 2, md: 3 }} display="flex" flexDirection={{ xs: "column", lg: "row" }} gap={{ xs: 2, lg: 3 }}>
-        <Box width={{ xs: "100%", lg: "55%" }}>
-          {/* Current Order Summary */}
-          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
-        </Box>
+      <Box
+        paddingX={{ xs: 0, sm: 3 }}
+        paddingTop={{ xs: 1, sm: 2, md: 3 }}
+        display="flex"
+        flexDirection={{ xs: "column", lg: "row" }}
+        gap={{ xs: 2, lg: 3 }}
+      >
 
-        <Box width={{ xs: "100%", lg: "45%" }}>
+
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Booking Summary */}
           <BookingSummary />
-        </Box>
+        </Grid2>
       </Box>
     </Box>
   );

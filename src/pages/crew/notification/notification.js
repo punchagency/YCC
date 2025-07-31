@@ -1,97 +1,686 @@
-import { useRef, useState, useEffect } from "react";
+"use client";
+
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { Box, Typography, Card, CardContent, Chip } from "@mui/material";
 import NotificationDetailsModal from "../../../components/NotificationDetailsModal";
-import NotificationTable from "./table";
-import { TableSkeleton } from "../../../components/TableSkeleton";
-import { useToast } from "../../../components/Toast";
 import {
   fetchCrewNotifications,
-  updateNotificationStatus,
   markNotificationAsRead,
 } from "../../../services/crew/crewNotificationService";
+import NotificationsSkeleton from "../../../components/NotificationsSkeleton";
+import { useToast } from "../../../components/Toast";
+import { Pagination } from "../../../components/pagination";
+import React from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
-// Static dummy data for crew notifications
-const dummyNotifications = [
-  {
-    _id: "1",
-    priority: "High",
-    type: "Maintenance Alert",
-    description:
-      "Engine room requires immediate inspection due to unusual noise reported by engineering staff.",
-    status: "Pending",
-    createdAt: "2023-06-15T10:30:00Z",
-  },
-  {
-    _id: "2",
-    priority: "Medium",
-    type: "Schedule Change",
-    description:
-      "Port arrival time changed from 14:00 to 16:00 due to weather conditions.",
-    status: "In Progress",
-    createdAt: "2023-06-14T08:45:00Z",
-  },
-  {
-    _id: "3",
-    priority: "Low",
-    type: "Inventory Update",
-    description:
-      "Fresh produce delivery scheduled for tomorrow morning at 08:00.",
-    status: "Resolved",
-    createdAt: "2023-06-13T15:20:00Z",
-  },
-  {
-    _id: "4",
-    priority: "High",
-    type: "Safety Drill",
-    description:
-      "Mandatory safety drill scheduled for all crew members tomorrow at 09:00.",
-    status: "Pending",
-    createdAt: "2023-06-12T11:10:00Z",
-  },
-  {
-    _id: "5",
-    priority: "Medium",
-    type: "Staff Meeting",
-    description:
-      "Department heads meeting in the conference room at 13:00 today.",
-    status: "In Progress",
-    createdAt: "2023-06-11T09:30:00Z",
-  },
-  {
-    _id: "6",
-    priority: "Low",
-    type: "Training Opportunity",
-    description:
-      "New safety equipment training available. Sign up by the end of the week.",
-    status: "Resolved",
-    createdAt: "2023-06-10T14:15:00Z",
-  },
-  {
-    _id: "7",
-    priority: "High",
-    type: "Weather Alert",
-    description:
-      "Rough seas expected in the next 24 hours. Secure all loose equipment and prepare accordingly.",
-    status: "Pending",
-    createdAt: "2023-06-09T16:40:00Z",
-  },
-];
+// Mobile notification card component
+const MobileNotificationCard = ({
+  notification,
+  handleViewDetails,
+  handleStatusChange,
+  statusLoading,
+  theme,
+}) => {
+  const cellStatusMenu = useRef(null);
 
-export default function Notification({ role }) {
+  // Add click outside handler for mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      try {
+        if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
+          const menuElement = cellStatusMenu.current.getElement();
+          if (menuElement && !menuElement.contains(event.target)) {
+            cellStatusMenu.current.hide();
+          }
+        }
+      } catch (error) {
+        // Silently handle any errors to prevent ugly error messages
+        console.warn("Menu close error:", error);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const statusStyles = {
+    read: { bg: "#ECFDF3", color: "#027A48" },
+    unread: { bg: "#FEF3F2", color: "#B42318" },
+  };
+
+  const style = statusStyles[notification?.read ? "read" : "unread"] || {
+    bg: "#F2F4F7",
+    color: "#344054",
+  };
+
+  const priorityStyles = {
+    order: { bg: "#ECFDF3", color: "#027A48" },
+    booking: { bg: "#FFFAEB", color: "#B54708" },
+    inventory: { bg: "#FEF3F2", color: "#B42318" },
+    system: { bg: "#F0F9FF", color: "#0369A1" },
+  };
+
+  const priorityStyle = priorityStyles[
+    (notification?.type || "").toLowerCase()
+  ] || {
+    bg: "#F2F4F7",
+    color: "#344054",
+  };
+
+  return (
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: "8px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+        backgroundColor: "#F8FBFF",
+        width: "100%",
+      }}
+    >
+      <CardContent sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 1.5,
+            alignItems: "center",
+          }}
+        >
+          <Chip
+            label={notification?.type || "N/A"}
+            size="small"
+            sx={{
+              backgroundColor: priorityStyle.bg,
+              color: priorityStyle.color,
+              fontSize: "12px",
+              height: "24px",
+            }}
+          />
+          <Chip
+            label={notification?.read ? "Read" : "Unread"}
+            size="small"
+            sx={{
+              backgroundColor: style.bg,
+              color: style.color,
+              fontSize: "12px",
+              height: "24px",
+            }}
+          />
+        </Box>
+
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontSize: "14px",
+            fontWeight: 500,
+            mb: 1,
+            color: "#101828",
+          }}
+        >
+          {notification?.title || "N/A"}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: "13px",
+            mb: 2,
+            color: "#475467",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {notification?.message || "No message available"}
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "12px",
+              color: "#667085",
+            }}
+          >
+            {notification?.createdAt
+              ? new Date(notification.createdAt).toLocaleDateString()
+              : "N/A"}
+          </Typography>
+
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              label="View"
+              className="p-button-outlined p-button-sm mobile-view-details-btn"
+              style={{
+                border: "1px solid #D0D5DD",
+                color: "#344054",
+                backgroundColor: "white",
+                padding: "6px 12px",
+                fontSize: "12px",
+                borderRadius: "8px",
+                transition: "background 0.2s, border-color 0.2s, color 0.2s",
+              }}
+              onClick={() => handleViewDetails(notification)}
+            />
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
+
+const StatusCell = React.memo(
+  ({ rowData, handleStatusChange, statusLoading }) => {
+    const cellStatusMenu = useRef(null);
+
+    // Add click outside handler for desktop menu
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        try {
+          if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
+            const menuElement = cellStatusMenu.current.getElement();
+            if (menuElement && !menuElement.contains(event.target)) {
+              cellStatusMenu.current.hide();
+            }
+          }
+        } catch (error) {
+          // Silently handle any errors to prevent ugly error messages
+          console.warn("Menu close error:", error);
+        }
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
+    const statusOptions = [{ label: "Mark as Read", value: "read" }];
+
+    const statusMenuItems = statusOptions.map((option) => ({
+      label: option.label,
+      command: () => handleStatusChange(rowData._id, option.value),
+    }));
+
+    return (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span
+          style={{
+            backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
+            color: rowData.read ? "#027A48" : "#B42318",
+            padding: "2px 8px",
+            borderRadius: "16px",
+            fontSize: "12px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          {rowData.read ? "Read" : "Unread"}
+        </span>
+        <Button
+          icon="pi pi-check-circle"
+          className="p-button-rounded p-button-text p-button-sm"
+          tooltip="Change Status"
+          tooltipOptions={{ position: "top" }}
+          onClick={(e) => cellStatusMenu.current.toggle(e)}
+          disabled={statusLoading}
+        />
+        <Menu
+          model={statusMenuItems}
+          popup
+          ref={cellStatusMenu}
+          id={`status-menu-${rowData._id}`}
+        />
+      </div>
+    );
+  }
+);
+
+// Modern Compact Filter Component with Dropdowns
+const NotificationFilter = ({
+  activeFilter,
+  activeStatusFilter,
+  onFilterChange,
+  onStatusFilterChange,
+  isMobile,
+}) => {
+  const [priorityDropdownOpen, setPriorityDropdownOpen] = useState(false);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+
+  const priorityFilters = [
+    { key: "all", label: "All Types", icon: "pi pi-list" },
+    {
+      key: "order",
+      label: "Order",
+      icon: "pi pi-shopping-cart",
+      color: "#027A48",
+    },
+    {
+      key: "booking",
+      label: "Booking",
+      icon: "pi pi-calendar",
+      color: "#B54708",
+    },
+    {
+      key: "inventory",
+      label: "Inventory",
+      icon: "pi pi-box",
+      color: "#B42318",
+    },
+    { key: "system", label: "System", icon: "pi pi-cog", color: "#0369A1" },
+  ];
+
+  const statusFilters = [
+    { key: "all", label: "All Status", icon: "pi pi-list" },
+    { key: "unread", label: "Unread", icon: "pi pi-circle", color: "#DC2626" },
+    {
+      key: "read",
+      label: "Read",
+      icon: "pi pi-check-circle",
+      color: "#059669",
+    },
+  ];
+
+  const getActiveFilterLabel = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey);
+    return filter ? filter.label : "Select...";
+  };
+
+  const getActiveFilterIcon = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey);
+    return filter ? filter.icon : "pi pi-list";
+  };
+
+  const getActiveFilterColor = (filters, activeKey) => {
+    const filter = filters.find((f) => f.key === activeKey);
+    return filter ? filter.color : "#6b7280";
+  };
+
+  // Custom click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".custom-dropdown")) {
+        setPriorityDropdownOpen(false);
+        setStatusDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handlePrioritySelect = (key) => {
+    onFilterChange(key);
+    setPriorityDropdownOpen(false);
+  };
+
+  const handleStatusSelect = (key) => {
+    onStatusFilterChange(key);
+    setStatusDropdownOpen(false);
+  };
+
+  return (
+    <>
+      <style>
+        {`
+          .filter-dropdown-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: ${isMobile ? "10px 14px" : "12px 16px"};
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            color: #374151;
+            font-size: ${isMobile ? "13px" : "14px"};
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            min-width: ${isMobile ? "140px" : "160px"};
+            justify-content: space-between;
+          }
+
+          .filter-dropdown-button:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          .filter-dropdown-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .filter-dropdown-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+          }
+
+          .filter-dropdown-chevron {
+            font-size: 12px;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+          }
+
+          .filter-dropdown-button:hover .filter-dropdown-chevron {
+            color: #374151;
+          }
+
+          .custom-dropdown {
+            position: relative;
+          }
+
+          .custom-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            margin-top: 4px;
+            padding: 4px;
+            min-width: 100%;
+          }
+
+          .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #374151;
+            font-size: ${isMobile ? "13px" : "14px"};
+          }
+
+          .custom-dropdown-item:hover {
+            background-color: #f8fafc;
+          }
+
+          .custom-dropdown-item.active {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+          }
+
+          .custom-dropdown-item i {
+            font-size: ${isMobile ? "12px" : "14px"};
+          }
+        `}
+      </style>
+
+      <div
+        style={{
+          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+          borderRadius: "12px",
+          padding: isMobile ? "16px" : "20px",
+          margin: isMobile ? "0 16px 6px 16px" : "0 20px 4px 20px",
+          boxShadow:
+            "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+          border: "1px solid #e2e8f0",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: isMobile ? "12px" : "16px",
+            flexWrap: isMobile ? "wrap" : "nowrap",
+          }}
+        >
+          {/* Filter Label */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              color: "#374151",
+              fontWeight: "600",
+              fontSize: isMobile ? "14px" : "16px",
+              minWidth: "fit-content",
+            }}
+          >
+            <i
+              className="pi pi-filter"
+              style={{ fontSize: isMobile ? "14px" : "16px", color: "#6b7280" }}
+            />
+            <span>Filters</span>
+          </div>
+
+          {/* Priority Filter Dropdown */}
+          <div className="custom-dropdown">
+            <button
+              className="filter-dropdown-button"
+              onClick={() => setPriorityDropdownOpen(!priorityDropdownOpen)}
+            >
+              <div className="filter-dropdown-content">
+                <i
+                  className={getActiveFilterIcon(priorityFilters, activeFilter)}
+                  style={{
+                    fontSize: isMobile ? "12px" : "14px",
+                    color: getActiveFilterColor(priorityFilters, activeFilter),
+                  }}
+                />
+                <span>
+                  {getActiveFilterLabel(priorityFilters, activeFilter)}
+                </span>
+              </div>
+              <i
+                className={`pi pi-chevron-down filter-dropdown-chevron ${
+                  priorityDropdownOpen ? "rotate-180" : ""
+                }`}
+                style={{
+                  transform: priorityDropdownOpen
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                }}
+              />
+            </button>
+            {priorityDropdownOpen && (
+              <div className="custom-dropdown-menu">
+                {priorityFilters.map((filter) => (
+                  <div
+                    key={filter.key}
+                    className={`custom-dropdown-item ${
+                      activeFilter === filter.key ? "active" : ""
+                    }`}
+                    onClick={() => handlePrioritySelect(filter.key)}
+                  >
+                    <i
+                      className={filter.icon}
+                      style={{ color: filter.color || "#6b7280" }}
+                    />
+                    <span>{filter.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status Filter Dropdown */}
+          <div className="custom-dropdown">
+            <button
+              className="filter-dropdown-button"
+              onClick={() => setStatusDropdownOpen(!statusDropdownOpen)}
+            >
+              <div className="filter-dropdown-content">
+                <i
+                  className={getActiveFilterIcon(
+                    statusFilters,
+                    activeStatusFilter
+                  )}
+                  style={{
+                    fontSize: isMobile ? "12px" : "14px",
+                    color: getActiveFilterColor(
+                      statusFilters,
+                      activeStatusFilter
+                    ),
+                  }}
+                />
+                <span>
+                  {getActiveFilterLabel(statusFilters, activeStatusFilter)}
+                </span>
+              </div>
+              <i
+                className={`pi pi-chevron-down filter-dropdown-chevron ${
+                  statusDropdownOpen ? "rotate-180" : ""
+                }`}
+                style={{
+                  transform: statusDropdownOpen
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+                }}
+              />
+            </button>
+            {statusDropdownOpen && (
+              <div className="custom-dropdown-menu">
+                {statusFilters.map((filter) => (
+                  <div
+                    key={filter.key}
+                    className={`custom-dropdown-item ${
+                      activeStatusFilter === filter.key ? "active" : ""
+                    }`}
+                    onClick={() => handleStatusSelect(filter.key)}
+                  >
+                    <i
+                      className={filter.icon}
+                      style={{ color: filter.color || "#6b7280" }}
+                    />
+                    <span>{filter.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Active Filters Indicator */}
+          {(activeFilter !== "all" || activeStatusFilter !== "all") && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginLeft: isMobile ? "0" : "auto",
+                flexWrap: "wrap",
+              }}
+            >
+              {activeFilter !== "all" && (
+                <span
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0387D9 0%, #0369A1 100%)",
+                    color: "#ffffff",
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "11px",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  {activeFilter}
+                  <button
+                    onClick={() => onFilterChange("all")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <i className="pi pi-times" style={{ fontSize: "10px" }} />
+                  </button>
+                </span>
+              )}
+              {activeStatusFilter !== "all" && (
+                <span
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    color: "#ffffff",
+                    padding: "4px 8px",
+                    borderRadius: "12px",
+                    fontSize: "11px",
+                    fontWeight: "500",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                  }}
+                >
+                  {activeStatusFilter}
+                  <button
+                    onClick={() => onStatusFilterChange("all")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "0",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <i className="pi pi-times" style={{ fontSize: "10px" }} />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default function Notifications({ role }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [activeStatusFilter, setActiveStatusFilter] = useState("all");
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
-  const toast = useRef(null);
-  const { showSuccess, showError } = useToast();
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  const toast = useRef(null);
+  const { showSuccess, showError } = useToast();
 
   // Add responsive detection
   const muiTheme = useMuiTheme();
@@ -99,215 +688,419 @@ export default function Notification({ role }) {
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
   const { theme } = useMuiTheme();
 
-  // Transform API notification to table format
-  const transformNotification = (notification) => {
-    console.log("Transforming notification:", notification);
-    return {
-      _id: notification._id,
-      priority: notification.type === "inventory" ? "Medium" : "High",
-      type: notification.title,
-      description: notification.message,
-      status: notification.read ? "Read" : "Unread",
-      createdAt: notification.createdAt,
-      data: notification.data,
-    };
-  };
+  const navigate = useNavigate();
+  const outletContext = useOutletContext();
 
-  // Add useEffect to fetch notifications
   useEffect(() => {
-    const loadNotifications = async () => {
-      try {
-        setLoading(true);
-        console.log("Fetching notifications with page:", page, "limit:", limit);
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Notifications");
+    }
+  }, [outletContext]);
 
-        const response = await fetchCrewNotifications({ page, limit });
-        console.log("Raw API Response:", response);
+  const fetchNotifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      console.log(
+        "Fetching notifications with page:",
+        page,
+        "limit:",
+        limit,
+        "filter:",
+        activeFilter,
+        "statusFilter:",
+        activeStatusFilter
+      );
 
-        if (response.success && response.data?.notifications) {
-          console.log(
-            "Raw notifications from API:",
-            response.data.notifications
-          );
+      const response = await fetchCrewNotifications({
+        page,
+        limit,
+        type: activeFilter !== "all" ? activeFilter : undefined,
+        status: activeStatusFilter !== "all" ? activeStatusFilter : undefined,
+      });
 
-          // Transform the notifications to match the table format
-          const transformedNotifications = response.data.notifications.map(
-            transformNotification
-          );
-          console.log(
-            "Transformed notifications for table:",
-            transformedNotifications
-          );
+      console.log("Notifications response:", response);
 
-          setNotifications(transformedNotifications);
-        } else {
-          console.error("Failed to load notifications:", response.error);
-          showError(response.error || "Failed to load notifications");
-          setNotifications([]);
-        }
-      } catch (error) {
-        console.error("Error loading notifications:", error);
-        showError("Failed to load notifications");
-        setNotifications([]);
-      } finally {
-        setLoading(false);
+      if (response.success) {
+        setNotifications(response.data);
+        setTotalPages(response.pagination.pages);
+        setTotalItems(response.pagination.total);
+        setError(null);
+      } else {
+        setError(response.error);
+        showError(response.error || "Failed to fetch notifications");
       }
-    };
+    } catch (err) {
+      console.error("Error loading notifications:", err);
+      setError("Failed to fetch notifications");
+      showError("Failed to fetch notifications");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, limit, activeFilter, activeStatusFilter, showError]);
 
-    loadNotifications();
-  }, [page, limit]);
-
-  // Ensure notifications is an array before filtering
-  const filteredNotifications = Array.isArray(notifications)
-    ? notifications.filter((notification) => {
-        console.log("Filtering notification:", notification);
-        return activeFilter === "all"
-          ? true
-          : notification.priority.toLowerCase() === activeFilter.toLowerCase();
-      })
-    : [];
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const handleFilterClick = (filter) => {
     console.log("Filter clicked:", filter);
     setActiveFilter(filter);
+    setPage(1); // Reset to first page when filter changes
   };
 
-  const handleViewDetails = async (row) => {
-    try {
-      console.log("Viewing details for notification:", row);
+  const handleStatusFilterClick = (filter) => {
+    console.log("Status filter clicked:", filter);
+    setActiveStatusFilter(filter);
+    setPage(1); // Reset to first page when status filter changes
+  };
 
-      // Mark notification as read if it's unread
-      if (row.status === "Unread") {
-        console.log("Marking notification as read:", row._id);
-        const response = await markNotificationAsRead(row._id);
+  const handleViewDetails = async (notification) => {
+    // If not read, optimistically update selectedNotification to read: true
+    if (!notification.read) {
+      setSelectedNotification({ ...notification, read: true });
+    } else {
+      setSelectedNotification(notification);
+    }
+    setShowModal(true);
 
+    // Auto-mark as read when viewing details (if not already read)
+    if (!notification.read) {
+      try {
+        const response = await markNotificationAsRead(notification._id);
         if (response.success) {
-          console.log("Successfully marked as read");
-          // Update the notification in the list
-          const updatedNotifications = notifications.map((notification) =>
-            notification._id === row._id
-              ? { ...notification, status: "Read" }
-              : notification
+          // Update the local state
+          setNotifications(
+            notifications.map((notif) =>
+              notif._id === notification._id ? { ...notif, read: true } : notif
+            )
           );
-          setNotifications(updatedNotifications);
-        } else {
-          console.error("Failed to mark as read:", response.error);
-          showError("Failed to mark notification as read");
         }
+      } catch (error) {
+        // Silently handle errors - don't show error for auto-read
+        console.warn("Auto-read error:", error);
       }
-
-      setSelectedNotification(row);
-      setShowModal(true);
-    } catch (error) {
-      console.error("Error handling view details:", error);
-      showError("Failed to open notification details");
     }
   };
 
   const handleStatusChange = async (notificationId, newStatus) => {
+    setStatusLoading(true);
     try {
-      console.log(
-        "Updating status for notification:",
-        notificationId,
-        "to:",
-        newStatus
-      );
-      setStatusLoading(true);
-
-      const response = await updateNotificationStatus(
-        notificationId,
-        newStatus
-      );
-      console.log("Status update response:", response);
-
+      // For now, we only support marking as read since that's what the backend supports
+      // The newStatus parameter is ignored since the backend only marks as read
+      const response = await markNotificationAsRead(notificationId);
       if (response.success) {
-        showSuccess(`Notification marked as ${newStatus}`);
-        // Refresh notifications after status change
-        const updatedResponse = await fetchCrewNotifications({ page, limit });
-        if (updatedResponse.success && updatedResponse.data?.notifications) {
-          const transformedNotifications =
-            updatedResponse.data.notifications.map(transformNotification);
-          setNotifications(transformedNotifications);
-        }
+        // Update the local state
+        setNotifications(
+          notifications.map((notification) =>
+            notification._id === notificationId
+              ? { ...notification, read: true }
+              : notification
+          )
+        );
+
+        showSuccess("Notification marked as read");
       } else {
-        showError(response.error || "Failed to update notification status");
+        showError(response.error || "Failed to update status");
       }
     } catch (error) {
-      console.error("Error updating notification status:", error);
-      showError("Failed to update notification status");
+      showError("An error occurred while updating status");
     } finally {
       setStatusLoading(false);
     }
   };
 
+  const priorityTemplate = (rowData) => {
+    // Crew notifications use 'type' instead of 'priority'
+    const typeColors = {
+      order: { bg: "#ECFDF3", color: "#027A48" },
+      booking: { bg: "#FFFAEB", color: "#B54708" },
+      inventory: { bg: "#FEF3F2", color: "#B42318" },
+      system: { bg: "#F0F9FF", color: "#0369A1" },
+    };
+
+    const style = typeColors[rowData.type?.toLowerCase()] || {
+      bg: "#F2F4F7",
+      color: "#344054",
+    };
+
+    return (
+      <span
+        style={{
+          backgroundColor: style.bg,
+          color: style.color,
+          padding: "2px 8px",
+          borderRadius: "16px",
+          fontSize: "12px",
+        }}
+      >
+        {rowData.type || "N/A"}
+      </span>
+    );
+  };
+
+  const statusTemplate = (rowData) => {
+    return (
+      <div style={{ position: "relative" }}>
+        <span
+          style={{
+            backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
+            color: rowData.read ? "#027A48" : "#B42318",
+            padding: "2px 8px",
+            borderRadius: "16px",
+            fontSize: "12px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
+        >
+          {rowData.read ? "Read" : "Unread"}
+        </span>
+      </div>
+    );
+  };
+
+  const actionTemplate = (rowData) => {
+    return (
+      <Button
+        label="View Details"
+        className="p-button-outlined desktop-view-details-btn"
+        style={{
+          border: "1px solid #D0D5DD",
+          color: "#344054",
+          backgroundColor: "white",
+          padding: isTablet ? "6px 12px" : "8px 14px",
+          fontSize: isTablet ? "12px" : "14px",
+          borderRadius: "8px",
+          transition: "background 0.2s, border-color 0.2s, color 0.2s",
+        }}
+        onClick={() => handleViewDetails(rowData)}
+      />
+    );
+  };
+
+  // Calculate unread notifications count
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // --- Filtering logic ---
+  const filteredNotifications = notifications.filter((notif) => {
+    let typeMatch = true;
+    let statusMatch = true;
+    if (activeFilter !== "all") {
+      typeMatch = notif.type && notif.type.toLowerCase() === activeFilter;
+    }
+    if (activeStatusFilter !== "all") {
+      statusMatch = activeStatusFilter === "read" ? notif.read : !notif.read;
+    }
+    return typeMatch && statusMatch;
+  });
+
+  if (loading) {
+    return (
+      <div
+        className="flex flex-column bg-[#F8FBFF] h-auto min-h-screen overflow-visible w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? "67px" : "0",
+        }}
+      >
+        <NotificationFilter
+          activeFilter={activeFilter}
+          activeStatusFilter={activeStatusFilter}
+          onFilterChange={handleFilterClick}
+          onStatusFilterChange={handleStatusFilterClick}
+          isMobile={isMobile}
+        />
+        <NotificationsSkeleton />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="notification-container"
+        style={{
+          paddingTop: isMobile ? "0" : "0",
+        }}
+      >
+        <div
+          className="error-message"
+          style={{ padding: "20px", textAlign: "center", color: "#dc3545" }}
+        >
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Toast ref={toast} />
       <div
-        className="notification-container"
-        style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}
+        className="flex flex-column bg-[#F8FBFF] h-auto w-full max-w-full"
+        style={{
+          paddingTop: isMobile ? "0px" : "0",
+        }}
       >
-        <div
-          className="notification-header"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            padding: isMobile ? "10px 15px" : "15px 20px",
-          }}
-        >
-          <h3 style={{ fontSize: isMobile ? "18px" : "20px" }}>
-            Notifications
-          </h3>
-          <Badge
-            value={notifications.length}
-            severity="danger"
-            style={{ marginLeft: "7px" }}
-          />
-        </div>
+        <div className="mb-4"></div>
+        <NotificationFilter
+          activeFilter={activeFilter}
+          activeStatusFilter={activeStatusFilter}
+          onFilterChange={handleFilterClick}
+          onStatusFilterChange={handleStatusFilterClick}
+          isMobile={isMobile}
+        />
 
-        <div
-          className="notification-filter"
-          style={{
-            overflowX: isMobile ? "auto" : "visible",
-            whiteSpace: isMobile ? "nowrap" : "normal",
-            padding: isMobile ? "0 15px" : "0 20px",
-          }}
-        >
-          {["all", "high", "medium", "low"].map((filter) => (
-            <Button
-              key={filter}
-              label={
-                filter.charAt(0).toUpperCase() +
-                filter.slice(1) +
-                (isMobile ? "" : " Priority")
-              }
-              className={`p-button-text ${
-                activeFilter === filter ? "p-button-primary" : ""
-              }`}
-              onClick={() => handleFilterClick(filter)}
+        {/* Desktop/Tablet View */}
+        {!isMobile && (
+          <div
+            className="notification-table"
+            style={{
+              padding: isTablet ? "15px" : "20px",
+              overflowX: "auto",
+            }}
+          >
+            <DataTable
+              value={filteredNotifications}
+              responsiveLayout="scroll"
               style={{
-                padding: isMobile ? "6px 10px" : "8px 16px",
-                fontSize: isMobile ? "12px" : "14px",
+                border: "1px solid #EAECF0",
+                borderRadius: "8px",
+                overflow: "hidden",
               }}
-            />
-          ))}
-        </div>
+            >
+              <Column
+                field="type"
+                header="Type"
+                body={priorityTemplate}
+                style={{
+                  padding: isTablet ? "12px 16px" : "16px 24px",
+                  //   width: isTablet ? "80px" : "100px",
+                  //   minWidth: isTablet ? "80px" : "100px",
+                }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="title"
+                header="Title"
+                style={{
+                  padding: isTablet ? "12px 16px" : "16px 24px",
+                  //   width: isTablet ? "180px" : "220px",
+                  //   minWidth: isTablet ? "180px" : "220px",
+                }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="message"
+                header="Message"
+                style={{
+                  padding: isTablet ? "12px 16px" : "16px 24px",
+                  maxWidth: isTablet ? "200px" : "300px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                field="read"
+                header="Status"
+                body={statusTemplate}
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+              <Column
+                header="Actions"
+                body={actionTemplate}
+                style={{ padding: isTablet ? "12px 16px" : "16px 24px" }}
+                headerStyle={{
+                  backgroundColor: "#F9FAFB",
+                  color: "#667085",
+                  fontWeight: "500",
+                  fontSize: isTablet ? "11px" : "12px",
+                  padding: isTablet ? "10px 16px" : "12px 24px",
+                  borderBottom: "1px solid #EAECF0",
+                }}
+              />
+            </DataTable>
 
-        {loading ? (
-          <div style={{ padding: "20px" }}>
-            <TableSkeleton />
+            {/* Use the new Pagination component */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={setPage}
+              isMobile={isMobile}
+              isTablet={isTablet}
+            />
           </div>
-        ) : (
-          <NotificationTable
-            notifications={filteredNotifications}
-            selectedNotification={selectedNotification}
-            setSelectedNotification={setSelectedNotification}
-            handleViewDetails={handleViewDetails}
-            handleStatusChange={handleStatusChange}
-            statusLoading={statusLoading}
-            isMobile={isMobile}
-            isTablet={isTablet}
-            loading={loading}
-          />
+        )}
+
+        {/* Mobile View */}
+        {isMobile && (
+          <Box sx={{ padding: "15px" }}>
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notification) => (
+                <MobileNotificationCard
+                  key={notification._id}
+                  notification={notification}
+                  handleViewDetails={handleViewDetails}
+                  handleStatusChange={handleStatusChange}
+                  statusLoading={statusLoading}
+                  theme={theme}
+                />
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  color: "#667085",
+                  padding: "20px 0",
+                }}
+              >
+                No notifications found
+              </Typography>
+            )}
+
+            {/* Add pagination to mobile view */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={setPage}
+              isMobile={isMobile}
+              isTablet={isTablet}
+            />
+          </Box>
         )}
       </div>
 
@@ -315,6 +1108,7 @@ export default function Notification({ role }) {
         visible={showModal}
         onHide={() => {
           setShowModal(false);
+          fetchNotifications();
         }}
         notificationData={selectedNotification}
       />

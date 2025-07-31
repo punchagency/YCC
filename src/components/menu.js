@@ -25,22 +25,26 @@ import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
 import { confirmDialog } from "primereact/confirmdialog";
 import { ConfirmDialog } from "primereact/confirmdialog";
+import transactionLogo from "../assets/images/crew/inventory-icon.png";
 import "../styles/menu.css";
 import CustomButton from "./Button";
+
 
 const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const location = useLocation();
   const { user } = useUser();
-  
+
   // Get role name from object or string
   let userRole = user?.role;
-  if (typeof userRole === 'object' && userRole.name) {
+  if (typeof userRole === "object" && userRole.name) {
     userRole = userRole.name;
   }
-  
+
   const isCrewMember = userRole === "crew_member";
+  const isSupplier = userRole === "supplier";
+  const isServiceProvider = userRole === "service_provider";
 
   const handleLogout = () => {
     confirmDialog({
@@ -105,45 +109,45 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           ? "active-menu-item menu-red-background"
           : "",
       items: [
-        {
-          label: "Legal Resources",
-          icon: (
-            <img
-              src={reportLogo}
-              alt="Legal Resources"
-              width={15}
-              height={15}
-            />
-          ),
-          className:
-            location.pathname === "/crew/legal-resources"
-              ? "active-menu-item menu-red-background"
-              : "",
-          command: () => navigate("/crew/legal-resources"),
-        },
-        {
-          label: "Crew Training",
-          icon: (
-            <img src={calendarLogo} alt="Training" width={15} height={15} />
-          ),
-          className: location.pathname === "/crew/training",
+        // {
+        //   label: "Legal Resources",
+        //   icon: (
+        //     <img
+        //       src={reportLogo}
+        //       alt="Legal Resources"
+        //       width={15}
+        //       height={15}
+        //     />
+        //   ),
+        //   className:
+        //     location.pathname === "/crew/legal-resources"
+        //       ? "active-menu-item menu-red-background"
+        //       : "",
+        //   command: () => navigate("/crew/legal-resources"),
+        // },
+        // {
+        //   label: "Crew Training",
+        //   icon: (
+        //     <img src={calendarLogo} alt="Training" width={15} height={15} />
+        //   ),
+        //   className: location.pathname === "/crew/training",
 
-          command: () => navigate("/crew/training"),
-        },
-        {
-          label: "Accommodation",
-          icon: (
-            <img
-              src={settingsLogo}
-              alt="Accommodation"
-              width={15}
-              height={15}
-            />
-          ),
-          className: location.pathname === "/crew/accommodation",
+        //   command: () => navigate("/crew/training"),
+        // },
+        // {
+        //   label: "Accommodation",
+        //   icon: (
+        //     <img
+        //       src={settingsLogo}
+        //       alt="Accommodation"
+        //       width={15}
+        //       height={15}
+        //     />
+        //   ),
+        //   className: location.pathname === "/crew/accommodation",
 
-          command: () => navigate("/crew/accomodation"),
-        },
+        //   command: () => navigate("/crew/accomodation"),
+        // },
         {
           label: "Document Management",
           icon: (
@@ -196,22 +200,22 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => navigate("/crew/booking"),
     },
-    {
-      label: "Inventory Management",
-      icon: (
-        <img
-          src={inventoryLogo}
-          alt="Inventory Management"
-          width={15}
-          height={15}
-        />
-      ),
-      className:
-        location.pathname === "/crew/inventory-management"
-          ? "active-menu-item menu-red-background"
-          : "",
-      command: () => navigate("/crew/inventory-management"),
-    },
+    // {
+    //   label: "Inventory Management",
+    //   icon: (
+    //     <img
+    //       src={inventoryLogo}
+    //       alt="Inventory Management"
+    //       width={15}
+    //       height={15}
+    //     />
+    //   ),
+    //   className:
+    //     location.pathname === "/crew/inventory-management"
+    //       ? "active-menu-item menu-red-background"
+    //       : "",
+    //   command: () => navigate("/crew/inventory-management"),
+    // },
     {
       label: "Orders",
       icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
@@ -386,7 +390,141 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
     },
   ];
 
-  const menuItems = isCrewMember ? crewMenuItems : adminMenuItems;
+  const supplierMenuItems = [
+    {
+      label: "Dashboard",
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/dashboard");
+      },
+    },
+    {
+      label: "Inventory Management",
+      icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/inventory"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/inventory");
+      },
+    },
+    {
+      label: "Orders",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/orders"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/orders");
+      },
+    },
+    {
+      label: "Transactions",
+      icon: <img src={transactionLogo} alt="Transactions" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/transactions"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/transactions");
+      },
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/supplier/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/supplier/settings");
+      },
+    },
+    {
+      separator: true,
+      style: { margin: "15px 0" },
+    },
+  ];
+  const serviceProvidersMenuItems = [
+    {
+      label: "Dashboard",
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/dashboard");
+      },
+    },
+    {
+      label: "Services Management",
+      icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/services"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/services");
+      },
+    },
+    {
+      label: "Bookings",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/bookings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/bookings");
+      },
+    },
+    {
+      label: "Calendar",
+      icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/calendar"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/calendar");
+      },
+    },
+    {
+      label: "Transactions",
+      icon: <img src={transactionLogo} alt="Transactions" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/transactions"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/transactions");
+      },
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/settings");
+      },
+    },
+    {
+      separator: true,
+      style: { margin: "15px 0" },
+    },
+  ];
+
+  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : isServiceProvider ? serviceProvidersMenuItems : adminMenuItems;
 
   menuItems.forEach((item) => {
     if (item.label) {
@@ -479,9 +617,6 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
         style={{
           backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
         }}
       >
         <div className="flex justify-content-center align-items-center logo-wraper">
@@ -497,16 +632,10 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
             onClick={() => setIsCollapsed(!isCollapsed)}
           />
         </div>
-        <div style={{ flex: 1, overflowY: "auto" }}>
+        <div className="menu-container">
           <PanelMenu model={menuItems} />
         </div>
-        <div
-          style={{
-            padding: "24px",
-            borderTop: "1px solid #f0f0f0",
-            background: "inherit",
-          }}
-        >
+        <div className="logout-container">
           <CustomButton
             onClick={handleLogout}
             style={{

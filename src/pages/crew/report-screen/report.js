@@ -1,15 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import lockLogo from "../../../assets/images/crew/lockLogo.png";
-import dropdown from "../../../assets/images/crew/dropdown.png";
-import profileReport from "../../../assets/images/crew/profile-report.png";
-import downloadIcon from "../../../assets/images/crew/downloadIcon.png";
-import sortIcon from "../../../assets/images/crew/sort.png";
-import {
-  getInventoryHealthReport,
-  getSystemChartData,
-  getSystemMetrics,
-} from "../../../services/reports/reports";
-// Import and register Chart.js components
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,14 +11,27 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-
-import { getDashboardSummary } from "../../../services/crew/crewReport";
-
-import { jsPDF } from "jspdf";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { getDashboardSummary, generateReport } from "../../../services/crew/crewReport";
 import "jspdf-autotable";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import Chip from "@mui/material/Chip";
+import LockIcon from "@mui/icons-material/Lock";
+import { Button, Select, MenuItem, Skeleton } from "@mui/material";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import { useOutletContext } from "react-router-dom";
 
 // Register the components
 ChartJS.register(
@@ -44,14 +46,73 @@ ChartJS.register(
   Filler
 );
 
+// Helper for table header cells with filter icons
+const TableHeaderCell = ({ children }) => (
+  <TableCell
+    sx={{
+      fontWeight: 500,
+      color: "#475467",
+      backgroundColor: "#F9FAFB",
+      borderBottom: "1px solid #EAECF0",
+      whiteSpace: "nowrap",
+    }}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      {children}
+      <FilterListIcon sx={{ fontSize: "16px" }} />
+    </Box>
+  </TableCell>
+);
+
+// Skeleton components
+const StatsSkeleton = () => (
+  <Grid container spacing={2}>
+    {[...Array(6)].map((_, index) => (
+      <Grid item xs={4} lg={2} key={index}>
+        <Skeleton variant="text" width={60} height={16} sx={{ mb: 0.5 }} />
+        <Skeleton variant="text" width={40} height={24} />
+      </Grid>
+    ))}
+  </Grid>
+);
+
+const TableSkeleton = () => (
+  <TableBody>
+    {[...Array(5)].map((_, index) => (
+      <TableRow key={index}>
+        {[...Array(7)].map((_, cellIndex) => (
+          <TableCell key={cellIndex}>
+            <Skeleton variant="text" width={cellIndex === 4 ? 60 : 80} height={20} />
+          </TableCell>
+        ))}
+      </TableRow>
+    ))}
+  </TableBody>
+);
+
 const Reports = () => {
+  const { setPageTitle } = useOutletContext() || {};
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Reports");
+  }, [setPageTitle]);
+  const [orderStatsPeriod, setOrderStatsPeriod] = React.useState({
+    orderPeriod: 'all',
+    orderStartDate: null,
+    orderEndDate: null
+  });
+  const [bookingStatsPeriod, setBookingStatsPeriod] = React.useState({
+    bookingPeriod: 'all',
+    bookingStartDate: null,
+    bookingEndDate: null
+  });
+  const [activityStatsPeriod, setActivityStatsPeriod] = React.useState({
+    activityPeriod: 'all',
+    activityStartDate: null,
+    activityEndDate: null
+  });
+
   // Move all state hooks and functions inside the component
   const [dashboardSummary, setDashboardSummary] = useState({
-    inventory: {
-      inProgress: 0,
-      pending: 0,
-      completed: 0,
-    },
     bookings: {
       inProgress: 0,
       pending: 0,
@@ -69,668 +130,139 @@ const Reports = () => {
     },
     customerSatisfaction: 0,
   });
+  const [loading, setLoading] = useState(true);
 
-  const fetchDashboardSummary = async () => {
+  const getStatusChip = (status) => {
+    let sxProps = {};
+    const normalizedStatus = status.toLowerCase();
+
+    if (normalizedStatus.includes("confirm")) {
+      sxProps = {
+        backgroundColor: "#FFFAEB",
+        color: "#B54708",
+        label: "Confirmed",
+      };
+    } else if (normalizedStatus.includes("in progress")) {
+      sxProps = {
+        backgroundColor: "#ECFDF3",
+        color: "#027A48",
+        label: "In Progress",
+      };
+    } else if (normalizedStatus.includes("complete")) {
+      sxProps = {
+        backgroundColor: "#EFF8FF",
+        color: "#175CD3",
+        label: "Completed",
+      };
+    } else if (normalizedStatus.includes("pending")) {
+      sxProps = {
+        backgroundColor: "#FFFAEB",
+        color: "#B54708",
+        label: "Pending",
+      };
+    } else if (normalizedStatus.includes("flagged")) {
+      sxProps = {
+        backgroundColor: "#FEF3F2",
+        color: "#B42318",
+        label: "Flagged",
+      };
+    } else {
+      sxProps = { backgroundColor: "#F2F4F7", color: "#364152", label: status };
+    }
+
+    return (
+      <Chip
+        label={sxProps.label}
+        size="small"
+        sx={{
+          ...sxProps,
+          fontWeight: 500,
+          borderRadius: "16px",
+          height: "22px",
+        }}
+      />
+    );
+  };
+
+  const fetchDashboardSummary = async (params = {}) => {
     try {
-      console.log("Fetching summary dashboard summary...");
-      const response = await getDashboardSummary();
+      setLoading(true);
+      console.log("Fetching dashboard summary...", params);
+      const response = await getDashboardSummary(params);
       console.log("Dashboard Response:", response);
 
-      // The response has a nested structure, so we need to navigate to the correct data
       if (response.status && response.data && response.data.data) {
-        console.log("Setting dashboard data:", response.data.data);
         setDashboardSummary(response.data.data);
+        if (!startDate && response.data.data.startDate) {
+          setStartDate(response.data.data.startDate);
+        }
       }
     } catch (error) {
       console.error("Error fetching dashboard summary:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // All useEffect hooks must be inside the component
+  // Fetch dashboard summary with filters
   useEffect(() => {
-    fetchDashboardSummary();
-  }, []);
-
-  const [activityData, setActivityData] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Bookings",
-        data: [],
-        backgroundColor: "#4318FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-      {
-        label: "Orders",
-        data: [],
-        backgroundColor: "#6AD2FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-    ],
-  });
-
-  const [healthReports, setHealthReports] = useState({
-    stockLevels: { rate: 0, correct: 0 },
-    supplierAvailability: { rate: 0, correct: 0 },
-    customerSatisfaction: { rate: 0, correct: 0 },
-    loading: true,
-    error: null,
-  });
-
-  const [systemMetrics, setSystemMetrics] = useState([]);
-
-  // Add refs for your charts
-  const barChartRef = useRef(null);
-  const lineChartRefs = useRef([]);
-
-  useEffect(() => {
-    fetchHealthReports();
-    fetchSystemActivity();
-    fetchSystemMetrics();
-
-    // Copy refs to local variables for proper cleanup
-    const currentBarChart = barChartRef.current;
-    const currentLineCharts = [...lineChartRefs.current];
-
-    // Cleanup function to destroy charts when component unmounts
-    return () => {
-      if (currentBarChart) {
-        currentBarChart.destroy();
-      }
-
-      currentLineCharts.forEach((chart) => {
-        if (chart) chart.destroy();
-      });
-    };
-  }, []);
-
-  const fetchHealthReports = async () => {
-    try {
-      const response = await getInventoryHealthReport();
-      console.log("Response", response);
-      if (response.success) {
-        setHealthReports({
-          stockLevels: {
-            rate: Math.round(response.data.data.stockLevels) || 0,
-          },
-          supplierAvailability: {
-            rate: Math.round(response.data.data.supplierAvailability) || 0,
-          },
-          customerSatisfaction: {
-            rate: Math.round(response.data.data.customerSatisfaction) || 0,
-          },
-          loading: false,
-          error: null,
-        });
-      } else {
-        setHealthReports((prev) => ({
-          ...prev,
-          loading: false,
-          error: response.error || "Failed to fetch inventory health report",
-        }));
-      }
-    } catch (error) {
-      setHealthReports((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error.message ||
-          "An error occurred while fetching inventory health report",
-      }));
+    const params = {};
+    
+    // Add order filters
+    if (orderStatsPeriod.orderPeriod !== 'all') {
+      params.orderPeriod = orderStatsPeriod.orderPeriod;
     }
-  };
-
-  const fetchSystemActivity = async () => {
-    try {
-      const response = await getSystemChartData();
-      if (response.success) {
-        const chartData = response.data;
-
-        setActivityData({
-          labels: chartData.map((item) => item.month),
-          datasets: [
-            {
-              label: "Bookings",
-              data: chartData.map((item) => item.bookings),
-              backgroundColor: "#4318FF",
-              borderRadius: 8,
-              barThickness: 15,
-              maxBarThickness: 8,
-            },
-            {
-              label: "Orders",
-              data: chartData.map((item) => item.orders),
-              backgroundColor: "#6AD2FF",
-              borderRadius: 8,
-              barThickness: 15,
-              maxBarThickness: 8,
-            },
-          ],
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching system activity:", error);
+    if (orderStatsPeriod.orderStartDate) {
+      params.orderStartDate = orderStatsPeriod.orderStartDate.toISOString().split('T')[0];
     }
-  };
-
-  const fetchSystemMetrics = async () => {
-    try {
-      const response = await getSystemMetrics();
-      if (response.success) {
-        // Map the titles to your preferred display names
-        const mappedMetrics = response.data.map((metric) => {
-          const customTitles = {
-            Users: "Active Users",
-            "Customer Satisfaction": "Customer Rating",
-            "Resolved Complaints": "Issues Resolved",
-            "Total Revenue": "Revenue",
-          };
-
-          return {
-            ...metric,
-            title: customTitles[metric.title] || metric.title,
-          };
-        });
-
-        setSystemMetrics(mappedMetrics);
-      }
-    } catch (error) {
-      console.error("Error fetching system metrics:", error);
+    if (orderStatsPeriod.orderEndDate) {
+      params.orderEndDate = orderStatsPeriod.orderEndDate.toISOString().split('T')[0];
     }
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 5,
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        grid: {
-          color: "#F4F7FE",
-          drawBorder: false,
-        },
-        border: {
-          display: false,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        border: {
-          display: false,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#ffffff",
-        titleColor: "#000000",
-        bodyColor: "#000000",
-        borderColor: "#F4F7FE",
-        borderWidth: 1,
-        padding: 12,
-        titleFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-        bodyFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-      },
-    },
-  };
-
-  const sparklineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { display: false },
-      y: {
-        display: false,
-        min: 0,
-        max: 10,
-      },
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false },
-    },
-    elements: {
-      point: { radius: 0 },
-      line: {
-        tension: 0.4,
-        borderWidth: 1.5,
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
-      },
-    },
-  };
-
-  const sparklineData = {
-    labels: ["", "", "", "", "", "", "", "", "", "", "", ""],
-    datasets: [
-      {
-        data: [5, 6, 4, 7, 5, 6, 8, 7, 6, 7, 8, 9],
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
-      },
-    ],
-  };
+    
+    // Add booking filters
+    if (bookingStatsPeriod.bookingPeriod !== 'all') {
+      params.bookingPeriod = bookingStatsPeriod.bookingPeriod;
+    }
+    if (bookingStatsPeriod.bookingStartDate) {
+      params.bookingStartDate = bookingStatsPeriod.bookingStartDate.toISOString().split('T')[0];
+    }
+    if (bookingStatsPeriod.bookingEndDate) {
+      params.bookingEndDate = bookingStatsPeriod.bookingEndDate.toISOString().split('T')[0];
+    }
+    
+    // Add activity filters
+    if (activityStatsPeriod.activityPeriod !== 'all') {
+      params.activityPeriod = activityStatsPeriod.activityPeriod;
+    }
+    if (activityStatsPeriod.activityStartDate) {
+      params.activityStartDate = activityStatsPeriod.activityStartDate.toISOString().split('T')[0];
+    }
+    if (activityStatsPeriod.activityEndDate) {
+      params.activityEndDate = activityStatsPeriod.activityEndDate.toISOString().split('T')[0];
+    }
+    
+    fetchDashboardSummary(params);
+  }, [orderStatsPeriod, bookingStatsPeriod, activityStatsPeriod]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [reportType, setReportType] = useState(null);
-  const [frequency, setFrequency] = useState(null);
+  const [fileType, setFileType] = useState(null);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const toast = useRef(null);
 
   const reportTypeOptions = [
-    { label: "Inventory", value: "Inventory" },
-    { label: "Bookings", value: "Bookings" },
-    { label: "Orders", value: "Orders" },
+    { label: "All", value: "all" },
+    { label: "Bookings", value: "bookings" },
+    { label: "Orders", value: "orders" },
+    { label: "Activities", value: "activities" },
   ];
 
-  const frequencyOptions = [
-    { label: "One-Time", value: "One-Time" },
-    { label: "Daily", value: "Daily" },
-    { label: "Weekly", value: "Weekly" },
-    { label: "Monthly", value: "Monthly" },
+  const fileTypeOption = [
+    { label: "CSV", value: "csv" },
+    { label: "PDF", value: "pdf" },
   ];
-
-  const generatePDFReport = (data) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let yPosition = 20;
-
-    // Add company logo or header
-    doc.setFontSize(24);
-    doc.setTextColor(3, 135, 217);
-    doc.text("YCC Reports", pageWidth / 2, yPosition, { align: "center" });
-    yPosition += 15;
-
-    // Add report title
-    doc.setFontSize(20);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`${reportType.toUpperCase()} REPORT`, pageWidth / 2, yPosition, {
-      align: "center",
-    });
-    yPosition += 15;
-
-    // Add report details
-    doc.setFontSize(12);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, yPosition);
-    yPosition += 10;
-    doc.text(
-      `Date Range: ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
-      margin,
-      yPosition
-    );
-    yPosition += 10;
-    doc.text(`Frequency: ${frequency}`, margin, yPosition);
-    yPosition += 20;
-
-    // Add summary section
-    doc.setFontSize(16);
-    doc.text("Summary", margin, yPosition);
-    yPosition += 10;
-
-    // Add summary data based on report type
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        generateOrdersPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-      case "bookings":
-        generateBookingsPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-      case "inventory":
-        generateInventoryPDF(doc, data, margin, yPosition, pageWidth);
-        break;
-    }
-
-    // Save the PDF
-    const filename = `${reportType}_Report_${
-      startDate.toISOString().split("T")[0]
-    }_to_${endDate.toISOString().split("T")[0]}.pdf`;
-    doc.save(filename);
-  };
-
-  const generateOrdersPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Total Orders", data.orders?.total || 0],
-      ["Confirmed Orders", data.orders?.confirmed || 0],
-      ["Pending Orders", data.orders?.pending || 0],
-    ];
-
-    // Create table manually
-    doc.setFontSize(12);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add recent orders if available
-    const recentOrders = data.recentActivity?.orders || [];
-    if (recentOrders.length > 0) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(16);
-      doc.text("Recent Orders", margin, yPosition);
-      yPosition += 15;
-
-      // Calculate column widths for wider table
-      const colWidths = [
-        (pageWidth - margin * 2) * 0.15, // ID
-        (pageWidth - margin * 2) * 0.25, // Product
-        (pageWidth - margin * 2) * 0.25, // Vendor
-        (pageWidth - margin * 2) * 0.15, // Date
-        (pageWidth - margin * 2) * 0.2, // Total
-      ];
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      let currentX = margin;
-      colWidths.forEach((width) => {
-        doc.rect(currentX, yPosition, width, 10, "F");
-        currentX += width;
-      });
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      currentX = margin;
-      doc.text("ID", currentX + 5, yPosition + 7);
-      currentX += colWidths[0];
-      doc.text("Product", currentX + 5, yPosition + 7);
-      currentX += colWidths[1];
-      doc.text("Vendor", currentX + 5, yPosition + 7);
-      currentX += colWidths[2];
-      doc.text("Date", currentX + 5, yPosition + 7);
-      currentX += colWidths[3];
-      doc.text("Total", currentX + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      recentOrders.forEach((order) => {
-        currentX = margin;
-        colWidths.forEach((width) => {
-          doc.rect(currentX, yPosition, width, 10);
-          currentX += width;
-        });
-
-        currentX = margin;
-        doc.text(order._id.substring(0, 8), currentX + 5, yPosition + 7);
-        currentX += colWidths[0];
-        doc.text(
-          order.products?.[0]?.name || "Product",
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[1];
-        doc.text(order.vendorName, currentX + 5, yPosition + 7);
-        currentX += colWidths[2];
-        doc.text(
-          new Date(order.createdAt).toLocaleDateString(),
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[3];
-        doc.text(`$${order.totalPrice || 0}`, currentX + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const generateBookingsPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Total Bookings", data.bookings?.total || 0],
-      ["Confirmed Bookings", data.bookings?.confirmed || 0],
-      ["Pending Bookings", data.bookings?.pending || 0],
-    ];
-
-    // Create table manually
-    doc.setFontSize(12);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add recent bookings if available
-    const recentBookings = data.recentActivity?.bookings || [];
-    if (recentBookings.length > 0) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(10);
-      doc.text("Recent Bookings", margin, yPosition);
-      yPosition += 15;
-
-      // Calculate column widths for wider table
-      const colWidths = [
-        (pageWidth - margin * 2) * 0.15, // ID
-        (pageWidth - margin * 2) * 0.25, // Service
-        (pageWidth - margin * 2) * 0.25, // Vendor
-        (pageWidth - margin * 2) * 0.15, // Date
-        (pageWidth - margin * 2) * 0.2, // Total
-      ];
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      let currentX = margin;
-      colWidths.forEach((width) => {
-        doc.rect(currentX, yPosition, width, 10, "F");
-        currentX += width;
-      });
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      currentX = margin;
-      doc.text("ID", currentX + 5, yPosition + 7);
-      currentX += colWidths[0];
-      doc.text("Service", currentX + 5, yPosition + 7);
-      currentX += colWidths[1];
-      doc.text("Vendor", currentX + 5, yPosition + 7);
-      currentX += colWidths[2];
-      doc.text("Date", currentX + 5, yPosition + 7);
-      currentX += colWidths[3];
-      doc.text("Total", currentX + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      recentBookings.forEach((booking) => {
-        currentX = margin;
-        colWidths.forEach((width) => {
-          doc.rect(currentX, yPosition, width, 10);
-          currentX += width;
-        });
-
-        currentX = margin;
-        doc.text(booking._id.substring(0, 8), currentX + 5, yPosition + 7);
-        currentX += colWidths[0];
-        doc.text(
-          booking.services?.[0]?.name || "Service",
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[1];
-        doc.text(booking.vendorName, currentX + 5, yPosition + 7);
-        currentX += colWidths[2];
-        doc.text(
-          new Date(booking.createdAt).toLocaleDateString(),
-          currentX + 5,
-          yPosition + 7
-        );
-        currentX += colWidths[3];
-        doc.text(`$${booking.totalAmount || 0}`, currentX + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const generateInventoryPDF = (doc, data, margin, yPosition, pageWidth) => {
-    // Add summary statistics
-    const summaryData = [
-      ["Metric", "Value"],
-      ["Low Stock Items", data.inventory?.lowStockItems || 0],
-      ["Total Items", data.inventory?.totalItems || 0],
-      ["Total Value", `$${data.inventory?.totalValue || 0}`],
-    ];
-
-    // Create table manually
-    doc.setFontSize(10);
-    doc.text("Summary Statistics", margin, yPosition);
-    yPosition += 10;
-
-    // Calculate column widths for wider table
-    const colWidth1 = (pageWidth - margin * 2) * 0.6;
-    const colWidth2 = (pageWidth - margin * 2) * 0.4;
-
-    // Draw table header
-    doc.setFillColor(3, 135, 217);
-    doc.rect(margin, yPosition, colWidth1, 10, "F");
-    doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.text("Metric", margin + 5, yPosition + 7);
-    doc.text("Value", margin + colWidth1 + 5, yPosition + 7);
-    yPosition += 10;
-
-    // Draw table rows
-    doc.setTextColor(0, 0, 0);
-    summaryData.slice(1).forEach((row) => {
-      doc.rect(margin, yPosition, colWidth1, 10);
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-      doc.text(row[0], margin + 5, yPosition + 7);
-      doc.text(row[1].toString(), margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-    });
-
-    // Add health metrics if available
-    if (data.healthReports) {
-      doc.addPage();
-      yPosition = 20;
-      doc.setFontSize(10);
-      doc.text("Inventory Health Metrics", margin, yPosition);
-      yPosition += 15;
-
-      // Draw table header
-      doc.setFillColor(3, 135, 217);
-      doc.rect(margin, yPosition, colWidth1, 10, "F");
-      doc.rect(margin + colWidth1, yPosition, colWidth2, 10, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(10);
-      doc.text("Metric", margin + 5, yPosition + 7);
-      doc.text("Rate", margin + colWidth1 + 5, yPosition + 7);
-      yPosition += 10;
-
-      // Draw table rows
-      doc.setTextColor(0, 0, 0);
-      const healthData = [
-        ["Stock Levels", `${data.healthReports.stockLevels?.rate || 0}%`],
-        [
-          "Supplier Availability",
-          `${data.healthReports.supplierAvailability?.rate || 0}%`,
-        ],
-        [
-          "Customer Satisfaction",
-          `${data.healthReports.customerSatisfaction?.rate || 0}%`,
-        ],
-      ];
-
-      healthData.forEach((row) => {
-        doc.rect(margin, yPosition, colWidth1, 10);
-        doc.rect(margin + colWidth1, yPosition, colWidth2, 10);
-        doc.text(row[0], margin + 5, yPosition + 7);
-        doc.text(row[1], margin + colWidth1 + 5, yPosition + 7);
-        yPosition += 10;
-      });
-    }
-  };
-
-  const handleGenerateReport = () => {
+  const handleGenerateReport = async () => {
     if (!startDate || !endDate) {
       toast.current.show({
         severity: "error",
@@ -751,218 +283,80 @@ const Reports = () => {
       return;
     }
 
-    if (!frequency) {
+    if (!fileType) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please select a frequency",
+        detail: "Please select a file to generate the report into.",
         life: 3000,
       });
       return;
     }
 
-    // Filter data based on date range
-    const filteredData = {
-      ...dashboardSummary,
-      recentActivity: {
-        orders:
-          dashboardSummary.recentActivity?.orders?.filter((order) => {
-            const orderDate = new Date(order.createdAt);
-            return orderDate >= startDate && orderDate <= endDate;
-          }) || [],
-        bookings:
-          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
-            const bookingDate = new Date(booking.createdAt);
-            return bookingDate >= startDate && bookingDate <= endDate;
-          }) || [],
-      },
-    };
+    setIsGeneratingReport(true);
+    try {
+      const params = {
+        reportType: reportType.toLowerCase(),
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        fileType: fileType
+      };
 
-    // Calculate summary statistics for the filtered data
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        filteredData.orders = {
-          total: filteredData.recentActivity.orders.length,
-          confirmed: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Pending"
-          ).length,
-        };
-        break;
-      case "bookings":
-        filteredData.bookings = {
-          total: filteredData.recentActivity.bookings.length,
-          confirmed: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Pending"
-          ).length,
-        };
-        break;
-      case "inventory":
-        // For inventory, we'll keep the current stats but you might want to filter these based on your business logic
-        filteredData.inventory = {
-          ...dashboardSummary.inventory,
-          // Add any date-based filtering for inventory if needed
-        };
-        break;
-    }
-
-    // Generate PDF using the filtered data
-    generatePDFReport(filteredData);
-  };
-
-  const handleExport = () => {
-    if (!startDate || !endDate) {
+      const response = await generateReport(params);
+      
+      if (response.status) {
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: response.message,
+          life: 3000,
+        });
+      } else {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: response.message,
+          life: 3000,
+        });
+      }
+    } catch (error) {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Please select both start and end dates",
+        detail: "Failed to generate report",
         life: 3000,
       });
-      return;
+    } finally {
+      setIsGeneratingReport(false);
     }
-
-    // Use the same filtering logic as handleGenerateReport
-    const filteredData = {
-      ...dashboardSummary,
-      recentActivity: {
-        orders:
-          dashboardSummary.recentActivity?.orders?.filter((order) => {
-            const orderDate = new Date(order.createdAt);
-            return orderDate >= startDate && orderDate <= endDate;
-          }) || [],
-        bookings:
-          dashboardSummary.recentActivity?.bookings?.filter((booking) => {
-            const bookingDate = new Date(booking.createdAt);
-            return bookingDate >= startDate && bookingDate <= endDate;
-          }) || [],
-      },
-    };
-
-    // Calculate summary statistics for the filtered data
-    switch (reportType.toLowerCase()) {
-      case "orders":
-        filteredData.orders = {
-          total: filteredData.recentActivity.orders.length,
-          confirmed: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.orders.filter(
-            (order) => order.status === "Pending"
-          ).length,
-        };
-        break;
-      case "bookings":
-        filteredData.bookings = {
-          total: filteredData.recentActivity.bookings.length,
-          confirmed: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Confirmed"
-          ).length,
-          pending: filteredData.recentActivity.bookings.filter(
-            (booking) => booking.status === "Pending"
-          ).length,
-        };
-        break;
-      case "inventory":
-        filteredData.inventory = {
-          ...dashboardSummary.inventory,
-          // Add any date-based filtering for inventory if needed
-        };
-        break;
-    }
-
-    // Generate PDF using the filtered data
-    generatePDFReport(filteredData);
   };
-
-  // Add the renderInventoryStats function
-  const renderInventoryStats = () => {
-    if (!dashboardSummary || !dashboardSummary.inventory) {
-      return (
-        <div className="pending-order-container">
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Low Stock</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Total Items</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-          <div style={{ marginRight: "5px" }}>
-            <p style={{ fontSize: "13px" }}>Total value</p>
-            <p style={{ fontSize: "12px" }}>--</p>
-          </div>
-        </div>
-      );
-    }
-
-    const { lowStockItems, totalItems, totalValue } =
-      dashboardSummary.inventory;
-
-    return (
-      <div className="pending-order-container">
-        <div style={{ marginRight: "5px" }}>
-          <p
-            style={{
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              minWidth: "50px",
-              fontSize: "13px",
-            }}
-          >
-            Low Stock
-          </p>
-          <p style={{ fontSize: "12px" }}>{lowStockItems || 0}</p>
-        </div>
-        <div style={{ marginRight: "5px" }}>
-          <p style={{ fontSize: "13px" }}>Total Items</p>
-          <p style={{ fontSize: "12px" }}>{totalItems || 0}</p>
-        </div>
-        <div style={{ marginRight: "5px" }}>
-          <p style={{ fontSize: "13px" }}>Total value</p>
-          <p style={{ fontSize: "12px" }}>
-            ${totalValue ? totalValue.toLocaleString() : 0}
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   // Add this function to format the recent activity data for the table
   const formatRecentActivity = () => {
     if (!dashboardSummary || !dashboardSummary.recentActivity) {
       return [];
     }
 
-    // Combine orders and bookings into one array
-    const orders =
-      dashboardSummary.recentActivity.orders?.map((order) => ({
-        type: "Order",
-        id: order._id,
-        name: order.products?.[0]?.name || "Product",
-        vendor: order.vendorName,
-        total: order.totalPrice || 0,
-        status: order.status || "Pending",
-        date: new Date(order.createdAt || Date.now()).toLocaleDateString(),
-        tracking: order.trackingId || "N/A",
-      })) || [];
+    // Format orders
+    const orders = dashboardSummary.recentActivity.orders?.map((order) => ({
+      type: "Order",
+      id: order.orderId || order._id,
+      name: order.subOrders?.[0]?.supplier?.businessName || "Order",
+      vendor: order.subOrders?.[0]?.supplier?.businessName || "Unknown Vendor",
+      total: order.totalPrice || 0,
+      status: order.overallStatus || order.subOrders?.[0]?.status || "Pending",
+      date: new Date(order.orderDate || order.createdAt).toLocaleDateString(),
+    })) || [];
 
-    const bookings =
-      dashboardSummary.recentActivity.bookings?.map((booking) => ({
-        type: "Booking",
-        id: booking._id,
-        name: booking.services?.[0]?.name || "Service",
-        vendor: booking.vendorName,
-        total: booking.totalAmount || 0,
-        status: booking.status || "Pending",
-        date: new Date(booking.createdAt || Date.now()).toLocaleDateString(),
-        tracking: "N/A",
-      })) || [];
+    // Format bookings
+    const bookings = dashboardSummary.recentActivity.bookings?.map((booking) => ({
+      type: "Booking",
+      id: booking.bookingId || booking._id,
+      name: booking.serviceName || booking.services?.[0]?.name || "Service",
+      vendor: booking.vendorName || booking.vendor?.businessName || "Unknown Vendor",
+      total: booking.totalAmount || booking.totalPrice || 0,
+      status: booking.status || "Pending",
+      date: new Date(booking.bookingDate || booking.createdAt).toLocaleDateString(),
+    })) || [];
 
     // Combine and sort by date (newest first)
     return [...orders, ...bookings].sort(
@@ -970,434 +364,597 @@ const Reports = () => {
     );
   };
 
-  return (
-    <div
-      style={{
-        background: "#F8FBFF",
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <Toast ref={toast} />
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{ marginBottom: "30px" }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ marginLeft: "40px" }}>Reports</h3>
-          </div>
-        </div>
-      </div>
+  React.useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
-      <div
-        className="bg-white"
-        style={{
-          width: "95%",
-          marginLeft: "30px",
-          padding: "20px 15px 20px 15px",
-          borderRadius: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className="flex items-center justify-between ">
-          <div className="flex items-center justify-between">
-            <div className="mr-3">
-              <h3>Date Range</h3>
-              <div
-                style={{
+  return (
+    <div>
+      <Toast ref={toast} />
+      {/* Export Summary Section */}
+      <Box sx={{ p: { xs: 2, sm: 2.5, md: 3 } }}>
+        <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+          {/* Date Range Section */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                Date Range
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Box
+                sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
+                  alignItems: "center",
+                  gap: { xs: 0.5, sm: 1 },
+                  flexDirection: { xs: "column", sm: "row" },
+                  width: "100%",
                 }}
               >
-                <div className="flex align-items-center gap-2">
+                <Calendar
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.value)}
+                  dateFormat="yy-mm-dd"
+                  placeholder="Start Date"
+                  showIcon
+                  minDate={new Date(2000, 0, 1)}
+                  maxDate={endDate || new Date(2100, 11, 31)}
+                  icon={<CalendarMonthIcon width={18} height={18} />}
+                  style={{ width: '100%' }}
+                />
+                <Typography sx={{ fontSize: { xs: '12px', sm: '14px' }, fontWeight: 600, py: { xs: 0.5, sm: 0 } }}>
+                  to
+                </Typography>
+                <Calendar
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.value)}
+                  dateFormat="yy-mm-dd"
+                  placeholder="End Date"
+                  showIcon
+                  minDate={startDate || new Date(2000, 0, 1)}
+                  maxDate={new Date(2100, 11, 31)}
+                  icon={<CalendarMonthIcon width={18} height={18} />}
+                  style={{ width: '100%' }}
+                />
+              </Box>
+              <Typography sx={{ color: "#666", fontSize: { xs: '11px', sm: '12px' } }}>
+                Select both start and end dates to generate report
+              </Typography>
+            </Box>
+          </Grid>
+
+          {/* Report Type Section */}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                Report Type
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "10px",
+                p: { xs: 0.8, sm: 1 },
+              }}
+            >
+              <Dropdown
+                value={reportType}
+                onChange={(e) => setReportType(e.value)}
+                options={reportTypeOptions}
+                placeholder="Select Report Type"
+                className="w-full"
+              />
+            </Box>
+          </Grid>
+
+          {/* File Type selection Section */}
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography variant="h6" sx={{ fontSize: { xs: '16px', sm: '18px', md: '20px' }, fontWeight: 600 }}>
+                File Type
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                border: "1px solid #e0e0e0",
+                borderRadius: "10px",
+                p: { xs: 0.8, sm: 1 },
+              }}
+            >
+              <Dropdown
+                value={fileType}
+                onChange={(e) => setFileType(e.value)}
+                options={fileTypeOption}
+                placeholder="Select file type"
+                className="w-full"
+              />
+            </Box>
+          </Grid>
+
+          {/* Action Buttons */}
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "center", sm: "flex-end" },
+                gap: { xs: 1.5, sm: 2 },
+                flexDirection: { xs: "column", sm: "row" },
+                mt: { xs: 1, sm: 0 },
+              }}
+            >
+              <Button
+                variant="contained"
+                onClick={handleGenerateReport}
+                disabled={isGeneratingReport}
+                sx={{
+                  width: { xs: "100%", sm: "160px", md: "180px" },
+                  height: { xs: "44px", sm: "40px" },
+                  textTransform: "none",
+                  fontSize: { xs: '14px', sm: '15px' },
+                  backgroundColor: "#0387D9",
+                  transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+                  "&:hover": {
+                    backgroundColor: "#0277bd",
+                    transform: { xs: "none", sm: "scale(1.05)" },
+                    boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                  },
+                  "&:disabled": {
+                    backgroundColor: "#ccc",
+                    color: "#666",
+                  },
+                }}
+              >
+                {isGeneratingReport ? "Generating..." : "Generate Report"}
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Report Summary Section */}
+      <Box sx={{ p: 3, backgroundColor: "white" }}>
+        <Typography
+          variant="h6"
+          sx={{ mb: 3, color: "#0A2647", fontWeight: 600 }}
+        >
+          Report Summary
+        </Typography>
+
+        <Grid container spacing={3}>
+          {/* All Orders Card */}
+          <Grid item xs={12} sm={6} lg={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                height: "100%",
+                borderRadius: 2,
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 3,
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
+                    All Orders
+                  </Typography>
+                </Box>
+                <Select
+                  value={orderStatsPeriod.orderPeriod}
+                  onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderPeriod: e.target.value }))}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: "#F8FAFC",
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
+                    },
+                  }}
+                >
+                  <MenuItem value="all">All time</MenuItem>
+                  <MenuItem value="today">Today</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                  <MenuItem value="custom">Custom</MenuItem>
+                </Select>
+              </Box>
+
+              {loading ? (
+                <StatsSkeleton />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={4} lg={2} >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Confirmed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.confirmed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Pending
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.pending || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Shipped
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.shipped || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Delivered
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.delivered || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Cancelled
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.cancelled || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Total
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.orders?.total || 0}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              )}
+              
+              {/* Custom Date Range for Orders */}
+              {orderStatsPeriod.orderPeriod === 'custom' && (
+                <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
                   <Calendar
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.value)}
+                    value={orderStatsPeriod.orderStartDate}
+                    onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderStartDate: e.value }))}
                     dateFormat="yy-mm-dd"
                     placeholder="Start Date"
                     showIcon
-                    className="p-inputtext-sm"
-                    minDate={new Date(2000, 0, 1)}
-                    maxDate={endDate || new Date(2100, 11, 31)}
+                    icon={<CalendarMonthIcon width={18} height={18} />}
                   />
-                  <span className="font-bold">to</span>
+                  <span style={{ fontSize: '12px' }}>to</span>
                   <Calendar
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.value)}
+                    value={orderStatsPeriod.orderEndDate}
+                    onChange={(e) => setOrderStatsPeriod(prev => ({ ...prev, orderEndDate: e.value }))}
                     dateFormat="yy-mm-dd"
                     placeholder="End Date"
                     showIcon
-                    className="p-inputtext-sm"
-                    minDate={startDate || new Date(2000, 0, 1)}
-                    maxDate={new Date(2100, 11, 31)}
+                    icon={<CalendarMonthIcon width={18} height={18} />}
                   />
-                </div>
-                <small style={{ color: "#666", fontSize: "12px" }}>
-                  Select both start and end dates to generate report
-                </small>
-              </div>
-            </div>
-            <div className="mr-3">
-              <h3>Report Type</h3>
-              <div
-                className="border-1 border-gray-200 p-2 rounded-lg"
-                style={{ width: "300px", borderRadius: "10px" }}
-              >
-                <Dropdown
-                  value={reportType}
-                  onChange={(e) => setReportType(e.value)}
-                  options={reportTypeOptions}
-                  placeholder="Select Report Type"
-                  className="w-full"
-                  style={{ width: "100%" }}
-                />
-              </div>
-            </div>
-            <div className="mr-3">
-              <h3>Frequency</h3>
-              <div
-                className="border-1 border-gray-200 p-2 rounded-lg"
-                style={{ width: "300px", borderRadius: "10px" }}
-              >
-                <Dropdown
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.value)}
-                  options={frequencyOptions}
-                  placeholder="Select Frequency"
-                  className="w-full"
-                  style={{ width: "100%" }}
-                />
-              </div>
-            </div>
-          </div>
-          <div
-            className=""
-            style={{
-              width: "200px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "400px",
-            }}
-          >
-            <div className="flex items-center justify-center ">
-              <button
-                style={{
-                  backgroundColor: "transparent",
-                  border: "1px solid #21212133",
-                  paddingLeft: "7px",
-                  paddingRight: "7px",
-                  borderRadius: "3px",
+                </Box>
+              )}
+            </Paper>
+          </Grid>
+
+          {/* Bookings Card */}
+          <Grid item xs={12} sm={6} lg={6}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                height: "100%",
+                borderRadius: 2,
+                border: "1px solid #E0E7ED",
+                transition:
+                  "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0 4px 20px 0 rgba(0,0,0,0.12)",
+                },
+              }}
+            >
+              <Box
+                sx={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  width: "120px",
+                  justifyContent: "space-between",
+                  mb: 3,
                 }}
-                onClick={handleExport}
               >
-                <img
-                  src={downloadIcon}
-                  alt="downloadIcon"
-                  style={{ width: "20px", height: "20px", marginRight: "5px" }}
-                />
-                Export
-              </button>
-              <button
-                className="p-2"
-                style={{
-                  backgroundColor: "#0387D9",
-                  width: "150px",
-                  color: "white",
-                  border: "1px solid #0387D9",
-                  borderRadius: "3px",
-                  marginLeft: "10px",
-                }}
-                onClick={handleGenerateReport}
-              >
-                Generate Report
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="order-summary-text-header">
-        <h2>Report Summary</h2>
-      </div>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <LockIcon sx={{ color: "#2563EB", fontSize: 20 }} />
+                  <Typography sx={{ fontSize: "15px", fontWeight: 500 }}>
+                    Bookings
+                  </Typography>
+                </Box>
+                <Select
+                  value={bookingStatsPeriod.bookingPeriod}
+                  onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingPeriod: e.target.value }))}
+                  variant="standard"
+                  disableUnderline
+                  sx={{
+                    bgcolor: "#F8FAFC",
+                    borderRadius: 1,
+                    px: 1,
+                    py: 0.5,
+                    "& .MuiSelect-select": {
+                      color: "#64748B",
+                      fontSize: "caption.fontSize",
+                      paddingRight: "24px !important",
+                      display: "flex",
+                      alignItems: "center",
+                    },
+                    "& .MuiSvgIcon-root": {
+                      color: "#64748B",
+                    },
+                  }}
+                >
+                  <MenuItem value="all">All time</MenuItem>
+                  <MenuItem value="today">Today</MenuItem>
+                  <MenuItem value="week">This week</MenuItem>
+                  <MenuItem value="month">This month</MenuItem>
+                  <MenuItem value="year">This year</MenuItem>
+                  <MenuItem value="custom">Custom</MenuItem>
+                </Select>
+              </Box>
 
-      <div className="box-order-container" style={{ minWidth: "800px" }}>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>All Orders</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                Confirmed
-              </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.confirmed}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.pending}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Total</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.orders.total}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Inventory</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          {renderInventoryStats()}
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Bookings</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                Comfirmed
-              </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.confirmed}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.pending}
-              </p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Total</p>
-              <p style={{ fontSize: "12px" }}>
-                {dashboardSummary.loading
-                  ? "Loading..."
-                  : dashboardSummary.bookings.total}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Financial</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>0</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="selling-products-container">
-        <div className="selling-products-header">
-          <h2>Weekly & Monthly Reports</h2>
-        </div>
-
-        <table className="selling-products-table">
-          <thead>
-            <tr>
-              <th>
-                Type <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Name <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Vendor <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Date <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Total <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Status <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                ID <img src={sortIcon} alt="sortIcon" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {dashboardSummary && dashboardSummary.recentActivity ? (
-              formatRecentActivity().map((activity, index) => (
-                <tr key={activity.id || index}>
-                  <td>{activity.type}</td>
-                  <td className="product-cell">{activity.name}</td>
-                  <td>{activity.vendor}</td>
-                  <td>{activity.date}</td>
-                  <td>${activity.total.toFixed(2)}</td>
-                  <td>
-                    <span className={`status-${activity.status.toLowerCase()}`}>
-                      {activity.status}
-                    </span>
-                  </td>
-                  <td>{activity.id.substring(0, 8)}...</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center" }}>
-                  Loading data...
-                </td>
-              </tr>
-            )}
-
-            {dashboardSummary &&
-              dashboardSummary.recentActivity &&
-              formatRecentActivity().length === 0 && (
-                <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
-                    No recent activity found.
-                  </td>
-                </tr>
+              {loading ? (
+                <StatsSkeleton />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Confirmed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.confirmed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Pending
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.pending || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Completed
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.completed || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Cancelled
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.cancelled || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Declined
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.declined || 0}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} lg={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "#64748B", display: "block", mb: 0.5 }}
+                    >
+                      Total
+                    </Typography>
+                    <Typography sx={{ fontWeight: 600, fontSize: "15px" }}>
+                      {dashboardSummary.bookings?.total || 0}
+                    </Typography>
+                  </Grid>
+                </Grid>
               )}
-          </tbody>
-        </table>
-      </div>
+              
+              {/* Custom Date Range for Bookings */}
+              {bookingStatsPeriod.bookingPeriod === 'custom' && (
+                <Box sx={{ mt: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+                  <Calendar
+                    value={bookingStatsPeriod.bookingStartDate}
+                    onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingStartDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="Start Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
+                  <span style={{ fontSize: '12px' }}>to</span>
+                  <Calendar
+                    value={bookingStatsPeriod.bookingEndDate}
+                    onChange={(e) => setBookingStatsPeriod(prev => ({ ...prev, bookingEndDate: e.value }))}
+                    dateFormat="yy-mm-dd"
+                    placeholder="End Date"
+                    showIcon
+                    icon={<CalendarMonthIcon width={18} height={18} />}
+                  />
+                </Box>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
+        
+        {/* Recent Activities Section with Filter */}
+        <Box sx={{ mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ color: "#0A2647", fontWeight: 600 }}>
+              Recent Activities
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Select
+                value={activityStatsPeriod.activityPeriod}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityPeriod: e.target.value }))}
+                variant="standard"
+                disableUnderline
+                sx={{
+                  bgcolor: "#F8FAFC",
+                  borderRadius: 1,
+                  px: 1,
+                  py: 0.5,
+                  "& .MuiSelect-select": {
+                    color: "#64748B",
+                    fontSize: "caption.fontSize",
+                    paddingRight: "24px !important",
+                    display: "flex",
+                    alignItems: "center",
+                  },
+                  "& .MuiSvgIcon-root": {
+                    color: "#64748B",
+                  },
+                }}
+              >
+                <MenuItem value="all">All time</MenuItem>
+                <MenuItem value="today">Today</MenuItem>
+                <MenuItem value="week">This week</MenuItem>
+                <MenuItem value="month">This month</MenuItem>
+                <MenuItem value="year">This year</MenuItem>
+                <MenuItem value="custom">Custom</MenuItem>
+              </Select>
+            </Box>
+          </Box>
+          
+          {/* Custom Date Range for Activities */}
+          {activityStatsPeriod.activityPeriod === 'custom' && (
+            <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Calendar
+                value={activityStatsPeriod.activityStartDate}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityStartDate: e.value }))}
+                dateFormat="yy-mm-dd"
+                placeholder="Start Date"
+                showIcon
+                icon={<CalendarMonthIcon width={18} height={18} />}
+              />
+              <span style={{ fontSize: '12px' }}>to</span>
+              <Calendar
+                value={activityStatsPeriod.activityEndDate}
+                onChange={(e) => setActivityStatsPeriod(prev => ({ ...prev, activityEndDate: e.value }))}
+                dateFormat="yy-mm-dd"
+                placeholder="End Date"
+                showIcon
+                icon={<CalendarMonthIcon width={18} height={18} />}
+              />
+            </Box>
+          )}
+          
+          {/* Recent Activities Table */}
+          <TableContainer component={Paper} sx={{ borderRadius: 2, border: "1px solid #E0E7ED" }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeaderCell>Type</TableHeaderCell>
+                  <TableHeaderCell>ID</TableHeaderCell>
+                  <TableHeaderCell>Name</TableHeaderCell>
+                  <TableHeaderCell>Vendor</TableHeaderCell>
+                  <TableHeaderCell>Total</TableHeaderCell>
+                  <TableHeaderCell>Status</TableHeaderCell>
+                  <TableHeaderCell>Date</TableHeaderCell>
+                </TableRow>
+              </TableHead>
+              {loading ? (
+                <TableSkeleton />
+              ) : (
+                <TableBody>
+                  {formatRecentActivity().slice(0, 10).map((activity, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{activity.type}</TableCell>
+                      <TableCell>{activity.id.substring(0, 8)}</TableCell>
+                      <TableCell>{activity.name}</TableCell>
+                      <TableCell>{activity.vendor}</TableCell>
+                      <TableCell>${activity.total}</TableCell>
+                      <TableCell>{getStatusChip(activity.status)}</TableCell>
+                      <TableCell>{activity.date}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              )}
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
     </div>
   );
 };
 
+export default Reports;
 // Create and add a stylesheet element for responsive design
 const responsiveStyle = document.createElement("style");
 responsiveStyle.innerHTML = `
+  /* Ensure the report container respects viewport height */
+  .report-container {
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
   @media screen and (max-width: 768px) {
     /* Main layout - stack everything vertically */
     .report-container-inventory-reports-and-bar-graph {
@@ -1498,6 +1055,12 @@ responsiveStyle.innerHTML = `
       margin-top: 15px !important;
       padding-left: 2% !important;
     }
+    
+    /* Ensure proper height constraints on mobile */
+    .report-container {
+      height: 100vh !important;
+      overflow: auto !important;
+    }
   }
 `;
 
@@ -1505,5 +1068,3 @@ responsiveStyle.innerHTML = `
 if (typeof document !== "undefined") {
   document.head.appendChild(responsiveStyle);
 }
-
-export default Reports;

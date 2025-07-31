@@ -1,6 +1,8 @@
 import axios from "axios";
+import { buildApiUrl } from "../utils/apiUtils";
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL =
+  process.env.REACT_APP_API_URL;
 console.log("API_URL:", API_URL);
 
 export const signup = async (formData) => {
@@ -17,7 +19,7 @@ export const signup = async (formData) => {
       );
     }
 
-    const response = await axios.post(`${API_URL}/auth/signup`, formData, {
+    const response = await axios.post(buildApiUrl("auth/signup"), formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -43,8 +45,8 @@ export const signup = async (formData) => {
 export const login = async (userData) => {
   try {
     console.log("Sending login request:", userData);
-    const response = await axios.post(`${API_URL}/auth/login`, userData);
-    console.log("Login response:", response.data);
+    const response = await axios.post(buildApiUrl("auth/login"), userData);
+
     return response.data;
   } catch (error) {
     console.error("Login failed:", error.response?.data || error.message);
@@ -54,7 +56,7 @@ export const login = async (userData) => {
 
 export const ForgotPassword = async (email) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/forgot-password`, {
+    const response = await axios.post(buildApiUrl("auth/forgot-password"), {
       email,
     });
     return {
@@ -78,7 +80,7 @@ export const checkTokenValidity = async () => {
     }
 
     // Make a request to a protected endpoint to check if token is valid
-    const response = await axios.get(`${API_URL}/auth/verify-token`, {
+    const response = await axios.get(buildApiUrl("auth/verify-token"), {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -96,9 +98,21 @@ export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("id");
   localStorage.removeItem("user");
-  
+
   console.log("User logged out, tokens removed from localStorage");
-  
+
   // Redirect to login page
   window.location.href = "/login";
+};
+
+export const verifyOtp = async (email, otp) => {
+  try {
+    const response = await axios.post(buildApiUrl("auth/verify-otp"), {
+      email,
+      otp,
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
 };

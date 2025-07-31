@@ -1,11 +1,63 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+  useLocation,
+  useOutletContext,
+} from "react-router-dom";
 
-import { InputText } from "primereact/inputtext";
-import { Toast } from "primereact/toast";
+import { useTheme } from "../../context/theme/themeContext";
+import AddIcon from "@mui/icons-material/Add";
+import InventoryIcon from '@mui/icons-material/Inventory';
+import { TableSkeleton } from "../../components/TableSkeleton";
+import { Pagination } from "../../components/pagination";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Checkbox,
+  IconButton,
+  Paper,
+  Tooltip,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Button,
+  Autocomplete,
+  Typography,
+  Stack,
+  Grid,
+  Divider,
+  Chip,
+} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import RemoveIcon from "@mui/icons-material/Remove";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ImageIcon from "@mui/icons-material/Image";
+import EmailIcon from "@mui/icons-material/Email";
+import CircularProgress from "@mui/material/CircularProgress";
+import Container from "@mui/material/Container";
+
 import {
   createInventoryData,
   getAllInventories,
@@ -13,19 +65,8 @@ import {
   deleteInventoryItem,
   getInventoryItemById,
   sendInventoryEmail,
+  getAllSuppliers,
 } from "../../services/inventory/inventoryService";
-
-import sort from "../../assets/images/crew/sort.png";
-import editLogo from "../../assets/images/crew/editLogo.png";
-import deleteLogo from "../../assets/images/crew/deleteLogo.png";
-// import plus from "../../assets/images/crew/plus.png";
-import eyesIn from "../../assets/images/crew/eyes-in.png";
-// import { ProgressSpinner } from "primereact/progressspinner";
-import { useTheme } from "../../context/theme/themeContext";
-import { Paginator } from "primereact/paginator";
-import { Dropdown } from "primereact/dropdown";
-
-import { TableSkeleton } from "../../components/TableSkeleton";
 
 const InventoryTableSkeleton = () => {
   const { theme } = useTheme();
@@ -61,10 +102,7 @@ const InventoryTableSkeleton = () => {
 };
 
 const Invent = () => {
-  const toast = useRef(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { inventoryId } = useParams(); // Get inventory ID from URL params
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -74,13 +112,22 @@ const Invent = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [viewItem, setViewItem] = useState({
     id: null,
+    productId: "",
     productName: "",
-    category: "",
+    description: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
     productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
+  const user = JSON.parse(localStorage.getItem('user')) || {};
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Initialize with empty array
@@ -88,21 +135,42 @@ const Invent = () => {
 
   const [editItem, setEditItem] = useState({
     id: null,
-    index: null,
+    productId: null,
     productName: "",
-    category: "",
+    description: "",
+    category: [], // always an array
     serviceArea: "",
     stockQuantity: "",
     price: "",
+    productImage: null,
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
 
+  // Add description to newItem state
   const [newItem, setNewItem] = useState({
     productName: "",
     category: "",
-    serviceArea: "",
     stockQuantity: "",
     price: "",
+    supplier: "",
+    description: "",
+    fileName: "",
+    hsCode: '',
+    countryOfOrigin: '',
+    height: 1,
+    width: 1,
+    length_: 1,
+    weight: 1,
   });
+
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [suppliersLoading, setSuppliersLoading] = useState(false);
 
   const { theme } = useTheme();
 
@@ -110,20 +178,102 @@ const Invent = () => {
   const [productImage, setProductImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
 
-  // Add a state to track whether we should update the URL
-  const [shouldUpdateURL, setShouldUpdateURL] = useState(true);
-
   // Add these state variables with your other state declarations
   const [hasNextPage, setHasNextPage] = useState(false);
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
 
   // Add these state variables
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const observer = useRef();
   const [totalItems, setTotalItems] = useState(0);
+  const isRequestInProgress = useRef(false); // Add this ref to track ongoing requests
+
+  const { setPageTitle } = useOutletContext() || {};
+
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState("");
+
+  // Add after other useState declarations
+  const [stockStatusFilter, setStockStatusFilter] = useState("all");
+
+  // Add this state variable for the dropdown open/close
+  const [stockStatusDropdownOpen, setStockStatusDropdownOpen] = useState(false);
+
+  // Add this state to the Invent component
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  // Add state for supplier search and pagination
+  const [supplierSearch, setSupplierSearch] = useState("");
+  const [supplierPage, setSupplierPage] = useState(1);
+  const [filteredSuppliers, setFilteredSuppliers] = useState([]);
+  const SUPPLIERS_PER_PAGE = 10;
+
+  // Add state for controlling the supplier dropdown open state
+  const [supplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
+
+  // 1. Add state for search text and applied filters
+  const [searchText, setSearchText] = useState("");
+  const [appliedStockStatus, setAppliedStockStatus] =
+    useState(stockStatusFilter);
+  const [appliedSearchText, setAppliedSearchText] = useState("");
+
+  // Add this state to the Invent component
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+
+  // Helper to get stock status
+  const getStockStatus = (quantity) => {
+    if (quantity >= 100) return "high";
+    if (quantity >= 50) return "medium";
+    return "low";
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedItems(inventoryItems.map((item) => item.id));
+      setSelectAll(true);
+    } else {
+      setSelectedItems([]);
+      setSelectAll(false);
+    }
+  };
+
+  const handleSelectItem = (id) => {
+    setSelectedItems((prev) => {
+      const newSelected = prev.includes(id)
+        ? prev.filter((itemId) => itemId !== id)
+        : [...prev, id];
+      // If not all items are selected, uncheck selectAll
+      if (newSelected.length !== inventoryItems.length) {
+        setSelectAll(false);
+      } else {
+        setSelectAll(true);
+      }
+      return newSelected;
+    });
+  };
+
+  const onPageChange = (event, newPage) => {
+    console.log("Pagination clicked, newPage:", newPage);
+    setPage(newPage - 1);
+    // Fetch new page data here if needed
+  };
+
+  const onRowsPerPageChange = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+    // Fetch new page data here if needed
+  };
 
   // Add this function to handle infinite scroll
   const lastInventoryElementRef = useCallback(
@@ -133,7 +283,6 @@ const Invent = () => {
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && hasMore) {
-            console.log("Loading more items...");
             loadMoreData();
           }
         },
@@ -165,114 +314,113 @@ const Invent = () => {
   });
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
-  // Add this useEffect to handle URL parameters
-  useEffect(() => {
-    // Check if we have an inventory ID in the URL
-    if (inventoryId) {
-      fetchInventoryItemById(inventoryId);
-    }
-  }, [inventoryId]);
-
   // Add scroll event handler
   useEffect(() => {
+    let scrollTimeout;
+
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop ===
-        document.documentElement.offsetHeight
-      ) {
-        if (hasMore && !isLoadingMore) {
-          loadMoreData();
-        }
+      // Clear any existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
       }
+
+      // Debounce the scroll event
+      scrollTimeout = setTimeout(() => {
+        if (
+          window.innerHeight + document.documentElement.scrollTop >=
+          document.documentElement.offsetHeight - 100 // Trigger 100px before bottom
+        ) {
+          if (hasMore && !isLoadingMore) {
+            loadMoreData();
+          }
+        }
+      }, 150); // 150ms debounce
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, isLoadingMore]);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [hasMore, isLoadingMore, page]); // Add page to dependencies to prevent stale closures
 
-  // Initial data fetch
+  // Combined useEffect for initial load and search parameter changes
   useEffect(() => {
-    fetchInventoryData(1);
-  }, []);
+    fetchInventoryData(page + 1);
+  }, [page, pageSize, appliedSearchText, appliedStockStatus]);
+
+  // Reset to first page when filters/search change
+  useEffect(() => {
+    setPage(0);
+  }, [appliedSearchText, appliedStockStatus]);
 
   const fetchInventoryData = async (pageNum = 1) => {
-    if (pageNum === 1) {
-      setIsLoading(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
+    setIsLoading(true);
     try {
-      console.log("Fetching page:", pageNum);
-      const result = await getAllInventories(pageNum, 10);
+      const result = await getAllInventories(
+        pageNum,
+        pageSize,
+        appliedSearchText,
+        appliedStockStatus
+      );
 
       if (result.success) {
-        const formattedItems = result.data.map((item) => ({
-          id: item._id,
-          productName: item.product?.name || "Unknown Product",
-          category: item.product?.category || "Uncategorized",
-          serviceArea: item.product?.serviceArea || "Not specified",
-          stockQuantity: item.quantity || 0,
-          price: item.price || 0,
-          productImage: item.productImage || null,
-          supplier: item.supplier,
-          userInfo: item.userInfo,
-        }));
-
-        console.log("Formatted Items:", formattedItems);
-
-        if (pageNum === 1) {
-          setInventoryItems(formattedItems);
-        } else {
-          setInventoryItems((prevItems) => [...prevItems, ...formattedItems]);
-        }
-
-        // Update total items count
-        setTotalItems(result.total || 0);
-
-        // Check if we have more items to load
-        const hasMoreItems =
-          formattedItems.length === 10 && pageNum * 10 < (result.total || 0);
-        setHasMore(hasMoreItems);
-        setPage(pageNum);
-
-        console.log("Updated state:", {
-          items: formattedItems.length,
-          total: result.total,
-          hasMore: hasMoreItems,
-          currentPage: pageNum,
-        });
+        const formattedItems = result.data.flatMap((item) =>
+          item.products?.map(product => ({
+            id: item._id,
+            productId: product.productId,
+            productName: product.productName || "Unknown Product",
+            category: typeof product.category === 'string' ? [product.category] : Array.isArray(product.category) ? product.category : ["Uncategorized"],
+            description: product.description || "Not available",
+            supplier: item.supplier?.businessName || item.userInfo?.businessName || "Not available",
+            stockQuantity: product.quantity || 0,
+            price: product.price || 0,
+            productImage: product.productImage || null,
+            hsCode: product.hsCode || "",
+            countryOfOrigin: product.countryOfOrigin || "",
+            height: product.height || 0,
+            width: product.width || 0,
+            length: product['length'] || 0,
+            weight: product.weight || 0,
+          })) || []
+        );
+        setInventoryItems(formattedItems);
+        setTotalItems(result.pagination?.totalItems || formattedItems.length);
+        setTotalPages(result.pagination?.totalPages || 1);
       } else {
+        setInventoryItems([]);
+        setTotalItems(0);
+        setTotalPages(1);
         console.error("Failed to load inventory data:", result.error);
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to load inventory data",
-            life: 3000,
-          });
-        }
       }
     } catch (error) {
+      setInventoryItems([]);
+      setTotalItems(0);
+      setTotalPages(1);
       console.error("Error fetching inventory data:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An error occurred while fetching inventory data",
-          life: 3000,
-        });
-      }
     } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
     }
   };
 
   const loadMoreData = async () => {
-    if (!hasMore || isLoadingMore) return;
-    const nextPage = page + 1;
-    await fetchInventoryData(nextPage);
+    if (!hasMore || isLoadingMore || isRequestInProgress.current) return;
+
+    // Set loading state and mark request as in progress
+    setIsLoadingMore(true);
+    isRequestInProgress.current = true;
+
+    try {
+      const nextPage = page + 1;
+      await fetchInventoryData(nextPage);
+    } catch (error) {
+      console.error("Error loading more data:", error);
+    } finally {
+      setIsLoadingMore(false);
+      isRequestInProgress.current = false;
+    }
   };
 
   // Add loading indicator component
@@ -297,103 +445,131 @@ const Invent = () => {
     );
   };
 
-  // const goCrewDashboardPage = () => {
-  //   navigate("/crew/dashboard");
-  // };
-  // const goInventorySummaryPage = () => {
-  //   navigate("/crew/inventory/summary");
-  // };
-
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const handleEdit = (index) => {
-    const item = inventoryItems[index];
-    setEditItem({
-      id: item.id,
-      index: index,
-      productName: item.productName,
-      category: item.category,
-      serviceArea: item.serviceArea,
-      stockQuantity: item.stockQuantity.toString(),
-      price: item.price.toFixed(2),
-    });
-    setShowEditModal(true);
-  };
+  }, []);;
 
   const handleUpdate = async () => {
     setIsLoading(true);
-
     try {
-      // Format the data for the API - make sure this matches your API's expected structure
-      const updateData = {
-        productName: editItem.productName,
-        category: editItem.category,
-        serviceArea: editItem.serviceArea,
-        quantity: parseInt(editItem.stockQuantity),
-        price: parseFloat(editItem.price),
-      };
-
-      console.log("Sending update with data:", updateData);
-
-      // Call the API to update the item
-      const result = await updateInventoryItem(editItem.id, updateData);
-
-      if (result.success) {
-        // Update the local state with the updated item
-        const updatedItems = [...inventoryItems];
-        const updatedItem = {
-          id: editItem.id,
+      let updateData;
+      let isFormData = false;
+      if (editItem.productImage && editItem.productImage instanceof File) {
+        updateData = new FormData();
+        updateData.append("productName", editItem.productName);
+        updateData.append("category", editItem.category);
+        updateData.append("quantity", editItem.stockQuantity);
+        updateData.append("price", editItem.price);
+        updateData.append("description", editItem.description);
+        updateData.append("productImage", editItem.productImage);
+        updateData.append("productId", editItem.productId);
+        updateData.append("hsCode", editItem.hsCode);
+        updateData.append("countryOfOrigin", editItem.countryOfOrigin);
+        updateData.append("height", editItem.height);
+        updateData.append("width", editItem.width);
+        updateData.append("length", editItem.length_);
+        updateData.append("weight", editItem.weight);
+        isFormData = true;
+      } else {
+        updateData = {
           productName: editItem.productName,
           category: editItem.category,
-          serviceArea: editItem.serviceArea,
-          stockQuantity: parseInt(editItem.stockQuantity),
-          price: parseFloat(editItem.price),
-          productImage: editItem.productImage,
+          quantity: editItem.stockQuantity,
+          price: editItem.price,
+          description: editItem.description,
+          productId: editItem.productId,
+          hsCode: editItem.hsCode,
+          countryOfOrigin: editItem.countryOfOrigin,
+          height: editItem.height,
+          width: editItem.width,
+          length: editItem.length_,
+          weight: editItem.weight
         };
-
-        updatedItems[editItem.index] = updatedItem;
-        setInventoryItems(updatedItems);
-
-        // Show success message
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product updated successfully",
-            life: 3000,
-          });
-        }
-
-        setShowEditModal(false);
-      } else {
-        // Show error message
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to update product",
-            life: 3000,
-          });
-        }
       }
-    } catch (error) {
-      console.error("Error updating product:", error);
-      if (toast.current) {
-        toast.current.show({
+      try {
+        const result = await updateInventoryItem(
+          editItem.id,
+          updateData,
+          isFormData
+        );
+
+        console.log("Update result:", result);
+
+        if (result.success) {
+          // Handle the nested response structure
+          const responseData = result.data?.data || result.data;
+
+          if (!responseData) {
+            throw new Error('Invalid response structure');
+          }
+
+          // Update UI with new data
+          const inventory = responseData;
+
+          // Enhanced formatting with better error handling
+          const formattedItems = inventory.products.map((prod) => {
+
+            return {
+              id: inventory._id,
+              productId: prod.productId, // Use productId from response instead of nested product._id
+              productName: prod.productName || "Unknown Product",
+              category: Array.isArray(prod.category) ? prod.category : typeof prod.category === 'string' ? [prod.category] : ["Uncategorized"],
+              description: prod.description || "Not available",
+              supplier: inventory.supplier?.businessName || "Not available",
+              stockQuantity: Number(prod.quantity) || 0,
+              price: Number(prod.price) || 0,
+              productImage: prod.productImage || null,
+              sku: prod.sku || "",
+              hsCode: prod.hsCode || "",
+              countryOfOrigin: prod.countryOfOrigin || "",
+              height: Number(prod.height) || 0, // Changed default from 1 to 0 to match API
+              width: Number(prod.width) || 0,
+              length: Number(prod['length']) || 0, // Fixed typo: was length_
+              weight: Number(prod.weight) || 0,
+              // Additional fields that might be useful
+              warehouseLocation: inventory.warehouseLocation || "",
+              createdAt: inventory.createdAt,
+              updatedAt: inventory.updatedAt
+            };
+          });
+
+          // Update the inventory items state
+          setInventoryItems(formattedItems);
+
+          // Close modal and show success message
+          setShowEditModal(false);
+          setSnackbar({
+            open: true,
+            message: result.data?.message || "Product updated successfully!",
+            severity: "success",
+          });
+
+        } else {
+          // Handle failure case
+          setSnackbar({
+            open: true,
+            message: result.error || result.message || "Update failed",
+            severity: "error",
+          });
+        }
+
+      } catch (error) {
+        console.error("Error updating inventory:", error);
+        setSnackbar({
+          open: true,
+          message: error.message || "An unexpected error occurred",
           severity: "error",
-          summary: "Error",
-          detail: "An unexpected error occurred while updating the product",
-          life: 3000,
         });
       }
+    } catch (error) {
+      setSnackbar({ open: true, message: "Update failed", severity: "error" });
     } finally {
       setIsLoading(false);
     }
@@ -402,7 +578,8 @@ const Invent = () => {
   const handleDelete = (index) => {
     const item = inventoryItems[index];
     setItemToDelete({
-      id: item.id,
+      inventoryId: item.id, // inventory document id
+      productId: item.productId, // product id inside inventory
       index: index,
     });
     setShowDeleteConfirmation(true);
@@ -413,35 +590,18 @@ const Invent = () => {
 
     setIsLoading(true);
     try {
-      const result = await deleteInventoryItem(itemToDelete.id);
+      // Call deleteInventoryItem with inventoryId and productId
+      const result = await deleteInventoryItem(itemToDelete.inventoryId, itemToDelete.productId);
       if (result.success) {
         // Remove the deleted item from the state
         setInventoryItems((prevItems) =>
           prevItems.filter((_, index) => index !== itemToDelete.index)
         );
-
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Product deleted successfully",
-          life: 3000,
-        });
       } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to delete product",
-          life: 3000,
-        });
+        console.error("Failed to delete product:", result.error);
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "An error occurred while deleting the product",
-        life: 3000,
-      });
     } finally {
       setIsLoading(false);
       setShowDeleteConfirmation(false);
@@ -451,6 +611,19 @@ const Invent = () => {
 
   const handleAddProduct = () => {
     setShowAddModal(true);
+    setNewItem({
+      productName: "",
+      category: "",
+      stockQuantity: "",
+      price: "",
+      supplier: "",
+      description: "",
+      fileName: "",
+    });
+    setProductImage(null);
+    setImagePreview(null);
+    setSaveSuccess("");
+    setSaveError("");
   };
 
   // Add this function to handle image selection
@@ -458,115 +631,123 @@ const Invent = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProductImage(file);
-
-      // Create a preview URL for the selected image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setNewItem({ ...newItem, fileName: file.name });
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
   // Update the handleSaveProduct function to use FormData for image upload
   const handleSaveProduct = async () => {
-    if (!newItem.productName || !newItem.category || !newItem.serviceArea) {
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Product name, category, and service area are required",
-          life: 3000,
-        });
-      } else {
-        alert("Product name, category, and service area are required");
-      }
+    if (!newItem.productName || !newItem.category) {
+      setSnackbar({
+        message: "Product name and category are required",
+        open: true,
+        severity: "error",
+      });
+      return;
+    }
+
+    // Validate quantity
+    if (!newItem.stockQuantity || newItem.stockQuantity <= 0) {
+      setSnackbar({
+        message: "Stock quantity must be greater than 0",
+        open: true,
+        severity: "error",
+      });
       return;
     }
 
     setIsLoading(true);
+    setSaveError("");
 
     try {
       // Create a FormData object for file upload
       const formData = new FormData();
       formData.append("productName", newItem.productName);
       formData.append("category", newItem.category);
-      formData.append("serviceArea", newItem.serviceArea);
       formData.append("quantity", newItem.stockQuantity);
       formData.append("price", newItem.price);
+      formData.append("hsCode", newItem.hsCode);
+      formData.append("countryOfOrigin", newItem.countryOfOrigin);
+      formData.append("height", newItem.height);
+      formData.append("width", newItem.width);
+      formData.append("length", newItem.length_);
+      formData.append("weight", newItem.weight);
+
+      // In handleSaveProduct, always send description (backend will ignore if not needed)
+      formData.append("description", newItem.description);
+      if (newItem.supplier) {
+        formData.append("supplierId", newItem.supplier);
+      }
 
       // Append the image file if one was selected
       if (productImage) {
+        console.log("Appending inventoryImage to FormData:", productImage);
         formData.append("inventoryImage", productImage);
-        console.log("Adding image to form data:", productImage.name);
       }
 
-      console.log("Submitting inventory with image:", !!productImage);
-
       const result = await createInventoryData(formData);
-
       if (result.success) {
-        if (toast.current) {
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Inventory added successfully",
-            life: 3000,
-          });
-        } else {
-          alert("Inventory added successfully");
-        }
-
-        // Add the new product to the beginning of the array instead of the end
-        const responseData = result.data.data;
-        const product = {
-          id: responseData._id,
-          productName: responseData.product.name,
-          category: responseData.product.category,
-          serviceArea: responseData.product.serviceArea,
-          stockQuantity: responseData.quantity,
-          price: responseData.price,
-          productImage: responseData.productImage || null,
-        };
-
-        setInventoryItems([product, ...inventoryItems]);
+        const inventory = result.data.data;
+        const formattedItems = inventory.products.map((prod) => ({
+          id: inventory._id,
+          productId: prod.product._id,
+          productName: prod.product.name || "Unknown Product",
+          category: Array.isArray(prod.product.category) ? prod.product.category : typeof prod.product.category === 'string' ? [prod.product.category] : ["Uncategorized"],
+          description: prod.product.description || "Not available",
+          supplier: inventory.supplier?.businessName || "Not available",
+          stockQuantity: prod.quantity || 0,
+          price: prod.product.price || 0,
+          productImage: prod.product.productImage || null,
+          hsCode: prod.product.hsCode || "",
+          countryOfOrigin: prod.product.countryOfOrigin || "",
+          height: prod.product.height || 1,
+          width: prod.product.width || 1,
+          length: prod.product['length'] || 1,
+          weight: prod.product.weight || 1,
+        }));
+        setInventoryItems(formattedItems);
+        setTotalItems(result.pagination?.totalItems || formattedItems.length);
+        setTotalPages(result.pagination?.totalPages || 1);
 
         // Reset the form including the image
         setNewItem({
           productName: "",
           category: "",
-          serviceArea: "",
           stockQuantity: "",
           price: "",
+          supplier: "",
+          description: "",
+          fileName: "",
         });
         setProductImage(null);
         setImagePreview(null);
+        setSelectedSupplier(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        // Also reset the file input by setting its value to null
+        if (fileInputRef.current) fileInputRef.current.value = null;
 
         setShowAddModal(false);
+        setSnackbar({
+          open: true,
+          message: "Product added successfully!",
+          severity: "success",
+        });
       } else {
-        if (toast.current) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: result.error || "Failed to add inventory",
-            life: 3000,
-          });
-        } else {
-          alert(result.error || "Failed to add inventory");
-        }
+        setSnackbar({
+          message: result.error || "Failed to add inventory. Please try again.",
+          open: true,
+          severity: "error",
+        });
+        console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
       console.error("Error adding inventory:", error);
-      if (toast.current) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "An error occurred while adding inventory",
-          life: 3000,
-        });
-      } else {
-        alert("An error occurred while adding inventory");
-      }
+      setSnackbar({
+        message: "An unexpected error occurred. Please try again.",
+        open: true,
+        severity: "error"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -574,88 +755,34 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
-    setViewItem(item);
+    console.log("Selected Item t be viewed:c ", item)
+    setViewItem({ ...item, length_: item['length'] });
     setShowViewModal(true);
-
-    // Only update URL if we should
-    if (shouldUpdateURL) {
-      navigate(`/admin/inventory-management/${item.id}`);
-    }
+  };
+  const handleEditModal = (item) => {
+    setEditItem({ ...item, length_: item['length'] });
+    setShowEditModal(true);
   };
 
   // Simplified modal close handler
   const handleCloseViewModal = () => {
-    // Disable URL updates temporarily to prevent race conditions
-    setShouldUpdateURL(false);
-
-    // Close the modal
     setShowViewModal(false);
-
-    // Navigate after a short delay
-    setTimeout(() => {
-      navigate("/admin/inventory-management", { replace: true });
-
-      // Re-enable URL updates after navigation
-      setTimeout(() => {
-        setShouldUpdateURL(true);
-      }, 50);
-    }, 50);
-  };
-
-  // Effect to handle URL parameters
-  useEffect(() => {
-    // If we have an ID in the URL and should update
-    if (inventoryId && shouldUpdateURL) {
-      fetchInventoryItemById(inventoryId);
-    }
-  }, [inventoryId, shouldUpdateURL]);
-
-  // Effect to handle browser navigation
-  useEffect(() => {
-    // If we navigate away and the modal is open
-    if (!inventoryId && showViewModal && shouldUpdateURL) {
-      setShowViewModal(false);
-    }
-  }, [inventoryId, showViewModal, shouldUpdateURL]);
-
-  // Function to fetch a single inventory item by ID
-  const fetchInventoryItemById = async (id) => {
-    try {
-      setIsLoading(true);
-      const result = await getInventoryItemById(id);
-
-      if (result.success) {
-        const item = {
-          id: result.data._id,
-          productName: result.data.product?.name || "Unknown Product",
-          category: result.data.product?.category || "Uncategorized",
-          serviceArea: result.data.product?.serviceArea || "Not specified",
-          stockQuantity: result.data.quantity || 0,
-          price: result.data.price || 0,
-          productImage: result.data.productImage || null,
-        };
-
-        setViewItem(item);
-        setShowViewModal(true);
-      } else {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to load inventory item",
-          life: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching inventory item:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Error loading inventory item",
-        life: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    setViewItem({
+      id: null,
+      productName: "",
+      description: "",
+      category: "",
+      serviceArea: "",
+      stockQuantity: "",
+      price: "",
+      productImage: null,
+      hsCode: '',
+      countryOfOrigin: '',
+      height: 1,
+      width: 1,
+      length_: 1,
+      weight: 1,
+    });
   };
 
   // Add email handling functions
@@ -664,18 +791,7 @@ const Invent = () => {
     const supplierEmail =
       item.supplier?.user?.email || item.userInfo?.email || "";
 
-    console.log("Clicked Item Data:", item);
-    console.log("Supplier Email:", supplierEmail);
-    console.log("Product Name:", item.productName);
-
     setEmailData({
-      to: supplierEmail,
-      subject: `Regarding your product: ${item.productName}`,
-      message: "",
-      productName: item.productName,
-    });
-
-    console.log("Email Modal Data:", {
       to: supplierEmail,
       subject: `Regarding your product: ${item.productName}`,
       message: "",
@@ -686,13 +802,8 @@ const Invent = () => {
   };
 
   const handleEmailSubmit = async () => {
-    if (!emailData.to || !emailData.subject || !emailData.message) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Please fill in all required fields",
-        life: 3000,
-      });
+    if (!emailData.to || !emailData.subject || !emailData.message.trim()) {
+      alert("Please fill in all required fields");
       return;
     }
 
@@ -705,34 +816,25 @@ const Invent = () => {
       );
 
       if (result.success) {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "Email sent successfully",
-          life: 3000,
-        });
         setShowEmailModal(false);
-        setEmailData({
-          to: "",
-          subject: "",
-          message: "",
-          productName: "",
+        setEmailData({ to: "", subject: "", message: "", productName: "" });
+        setSnackbar({
+          open: true,
+          message: "Email sent successfully!",
+          severity: "success",
         });
       } else {
-        toast.current.show({
+        setSnackbar({
+          open: true,
+          message: "Failed to send email.",
           severity: "error",
-          summary: "Error",
-          detail: result.error || "Failed to send email",
-          life: 3000,
         });
       }
     } catch (error) {
-      console.error("Error sending email:", error);
-      toast.current.show({
+      setSnackbar({
+        open: true,
+        message: "An error occurred while sending email.",
         severity: "error",
-        summary: "Error",
-        detail: "An error occurred while sending the email",
-        life: 3000,
       });
     } finally {
       setIsSendingEmail(false);
@@ -742,169 +844,389 @@ const Invent = () => {
   // Render mobile card view for inventory items
   const renderMobileInventoryCards = () => {
     return (
-      <div style={{ padding: "0 10px" }}>
-        {inventoryItems.map((item, index) => (
-          <div
-            key={index}
-            ref={
-              index === inventoryItems.length - 1
-                ? lastInventoryElementRef
-                : null
-            }
-            style={{
-              backgroundColor: "white",
-              borderRadius: "8px",
-              padding: "12px",
-              marginBottom: "10px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+      <Box sx={{ px: 2 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 3,
+            border: '1px solid #e2e8f0',
+            background: theme === "light" ? '#fff' : '#1a1a1a',
+          }}
+        >
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{ width: "100%" }}
+          >
+            <Box
+              className="custom-dropdown"
+              sx={{ minWidth: 160, position: "relative" }}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => setStockStatusDropdownOpen((open) => !open)}
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  border: "1px solid #e2e8f0",
+                  background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+                  fontWeight: 500,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  px: 2,
+                  py: 1,
+                  width: "100%",
+                  height: 40,
+                }}
+                fullWidth
+                endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
+              >
+                {stockStatusFilter === "all" && "All Status"}
+                {stockStatusFilter === "high" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RadioButtonUncheckedIcon
+                      sx={{ color: "#059669", fontSize: 18 }}
+                    />
+                    <span style={{ color: "#059669" }}>High Stock</span>
+                  </Box>
+                )}
+                {stockStatusFilter === "medium" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
+                    <span style={{ color: "#D97706" }}>Medium Stock</span>
+                  </Box>
+                )}
+                {stockStatusFilter === "low" && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ErrorOutlineIcon
+                      sx={{ color: "#DC2626", fontSize: 18 }}
+                    />
+                    <span style={{ color: "#DC2626" }}>Low Stock</span>
+                  </Box>
+                )}
+              </Button>
+              {stockStatusDropdownOpen && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    right: 0,
+                    background: theme === "light" ? "#fff" : "#1a1a1a",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: 2,
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                    zIndex: 10,
+                    mt: 0.5,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {[
+                    { key: "all", label: "All Status" },
+                    {
+                      key: "high",
+                      label: "High Stock",
+                      icon: (
+                        <RadioButtonUncheckedIcon
+                          sx={{ color: "#059669", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                    {
+                      key: "medium",
+                      label: "Medium Stock",
+                      icon: (
+                        <RemoveIcon
+                          sx={{ color: "#D97706", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                    {
+                      key: "low",
+                      label: "Low Stock",
+                      icon: (
+                        <ErrorOutlineIcon
+                          sx={{ color: "#DC2626", fontSize: 18 }}
+                        />
+                      ),
+                    },
+                  ].map((opt) => (
+                    <Box
+                      key={opt.key}
+                      className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
+                        }`}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        px: 2,
+                        py: 1.5,
+                        cursor: "pointer",
+                        fontWeight: stockStatusFilter === opt.key ? 600 : 400,
+                        color:
+                          opt.key === "high"
+                            ? "#059669"
+                            : opt.key === "medium"
+                              ? "#D97706"
+                              : opt.key === "low"
+                                ? "#DC2626"
+                                : "#374151",
+                        background:
+                          stockStatusFilter === opt.key ?
+                            theme === "light" ? "#eff6ff" : "#1e293b" :
+                            undefined,
+                        "&:hover": {
+                          background: theme === "light" ? "#f8fafc" : "#1e293b",
+                        },
+                      }}
+                      onClick={() => {
+                        setStockStatusFilter(opt.key);
+                        setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
+                        setPage(0); // Optionally reset to first page
+                        setStockStatusDropdownOpen(false);
+                      }}
+                    >
+                      {opt.icon && opt.icon}
+                      <span>{opt.label}</span>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+            <TextField
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search by product name..."
+              fullWidth
+              size="small"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  height: 40,
+                  '&.Mui-focused': {
+                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setAppliedStockStatus(stockStatusFilter);
+                setAppliedSearchText(searchText);
+              }}
+              sx={{
+                minWidth: { sm: 120 },
+                height: 40,
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
+            >
+              Search
+            </Button>
+          </Stack>
+        </Paper>
+
+        {inventoryItems.map((item, index) => {
+          // Determine stock status color
+          const stockStatus = getStockStatus(item.stockQuantity);
+          const statusColor =
+            stockStatus === 'high' ? '#059669' :
+              stockStatus === 'medium' ? '#D97706' :
+                '#DC2626';
+
+          return (
+            <Paper
+              key={index}
+              elevation={1}
+              sx={{
+                borderRadius: 3,
+                overflow: 'hidden',
+                mb: 2,
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                },
+                position: 'relative',
+                background: theme === "light" ? '#fff' : '#1a1a1a',
+              }}
+            >
+              {/* Status indicator line at top */}
+              <Box
+                sx={{
+                  height: '4px',
+                  width: '100%',
+                  bgcolor: statusColor,
+                }}
+              />
+
+              <Box sx={{ p: 2 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    {item.productName}
+                  </Typography>
+                  <Stack direction="row" spacing={1}>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleViewItem(item)}
+                      sx={{
+                        bgcolor: 'rgba(0, 102, 204, 0.1)',
+                        color: '#0066cc',
+                        '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                      }}
+                    >
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleEditModal(item)}
+                      sx={{
+                        bgcolor: 'rgba(5, 150, 105, 0.1)',
+                        color: '#059669',
+                        '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => handleDelete(index)}
+                      sx={{
+                        bgcolor: 'rgba(220, 38, 38, 0.1)',
+                        color: '#DC2626',
+                        '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
+                </Stack>
+
+                <Grid container spacing={1} sx={{ mb: 2 }}>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Category
+                    </Typography>
+                    <Typography variant="body2">
+                      {item.category && item.category.length > 0 && item.category.slice(0, 1).map(cat => cat).join(", ")}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Stock
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      fontWeight={600}
+                      sx={{ color: statusColor }}
+                    >
+                      {item.stockQuantity} units
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                      Price
+                    </Typography>
+                    <Typography variant="body2" fontWeight={600}>
+                      {!isNaN(Number(item.price))
+                        ? formatCurrency(Number(item.price)) + " per unit"
+                        : "$0.00"}
+                    </Typography>
+                  </Grid>
+                </Grid>
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  startIcon={<EmailIcon />}
+                  onClick={() => handleSendEmail(item)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    py: 1,
+                    background: 'linear-gradient(135deg, #0066cc 0%, #0044aa 100%)',
+                    boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+                    '&:hover': {
+                      boxShadow: '0 6px 16px rgba(0, 102, 204, 0.3)',
+                    },
+                  }}
+                >
+                  Contact Supplier
+                </Button>
+              </Box>
+            </Paper>
+          );
+        })}
+
+        {inventoryItems.length === 0 && !isLoading && (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 4,
+              borderRadius: 3,
+              textAlign: 'center',
+              border: '1px dashed #cbd5e1',
+              bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "8px",
+            <InventoryIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
+            <Typography variant="h6" fontWeight={600} color="text.secondary">
+              No inventory items found
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Add your first product to get started
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddProduct}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                px: 3,
               }}
             >
-              <h3
-                style={{
-                  margin: 0,
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                }}
-              >
-                {item.productName}
-              </h3>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "10px",
-                }}
-              >
-                <img
-                  src={eyesIn}
-                  alt="view"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleViewItem(item)}
-                />
-                <img
-                  src={editLogo}
-                  alt="edit"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleEdit(index)}
-                />
-                <img
-                  src={deleteLogo}
-                  alt="delete"
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => handleDelete(index)}
-                />
-              </div>
-            </div>
+              Add Product
+            </Button>
+          </Paper>
+        )}
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "8px",
-                fontSize: "14px",
+        {inventoryItems.length > 0 && (
+          <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+            <Pagination
+              currentPage={page + 1}
+              totalPages={Math.ceil(totalItems / pageSize)}
+              totalItems={totalItems}
+              itemsPerPage={pageSize}
+              onPageChange={(newPage) => {
+                setPage(newPage - 1);
               }}
-            >
-              <div>
-                <span style={{ color: "#666" }}>Category: </span>
-                <span>{item.category}</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Area: </span>
-                <span>{item.serviceArea}</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Stock: </span>
-                <span>{item.stockQuantity} units</span>
-              </div>
-              <div>
-                <span style={{ color: "#666" }}>Price: </span>
-                <span>${item.price.toFixed(2)}</span>
-              </div>
-            </div>
-
-            {/* Add Send Email button */}
-            <div style={{ marginTop: "10px" }}>
-              <button
-                style={{
-                  padding: "8px 12px",
-                  borderRadius: "5px",
-                  backgroundColor: "#0387D9",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  width: "100%",
-                }}
-                onClick={() => handleSendEmail(item)}
-              >
-                Send Email
-              </button>
-            </div>
-          </div>
-        ))}
-        {renderLoadingIndicator()}
-      </div>
+            />
+          </Box>
+        )}
+      </Box>
     );
   };
 
   // Render inventory items with loading state
   const renderInventoryItems = () => {
-    if (isDataLoading) {
-      // return (
-      //   <div
-      //     className="loading-container"
-      //     style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-      //   >
-      //     <ProgressSpinner
-      //       style={{ width: "50px", height: "50px" }}
-      //       strokeWidth="4"
-      //       fill="var(--surface-ground)"
-      //       animationDuration=".5s"
-      //     />
-      //   </div>
-      // );
-    }
-
-    if (inventoryItems.length === 0) {
+    if (isLoading) {
       return (
-        <div
-          className="empty-state"
-          style={{ textAlign: "center", padding: "2rem" }}
-        >
-          <p>No inventory items found. Add your first product!</p>
-          <Button
-            label="Add New Product"
-            icon="pi pi-plus"
-            onClick={handleAddProduct}
-            style={{
-              backgroundColor: "#0387D9",
-              border: "none",
-              borderRadius: "5px",
-              marginTop: "1rem",
-            }}
-          />
-        </div>
+        <Box sx={{ p: 4, textAlign: 'center' }}>
+          <CircularProgress size={40} thickness={4} />
+          <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+            Loading inventory items...
+          </Typography>
+        </Box>
       );
     }
+    // Return null when there are items (they'll be rendered by desktop or mobile view)
+    return null;
   };
 
   // Add this style to your component
@@ -946,270 +1268,746 @@ const Invent = () => {
     };
   }, []);
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
   // Modify the desktop view to include the loading indicator
   const renderDesktopView = () => {
     return (
-      <div className="inventory-summary">
-        <table className="inventory-header-table">
-          <thead>
-            <tr>
-              <th
-                style={{
-                  width: "20%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Product Name
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Category
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Service Area
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>
-                    Stock Quantity
-                  </p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Price</p>
-                </div>
-              </th>
-              <th
-                style={{
-                  width: "15%",
-                  textAlign: "left",
-                  padding: "10px",
-                  borderBottom: "1px solid #eee",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <img
-                    src={sort}
-                    alt="sort"
-                    style={{
-                      width: "15px",
-                      height: "15px",
-                      marginRight: "5px",
-                    }}
-                  />
-                  <p style={{ margin: 0, flex: 1, fontSize: "12px" }}>Manage</p>
-                </div>
-              </th>
-            </tr>
-          </thead>
-        </table>
+      <>
+        <Paper
+          elevation={0}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 2,
+            mb: 3,
+            p: 2,
+            marginTop: "28px",
+            backgroundColor: theme === "light" ? "#fff" : "#1a1a1a",
+            borderRadius: 3,
+            border: "1px solid #EAECF0",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <FilterListIcon color="primary" fontSize="small" />
+            <Typography variant="subtitle2" fontWeight={600}>Filters:</Typography>
+          </Stack>
 
-        <table className="inventory-table">
-          <tbody>
-            {inventoryItems.map((item, index) => (
-              <tr
-                key={index}
-                ref={
-                  index === inventoryItems.length - 1
-                    ? lastInventoryElementRef
-                    : null
-                }
+          <Box
+            className="custom-dropdown"
+            sx={{
+              minWidth: 180,
+              position: "relative",
+              flex: { xs: '1 1 100%', sm: '0 1 auto' },
+              mt: { xs: 1, sm: 0 },
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setStockStatusDropdownOpen((open) => !open)}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                border: "1px solid #e2e8f0",
+                background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                px: 2,
+                py: 1,
+                height: 40,
+              }}
+              fullWidth
+              endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
+            >
+              {stockStatusFilter === "all" && "All Status"}
+              {stockStatusFilter === "high" && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <RadioButtonUncheckedIcon
+                    sx={{ color: "#059669", fontSize: 18 }}
+                  />
+                  <span style={{ color: "#059669" }}>High Stock</span>
+                </Box>
+              )}
+              {stockStatusFilter === "medium" && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
+                  <span style={{ color: "#D97706" }}>Medium Stock</span>
+                </Box>
+              )}
+              {stockStatusFilter === "low" && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ErrorOutlineIcon
+                    sx={{ color: "#DC2626", fontSize: 18 }}
+                  />
+                  <span style={{ color: "#DC2626" }}>Low Stock</span>
+                </Box>
+              )}
+            </Button>
+            {stockStatusDropdownOpen && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  background: theme === "light" ? "#fff" : "#1a1a1a",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  zIndex: 10,
+                  mt: 0.5,
+                  overflow: 'hidden',
+                }}
               >
-                <td
-                  style={{
-                    width: "20%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.productName}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.category}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.serviceArea}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  {item.stockQuantity} units
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  ${item.price.toFixed(2)}
-                </td>
-                <td
-                  style={{
-                    width: "15%",
-                    padding: "10px",
-                    borderBottom: "1px solid #eee",
-                  }}
-                >
-                  <div
-                    style={{
+                {[
+                  { key: "all", label: "All Status" },
+                  {
+                    key: "high",
+                    label: "High Stock",
+                    icon: (
+                      <RadioButtonUncheckedIcon
+                        sx={{ color: "#059669", fontSize: 18 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "medium",
+                    label: "Medium Stock",
+                    icon: (
+                      <RemoveIcon
+                        sx={{ color: "#D97706", fontSize: 18 }}
+                      />
+                    ),
+                  },
+                  {
+                    key: "low",
+                    label: "Low Stock",
+                    icon: (
+                      <ErrorOutlineIcon
+                        sx={{ color: "#DC2626", fontSize: 18 }}
+                      />
+                    ),
+                  },
+                ].map((opt) => (
+                  <Box
+                    key={opt.key}
+                    className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
+                      }`}
+                    sx={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "10px",
+                      gap: 1,
+                      px: 2,
+                      py: 1.5,
+                      cursor: "pointer",
+                      fontWeight: stockStatusFilter === opt.key ? 600 : 400,
+                      color:
+                        opt.key === "high"
+                          ? "#059669"
+                          : opt.key === "medium"
+                            ? "#D97706"
+                            : opt.key === "low"
+                              ? "#DC2626"
+                              : "#374151",
+                      background:
+                        stockStatusFilter === opt.key ?
+                          theme === "light" ? "#eff6ff" : "#1e293b" :
+                          undefined,
+                      "&:hover": {
+                        background: theme === "light" ? "#f8fafc" : "#1e293b",
+                      },
+                    }}
+                    onClick={() => {
+                      setStockStatusFilter(opt.key);
+                      setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
+                      setPage(0); // Optionally reset to first page
+                      setStockStatusDropdownOpen(false);
                     }}
                   >
-                    <img
-                      src={eyesIn}
-                      alt="view"
-                      style={{
-                        width: "22px",
-                        height: "22px",
-                        cursor: "pointer",
+                    {opt.icon && opt.icon}
+                    <span>{opt.label}</span>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 2, flex: 1, maxWidth: { xs: '100%', md: '50%' } }}>
+            <TextField
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Search by product name..."
+              fullWidth
+              size="small"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  height: 40,
+                  '&.Mui-focused': {
+                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  },
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setAppliedStockStatus(stockStatusFilter);
+                setAppliedSearchText(searchText);
+              }}
+              sx={{
+                minWidth: 100,
+                height: 40,
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              }}
+            >
+              Search
+            </Button>
+          </Box>
+        </Paper>
+
+        <TableContainer
+          component={Paper}
+          sx={{
+            borderRadius: 3,
+            boxShadow: theme === "light" ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+            border: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+            overflow: 'hidden',
+          }}
+        >
+          <Table>
+            <TableHead sx={{
+              backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
+              borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+            }}>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    inputProps={{ "aria-label": "select all products" }}
+                    sx={{
+                      color: theme === "light" ? "#94a3b8" : "#64748b",
+                      '&.Mui-checked': {
+                        color: '#0066cc',
+                      },
+                    }}
+                  />
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Product ID
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                {user.role.name === 'admin' && (
+                  <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      Supplier's Name
+                      <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                        <FilterListIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                )}
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Product Name
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Category
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Stock Quantity
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Price
+                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <FilterListIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                    Actions
+                  </Box>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inventoryItems.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+                      <InventoryIcon sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
+                      <Typography variant="h5" fontWeight={600} color="text.secondary">
+                        No inventory items found
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
+                        Start by adding your first product to manage your inventory effectively
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleAddProduct}
+                        startIcon={<AddIcon />}
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          px: 4,
+                          py: 1.5,
+                          fontWeight: 600,
+                          boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+                        }}
+                      >
+                        Add Your First Product
+                      </Button>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                inventoryItems.map((item, idx) => {
+                  const stockStatus = getStockStatus(item.stockQuantity);
+                  const statusColor =
+                    stockStatus === 'high' ? '#059669' :
+                      stockStatus === 'medium' ? '#D97706' :
+                        '#DC2626';
+                  const statusBgColor =
+                    stockStatus === 'high' ? '#ECFDF3' :
+                      stockStatus === 'medium' ? '#FFFAEB' :
+                        '#FEF3F2';
+
+                  return (
+                    <TableRow
+                      key={item.id}
+                      hover
+                      selected={selectedItems.includes(item.id)}
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.04)' : 'rgba(0, 102, 204, 0.08)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.08)' : 'rgba(0, 102, 204, 0.12)',
+                          '&:hover': {
+                            backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.12)' : 'rgba(0, 102, 204, 0.16)',
+                          },
+                        },
+                        borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
                       }}
-                      onClick={() => handleViewItem(item)}
-                    />
-                    <button
-                      style={{
-                        padding: "10px 16px",
-                        borderRadius: "5px",
-                        backgroundColor: "#0387D9",
-                        color: "#fff",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                        marginLeft: "10px",
-                      }}
-                      onClick={() => handleSendEmail(item)}
                     >
-                      Send Email
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {renderLoadingIndicator()}
-      </div>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedItems.includes(item.id)}
+                          onChange={() => handleSelectItem(item.id)}
+                          inputProps={{
+                            "aria-label": `select product ${item.productName}`,
+                          }}
+                          sx={{
+                            color: theme === "light" ? "#94a3b8" : "#64748b",
+                            '&.Mui-checked': {
+                              color: '#0066cc',
+                            },
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                        <Chip
+                          label={`#${item.productId?.slice?.(-6) || item.productId || idx + 1}`}
+                          size="small"
+                          sx={{
+                            bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
+                            color: theme === "light" ? '#334155' : '#94a3b8',
+                            fontWeight: 500,
+                            fontSize: '0.75rem',
+                            height: 24,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {typeof item.supplier === "object"
+                          ? item.supplier.businessName ||
+                          item.supplier.user?.email ||
+                          "Not available"
+                          : typeof item.supplier === "string" &&
+                            item.supplier.trim() !== ""
+                            ? item.supplier
+                            : "Not available"}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {item.productName}
+                      </TableCell>
+                      <TableCell sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {item.category && item.category.length > 0 && item.category.slice(0, 2).map((cat) => (
+                          <Chip
+                            key={cat}
+                            label={cat}
+                            size="small"
+                            sx={{
+                              bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
+                              color: theme === "light" ? '#334155' : '#94a3b8',
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              height: 24,
+                            }}
+                          />
+                        ))}
+                      </TableCell>
+                      <TableCell>
+                        <Box
+                          sx={{
+                            backgroundColor: statusBgColor,
+                            color: statusColor,
+                            py: 0.5,
+                            px: 1.5,
+                            borderRadius: 2,
+                            display: "inline-flex",
+                            alignItems: 'center',
+                            gap: 0.5,
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            width: 'fit-content',
+                          }}
+                        >
+                          {stockStatus === 'high' && <RadioButtonUncheckedIcon sx={{ fontSize: 14 }} />}
+                          {stockStatus === 'medium' && <RemoveIcon sx={{ fontSize: 14 }} />}
+                          {stockStatus === 'low' && <ErrorOutlineIcon sx={{ fontSize: 14 }} />}
+                          {item.stockQuantity} units
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                        {!isNaN(Number(item.price))
+                          ? formatCurrency(Number(item.price))
+                          : "$0.00"}
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleViewItem(item)}
+                            sx={{
+                              bgcolor: 'rgba(0, 102, 204, 0.1)',
+                              color: '#0066cc',
+                              '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                            }}
+                          >
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleEditModal(item)}
+                            sx={{
+                              bgcolor: 'rgba(5, 150, 105, 0.1)',
+                              color: '#059669',
+                              '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                            }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDelete(idx)}
+                            sx={{
+                              bgcolor: 'rgba(220, 38, 38, 0.1)',
+                              color: '#DC2626',
+                              '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                          {/* {user.role.name === 'admin' && (
+                            <IconButton
+                              size="small"
+                              onClick={() => handleSendEmail(item)}
+                              sx={{
+                                bgcolor: 'rgba(79, 70, 229, 0.1)',
+                                color: '#4F46E5',
+                                '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.2)' },
+                              }}
+                            >
+                              <EmailIcon fontSize="small" />
+                            </IconButton>
+                          )} */}
+
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <Box sx={{ mt: 3, mb: 3, display: "flex", justifyContent: "center" }}>
+          <Pagination
+            currentPage={page + 1}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+            onPageChange={(newPage) => {
+              console.log("Pagination clicked, newPage:", newPage);
+              setPage(newPage - 1);
+            }}
+          />
+        </Box>
+      </>
     );
   };
 
+  // Fetch suppliers for the dropdown
+  const fetchSuppliers = async () => {
+    try {
+      setSuppliersLoading(true);
+      const result = await getAllSuppliers();
+      // Fix: handle paginated and non-paginated responses
+      if (result.success && Array.isArray(result.data?.result)) {
+        setSuppliers(result.data.result);
+      } else if (result.success && Array.isArray(result.data)) {
+        setSuppliers(result.data);
+      } else {
+        console.error("Invalid suppliers data:", result.data);
+        setSuppliers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      setSuppliers([]);
+    } finally {
+      setSuppliersLoading(false);
+    }
+  };
+
+  const handleImportFromCSV = () => {
+    navigate(`/vendors/onboarding/${user._id}`);
+  };
+  // Set page title and add event listener for create inventory button
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Inventory");
+
+    // Fetch suppliers when component mounts
+    fetchSuppliers();
+
+    // Add event listener for create inventory button in title bar
+    const handleCreateInventoryModal = () => {
+      handleAddProduct();
+    };
+
+    window.addEventListener(
+      "openCreateInventoryModal",
+      handleCreateInventoryModal
+    );
+    window.addEventListener(
+      "openImportInventoryCSVModal",
+      handleImportFromCSV
+    );
+
+    return () => {
+      window.removeEventListener(
+        "openCreateInventoryModal",
+        handleCreateInventoryModal
+      );
+      window.removeEventListener(
+        "openImportInventoryCSVModal",
+        handleImportFromCSV
+      );
+    };
+  }, [setPageTitle]);
+
+
+  const categoryOptions = [
+    {
+      label: "Navigation Equipment",
+      value: "Navigation Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/navigation1.png",
+    },
+    {
+      label: "Safety Gear",
+      value: "Safety Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/safety1.png",
+    },
+    {
+      label: "Marine Electronics",
+      value: "Marine Electronics",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electronics1.png",
+    },
+    {
+      label: "Deck Equipment",
+      value: "Deck_Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/deck1.png",
+    },
+    {
+      label: "Engine & Propulsion",
+      value: "Engine & Propulsion",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/engine1.png",
+    },
+    {
+      label: "Anchoring System",
+      value: "Anchoring System",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/anchor1.png",
+    },
+    {
+      label: "Sailing Equipment",
+      value: "Sailing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sailing1.png",
+    },
+    {
+      label: "Water Sports Gear",
+      value: "Water Sports Gear",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/sports1.png",
+    },
+    {
+      label: "Fishing Equipment",
+      value: "Fishing Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/fishing1.png",
+    },
+    {
+      label: "Marine Furniture",
+      value: "Marine Furniture",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/furniture1.png",
+    },
+    {
+      label: "Galley Equipment",
+      value: "Galley Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/galley1.png",
+    },
+    {
+      label: "Refrigeration",
+      value: "Refrigeration",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/refrigeration1.png",
+    },
+    {
+      label: "Water Systems",
+      value: "Water Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/water1.png",
+    },
+    {
+      label: "Electrical Systems",
+      value: "Electrical Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/electrical1.png",
+    },
+    {
+      label: "Hull Maintenance",
+      value: "Hull Maintenance",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/maintenance1.png",
+    },
+    {
+      label: "Mooring Equipment",
+      value: "Mooring Equipment",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/mooring1.png",
+    },
+    {
+      label: "Communication Systems",
+      value: "Communication Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/communication1.png",
+    },
+    {
+      label: "Sea Food Storage",
+      value: "Sea Food Storage",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/food_storage1.png",
+    },
+    {
+      label: "Bilge Systems",
+      value: "Bilge Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/bilge1.png",
+    },
+    {
+      label: "HVAC Systems",
+      value: "HVAC Systems",
+      icon: process.env.PUBLIC_URL + "/RescourceIcon/hvac1.png",
+    },
+  ];
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    setSaveSuccess("");
+    setSaveError("");
+    setSelectedSupplier(null);
+    setNewItem({
+      productName: "",
+      category: "",
+      stockQuantity: "",
+      price: "",
+      supplier: "",
+      description: "",
+      fileName: "",
+    });
+  };
+
+  // Filter and paginate suppliers when supplierSearch or suppliers changes
+  useEffect(() => {
+    const searchTerm = supplierSearch.toLowerCase();
+    const filtered = suppliers.filter((option) => {
+      const match =
+        (option.businessName &&
+          option.businessName.toLowerCase().includes(searchTerm)) ||
+        (option.companyName &&
+          option.companyName.toLowerCase().includes(searchTerm)) ||
+        (option.name && option.name.toLowerCase().includes(searchTerm)) ||
+        (option.user?.email &&
+          option.user.email.toLowerCase().includes(searchTerm));
+      return match;
+    });
+    setFilteredSuppliers(filtered.slice(0, supplierPage * SUPPLIERS_PER_PAGE));
+  }, [supplierSearch, suppliers, supplierPage]);
+
+  const fileInputRef = useRef(null);
+
   return (
     <>
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{}}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ margin: "0 0 10px 40px" }}>Inventory</h3>
+      {/* Loading Overlay for Initial Load */}
+      {isLoading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              className="pi pi-spin pi-spinner"
+              style={{ fontSize: "2rem", marginBottom: "10px" }}
+            ></div>
+            <p>Loading inventory data...</p>
           </div>
         </div>
-      </div>
+      )}
 
       <div
         className="inventory-wrapper"
@@ -1227,553 +2025,2075 @@ const Invent = () => {
           {isLoading ? (
             <TableSkeleton showSummary={false} />
           ) : (
-            <>
-              {isMobile
-                ? // Mobile view
-                  renderMobileInventoryCards()
-                : // Desktop view
-                  renderDesktopView()}
-            </>
+            <>{isMobile ? renderMobileInventoryCards() : renderDesktopView()}</>
           )}
         </div>
       </div>
 
       {renderInventoryItems()}
 
-      <Toast ref={toast} />
-
       <Dialog
-        visible={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        header="Update Stock"
-        className="edit-inventory-modal"
-        modal
-        dismissableMask
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "35vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        open={showEditModal && editItem.id}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditItem({
+            id: null,
+            productName: "",
+            category: [], // always an array
+            stockQuantity: "",
+            price: "",
+            description: "",
+            serviceArea: "",
+            productImage: null,
+            fileName: "",
+            height: 1,
+            hsCode: '',
+            countryOfOrigin: '',
+            weight: 1,
+            width: 1,
+            length_: 1,
+          });
+        }}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
+            overflowY: "auto",
+            position: "relative",
+          },
         }}
       >
-        <div className="edit-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="productName">Product Name</label>
-              <InputText
-                id="productName"
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Edit Product
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowEditModal(false)}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Image
+              </Typography>
+              <Box
+                sx={{
+                  border: "1px dashed #D1D5DB",
+                  borderRadius: "12px",
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#F9FAFB",
+                  position: "relative",
+                  cursor: "pointer",
+                  height: "160px",
+                  overflow: "hidden",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#0387D9",
+                    backgroundColor: "#F0F9FF",
+                  },
+                }}
+              >
+                {editItem.productImage || imagePreview ? (
+                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <img
+                      src={imagePreview || editItem.productImage}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        backgroundColor: "rgba(255,255,255,0.8)",
+                        "&:hover": { backgroundColor: "#fff" },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditItem({ ...editItem, productImage: null });
+                        setImagePreview(null);
+                        if (fileInputRef.current) fileInputRef.current.value = null;
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    <CloudUploadIcon sx={{ fontSize: 40, color: "#9CA3AF" }} />
+                    <Typography variant="body2" color="#6B7280">
+                      Drag and drop or click to upload
+                    </Typography>
+                    <Typography variant="caption" color="#9CA3AF">
+                      Supports JPG, PNG or GIF up to 5MB
+                    </Typography>
+                  </Box>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                    left: 0,
+                    top: 0,
+                  }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setEditItem({ ...editItem, productImage: file });
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  ref={fileInputRef}
+                />
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Name
+              </Typography>
+              <TextField
                 value={editItem.productName}
                 onChange={(e) =>
                   setEditItem({ ...editItem, productName: e.target.value })
                 }
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="category">Category</label>
-              <InputText
-                id="category"
-                value={editItem.category}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, category: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="serviceArea">Service Area</label>
-              <InputText
-                id="serviceArea"
-                value={editItem.serviceArea}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, serviceArea: e.target.value })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="stockQuantity">Stock Quantity</label>
-              <InputText
-                id="stockQuantity"
-                type="number"
-                value={editItem.stockQuantity}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, stockQuantity: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="price">Price</label>
-              <InputText
-                id="price"
-                type="number"
-                step="0.01"
-                value={editItem.price}
-                onChange={(e) =>
-                  setEditItem({ ...editItem, price: e.target.value })
-                }
-              />
-            </div>
-          </div>
-
-          <div
-            className="button-row"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
-            }}
-          >
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              onClick={() => setShowEditModal(false)}
-              className="p-button-text"
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-            <Button
-              label={isLoading ? "Updating..." : "Update Product"}
-              icon="pi pi-check"
-              onClick={handleUpdate}
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={showAddModal}
-        onHide={() => setShowAddModal(false)}
-        header="Add New Product"
-        className="add-inventory-modal"
-        modal
-        dismissableMask
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        style={{ width: "35vw" }}
-        contentStyle={{ overflow: "visible" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
-        }}
-      >
-        <div className="add-form" style={{ overflow: "hidden" }}>
-          <div className="form-row">
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="productName">Product Name</label>
-              <InputText
-                id="productName"
-                value={newItem.productName}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, productName: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="category">Category</label>
-              <InputText
-                id="category"
-                value={newItem.category}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, category: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div
-              className="form-group-1"
-              style={{ display: "block", marginBottom: "15px", border: "none" }}
-            >
-              <label htmlFor="serviceArea">Service Area</label>
-              <Dropdown
-                id="serviceArea"
-                value={newItem.serviceArea}
-                options={serviceAreaOptions}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, serviceArea: e.value })
-                }
-                placeholder="Select a service area"
-                style={{
-                  width: "100%",
-                  height: "45px",
-                  alignContent: "center",
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product name"
+                size="medium"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
                 }}
-                inputStyle={dropdownStyles}
-                className="no-border-dropdown"
+                disabled
               />
-            </div>
+            </Box>
 
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="stockQuantity">Stock Quantity</label>
-              <InputText
-                id="stockQuantity"
-                type="number"
-                value={newItem.stockQuantity}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, stockQuantity: e.target.value })
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Category
+              </Typography>
+              <Autocomplete
+                multiple
+                options={categoryOptions}
+                getOptionLabel={(option) => option.label}
+                filterOptions={(options, state) =>
+                  options.filter(opt =>
+                    !editItem.category.includes(opt.value) &&
+                    (!state.inputValue ||
+                      opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                  )
                 }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div
-              className="form-group"
-              style={{ display: "block", marginBottom: "15px" }}
-            >
-              <label htmlFor="price">Price</label>
-              <InputText
-                id="price"
-                type="number"
-                step="0.01"
-                value={newItem.price}
-                onChange={(e) =>
-                  setNewItem({ ...newItem, price: e.target.value })
-                }
-                style={{ width: "100%" }}
-              />
-            </div>
-          </div>
-
-          <div
-            className="form-row"
-            style={{ display: "block", marginBottom: "15px" }}
-          >
-            <label htmlFor="productImage">Product Image</label>
-            <div style={{ marginTop: "8px" }}>
-              {imagePreview && (
-                <div style={{ marginBottom: "10px" }}>
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "200px",
-                      borderRadius: "4px",
-                      border: "1px solid #ced4da",
+                open={categoryDropdownOpen}
+                onOpen={() => setCategoryDropdownOpen(true)}
+                onClose={() => setCategoryDropdownOpen(false)}
+                openOnFocus
+                value={categoryOptions.filter(opt => editItem.category.includes(opt.value))}
+                onChange={(event, newValue) => {
+                  setEditItem({
+                    ...editItem,
+                    category: newValue.map(opt => opt.value),
+                  });
+                }}
+                disablePortal
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={
+                      categoryOptions.length === 0
+                        ? "No categories available"
+                        : "Select categories..."
+                    }
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "10px",
+                        backgroundColor: "#F9FAFB",
+                        "& fieldset": {
+                          borderColor: "#E5E7EB",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#D1D5DB",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#0387D9",
+                        },
+                      },
                     }}
                   />
-                  <Button
-                    icon="pi pi-times"
-                    className="p-button-rounded p-button-danger p-button-text"
-                    onClick={() => {
-                      setProductImage(null);
-                      setImagePreview(null);
+                )}
+                renderOption={(props, option, { index }) => (
+                  <Box
+                    component="li"
+                    {...props}
+                    key={option.value || index}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      py: 1.5,
+                      borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
                     }}
-                    style={{ position: "absolute", top: "5px", right: "5px" }}
-                    tooltip="Remove image"
-                  />
-                </div>
-              )}
-              <input
-                type="file"
-                id="productImage"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{ display: "none" }}
+                  >
+                    {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                    <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                  </Box>
+                )}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => (
+                    <Chip
+                      key={option.value}
+                      label={option.label}
+                      // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                      {...getTagProps({ index })}
+                      sx={{
+                        bgcolor: '#f1f5f9',
+                        color: '#334155',
+                        fontWeight: 500,
+                        fontSize: '0.8rem',
+                        height: 24,
+                        borderRadius: '6px',
+                        mr: 0.5,
+                      }}
+                    />
+                  ))
+                }
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                disabled={categoryOptions.length === 0}
               />
-              <Button
-                label={imagePreview ? "Change Image" : "Upload Image"}
-                icon="pi pi-upload"
-                onClick={() => document.getElementById("productImage").click()}
-                className="p-button-outlined"
-                style={{ width: "100%" }}
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <TextField
+                value={editItem.description || ""}
+                onChange={(e) =>
+                  setEditItem({ ...editItem, description: e.target.value })
+                }
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product description"
+                multiline
+                rows={4}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
               />
-            </div>
-          </div>
+            </Box>
 
-          <div
-            className="button-row"
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              marginTop: "20px",
-            }}
-          >
-            <Button
-              label="Cancel"
-              onClick={() => setShowAddModal(false)}
-              className="p-button-text"
-              autoFocus={false}
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                width: "200px",
-                outline: "none",
-              }}
-            />
-            <Button
-              label={isLoading ? "Saving..." : "Save Product"}
-              icon="pi pi-check"
-              onClick={handleSaveProduct}
-              disabled={isLoading}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                width: "200px",
-              }}
-            />
-          </div>
-        </div>
-      </Dialog>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Price (per unit)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.price}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, price: e.target.value })
+                  }
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    startAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                        $
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Stock Quantity
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.stockQuantity}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, stockQuantity: e.target.value })
+                  }
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
 
-      <Dialog
-        visible={showDeleteConfirmation}
-        onHide={() => setShowDeleteConfirmation(false)}
-        header="Confirm Deletion"
-        modal
-        dismissableMask
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
-        }}
-        footer={
-          <div
-            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
-          >
-            <Button
-              label="Cancel"
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                border: "1px solid #EF4444",
-                width: "100px",
-                outline: "none",
-              }}
-              onClick={() => setShowDeleteConfirmation(false)}
-              className="p-button-text"
-              disabled={isLoading}
-            />
-            <Button
-              label={isLoading ? "Deleting..." : "Yes"}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                border: "1px solid #0387D9",
-                width: "100px",
-                outline: "none",
-              }}
-              onClick={confirmDelete}
-              className="p-button-danger"
-              disabled={isLoading}
-            />
-          </div>
-        }
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ fontSize: "2rem", color: "#ff9800", marginRight: "10px" }}
-          ></i>
-          <span>Are you sure you want to delete this product?</span>
-        </div>
-      </Dialog>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, hsCode: "" });
+                    } else {
+                      setEditItem({ ...editItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
 
-      <Dialog
-        visible={showViewModal}
-        onHide={handleCloseViewModal}
-        header="Inventory Summary"
-        className="view-inventory-modal"
-        style={{ width: "80%", maxWidth: "800px" }}
-        modal
-        dismissableMask
-        blockScroll
-      >
-        <div className="view-form">
-          {/* Product Image and Name Section */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "24px",
-              padding: "12px",
-              backgroundColor: "#F9FAFB",
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={editItem.countryOfOrigin || ""}
+                  onChange={(e) => setEditItem({ ...editItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, height: "" });
+                    } else {
+                      setEditItem({ ...editItem, height: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, height: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.width || ""}
+                  onChange={(e) => setEditItem({ ...editItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setEditItem({ ...editItem, weight: "" });
+                    } else {
+                      setEditItem({ ...editItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setEditItem({ ...editItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={editItem.length_ || ""}
+                  onChange={(e) => setEditItem({ ...editItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+          </Stack>
+        </Box>
+
+        {/* Sticky action buttons */}
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            width: "100%",
+            backgroundColor: "#fff",
+            borderTop: "1px solid #f0f0f0",
+            p: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
+            gap: 2,
+            mt: 2,
+            zIndex: 5,
+          }}
+        >
+          <Button
+            onClick={() => setShowEditModal(false)}
+            variant="outlined"
+            sx={{
               borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
             }}
           >
-            {viewItem.productImage ? (
-              <img
-                src={viewItem.productImage}
-                alt={viewItem.productName}
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "4px",
-                  objectFit: "cover",
-                }}
-              />
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUpdate}
+            disabled={isLoading}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            {isLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span>Updating...</span>
+              </Box>
             ) : (
-              <div
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  borderRadius: "4px",
-                  backgroundColor: "#E5E7EB",
+              "Save Changes"
+            )}
+          </Button>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={showAddModal}
+        onClose={handleCloseAddModal}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
+            overflowY: "auto",
+            position: "relative",
+          },
+        }}
+      >
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Add New Product
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseAddModal}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+          <Stack spacing={3}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Product Image
+              </Typography>
+              <Box
+                sx={{
+                  border: "1px dashed #D1D5DB",
+                  borderRadius: "12px",
+                  p: 2,
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
+                  backgroundColor: "#F9FAFB",
+                  position: "relative",
+                  cursor: "pointer",
+                  height: "160px",
+                  overflow: "hidden",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    borderColor: "#0387D9",
+                    backgroundColor: "#F0F9FF",
+                  },
                 }}
               >
-                <i
-                  className="pi pi-image"
-                  style={{ fontSize: "24px", color: "#9CA3AF" }}
-                ></i>
-              </div>
-            )}
-            <div>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "600" }}>
-                {viewItem.productName}
-              </h3>
-              <p
-                style={{
-                  margin: "4px 0 0 0",
-                  fontSize: "14px",
-                  color: "#6B7280",
-                }}
-              >
-                {viewItem.category}
-              </p>
-            </div>
-          </div>
+                {imagePreview ? (
+                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        backgroundColor: "rgba(255,255,255,0.8)",
+                        "&:hover": { backgroundColor: "#fff" },
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setProductImage(null);
+                        setImagePreview(null);
+                        setNewItem({ ...newItem, fileName: "" });
+                        if (fileInputRef.current) fileInputRef.current.value = null;
+                      }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    gap={1}
+                  >
+                    <CloudUploadIcon sx={{ fontSize: 40, color: "#9CA3AF" }} />
+                    <Typography variant="body2" color="#6B7280">
+                      Drag and drop or click to upload
+                    </Typography>
+                    <Typography variant="caption" color="#9CA3AF">
+                      Supports JPG, PNG or GIF up to 5MB
+                    </Typography>
+                  </Box>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "100%",
+                    opacity: 0,
+                    cursor: "pointer",
+                    left: 0,
+                    top: 0,
+                  }}
+                  onChange={handleImageChange}
+                  ref={fileInputRef}
+                />
+              </Box>
+            </Box>
 
-          {/* Details Grid */}
-          <div style={{ display: "grid", gap: "16px" }}>
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
                 Product Name
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
+              </Typography>
+              <TextField
+                value={newItem.productName}
+                onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product name"
+                size="medium"
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
                 }}
-              >
-                {viewItem.productName}
-              </span>
-            </div>
+              />
+            </Box>
 
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <TextField
+                value={newItem.description}
+                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                fullWidth
+                variant="outlined"
+                placeholder="Enter product description"
+                multiline
+                rows={4}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
+                  },
+                }}
+              />
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
                 Category
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.category}
-              </span>
-            </div>
+              </Typography>
+              <FormControl fullWidth>
+                <Autocomplete
+                  multiple
+                  options={categoryOptions}
+                  getOptionLabel={(option) => option.label}
+                  filterOptions={(options, state) =>
+                    options.filter(opt =>
+                      !newItem.category.includes(opt.value) &&
+                      (!state.inputValue ||
+                        opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                    )
+                  }
+                  open={categoryDropdownOpen}
+                  onOpen={() => setCategoryDropdownOpen(true)}
+                  onClose={() => setCategoryDropdownOpen(false)}
+                  openOnFocus
+                  value={categoryOptions.filter(opt => newItem.category.includes(opt.value))}
+                  onChange={(event, newValue) => {
+                    setNewItem({
+                      ...newItem,
+                      category: newValue.map(opt => opt.value),
+                    });
+                  }}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={
+                        categoryOptions.length === 0
+                          ? "No categories available"
+                          : "Select categories..."
+                      }
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                          backgroundColor: "#F9FAFB",
+                          "& fieldset": {
+                            borderColor: "#E5E7EB",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#D1D5DB",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#0387D9",
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option, { index }) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={option.value || index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 1.5,
+                        borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                      }}
+                    >
+                      {/* <img
+                      src={option.icon}
+                      alt={option.label}
+                      style={{ width: 24, height: 24, objectFit: "contain" }}
+                      loading="lazy"
+                    /> */}
+                      <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                    </Box>
+                  )}
+                  renderTags={(tagValue, getTagProps) =>
+                    tagValue.map((option, index) => (
+                      <Chip
+                        key={option.value}
+                        label={option.label}
+                        // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
+                        {...getTagProps({ index })}
+                        sx={{
+                          bgcolor: '#f1f5f9',
+                          color: '#334155',
+                          fontWeight: 500,
+                          fontSize: '0.8rem',
+                          height: 24,
+                          borderRadius: '6px',
+                          mr: 0.5,
+                        }}
+                      />
+                    ))
+                  }
+                  isOptionEqualToValue={(option, value) => option.value === value.value}
+                  noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                  disabled={categoryOptions.length === 0}
+                />
+              </FormControl>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Price (per unit)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.price}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, price: "" });
+                    } else {
+                      setNewItem({ ...newItem, price: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, price: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    startAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                        $
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Stock Quantity
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.stockQuantity || ""}
+                  onChange={(e) => setNewItem({ ...newItem, stockQuantity: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        units
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  HS Code
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.hsCode}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, hsCode: "" });
+                    } else {
+                      setNewItem({ ...newItem, hsCode: val });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the HS Code"
+                  InputProps={{
 
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>Price</span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.price}
-              </span>
-            </div>
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Country Of Origin
+                </Typography>
+                <TextField
+                  type="text"
+                  value={newItem.countryOfOrigin || ""}
+                  onChange={(e) => setNewItem({ ...newItem, countryOfOrigin: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Enter the country"
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Height (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.height}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, height: "" });
+                    } else {
+                      setNewItem({ ...newItem, height: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, height: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Width (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.width || ""}
+                  onChange={(e) => setNewItem({ ...newItem, width: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Weight (ounces)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.weight}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Allow empty string for clearing
+                    if (val === "") {
+                      setNewItem({ ...newItem, weight: "" });
+                    } else {
+                      setNewItem({ ...newItem, weight: val });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const val = Number(e.target.value);
+                    if (val < 1 || isNaN(val)) {
+                      setNewItem({ ...newItem, weight: 1 });
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0.00"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        oz
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Length (inches)
+                </Typography>
+                <TextField
+                  type="number"
+                  value={newItem.length_ || ""}
+                  onChange={(e) => setNewItem({ ...newItem, length_: e.target.value })}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="0"
+                  InputProps={{
+                    endAdornment: (
+                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                        in
+                      </Typography>
+                    ),
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                        borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#0387D9",
+                      },
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
 
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Availability
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.stockQuantity}
-              </span>
-            </div>
+            {user?.role?.name === 'admin' && (
+              <Box>
+                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                  Supplier
+                </Typography>
+                <Autocomplete
+                  options={filteredSuppliers}
+                  getOptionLabel={(option) =>
+                    option.businessName ||
+                    option.companyName ||
+                    option.name ||
+                    option.user?.email ||
+                    ""
+                  }
+                  filterOptions={(options) => options}
+                  onInputChange={(event, value) => setSupplierSearch(value)}
+                  open={supplierDropdownOpen}
+                  onOpen={() => setSupplierDropdownOpen(true)}
+                  onClose={() => setSupplierDropdownOpen(false)}
+                  openOnFocus
+                  value={selectedSupplier}
+                  onChange={(event, newValue) => {
+                    setSelectedSupplier(newValue);
+                    setNewItem({
+                      ...newItem,
+                      supplier: newValue ? newValue._id : "",
+                    });
+                  }}
+                  disablePortal
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder={
+                        suppliersLoading
+                          ? "Loading suppliers..."
+                          : "Type supplier name, company, or email..."
+                      }
+                      variant="outlined"
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "10px",
+                          backgroundColor: "#F9FAFB",
+                          "& fieldset": {
+                            borderColor: "#E5E7EB",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#D1D5DB",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#0387D9",
+                          },
+                        },
+                      }}
+                      helperText={
+                        suppliersLoading
+                          ? "Loading suppliers..."
+                          : "Search by business name, company name, or email"
+                      }
+                      FormHelperTextProps={{
+                        sx: { color: "#9CA3AF", mt: 0.5, ml: 1 }
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option, { index }) => (
+                    <Box
+                      component="li"
+                      {...props}
+                      key={
+                        option._id ||
+                        option.email ||
+                        option.businessName ||
+                        option.name ||
+                        index
+                      }
+                      sx={{
+                        py: 1.5,
+                        borderBottom: index < filteredSuppliers.length - 1 ? "1px solid #F3F4F6" : "none"
+                      }}
+                    >
+                      <Box>
+                        <Box sx={{ fontWeight: "600", color: "#111827" }}>
+                          {option.businessName || option.companyName || option.name}
+                        </Box>
+                        <Box sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
+                          {option.user?.email}
+                        </Box>
+                      </Box>
+                    </Box>
+                  )}
+                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  noOptionsText={
+                    suppliersLoading ? "Loading..." : "No suppliers found"
+                  }
+                  loading={suppliersLoading}
+                  disabled={suppliersLoading}
+                />
+              </Box>
+            )}
 
-            <div
-              className="detail-row"
-              style={{ display: "flex", justifyContent: "space-between" }}
-            >
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
-                Service Area
-              </span>
-              <span
-                style={{
-                  color: "#111827",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                }}
-              >
-                {viewItem.serviceArea}
-              </span>
-            </div>
-          </div>
-        </div>
+          </Stack>
+        </Box>
+
+        {saveError && (
+          <Box sx={{
+            backgroundColor: "#FEF2F2",
+            color: "#B91C1C",
+            p: 2,
+            mx: 3,
+            mb: 2,
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: 1
+          }}>
+            <ErrorOutlineIcon fontSize="small" />
+            <Typography variant="body2">{saveError}</Typography>
+          </Box>
+        )}
+
+        {saveSuccess && (
+          <Box sx={{
+            backgroundColor: "#ECFDF5",
+            color: "#065F46",
+            p: 2,
+            mx: 3,
+            mb: 2,
+            borderRadius: "8px",
+            display: "flex",
+            alignItems: "center",
+            gap: 1
+          }}>
+            <CheckCircleIcon fontSize="small" />
+            <Typography variant="body2">{saveSuccess}</Typography>
+          </Box>
+        )}
+
+        {/* Sticky action buttons */}
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            width: "100%",
+            backgroundColor: "#fff",
+            borderTop: "1px solid #f0f0f0",
+            p: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
+            gap: 2,
+            zIndex: 5,
+          }}
+        >
+          <Button
+            onClick={handleCloseAddModal}
+            variant="outlined"
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveProduct}
+            disabled={isLoading}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            {isLoading ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span>Saving...</span>
+              </Box>
+            ) : (
+              "Save Product"
+            )}
+          </Button>
+        </Box>
       </Dialog>
 
-      {/* Add Email Modal */}
       <Dialog
-        visible={showEmailModal}
-        onHide={() => setShowEmailModal(false)}
-        header="Send Email"
-        className="email-modal"
-        modal
-        dismissableMask
-        style={{ width: "50vw" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        maskStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
-          backdropFilter: "blur(4px)",
+        open={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        maxWidth="xs"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "400px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            overflow: "hidden",
+          },
         }}
       >
-        <div className="email-form" style={{ padding: "20px" }}>
+        <Box sx={{
+          position: "relative",
+          backgroundColor: "#FEF2F2",
+          py: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Box
+            sx={{
+              width: 64,
+              height: 64,
+              borderRadius: "50%",
+              backgroundColor: "#FEE2E2",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2
+            }}
+          >
+            <DeleteIcon sx={{ fontSize: 32, color: "#DC2626" }} />
+          </Box>
+          <Typography variant="h6" fontWeight="600" color="#111827" align="center">
+            Delete Product
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowDeleteConfirmation(false)}
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "rgba(107, 114, 128, 0.08)",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: 3 }}>
+          <Typography variant="body1" align="center" color="#4B5563" sx={{ mb: 3 }}>
+            Are you sure you want to delete this product? This action cannot be undone.
+          </Typography>
+
+          <Box sx={{
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            gap: 2,
+            justifyContent: "center"
+          }}>
+            <Button
+              onClick={() => setShowDeleteConfirmation(false)}
+              variant="outlined"
+              fullWidth
+              sx={{
+                borderRadius: "8px",
+                borderColor: "#D1D5DB",
+                color: "#374151",
+                fontWeight: 600,
+                py: 1.5,
+                "&:hover": {
+                  borderColor: "#9CA3AF",
+                  backgroundColor: "#F9FAFB",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              variant="contained"
+              fullWidth
+              sx={{
+                borderRadius: "8px",
+                backgroundColor: "#DC2626",
+                color: "#fff",
+                fontWeight: 600,
+                py: 1.5,
+                "&:hover": {
+                  backgroundColor: "#B91C1C",
+                },
+              }}
+            >
+              {isLoading ? (
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                  <span>Deleting...</span>
+                </Box>
+              ) : (
+                "Delete Product"
+              )}
+            </Button>
+          </Box>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={showViewModal && viewItem.id}
+        onClose={handleCloseViewModal}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "none",
+            maxWidth: { xs: "100%", sm: "600px" },
+            width: "100%",
+            borderRadius: { xs: 0, sm: "16px" },
+            boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+            m: { xs: 0, sm: 2 },
+            p: { xs: 0, sm: 0 },
+            height: { xs: "100vh", sm: "auto" },
+            maxHeight: { xs: "100vh", sm: "90vh" },
+            overflowY: "auto",
+            position: "relative",
+          },
+        }}
+      >
+        <Box sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          backgroundColor: "#fff",
+          borderBottom: "1px solid #f0f0f0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          px: 3,
+          py: 2,
+          borderTopLeftRadius: { xs: 0, sm: "16px" },
+          borderTopRightRadius: { xs: 0, sm: "16px" },
+        }}>
+          <Typography variant="h6" fontWeight="600" color="#111827">
+            Product Details
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseViewModal}
+            sx={{
+              color: "#6B7280",
+              "&:hover": {
+                backgroundColor: "#F3F4F6",
+                color: "#111827",
+              },
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={3}>
+            <Box sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 3,
+              alignItems: { xs: "flex-start", sm: "center" }
+            }}>
+              {viewItem.productImage ? (
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "120px" },
+                    height: { xs: "200px", sm: "120px" },
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "1px solid #E5E7EB",
+                    backgroundColor: "#F9FAFB",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <img
+                    src={viewItem.productImage}
+                    alt={viewItem.productName}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    width: { xs: "100%", sm: "120px" },
+                    height: { xs: "200px", sm: "120px" },
+                    borderRadius: "12px",
+                    backgroundColor: "#F3F4F6",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#9CA3AF",
+                  }}
+                >
+                  <Box sx={{ textAlign: "center", p: 1 }}>
+                    <ImageIcon sx={{ fontSize: 40, mb: 1 }} />
+                    <Typography variant="caption" display="block">
+                      No image available
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h5" fontWeight="600" color="#111827" gutterBottom>
+                  {viewItem.productName}
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                  {viewItem.category && viewItem.category.length > 0 && viewItem.category.map((cat) => (
+                    <Chip
+                      key={cat}
+                      label={cat}
+                      size="small"
+                      sx={{
+                        backgroundColor: "#F3F4F6",
+                        color: "#374151",
+                        fontWeight: 500,
+                        borderRadius: "6px"
+                      }}
+                    />
+                  ))}
+                  <Chip
+                    label={`ID: ${viewItem.productId?.slice?.(-6) || viewItem.productId || "—"}`}
+                    size="small"
+                    sx={{
+                      backgroundColor: "#F3F4F6",
+                      color: "#374151",
+                      fontWeight: 500,
+                      borderRadius: "6px"
+                    }}
+                  />
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Price
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.price ? formatCurrency(Number(viewItem.price)) + " per unit" : "—"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+
+            <Divider sx={{ my: 1 }} />
+
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Box>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Stock Quantity
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Box
+                      sx={{
+                        backgroundColor:
+                          getStockStatus(viewItem.stockQuantity) === "high"
+                            ? "#ECFDF3"
+                            : getStockStatus(viewItem.stockQuantity) === "medium"
+                              ? "#FFFAEB"
+                              : "#FEF3F2",
+                        color:
+                          getStockStatus(viewItem.stockQuantity) === "high"
+                            ? "#059669"
+                            : getStockStatus(viewItem.stockQuantity) === "medium"
+                              ? "#D97706"
+                              : "#DC2626",
+                        py: 0.5,
+                        px: 1.5,
+                        borderRadius: "6px",
+                        display: "inline-block",
+                        fontSize: "0.875rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {viewItem.stockQuantity || 0} units
+                    </Box>
+                    <Typography variant="body2" color="#6B7280">
+                      {getStockStatus(viewItem.stockQuantity) === "high"
+                        ? "High stock"
+                        : getStockStatus(viewItem.stockQuantity) === "medium"
+                          ? "Medium stock"
+                          : "Low stock"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Box>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Supplier
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {typeof viewItem.supplier === "object"
+                      ? viewItem.supplier.businessName ||
+                      viewItem.supplier.user?.email ||
+                      "Not available"
+                      : typeof viewItem.supplier === "string" &&
+                        viewItem.supplier.trim() !== ""
+                        ? viewItem.supplier
+                        : "Not available"}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  HS Code
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.hsCode || "—"}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography variant="body2" color="#6B7280" gutterBottom>
+                  Country of Origin
+                </Typography>
+                <Typography variant="body1" fontWeight="600" color="#111827">
+                  {viewItem.countryOfOrigin || "—"}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Description
+              </Typography>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  borderRadius: "10px",
+                  backgroundColor: "#F9FAFB",
+                  border: "1px solid #E5E7EB",
+                  minHeight: "100px",
+                }}
+              >
+                <Typography variant="body2" color="#4B5563" whiteSpace="pre-wrap">
+                  {viewItem.description || "No description available"}
+                </Typography>
+              </Paper>
+            </Box>
+
+            {/* Physical Attributes Section */}
+            <Box>
+              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                Physical Attributes
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Weight
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.weight ? `${viewItem.weight} oz` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Height
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.height ? `${viewItem.height} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Width
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.width ? `${viewItem.width} in` : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Typography variant="body2" color="#6B7280" gutterBottom>
+                    Length
+                  </Typography>
+                  <Typography variant="body1" fontWeight="600" color="#111827">
+                    {viewItem.length_ ? `${viewItem.length_} in` : "—"}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Box>
+
+          </Stack>
+        </Box>
+
+        {/* Action buttons */}
+        <Box
+          sx={{
+            borderTop: "1px solid #f0f0f0",
+            p: 2,
+            display: "flex",
+            flexDirection: { xs: "column", sm: "row" },
+            justifyContent: "flex-end",
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          <Button
+            onClick={handleCloseViewModal}
+            variant="outlined"
+            sx={{
+              borderRadius: "8px",
+              borderColor: "#D1D5DB",
+              color: "#374151",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                borderColor: "#9CA3AF",
+                backgroundColor: "#F9FAFB",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            onClick={() => {
+              handleCloseViewModal();
+              handleEditModal(viewItem);
+            }}
+            variant="contained"
+            sx={{
+              borderRadius: "8px",
+              backgroundColor: "#0387D9",
+              color: "#fff",
+              fontWeight: 600,
+              py: 1.5,
+              px: 4,
+              "&:hover": {
+                backgroundColor: "#0369A1",
+              },
+              width: { xs: "100%", sm: "auto" },
+            }}
+          >
+            Edit Product
+          </Button>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        maxWidth="sm"
+        fullWidth
+        sx={{
+          zIndex: 9999,
+          "& .MuiDialog-paper": {
+            zIndex: 9999,
+            backgroundColor: "#ffffff",
+            border: "2px solid #0387D9",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 600,
+            fontSize: 22,
+            pb: 0,
+            pr: 5,
+            backgroundColor: "#f0f8ff",
+          }}
+        >
+          Send Email
+          <IconButton
+            aria-label="close"
+            onClick={() => setShowEmailModal(false)}
+            sx={{ position: "absolute", right: 16, top: 16 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
           <div className="form-group" style={{ marginBottom: "20px" }}>
             <label
               htmlFor="to"
@@ -1785,7 +4105,7 @@ const Invent = () => {
             >
               To
             </label>
-            <InputText
+            <TextField
               id="to"
               value={emailData.to}
               onChange={(e) =>
@@ -1807,7 +4127,7 @@ const Invent = () => {
             >
               Subject
             </label>
-            <InputText
+            <TextField
               id="subject"
               value={emailData.subject}
               onChange={(e) =>
@@ -1844,37 +4164,52 @@ const Invent = () => {
                 resize: "vertical",
               }}
               placeholder="Enter your message"
+              required
             />
           </div>
-
-          <div
-            style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, pt: 2 }}>
+          <Button
+            onClick={() => setShowEmailModal(false)}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
           >
-            <Button
-              label="Cancel"
-              onClick={() => setShowEmailModal(false)}
-              className="p-button-text"
-              style={{
-                backgroundColor: "#EF4444",
-                color: "#fff",
-                border: "1px solid #EF4444",
-                width: "100px",
-              }}
-            />
-            <Button
-              label={isSendingEmail ? "Sending..." : "Send Email"}
-              onClick={handleEmailSubmit}
-              disabled={isSendingEmail}
-              style={{
-                backgroundColor: "#0387D9",
-                color: "#fff",
-                border: "1px solid #0387D9",
-                width: "100px",
-              }}
-            />
-          </div>
-        </div>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleEmailSubmit}
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 2, px: 4, fontWeight: 600 }}
+            disabled={
+              !emailData.to ||
+              !emailData.subject ||
+              !emailData.message ||
+              !emailData.message.trim() ||
+              isSendingEmail
+            }
+          >
+            Send Email
+          </Button>
+        </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{ zIndex: 1000000 }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

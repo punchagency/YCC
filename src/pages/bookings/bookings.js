@@ -45,6 +45,8 @@ import { useBooking } from "../../context/booking/bookingContext";
 import { useService } from "../../context/service/serviceContext";
 import { useTheme } from "../../context/theme/themeContext";
 import { useToast } from "../../components/Toast";
+import { Pagination } from "../../components/pagination";
+import { useOutletContext } from "react-router-dom";
 // import { formGroupClasses } from "@mui/material";
 
 const Bookings = () => {
@@ -122,6 +124,25 @@ const Bookings = () => {
     phoneNumber: "",
     deliveryDate: null,
   });
+
+  const { setPageTitle } = useOutletContext() || {};
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Bookings");
+  }, [setPageTitle]);
+
+  // Listen for create booking button click from title bar
+  React.useEffect(() => {
+    const handleCreateBookingClick = () => {
+      setShowVendorModal(true);
+    };
+    window.addEventListener("openCreateBookingModal", handleCreateBookingClick);
+    return () => {
+      window.removeEventListener(
+        "openCreateBookingModal",
+        handleCreateBookingClick
+      );
+    };
+  }, []);
 
   // Add this useEffect to handle window resizing
   useEffect(() => {
@@ -749,27 +770,6 @@ const Bookings = () => {
       style={{ width: "100%", padding: 0, margin: 0 }}
     >
       <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{
-          backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-          color: theme === "light" ? "#103B57" : "#FFFFFF",
-        }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3
-              style={{
-                fontSize: isMobile ? "16px" : isTablet ? "18px" : "20px",
-                margin: "0 0 10px 40px",
-              }}
-            >
-              Bookings
-            </h3>
-          </div>
-        </div>
-      </div>
-
-      <div
         className="bookings-wrapper"
         style={{
           height: "100vh",
@@ -1319,27 +1319,9 @@ const Bookings = () => {
                           width: "100%",
                         }}
                       >
-                        <button
-                          className="p-button-text p-button-sm"
-                          onClick={() => setShowVendorModal(true)}
-                          style={{
-                            backgroundColor: "#0387D9",
-                            color: "white",
-                            borderRadius: "5px",
-                            padding: "5px 10px",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            gap: "5px",
-                            border: "1px solid #0387D9",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <img src={plus} alt="Add Booking" />
-                          Add Booking
-                        </button>
+                        {/* Add Booking button removed; now only in title bar */}
                       </div>
-                      {/* Pagination component */}
+                      {/* Pagination component - always show desktop style, even on mobile */}
                       <div
                         className="pagination-container"
                         style={{
@@ -1350,66 +1332,36 @@ const Bookings = () => {
                           marginTop: "1rem",
                         }}
                       >
-                        <div className="flex justify-content-between align-items-center">
-                          <div className="flex align-items-center gap-2">
-                            <span
-                              style={{
-                                color:
-                                  theme === "light" ? "#103B57" : "#FFFFFF",
-                              }}
-                            >
-                              Rows per page:
-                            </span>
-                            <Dropdown
-                              value={pageSize}
-                              options={[5, 10, 15, 20, 30, 50]}
-                              onChange={(e) => {
-                                setPageSize(e.value);
-                                setCurrentPage(1);
-                              }}
-                              className="p-inputtext-sm"
-                            />
-                          </div>
-
-                          <div className="flex align-items-center gap-3">
-                            <Button
-                              icon="pi pi-angle-left"
-                              onClick={() =>
-                                setCurrentPage((prev) => Math.max(1, prev - 1))
-                              }
-                              disabled={currentPage === 1}
-                              className="p-button-text"
-                            />
-                            <span
-                              style={{
-                                color:
-                                  theme === "light" ? "#103B57" : "#FFFFFF",
-                              }}
-                            >
-                              Page {currentPage} of{" "}
-                              {Math.ceil(totalRecords / pageSize)}
-                            </span>
-                            <Button
-                              icon="pi pi-angle-right"
-                              onClick={() => setCurrentPage((prev) => prev + 1)}
-                              disabled={
-                                currentPage >=
-                                Math.ceil(totalRecords / pageSize)
-                              }
-                              className="p-button-rounded p-button-outlined"
-                              style={{ minWidth: "40px" }}
-                            />
-                            <span
-                              className="text-sm"
-                              style={{
-                                color:
-                                  theme === "light" ? "#103B57" : "#FFFFFF",
-                              }}
-                            >
-                              Total Records: {totalRecords}
-                            </span>
-                          </div>
+                        <div
+                          className="flex align-items-center gap-2"
+                          style={{ marginBottom: "1rem" }}
+                        >
+                          <span
+                            style={{
+                              color: theme === "light" ? "#103B57" : "#FFFFFF",
+                            }}
+                          >
+                            Rows per page:
+                          </span>
+                          <Dropdown
+                            value={pageSize}
+                            options={[5, 10, 15, 20, 30, 50]}
+                            onChange={(e) => {
+                              setPageSize(e.value);
+                              setCurrentPage(1);
+                            }}
+                            className="p-inputtext-sm"
+                          />
                         </div>
+                        <Pagination
+                          currentPage={currentPage}
+                          totalPages={Math.ceil(totalRecords / pageSize)}
+                          totalItems={totalRecords}
+                          itemsPerPage={pageSize}
+                          onPageChange={setCurrentPage}
+                          isMobile={false}
+                          isTablet={false}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1424,27 +1376,7 @@ const Bookings = () => {
                         padding: "0 15px",
                       }}
                     >
-                      <button
-                        className="p-button-text p-button-sm"
-                        onClick={() => setShowVendorModal(true)}
-                        style={{
-                          backgroundColor: "#0387D9",
-                          color: "white",
-                          borderRadius: "5px",
-                          padding: "10px 15px",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          gap: "5px",
-                          border: "1px solid #0387D9",
-                          cursor: "pointer",
-                          width: "100%",
-                          maxWidth: "250px",
-                        }}
-                      >
-                        <img src={plus} alt="Add Booking" />
-                        Add Booking
-                      </button>
+                      {/* Add Booking button removed; now only in title bar */}
                     </div>
                     {loading ? (
                       <div className="mobile-skeleton-loader">
@@ -1477,107 +1409,6 @@ const Bookings = () => {
                         }}
                       >
                         No bookings found
-                      </div>
-                    )}
-
-                    {/* Mobile Pagination */}
-                    {bookingData && bookingData.length > 0 && (
-                      <div
-                        className="mobile-pagination"
-                        style={{
-                          padding: "15px",
-                          marginTop: "20px",
-                          backgroundColor:
-                            theme === "light" ? "#FFFFFF" : "#03141F",
-                          borderRadius: "8px",
-                          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            gap: "15px",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              width: "100%",
-                              gap: "10px",
-                            }}
-                          >
-                            <Button
-                              icon="pi pi-angle-left"
-                              onClick={() =>
-                                setCurrentPage((prev) => Math.max(1, prev - 1))
-                              }
-                              disabled={currentPage === 1}
-                              className="p-button-rounded p-button-outlined"
-                              style={{ minWidth: "40px" }}
-                            />
-
-                            <span
-                              style={{
-                                color:
-                                  theme === "light" ? "#103B57" : "#FFFFFF",
-                              }}
-                            >
-                              Page {currentPage} of{" "}
-                              {Math.ceil(totalRecords / pageSize)}
-                            </span>
-
-                            <Button
-                              icon="pi pi-angle-right"
-                              onClick={() => setCurrentPage((prev) => prev + 1)}
-                              disabled={
-                                currentPage >=
-                                Math.ceil(totalRecords / pageSize)
-                              }
-                              className="p-button-rounded p-button-outlined"
-                              style={{ minWidth: "40px" }}
-                            />
-                          </div>
-
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                            }}
-                          >
-                            <span
-                              style={{
-                                color:
-                                  theme === "light" ? "#103B57" : "#FFFFFF",
-                              }}
-                            >
-                              Rows per page:
-                            </span>
-                            <Dropdown
-                              value={pageSize}
-                              options={[5, 10, 15, 20, 30]}
-                              onChange={(e) => {
-                                setPageSize(e.value);
-                                setCurrentPage(1);
-                              }}
-                              className="p-inputtext-sm"
-                              style={{ width: "80px" }}
-                            />
-                          </div>
-
-                          <div
-                            style={{
-                              fontSize: "0.9rem",
-                              color: theme === "light" ? "#103B57" : "#FFFFFF",
-                            }}
-                          >
-                            Total Records: {totalRecords}
-                          </div>
-                        </div>
                       </div>
                     )}
                   </div>

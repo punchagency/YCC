@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react'; 
 import { useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
@@ -44,7 +43,12 @@ const Role = () => {
         className="p-button-rounded p-button-text"
         onClick={(e) => menuRef.current.toggle(e)}
       />
-      <OverlayPanel ref={menuRef} dismissable className="datatable-overlaypanel">
+              <OverlayPanel 
+                ref={menuRef} 
+                dismissable 
+                className="datatable-overlaypanel"
+                hideOverlaysOnDocumentScrolling={false}
+              >
         <Button
           label="Edit"
           icon="pi pi-pencil"

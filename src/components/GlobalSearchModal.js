@@ -248,7 +248,7 @@ const GlobalSearchModal = ({
       style={{
         display: "flex",
         gap: "10px",
-        padding: "8px 20px",
+        padding: window.innerWidth <= 768 ? "8px 12px" : "8px 20px",
         borderBottom: "1px solid #eaeaea",
         backgroundColor: "#f9f9f9",
         flexWrap: "wrap",
@@ -587,6 +587,7 @@ const GlobalSearchModal = ({
       onHide={onHide}
       header={dialogHeader}
       className="global-search-modal"
+      hideOverlaysOnDocumentScrolling={false}
       style={{
         width: "80vw",
         maxWidth: "800px",
@@ -601,7 +602,7 @@ const GlobalSearchModal = ({
           className="search-input-container"
           style={{
             position: "relative",
-            padding: "16px 20px",
+            padding: window.innerWidth <= 768 ? "16px 12px" : "16px 20px",
             borderBottom: "1px solid #eaeaea",
             backgroundColor: "#f9f9f9",
           }}
@@ -671,7 +672,7 @@ const GlobalSearchModal = ({
             style={{
               display: "flex",
               alignItems: "center",
-              padding: "10px 20px",
+              padding: window.innerWidth <= 768 ? "10px 12px" : "10px 20px",
               backgroundColor: "#e0f0ff",
               fontSize: "13px",
             }}
@@ -711,7 +712,7 @@ const GlobalSearchModal = ({
           style={{
             maxHeight: "60vh",
             overflowY: "auto",
-            padding: "20px",
+            padding: window.innerWidth <= 768 ? "16px 12px" : "20px",
             backgroundColor: "#fff",
           }}
         >

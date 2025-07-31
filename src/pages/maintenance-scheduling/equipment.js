@@ -144,6 +144,7 @@ const Equipment = () => {
         ref={menuRef}
         dismissable
         className="datatable-overlaypanel"
+        hideOverlaysOnDocumentScrolling={false}
       >
         <Button
           label="Edit"
@@ -246,7 +247,7 @@ const Equipment = () => {
             iconPos="right" // This will place the icon to the right of the text
             onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
           />
-          <OverlayPanel ref={op}>
+          <OverlayPanel ref={op} hideOverlaysOnDocumentScrolling={false}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
                 value={selectedManufacturer}

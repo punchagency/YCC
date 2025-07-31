@@ -9,7 +9,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
   const handleDownload = () => {
     const link = document.createElement("a")
     link.href = pdfUrl
-    link.download = fileName || "terms-and-conditions.pdf"
+    link.download = fileName || "document.pdf"
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -83,7 +83,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                     wordBreak: "break-word",
                   }}
                 >
-                  {title || "Terms and Conditions"}
+                  {title || "Document"}
                 </h2>
                 <p
                   style={{
@@ -93,7 +93,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                     lineHeight: "1.4",
                   }}
                 >
-                  Please review the complete terms and conditions
+                  Please review the complete document
                 </p>
               </div>
               <div
@@ -226,7 +226,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                   borderRadius: "0 0 16px 16px",
                 }}
                 onLoad={handleIframeLoad}
-                title={title || "Terms and Conditions"}
+                title={title || "Document"}
                 allow="fullscreen"
               />
             </div>
@@ -249,7 +249,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                   lineHeight: "1.5",
                 }}
               >
-                By closing this modal, you acknowledge that you have reviewed the terms and conditions
+                By closing this modal, you acknowledge that you have reviewed the document
               </p>
             </div>
           </motion.div>

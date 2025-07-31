@@ -12,6 +12,8 @@ import {
   getCrewInventoryData,
 } from "../../../services/crew/crewInventoryService";
 import { useUser } from "../../../context/userContext";
+import { useOutletContext } from "react-router-dom";
+import "./inventory.css";
 
 const Inventory = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -31,6 +33,28 @@ const Inventory = () => {
 
   // Get user data from context
   const { user } = useUser();
+
+  const { setPageTitle } = useOutletContext() || {};
+  useEffect(() => {
+    if (setPageTitle) setPageTitle("Inventory");
+
+    // Add event listener for create inventory button in title bar
+    const handleCreateInventoryModal = () => {
+      handleAddProduct();
+    };
+
+    window.addEventListener(
+      "openCreateInventoryModal",
+      handleCreateInventoryModal
+    );
+
+    return () => {
+      window.removeEventListener(
+        "openCreateInventoryModal",
+        handleCreateInventoryModal
+      );
+    };
+  }, [setPageTitle]);
 
   const categories = [
     { label: "Food & Beverage", value: "Food & Beverage" },
@@ -175,43 +199,6 @@ const Inventory = () => {
 
   return (
     <>
-      <div className="flex align-items-center justify-content-between sub-header-panel">
-        <div
-          className="sub-header-left sub-header-left-with-arrow"
-          style={{ width: "100%" }}
-        >
-          <div
-            className="content flex align-items-center justify-content-between"
-            style={{ width: "50rem" }}
-          >
-            <h3
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                marginLeft: "40px",
-              }}
-            >
-              Inventory Management
-            </h3>
-            <div className="mr-5">
-              <button
-                className="flex align-items-center justify-content-center mr-4"
-                style={{
-                  borderRadius: "4px",
-                  padding: "5px 10px",
-                  border: "none",
-                  cursor: "pointer",
-                  backgroundColor: "#0387D9",
-                  color: "white",
-                }}
-                onClick={handleAddProduct}
-              >
-                <img src={plus} alt="plus" className="mr-2" />
-                Add New Product
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
       <Table
         inventoryItems={inventoryItems}
         onRefresh={handleRefreshFunction}

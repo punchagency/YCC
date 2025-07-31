@@ -141,8 +141,7 @@ const Document = () => {
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left">
-          <h3>Documents</h3>
-          <p>list of all documents</p>
+          {/* Removed double title bar here */}
         </div>
         <div className="sub-header-right sub-header-big-desktop">
           <div className="p-input-icon-left search mr-3">
@@ -184,7 +183,7 @@ const Document = () => {
             iconPos="right" // This will place the icon to the right of the text
             onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
           />
-          <OverlayPanel ref={op}>
+          <OverlayPanel ref={op} hideOverlaysOnDocumentScrolling={false}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
                 value={selectedVessel}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 // import { Checkbox } from "primereact/checkbox";
@@ -28,8 +28,9 @@ const LANGUAGES = [
   { name: "Arabic", code: "ar" },
 ];
 
-const CrewSetting = () => {
+const AdminSetting = () => {
   const navigate = useNavigate();
+  const { setPageTitle } = useOutletContext() || {};
   const { user } = useUser();
   const { notificationsEnabled, toggleNotifications } = useNotifications();
 
@@ -48,6 +49,7 @@ const CrewSetting = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (setPageTitle) setPageTitle("Settings");
     // Populate form with user data when available
     if (user) {
       // Set name from crewProfile firstName and lastName if available
@@ -69,7 +71,7 @@ const CrewSetting = () => {
       // Set account visibility if available
       setAccountVisibility(user.accountVisibility !== false);
     }
-  }, [user]);
+  }, [user, setPageTitle]);
 
   const handleSaveChanges = async () => {
     setLoading(true);
@@ -190,19 +192,8 @@ const CrewSetting = () => {
     <>
       <Toast ref={toast} />
       <div style={{ background: "#F8FBFF", minHeight: "100vh", width: "100%" }}>
-        <div className="flex align-items-center justify-content-between sub-header-panel">
-          <div className="sub-header-left sub-header-left-with-arrow">
-            <div className="content">
-              <h3
-                style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  paddingLeft: "20px",
-                }}
-              >
-                Settings
-              </h3>
-            </div>
-          </div>
+        <div className="sub-header-left sub-header-left-with-arrow">
+          <div className="content"></div>
         </div>
 
         <div className="settings-container">
@@ -246,7 +237,7 @@ const CrewSetting = () => {
               <label>New Password</label>
               <Password
                 value={password}
-                onChange={(e) => setPassword(e.target.value)} 
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="New Password"
                 feedback={true}
                 style={{ width: "100%" }}
@@ -351,4 +342,4 @@ const CrewSetting = () => {
   );
 };
 
-export default CrewSetting;
+export default AdminSetting;

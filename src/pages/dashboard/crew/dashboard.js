@@ -1,7 +1,14 @@
 import BookingsDashboard from "../../../components/dashboard/bookings-dashboard";
-import DashboardTitleBar from "../../../components/dashboard/title-bar";
 import { Box } from "@mui/material";
+import { useOutletContext } from "react-router-dom";
+import React from "react";
+
 const CrewDashboard = () => {
+  const { setPageTitle } = useOutletContext() || {};
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Dashboard");
+  }, [setPageTitle]);
+
   return (
     <Box
       sx={{
@@ -9,7 +16,7 @@ const CrewDashboard = () => {
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "auto",
         position: "relative",
         backgroundColor: "white",
       }}

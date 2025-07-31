@@ -8,7 +8,7 @@ const LegalSearch = () => {
       <div>
         <div className="flex align-items-center justify-content-between p-4">
           <div className="" style={{ width: "95%", marginLeft: "20px" }}>
-            <h2>Training & Certification</h2>
+            {/* Removed <h2>Training & Certification</h2> to avoid duplicate page title */}
           </div>
           <div className="flex align-items-center">
             {/* <div
@@ -76,7 +76,8 @@ const LegalSearch = () => {
                   marginLeft: "10px",
                 }}
               >
-                <img src={neworder} alt="neworder" className="mr-2" /> Book New Course
+                <img src={neworder} alt="neworder" className="mr-2" /> Book New
+                Course
               </button>
             </div>
           </div>

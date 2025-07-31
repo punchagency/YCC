@@ -5,6 +5,7 @@ import { getBookings } from "../../../services/crew/crewBookingService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { useToast } from "../../../components/Toast";
+import { Pagination } from "../../../components/pagination";
 
 import {
   FiEye,
@@ -24,6 +25,10 @@ const BookingTable = () => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Add window resize handler
   useEffect(() => {
@@ -38,11 +43,13 @@ const BookingTable = () => {
   // Fetch bookings when component mounts
   const fetchBookings = useCallback(async () => {
     try {
-      const response = await getBookings();
+      const response = await getBookings({ page, limit });
       console.log("Fetched bookings:", response);
 
       if (response.status) {
         setBookings(response.data.data || []);
+        setTotalPages(response.data.pagination?.totalPages || 1);
+        setTotalItems(response.data.pagination?.totalItems || 0);
       } else {
         setError(response.error || "Failed to fetch bookings");
         showError(response.error || "Failed to fetch bookings");
@@ -54,7 +61,7 @@ const BookingTable = () => {
     } finally {
       setLoading(false);
     }
-  }, [showError]);
+  }, [showError, page, limit]);
 
   useEffect(() => {
     fetchBookings();
@@ -250,296 +257,249 @@ const BookingTable = () => {
 
   return (
     <>
-      <div className="p-4 mt-2 ml-4 mr-4 mb-2 w-full">
-        {/* Booking Table */}
-        <div
-          className="pl-2 pr-2 pt-6 pb-2 rounded-xl shadow-sm mt-1 bg-white"
-          style={{ borderRadius: "10px" }}
-        >
-          {bookings.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              No bookings found.
-            </div>
-          ) : (
-            <div
-              className="overflow-x-hidden"
+      {/* Booking Table */}
+      <div
+        className="pl-2 pr-2 pb-2 rounded-xl shadow-sm mt-1 bg-white overflow-x-auto"
+        style={{ borderRadius: "10px" }}
+      >
+        {bookings.length === 0 ? (
+          <div className="p-4 text-center text-gray-500">
+            No bookings found.
+          </div>
+        ) : (
+          <div
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+            }}
+          >
+            <table
               style={{
                 width: "100%",
-                tableLayout: "fixed",
-                borderCollapse: "collapse",
+                minWidth: "800px",
+                paddingLeft: "1rem",
+                paddingRight: "1rem",
               }}
             >
-              <table style={{ width: "100%" }}>
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("bookingId")}
+                  >
+                    <div className="flex items-center">
+                      Booking ID {getSortIcon("bookingId")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("serviceType")}
+                  >
+                    <div className="flex items-center">
+                      Service Type {getSortIcon("serviceType")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("vendorName")}
+                  >
+                    <div className="flex items-center">
+                      Vendor Name {getSortIcon("vendorName")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("location")}
+                  >
+                    <div className="flex items-center">
+                      Location {getSortIcon("location")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("dateTime")}
+                  >
+                    <div className="flex items-center">
+                      Date & Time {getSortIcon("dateTime")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("status")}
+                  >
+                    <div className="flex items-center">
+                      Status {getSortIcon("status")}
+                    </div>
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: "12px 8px",
+                      borderBottom: "1px solid #eee",
+                      whiteSpace: "nowrap",
+                    }}
+                    onClick={() => handleSort("status")}
+                  >
+                    <div className="flex items-center">
+                      Actions {getSortIcon("status")}
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.map((item, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td
                       style={{
-                        width: "12%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        whiteSpace: "nowrap",
                       }}
-                      onClick={() => handleSort("bookingId")}
                     >
-                      <div className="flex items-center">
-                        Booking ID {getSortIcon("bookingId")}
-                      </div>
-                    </th>
-                    <th
+                      {item.bookingId || "N/A"}
+                    </td>
+                    <td
                       style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        maxWidth: "200px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
-                      onClick={() => handleSort("serviceType")}
                     >
-                      <div className="flex items-center">
-                        Service Type {getSortIcon("serviceType")}
-                      </div>
-                    </th>
-                    <th
+                      {item.services &&
+                      item.services.length > 0 &&
+                      item.services[0].service
+                        ? item.services[0].service.name || "N/A"
+                        : "N/A"}
+                    </td>
+                    <td
                       style={{
-                        width: "20%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        maxWidth: "150px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
-                      onClick={() => handleSort("vendorName")}
                     >
-                      <div className="flex items-center">
-                        Vendor Name {getSortIcon("vendorName")}
-                      </div>
-                    </th>
-                    <th
+                      {item.vendorName || "N/A"}
+                    </td>
+                    <td
                       style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        maxWidth: "150px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        fontSize: isMobile ? "11px" : "12px",
                       }}
-                      onClick={() => handleSort("location")}
                     >
-                      <div className="flex items-center">
-                        Location {getSortIcon("location")}
-                      </div>
-                    </th>
-                    <th
+                      {item.serviceLocation || item.deliveryAddress || "N/A"}
+                    </td>
+                    <td
                       style={{
-                        width: "15%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        whiteSpace: "nowrap",
                       }}
-                      onClick={() => handleSort("dateTime")}
                     >
-                      <div className="flex items-center">
-                        Date & Time {getSortIcon("dateTime")}
-                      </div>
-                    </th>
-                    <th
+                      {item.dateTime
+                        ? new Date(item.dateTime).toLocaleString()
+                        : "N/A"}
+                    </td>
+                    <td
                       style={{
-                        width: "10%",
-                        textAlign: "left",
-                        padding: "10px",
+                        padding: "12px 8px",
                         borderBottom: "1px solid #eee",
+                        whiteSpace: "nowrap",
                       }}
-                      onClick={() => handleSort("status")}
                     >
-                      <div className="flex items-center">
-                        Status {getSortIcon("status")}
-                      </div>
-                    </th>
-                    <th
-                      style={{
-                        width: "10%",
-                        textAlign: "left",
-                        padding: "10px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                      onClick={() => handleSort("status")}
-                    >
-                      <div className="flex items-center">
-                        Actions {getSortIcon("status")}
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
+                      <span
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
+                          item.status || ""
+                        )}`}
                       >
-                        {item.bookingId || "N/A"}
-                      </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        {item.services &&
-                        item.services.length > 0 &&
-                        item.services[0].service
-                          ? item.services[0].service.name || "N/A"
-                          : "N/A"}
-                      </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        {item.vendorName || "N/A"}
-                      </td>
-                      <td
-                        style={{
-                          padding: "8px",
-                          fontSize: isMobile ? "11px" : "10px",
-                        }}
-                      >
-                        {item.serviceLocation || item.deliveryAddress || "N/A"}
-                      </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        {item.dateTime
-                          ? new Date(item.dateTime).toLocaleString()
-                          : "N/A"}
-                      </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        <span
-                          className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                            item.status || ""
-                          )}`}
+                        {item.status || "Pending"}
+                      </span>
+                    </td>
+                    <td
+                      style={{
+                        padding: "12px 8px",
+                        borderBottom: "1px solid #eee",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      <div className="flex justify-end gap-3">
+                        <button
+                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
+                          onClick={() =>
+                            handleViewDetails(item.bookingId || item._id)
+                          }
+                          title="View Details"
                         >
-                          {item.status || "Pending"}
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          padding: "10px",
-                          borderBottom: "1px solid #eee",
-                        }}
-                      >
-                        <div className="flex justify-end space-x-4">
-                          <div
-                            style={{
-                              border: "1px solid lightgrey",
-                              padding: "5px",
-                              cursor: "pointer",
-                            }}
-                            onClick={() =>
-                              handleViewDetails(item.bookingId || item._id)
-                            }
-                          >
-                            <FiEye size={18} />
-                          </div>
-                          <div
-                            style={{
-                              border: "1px solid lightgrey",
-                              padding: "5px",
-                            }}
-                          >
-                            <FiEdit size={18} />
-                          </div>
-                          <div
-                            style={{
-                              border: "1px solid lightgrey",
-                              padding: "5px",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => handleDownloadPDF(item)}
-                          >
-                            <FiDownload
-                              size={18}
-                              style={{ cursor: "pointer" }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {/* Pagination */}
-          <div
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-1 sm:px-6 mt-4"
-            style={{ height: "50px" }}
-          >
-            {/* Mobile view pagination */}
-            <div className="flex flex-1 justify-between sm:hidden">
-              <div>
-                <p className="text-xs text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">10</span> of{" "}
-                  <span className="font-medium">200</span> results
-                </p>
-              </div>
-              <div className="flex">
-                <a
-                  href="#"
-                  className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <FiChevronLeft size={15} />
-                </a>
-                <a
-                  href="#"
-                  className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <FiChevronRight size={15} />
-                </a>
-              </div>
-            </div>
-
-            {/* Desktop view pagination */}
-            <div className="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-600 bg-white border rounded-md shadow-sm">
-              {/* Left: Items per page and count */}
-              <div className="flex items-center ">
-                {/* Items per page dropdown */}
-                <div className="">
-                  <span className="text-gray-500 p-3">10</span>
-                  <FiChevronDown className="text-xs" />
-                </div>
-                <span className="text-gray-500">Items Per Page</span>
-                <span className="text-gray-500">1–10 Of 200 Items</span>
-              </div>
-
-              {/* Right: Page navigation */}
-              <div className="flex items-center gap-2">
-                {/* Page number dropdown */}
-                <div className="">
-                  <span>1</span>
-                  <FiChevronDown className="text-xs" />
-                </div>
-                <span className="text-gray-500">Of 44 Pages</span>
-
-                {/* Arrows */}
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiChevronLeft />
-                </button>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <FiChevronRight />
-                </button>
-              </div>
-            </div>
+                          <FiEye size={16} />
+                        </button>
+                        <button
+                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
+                          title="Edit Booking"
+                        >
+                          <FiEdit size={16} />
+                        </button>
+                        <button
+                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
+                          onClick={() => handleDownloadPDF(item)}
+                          title="Download PDF"
+                        >
+                          <FiDownload size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        )}
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={limit}
+          onPageChange={setPage}
+          isMobile={isMobile}
+        />
       </div>
     </>
   );

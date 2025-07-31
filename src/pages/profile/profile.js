@@ -1,34 +1,58 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useUser } from '../../context/userContext';
+import { useUser } from "../../context/userContext";
+import { useOutletContext } from "react-router-dom";
 
 import manprofile from "../../assets/images/crew/manprofile.png";
 import "./profile.css";
-import { uploadProfilePicture, removeProfilePicture } from '../../services/crewSettings/crewsettings';
+import {
+  uploadProfilePicture,
+  removeProfilePicture,
+  updateUserSettings,
+  updateCrewProfile,
+} from "../../services/crewSettings/crewsettings";
+
+const YEARS_OF_EXPERIENCE_OPTIONS = [
+  { label: "0-2", value: "0-2" },
+  { label: "2-4", value: "2-4" },
+  { label: "4-10", value: "4-10" },
+  { label: "10+", value: "10+" },
+];
+const DEPARTMENT_OPTIONS = [
+  { label: "Captain", value: "captain" },
+  { label: "Exterior", value: "exterior" },
+  { label: "Interior", value: "interior" },
+  { label: "Chef", value: "chef" },
+  { label: "Engineering", value: "engineering" },
+];
 
 const ProfilePage = () => {
   const { user, refreshUser } = useUser();
-  const isCrew = user?.role?.name === 'crew_member' || user?.role === 'crew_member';
+  const isCrew =
+    user?.role?.name === "crew_member" || user?.role === "crew_member";
+  const outletContext = useOutletContext();
 
   // Debug: Log user data
-  console.log('Profile - User data:', {
+  console.log("Profile - User data:", {
     user: user,
     crewProfile: user?.crewProfile,
     profilePicture: user?.profilePicture,
     role: user?.role,
-    isCrew: isCrew
+    isCrew: isCrew,
   });
 
   // Helper to always prefix phone with + if not empty
   const formatPhone = (phone) => {
-    if (!phone) return '';
-    return phone.startsWith('+') ? phone : `+${phone}`;
+    if (!phone) return "";
+    return phone.startsWith("+") ? phone : `+${phone}`;
   };
 
   // Initial form data for admin or crew
   const initialFormData = isCrew
     ? {
-        name: user?.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user?.name || "",
+        name: user?.crewProfile
+          ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}`
+          : user?.name || "",
         email: user?.email || "",
         location: user?.crewProfile?.country || "",
         phone: formatPhone(user?.crewProfile?.phone || ""),
@@ -48,20 +72,85 @@ const ProfilePage = () => {
   const picRef = useRef(null);
   const [showPicPreview, setShowPicPreview] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const fileInputRef = useRef(null);
+  const [replyToEmail, setReplyToEmail] = useState(
+    user?.replyToEmail || user?.email || ""
+  );
 
   const handleEdit = () => {
     setIsEditing(true);
+    setSaveLoading(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setFormData(initialFormData);
+    setSaveLoading(false);
   };
 
-  const handleSave = () => {
-    // Add your save logic here
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (isCrew) {
+      setSaveLoading(true);
+      try {
+        // Parse name into firstName and lastName
+        const nameParts = formData.name.trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        const updateData = {
+          firstName,
+          lastName,
+          phone: formData.phone.replace(/^\+/, ""),
+          country: formData.location,
+          yearsOfExperience: formData.yearsOfExperience,
+          position: formData.department,
+          replyToEmail: replyToEmail,
+        };
+
+        const response = await updateCrewProfile(updateData);
+        if (response.status) {
+          await refreshUser();
+          setIsEditing(false);
+        } else {
+          alert(response.message || "Failed to update crew profile");
+        }
+      } catch (error) {
+        alert("An error occurred while updating your profile");
+      } finally {
+        setSaveLoading(false);
+      }
+      return;
+    }
+
+    // For admin users, update the basic profile fields
+    setSaveLoading(true);
+    try {
+      const updateData = {
+        name: formData.name,
+        email: formData.email,
+        location: formData.location,
+        phone: formData.phone.replace(/^\+/, ""), // Remove + prefix for backend
+        replyToEmail: replyToEmail,
+      };
+
+      console.log("Updating admin profile with:", updateData);
+      const response = await updateUserSettings(updateData);
+
+      if (response.status) {
+        console.log("Profile updated successfully");
+        await refreshUser(); // Refresh user data from context
+        setIsEditing(false);
+      } else {
+        console.error("Failed to update profile:", response.message);
+        alert(response.message || "Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert("An error occurred while updating your profile");
+    } finally {
+      setSaveLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -77,32 +166,32 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
     setPicLoading(true);
-    console.log('Uploading profile picture:', file.name);
+    console.log("Uploading profile picture:", file.name);
     const res = await uploadProfilePicture(file);
-    console.log('Upload response:', res);
+    console.log("Upload response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log('Upload successful, refreshing user data...');
+      console.log("Upload successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error('Upload failed:', res.message);
-      alert(res.message || 'Failed to upload profile picture');
+      console.error("Upload failed:", res.message);
+      alert(res.message || "Failed to upload profile picture");
     }
   };
 
   const handleRemovePicture = async () => {
-    if (!window.confirm('Remove your profile picture?')) return;
+    if (!window.confirm("Remove your profile picture?")) return;
     setPicLoading(true);
-    console.log('Removing profile picture...');
+    console.log("Removing profile picture...");
     const res = await removeProfilePicture();
-    console.log('Remove response:', res);
+    console.log("Remove response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log('Remove successful, refreshing user data...');
+      console.log("Remove successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error('Remove failed:', res.message);
-      alert(res.message || 'Failed to remove profile picture');
+      console.error("Remove failed:", res.message);
+      alert(res.message || "Failed to remove profile picture");
     }
   };
 
@@ -113,48 +202,52 @@ const ProfilePage = () => {
 
   // Calculate drawer position relative to profile picture
   const getDrawerStyle = () => {
-    if (!picRef.current) return { opacity: 0, pointerEvents: 'none' };
+    if (!picRef.current) return { opacity: 0, pointerEvents: "none" };
     const rect = picRef.current.getBoundingClientRect();
     const isMobile = window.innerWidth <= 768;
     if (isMobile) {
       return {
-        position: 'absolute',
+        position: "absolute",
         top: rect.bottom + 12 + window.scrollY,
         left: rect.left + window.scrollX,
         zIndex: 1000,
         opacity: showPicDrawer ? 1 : 0,
-        pointerEvents: showPicDrawer ? 'auto' : 'none',
-        transform: showPicDrawer ? 'translateY(0)' : 'translateY(40px)',
-        transition: 'opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)',
+        pointerEvents: showPicDrawer ? "auto" : "none",
+        transform: showPicDrawer ? "translateY(0)" : "translateY(40px)",
+        transition:
+          "opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)",
         minWidth: 220,
         maxWidth: 260,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)',
-        background: '#fff',
-        padding: '0.5rem 0.75rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        boxShadow:
+          "0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)",
+        background: "#fff",
+        padding: "0.5rem 0.75rem",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
       };
     } else {
       return {
-        position: 'absolute',
+        position: "absolute",
         top: rect.top + window.scrollY,
         left: rect.right + 16 + window.scrollX,
         zIndex: 1000,
         opacity: showPicDrawer ? 1 : 0,
-        pointerEvents: showPicDrawer ? 'auto' : 'none',
-        transform: showPicDrawer ? 'translateX(0)' : 'translateX(40px)',
-        transition: 'opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)',
+        pointerEvents: showPicDrawer ? "auto" : "none",
+        transform: showPicDrawer ? "translateX(0)" : "translateX(40px)",
+        transition:
+          "opacity 0.22s cubic-bezier(.4,2,.6,1), transform 0.22s cubic-bezier(.4,2,.6,1)",
         minWidth: 220,
         maxWidth: 260,
         borderRadius: 16,
-        boxShadow: '0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)',
-        background: '#fff',
-        padding: '0.5rem 0.75rem',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
+        boxShadow:
+          "0 8px 32px rgba(4,135,217,0.18), 0 1.5px 6px rgba(0,0,0,0.08)",
+        background: "#fff",
+        padding: "0.5rem 0.75rem",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
       };
     }
   };
@@ -162,42 +255,69 @@ const ProfilePage = () => {
   // Close drawer on click outside
   React.useEffect(() => {
     const handleClick = (e) => {
-      if (showPicDrawer && picRef.current && !picRef.current.contains(e.target)) {
-        const drawer = document.getElementById('profile-pic-mini-drawer');
+      if (
+        showPicDrawer &&
+        picRef.current &&
+        !picRef.current.contains(e.target)
+      ) {
+        const drawer = document.getElementById("profile-pic-mini-drawer");
         if (drawer && !drawer.contains(e.target)) {
           setShowPicDrawer(false);
         }
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, [showPicDrawer]);
+
+  useEffect(() => {
+    if (outletContext && outletContext.setPageTitle) {
+      outletContext.setPageTitle("Profile", { backArrow: true });
+    }
+  }, [outletContext]);
 
   return (
     <>
       {/* Mini-drawer for profile picture actions */}
       <div
         id="profile-pic-mini-drawer"
-        style={showPicDrawer ? getDrawerStyle() : { ...getDrawerStyle(), pointerEvents: 'none' }}
+        style={
+          showPicDrawer
+            ? getDrawerStyle()
+            : { ...getDrawerStyle(), pointerEvents: "none" }
+        }
       >
         {showPicDrawer && (
           <div className="profile-pic-drawer-content">
-            <div style={{display:'flex',width:'100%',justifyContent:'flex-end',marginBottom:4}}>
-              <Button icon="pi pi-times" className="p-button-text" onClick={()=>setShowPicDrawer(false)} aria-label="Close" style={{fontSize:20}}/>
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "flex-end",
+                marginBottom: 4,
+              }}
+            >
+              <Button
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={() => setShowPicDrawer(false)}
+                aria-label="Close"
+                style={{ fontSize: 20 }}
+              />
             </div>
             <Button
               label="Change Profile Picture"
               icon="pi pi-upload"
               className="p-button-text drawer-action-btn"
               onClick={handleChangePicture}
-              style={{ width: '100%', marginBottom: 12 }}
+              style={{ width: "100%", marginBottom: 12 }}
               disabled={picLoading}
             />
             <input
               type="file"
               accept="image/*"
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={handleFileChange}
             />
             <Button
@@ -205,7 +325,7 @@ const ProfilePage = () => {
               icon="pi pi-eye"
               className="p-button-text drawer-action-btn"
               onClick={handleViewPicture}
-              style={{ width: '100%', marginBottom: 12 }}
+              style={{ width: "100%", marginBottom: 12 }}
             />
             <Button
               label="Remove Profile Picture"
@@ -213,7 +333,7 @@ const ProfilePage = () => {
               className="p-button-text drawer-action-btn"
               severity="danger"
               onClick={handleRemovePicture}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               disabled={picLoading}
             />
           </div>
@@ -222,38 +342,54 @@ const ProfilePage = () => {
 
       {/* Profile picture preview modal */}
       {showPicPreview && (
-        <div className="profile-pic-preview-modal" onClick={()=>setShowPicPreview(false)}>
-          <div className="profile-pic-preview-content" onClick={e=>e.stopPropagation()}>
+        <div
+          className="profile-pic-preview-modal"
+          onClick={() => setShowPicPreview(false)}
+        >
+          <div
+            className="profile-pic-preview-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
-              src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+              src={
+                user?.profilePicture ||
+                user?.crewProfile?.profilePicture ||
+                manprofile
+              }
               alt="Profile Preview"
-              style={{maxWidth:'90vw',maxHeight:'70vh',borderRadius:16,boxShadow:'0 8px 32px rgba(4,135,217,0.18)'}}
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "70vh",
+                borderRadius: 16,
+                boxShadow: "0 8px 32px rgba(4,135,217,0.18)",
+              }}
             />
-            <Button icon="pi pi-times" className="p-button-text" onClick={()=>setShowPicPreview(false)} style={{position:'absolute',top:8,right:8,fontSize:22}} aria-label="Close"/>
+            <Button
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => setShowPicPreview(false)}
+              style={{ position: "absolute", top: 8, right: 8, fontSize: 22 }}
+              aria-label="Close"
+            />
           </div>
         </div>
       )}
 
-      <div className="flex align-items-center justify-content-between sub-header-panel sticky-profile-header">
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content">
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              Profile
-            </h3>
-          </div>
-        </div>
-      </div>
       <div className="settings-container">
         <div className="profile-container-about">
           <div className="profile-container-about-left">
             <div className="profile-container-about-left-top">
               <img
                 ref={picRef}
-                src={user?.profilePicture || user?.crewProfile?.profilePicture || manprofile}
+                src={
+                  user?.profilePicture ||
+                  user?.crewProfile?.profilePicture ||
+                  manprofile
+                }
                 alt="manprofile"
                 className="profile-picture-clickable"
                 onClick={() => setShowPicDrawer((v) => !v)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               />
               <div className="profile-name">
                 <p>{formData.name}</p>
@@ -339,28 +475,57 @@ const ProfilePage = () => {
             <>
               <div className="form-group">
                 <label>Years of Experience</label>
-                <input
-                  type="text"
+                <select
                   name="yearsOfExperience"
                   value={formData.yearsOfExperience}
                   disabled={!isEditing}
                   className="form-input"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select...</option>
+                  {YEARS_OF_EXPERIENCE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="form-group">
                 <label>Department</label>
-                <input
-                  type="text"
+                <select
                   name="department"
                   value={formData.department}
                   disabled={!isEditing}
                   className="form-input"
                   onChange={handleChange}
-                />
+                >
+                  <option value="">Select...</option>
+                  {DEPARTMENT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
+          <div className="form-group">
+            <label htmlFor="replyToEmail">Reply-To Email</label>
+            <input
+              type="email"
+              id="replyToEmail"
+              name="replyToEmail"
+              value={replyToEmail}
+              onChange={(e) => setReplyToEmail(e.target.value)}
+              disabled={!isEditing}
+              placeholder="Enter a custom reply-to email or leave as your signup email"
+              style={{ width: "100%", padding: "8px", marginTop: "4px" }}
+            />
+            <small style={{ color: "#888" }}>
+              This email will be used as the reply-to address for calendar
+              invites. Default is your signup email: <b>{user?.email}</b>
+            </small>
+          </div>
         </div>
         {isEditing && (
           <div className="form-actions">
@@ -375,6 +540,7 @@ const ProfilePage = () => {
               className="save-button"
               icon="pi pi-check"
               onClick={handleSave}
+              loading={saveLoading}
             />
           </div>
         )}

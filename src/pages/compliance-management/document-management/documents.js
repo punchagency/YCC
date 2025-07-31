@@ -196,6 +196,7 @@ const Documents = () => {
         ref={menuRef}
         dismissable
         className="datatable-overlaypanel"
+        hideOverlaysOnDocumentScrolling={false}
       >
         <Button
           label="Edit"
@@ -240,8 +241,7 @@ const Documents = () => {
     <>
       <div className="flex align-items-center justify-content-between sub-header-panel">
         <div className="sub-header-left">
-          <h3>Documents</h3>
-          <p></p>
+          {/* Removed double title bar here */}
         </div>
         <div className="sub-header-right sub-header-big-desktop">
           <div className="p-input-icon-left search mr-3">
@@ -291,7 +291,7 @@ const Documents = () => {
             iconPos="right" // This will place the icon to the right of the text
             onClick={(e) => op.current && op.current.toggle(e)} // Ensure `op.current` is not null
           />
-          <OverlayPanel ref={op}>
+          <OverlayPanel ref={op} hideOverlaysOnDocumentScrolling={false}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
                 value={selectedAuthority}
@@ -372,7 +372,6 @@ const Documents = () => {
               );
             }}
           />
-         
         </DataTable>
       </div>
     </>

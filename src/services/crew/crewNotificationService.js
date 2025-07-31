@@ -30,25 +30,37 @@ const getUserData = () => {
  */
 export const fetchCrewNotifications = async (params = {}) => {
   try {
-    const { page = 1, limit = 10 } = params;
+    const { page = 1, limit = 10, type, status } = params;
 
-    console.log("Fetching notifications with params:", { page, limit });
+    console.log("Fetching notifications with params:", { page, limit, type, status });
 
     const response = await axios.get(
-      `${API_URL}/crew-notifications/notify?page=${page}&limit=${limit}`,
+      `${API_URL}/crew-notifications/notify`,
       {
         headers: getAuthHeader(),
+        params: {
+          page,
+          limit,
+          type,
+          status,
+        },
       }
     );
 
     console.log("API Response for notifications:", response.data);
 
-    return {
-      success: true,
-      data: response.data.data,
-      pagination: response.data.pagination,
-      message: response.data.message,
-    };
+    if (response.data.status) {
+      return {
+        success: true,
+        data: response.data.data.notifications,
+        pagination: response.data.data.pagination,
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to fetch notifications",
+      };
+    }
   } catch (error) {
     console.error("Error fetching crew notifications:", error);
     return {

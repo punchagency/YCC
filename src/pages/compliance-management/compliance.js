@@ -7,7 +7,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Skeleton } from "primereact/skeleton";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { InputText } from "primereact/inputtext";
-import CustomButton from '../../components/Button';
+import CustomButton from "../../components/Button";
 
 const Compliance = () => {
   const [documents, setDocuments] = useState([]);
@@ -130,9 +130,9 @@ const Compliance = () => {
     (date) => ({ name: date, value: date })
   );
 
-  const statuses = [...new Set(documents.map((document) => document.status))].map(
-    (status) => ({ name: status, value: status })
-  );
+  const statuses = [
+    ...new Set(documents.map((document) => document.status)),
+  ].map((status) => ({ name: status, value: status }));
 
   const goToAddCompliancePage = () => {
     navigate("/compliance-management/compliance/new");
@@ -169,6 +169,7 @@ const Compliance = () => {
         ref={menuRef}
         dismissable
         className="datatable-overlaypanel"
+        hideOverlaysOnDocumentScrolling={false}
       >
         <Button
           label="Edit"
@@ -234,7 +235,8 @@ const Compliance = () => {
             className="mr-3"
           />
           <CustomButton onClick={goToAddCompliancePage}>
-            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add Compliance
+            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add
+            Compliance
           </CustomButton>
         </div>
         <div className="sub-header-right sub-header-small-desktop ">
@@ -242,10 +244,13 @@ const Compliance = () => {
             <i className="pi pi-search" />
             <InputText type="search" placeholder="Search" />
           </div>
-          <CustomButton className="mr-3" onClick={(e) => op.current && op.current.toggle(e)}>
+          <CustomButton
+            className="mr-3"
+            onClick={(e) => op.current && op.current.toggle(e)}
+          >
             <i className="pi pi-filter" style={{ marginRight: 8 }} /> Filters
           </CustomButton>
-          <OverlayPanel ref={op}>
+          <OverlayPanel ref={op} hideOverlaysOnDocumentScrolling={false}>
             <div className="p-d-flex p-flex-column">
               <Dropdown
                 value={selectedOutcome}
@@ -274,7 +279,8 @@ const Compliance = () => {
             </div>
           </OverlayPanel>
           <CustomButton onClick={goToAddCompliancePage}>
-            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add Compliance
+            <i className="pi pi-plus" style={{ marginRight: 8 }} /> Add
+            Compliance
           </CustomButton>
         </div>
       </div>

@@ -1,36 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-
-import { Button } from "primereact/button";
-// import { useNavigate } from "react-router-dom";
-// import { TabView, TabPanel } from "primereact/tabview";
-// import { InputText } from "primereact/inputtext";
-// import lone from "../../assets/images/crew/lone.png";
-// import upcomingLogo from "../../assets/images/crew/upcomingorderLogo.png";
-// import iconexpire from "../../assets/images/crew/iconexpire.png";
-// import iconcareer from "../../assets/images/crew/iconcareer.png";
-// import { Chart as ChartJS } from "chart.js/auto";
 import { Bar, Line } from "react-chartjs-2";
-// import sourceData from "../../data/sourceData.json";
-// import analyticsData from "../../data/analyticsData.json";
-// import sort from "../../assets/images/crew/sort.png";
-import lockLogo from "../../assets/images/crew/lockLogo.png";
-import dropdown from "../../assets/images/crew/dropdown.png";
-// import cart from "../../assets/images/crew/cart.png";
-// import iconcontainer from "../../assets/images/crew/iconContainer.png";
-// import neworder from "../../assets/images/crew/neworder.png";
-// import doctor from "../../assets/images/crew/doctor.png";
-// import wavyline from "../../assets/images/crew/wavyline.png";
-// import wavyback from "../../assets/images/crew/wavyback.png";
-import profileReport from "../../assets/images/crew/profile-report.png";
-// import profileReport2 from "../../assets/images/crew/profile-report2.png";
-import sortIcon from "../../assets/images/crew/sort.png";
 import {
   getInventoryHealthReport,
   getSystemChartData,
   getSystemMetrics,
 } from "../../services/reports/reports";
 
-// Import and register Chart.js components
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,8 +18,39 @@ import {
   Legend,
   Filler,
 } from "chart.js";
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Button,
+  Select,
+  MenuItem,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { linearProgressClasses } from "@mui/material/LinearProgress";
+import doctorImage from "../../assets/images/crew/doctor.png";
 
-// Register the components
+// --- Icons ---
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
+import VaccinesIcon from "@mui/icons-material/Vaccines";
+import ScienceIcon from "@mui/icons-material/Science";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import BookOnlineIcon from "@mui/icons-material/BookOnline";
+import PaidIcon from "@mui/icons-material/Paid";
+import SellingProductsTable from "../../components/report/selling-products-table";
+import { useOutletContext } from "react-router-dom";
+
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -57,105 +63,134 @@ ChartJS.register(
   Filler
 );
 
-const Reports = () => {
-  // const navigate = useNavigate();
-  // const goCrewDashboardPage = () => {
-  //   navigate("/crew/dashboard");
-  // };
-  // const goInventorySummaryPage = () => {
-  //   navigate("/crew/inventory/summary");
-  // };
+// Styled component for the progress bars
+const GradientLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 8,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: theme.palette.grey[200],
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    background: "linear-gradient(90deg, #34D399, #6EE7B7)",
+  },
+}));
 
+// A single metric card component for the right-hand side
+const MetricCard = ({ title, value, data }) => {
+  const chartRef = useRef(null);
+  const sparklineOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: { x: { display: false }, y: { display: false } },
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    elements: {
+      point: { radius: 0 },
+      line: {
+        tension: 0.4,
+        borderWidth: 2,
+        borderColor: "#0387D9",
+        fill: true,
+        backgroundColor: "rgba(3, 135, 217, 0.1)",
+      },
+    },
+  };
+  const sparklineData = {
+    labels: data.map((_, i) => i),
+    datasets: [{ data: data }],
+  };
+
+  return (
+    <Paper
+      elevation={2}
+      sx={{
+        p: 2,
+        borderRadius: 3,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        height: "100%",
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        {title}
+      </Typography>
+      <Typography variant="h4" sx={{ fontWeight: 600, my: 1 }}>
+        {value}
+      </Typography>
+      <Box sx={{ height: 40 }}>
+        <Line ref={chartRef} data={sparklineData} options={sparklineOptions} />
+      </Box>
+    </Paper>
+  );
+};
+
+// --- A single inventory report item ---
+const InventoryReportItem = ({ icon, name, value }) => (
+  <Box sx={{ mb: 2.5 }}>
+    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+      <Box
+        component="img"
+        src={icon}
+        sx={{ width: 40, height: 40, borderRadius: 2, mr: 1.5 }}
+      />
+      <Typography sx={{ flexGrow: 1, fontWeight: 500 }}>{name}</Typography>
+      <Typography variant="body2" color="text.secondary">
+        {value}% Correct
+      </Typography>
+    </Box>
+    <GradientLinearProgress variant="determinate" value={value} />
+  </Box>
+);
+
+const Reports = () => {
+  const { setPageTitle } = useOutletContext() || {};
+  React.useEffect(() => {
+    if (setPageTitle) setPageTitle("Reports");
+  }, [setPageTitle]);
   const [activityData, setActivityData] = useState({
     labels: [],
-    datasets: [
-      {
-        label: "Bookings",
-        data: [],
-        backgroundColor: "#4318FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-      {
-        label: "Orders",
-        data: [],
-        backgroundColor: "#6AD2FF",
-        borderRadius: 8,
-        barThickness: 15,
-        maxBarThickness: 8,
-      },
-    ],
+    datasets: [],
   });
+  const [activityDateRange, setActivityDateRange] = useState("year");
+  const [inventoryDateRange, setInventoryDateRange] = useState("week");
+  const barChartRef = useRef(null);
 
   const [healthReports, setHealthReports] = useState({
-    stockLevels: { rate: 0, correct: 0 },
-    supplierAvailability: { rate: 0, correct: 0 },
-    customerSatisfaction: { rate: 0, correct: 0 },
+    stockLevels: { rate: 0 },
+    supplierAvailability: { rate: 0 },
+    customerSatisfaction: { rate: 0 },
     loading: true,
-    error: null,
   });
 
-  const [systemMetrics, setSystemMetrics] = useState([]);
-
-  // Add refs for your charts
-  const barChartRef = useRef(null);
-  const lineChartRefs = useRef([]);
+  const [dateRange, setDateRange] = useState("month");
+  const [summaryDateRange, setSummaryDateRange] = useState("week");
+  const [ordersDateRange, setOrdersDateRange] = useState("week");
+  const [inventorySummaryDateRange, setInventorySummaryDateRange] =
+    useState("week");
+  const [bookingsDateRange, setBookingsDateRange] = useState("week");
+  const [financialDateRange, setFinancialDateRange] = useState("week");
 
   useEffect(() => {
     fetchHealthReports();
     fetchSystemActivity();
-    fetchSystemMetrics();
-
-    // Copy refs to local variables for proper cleanup
-    const currentBarChart = barChartRef.current;
-    const currentLineCharts = [...lineChartRefs.current];
-
-    // Cleanup function to destroy charts when component unmounts
-    return () => {
-      if (currentBarChart) {
-        currentBarChart.destroy();
-      }
-
-      currentLineCharts.forEach((chart) => {
-        if (chart) chart.destroy();
-      });
-    };
   }, []);
 
   const fetchHealthReports = async () => {
     try {
       const response = await getInventoryHealthReport();
-      console.log("Response", response);
       if (response.success) {
         setHealthReports({
-          stockLevels: {
-            rate: Math.round(response.data.data.stockLevels) || 0,
-          },
-          supplierAvailability: {
-            rate: Math.round(response.data.data.supplierAvailability) || 0,
-          },
-          customerSatisfaction: {
-            rate: Math.round(response.data.data.customerSatisfaction) || 0,
+          vaccinationRate: { rate: response.data.data.vaccinationRate || 88 },
+          healthScreening: { rate: response.data.data.healthScreening || 92 },
+          testingAvailability: {
+            rate: response.data.data.testingAvailability || 89,
           },
           loading: false,
-          error: null,
         });
-      } else {
-        setHealthReports((prev) => ({
-          ...prev,
-          loading: false,
-          error: response.error || "Failed to fetch inventory health report",
-        }));
       }
     } catch (error) {
-      setHealthReports((prev) => ({
-        ...prev,
-        loading: false,
-        error:
-          error.message ||
-          "An error occurred while fetching inventory health report",
-      }));
+      console.error("Error fetching health reports:", error);
+      // Set loading to false even on error to not show loading state indefinitely
+      setHealthReports((prev) => ({ ...prev, loading: false }));
     }
   };
 
@@ -164,25 +199,16 @@ const Reports = () => {
       const response = await getSystemChartData();
       if (response.success) {
         const chartData = response.data;
-
         setActivityData({
           labels: chartData.map((item) => item.month),
           datasets: [
             {
-              label: "Bookings",
-              data: chartData.map((item) => item.bookings),
-              backgroundColor: "#4318FF",
+              label: "Activity",
+              data: chartData.map((item) => item.bookings + item.orders), // Example aggregation
+              backgroundColor: "rgba(3, 135, 217, 0.6)",
+              hoverBackgroundColor: "rgba(3, 135, 217, 1)",
               borderRadius: 8,
               barThickness: 15,
-              maxBarThickness: 8,
-            },
-            {
-              label: "Orders",
-              data: chartData.map((item) => item.orders),
-              backgroundColor: "#6AD2FF",
-              borderRadius: 8,
-              barThickness: 15,
-              maxBarThickness: 8,
             },
           ],
         });
@@ -192,723 +218,541 @@ const Reports = () => {
     }
   };
 
-  const fetchSystemMetrics = async () => {
-    try {
-      const response = await getSystemMetrics();
-      if (response.success) {
-        // Map the titles to your preferred display names
-        const mappedMetrics = response.data.map((metric) => {
-          const customTitles = {
-            Users: "Active Users",
-            "Customer Satisfaction": "Customer Rating",
-            "Resolved Complaints": "Issues Resolved",
-            "Total Revenue": "Revenue",
-          };
-
-          return {
-            ...metric,
-            title: customTitles[metric.title] || metric.title,
-          };
-        });
-
-        setSystemMetrics(mappedMetrics);
+  useEffect(() => {
+    // This function simulates fetching data for the selected time range.
+    // Replace this with your actual backend API calls.
+    const generateChartData = (range) => {
+      let labels = [];
+      let data = [];
+      switch (range) {
+        case "day":
+          labels = ["12a", "3a", "6a", "9a", "12p", "3p", "6p", "9p"];
+          data = [12, 15, 25, 45, 55, 48, 30, 20];
+          break;
+        case "week":
+          labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          data = [150, 210, 180, 250, 220, 300, 280];
+          break;
+        case "month":
+          labels = Array.from({ length: 30 }, (_, i) => `${i + 1}`);
+          data = Array.from(
+            { length: 30 },
+            () => Math.floor(Math.random() * 50) + 10
+          );
+          break;
+        case "year":
+        default:
+          labels = [
+            "JAN",
+            "FEB",
+            "MAR",
+            "APR",
+            "MAY",
+            "JUN",
+            "JUL",
+            "AUG",
+            "SEP",
+            "OCT",
+            "NOV",
+            "DEC",
+          ];
+          data = [100, 150, 140, 210, 200, 280, 250, 230, 120, 280, 310, 350];
+          break;
       }
-    } catch (error) {
-      console.error("Error fetching system metrics:", error);
-    }
-  };
+
+      setActivityData({
+        labels,
+        datasets: [
+          {
+            label: "Activity",
+            data,
+            backgroundColor: "rgba(3, 135, 217, 0.6)",
+            hoverBackgroundColor: "rgba(3, 135, 217, 1)",
+            borderRadius: 8,
+            barThickness: 15,
+          },
+        ],
+      });
+    };
+
+    generateChartData(activityDateRange);
+  }, [activityDateRange]); // Re-run when the date range changes
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          stepSize: 5,
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        grid: {
-          color: "#F4F7FE",
-          drawBorder: false,
-        },
-        border: {
-          display: false,
-        },
-      },
-      x: {
-        grid: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-        border: {
-          display: false,
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: {
-          font: {
-            size: 12,
-            family: "Plus Jakarta Sans",
-          },
-          color: "#A3AED0",
-        },
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#ffffff",
-        titleColor: "#000000",
-        bodyColor: "#000000",
-        borderColor: "#F4F7FE",
-        borderWidth: 1,
-        padding: 12,
-        titleFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-        bodyFont: {
-          size: 12,
-          family: "Plus Jakarta Sans",
-        },
-      },
-    },
-  };
-
-  const sparklineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { display: false },
-      y: {
-        display: false,
-        min: 0,
-        max: 10,
-      },
+      y: { beginAtZero: true, grid: { drawBorder: false, display: false } },
+      x: { grid: { display: false } },
     },
     plugins: {
       legend: { display: false },
-      tooltip: { enabled: false },
-    },
-    elements: {
-      point: { radius: 0 },
-      line: {
-        tension: 0.4,
-        borderWidth: 1.5,
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
+      tooltip: {
+        enabled: true,
+        backgroundColor: "#0A2647",
+        titleColor: "white",
+        bodyColor: "white",
+        padding: 10,
+        cornerRadius: 6,
+        displayColors: false,
+        callbacks: {
+          title: () => null, // Hide title
+          label: (context) => `Activity: ${context.parsed.y}`,
+        },
       },
+    },
+    animation: {
+      duration: 400,
+      easing: "easeInOutQuad",
     },
   };
 
-  const sparklineData = {
-    labels: ["", "", "", "", "", "", "", "", "", "", "", ""],
-    datasets: [
-      {
-        data: [5, 6, 4, 7, 5, 6, 8, 7, 6, 7, 8, 9],
-        borderColor: "#0D6EFD",
-        fill: true,
-        backgroundColor: "rgba(13, 110, 253, 0.1)",
-      },
+  const inventoryReportsData = {
+    day: [
+      { name: "Vaccination Rate", value: 25, icon: doctorImage },
+      { name: "Health Screening", value: 40, icon: doctorImage },
+      { name: "Testing Availability", value: 60, icon: doctorImage },
+    ],
+    week: [
+      { name: "Vaccination Rate", value: 88, icon: doctorImage },
+      { name: "Health Screening", value: 92, icon: doctorImage },
+      { name: "Testing Availability", value: 89, icon: doctorImage },
+    ],
+    month: [
+      { name: "Vaccination Rate", value: 75, icon: doctorImage },
+      { name: "Health Screening", value: 85, icon: doctorImage },
+      { name: "Testing Availability", value: 80, icon: doctorImage },
+    ],
+    year: [
+      { name: "Vaccination Rate", value: 95, icon: doctorImage },
+      { name: "Health Screening", value: 98, icon: doctorImage },
+      { name: "Testing Availability", value: 92, icon: doctorImage },
     ],
   };
 
+  const metricsData = [
+    {
+      title: "Active Users",
+      value: "27/80",
+      data: [5, 6, 4, 7, 5, 6, 8, 7, 6, 7, 8, 9],
+    },
+    {
+      title: "Questions Answered",
+      value: "3,298",
+      data: [4, 5, 6, 8, 7, 6, 5, 6, 7, 8, 9, 7],
+    },
+    {
+      title: "Av. Session Length",
+      value: "2m 34s",
+      data: [8, 7, 6, 5, 6, 7, 8, 9, 8, 7, 6, 5],
+    },
+    {
+      title: "Current Knowledge",
+      value: "86%",
+      data: [6, 7, 8, 9, 8, 7, 6, 5, 6, 7, 8, 9],
+    },
+  ];
+
+  const sellingProductsData = [
+    {
+      id: 1,
+      name: "Fuel",
+      sales: "Sold",
+      orderType: "Earned",
+      trackingId: "Placed",
+      orderTotal: "Processed",
+      profit: "Net",
+      status: "Confirmed",
+    },
+    {
+      id: 2,
+      name: "Energy",
+      sales: "Delivered",
+      orderType: "Generated",
+      trackingId: "Allocated",
+      orderTotal: "Completed",
+      profit: "Gross",
+      status: "In Progress",
+    },
+    {
+      id: 3,
+      name: "Power",
+      sales: "Distributed",
+      orderType: "Produced",
+      trackingId: "Assigned",
+      orderTotal: "Finalized",
+      profit: "Total",
+      status: "Pending",
+    },
+    {
+      id: 4,
+      name: "Electricity",
+      sales: "Supplied",
+      orderType: "Achieved",
+      trackingId: "Settled",
+      orderTotal: "Executed",
+      profit: "Balance",
+      status: "Completed",
+    },
+    {
+      id: 5,
+      name: "Gas",
+      sales: "Rendered",
+      orderType: "Accumulated",
+      trackingId: "Distributed",
+      orderTotal: "Confirmed",
+      profit: "Surplus",
+      status: "Flagged",
+    },
+  ];
+
+  const getStatusChip = (status) => {
+    const statusStyles = {
+      Confirmed: { backgroundColor: "#ECFDF3", color: "#027A48" },
+      "In Progress": { backgroundColor: "#EFF8FF", color: "#175CD3" },
+      Pending: { backgroundColor: "#FFFAEB", color: "#B54708" },
+      Completed: { backgroundColor: "#F0F9FF", color: "#026AA2" },
+      Flagged: { backgroundColor: "#FEF3F2", color: "#B42318" },
+    };
+    return (
+      <Chip
+        label={status}
+        size="small"
+        sx={{ ...statusStyles[status], borderRadius: "16px", fontWeight: 500 }}
+      />
+    );
+  };
+
+  const cardHoverStyle = {
+    transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+    "&:hover": {
+      transform: "translateY(-5px)",
+      boxShadow: "0 8px 25px 0 rgba(0,0,0,0.1)",
+    },
+  };
+
+  const summaryData = {
+    day: {
+      orders: { inProgress: 45, pending: 20, completed: 512 },
+      inventory: { inProgress: 45, pending: 2, completed: 3 },
+      bookings: { inProgress: 22, pending: 8, completed: 40 },
+      financial: { inProgress: 10, pending: 15, completed: 9 },
+    },
+    week: {
+      orders: { inProgress: 885, pending: 579, completed: 9981 },
+      inventory: { inProgress: 885, pending: 5, completed: 22 },
+      bookings: { inProgress: 457, pending: 25, completed: 232 },
+      financial: { inProgress: 125, pending: 458, completed: 89 },
+    },
+    month: {
+      orders: { inProgress: 2500, pending: 1200, completed: 25000 },
+      inventory: { inProgress: 2500, pending: 20, completed: 80 },
+      bookings: { inProgress: 1200, pending: 100, completed: 900 },
+      financial: { inProgress: 500, pending: 1000, completed: 400 },
+    },
+    year: {
+      orders: { inProgress: 15000, pending: 5000, completed: 120000 },
+      inventory: { inProgress: 15000, pending: 100, completed: 500 },
+      bookings: { inProgress: 8000, pending: 800, completed: 5000 },
+      financial: { inProgress: 3000, pending: 4000, completed: 2000 },
+    },
+  };
+
+  const summaryCardsMeta = [
+    {
+      title: "All Orders",
+      dataKey: "orders",
+      icon: <ShoppingCartIcon sx={{ color: "#175CD3" }} />,
+      dateRange: ordersDateRange,
+      setDateRange: setOrdersDateRange,
+    },
+    {
+      title: "Inventory",
+      dataKey: "inventory",
+      icon: <InventoryIcon sx={{ color: "#175CD3" }} />,
+      dateRange: inventorySummaryDateRange,
+      setDateRange: setInventorySummaryDateRange,
+    },
+    {
+      title: "Bookings",
+      dataKey: "bookings",
+      icon: <BookOnlineIcon sx={{ color: "#175CD3" }} />,
+      dateRange: bookingsDateRange,
+      setDateRange: setBookingsDateRange,
+    },
+    {
+      title: "Financial",
+      dataKey: "financial",
+      icon: <PaidIcon sx={{ color: "#175CD3" }} />,
+      dateRange: financialDateRange,
+      setDateRange: setFinancialDateRange,
+    },
+  ];
+
+  // This new effect handles the master filter logic for the summary cards
+  useEffect(() => {
+    if (ordersDateRange) {
+      setInventorySummaryDateRange(ordersDateRange);
+      setBookingsDateRange(ordersDateRange);
+      setFinancialDateRange(ordersDateRange);
+    }
+  }, [ordersDateRange]); // This runs whenever the "All Orders" date range changes
+
   return (
-    <div
-      style={{
-        background: "#F8FBFF",
-        position: "relative",
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        className="flex align-items-center justify-content-between sub-header-panel"
-        style={{ marginBottom: "30px" }}
-      >
-        <div className="sub-header-left sub-header-left-with-arrow">
-          <div className="content" style={{marginLeft:"40px"}}>
-            <h3>Reports</h3>
-          </div>
-        </div>
-      </div>
-
-      <div
-        className="report-container-inventory-reports-and-bar-graph"
-        style={{ width: "100%", paddingLeft: "20px" }}
-      >
-        <div
-          className="report-container-inventory-reports"
-          style={{ width: "35%" }}
-        >
-          <div>
-            <h2>Inventory Report</h2>
-            <div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "90%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Customer Satisfaction
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
-                      <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.customerSatisfaction.rate}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.customerSatisfaction.rate}% </p>
-                  </div>
-                </div>
-              </div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "90%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Supplier Availability
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
-                      <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.supplierAvailability.rate}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.supplierAvailability.rate}%</p>
-                  </div>
-                </div>
-              </div>
-              <div className="report-container-flop" style={{ width: "100%" }}>
-                <div>
-                  <img src={profileReport} alt="iconcontainer" />
-                </div>
-                <div
-                  className="report-container-flop-2"
-                  style={{ width: "100%" }}
-                >
-                  <div style={{ width: "100%" }}>
-                    <p style={{ color: "#212121", fontWeight: "bold" }}>
-                      Stock Levels
-                    </p>
-                    <div
-                      className="report-progress-outer-bar"
-                      style={{ width: "100%" }}
-                    >
-                      <div
-                        className="report-progress-inner-bar"
-                        style={{
-                          width: `${healthReports.stockLevels.rate}%`,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="report-progress-text">
-                    <p>{healthReports.stockLevels.rate}%</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="report-container-bar-graph" style={{ width: "33%" }}>
-          <div style={{ width: "100%", height: "100%", padding: "10px" }}>
-            <Bar data={activityData} options={chartOptions} ref={barChartRef} />
-          </div>
-        </div>
-
-        <div className="metrics-container" style={{ width: "33%" }}>
-          {systemMetrics.map((metric, index) => (
-            <div
-              key={index}
-              className="metric-card"
-              style={{
-                width: "90%",
-                overflow: "hidden",
-                position: "relative",
-                boxSizing: "border-box",
+    <Box>
+      <Box sx={{ p: { xs: 2, md: 3 } }}>
+        <Grid container spacing={3}>
+          {/* Inventory Reports Card */}
+          <Grid item xs={12} md={6} lg={3}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                height: "100%",
+                ...cardHoverStyle,
               }}
             >
-              <div className="metric-header">
-                <span style={{ fontSize: "15px" }}>{metric.title}</span>
-                <h2 style={{ fontSize: "25px" }}>{metric.value}</h2>
-              </div>
-              <div
-                className="sparkline"
-                style={{
-                  height: "40px",
-                  width: "100%",
-                  overflow: "hidden",
-                  position: "relative",
-                  paddingBottom: "10px",
-                  marginBottom: "10px",
-                  boxSizing: "border-box",
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
                 }}
               >
-                <Line
-                  data={sparklineData}
-                  options={sparklineOptions}
-                  ref={(el) => {
-                    if (el) lineChartRefs.current[index] = el;
-                  }}
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Inventory Reports
+                </Typography>
+                <Select
+                  value={inventoryDateRange}
+                  onChange={(e) => setInventoryDateRange(e.target.value)}
+                  size="small"
+                  variant="outlined"
+                  sx={{ ".MuiOutlinedInput-notchedOutline": { border: 0 } }}
+                >
+                  <MenuItem value="day">Day</MenuItem>
+                  <MenuItem value="week">Week</MenuItem>
+                  <MenuItem value="month">Month</MenuItem>
+                  <MenuItem value="year">Year</MenuItem>
+                </Select>
+              </Box>
+              {inventoryReportsData[inventoryDateRange].map((report) => (
+                <InventoryReportItem key={report.name} {...report} />
+              ))}
+            </Paper>
+          </Grid>
+
+          {/* Activity Chart */}
+          <Grid item xs={12} md={6} lg={5}>
+            <Paper
+              elevation={2}
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                height: "100%",
+                ...cardHoverStyle,
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Activity
+                </Typography>
+                <Select
+                  value={activityDateRange}
+                  onChange={(e) => setActivityDateRange(e.target.value)}
+                  size="small"
+                  variant="outlined"
+                  sx={{ ".MuiOutlinedInput-notchedOutline": { border: 0 } }}
+                >
+                  <MenuItem value="day">Day</MenuItem>
+                  <MenuItem value="week">Week</MenuItem>
+                  <MenuItem value="month">Month</MenuItem>
+                  <MenuItem value="year">Year</MenuItem>
+                </Select>
+              </Box>
+              <Box sx={{ height: 250 }}>
+                <Bar
+                  ref={barChartRef}
+                  data={activityData}
+                  options={chartOptions}
                 />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+              </Box>
+            </Paper>
+          </Grid>
 
-      <div className="order-summary-text-header">
-        <h2>Order Summary</h2>
-      </div>
+          {/* Metrics Cards */}
+          <Grid item xs={12} lg={4}>
+            <Grid container spacing={3}>
+              {metricsData.map((metric) => (
+                <Grid item xs={12} sm={6} key={metric.title}>
+                  <Box sx={{ ...cardHoverStyle, height: "100%" }}>
+                    <MetricCard
+                      title={metric.title}
+                      value={metric.value}
+                      data={metric.data}
+                    />
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
 
-      <div className="box-order-container" style={{ minWidth: "800px" }}>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>All Orders</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>885</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>579</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>9981</p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Inventory</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>885</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending</p>
-              <p style={{ fontSize: "12px" }}>5</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>22</p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Bookings</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>457</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
-            </div>
-          </div>
-        </div>
-        <div className="box1-order" style={{ minWidth: "180px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0px 9px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <img src={lockLogo} alt="lockLogo" />
-              <h3>Financial</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <p style={{ marginRight: "5px" }}>This week</p>
-              <img
-                src={dropdown}
-                alt="dropdown"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </div>
-          </div>
-          <div className="pending-order-container">
-            <div style={{ marginRight: "5px" }}>
-              <p
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  minWidth: "50px",
-                  fontSize: "13px",
-                }}
-              >
-                In progress
-              </p>
-              <p style={{ fontSize: "12px" }}>457</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Pending </p>
-              <p style={{ fontSize: "12px" }}>25</p>
-            </div>
-            <div style={{ marginRight: "5px" }}>
-              <p style={{ fontSize: "13px" }}>Completed</p>
-              <p style={{ fontSize: "12px" }}>232</p>
-            </div>
-          </div>
-        </div>
-      </div>
+          {/* Orders Summary Section */}
+          <Grid item xs={12}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              Orders Summary
+            </Typography>
+            <Grid container spacing={3}>
+              {summaryCardsMeta.map((card) => (
+                <Grid item xs={12} sm={6} md={6} lg={4} xl={3} key={card.title}>
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 2,
+                      borderRadius: 3,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                      ...cardHoverStyle,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 2,
+                        gap: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: { xs: "0.9rem", sm: "1.1rem" },
+                          flexShrink: 1,
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        }}
+                      >
+                        {card.title}
+                      </Typography>
+                      <Box sx={{ flexShrink: 0 }}>
+                        <Select
+                          value={card.dateRange}
+                          onChange={(e) => card.setDateRange(e.target.value)}
+                          size="small"
+                          sx={{
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                            ".MuiOutlinedInput-notchedOutline": { border: 0 },
+                            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                              border: 0,
+                            },
+                            boxShadow: "none",
+                            ".MuiSelect-select": {
+                              paddingRight: "24px !important",
+                            },
+                          }}
+                        >
+                          <MenuItem value="day">This Day</MenuItem>
+                          <MenuItem value="week">This Week</MenuItem>
+                          <MenuItem value="month">This Month</MenuItem>
+                          <MenuItem value="year">This Year</MenuItem>
+                        </Select>
+                      </Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-around",
+                        textAlign: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          In Progress
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: {
+                              xs: "0.875rem",
+                              sm: "1rem",
+                              md: "1.1rem",
+                              lg: "1.25rem",
+                            },
+                          }}
+                        >
+                          {summaryData[card.dateRange][
+                            card.dataKey
+                          ].inProgress.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Pending
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: {
+                              xs: "0.875rem",
+                              sm: "1rem",
+                              md: "1.1rem",
+                              lg: "1.25rem",
+                            },
+                          }}
+                        >
+                          {summaryData[card.dateRange][
+                            card.dataKey
+                          ].pending.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Completed
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: {
+                              xs: "0.875rem",
+                              sm: "1rem",
+                              md: "1.1rem",
+                              lg: "1.25rem",
+                            },
+                          }}
+                        >
+                          {summaryData[card.dateRange][
+                            card.dataKey
+                          ].completed.toLocaleString()}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
 
-      <div className="selling-products-container">
-        <div className="selling-products-header">
-          <h2>Selling Products</h2>
-          <Button
-            label="AI Report Generate"
-            icon="pi pi-file"
-            className="p-button-primary"
-          />
-        </div>
-
-        <table className="selling-products-table">
-          <thead>
-            <tr>
-              <th>
-                Product Name <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Sales <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Type <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Tracking ID <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Order Total <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Profit <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                1500 <img src={sortIcon} alt="sortIcon" />
-              </th>
-              <th>
-                Status <img src={sortIcon} alt="sortIcon" />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Fuel</td>
-              <td>Sold</td>
-              <td>Earned</td>
-              <td>Placed</td>
-              <td>Processed</td>
-              <td>Net</td>
-              <td>Widgets Pro</td>
-              <td>
-                <span className="status-confirmed">Confirmed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Energy</td>
-              <td>Delivered</td>
-              <td>Generated</td>
-              <td>Allocated</td>
-              <td>Completed</td>
-              <td>Gross</td>
-              <td>Widgets Plus</td>
-              <td>
-                <span className="status-in-progress">In Progress</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Power</td>
-              <td>Distributed</td>
-              <td>Produced</td>
-              <td>Assigned</td>
-              <td>Finalized</td>
-              <td>Total</td>
-              <td>Widgets Max</td>
-              <td>
-                <span className="status-pending">Pending</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Electricity</td>
-              <td>Supplied</td>
-              <td>Achieved</td>
-              <td>Settled</td>
-              <td>Executed</td>
-              <td>Balance</td>
-              <td>Widgets Elite</td>
-              <td>
-                <span className="status-completed">Completed</span>
-              </td>
-            </tr>
-            <tr>
-              <td>Gas</td>
-              <td>Rendered</td>
-              <td>Accumulated</td>
-              <td>Distributed</td>
-              <td>Confirmed</td>
-              <td>Surplus</td>
-              <td>Widgets Standard</td>
-              <td>
-                <span className="status-flagged">Flagged</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          {/* Selling Products Table */}
+          <Grid item xs={12}>
+            <SellingProductsTable />
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
-
-// Create and add a stylesheet element for responsive design
-const responsiveStyle = document.createElement("style");
-responsiveStyle.innerHTML = `
-  @media screen and (max-width: 768px) {
-    /* Main layout - stack everything vertically */
-    .report-container-inventory-reports-and-bar-graph {
-      display: flex !important;
-      flex-direction: column !important;
-      width: 100% !important;
-      padding-left: 10px !important;
-      padding-right: 10px !important;
-    }
-    
-    /* Make all sections the EXACT same width on mobile */
-    .report-container-inventory-reports,
-    .report-container-bar-graph,
-    .metrics-container {
-      width: 92% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      margin-bottom: 20px !important;
-    }
-    
-    /* Make sure the chart container itself has the right styling */
-    .report-container-bar-graph {
-      background-color: #FFFFFF !important;
-      border-radius: 8px !important;
-      padding: 10px !important;
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.05) !important;
-    }
-    
-    /* Style the chart's inner container */
-    .report-container-bar-graph > div {
-      width: 100% !important;
-      height: 250px !important;
-      padding: 5px !important;
-    }
-    
-    /* Stack order summary boxes vertically */
-    .box-order-container {
-      display: flex !important;
-      flex-direction: column !important;
-      min-width: unset !important;
-      width: 96% !important;
-      margin: 0 auto !important;
-    }
-    
-    .box1-order {
-      width: 100% !important;
-      min-width: unset !important;
-      margin-bottom: 15px !important;
-    }
-    
-    /* Fix selling products section */
-    .selling-products-container {
-      margin-top: 20px !important;
-      width: 96% !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-    }
-    
-    .selling-products-header {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: flex-start !important;
-    }
-    
-    .selling-products-header .p-button {
-      width: 100% !important;
-      margin-top: 10px !important;
-    }
-    
-    /* Make table horizontally scrollable */
-    .selling-products-container {
-      overflow-x: auto !important;
-    }
-    
-    .selling-products-table {
-      min-width: 600px !important;
-    }
-    
-    /* Adjust font sizes for better mobile readability */
-    h3 {
-      font-size: 20px !important;
-    }
-    
-    h2 {
-      font-size: 18px !important;
-    }
-    
-    .metric-header span {
-      font-size: 12px !important;
-    }
-    
-    .metric-header h2 {
-      font-size: 18px !important;
-    }
-    
-    /* Add margin to order summary title */
-    .order-summary-text-header {
-      margin-top: 15px !important;
-      padding-left: 2% !important;
-    }
-  }
-`;
-
-// Add style element to document head
-if (typeof document !== "undefined") {
-  document.head.appendChild(responsiveStyle);
-}
 
 export default Reports;

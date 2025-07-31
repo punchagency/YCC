@@ -167,3 +167,43 @@ export const bulkDeleteBookings = async (bookingIds) => {
     };
   }
 };
+
+export const getServiceProviderBookings = async ({ page = 1, limit = 10, status, paymentStatus, StartDate, EndDate, sortBy = "dateTime", sortOrder = "desc" }) => {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append("page", page);
+    queryParams.append("limit", limit);
+    if(status) queryParams.append("status", status);
+    if(paymentStatus) queryParams.append("paymentStatus", paymentStatus);
+    if(StartDate) queryParams.append("StartDate", StartDate);
+    if(EndDate) queryParams.append("EndDate", EndDate);
+    if(sortBy) queryParams.append("sortBy", sortBy);
+    if(sortOrder) queryParams.append("sortOrder", sortOrder);
+    const response = await axios.get(`${API_URL}/vendor-bookings?${queryParams}`, {
+      headers: getAuthHeader(),
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error in getServiceProviderBookings:", error);
+    console.error("Error response:", error.response?.data);
+
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete bookings",
+    };
+  }
+};
+
+export const updateStatusOfBooking = async ({bookingId, status, reason, notes}) => {
+  try {
+    const response = await axios.patch(`${API_URL}/${bookingId}/status`, { status, reason, notes }, { headers: getAuthHeader() });
+    return response.data;
+  } catch (error) {
+    console.log("Error in updateStatusOfBooking:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to update booking status",
+    };
+  }
+}

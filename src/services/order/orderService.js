@@ -261,9 +261,9 @@ export const deleteOrder = async (orderId) => {
 };
 
 // Get order summary
-export const getOrderSummary = async () => {
+export const getOrderSummary = async (status) => {
   try {
-    const response = await axios.get(`${API_URL}/orders?limit=5`, {
+    const response = await axios.get(`${API_URL}/orders?limit=5${status && `&status=${status}`}`, {
       headers: getAuthHeader(),
     });
 
@@ -309,3 +309,70 @@ export const bulkDeleteOrders = async (orderIds) => {
     };
   }
 };
+
+/**
+ * Search products for order creation
+ * @param {Object} params - Search parameters
+ * @param {string} params.query - Search query
+ * @param {string} params.category - Category filter
+ * @param {string} params.supplier - Supplier filter
+ * @param {number} params.limit - Items per page
+ * @param {number} params.page - Page number
+ * @returns {Promise<Object>} Search results
+ */
+export const searchProducts = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams();
+    if (params.query) queryParams.append('query', params.query);
+    if (params.category) queryParams.append('category', params.category);
+    if (params.supplier) queryParams.append('supplier', params.supplier);
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.page) queryParams.append('page', params.page.toString());
+    const response = await axios.get(
+      `${API_URL}/orders/search-products?${queryParams}`,
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get product categories for filter dropdown
+ * @returns {Promise<Object>} Categories list
+ */
+export const getProductCategories = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/orders/categories`,
+      { headers: getAuthHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+};
+
+export const getSupplierOrders = async (status) => {
+    try {
+        const response = await axios.get(`${API_URL}/orders/supplier-orders?status=${status}`, {
+            headers: getAuthHeader(),
+        });
+        return {
+            success: true,
+            data: response.data,
+        };
+    } catch (error) {
+        console.error(
+            "Error fetching supplier orders:",
+            error.response?.data || error.message
+        );
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to fetch supplier orders",
+        };
+    }
+}

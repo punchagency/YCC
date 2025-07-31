@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global layout styles */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure proper flex behavior */
+.flex {
+  display: flex;
+}
+
+/* Prevent content from overflowing viewport */
+.wrapper, .page, .right-panel-component {
+  min-height: 0;
+  flex-shrink: 0;
+}

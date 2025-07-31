@@ -37,7 +37,7 @@ const UpdatedCalendar = () => {
   // Fetch events when component mounts
   useEffect(() => {
     fetchEventsByDate();
-  }, [fetchEventsByDate]);
+  }, []);
 
   // Fetch events when currentDate (month) changes
   // useEffect(() => {
@@ -110,7 +110,7 @@ const UpdatedCalendar = () => {
             initialView="dayGridMonth"
             datesSet={handleCalendarChange}
             events={events}
-            height="280px"
+            height="auto"
             initialDate={currentDate}
             dayHeaders={false}
             dayCellClassNames={({ date }) => {
