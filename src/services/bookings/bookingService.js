@@ -167,3 +167,12 @@ export const bulkDeleteBookings = async (bookingIds) => {
     };
   }
 };
+
+export const getServiceProviderBookings = async (vendorId) => {
+  try {
+    const response = await axios.get(`${API_URL}/vendor`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

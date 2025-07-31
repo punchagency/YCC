@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
-import { createBooking } from "../../../services/crew/crewBookingService";
+import { createBooking, getVendorsAndServices } from "../../../services/crew/crewBookingService";
 import { getAllServices } from "../../../services/service/serviceService";
 import { useToast } from "../../../components/Toast";
 
@@ -27,30 +27,10 @@ const CreateBooking = () => {
   const fetchVendors = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getAllServices();
+      const response = await getVendorsAndServices();
       if (response.status) {
         // Extract unique vendors from services
-        const uniqueVendors = response.data.reduce((acc, service) => {
-          const vendor = service.vendor;
-          if (vendor && !acc.find((v) => v._id === vendor._id)) {
-            acc.push({
-              _id: vendor._id,
-              businessName: vendor.businessName,
-              businessAddress: vendor.serviceAreas || "Not specified",
-              email: vendor.email,
-              phoneNumber: vendor.phoneNumber,
-              businessType: vendor.businessType,
-              services: [service],
-              user: vendor.user,
-            });
-          } else if (vendor) {
-            const existingVendor = acc.find((v) => v._id === vendor._id);
-            if (existingVendor) {
-              existingVendor.services.push(service);
-            }
-          }
-          return acc;
-        }, []);
+        const uniqueVendors = response.data.data.filter((vendor) => vendor.services.length > 0);
         setVendors(uniqueVendors);
       }
     } catch (error) {

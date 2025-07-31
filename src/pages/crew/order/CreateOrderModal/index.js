@@ -32,7 +32,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
   // Pagination states
@@ -104,7 +103,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         setSearchLoading(false);
       }
     }, 300),
-    [pagination.limit]
+    [pagination.limit, searchQuery, selectedCategory]
   );
 
   // Handle search
@@ -282,6 +281,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
             searchResults={searchResults}
             categories={categories}
             selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
             loading={false}
             searchLoading={searchLoading}
             pagination={pagination}

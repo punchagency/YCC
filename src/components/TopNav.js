@@ -32,6 +32,7 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
 
   const isCrewMember = userRole === "crew_member";
   const isSupplier = userRole === "supplier";
+  const isServiceProvider = userRole === "service_provider";
 
   // Prevent scrolling when menu is open
   useEffect(() => {
@@ -203,11 +204,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       icon: orderLogo,
       path: "/crew/orders-management",
     },
-    // {
-    //   label: "Bookings",
-    //   icon: bookingLogo,
-    //   path: "/crew/booking",
-    // },
+    {
+      label: "Bookings",
+      icon: bookingLogo,
+      path: "/crew/booking",
+    },
     {
       label: "Financial Management",
       icon: financeLogo,
@@ -319,8 +320,42 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
     },
   ];
 
+  const ServiceProviderMenuItems = [
+    {
+      label: "Dashboard",
+      icon: dashboardLogo,
+      path: '/service-provider/dashboard',
+    },
+     {
+      label: "Service Management",
+      icon: inventoryLogo,
+      path: "/service-provider/services",
+    },
+    {
+      label: "Bookings",
+      icon: orderLogo,
+      path: "/service-provider/bookings"
+    },
+    {
+      label: "Transactions",
+      icon: transactionLogo,
+      path: "/service-provider/transactions",
+    },
+    {
+      label: "Settings",
+      icon: settingsLogo,
+      path: "/service-provider/settings"
+    },
+    {
+      label: "Log Out",
+      icon: logoutLogo,
+      onClick: handleLogout,
+      divider: true,
+    },
+  ];
+
   // Choose menu items based on user role
-  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : adminMenuItems;
+  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : isServiceProvider ? ServiceProviderMenuItems : adminMenuItems;
 
   const handleNavigation = (path, onClick, subItems) => {
     if (onClick) {

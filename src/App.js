@@ -90,6 +90,13 @@ import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
 import AdminOrderDetails from "./pages/order/adminOrderDetails";
 
+// Service Providers
+import ServiceProviderDashboard from "./pages/service-providers/dashboard/service-provider-dashboard.js";
+import ServiceProviderSettings from "./pages/service-providers/settings/service-provider-settings.js";
+import ServiceProvidersBookings from "./pages/service-providers/bookings/service-providers-bookings.js";
+import ServiceProvidersServiceManagement from "./pages/service-providers/services-management/service-providers-services-management.js";
+import ServiceProvidersTransactions from "./pages/service-providers/transactions/service-providers-transaction.js";
+
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
   const location = useLocation();
@@ -521,6 +528,50 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                  </Route>
+
+                  {/* Service Provider's Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route
+                      path="/service-provider/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProviderDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/settings"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProviderSettings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/bookings"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersBookings />
+                        </ProtectedRoute>
+                      }
+                      />
+                    <Route
+                      path="/service-provider/transactions"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersTransactions />
+                        </ProtectedRoute>
+                      }
+                      />
+                    <Route
+                      path="/service-provider/services"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersServiceManagement />
+                        </ProtectedRoute>
+                      }
+                      />
                   </Route>
 
                   {/* Onboarding Routes */}

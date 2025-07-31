@@ -4,7 +4,6 @@ import CrewBookingsAndQuotes from "./CrewBookingsAndQuotes";
 import BookingDetails from "./details";
 import ModifyService from "./modifyservice";
 import CreateBooking from "./createBooking";
-import { useEffect } from "react";
 
 const Booking = () => {
   const outletContext = useOutletContext();

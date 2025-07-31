@@ -21,7 +21,7 @@ const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("all");
-  const { orderSummary, fetchOrderSummary, orderSummaryLoading } = useOrder();
+  const { orderSummary, fetchOrderSummary } = useOrder();
   const { invoices, fetchInvoices } = useInvoice();
   const { lowInventory, fetchLowInventory } = useInventory();
   const handleOpen = () => setOpen(true);
