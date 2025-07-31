@@ -12,8 +12,8 @@ export default function AdminDashboard() {
   }, [setPageTitle]);
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
-      <Box sx={{ px: { xs: 0, sm: 0, md: 2 } }}>
+    <Container maxWidth="100%" sx={{ py: { md: 2 } }}>
+      <Box sx={{ px: { sm: 0, md: 2 } }}>
         {/* First Row: User Stats */}
         <UserStatsRow />
 
