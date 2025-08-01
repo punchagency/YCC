@@ -82,6 +82,7 @@ const LoginForm = ({ onClose }) => {
       if (response.status === "success") {
         // Store the token from the nested data object
         if (response.data && response.data.token) {
+          console.log("Saving token to localStorage:", response.data.token);
           localStorage.setItem("token", response.data.token);
         }
 
@@ -110,7 +111,7 @@ const LoginForm = ({ onClose }) => {
         } else if (userRole === "supplier") {
           navigate("/supplier/dashboard");
         } else if (userRole === "service_provider") {
-          navigate("/service-provider/dashboard");
+          navigate("/vendor/onboarding");
         }
       } else {
         setError(response.message || "Login failed. Please try again.");

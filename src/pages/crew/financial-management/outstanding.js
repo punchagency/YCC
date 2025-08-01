@@ -21,13 +21,10 @@ import {
   CheckCircle,
   Schedule
 } from "@mui/icons-material";
-import { Skeleton } from "@mui/material";
 
-const Outstanding = ({financeData, fetchData, setFinanceData, loading = false}) => {
-
+const Outstanding = ({financeData, fetchData, setFinanceData}) => {
   // New expense modal state
   const [showExpenseModal, setShowExpenseModal] = useState(false);
-  const [analytics, setAnalytics] = useState(financeData.analytics);
   const [newExpense, setNewExpense] = useState({
     category: "Exterior",
     amount: "",
@@ -47,10 +44,6 @@ const Outstanding = ({financeData, fetchData, setFinanceData, loading = false}) 
     "Education",
     "Others",
   ];
-
-  React.useEffect(() => {
-    setAnalytics(financeData.analytics);
-  }, [financeData.analytics]);
 
   // Handle expense form input changes
   const handleExpenseChange = (e) => {
@@ -95,48 +88,24 @@ const Outstanding = ({financeData, fetchData, setFinanceData, loading = false}) 
 
   const cards = [
     {
-      title: "Total Amount",
-      amount: formatCurrency(analytics?.totalAmount || 0),
-      icon: <Schedule sx={{ fontSize: 40, color: '#2196f3' }} />,
-      color: '#e3f2fd'
+      title: "Outstanding Invoices",
+      amount: "$4,000",
+      icon: <AccountBalanceWallet sx={{ fontSize: 40, color: '#ff9800' }} />,
+      color: '#fff3e0'
     },
     {
       title: "Completed Payments",
-      amount: formatCurrency(analytics?.totalCompletedAmount || 0),
+      amount: "$4,000",
       icon: <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />,
       color: '#e8f5e8'
     },
     {
-      title: "Outstanding Invoices",
-      amount: formatCurrency(analytics?.totalOutstandingAmount || 0),
-      icon: <AccountBalanceWallet sx={{ fontSize: 40, color: '#ff9800' }} />,
-      color: '#fff3e0'
-    },
+      title: "Upcoming Expenses",
+      amount: "$4,000",
+      icon: <Schedule sx={{ fontSize: 40, color: '#2196f3' }} />,
+      color: '#e3f2fd'
+    }
   ];
-
-  if (loading) {
-    return (
-      <Box sx={{ p: { xs: 2, md: 3 } }}>
-        <Grid container spacing={3}>
-          {[1, 2, 3].map((index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={{ height: '100%', borderRadius: 3, p: 3 }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Skeleton variant="circular" width={60} height={60} />
-                    <Box sx={{ flex: 1 }}>
-                      <Skeleton variant="text" width="60%" height={20} />
-                      <Skeleton variant="text" width="80%" height={32} sx={{ mt: 0.5 }} />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    );
-  }
 
   return (
     <>

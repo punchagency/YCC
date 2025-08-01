@@ -18,9 +18,9 @@ export const InvoiceProvider = ({ children }) => {
     const [error, setError] = useState(null);
 
 
-    const fetchInvoices = async ({status, type, period}) => {
+    const fetchInvoices = async () => {
         try {
-            const response = await getInvoices({status, type, period});
+            const response = await getInvoices();
             setInvoices(response.data);
         } catch (error) {
             setError(error);

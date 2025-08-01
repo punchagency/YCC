@@ -44,7 +44,7 @@ const BookingSummary = () => {
         >
           <Grid
             spacing={{ xs: 1, sm: 1.5, md: 2 }}
-            sx={{ height: "100%", display:"flex", flexDirection: "row", gap: { xs: "10px", sm: "12px", md: "15px" } }}
+            sx={{ height: "100%" }}
           >
             <Grid
               xs={12}

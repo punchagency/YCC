@@ -1,6 +1,6 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import { Typography, Box, useMediaQuery, Skeleton } from "@mui/material";
+import { Typography, Box, useMediaQuery } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -52,20 +52,10 @@ const statusColors = {
   pending: { backgroundColor: "#FFF3E4", color: "#896942" },
 };
 
-export default function BasicTable({ orders, loading = false }) {
+export default function BasicTable({ orders }) {
   const { theme } = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
-
-  const SkeletonRow = () => (
-    <StyledTableRow mode={theme}>
-      <StyledTableCell><Skeleton width="80%" /></StyledTableCell>
-      <StyledTableCell align="right"><Skeleton width="60%" /></StyledTableCell>
-      <StyledTableCell align="right"><Skeleton width="70%" /></StyledTableCell>
-      <StyledTableCell align="right"><Skeleton width="50%" /></StyledTableCell>
-      {!isMobile && <StyledTableCell align="right"><Skeleton width="60%" /></StyledTableCell>}
-    </StyledTableRow>
-  );
 
   return (
     <TableContainer
@@ -121,9 +111,7 @@ export default function BasicTable({ orders, loading = false }) {
         <TableBody
           sx={{ backgroundColor: theme === "light" ? "white" : "#7A7A7A" }}
         >
-          {loading ? (
-            Array.from({ length: 5 }).map((_, index) => <SkeletonRow key={index} />)
-          ) : orders && orders.length > 0 ? (
+          {orders && orders.length > 0 ? (
             orders.map((order) => (
               <StyledTableRow key={order.orderId} mode={theme}>
                 <StyledTableCell component="th" scope="row">
@@ -156,15 +144,15 @@ export default function BasicTable({ orders, loading = false }) {
                       : order?.customerName || order?.customer?.name || "N/A"}
                   </TableBodyText>
                 </StyledTableCell>
-                {order?.overallStatus && (
+                {order?.status && (
                   <StyledTableCell align="right">
                     <TableBodyText mode={theme} padding="0px">
                       <StatusBox
                         mode={theme}
-                        status={order?.overallStatus}
+                        status={order?.status}
                         isMobile={isMobile}
                       >
-                        {order?.overallStatus}
+                        {order?.status}
                       </StatusBox>
                     </TableBodyText>
                   </StyledTableCell>
@@ -246,11 +234,10 @@ const TableBodyText = styled(Typography)(({ mode, padding }) => ({
 
 const StatusBox = styled(Box)(({ mode, status, isMobile }) => ({
   backgroundColor: statusColors[status]?.backgroundColor || "transparent",
-  // color: statusColors[status]?.color || "transparent",
+  color: statusColors[status]?.color || "transparent",
   borderRadius: "6px",
   padding: isMobile ? "2px 6px" : "4px 11px",
   width: isMobile ? "70px" : "100px",
   textAlign: "center",
   fontSize: isMobile ? "10px" : "inherit",
-  textTransform: "capitalize",
 }));
