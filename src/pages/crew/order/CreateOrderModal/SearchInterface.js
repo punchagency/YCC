@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   FormControl,
@@ -22,7 +22,6 @@ const SearchInterface = ({
   searchResults,
   categories,
   selectedCategory,
-  setSelectedCategory,
   loading,
   searchLoading,
   pagination,
@@ -52,15 +51,13 @@ const SearchInterface = ({
     onSearch(query, selectedCategory, 1);
   };
 
-  // Handle category change - FIXED
+  // Handle category change
   const handleCategoryChange = (e) => {
     const category = e.target.value;
-    setSelectedCategory(category);
-    
-    // Use the current localSearchQuery value directly
+    // Always fetch when category changes, even if query is empty
     if (category === "all") {
       setLocalSearchQuery("");
-      onSearch("", "all", 1); // Use empty string directly
+      onSearch("", "all", 1);
     } else {
       onSearch(localSearchQuery, category, 1);
     }
@@ -69,7 +66,7 @@ const SearchInterface = ({
   // Handle clear search
   const handleClearSearch = () => {
     setLocalSearchQuery("");
-    onSearch("", selectedCategory, 1);
+    onSearch("", "all", 1);
   };
 
   // Handle page change
@@ -254,14 +251,14 @@ const SearchInterface = ({
             renderLoadingSkeleton()
           ) : searchResults.length > 0 ? (
             <Grid container spacing={3}>
-              {searchResults.map((product, index) => (
+              {searchResults.map((product) => (
                 <Grid
                   item
                   xs={12}
                   sm={6}
                   md={4}
                   lg={3}
-                  key={index}
+                  key={product.inventoryId}
                 >
                   <ProductCard
                     product={product}

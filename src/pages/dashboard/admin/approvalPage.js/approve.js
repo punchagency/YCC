@@ -12,8 +12,10 @@ import {
 } from "../../../../services/admin/adminService";
 import { constructOnboardingUrl } from "../../../../utils/urlUtils";
 import "./approve.css";
+import { useOutletContext } from "react-router-dom";
 
 const ApprovePage = () => {
+  const { setPageTitle } = useOutletContext() || {};
   const [activeTab, setActiveTab] = useState("supplier");
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showDenyModal, setShowDenyModal] = useState(false);
@@ -29,6 +31,10 @@ const ApprovePage = () => {
   const [rejectionContent, setRejectionContent] = useState("");
   const [sendingRejection, setSendingRejection] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setPageTitle("Approve");
+  }, [setPageTitle]);
 
   const fetchVendors = useCallback(
     async (reset = false) => {

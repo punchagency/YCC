@@ -17,7 +17,6 @@ export const OrderProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [orderSummary, setOrderSummary] = useState({});
-    const [orderSummaryLoading, setOrderSummaryLoading] = useState(false);
 
 
     const fetchOrders = async () => {
@@ -31,15 +30,14 @@ export const OrderProvider = ({ children }) => {
         }
     };  
 
-    const fetchOrderSummary = async (status) => {
-        setOrderSummaryLoading(true);
+    const fetchOrderSummary = async () => {
         try {
-            const response = await getOrderSummary(status);
+            const response = await getOrderSummary();
             setOrderSummary(response.data.data);
         } catch (error) {
             setError(error);
         } finally {
-            setOrderSummaryLoading(false);
+            setLoading(false);
         }
     };
 
@@ -50,8 +48,7 @@ export const OrderProvider = ({ children }) => {
         error,
         fetchOrders,
         orderSummary,
-        fetchOrderSummary,
-        orderSummaryLoading
+        fetchOrderSummary
     };
 
     return (

@@ -261,9 +261,9 @@ export const deleteOrder = async (orderId) => {
 };
 
 // Get order summary
-export const getOrderSummary = async (status) => {
+export const getOrderSummary = async () => {
   try {
-    const response = await axios.get(`${API_URL}/orders?limit=5${status && `&status=${status}`}`, {
+    const response = await axios.get(`${API_URL}/orders?limit=5`, {
       headers: getAuthHeader(),
     });
 
