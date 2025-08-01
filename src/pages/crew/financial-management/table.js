@@ -26,12 +26,13 @@ import {
 } from "@mui/material";
 import {
   Visibility,
+  Edit,
+  Delete,
   DeleteOutline
 } from "@mui/icons-material";
-import { Skeleton } from "@mui/material";
 import { visuallyHidden } from '@mui/utils';
 
-const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[], loading = false }) => {
+const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sortField, setSortField] = useState(null);
@@ -42,26 +43,149 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
 
+  // Sample invoice data
+  const invoices = [
+    {
+      id: "INV-001",
+      vendor: "John Doe",
+      date: "01/03/2025",
+      amount: 12000.0,
+      status: "In Progress",
+      details: {
+        invoiceNo: "INV-001",
+        serviceName: "Yacht Maintenance",
+        serviceFee: 11500,
+        taxRate: 5,
+        taxAmount: 575,
+        discount: 75,
+        total: 12000,
+        bookingDate: "01/03/2025",
+        paymentMethod: "Credit Card",
+        cardEnding: "4321",
+        paymentStatus: "In Progress",
+      },
+    },
+    {
+      id: "INV-002",
+      vendor: "Jane Smith",
+      date: "01/04/2025",
+      amount: 8500.0,
+      status: "Completed",
+      details: {
+        invoiceNo: "INV-002",
+        serviceName: "Crew Training",
+        serviceFee: 8000,
+        taxRate: 5,
+        taxAmount: 400,
+        discount: 0,
+        total: 8500,
+        bookingDate: "01/04/2025",
+        paymentMethod: "Bank Transfer",
+        cardEnding: "N/A",
+        paymentStatus: "Completed",
+      },
+    },
+    {
+      id: "INV-003",
+      vendor: "Alice Johnson",
+      date: "01/05/2025",
+      amount: 15200.0,
+      status: "Pending",
+      details: {
+        invoiceNo: "INV-003",
+        serviceName: "Engine Repair",
+        serviceFee: 14500,
+        taxRate: 5,
+        taxAmount: 725,
+        discount: 25,
+        total: 15200,
+        bookingDate: "01/05/2025",
+        paymentMethod: "Visa",
+        cardEnding: "7890",
+        paymentStatus: "Pending",
+      },
+    },
+    {
+      id: "INV-004",
+      vendor: "Bob Brown",
+      date: "01/06/2025",
+      amount: 9750.0,
+      status: "In Progress",
+      details: {
+        invoiceNo: "INV-004",
+        serviceName: "Interior Design",
+        serviceFee: 9500,
+        taxRate: 5,
+        taxAmount: 475,
+        discount: 225,
+        total: 9750,
+        bookingDate: "01/06/2025",
+        paymentMethod: "Mastercard",
+        cardEnding: "5678",
+        paymentStatus: "In Progress",
+      },
+    },
+    {
+      id: "INV-005",
+      vendor: "Carol White",
+      date: "01/07/2025",
+      amount: 22300.0,
+      status: "Completed",
+      details: {
+        invoiceNo: "INV-005",
+        serviceName: "Hull Painting",
+        serviceFee: 21000,
+        taxRate: 5,
+        taxAmount: 1050,
+        discount: 0,
+        total: 22300,
+        bookingDate: "01/07/2025",
+        paymentMethod: "American Express",
+        cardEnding: "9012",
+        paymentStatus: "Completed",
+      },
+    },
+    {
+      id: "INV-006",
+      vendor: "David Green",
+      date: "01/08/2025",
+      amount: 5600.0,
+      status: "Pending",
+      details: {
+        invoiceNo: "INV-006",
+        serviceName: "Safety Inspection",
+        serviceFee: 5500,
+        taxRate: 5,
+        taxAmount: 275,
+        discount: 175,
+        total: 5600,
+        bookingDate: "01/08/2025",
+        paymentMethod: "Visa",
+        cardEnding: "3456",
+        paymentStatus: "Pending",
+      },
+    },
+  ];
+
   // Initialize filteredInvoices with invoices data
   useEffect(() => {
-    setFilteredInvoices(financeData);
+    setFilteredInvoices(invoices);
   }, []);
 
   // Filter invoices when activeFilter or searchQuery changes
   useEffect(() => {
-    if(!financeData && financeData.length === 0) return;
-    let filtered = [...financeData];
+    let filtered = [...invoices];
 
     // Apply status filter
     if (activeFilter !== "all") {
       filtered = filtered.filter((invoice) => {
         switch (activeFilter) {
           case "pending":
-            return invoice.status === "pending";
+            return invoice.status === "Pending";
           case "completed":
-            return invoice.status === "paid";
+            return invoice.status === "Completed";
           case "upcoming":
-            return invoice.status === "failed" || invoice.status === "cancelled";
+            return invoice.status === "In Progress";
           default:
             return true;
         }
@@ -73,16 +197,14 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (invoice) =>
-          invoice.invoiceId.toLowerCase().includes(query) ||
-          invoice.orderId.toLowerCase().includes(query) ||
-          invoice.type.toLowerCase().includes(query) ||
-          (invoice.suppliers && invoice.suppliers.some(supplier => supplier.toLowerCase().includes(query))) ||
-          (invoice.serviceProvider && invoice.serviceProvider.toLowerCase().includes(query))
+          invoice.id.toLowerCase().includes(query) ||
+          invoice.vendor.toLowerCase().includes(query) ||
+          invoice.details?.serviceName.toLowerCase().includes(query)
       );
     }
 
     setFilteredInvoices(filtered);
-  }, [activeFilter, searchQuery, financeData]);
+  }, [activeFilter, searchQuery]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -93,18 +215,25 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
     }
   };
 
+  // const getSortIcon = (field) => {
+  //   if (sortField === field) {
+  //     return sortDirection === "asc" ? (
+  //       <FaSortAmountUp className="ml-1" />
+  //     ) : (
+  //       <FaSortAmountDown className="ml-1" />
+  //     );
+  //   }
+  //   return <FaSortAmountUp className="ml-1 opacity-30" />;
+  // };
+
   const getStatusColor = (status) => {
     switch (status) {
-      case "paid":
+      case "In Progress":
         return { bgcolor: '#e8f5e8', color: '#2e7d32' };
-      case "pending":
+      case "Completed":
+        return { bgcolor: '#e3f2fd', color: '#1976d2' };
+      case "Pending":
         return { bgcolor: '#fff3e0', color: '#f57c00' };
-      case "failed":
-        return { bgcolor: '#ffebee', color: '#d32f2f' };
-      case "cancelled":
-        return { bgcolor: '#f3e5f5', color: '#7b1fa2' };
-      case "refunded":
-        return { bgcolor: '#e0f2f1', color: '#00695c' };
       default:
         return { bgcolor: '#f5f5f5', color: '#666' };
     }
@@ -127,7 +256,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
 
     if (checked) {
       // Select all items
-      const allItemIds = financeData.map((item) => item.invoiceId);
+      const allItemIds = invoices.map((item) => item.id);
       setSelectedItems(allItemIds);
     } else {
       // Deselect all
@@ -170,42 +299,17 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
     setSelectedInvoice(null);
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+  // Edit handler
+  const handleEdit = (index) => {
+    console.log("Editing item:", invoices[index]);
+    // Implement edit functionality
   };
 
-  const SkeletonCard = () => (
-    <Card variant="outlined" sx={{ borderRadius: 2 }}>
-      <CardContent sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Skeleton variant="text" width="40%" height={20} />
-          <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
-        </Box>
-        <Skeleton variant="text" width="80%" height={16} sx={{ mb: 0.5 }} />
-        <Skeleton variant="text" width="70%" height={16} sx={{ mb: 0.5 }} />
-        <Skeleton variant="text" width="60%" height={16} sx={{ mb: 0.5 }} />
-        <Skeleton variant="text" width="50%" height={16} sx={{ mb: 1 }} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 1 }} />
-        </Box>
-      </CardContent>
-    </Card>
-  );
-
-  const SkeletonRow = () => (
-    <TableRow>
-      <TableCell padding="checkbox"><Skeleton variant="rectangular" width={20} height={20} /></TableCell>
-      <TableCell><Skeleton variant="text" width="80%" /></TableCell>
-      <TableCell><Skeleton variant="text" width="60%" /></TableCell>
-      <TableCell><Skeleton variant="text" width="70%" /></TableCell>
-      <TableCell><Skeleton variant="text" width="50%" /></TableCell>
-      <TableCell><Skeleton variant="text" width="60%" /></TableCell>
-      <TableCell><Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} /></TableCell>
-    </TableRow>
-  );
+  // Delete handler
+  const handleDelete = (index) => {
+    console.log("Deleting item:", invoices[index]);
+    // Implement delete functionality
+  };
 
   if (isMobile) {
     return (
@@ -220,62 +324,51 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
             </Typography>
             
             <Stack spacing={2}>
-              {loading ? (
-                Array.from({ length: 4 }).map((_, index) => <SkeletonCard key={index} />)
-              ) : sortedInvoices && sortedInvoices.length > 0 ? (
-                sortedInvoices.map((invoice) => {
-                  const statusStyle = getStatusColor(invoice.status);
-                  return (
-                    <Card key={invoice.invoiceId} variant="outlined" sx={{ borderRadius: 2 }}>
-                      <CardContent sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                            {invoice.invoiceId}
-                          </Typography>
-                          <Chip
-                            label={invoice?.status}
-                            size="small"
-                            sx={{
-                              bgcolor: statusStyle.bgcolor,
-                              color: statusStyle.color,
-                              fontWeight: 500,
-                              fontSize: '0.75rem',
-                              textTransform: 'capitalize'
-                            }}
-                          />
-                        </Box>
-                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
-                          Type: {invoice.type} | Order: {invoice.orderId}
+              {sortedInvoices.map((invoice) => {
+                const statusStyle = getStatusColor(invoice.status);
+                return (
+                  <Card key={invoice.id} variant="outlined" sx={{ borderRadius: 2 }}>
+                    <CardContent sx={{ p: 2 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {invoice.id}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
-                          Vendor: {invoice.type === 'booking' ? invoice.serviceProvider : invoice.suppliers?.join(', ') || 'N/A'}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
-                          Amount: {formatCurrency(invoice.amount)}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                          Date: {new Date(invoice.invoiceDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) || 'N/A'} | Due: {new Date(invoice.dueDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) || 'N/A'}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                          <IconButton size="small" sx={{ fontSize: '14px' }} onClick={() => handleViewItem(invoice)}>
-                            <Visibility fontSize="small" />
-                            View Details
-                          </IconButton>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-              ) : (
-                <Box sx={{ textAlign: 'center', py: 6 }}>
-                  <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
-                    No Invoices Found
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: '#999' }}>
-                    There are no invoices to display at the moment.
-                  </Typography>
-                </Box>
-              )}
+                        <Chip
+                          label={invoice.status}
+                          size="small"
+                          sx={{
+                            bgcolor: statusStyle.bgcolor,
+                            color: statusStyle.color,
+                            fontWeight: 500,
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      </Box>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                        Vendor: {invoice.vendor}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                        Amount: ${invoice.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                        Date: {invoice.date}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                        <IconButton size="small" sx={{ fontSize: '14px' }} onClick={() => handleViewItem(invoice)}>
+                          <Visibility fontSize="small" />
+                          View Details
+                        </IconButton>
+                        {/* <IconButton size="small" onClick={() => handleEdit(0)}>
+                          <Edit fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" onClick={() => handleDelete(0)}>
+                          <Delete fontSize="small" color="error" />
+                        </IconButton> */}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </Stack>
           </CardContent>
         </Card>
@@ -319,12 +412,12 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, color: '#555' }}>
                     <TableSortLabel
-                      active={sortField === 'invoiceId'}
-                      direction={sortField === 'invoiceId' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('invoiceId')}
+                      active={sortField === 'id'}
+                      direction={sortField === 'id' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('id')}
                     >
                       Inv. No.
-                      {sortField === 'invoiceId' ? (
+                      {sortField === 'id' ? (
                         <Box component="span" sx={visuallyHidden}>
                           {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
                         </Box>
@@ -333,21 +426,18 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, color: '#555' }}>
                     <TableSortLabel
-                      active={sortField === 'type'}
-                      direction={sortField === 'type' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('type')}
+                      active={sortField === 'vendor'}
+                      direction={sortField === 'vendor' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('vendor')}
                     >
-                      Type
+                      Vendor
                     </TableSortLabel>
                   </TableCell>
                   <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    Vendor/Provider
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
                     <TableSortLabel
-                      active={sortField === 'invoiceDate'}
-                      direction={sortField === 'invoiceDate' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('invoiceDate')}
+                      active={sortField === 'date'}
+                      direction={sortField === 'date' ? sortDirection : 'asc'}
+                      onClick={() => handleSort('date')}
                     >
                       Date
                     </TableSortLabel>
@@ -377,72 +467,51 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
               </TableHead>
 
               <TableBody>
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, index) => <SkeletonRow key={index} />)
-                ) : sortedInvoices.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} sx={{ textAlign: 'center', py: 8 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="h6" sx={{ color: '#666', fontWeight: 500 }}>
-                          No Invoices Found
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#999' }}>
-                          There are no invoices to display at the moment.
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedInvoices.map((invoice, index) => {
-                    const statusStyle = getStatusColor(invoice.status);
-                    return (
-                      <TableRow
-                        key={invoice.invoiceId}
-                        sx={{
-                          '&:hover': { bgcolor: '#f8f9fa' },
-                          '&:last-child td, &:last-child th': { border: 0 }
-                        }}
-                      >
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={selectedItems.includes(invoice.invoiceId)}
-                            onChange={(e) => handleSelectItem(e, invoice.invoiceId)}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 500, color: '#333' }}>
-                          {invoice.invoiceId}
-                        </TableCell>
-                        <TableCell sx={{ color: '#666', textTransform: 'capitalize' }}>
-                          {invoice.type}
-                        </TableCell>
-                        <TableCell sx={{ color: '#666' }}>
-                          {invoice.type === 'booking' ? invoice.serviceProvider : invoice.suppliers?.join(', ') || 'N/A'}
-                        </TableCell>
-                        <TableCell sx={{ color: '#666' }}>
-                          {new Date(invoice.invoiceDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          }) || 'N/A'}
-                        </TableCell>
-                        <TableCell sx={{ color: '#666', fontWeight: 500 }}>
-                          {formatCurrency(invoice.amount)}
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={invoice.status}
-                            size="small"
-                            sx={{
-                              bgcolor: statusStyle.bgcolor,
-                              color: statusStyle.color,
-                              fontWeight: 500,
-                              fontSize: '0.75rem',
-                              textTransform: 'capitalize'
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell align="center">
+                {sortedInvoices.map((invoice, index) => {
+                  const statusStyle = getStatusColor(invoice.status);
+                  return (
+                    <TableRow
+                      key={invoice.id}
+                      sx={{
+                        '&:hover': { bgcolor: '#f8f9fa' },
+                        '&:last-child td, &:last-child th': { border: 0 }
+                      }}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedItems.includes(invoice.id)}
+                          onChange={(e) => handleSelectItem(e, invoice.id)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 500, color: '#333' }}>
+                        {invoice.id}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {invoice.vendor}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666' }}>
+                        {invoice.date}
+                      </TableCell>
+                      <TableCell sx={{ color: '#666', fontWeight: 500 }}>
+                        ${invoice.amount.toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={invoice.status}
+                          size="small"
+                          sx={{
+                            bgcolor: statusStyle.bgcolor,
+                            color: statusStyle.color,
+                            fontWeight: 500,
+                            fontSize: '0.75rem'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                           <IconButton
                             size="small"
@@ -454,10 +523,9 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
                           </IconButton>
                         </Box>
                       </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -510,72 +578,85 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData=[]
         <DialogContent sx={{ p: 0 }}>
           {selectedInvoice && (
             <Box>
-              {/* Invoice Details */}
+              {/* Invoice Number */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
                 <Typography sx={{ fontWeight: 500, color: '#666' }}>Invoice No.</Typography>
-                <Typography sx={{ color: '#333' }}>{selectedInvoice.invoiceId}</Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Order ID</Typography>
-                <Typography sx={{ color: '#333' }}>{selectedInvoice.orderId}</Typography>
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Type</Typography>
-                <Typography sx={{ color: '#333', textTransform: 'capitalize' }}>{selectedInvoice.type}</Typography>
-              </Box>
-
-              {/* Vendor/Provider */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>
-                  {selectedInvoice.type === 'booking' ? 'Service Provider' : 'Suppliers'}
-                </Typography>
                 <Typography sx={{ color: '#333' }}>
-                  {selectedInvoice.type === 'booking' 
-                    ? selectedInvoice.serviceProvider || 'N/A'
-                    : selectedInvoice.suppliers?.join(', ') || 'N/A'
-                  }
+                  {selectedInvoice.details?.invoiceNo || selectedInvoice.id}
                 </Typography>
               </Box>
 
-              {/* Amount */}
+              {/* Service Name */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Amount</Typography>
-                <Typography sx={{ color: '#333', fontWeight: 600 }}>
-                  {formatCurrency(selectedInvoice.amount)}
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Service Name</Typography>
+                <Typography sx={{ color: '#333' }}>
+                  {selectedInvoice.details?.serviceName || "Service details not available"}
                 </Typography>
               </Box>
 
-              {/* Dates */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Invoice Date</Typography>
-                <Typography sx={{ color: '#333' }}>{new Date(selectedInvoice.invoiceDate).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                }) || 'N/A'}</Typography>
+              {/* Amount Breakdown */}
+              <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 600, mb: 1.5 }}>Amount Breakdown</Typography>
+                <Stack spacing={1}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2">1. Service Fee</Typography>
+                    <Typography variant="body2">
+                      ${selectedInvoice.details?.serviceFee || selectedInvoice.amount}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2">
+                      2. Tax ({selectedInvoice.details?.taxRate || 5}%)
+                    </Typography>
+                    <Typography variant="body2">
+                      ${selectedInvoice.details?.taxAmount || 0}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2">3. Discount Applied</Typography>
+                    <Typography variant="body2" sx={{ color: '#f44336' }}>
+                      -${selectedInvoice.details?.discount || 0}
+                    </Typography>
+                  </Box>
+                  <Divider />
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography sx={{ fontWeight: 600 }}>4. Total</Typography>
+                    <Typography sx={{ fontWeight: 600 }}>${selectedInvoice.amount}</Typography>
+                  </Box>
+                </Stack>
               </Box>
 
+              {/* Linked Booking Date */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Due Date</Typography>
-                <Typography sx={{ color: '#333' }}>{new Date(selectedInvoice.dueDate).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                }) || 'N/A'}</Typography>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Linked Booking Date</Typography>
+                <Typography sx={{ color: '#333' }}>
+                  {selectedInvoice.details?.bookingDate || selectedInvoice.date}
+                </Typography>
               </Box>
 
-              {/* Status */}
+              {/* Payment Method */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2, borderBottom: '1px solid #e0e0e0' }}>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Payment Method</Typography>
+                <Typography sx={{ color: '#333' }}>
+                  {selectedInvoice.details?.paymentMethod
+                    ? `${selectedInvoice.details.paymentMethod}${
+                        selectedInvoice.details.cardEnding !== "N/A"
+                          ? ` - Ending ${selectedInvoice.details.cardEnding}`
+                          : ""
+                      }`
+                    : "Payment method not specified"}
+                </Typography>
+              </Box>
+
+              {/* Payment Status */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
-                <Typography sx={{ fontWeight: 500, color: '#666' }}>Status</Typography>
+                <Typography sx={{ fontWeight: 500, color: '#666' }}>Payment Status</Typography>
                 <Chip
                   label={selectedInvoice.status}
                   size="small"
                   sx={{
                     ...getStatusColor(selectedInvoice.status),
-                    fontWeight: 500,
-                    textTransform: 'capitalize'
+                    fontWeight: 500
                   }}
                 />
               </Box>

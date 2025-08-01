@@ -32,6 +32,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
   // Pagination states
@@ -75,11 +76,22 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (query, category, page = 1) => {
+      if (!query.trim() && category === "all") {
+        setSearchResults([]);
+        setPagination((prev) => ({
+          ...prev,
+          page: 1,
+          total: 0,
+          totalPages: 0,
+        }));
+        return;
+      }
+
       try {
         setSearchLoading(true);
         const response = await searchProducts({
           query: query.trim(),
-          category: category === "all" ? 'all' : category,
+          category: category === "all" ? undefined : category,
           page,
           limit: pagination.limit,
         });
@@ -103,7 +115,7 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         setSearchLoading(false);
       }
     }, 300),
-    [pagination.limit, searchQuery, selectedCategory]
+    [pagination.limit]
   );
 
   // Handle search
@@ -281,7 +293,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
             searchResults={searchResults}
             categories={categories}
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
             loading={false}
             searchLoading={searchLoading}
             pagination={pagination}

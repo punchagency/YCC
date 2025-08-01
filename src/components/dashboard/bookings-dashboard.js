@@ -20,7 +20,7 @@ import { useInventory } from "../../context/inventory/inventoryContext";
 const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("all");
+  const [value, setValue] = useState("monthly");
   const { orderSummary, fetchOrderSummary } = useOrder();
   const { invoices, fetchInvoices } = useInvoice();
   const { lowInventory, fetchLowInventory } = useInventory();
@@ -29,45 +29,27 @@ const BookingsDashboard = () => {
 
   useEffect(() => {
     fetchOrderSummary();
-    fetchInvoices({ status: undefined, type: undefined, period: value });
+    fetchInvoices();
     fetchLowInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  useEffect(() => {
-    fetchInvoices({ status: undefined, type: undefined, period: value });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
 
   console.log("lowInventory", lowInventory);
+  console.log("invoices", invoices);
   const menuItems = [
     {
-      label: "All",
-      value: "all",
-    },
-    {
-      label: "Today",
-      value: "today",
-    },
-    {
-      label: "Weekly",
-      value: "week",
-    },
-    {
       label: "Monthly",
-      value: "month",
+      value: "monthly",
     },
     {
       label: "Yearly",
-      value: "year",
+      value: "yearly",
+    },
+    {
+      label: "Weekly",
+      value: "weekly",
     },
   ];
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
-  };
 
   return (
     <Box
@@ -333,10 +315,10 @@ const BookingsDashboard = () => {
             </Box>
           )}
         </Grid2> */}
-        <Grid2 item xs={12} md={6} lg={6} width="100%">
+        <Box width={{ xs: "100%", lg: "55%" }}>
           {/* Current Order Summary */}
-          <CurrentOrderSummary orderSummary={orderSummary} fetchOrderSummary={fetchOrderSummary} />
-        </Grid2>
+          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
+        </Box>
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Financial Summary */}
@@ -387,60 +369,73 @@ const BookingsDashboard = () => {
                   marginTop: "10px",
                 }}
               >
-                {invoices.length > 0 ? invoices.map((item, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "10px",
-                      justifyContent: "space-between",
-                      padding: "10px",
-                      borderRadius: "8px",
-                      border: "1px solid #EFEFEF",
-                      backgroundColor: theme === "light" ? "white" : "#03141F",
-                    }}
-                  >
+                {invoices && invoices.length > 0 ? (
+                  invoices.map((item, index) => (
                     <Box
+                      key={index}
                       sx={{
                         display: "flex",
-                        flexDirection: "column",
-                        gap: "8px",
+                        flexDirection: "row",
+                        gap: "10px",
+                        justifyContent: "space-between",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        border: "1px solid #EFEFEF",
+                        backgroundColor:
+                          theme === "light" ? "white" : "#03141F",
                       }}
                     >
-                      <FinancialSummaryDescriptionText mode={theme}>
-                        Invoice {item.invoiceId}
-                      </FinancialSummaryDescriptionText>
-                      <FinancialSummaryDescriptionText mode={theme}>
-                        Amount: ${formatCurrency(item.amount)} -
-                        Due:{" "}
-                        {
-                          new Date(item.dueDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })
-                        }
-                      </FinancialSummaryDescriptionText>
-                    </Box>
-
-                    <Box>
-                      <FinancialSummaryButton mode={theme}
-                        onClick={()=>{
-                          window.open(item.invoiceUrl, "_blank");
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
                         }}
                       >
-                        <ViewButtonText mode={theme}>View</ViewButtonText>
-                      </FinancialSummaryButton>
+                        <FinancialSummaryDescriptionText mode={theme}>
+                          Invoice {item.invoiceId}
+                        </FinancialSummaryDescriptionText>
+                        <FinancialSummaryDescriptionText mode={theme}>
+                          Amount: ${parseFloat(item.amount || 0).toFixed(2)} -
+                          Due:{" "}
+                          {(() => {
+                            try {
+                              return item.dueDate
+                                ? new Date(item.dueDate)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : "N/A";
+                            } catch (error) {
+                              console.warn(
+                                "Invalid date format for invoice:",
+                                item.invoiceId,
+                                error
+                              );
+                              return "Invalid Date";
+                            }
+                          })()}
+                        </FinancialSummaryDescriptionText>
+                      </Box>
+
+                      <Box>
+                        <FinancialSummaryButton mode={theme}>
+                          <ViewButtonText mode={theme}>View</ViewButtonText>
+                        </FinancialSummaryButton>
+                      </Box>
                     </Box>
-                  </Box>
-                )) : (
-                  <Box sx={{ textAlign: 'center', py: 6 }}>
-                    <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
-                      No Invoices Found
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#999' }}>
-                      There are no invoices to display at the moment.
+                  ))
+                ) : (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "20px",
+                      color: theme === "light" ? "#666" : "#ccc",
+                    }}
+                  >
+                    <Typography variant="body2">
+                      No invoices available
                     </Typography>
                   </Box>
                 )}
@@ -457,7 +452,7 @@ const BookingsDashboard = () => {
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-
+        
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Booking Summary */}
