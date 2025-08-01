@@ -1,10 +1,12 @@
 import { Box, Tab, Tabs, Typography, styled } from "@mui/material";
-import { useState } from "react";
+import React, { useState } from "react";
 import BasicTable from "./basic-table";
 import { useTheme } from "../../context/theme/themeContext";
+import { useOrder } from "../../context/order/orderContext";
 
-const CurrentOrderSummary = ({ orderSummary }) => {
+const CurrentOrderSummary = ({ orderSummary, fetchOrderSummary }) => {
   const { theme } = useTheme();
+  const { orderSummaryLoading } = useOrder();
   const [activeTab, setActiveTab] = useState('total');
   console.log({orderSummary});
   const summaryData = [
@@ -29,33 +31,13 @@ const CurrentOrderSummary = ({ orderSummary }) => {
     setActiveTab(newValue);
   };
 
-  const getFilteredOrders = () => {
-    if (!orderSummary?.result) return [];
-    
-    switch (activeTab) {
-      case 'total':
-        return orderSummary.result;
-      case 'pending':
-        return orderSummary.result.filter(order => order.status === 'pending');
-      case 'completed':
-        return orderSummary.result.filter(order => order.status === 'completed');
-      default:
-        return orderSummary.result;
+  React.useEffect(()=>{
+    if(activeTab === 'total'){
+      fetchOrderSummary();
+    }else{
+      fetchOrderSummary(activeTab === 'pending' ? 'pending' : 'delivered');
     }
-  };
-
-  const getCurrentValue = () => {
-    switch (activeTab) {
-      case 'total':
-        return orderSummary.totalData;
-      case 'pending':
-        return orderSummary.pendingOrders;
-      case 'completed':
-        return orderSummary.completedOrders;
-      default:
-        return orderSummary.totalData;
-    }
-  };
+  }, [activeTab]);
 
   return (
     <Box
@@ -107,7 +89,7 @@ const CurrentOrderSummary = ({ orderSummary }) => {
 
         {/* Table */}
         <Box sx={{ marginTop: "10px" }}>
-          {orderSummary && <BasicTable orders={getFilteredOrders()} />}
+          <BasicTable orders={orderSummary?.result} loading={orderSummaryLoading} />
         </Box>
       </Box>
     </Box>

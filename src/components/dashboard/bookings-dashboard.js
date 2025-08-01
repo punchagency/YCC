@@ -20,7 +20,7 @@ import { useInventory } from "../../context/inventory/inventoryContext";
 const BookingsDashboard = () => {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("monthly");
+  const [value, setValue] = useState("all");
   const { orderSummary, fetchOrderSummary } = useOrder();
   const { invoices, fetchInvoices } = useInvoice();
   const { lowInventory, fetchLowInventory } = useInventory();
@@ -29,27 +29,46 @@ const BookingsDashboard = () => {
 
   useEffect(() => {
     fetchOrderSummary();
-    fetchInvoices();
+    fetchInvoices({ status: undefined, type: undefined, period: value });
     fetchLowInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  useEffect(() => {
+    fetchInvoices({ status: undefined, type: undefined, period: value });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   console.log("lowInventory", lowInventory);
   console.log("invoices", invoices);
   const menuItems = [
     {
-      label: "Monthly",
-      value: "monthly",
+      label: "All",
+      value: "all",
     },
     {
-      label: "Yearly",
-      value: "yearly",
+      label: "Today",
+      value: "today",
     },
     {
       label: "Weekly",
-      value: "weekly",
+      value: "week",
+    },
+    {
+      label: "Monthly",
+      value: "month",
+    },
+    {
+      label: "Yearly",
+      value: "year",
     },
   ];
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
 
   return (
     <Box
@@ -315,10 +334,10 @@ const BookingsDashboard = () => {
             </Box>
           )}
         </Grid2> */}
-        <Box width={{ xs: "100%", lg: "55%" }}>
+        <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Current Order Summary */}
-          {orderSummary && <CurrentOrderSummary orderSummary={orderSummary} />}
-        </Box>
+          <CurrentOrderSummary orderSummary={orderSummary} fetchOrderSummary={fetchOrderSummary} />
+        </Grid2>
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Financial Summary */}
@@ -417,25 +436,23 @@ const BookingsDashboard = () => {
                         </FinancialSummaryDescriptionText>
                       </Box>
 
-                      <Box>
-                        <FinancialSummaryButton mode={theme}>
-                          <ViewButtonText mode={theme}>View</ViewButtonText>
-                        </FinancialSummaryButton>
-                      </Box>
+                    <Box>
+                      <FinancialSummaryButton mode={theme}
+                        onClick={()=>{
+                          window.open(item.invoiceUrl, "_blank");
+                        }}
+                      >
+                        <ViewButtonText mode={theme}>View</ViewButtonText>
+                      </FinancialSummaryButton>
                     </Box>
-                  ))
-                ) : (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: "20px",
-                      color: theme === "light" ? "#666" : "#ccc",
-                    }}
-                  >
-                    <Typography variant="body2">
-                      No invoices available
+                  </Box>
+                )) : (
+                  <Box sx={{ textAlign: 'center', py: 6 }}>
+                    <Typography variant="h6" sx={{ color: '#666', fontWeight: 500, mb: 1 }}>
+                      No Invoices Found
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#999' }}>
+                      There are no invoices to display at the moment.
                     </Typography>
                   </Box>
                 )}
@@ -452,7 +469,7 @@ const BookingsDashboard = () => {
         flexDirection={{ xs: "column", lg: "row" }}
         gap={{ xs: 2, lg: 3 }}
       >
-        
+
 
         <Grid2 item xs={12} md={6} lg={6} width="100%">
           {/* Booking Summary */}
