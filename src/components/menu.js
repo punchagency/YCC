@@ -539,10 +539,10 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
-      .p-panelmenu .p-menuitem-text {
-        transition: none; /* Remove transition */
-        color: #000000 !important; /* Force black text color */
-      }
+      // .p-panelmenu .p-menuitem-text {
+      //   transition: none; /* Remove transition */
+      //   color: #000000 !important; /* Force black text color */
+      // }
       
       /* Make all menu items white background, including on hover */
       .p-panelmenu .p-panelmenu-header > a,

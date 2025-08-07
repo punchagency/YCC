@@ -217,7 +217,7 @@ const ServiceProviderBookingsConfirmationPage = () => {
             const apiUrl = `${cleanBaseUrl}/api/bookings/confirm?${queryParams.toString()}`;
             
             const response = await fetch(apiUrl, {
-                method: "POST",
+                method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     status: updateFormData.status, 
@@ -486,7 +486,7 @@ const ServiceProviderBookingsConfirmationPage = () => {
                                                 {vendor?.businessName || "Vendor Name Not Available"}
                                             </Typography>
                                             <Typography variant="body2" mb={0.5} color="#6c757d">
-                                                Contact: {vendor?.contactPerson || "N/A"}
+                                                Contact: {vendor?.contactPerson?.fullName || "N/A"} <span>{vendor?.contactPerson?.role}</span>
                                             </Typography>
                                             <Typography variant="body2" mb={0.5} color="#6c757d">
                                                 Address: {vendor?.businessAddress || "N/A"}

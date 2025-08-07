@@ -28,7 +28,6 @@ import {
   TableRow,
   TablePagination,
   InputAdornment,
-  CircularProgress,
   Pagination,
   Skeleton,
   Tabs,
@@ -60,7 +59,7 @@ const ServiceProvidersBookings = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
   const muiTheme = useMuiTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   
   const [bookings, setBookings] = useState([]);
   const [bookingCounts, setBookingCounts] = useState({
@@ -73,7 +72,6 @@ const ServiceProvidersBookings = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [bookingStatus, setBookingStatus] = useState("all");
-  const [paymentStatus, setPaymentStatus] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -95,7 +93,6 @@ const ServiceProvidersBookings = () => {
         page: page + 1,
         limit: rowsPerPage,
         ...(bookingStatus !== "all" && { status: bookingStatus }),
-        ...(paymentStatus !== "all" && { paymentStatus }),
       };
       
       const response = await getServiceProviderBookings(params);
@@ -137,7 +134,7 @@ const ServiceProvidersBookings = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, [bookingStatus, paymentStatus, page, rowsPerPage]);
+  }, [bookingStatus, page, rowsPerPage]);
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -480,9 +477,9 @@ const ServiceProvidersBookings = () => {
             }
           />
           <Tab
-            value="cancelled"
+            value="declined"
             label={
-              <Badge badgeContent={bookingCounts.cancelled || 0} color="error">
+              <Badge badgeContent={bookingCounts.declined || 0 + bookingCounts.cancelled || 0} color="error">
                 <Box sx={{ pr: 2 }}>Cancelled</Box>
               </Badge>
             }

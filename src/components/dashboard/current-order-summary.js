@@ -8,7 +8,7 @@ const CurrentOrderSummary = ({ orderSummary, fetchOrderSummary }) => {
   const { theme } = useTheme();
   const { orderSummaryLoading } = useOrder();
   const [activeTab, setActiveTab] = useState('total');
-  console.log({orderSummary});
+
   const summaryData = [
     {
       title: "Total",

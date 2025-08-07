@@ -1,23 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
-import { FiEye, FiEdit, FiCreditCard, FiChevronLeft, FiChevronRight, FiChevronDown, FiRefreshCw } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-
-// Dummy data for fallback (commented out but kept for reference)
-/*
-const dummyQuotes = [
-  {
-    _id: "QTE-2024-001",
-    quoteId: "QTE-2024-001",
-    service: { name: "Maintenance" },
-    vendor: { businessName: "Marine Services Inc." },
-    requestDetails: { location: "Port A, Dock 3" },
-    createdAt: "2025-02-15T10:00:00",
-    status: "pending",
-  },
-  // ... other dummy data
-];
-*/
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableSortLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  Alert,
+  useTheme,
+  useMediaQuery,
+  Divider,
+  Skeleton
+} from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  FilterList as FilterListIcon,
+  Refresh as RefreshIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon
+} from '@mui/icons-material';
+import { getCrewQuotes } from "../../../services/bookings/quoteService";
 
 const QuotesTable = () => {
   const [quotes, setQuotes] = useState([]);
@@ -28,54 +42,41 @@ const QuotesTable = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hoveredAction, setHoveredAction] = useState({});
+  const [statusFilter, setStatusFilter] = useState("");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const pageSize = 10;
   const navigate = useNavigate();
 
-  // Fetch quotes from API
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "pending", label: "Pending" },
+    { value: "quoted", label: "Quoted" },
+    { value: "accepted", label: "Accepted" },
+    { value: "declined", label: "Declined" },
+    { value: "deposit_paid", label: "Deposit Paid" },
+    { value: "final_payment_due", label: "Final Payment Due" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" }
+  ];
+
   const fetchQuotes = async () => {
     setLoading(true);
     setError(null);
-    
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/quotes/customer?page=${currentPage}&limit=${pageSize}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-      });
-
-      const data = await response.json();
-
-      // Handle error responses
-      if (!response.ok) {
-        // If the response has a specific error message, use it
-        if (data.message) {
-          throw new Error(data.message);
-        }
-        throw new Error('Failed to fetch quotes');
-      }
-
-      // Handle successful response with no data
-      if (!data.status) {
+      const params = { page: currentPage, limit: pageSize };
+      if (statusFilter) params.status = statusFilter;
+      
+      const response = await getCrewQuotes(params);
+      if (response.status) {
+        setQuotes(response.data.result);
+        setTotalPages(response.data.totalPages);
+        setTotalItems(response.data.totalData);
+      } else {
         setQuotes([]);
         setTotalPages(1);
         setTotalItems(0);
-        return;
       }
-
-      // Handle successful response with data
-      const paginatedData = data.data;
-      if (!paginatedData || !paginatedData.result) {
-        setQuotes([]);
-        setTotalPages(1);
-        setTotalItems(0);
-        return;
-      }
-
-      setQuotes(paginatedData.result);
-      setTotalPages(paginatedData.totalPages || 1);
-      setTotalItems(paginatedData.totalData || 0);
     } catch (err) {
       console.error('Error fetching quotes:', err);
       setError(err.message || 'Failed to fetch quotes');
@@ -86,7 +87,7 @@ const QuotesTable = () => {
 
   useEffect(() => {
     fetchQuotes();
-  }, [currentPage]);
+  }, [currentPage, statusFilter]);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -97,305 +98,436 @@ const QuotesTable = () => {
     }
   };
 
-  const getSortIcon = (field) => {
-    if (sortField === field) {
-      return sortDirection === "asc" ? (
-        <FaSortAmountUp style={{ marginLeft: 4 }} />
-      ) : (
-        <FaSortAmountDown style={{ marginLeft: 4 }} />
-      );
-    }
-    return <FaSortAmountUp style={{ marginLeft: 4, opacity: 0.3 }} />;
-  };
 
-  const getStatusBadgeStyle = (status) => {
+
+  const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "pending":
-        return { background: "#fff8e6", color: "#b98900" };
-      case "quoted":
-        return { background: "#e6f7ee", color: "#1d9d74" };
-      case "accepted":
-        return { background: "#e6f0ff", color: "#3366ff" };
-      case "declined":
-        return { background: "#ffebeb", color: "#ff4d4f" };
-      case "deposit_paid":
-        return { background: "#e6f7ee", color: "#1d9d74" };
-      case "final_payment_due":
-        return { background: "#fff8e6", color: "#b98900" };
-      case "completed":
-        return { background: "#e6f7ee", color: "#1d9d74" };
-      case "cancelled":
-        return { background: "#ffebeb", color: "#ff4d4f" };
-      default:
-        return { background: "#f3f4f6", color: "#64748b" };
+      case "pending": return "warning";
+      case "quoted": return "success";
+      case "accepted": return "info";
+      case "declined": return "error";
+      case "deposit_paid": return "success";
+      case "final_payment_due": return "warning";
+      case "completed": return "success";
+      case "cancelled": return "error";
+      default: return "default";
     }
   };
 
-  // Sort quotes
   const sortedQuotes = [...quotes].sort((a, b) => {
     if (!sortField) return 0;
-    const aValue = sortField.includes('.') 
+    const aValue = sortField.includes('.')
       ? sortField.split('.').reduce((obj, key) => obj?.[key], a)
       : a[sortField];
     const bValue = sortField.includes('.')
       ? sortField.split('.').reduce((obj, key) => obj?.[key], b)
       : b[sortField];
-    
+
     if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
     if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
-  const handleActionHover = (rowIdx, action, isHover) => {
-    setHoveredAction((prev) => ({
-      ...prev,
-      [rowIdx]: {
-        ...prev[rowIdx],
-        [action]: isHover,
-      },
-    }));
+  const formatServices = (services) => {
+    if (!services || services.length === 0) return 'N/A';
+    return services.map(s => s.service?.name).filter(Boolean).join(', ') || 'N/A';
   };
 
-  // Loading UI
-  if (loading) {
-    return (
-      <div style={{ 
-        minHeight: 420, 
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "center", 
-        width: "100%",
-        background: "#fff",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
-      }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ 
-            margin: "0 auto 12px", 
-            border: "4px solid #e5e7eb", 
-            borderTop: "4px solid #0387d9", 
-            borderRadius: "50%", 
-            width: 40, 
-            height: 40, 
-            animation: "spin 1s linear infinite" 
-          }} />
-          <div style={{ color: "#64748b", fontSize: 16 }}>Loading quotes...</div>
-        </div>
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }`}</style>
-      </div>
-    );
-  }
+  const handleViewDetails = (quoteId) => {
+    const quoteDetails = quotes.find(quote => quote._id === quoteId);
+    navigate(`/crew/quotes/${quoteId}`, { state: { quoteDetails } });
+  };
 
-  // Error UI
+  const renderLoadingSkeleton = () => (
+    isMobile ? (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+        {[...Array(3)].map((_, index) => (
+          <Card key={index} sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ p: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                <Skeleton variant="text" width={120} height={20} />
+                <Skeleton variant="rounded" width={80} height={24} />
+              </Box>
+              <Skeleton variant="text" width="100%" height={16} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="80%" height={16} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="60%" height={16} sx={{ mb: 1 }} />
+              <Divider sx={{ my: 1.5 }} />
+              <Skeleton variant="rounded" width="100%" height={36} />
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    ) : (
+      <TableContainer sx={{ borderRadius: 2 }}>
+        <Table>
+          <TableHead sx={{ bgcolor: 'grey.50' }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 600 }}>Quote ID</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Services</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Vendor</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 600, textAlign: 'center' }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {[...Array(5)].map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton variant="text" width={100} /></TableCell>
+                <TableCell><Skeleton variant="text" width={150} /></TableCell>
+                <TableCell><Skeleton variant="text" width={120} /></TableCell>
+                <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                <TableCell><Skeleton variant="text" width={100} /></TableCell>
+                <TableCell><Skeleton variant="rounded" width={80} height={24} /></TableCell>
+                <TableCell sx={{ textAlign: 'center' }}><Skeleton variant="rounded" width={60} height={32} /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    )
+  );
+
+  const renderEmptyState = () => (
+    isMobile ? (
+      <Box sx={{ textAlign: 'center', py: 8 }}>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          No Quotes Found
+        </Typography>
+        <Typography color="text.secondary">
+          {statusFilter ? 'No quotes match the selected filter.' : "You haven't made any quote requests yet."}
+        </Typography>
+      </Box>
+    ) : (
+      <TableContainer sx={{ borderRadius: 2 }}>
+        <Table>
+          <TableHead sx={{ bgcolor: 'grey.50' }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 600 }}>
+                <TableSortLabel
+                  active={sortField === '_id'}
+                  direction={sortField === '_id' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('_id')}
+                >
+                  Quote ID
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Services</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                <TableSortLabel
+                  active={sortField === 'vendor.businessName'}
+                  direction={sortField === 'vendor.businessName' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('vendor.businessName')}
+                >
+                  Vendor
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                <TableSortLabel
+                  active={sortField === 'amount'}
+                  direction={sortField === 'amount' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('amount')}
+                >
+                  Amount
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                <TableSortLabel
+                  active={sortField === 'createdAt'}
+                  direction={sortField === 'createdAt' ? sortDirection : 'asc'}
+                  onClick={() => handleSort('createdAt')}
+                >
+                  Date
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+              <TableCell sx={{ fontWeight: 600, textAlign: 'center' }}>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7} sx={{ textAlign: 'center', py: 8 }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No Quotes Found
+                </Typography>
+                <Typography color="text.secondary">
+                  {statusFilter ? 'No quotes match the selected filter.' : "You haven't made any quote requests yet."}
+                </Typography>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    )
+  );
+
   if (error) {
     return (
-      <div style={{ 
-        minHeight: 420, 
-        display: "flex", 
-        flexDirection: "column",
-        alignItems: "center", 
-        justifyContent: "center", 
-        width: "100%",
-        background: "#fff",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        padding: 24
-      }}>
-        <div style={{ 
-          color: "#ff4d4f", 
-          fontSize: 16, 
-          background: "#fff0f0", 
-          padding: 24, 
-          borderRadius: 8, 
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-          marginBottom: 16
-        }}>
-          {error}
-        </div>
-        <button
-          onClick={fetchQuotes}
-          style={{
-            background: "#0387d9",
-            color: "#fff",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: 6,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 14
-          }}
-        >
-          <FiRefreshCw size={16} />
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  // No data UI
-  if (!sortedQuotes.length) {
-    return (
-      <div style={{ 
-        minHeight: 420, 
-        display: "flex", 
-        flexDirection: "column",
-        alignItems: "center", 
-        justifyContent: "center", 
-        width: "100%",
-        background: "#fff",
-        borderRadius: 12,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-        padding: 24
-      }}>
-        <div style={{ 
-          color: "#64748b", 
-          fontSize: 16, 
-          background: "#f8fafc", 
-          padding: 24, 
-          borderRadius: 8,
-          marginBottom: 16,
-          textAlign: "center"
-        }}>
-          <h3 style={{ margin: "0 0 8px 0", color: "#1e293b" }}>No Quotes Found</h3>
-          <p style={{ margin: 0, color: "#64748b" }}>
-            You haven't made any quote requests yet.
-          </p>
-        </div>
-      </div>
+      <Alert 
+        severity="error" 
+        action={
+          <Button color="inherit" size="small" onClick={fetchQuotes} startIcon={<RefreshIcon />}>
+            Retry
+          </Button>
+        }
+        sx={{ borderRadius: 3 }}
+      >
+        {error}
+      </Alert>
     );
   }
 
   return (
-    <div style={{ background: "#fff", borderRadius: 12, boxShadow: "0 2px 8px rgba(0,0,0,0.06)", padding: 0, margin: 0, width: "100%", minWidth: 900, maxWidth: "100%", minHeight: 420, display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
-      <div style={{ padding: 24, background: "#fff", borderRadius: 12, marginTop: 0, width: "100%", flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-start" }}>
-        <div style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", flex: 1 }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-            <thead>
-              <tr style={{ background: "#f8fafc" }}>
-                <th style={{ width: "12%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("_id")}>Quote ID {getSortIcon("_id")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("service.name")}>Service Type {getSortIcon("service.name")}</th>
-                <th style={{ width: "20%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("vendor.businessName")}>Service Provider {getSortIcon("vendor.businessName")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("requestDetails")}>Location {getSortIcon("requestDetails")}</th>
-                <th style={{ width: "15%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("createdAt")}>Date & Time {getSortIcon("createdAt")}</th>
-                <th style={{ width: "10%", textAlign: "left", padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} onClick={() => handleSort("status")}>Status {getSortIcon("status")}</th>
-                <th style={{ width: "13%", textAlign: "right", padding: "10px", borderBottom: "1px solid #eee" }}>
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>Actions</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedQuotes.map((quote, idx) => (
-                <tr key={quote._id} style={{ borderBottom: "1px solid #eee", background: idx % 2 === 1 ? "#fafbfc" : "#fff" }}>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote._id}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.service?.name || "-"}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.vendor?.businessName || "-"}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{quote.requestDetails || "-"}</td>
-                  <td style={{ padding: "10px", color: "#1e293b" }}>{new Date(quote.createdAt).toLocaleString()}</td>
-                  <td style={{ padding: "10px" }}>
-                    <span style={{ ...getStatusBadgeStyle(quote.status), padding: "4px 12px", borderRadius: 20, fontWeight: 500, fontSize: 12 }}>
-                      {quote.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: "10px" }}>
-                    <div style={{ display: "flex", gap: "3px", justifyContent: "flex-end" }}>
-                      {/* View Button */}
-                      <div
-                        style={{
-                          border: "1px solid lightgrey",
-                          padding: 5,
-                          cursor: "pointer",
-                          borderRadius: 6,
-                          transition: "background 0.15s, border 0.15s",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                        title="View Details"
-                        onMouseEnter={() => handleActionHover(idx, "view", true)}
-                        onMouseLeave={() => handleActionHover(idx, "view", false)}
-                        onClick={() => navigate(`/crew/quotes/${quote._id}`)}
-                      >
-                        <FiEye size={18} color={hoveredAction[idx]?.view ? "#0387d9" : undefined} />
-                      </div>
-                      {/* Edit Button */}
-                      <div
-                        style={{
-                          border: "1px solid lightgrey",
-                          padding: 5,
-                          borderRadius: 6,
-                          transition: "background 0.15s, border 0.15s",
-                          display: "flex",
-                          alignItems: "center",
-                          cursor: "pointer",
-                        }}
-                        title="Edit"
-                        onMouseEnter={() => handleActionHover(idx, "edit", true)}
-                        onMouseLeave={() => handleActionHover(idx, "edit", false)}
-                      >
-                        <FiEdit size={18} color={hoveredAction[idx]?.edit ? "#0387d9" : undefined} />
-                      </div>
-                      {/* Payment Button - Show only for accepted quotes */}
-                      {quote.status === 'accepted' && (
-                        <div
-                          style={{
-                            border: "1px solid lightgrey",
-                            padding: 5,
-                            cursor: "pointer",
-                            borderRadius: 6,
-                            transition: "background 0.15s, border 0.15s",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                          title="Make Payment"
-                          onMouseEnter={() => handleActionHover(idx, "payment", true)}
-                          onMouseLeave={() => handleActionHover(idx, "payment", false)}
-                          onClick={() => navigate(`/crew/quotes/${quote._id}/payment`)}
-                        >
-                          <FiCreditCard size={18} color={hoveredAction[idx]?.payment ? "#0387d9" : undefined} />
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
+    <Paper sx={{ borderRadius: 3, overflow: 'hidden' }}>
+      {/* Header with Filter */}
+      <Box sx={{ 
+        p: 2, 
+        borderBottom: 1, 
+        borderColor: 'divider', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Typography variant="h6" fontWeight={600}>Quotes</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <FilterListIcon color="action" />
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <Select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              displayEmpty
+            >
+              {statusOptions.map(option => (
+                <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </Select>
+          </FormControl>
+        </Box>
+      </Box>
+
+      <Box sx={{ p: 3 }}>
+        {loading ? (
+          renderLoadingSkeleton()
+        ) : !sortedQuotes.length ? (
+          renderEmptyState()
+        ) : (
+          isMobile ? (
+            // Mobile Card Layout
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {sortedQuotes.map((quote) => (
+                <Card key={quote._id} sx={{ 
+                  borderRadius: 3,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                      <Typography variant="body2" fontWeight={600} color="primary">
+                        {quote._id}
+                      </Typography>
+                      <Chip 
+                        label={quote.status} 
+                        color={getStatusColor(quote.status)}
+                        size="small"
+                        sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+                      />
+                    </Box>
+                    
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="caption" color="text.secondary">Services</Typography>
+                      <Typography variant="body2" fontWeight={500}>{formatServices(quote.services)}</Typography>
+                    </Box>
+                    
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="caption" color="text.secondary">Vendor</Typography>
+                      <Typography variant="body2">{quote.vendor?.businessName || 'N/A'}</Typography>
+                    </Box>
+                    
+                    <Box sx={{ mb: 1 }}>
+                      <Typography variant="caption" color="text.secondary">Amount</Typography>
+                      <Typography variant="body2" fontWeight={600} color="success.main">${quote.amount || 0}</Typography>
+                    </Box>
+                    
+                    <Box sx={{ mb: 1.5 }}>
+                      <Typography variant="caption" color="text.secondary">Date</Typography>
+                      <Typography variant="body2">{new Date(quote.createdAt).toLocaleDateString()}</Typography>
+                    </Box>
+                    
+                    <Divider sx={{ my: 1.5 }} />
+                    <Button
+                      onClick={() => handleViewDetails(quote._id)}
+                      variant="contained"
+                      fullWidth
+                      startIcon={<VisibilityIcon />}
+                      sx={{ borderRadius: 2 }}
+                    >
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          ) : (
+            // Desktop Table Layout
+            <TableContainer sx={{ borderRadius: 2 }}>
+              <Table>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      <TableSortLabel
+                        active={sortField === '_id'}
+                        direction={sortField === '_id' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('_id')}
+                      >
+                        Quote ID
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Services</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      <TableSortLabel
+                        active={sortField === 'vendor.businessName'}
+                        direction={sortField === 'vendor.businessName' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('vendor.businessName')}
+                      >
+                        Vendor
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      <TableSortLabel
+                        active={sortField === 'amount'}
+                        direction={sortField === 'amount' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('amount')}
+                      >
+                        Amount
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      <TableSortLabel
+                        active={sortField === 'createdAt'}
+                        direction={sortField === 'createdAt' ? sortDirection : 'asc'}
+                        onClick={() => handleSort('createdAt')}
+                      >
+                        Date
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, textAlign: 'center' }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedQuotes.map((quote, idx) => (
+                    <TableRow 
+                      key={quote._id}
+                      sx={{ 
+                        '&:hover': { bgcolor: 'grey.50' },
+                        bgcolor: idx % 2 === 1 ? 'grey.25' : 'transparent'
+                      }}
+                    >
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={500} color="primary">
+                          {quote._id}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ maxWidth: 200 }}>
+                        <Typography variant="body2" noWrap>
+                          {formatServices(quote.services)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {quote.vendor?.businessName || 'N/A'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={600} color="success.main">
+                          ${quote.amount || 0}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {new Date(quote.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip 
+                          label={quote.status} 
+                          color={getStatusColor(quote.status)}
+                          size="small"
+                          sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+                        />
+                      </TableCell>
+                      <TableCell sx={{ textAlign: 'center' }}>
+                        <Button
+                          onClick={() => handleViewDetails(quote._id)}
+                          variant="contained"
+                          size="small"
+                          startIcon={<VisibilityIcon />}
+                          sx={{ borderRadius: 2 }}
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )
+        )}
+
         {/* Pagination */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid #e5e7eb", background: "#fff", padding: "8px 16px", marginTop: 8, height: 50 }}>
-          {/* Left: Items per page and count */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ color: "#6b7280", fontSize: 13, padding: 6 }}>{pageSize}</span>
-            <FiChevronDown style={{ fontSize: 13, color: "#6b7280" }} />
-            <span style={{ color: "#6b7280", fontSize: 13 }}>Items Per Page</span>
-            <span style={{ color: "#6b7280", fontSize: 13 }}>{(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalItems)} Of {totalItems} Items</span>
-          </div>
-          {/* Right: Page navigation */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ fontSize: 13 }}>{currentPage}</span>
-              <FiChevronDown style={{ fontSize: 13, color: "#6b7280" }} />
-            </div>
-            <span style={{ color: "#6b7280", fontSize: 13 }}>Of {totalPages} Pages</span>
-            <button
-              style={{ color: currentPage === 1 ? "#cbd5e1" : "#64748b", background: "none", border: "none", cursor: currentPage === 1 ? "not-allowed" : "pointer", fontSize: 16, padding: 4 }}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              <FiChevronLeft />
-            </button>
-            <button
-              style={{ color: currentPage === totalPages ? "#cbd5e1" : "#64748b", background: "none", border: "none", cursor: currentPage === totalPages ? "not-allowed" : "pointer", fontSize: 16, padding: 4 }}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              <FiChevronRight />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        {!loading && sortedQuotes.length > 0 && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderTop: 1,
+            borderColor: 'divider',
+            pt: 2,
+            mt: 2,
+            flexWrap: 'wrap',
+            gap: 2
+          }}>
+            <Typography variant="body2" color="text.secondary">
+              {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                startIcon={<ChevronLeftIcon />}
+                variant="outlined"
+                size="small"
+              >
+                Previous
+              </Button>
+              <Typography variant="body2" color="text.secondary" sx={{ px: 1 }}>
+                Page {currentPage} of {totalPages}
+              </Typography>
+              <Button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                endIcon={<ChevronRightIcon />}
+                variant="outlined"
+                size="small"
+              >
+                Next
+              </Button>
+            </Box>
+          </Box>
+        )}
+      </Box>
+    </Paper>
   );
 };
 

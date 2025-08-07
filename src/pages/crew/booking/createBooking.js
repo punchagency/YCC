@@ -1,341 +1,1022 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Calendar } from "primereact/calendar";
-import { Toast } from "primereact/toast";
-import { createBooking, getVendorsAndServices } from "../../../services/crew/crewBookingService";
-import { getAllServices } from "../../../services/service/serviceService";
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Box,
+  TextField,
+  CircularProgress,
+  Avatar,
+  Rating,
+  Skeleton
+} from "@mui/material";
+
+import { fetchVendorsByServiceCategories, fetchServicesByVendor, createBooking } from "../../../services/crew/crewBookingService";
+import { useUser } from "../../../context/userContext";
 import { useToast } from "../../../components/Toast";
 
-const CreateBooking = () => {
+const CreateBooking = ({
+  openSelectServiceCategories, setOpenSelectServiceCategories,
+  openSelectVendors, setOpenSelectVendors,
+  openVendorServices, setOpenVendorServices,
+  openVendorProfile, setOpenVendorProfile,
+  openCreateBookingForm, setOpenCreateBookingForm,
+  selectedServiceCategories, setSelectedServiceCategories,
+  selectedVendor, setSelectedVendor,
+  selectedServices, setSelectedServices,
+  vendors, setVendors,
+  vendorServices, setVendorServices,
+  loading, setLoading, fetchBookings
+}) => {
+  const { user } = useUser();
   const { showSuccess, showError } = useToast();
-  const [showVendorModal, setShowVendorModal] = useState(false);
-  const [showServicesModal, setShowServicesModal] = useState(false);
-  const [showBookingDetailsModal, setShowBookingDetailsModal] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [vendors, setVendors] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState(null);
-  const [selectedService, setSelectedService] = useState(null);
-  const [bookingDetails, setBookingDetails] = useState({
-    deliveryAddress: "",
-    phoneNumber: "",
-    deliveryDate: null,
+  const [bookingForm, setBookingForm] = React.useState({
+    serviceLocation: '',
+    contactPhone: '',
+    dateTime: null,
+    internalNotes: ''
   });
 
-  // Fetch vendors when modal opens
-  const fetchVendors = useCallback(async () => {
+  
+  const [searchTerm, setSearchTerm] = React.useState('');
+
+  // Get all service categories
+  const getAllServiceCategories = () => {
+    const allCategories = [];
+    Object.values(departmentServiceOptions).forEach(categories => {
+      allCategories.push(...categories);
+    });
+    return allCategories.filter((category, index, self) =>
+      index === self.findIndex(c => c.value === category.value)
+    );
+  };
+
+  // Filter categories based on search term
+  const getFilteredCategories = () => {
+    const allCategories = getAllServiceCategories();
+    if (!searchTerm.trim()) return allCategories;
+    return allCategories.filter(category =>
+      category.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+
+  // Handle service category selection
+  const handleCategorySelect = (category) => {
+    setSelectedServiceCategories(prev => {
+      const isSelected = prev.includes(category.value);
+      if (isSelected) {
+        return prev.filter(c => c !== category.value);
+      } else {
+        return [...prev, category.value];
+      }
+    });
+  };
+
+  // Find service providers
+  const handleFindProviders = async () => {
+    if (selectedServiceCategories.length === 0) {
+      showError('Please select at least one service category');
+      return;
+    }
+
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await getVendorsAndServices();
+      const response = await fetchVendorsByServiceCategories({ serviceCategories: selectedServiceCategories });
+
       if (response.status) {
-        // Extract unique vendors from services
-        const uniqueVendors = response.data.data.filter((vendor) => vendor.services.length > 0);
-        setVendors(uniqueVendors);
+        setVendors(response.data.vendors || []);
+        setOpenSelectServiceCategories(false);
+        setOpenSelectVendors(true);
+      } else {
+        showError(response.error || 'Failed to fetch vendors');
       }
     } catch (error) {
-      console.error("Error fetching vendors:", error);
-      showError("Failed to fetch vendors");
+      console.error('Error fetching vendors:', error);
+      showError('An error occurred while fetching vendors');
     } finally {
       setLoading(false);
     }
-  }, [showError]);
+  };
 
   // Handle vendor selection
-  const handleVendorSelect = useCallback((vendor) => {
+  const handleVendorSelect = async (vendor) => {
+    console.log('Selected vendor:', vendor);
     setSelectedVendor(vendor);
-    setShowVendorModal(false);
-    setShowServicesModal(true);
-  }, []);
-
-  // Handle service booking
-  const handleServiceBook = useCallback((service) => {
-    setSelectedService(service);
-    setShowServicesModal(false);
-    setShowBookingDetailsModal(true);
-  }, []);
-
-  // Handle booking details change
-  const handleBookingDetailsChange = useCallback((field, value) => {
-    setBookingDetails((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  }, []);
-
-  // Handle closing services modal
-  const handleCloseServicesModal = useCallback(() => {
-    setShowServicesModal(false);
-    setShowVendorModal(true);
-  }, []);
-
-  // Handle create booking
-  const handleCreateBooking = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Validate required fields
-      if (
-        !selectedService ||
-        !bookingDetails.deliveryAddress ||
-        !bookingDetails.phoneNumber ||
-        !bookingDetails.deliveryDate
-      ) {
-        showError("Please fill in all required fields");
-        return;
+      const response = await fetchServicesByVendor({ vendorId: vendor._id });
+      console.log('Vendor services response:', response);
+      if (response.status) {
+        setVendorServices(response.data.services || []);
+        setOpenSelectVendors(false);
+        setOpenVendorServices(true);
+      } else {
+        showError(response.error || 'Failed to fetch vendor services');
       }
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      showError('An error occurred while fetching services');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // Create booking data object
+  // Handle service selection (multiple)
+  const handleServiceSelect = (service) => {
+    setSelectedServices(prev => {
+      const isSelected = prev.some(s => s._id === service._id);
+      if (isSelected) {
+        return prev.filter(s => s._id !== service._id);
+      } else {
+        return [...prev, service];
+      }
+    });
+  };
+
+  // Proceed to booking form
+  const handleProceedToBooking = () => {
+    if (selectedServices.length === 0) {
+      showError('Please select at least one service');
+      return;
+    }
+    setOpenVendorServices(false);
+    setOpenCreateBookingForm(true);
+  };
+
+  // Handle booking creation
+  const handleCreateBooking = async () => {
+    // Validate required fields
+    const missingFields = [];
+    if (!bookingForm.serviceLocation.trim()) missingFields.push('Service Location');
+    if (!bookingForm.contactPhone.trim()) missingFields.push('Contact Phone');
+    if (!bookingForm.dateTime) missingFields.push('Date & Time');
+
+    if (missingFields.length > 0) {
+      showError(`Please fill in the following required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if (selectedServices.length === 0) {
+      showError('Please select at least one service');
+      return;
+    }
+
+    setLoading(true);
+    try {
       const bookingData = {
-        services: [
-          {
-            service: selectedService._id,
-            notes: "No additional notes",
-          },
-        ],
+        services: selectedServices.map(service => service._id),
         vendorAssigned: selectedVendor._id,
         vendorName: selectedVendor.businessName,
         vendorLocation: Array.isArray(selectedVendor.businessAddress)
-          ? selectedVendor.businessAddress.join(", ")
-          : selectedVendor.businessAddress || "Not specified",
-        dateTime: bookingDetails.deliveryDate,
-        serviceLocation: bookingDetails.deliveryAddress,
-        contactPhone: bookingDetails.phoneNumber,
-        bookingStatus: "pending",
+          ? selectedVendor.businessAddress.join(', ')
+          : selectedVendor.businessAddress || 'Not specified',
+        dateTime: bookingForm.dateTime,
+        internalNotes: bookingForm.internalNotes || '',
+        serviceLocation: bookingForm.serviceLocation,
+        contactPhone: bookingForm.contactPhone
       };
 
-      console.log("Creating booking with data:", bookingData);
-
       const response = await createBooking(bookingData);
-
+      
       if (response.status) {
-        showSuccess("Booking created successfully");
-        setShowBookingDetailsModal(false);
-        setSelectedService(null);
-        setSelectedVendor(null);
-        setBookingDetails({
-          deliveryAddress: "",
-          phoneNumber: "",
-          deliveryDate: null,
-        });
+        showSuccess(`Booking created successfully with ${selectedServices.length} service(s)!`);
+        handleCloseAll();
+        fetchBookings();
       } else {
-        showError(response.message || "Failed to create booking");
+        showError(response.error || response.message || 'Failed to create booking');
       }
     } catch (error) {
-      console.error("Error creating booking:", error);
-      showError("An error occurred while creating the booking");
+      console.error('Error creating booking:', error);
+      showError('An error occurred while creating the booking');
     } finally {
       setLoading(false);
     }
-  }, [selectedService, selectedVendor, bookingDetails, showSuccess, showError]);
+  };
 
-  // Fetch vendors when vendor modal opens
-  useEffect(() => {
-    if (showVendorModal) {
-      fetchVendors();
-    }
-  }, [showVendorModal, fetchVendors]);
+  // Navigation functions
+  const goBackToCategories = () => {
+    setOpenSelectVendors(false);
+    setOpenSelectServiceCategories(true);
+  };
 
-  // Listen for create booking button click from title bar
-  useEffect(() => {
-    const handleCreateBookingClick = () => {
-      setShowVendorModal(true);
-    };
-    window.addEventListener("openCreateBookingModal", handleCreateBookingClick);
-    return () => {
-      window.removeEventListener(
-        "openCreateBookingModal",
-        handleCreateBookingClick
-      );
-    };
-  }, []);
+  const goBackToVendors = () => {
+    setOpenVendorServices(false);
+    setOpenSelectVendors(true);
+  };
+
+  const goBackToServices = () => {
+    setOpenCreateBookingForm(false);
+    setOpenVendorServices(true);
+  };
+
+  // Close all dialogs and reset state
+  const handleCloseAll = () => {
+    setOpenSelectServiceCategories(false);
+    setOpenSelectVendors(false);
+    setOpenVendorServices(false);
+    setOpenVendorProfile(false);
+    setOpenCreateBookingForm(false);
+    setSelectedServiceCategories([]);
+    setSelectedVendor(null);
+    setSelectedServices([]);
+    setVendors([]);
+    setVendorServices([]);
+    setBookingForm({
+      serviceLocation: '',
+      contactPhone: '',
+      dateTime: null,
+      internalNotes: ''
+    });
+    setSearchTerm('');
+  };
+
+  // Empty state component
+  const EmptyState = ({ message }) => (
+    <Box sx={{ textAlign: 'center', py: 4 }}>
+      <Typography variant="h6" color="text.secondary">
+        {message}
+      </Typography>
+    </Box>
+  );
+
+  // Loading skeleton component
+  const LoadingSkeleton = ({ count = 3 }) => (
+    <Grid container spacing={2}>
+      {Array.from({ length: count }).map((_, index) => (
+        <Grid item xs={12} sm={6} md={4} key={index}>
+          <Card>
+            <CardContent>
+              <Skeleton variant="text" width="60%" height={24} />
+              <Skeleton variant="text" width="80%" height={20} sx={{ mt: 1 }} />
+              <Skeleton variant="rectangular" width="100%" height={40} sx={{ mt: 2 }} />
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
+  );
 
   return (
     <>
-      {/* Create New Booking button removed from main content; now only in title bar */}
-      {/* Vendor Selection Modal */}
+      {/* Step 1: Service Categories Selection */}
       <Dialog
-        visible={showVendorModal}
-        onHide={() => setShowVendorModal(false)}
-        style={{ width: "80vw", maxWidth: "800px" }}
-        header="Select Vendor"
-        className="vendor-dialog"
+        open={openSelectServiceCategories}
+        onClose={() => { }}
+        disableEscapeKeyDown
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            backgroundColor: '#fff'
+          }
+        }}
       >
-        <div className="p-fluid grid">
-          {loading ? (
-            <div className="col-12 text-center">Loading vendors...</div>
-          ) : vendors.length === 0 ? (
-            <div className="col-12 text-center">No vendors available</div>
-          ) : (
-            vendors.map((vendor) => (
-              <div key={vendor._id} className="col-12 md:col-6 lg:col-4">
-                <div
-                  className="vendor-card"
-                  style={{
-                    padding: "20px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    marginBottom: "15px",
-                    backgroundColor: "white",
+        <DialogTitle sx={{
+          textAlign: 'center',
+          fontSize: '1.5rem',
+          fontWeight: 600,
+          py: 2,
+          color: '#0387d9'
+        }}>
+          Select Service Categories
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', color: 'text.secondary' }}>
+            Choose the service categories you need for your booking
+          </Typography>
+          <TextField
+            fullWidth
+            placeholder="Search service categories..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ mb: 3 }}
+          />
+          <Grid container spacing={2}>
+            {getFilteredCategories().map((category) => (
+              <Grid item xs={12} sm={6} md={4} key={category.value}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    backgroundColor: selectedServiceCategories.includes(category.value) ? '#0387d9' : 'white',
+                    color: selectedServiceCategories.includes(category.value) ? 'white' : 'inherit',
+                    border: selectedServiceCategories.includes(category.value) ? '2px solid #0387d9' : '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(3,135,217,0.15)'
+                    }
                   }}
+                  onClick={() => handleCategorySelect(category)}
                 >
-                  <h3 style={{ marginBottom: "10px" }}>
-                    {vendor.businessName}
-                  </h3>
-                  <p style={{ marginBottom: "5px", color: "#666" }}>
-                    <strong>Type:</strong> {vendor.businessType}
-                  </p>
-                  <p style={{ marginBottom: "5px", color: "#666" }}>
-                    <strong>Location:</strong> {vendor.businessAddress}
-                  </p>
-                  <p style={{ marginBottom: "5px", color: "#666" }}>
-                    <strong>Contact:</strong> {vendor.email}
-                  </p>
-                  <p style={{ marginBottom: "15px", color: "#666" }}>
-                    <strong>Phone:</strong> {vendor.phoneNumber}
-                  </p>
-                  <Button
-                    label="See Services"
-                    onClick={() => handleVendorSelect(vendor)}
-                    className="p-button-primary"
-                    style={{ width: "100%" }}
-                  />
-                </div>
-              </div>
-            ))
+                  <CardContent sx={{ p: 2, textAlign: 'center' }}>
+                    <Typography variant="body2" sx={{
+                      fontWeight: selectedServiceCategories.includes(category.value) ? 600 : 400,
+                      fontSize: '0.9rem',
+                      color: selectedServiceCategories.includes(category.value) ? 'white' : 'inherit'
+                    }}>
+                      {category.label}
+                    </Typography>
+                    {/* {selectedServiceCategories.includes(category.value) && (
+                      <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                        ✓ Selected
+                      </Typography>
+                    )} */}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+          {selectedServiceCategories.length > 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="subtitle2">Selected Categories:</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                {selectedServiceCategories.map((category) => (
+                  <Chip key={category} label={category} size="small" />
+                ))}
+              </Box>
+            </Box>
           )}
-        </div>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'center', gap: 2 }}>
+          <Button
+            onClick={handleCloseAll}
+            sx={{
+              px: '20px',
+              py: '10px',
+              borderRadius: 1,
+              backgroundColor: '#f5f5f5',
+              color: '#666',
+              '&:hover': { backgroundColor: '#e0e0e0' }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleFindProviders}
+            variant="contained"
+            disabled={selectedServiceCategories.length === 0 || loading}
+            sx={{
+              px: '20px',
+              py: '10px',
+              borderRadius: 1,
+              backgroundColor: '#0387d9',
+              '&:hover': { backgroundColor: '#0277bd' }
+            }}
+          >
+            {loading ? <CircularProgress size={20} color="inherit" /> : 'Find Service Providers'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
-      {/* Services Modal */}
+      {/* Step 2: Vendor Selection */}
       <Dialog
-        visible={showServicesModal}
-        onHide={handleCloseServicesModal}
-        style={{ width: "80vw", maxWidth: "800px" }}
-        header={`${selectedVendor?.businessName}'s Services`}
-        className="services-dialog"
+        open={openSelectVendors}
+        onClose={() => { }}
+        disableEscapeKeyDown
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            backgroundColor: 'white'
+          }
+        }}
       >
-        <div className="p-fluid grid">
-          {selectedVendor?.services?.map((service) => (
-            <div key={service._id} className="col-12 md:col-6 lg:col-4">
-              <div
-                className="service-card"
-                style={{
-                  padding: "20px",
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  marginBottom: "15px",
-                  backgroundColor: "white",
-                }}
-              >
-                <h3 style={{ marginBottom: "10px" }}>{service.name}</h3>
-                <p style={{ marginBottom: "15px", color: "#666" }}>
-                  {service.description || "No description available"}
-                </p>
-                <Button
-                  label="Book Now"
-                  onClick={() => handleServiceBook(service)}
-                  className="p-button-primary"
-                  style={{ width: "100%" }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+        <DialogTitle sx={{
+          textAlign: 'center',
+          fontSize: '1.5rem',
+          fontWeight: 600,
+          py: 2,
+          color: '#0387d9'
+        }}>
+          Select Vendor
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', color: 'text.secondary' }}>
+            Choose a vendor from the available service providers
+          </Typography>
+          {loading ? (
+            <LoadingSkeleton />
+          ) : vendors.length === 0 ? (
+            <EmptyState message="No vendors found for the selected service categories" />
+          ) : (
+            <Grid container spacing={2}>
+              {vendors.map((vendor) => (
+                <Grid item xs={12} sm={6} key={vendor._id}>
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
+                      backgroundColor: 'white',
+                      borderRadius: 2,
+                      border: '1px solid #e0e0e0',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(3,135,217,0.15)',
+                        borderColor: '#0387d9'
+                      }
+                    }}
+                    onClick={() => handleVendorSelect(vendor)}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Avatar sx={{ mr: 2, bgcolor: '#1976d2', width: 48, height: 48 }}>
+                          {vendor.businessName?.charAt(0)}
+                        </Avatar>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            {vendor.businessName}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {vendor.businessAddress}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Rating value={vendor.customerSatisfaction.totalRatings || 2} readOnly size="small" />
+                        <Chip
+                          label={`${vendor.services?.length || 0} services`}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                        />
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between', gap: 2 }}>
+          <Button
+            onClick={goBackToCategories}
+            sx={{
+              px: '20px', py: '10px', borderRadius: 1,
+              backgroundColor: '#f5f5f5',
+              color: '#666',
+              '&:hover': { backgroundColor: '#e0e0e0' }
+            }}
+          >
+            Back
+          </Button>
+          <Button
+            onClick={handleCloseAll}
+            sx={{
+              px: '20px', py: '10px', borderRadius: 1,
+              backgroundColor: '#f44336',
+              color: 'white',
+              '&:hover': { backgroundColor: '#d32f2f' }
+            }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
       </Dialog>
 
-      {/* Booking Details Modal */}
+      {/* Step 3: Service Selection */}
       <Dialog
-        visible={showBookingDetailsModal}
-        onHide={() => setShowBookingDetailsModal(false)}
-        style={{ width: "80vw", maxWidth: "800px" }}
-        header="Booking Details"
-        className="booking-details-dialog"
+        open={openVendorServices}
+        onClose={() => { }}
+        disableEscapeKeyDown
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            backgroundColor: 'white'
+          }
+        }}
       >
-        <div className="p-fluid grid formgrid">
-          <div className="col-12 field">
-            <label htmlFor="serviceName">Service</label>
-            <InputText
-              id="serviceName"
-              value={selectedService?.name || ""}
-              disabled
-            />
-          </div>
+        <DialogTitle sx={{
+          textAlign: 'center',
+          fontSize: '1.5rem',
+          fontWeight: 600,
+          py: 2,
+          color: '#0387d9'
+        }}>
+          Select Services
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', color: 'text.secondary' }}>
+            Choose services from {selectedVendor?.businessName} (You can select multiple services)
+          </Typography>
+          {loading ? (
+            <LoadingSkeleton />
+          ) : vendorServices.length === 0 ? (
+            <EmptyState message="No services available from this vendor" />
+          ) : (
+            <>
+              <Grid container spacing={2}>
+                {vendorServices.map((service) => {
+                  const isSelected = selectedServices.some(s => s._id === service._id);
+                  return (
+                    <Grid item xs={12} sm={6} key={service._id}>
+                      <Card
+                        sx={{
+                          cursor: 'pointer',
+                          backgroundColor: isSelected ? 'rgba(3,135,217,0.1)' : 'white',
+                          border: isSelected ? '2px solid #0387d9' : '1px solid #e0e0e0',
+                          borderRadius: 2,
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 12px rgba(3,135,217,0.15)',
+                            borderColor: '#0387d9'
+                          }
+                        }}
+                        onClick={() => handleServiceSelect(service)}
+                      >
+                        <CardContent sx={{ p: 3 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textTransform: 'capitalize', color: isSelected ? '#0387d9' : 'inherit' }}>
+                            {service.name}
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 2, minHeight: 40, opacity: 0.8 }}>
+                            {service.description || 'No description available'}
+                          </Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 700, color: '#0387d9' }}>
+                              ${service.price || 'Price on request'}
+                            </Typography>
+                            <Chip
+                              label={service.duration || 'Duration TBD'}
+                              size="small"
+                              variant="outlined"
+                              color={isSelected ? 'primary' : 'default'}
+                            />
+                          </Box>
+                          {/* {isSelected && (
+                            <Typography variant="caption" sx={{ mt: 1, display: 'block', color: '#0387d9', fontWeight: 600 }}>
+                              ✓ Selected
+                            </Typography>
+                          )} */}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              {selectedServices.length > 0 && (
+                <Box sx={{ mt: 3, p: 2, backgroundColor: '#f8f9fa', borderRadius: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, color: '#0387d9' }}>
+                    Selected Services ({selectedServices.length}):
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {selectedServices.map((service) => (
+                      <Chip
+                        key={service._id}
+                        label={service.name}
+                        size="medium"
+                        color="primary"
+                        onDelete={() => handleServiceSelect(service)}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              onClick={goBackToVendors}
+              sx={{
+                px: '20px', py: '10px', borderRadius: 1,
+                backgroundColor: '#f5f5f5',
+                color: '#666',
+                '&:hover': { backgroundColor: '#e0e0e0' }
+              }}
+            >
+              Back
+            </Button>
+            <Button
+              onClick={() => setOpenVendorProfile(true)}
+              variant="outlined"
+              sx={{
+                px: '20px', py: '10px', borderRadius: 1,
+                borderColor: '#0387d9',
+                color: '#0387d9',
+                '&:hover': { backgroundColor: 'rgba(3,135,217,0.1)' }
+              }}
+            >
+              View Profile
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              onClick={handleCloseAll}
+              sx={{
+                px: '20px', py: '10px', borderRadius: 1,
+                backgroundColor: '#f44336',
+                color: 'white',
+                '&:hover': { backgroundColor: '#d32f2f' }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleProceedToBooking}
+              variant="contained"
+              disabled={selectedServices.length === 0}
+              sx={{
+                px: '30px', py: '10px', borderRadius: 1,
+                backgroundColor: '#0387d9',
+                fontWeight: 600,
+                '&:hover': { backgroundColor: '#0277bd' },
+                '&:disabled': { backgroundColor: '#ccc' }
+              }}
+            >
+              Continue ({selectedServices.length} selected)
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
 
-          <div className="col-12 field">
-            <label htmlFor="vendorName">Vendor</label>
-            <InputText
-              id="vendorName"
-              value={selectedVendor?.businessName || ""}
-              disabled
-            />
-          </div>
+      {/* Step 4: Vendor Profile */}
+      <Dialog
+        open={openVendorProfile}
+        onClose={() => { }}
+        disableEscapeKeyDown
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Vendor Profile</DialogTitle>
+        <DialogContent>
+          {selectedVendor && (
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Avatar sx={{ width: 64, height: 64, mr: 2 }}>
+                  {selectedVendor.businessName?.charAt(0)}
+                </Avatar>
+                <Box>
+                  <Typography variant="h5">{selectedVendor.contactPerson.fullName}</Typography>
+                  <Typography variant="subtitle1">{selectedVendor.contactPerson.role}</Typography>
+                  <Rating value={selectedVendor.customerSatisfaction.totalRating || 2} readOnly />
+                </Box>
+              </Box>
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                {selectedVendor.description || 'No description available'}
+              </Typography>
+              <Typography variant="subtitle2">Contact Information:</Typography>
+              <Typography variant="body2">Email: {selectedVendor.user.email}</Typography>
+              <Typography variant="body2">Phone: {selectedVendor.phone}</Typography>
+              <Typography variant="body2">Address: {selectedVendor.businessAddress}</Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenVendorProfile(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
 
-          <div className="col-12 field">
-            <label htmlFor="deliveryAddress">Delivery Address*</label>
-            <InputText
-              id="deliveryAddress"
-              value={bookingDetails.deliveryAddress}
-              onChange={(e) =>
-                handleBookingDetailsChange("deliveryAddress", e.target.value)
-              }
-              placeholder="Enter delivery address"
-            />
-          </div>
+      {/* Step 5: Booking Form */}
+      <Dialog
+        open={openCreateBookingForm}
+        onClose={() => { }}
+        disableEscapeKeyDown
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            backgroundColor: 'white'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          textAlign: 'center',
+          fontSize: '1.5rem',
+          fontWeight: 600,
+          py: 2,
+          color: '#0387d9'
+        }}>
+          Create Booking
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{
+            backgroundColor: 'white',
+            borderRadius: 2,
+            p: 3,
+            border: '1px solid #e0e0e0'
+          }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, color: '#333', cursor: 'pointer', textTransform: 'capitalize', fontWeight: 600 }}>
+              Selected Services: {selectedServices.map(s => s.name).join(', ')}
+            </Typography>
+            <Typography variant="subtitle2" sx={{ mb: 3 }}>
+              Vendor: {selectedVendor?.businessName}
+            </Typography>
 
-          <div className="col-12 field">
-            <label htmlFor="phoneNumber">Phone Number*</label>
-            <InputText
-              id="phoneNumber"
-              value={bookingDetails.phoneNumber}
-              onChange={(e) =>
-                handleBookingDetailsChange("phoneNumber", e.target.value)
-              }
-              placeholder="Enter phone number"
+            <TextField
+              fullWidth
+              label="Service Location *"
+              value={bookingForm.serviceLocation}
+              onChange={(e) => setBookingForm(prev => ({ ...prev, serviceLocation: e.target.value }))}
+              sx={{ mb: 2 }}
             />
-          </div>
 
-          <div className="col-12 field">
-            <label htmlFor="deliveryDate">Delivery Date*</label>
-            <Calendar
-              id="deliveryDate"
-              value={bookingDetails.deliveryDate}
-              onChange={(e) =>
-                handleBookingDetailsChange("deliveryDate", e.value)
-              }
-              showTime
-              placeholder="Select delivery date and time"
+            <TextField
+              fullWidth
+              label="Contact Phone *"
+              value={bookingForm.contactPhone}
+              onChange={(e) => setBookingForm(prev => ({ ...prev, contactPhone: e.target.value }))}
+              sx={{ mb: 2 }}
             />
-          </div>
-        </div>
 
-        <div
-          className="dialog-footer"
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "1rem",
-            marginTop: "2rem",
-          }}
-        >
+            <TextField
+              fullWidth
+              label="Date & Time *"
+              type="datetime-local"
+              value={bookingForm.dateTime ? new Date(bookingForm.dateTime).toISOString().slice(0, 16) : ''}
+              onChange={(e) => setBookingForm(prev => ({ ...prev, dateTime: new Date(e.target.value) }))}
+              InputLabelProps={{ shrink: true }}
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              fullWidth
+              label="Internal Notes"
+              multiline
+              rows={3}
+              value={bookingForm.internalNotes}
+              onChange={(e) => setBookingForm(prev => ({ ...prev, internalNotes: e.target.value }))}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
           <Button
-            label="Cancel"
-            icon="pi pi-times"
-            onClick={() => setShowBookingDetailsModal(false)}
-            className="p-button-danger"
-            style={{ backgroundColor: "#EF4444", border: "none" }}
-          />
-          <Button
-            label="Create Booking"
-            icon="pi pi-check"
-            onClick={handleCreateBooking}
-            loading={loading}
-            style={{ backgroundColor: "#0387D9", border: "none" }}
-          />
-        </div>
+            onClick={goBackToServices}
+            sx={{
+              px: '20px', py: '10px', borderRadius: 1,
+              backgroundColor: '#f5f5f5',
+              color: '#666',
+              '&:hover': { backgroundColor: '#e0e0e0' }
+            }}
+          >
+            Back
+          </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              onClick={handleCloseAll}
+              sx={{
+                px: '20px', py: '10px', borderRadius: 1,
+                backgroundColor: '#f44336',
+                color: 'white',
+                '&:hover': { backgroundColor: '#d32f2f' }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateBooking}
+              variant="contained"
+              disabled={loading || !bookingForm.serviceLocation || !bookingForm.contactPhone || !bookingForm.dateTime}
+              sx={{
+                px: '30px', py: '10px', borderRadius: 1,
+                backgroundColor: '#0387d9',
+                fontWeight: 600,
+                '&:hover': { backgroundColor: '#0277bd' },
+                '&:disabled': { backgroundColor: '#ccc' }
+              }}
+            >
+              {loading ? <CircularProgress size={20} color="inherit" /> : 'Create Booking'}
+            </Button>
+          </Box>
+        </DialogActions>
       </Dialog>
     </>
   );
 };
 
 export default CreateBooking;
+
+
+const departmentServiceOptions = {
+  captain: [
+    {
+      value: "Vessel Management & Administration",
+      label: "Vessel Management & Administration",
+    },
+    {
+      value: "Maritime Legal & Compliance Assistance",
+      label: "Maritime Legal & Compliance Assistance",
+    },
+    {
+      value: "Crew Recruitment & Placement Services",
+      label: "Crew Recruitment & Placement Services",
+    },
+    {
+      value: "Customs & Immigration Assistance",
+      label: "Customs & Immigration Assistance",
+    },
+    {
+      value: "Insurance & Risk Management",
+      label: "Insurance & Risk Management",
+    },
+    {
+      value: "Security & Anti-Piracy Training",
+      label: "Security & Anti-Piracy Training",
+    },
+    {
+      value: "Safety Equipment Inspections & Compliance",
+      label: "Safety Equipment Inspections & Compliance",
+    },
+    {
+      value: "IT & Cybersecurity Services for Yachts",
+      label: "IT & Cybersecurity Services for Yachts",
+    },
+    {
+      value: "Charter & Itinerary Planning Assistance",
+      label: "Charter & Itinerary Planning Assistance",
+    },
+    {
+      value: "Satellite & Internet Connectivity Solutions",
+      label: "Satellite & Internet Connectivity Solutions",
+    },
+  ],
+  galley: [
+    {
+      value: "Fresh Produce & Gourmet Food Provisioning",
+      label: "Fresh Produce & Gourmet Food Provisioning",
+    },
+    {
+      value: "Butcher & Seafood Supply Services",
+      label: "Butcher & Seafood Supply Services",
+    },
+    {
+      value: "Specialty Ingredient Sourcing",
+      label: "Specialty Ingredient Sourcing",
+    },
+    {
+      value: "Custom Catering & Onboard Chef Services",
+      label: "Custom Catering & Onboard Chef Services",
+    },
+    {
+      value: "Galley Equipment Maintenance & Repair",
+      label: "Galley Equipment Maintenance & Repair",
+    },
+    {
+      value: "Wine, Spirits & Specialty Beverages Supply",
+      label: "Wine, Spirits & Specialty Beverages Supply",
+    },
+    {
+      value: "Specialty Coffee & Tea Provisioning",
+      label: "Specialty Coffee & Tea Provisioning",
+    },
+    {
+      value: "Dry & Frozen Goods Supply",
+      label: "Dry & Frozen Goods Supply",
+    },
+    {
+      value: "Galley Deep Cleaning & Sanitation Services",
+      label: "Galley Deep Cleaning & Sanitation Services",
+    },
+    {
+      value: "Kitchenware & Culinary Equipment Supply",
+      label: "Kitchenware & Culinary Equipment Supply",
+    },
+  ],
+  engineering: [
+    {
+      value: "Marine Engine Servicing & Repairs",
+      label: "Marine Engine Servicing & Repairs",
+    },
+    {
+      value: "Generator Installation & Maintenance",
+      label: "Generator Installation & Maintenance",
+    },
+    {
+      value: "HVAC & Refrigeration Services",
+      label: "HVAC & Refrigeration Services",
+    },
+    {
+      value: "Watermaker Installation & Repairs",
+      label: "Watermaker Installation & Repairs",
+    },
+    {
+      value: "Fuel System Cleaning & Maintenance",
+      label: "Fuel System Cleaning & Maintenance",
+    },
+    {
+      value: "Electrical System Troubleshooting",
+      label: "Electrical System Troubleshooting",
+    },
+    {
+      value: "Navigation & Communication System Setup",
+      label: "Navigation & Communication System Setup",
+    },
+    {
+      value: "Hydraulic System Servicing",
+      label: "Hydraulic System Servicing",
+    },
+    {
+      value: "Welding & Metal Fabrication Services",
+      label: "Welding & Metal Fabrication Services",
+    },
+    {
+      value: "Spare Parts Sourcing & Logistics",
+      label: "Spare Parts Sourcing & Logistics",
+    },
+  ],
+  interior: [
+    {
+      value: "Yacht Interior Cleaning & Housekeeping",
+      label: "Yacht Interior Cleaning & Housekeeping",
+    },
+    {
+      value: "Laundry & Dry Cleaning Services",
+      label: "Laundry & Dry Cleaning Services",
+    },
+    {
+      value: "Custom Interior Design & Refurbishment",
+      label: "Custom Interior Design & Refurbishment",
+    },
+    {
+      value: "Florist & Fresh Flower Arrangements",
+      label: "Florist & Fresh Flower Arrangements",
+    },
+    {
+      value: "Carpet & Upholstery Cleaning",
+      label: "Carpet & Upholstery Cleaning",
+    },
+    {
+      value: "Event & Party Planning Services",
+      label: "Event & Party Planning Services",
+    },
+    {
+      value: "Provisioning for Guest Supplies",
+      label: "Provisioning for Guest Supplies",
+    },
+    {
+      value: "Bar & Beverage Supply Services",
+      label: "Bar & Beverage Supply Services",
+    },
+    {
+      value: "AV & Entertainment System Installation",
+      label: "AV & Entertainment System Installation",
+    },
+    {
+      value: "Crew Uniform Tailoring & Embroidery",
+      label: "Crew Uniform Tailoring & Embroidery",
+    },
+  ],
+  exterior: [
+    {
+      value: "Yacht Detailing & Washdowns",
+      label: "Yacht Detailing & Washdowns",
+    },
+    {
+      value: "Teak Deck Sanding & Restoration",
+      label: "Teak Deck Sanding & Restoration",
+    },
+    {
+      value: "Varnishing & Paintwork Services",
+      label: "Varnishing & Paintwork Services",
+    },
+    {
+      value: "Fiberglass & Gelcoat Repairs",
+      label: "Fiberglass & Gelcoat Repairs",
+    },
+    {
+      value: "Docking & Line Handling Assistance",
+      label: "Docking & Line Handling Assistance",
+    },
+    {
+      value: "Diving & Underwater Hull Cleaning",
+      label: "Diving & Underwater Hull Cleaning",
+    },
+    {
+      value: "Fender & Rope Supply & Maintenance",
+      label: "Fender & Rope Supply & Maintenance",
+    },
+    {
+      value: "Tender & Jet Ski Servicing",
+      label: "Tender & Jet Ski Servicing",
+    },
+    {
+      value: "Watersports Equipment Rental & Repairs",
+      label: "Watersports Equipment Rental & Repairs",
+    },
+    {
+      value: "Exterior Upholstery & Canvas Work",
+      label: "Exterior Upholstery & Canvas Work",
+    },
+  ],
+  // Add options for other departments as needed
+  default: [
+    { value: "Mental Health Support", label: "Mental Health Support" },
+    { value: "Confidential Therapy", label: "Confidential Therapy" },
+    { value: "Career Guidance", label: "Career Guidance" },
+    { value: "Legal Consultation", label: "Legal Consultation" },
+    { value: "Financial Advisory", label: "Financial Advisory" },
+  ],
+};

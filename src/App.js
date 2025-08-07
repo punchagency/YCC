@@ -89,6 +89,7 @@ import SupplierOrder from "./pages/supplier/order";
 import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
 import AdminOrderDetails from "./pages/order/adminOrderDetails";
+import SelectBookingService from "./pages/crew/booking/SelectBookingService";
 
 // Service Providers
 import ServiceProviderDashboard from "./pages/service-providers/dashboard/service-provider-dashboard.js";
@@ -404,6 +405,14 @@ function App() {
                       }
                     />
                     <Route
+                      path="/crew/booking/select-service"
+                      element={
+                        <ProtectedRoute requiredRoles={["crew_member"]}>
+                          <SelectBookingService />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/crew/booking/*"
                       element={
                         <ProtectedRoute requiredRoles={["crew_member"]}>
@@ -563,7 +572,7 @@ function App() {
                           <ServiceProvidersBookings />
                         </ProtectedRoute>
                       }
-                      />
+                    />
                     <Route
                       path="/service-provider/calendar"
                       element={
@@ -571,7 +580,7 @@ function App() {
                           <ServiceProvidersCalendar />
                         </ProtectedRoute>
                       }
-                      />
+                    />
                     <Route
                       path="/service-providers/bookings/details"
                       element={
@@ -579,7 +588,7 @@ function App() {
                           <ServiceProvidersBookingDetails />
                         </ProtectedRoute>
                       }
-                      />
+                    />
                     <Route
                       path="/service-provider/transactions"
                       element={
@@ -587,7 +596,7 @@ function App() {
                           <ServiceProvidersTransactions />
                         </ProtectedRoute>
                       }
-                      />
+                    />
                     <Route
                       path="/service-provider/services"
                       element={
@@ -595,7 +604,7 @@ function App() {
                           <ServiceProvidersServiceManagement />
                         </ProtectedRoute>
                       }
-                      />
+                    />
                   </Route>
 
                   {/* Onboarding Routes */}

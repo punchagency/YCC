@@ -195,9 +195,9 @@ export const getServiceProviderBookings = async ({ page = 1, limit = 10, status,
   }
 };
 
-export const updateStatusOfBooking = async ({bookingId, status, reason, notes}) => {
+export const updateStatusOfBooking = async ({bookingId, status, reason, notes, requiresQuote, quoteItems}) => {
   try {
-    const response = await axios.patch(`${API_URL}/${bookingId}/status`, { status, reason, notes }, { headers: getAuthHeader() });
+    const response = await axios.patch(`${API_URL}/${bookingId}/status`, { status, reason, notes, requiresQuote, quoteItems }, { headers: getAuthHeader() });
     return response.data;
   } catch (error) {
     console.log("Error in updateStatusOfBooking:", error);

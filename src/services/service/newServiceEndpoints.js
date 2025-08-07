@@ -87,3 +87,57 @@ export const deleteService = async (service_id) => {
         };
     }
 }
+
+export const fetchServiceProviderDashboard = async()=> {
+    try {
+        const response = await axios.get(`${API_URL}/services/dashboard`, {
+            headers: getAuthHeader(),
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching dashboard:", error);
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to fetch dashboard",
+        };
+    }
+};
+
+export const updateServiceProviderSettings = async (formData) => {
+    try {
+        const response = await axios.put(`${API_URL}/settings/vendor`, formData, {
+            headers: getAuthHeader(),
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("Error updating settings:", error);
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to update settings",
+        };
+    }
+}
+
+export const fetchFinancialAnalysis = async ({page, limit, status, period, startDate, endDate}) => {
+    try {
+        const urlParams = new URLSearchParams();
+        if(page) urlParams.append('page', page.toString());
+        if(limit) urlParams.append('limit', limit.toString());
+        if(status) urlParams.append('status', status);
+        if(period) urlParams.append('period', period);
+        if(startDate) urlParams.append('startDate', startDate);
+        if(endDate) urlParams.append('endDate', endDate);
+        const response = await axios.get(`${API_URL}/invoices/analytics?${urlParams}`, {
+            headers: getAuthHeader(),
+        });
+        return response.data;
+    } catch (error) {
+        console.log("Error fetching financial analysis:", error);
+        return {
+            success: false,
+            error: error.response?.data?.message || "Failed to fetch financial analysis",
+        };
+    }
+}
