@@ -13,7 +13,7 @@ export default function ReportsPage() {
 
   return (
     <Container maxWidth="100%" sx={{ py: { md: 4 } }}>
-      <Box sx={{ px: { sm: 0, md: 2 } }}>
+      <Box sx={{ px: { sm: 0, md: 0 } }}>
         {/* First Row: Reports Overview */}
         <ReportsOverviewRow />
         {/* Second Row: Charts */}

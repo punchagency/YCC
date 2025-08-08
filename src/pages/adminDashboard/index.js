@@ -14,7 +14,7 @@ export default function AdminDashboard() {
 
   return (
     <Container maxWidth="100%" sx={{ py: { md: 4 } }}>
-      <Box sx={{ px: { sm: 0, md: 2 } }}>
+      <Box sx={{ px: { sm: 0, md: 0 } }}>
         {/* First Row: User Stats */}
         <UserStatsRow />
 
