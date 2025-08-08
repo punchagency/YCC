@@ -6,7 +6,7 @@ import { useTheme } from "../../context/theme/themeContext";
 const CurrentOrderSummary = ({ orderSummary }) => {
   const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('total');
-  console.log({orderSummary});
+
   const summaryData = [
     {
       title: "Total",

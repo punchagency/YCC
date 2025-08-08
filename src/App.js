@@ -90,6 +90,17 @@ import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
 import AdminOrderDetails from "./pages/order/adminOrderDetails";
 import AdminDashboard from "./pages/adminDashboard";
+import SelectBookingService from "./pages/crew/booking/SelectBookingService";
+
+// Service Providers
+import ServiceProviderDashboard from "./pages/service-providers/dashboard/service-provider-dashboard.js";
+import ServiceProviderSettings from "./pages/service-providers/settings/service-provider-settings.js";
+import ServiceProvidersBookings from "./pages/service-providers/bookings/service-providers-bookings.js";
+import ServiceProvidersBookingDetails from "./pages/service-providers/bookings/booking-details.js";
+import ServiceProvidersCalendar from './pages/service-providers/calendar/service-providers-calendar.js';
+import ServiceProvidersServiceManagement from "./pages/service-providers/services-management/service-providers-services-management.js";
+import ServiceProvidersTransactions from "./pages/service-providers/transactions/service-providers-transaction.js";
+import ServiceProviderBookingsConfirmationPage from './pages/service-providers/bookings/service-provider-bookings-confirmation-page.js';
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -200,6 +211,10 @@ function App() {
                   <Route
                     path="/supplier/orders/confirm/:subOrderId/:token"
                     element={<SupplierOrderConfirmationPage />}
+                  />
+                  <Route
+                    path="/service-provider/bookings/confirm/:token"
+                    element={<ServiceProviderBookingsConfirmationPage />}
                   />
 
                   {/* Protected Routes - Require Authentication */}
@@ -391,6 +406,14 @@ function App() {
                       }
                     />
                     <Route
+                      path="/crew/booking/select-service"
+                      element={
+                        <ProtectedRoute requiredRoles={["crew_member"]}>
+                          <SelectBookingService />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/crew/booking/*"
                       element={
                         <ProtectedRoute requiredRoles={["crew_member"]}>
@@ -525,7 +548,67 @@ function App() {
                     />
                   </Route>
 
-                  {/* Onboarding Routes */}
+                  {/* Service Provider's Routes */}
+                  <Route element={<AdminLayout />}>
+                    <Route
+                      path="/service-provider/dashboard"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProviderDashboard />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/settings"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProviderSettings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/bookings"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersBookings />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/calendar"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersCalendar />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-providers/bookings/details"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersBookingDetails />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/transactions"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersTransactions />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/services"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <ServiceProvidersServiceManagement />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
+
+                  {/* Onboarding Routes *
                   <Route element={<OnboardingPageLayout />}>
                     {/* <Route
                     path="/supplier/onboarding/:id"
@@ -541,7 +624,7 @@ function App() {
                     element={<VendorOnboardingStep2 />}
                   /> */}
                     <Route path="/crew/settings" element={<CrewSettings />} />
-                  </Route>
+                  {/* </Route> */}
                   <Route
                     path="/vendors/onboarding/:id"
                     element={<SupplierOnboarding />}
