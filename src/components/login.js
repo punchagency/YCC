@@ -111,7 +111,7 @@ const LoginForm = ({ onClose }) => {
         } else if (userRole === "supplier") {
           navigate("/supplier/dashboard");
         } else if (userRole === "service_provider") {
-          navigate("/vendor/onboarding");
+          navigate("/service-provider/dashboard");
         }
       } else {
         setError(response.message || "Login failed. Please try again.");

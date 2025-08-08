@@ -44,6 +44,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
 
   const isCrewMember = userRole === "crew_member";
   const isSupplier = userRole === "supplier";
+  const isServiceProvider = userRole === "service_provider";
 
   const handleLogout = () => {
     confirmDialog({
@@ -190,15 +191,15 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
           : "",
       command: () => navigate("/crew/financial-management"),
     },
-    // {
-    //   label: "Bookings",
-    //   icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
-    //   className:
-    //     location.pathname === "/crew/booking"
-    //       ? "active-menu-item menu-red-background"
-    //       : "",
-    //   command: () => navigate("/crew/booking"),
-    // },
+    {
+      label: "Bookings",
+      icon: <img src={bookingLogo} alt="Bookings" width={15} height={15} />,
+      className:
+        location.pathname === "/crew/booking"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => navigate("/crew/booking"),
+    },
     // {
     //   label: "Inventory Management",
     //   icon: (
@@ -450,8 +451,80 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       style: { margin: "15px 0" },
     },
   ];
+  const serviceProvidersMenuItems = [
+    {
+      label: "Dashboard",
+      icon: <img src={dashboardLogo} alt="Dashboard" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/dashboard"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/dashboard");
+      },
+    },
+    {
+      label: "Services Management",
+      icon: <img src={inventoryLogo} alt="Inventory" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/services"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/services");
+      },
+    },
+    {
+      label: "Bookings",
+      icon: <img src={orderLogo} alt="Orders" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/bookings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/bookings");
+      },
+    },
+    {
+      label: "Calendar",
+      icon: <img src={calendarLogo} alt="Calendar" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/calendar"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/calendar");
+      },
+    },
+    {
+      label: "Transactions",
+      icon: <img src={transactionLogo} alt="Transactions" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/transactions"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/transactions");
+      },
+    },
+    {
+      label: "Settings",
+      icon: <img src={settingsLogo} alt="Settings" width={15} height={15} />,
+      className:
+        location.pathname === "/service-provider/settings"
+          ? "active-menu-item menu-red-background"
+          : "",
+      command: () => {
+        navigate("/service-provider/settings");
+      },
+    },
+    {
+      separator: true,
+      style: { margin: "15px 0" },
+    },
+  ];
 
-  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : adminMenuItems;
+  const menuItems = isCrewMember ? crewMenuItems : isSupplier ? supplierMenuItems : isServiceProvider ? serviceProvidersMenuItems : adminMenuItems;
 
   menuItems.forEach((item) => {
     if (item.label) {
