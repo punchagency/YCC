@@ -3,8 +3,7 @@
  * Handles the case where API_URL might already include /api
  */
 export const buildApiUrl = (endpoint) => {
-  const API_URL =
-    process.env.REACT_APP_API_URL;
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // Remove leading slash from endpoint if present
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;

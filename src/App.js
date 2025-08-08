@@ -89,6 +89,7 @@ import SupplierOrder from "./pages/supplier/order";
 import SupplierOrderDetails from "./pages/supplier/OrderDetails";
 import SupplierTransaction from "./pages/supplier/transaction";
 import AdminOrderDetails from "./pages/order/adminOrderDetails";
+import AdminDashboard from "./pages/adminDashboard";
 import SelectBookingService from "./pages/crew/booking/SelectBookingService";
 
 // Service Providers
@@ -134,7 +135,6 @@ const AuthCheck = ({ children }) => {
     "/services/onboarding/refresh-stripe-account",
     "/reset-password",
     "/supplier/orders/confirm/:subOrderId/:token",
-    "/service-provider/bookings/confirm/:confirmToken",
   ];
 
   // Check if the current path is a public route
@@ -212,10 +212,6 @@ function App() {
                     path="/supplier/orders/confirm/:subOrderId/:token"
                     element={<SupplierOrderConfirmationPage />}
                   />
-                  <Route
-                    path="/service-provider/bookings/confirm/:token"
-                    element={<ServiceProviderBookingsConfirmationPage />}
-                  />
 
                   {/* Protected Routes - Require Authentication */}
                   {/* Admin Routes */}
@@ -225,7 +221,8 @@ function App() {
                       path="/admin/dashboard"
                       element={
                         <ProtectedRoute requiredRoles={["admin"]}>
-                          <AdminDashboard1 />
+                          {/* <AdminDashboard1 /> */}
+                          <AdminDashboard />
                         </ProtectedRoute>
                       }
                     />
@@ -607,7 +604,7 @@ function App() {
                     />
                   </Route>
 
-                  {/* Onboarding Routes */}
+                  {/* Onboarding Routes *
                   <Route element={<OnboardingPageLayout />}>
                     {/* <Route
                     path="/supplier/onboarding/:id"
@@ -623,7 +620,7 @@ function App() {
                     element={<VendorOnboardingStep2 />}
                   /> */}
                     <Route path="/crew/settings" element={<CrewSettings />} />
-                  </Route>
+                  {/* </Route> */}
                   <Route
                     path="/vendors/onboarding/:id"
                     element={<SupplierOnboarding />}

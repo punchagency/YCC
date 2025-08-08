@@ -1,12 +1,10 @@
 import { Box, Tab, Tabs, Typography, styled } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import BasicTable from "./basic-table";
 import { useTheme } from "../../context/theme/themeContext";
-import { useOrder } from "../../context/order/orderContext";
 
-const CurrentOrderSummary = ({ orderSummary, fetchOrderSummary }) => {
+const CurrentOrderSummary = ({ orderSummary }) => {
   const { theme } = useTheme();
-  const { orderSummaryLoading } = useOrder();
   const [activeTab, setActiveTab] = useState('total');
 
   const summaryData = [
@@ -31,13 +29,33 @@ const CurrentOrderSummary = ({ orderSummary, fetchOrderSummary }) => {
     setActiveTab(newValue);
   };
 
-  React.useEffect(()=>{
-    if(activeTab === 'total'){
-      fetchOrderSummary();
-    }else{
-      fetchOrderSummary(activeTab === 'pending' ? 'pending' : 'delivered');
+  const getFilteredOrders = () => {
+    if (!orderSummary?.result) return [];
+    
+    switch (activeTab) {
+      case 'total':
+        return orderSummary.result;
+      case 'pending':
+        return orderSummary.result.filter(order => order.status === 'pending');
+      case 'completed':
+        return orderSummary.result.filter(order => order.status === 'completed');
+      default:
+        return orderSummary.result;
     }
-  }, [activeTab]);
+  };
+
+  const getCurrentValue = () => {
+    switch (activeTab) {
+      case 'total':
+        return orderSummary.totalData;
+      case 'pending':
+        return orderSummary.pendingOrders;
+      case 'completed':
+        return orderSummary.completedOrders;
+      default:
+        return orderSummary.totalData;
+    }
+  };
 
   return (
     <Box
@@ -89,7 +107,7 @@ const CurrentOrderSummary = ({ orderSummary, fetchOrderSummary }) => {
 
         {/* Table */}
         <Box sx={{ marginTop: "10px" }}>
-          <BasicTable orders={orderSummary?.result} loading={orderSummaryLoading} />
+          {orderSummary && <BasicTable orders={getFilteredOrders()} />}
         </Box>
       </Box>
     </Box>

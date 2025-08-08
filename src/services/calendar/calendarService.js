@@ -30,19 +30,34 @@ export const fetchEvents = async (startDate, endDate) => {
   try {
     const from = startDate.toISOString();
     const to = endDate.toISOString();
-    const response = await axios.get(`${API_URL}/events`, {
-      headers: getAuthHeader(),
+
+    const headers = getAuthHeader();
+
+    const requestConfig = {
+      headers,
       params: {
         from,
         to,
       },
-    });
-    return {
-      success: true,
-      data: response.data,
     };
+
+    const response = await axios.get(`${API_URL}/events`, requestConfig);
+
+    // Fix: Return the events array directly instead of the wrapper object
+    if (response.data.status && response.data.data) {
+      return {
+        success: true,
+        data: response.data.data, // Return the events array directly
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Invalid response format",
+      };
+    }
   } catch (error) {
     console.error("Error fetching events:", error);
+
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch events",

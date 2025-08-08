@@ -448,13 +448,13 @@ const AdminLayout = ({ role }) => {
       Add New Service
     </button>
   );
+
+  // Create New Event button for service providers
   const CreateNewEventButton = (
     <button
       onClick={() => {
-        // Trigger the existing modal in the inventory pages
-        const event = new CustomEvent(
-          "openCreateEventModal"
-        );
+        // Trigger the existing modal in the calendar pages
+        const event = new CustomEvent("openCreateEventModal");
         window.dispatchEvent(event);
       }}
       style={{
@@ -469,29 +469,22 @@ const AdminLayout = ({ role }) => {
         display: "flex",
         alignItems: "center",
         gap: "6px",
-        transition:
-          "background 0.2s, transform 0.2s",
+        transition: "background 0.2s, transform 0.2s",
         outline: "none",
       }}
       onMouseOver={(e) => {
-        e.currentTarget.style.backgroundColor =
-          "#026bb3";
-        e.currentTarget.style.transform =
-          "scale(1.02)";
+        e.currentTarget.style.backgroundColor = "#026bb3";
+        e.currentTarget.style.transform = "scale(1.02)";
       }}
       onMouseOut={(e) => {
-        e.currentTarget.style.backgroundColor =
-          "#0387D9";
-        e.currentTarget.style.transform =
-          "scale(1)";
+        e.currentTarget.style.backgroundColor = "#0387D9";
+        e.currentTarget.style.transform = "scale(1)";
       }}
       onFocus={(e) => {
-        e.currentTarget.style.outline =
-          "2px solid #026bb3";
+        e.currentTarget.style.outline = "2px solid #026bb3";
       }}
       onBlur={(e) => {
-        e.currentTarget.style.outline =
-          "none";
+        e.currentTarget.style.outline = "none";
       }}
     >
       <svg
@@ -502,20 +495,10 @@ const AdminLayout = ({ role }) => {
         stroke="currentColor"
         strokeWidth="2"
       >
-        <line
-          x1="12"
-          y1="5"
-          x2="12"
-          y2="19"
-        ></line>
-        <line
-          x1="5"
-          y1="12"
-          x2="19"
-          y2="12"
-        ></line>
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
-      Add New Event
+      Create New Event
     </button>
   );
 
@@ -564,7 +547,7 @@ const AdminLayout = ({ role }) => {
                                   title={pageTitle}
                                   backArrow={backArrow}
                                   button={
-                                    shouldShowCreateBookingButton && user.role.name === 'crew_member' ? (
+                                    shouldShowCreateBookingButton && user.role.name === 'crew' ? (
                                       createBookingButton
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton
