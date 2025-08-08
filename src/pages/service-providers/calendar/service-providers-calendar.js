@@ -42,7 +42,7 @@ import AddGuestDialog from './components/AddGuestDialog';
 const ServiceProvidersCalendar = () => {
   // Get page title setter from outlet context
   const { setPageTitle } = useOutletContext() || {};
-  
+
   // Set page title on component mount
   useEffect(() => {
     if (setPageTitle) setPageTitle("Calendar");
@@ -84,25 +84,20 @@ const ServiceProvidersCalendar = () => {
 
     try {
       const { start: startDate, end: endDate } = calendarHelpers.getMonthRange(currentDate);
-      
-      const result = await fetchEvents(startDate, endDate);
 
+      const result = await fetchEvents(startDate, endDate);
       if (result.success) {
-        const eventsData = result.data.data || [];
-        console.log("eventsData", {eventsData});
+        const eventsData = result.data || [];
         // Sort events by time for better display
         const sortedEvents = calendarHelpers.sortEventsByTime(eventsData);
-        console.log("sortedEvents", {sortedEvents});
         setEvents(sortedEvents);
       } else {
         const errorMessage = apiHandlers.createErrorMessage(result.error, 'Failed to load events');
         setError(errorMessage);
-        console.error('API Error:', errorMessage);
       }
     } catch (err) {
       const errorMessage = apiHandlers.createErrorMessage(err, 'An unexpected error occurred while loading events');
       setError(errorMessage);
-      console.error('Network Error:', err);
     } finally {
       if (showLoadingState) {
         setLoading(false);
@@ -119,6 +114,9 @@ const ServiceProvidersCalendar = () => {
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // Filtered and processed events for display
   const processedEvents = useMemo(() => {
@@ -154,13 +152,13 @@ const ServiceProvidersCalendar = () => {
     } else if (modalName === 'createEvent') {
       setSelectedDate(data || new Date());
     }
-    
+
     setModals(prev => ({ ...prev, [modalName]: true }));
   };
 
   const closeModal = (modalName) => {
     setModals(prev => ({ ...prev, [modalName]: false }));
-    
+
     if (modalName !== 'dayEvents') {
       setSelectedEvent(null);
     }
@@ -169,10 +167,10 @@ const ServiceProvidersCalendar = () => {
   // Event handlers
   const handleCreateEvent = async (eventData) => {
     setIsSubmitting(true);
-    
+
     try {
       const result = await createEvent(eventData);
-      
+
       if (result.success) {
         showSuccess('Event created successfully');
         await refreshEvents();
@@ -188,12 +186,12 @@ const ServiceProvidersCalendar = () => {
 
   const handleUpdateEvent = async (eventData) => {
     if (!selectedEvent?._id) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const result = await updateEvent(selectedEvent._id, eventData);
-      
+
       if (result.success) {
         showSuccess('Event updated successfully');
         await refreshEvents();
@@ -209,12 +207,12 @@ const ServiceProvidersCalendar = () => {
 
   const handleDeleteEvent = async () => {
     if (!selectedEvent?._id) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const result = await deleteEvent(selectedEvent._id);
-      
+
       if (result.success) {
         showSuccess('Event deleted successfully');
         closeModal('deleteConfirmation');
@@ -231,10 +229,10 @@ const ServiceProvidersCalendar = () => {
 
   const handleAddGuests = async (eventId, guestEmails) => {
     setIsSubmitting(true);
-    
+
     try {
       const result = await inviteGuests(eventId, guestEmails);
-      
+
       if (result.success) {
         showSuccess('Invitations sent successfully');
         closeModal('addGuest');
@@ -334,7 +332,7 @@ const ServiceProvidersCalendar = () => {
           </Stack>
         </Box>
       </Paper>
-      
+
       <Box
         sx={{
           mb: 3,
@@ -345,7 +343,7 @@ const ServiceProvidersCalendar = () => {
           gap: 2,
         }}
       >
-        
+
 
         {/* <Button
           variant="contained"
@@ -471,7 +469,7 @@ const ServiceProvidersCalendar = () => {
                   <Typography variant="body1" sx={{ mb: 2 }}>
                     Failed to load events
                   </Typography>
-                  
+
                 </Box>
               ) : processedEvents.currentMonth.length === 0 ? (
                 <Box
@@ -556,8 +554,8 @@ const ServiceProvidersCalendar = () => {
                 <Button
                   size="small"
                   onClick={handlePreviousMonth}
-                  sx={{ 
-                    minWidth: 'auto', 
+                  sx={{
+                    minWidth: 'auto',
                     p: 1,
                     borderRadius: 2,
                     color: '#0387D9',
@@ -573,8 +571,8 @@ const ServiceProvidersCalendar = () => {
                   onClick={handleToday}
                   variant="outlined"
                   startIcon={<TodayIcon />}
-                  sx={{ 
-                    textTransform: 'none', 
+                  sx={{
+                    textTransform: 'none',
                     px: 2,
                     borderRadius: 2,
                     borderColor: '#0387D9',
@@ -591,8 +589,8 @@ const ServiceProvidersCalendar = () => {
                 <Button
                   size="small"
                   onClick={handleNextMonth}
-                  sx={{ 
-                    minWidth: 'auto', 
+                  sx={{
+                    minWidth: 'auto',
                     p: 1,
                     borderRadius: 2,
                     color: '#0387D9',
@@ -632,7 +630,7 @@ const ServiceProvidersCalendar = () => {
                   <Typography variant="h6" gutterBottom>
                     Failed to load calendar
                   </Typography>
-                  
+
                 </Box>
               ) : (
                 <CalendarGrid

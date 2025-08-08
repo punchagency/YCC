@@ -71,6 +71,9 @@ const Settings = () => {
     const departmentOptions = [
         'Captain', 'Crew', 'Exterior', 'Interior', 'Engineering', 'Galley'
     ];
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
 
     const serviceOptions = {
         captain: [
@@ -143,9 +146,9 @@ const Settings = () => {
     };
 
     const bookingMethodOptions = [
-        {label: 'Instant Booking', value: 'instant booking'},
-        {label: 'Request to Book', value: 'request to book'},
-        {label: 'Quote Request', value: 'quote request'}
+        { label: 'Instant Booking', value: 'instant booking' },
+        { label: 'Request to Book', value: 'request to book' },
+        { label: 'Quote Request', value: 'quote request' }
     ];
 
     const serviceAreaOptions = [
@@ -212,7 +215,7 @@ const Settings = () => {
                         // border: '1px solid rgba(3, 77, 146, 0.1)'
                     }}>
                         <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h5" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66'  }}>
+                            <Typography variant="h5" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
                                 <BusinessIcon /> Business Information
                             </Typography>
 
@@ -323,7 +326,7 @@ const Settings = () => {
                         // border: '1px solid rgba(3, 77, 146, 0.1)'
                     }}>
                         <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66'  }}>
+                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
                                 <ServiceIcon /> Service Information
                             </Typography>
 
@@ -343,7 +346,7 @@ const Settings = () => {
                                                     sx={{
                                                         backgroundColor: alpha('#123F66', 0.1),
                                                         borderColor: '#123F66',
-                                                        
+
                                                     }}
                                                 />
                                             ))
@@ -473,7 +476,7 @@ const Settings = () => {
                                                     sx={{
                                                         backgroundColor: alpha('#123F66', 0.1),
                                                         borderColor: '#123F66',
-                                                        
+
                                                     }}
                                                 />
                                             ))
@@ -519,7 +522,7 @@ const Settings = () => {
                         // border: '1px solid rgba(3, 77, 146, 0.1)'
                     }}>
                         <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66'   }}>
+                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
                                 <PersonIcon /> Contact Person
                             </Typography>
 

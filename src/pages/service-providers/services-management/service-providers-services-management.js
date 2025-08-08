@@ -53,22 +53,7 @@ import {
 import { format } from 'date-fns';
 import { useNavigate } from "react-router-dom";
 import { createService, deleteService, getAllServices, updateService } from '../../../services/service/newServiceEndpoints';
-/* 
-  service: {
-    _id: string,
-    name: string,
-    price: number,
-    description: string,
-    createdAt: string,
-    updatedAt: string,
-  },
-  pagination: {
-    current: number,
-    total: number,
-    count: number,
-    totalServices: number,
-  },
-*/
+
 
 const ServiceProviderServiceManagement = () => {
     const { user } = useUser();
@@ -290,6 +275,10 @@ const ServiceProviderServiceManagement = () => {
     React.useEffect(() => {
         if (setPageTitle) setPageTitle("Service Management");
     }, [setPageTitle]);
+
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, []);
 
     return (
         <Box sx={{ p: { xs: 1, sm: 1.4, lg: 4 }, paddingTop: "70px !important" }}>
