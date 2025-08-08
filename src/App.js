@@ -212,6 +212,10 @@ function App() {
                     path="/supplier/orders/confirm/:subOrderId/:token"
                     element={<SupplierOrderConfirmationPage />}
                   />
+                  <Route
+                    path="/service-provider/bookings/confirm/:token"
+                    element={<ServiceProviderBookingsConfirmationPage />}
+                  />
 
                   {/* Protected Routes - Require Authentication */}
                   {/* Admin Routes */}

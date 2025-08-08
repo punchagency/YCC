@@ -9,7 +9,6 @@ import { getVendorsAndServices } from "../../../services/crew/crewBookingService
 import { useToast } from "../../../components/Toast";
 import { getBookings } from "../../../services/crew/crewBookingService";
 import { Box } from "@mui/material";
-import { useEffect } from "react";
 
 const Booking = () => {
   const { showError } = useToast();
