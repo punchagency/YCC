@@ -86,3 +86,63 @@ export const getBookingById = async (bookingId) => {
     };
   }
 };
+export const getVendorsAndServices = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/crew-bookings/vendors-and-services`, {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    return {
+      status: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error fetching vendors and their services:`, error);
+    return {
+      status: false,
+      error: error.response?.data?.message || "Failed to fetching vendors and their services",
+    };
+  }
+};
+
+export const fetchVendorsByServiceCategories = async ({ serviceCategories }) => {
+  try {
+    const response = await axios.post(`${API_URL}/bookings/vendors-by-service-categories`, {
+      serviceCategories
+    }, {
+      headers: {
+        ...getAuthHeader(),
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching vendors by service categories:`, error);
+    return {
+      status: false,
+      error: error.response?.data?.message || "Failed to fetch vendors by service categories",
+    };
+  }
+}
+
+
+export const fetchServicesByVendor = async ({ vendorId }) => {
+  try {
+    const response = await axios.post(`${API_URL}/bookings/services-by-vendor`, { vendorId },{
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching services by vendor:`, error);
+    return {
+      status: false,
+      error: error.response?.data?.message || "Failed to fetch services by vendor",
+    };
+  }
+};
