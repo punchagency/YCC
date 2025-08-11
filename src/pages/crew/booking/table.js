@@ -1,127 +1,83 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getBookings } from "../../../services/crew/crewBookingService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { useToast } from "../../../components/Toast";
 import { Pagination } from "../../../components/pagination";
-
 import {
-  FiEye,
-  FiDownload,
-  FiEdit,
-  FiChevronLeft,
-  FiChevronRight,
-  FiChevronDown,
-} from "react-icons/fi";
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  IconButton,
+  Box,
+  Grid,
+  Divider,
+  Alert,
+  Button,
+  useTheme,
+  useMediaQuery,
+  TableSortLabel,
+  Skeleton
+} from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  GetApp as GetAppIcon,
+  Edit as EditIcon,
+  CalendarToday as CalendarIcon,
+  LocationOn as LocationIcon,
+  Business as BusinessIcon
+} from '@mui/icons-material';
 
-const BookingTable = () => {
+const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, limit, setLimit, totalPages, totalItems }) => {
   const { showError } = useToast();
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
 
-  // Add window resize handler
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+  const handleSort = useCallback((field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  }, [sortField, sortDirection]);
+
+  const getStatusColor = useCallback((status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending': return 'warning';
+      case 'confirmed': return 'info';
+      case 'completed': return 'success';
+      case 'cancelled': return 'error';
+      case 'declined': return 'error';
+      default: return 'default';
+    }
   }, []);
 
-  // Fetch bookings when component mounts
-  const fetchBookings = useCallback(async () => {
-    try {
-      const response = await getBookings({ page, limit });
-      console.log("Fetched bookings:", response);
-
-      if (response.status) {
-        setBookings(response.data.data || []);
-        setTotalPages(response.data.pagination?.totalPages || 1);
-        setTotalItems(response.data.pagination?.totalItems || 0);
-      } else {
-        setError(response.error || "Failed to fetch bookings");
-        showError(response.error || "Failed to fetch bookings");
-      }
-    } catch (err) {
-      console.error("Error in fetching bookings:", err);
-      setError("An unexpected error occurred");
-      showError("An unexpected error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }, [showError, page, limit]);
-
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
-
-  const handleSort = useCallback(
-    (field) => {
-      if (sortField === field) {
-        setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-      } else {
-        setSortField(field);
-        setSortDirection("asc");
-      }
-    },
-    [sortField, sortDirection]
-  );
-
-  const getSortIcon = useCallback(
-    (field) => {
-      if (sortField === field) {
-        return sortDirection === "asc" ? (
-          <FaSortAmountUp className="ml-1" />
-        ) : (
-          <FaSortAmountDown className="ml-1" />
-        );
-      }
-      return <FaSortAmountUp className="ml-1 opacity-30" />;
-    },
-    [sortField, sortDirection]
-  );
-
-  const getStatusBadgeClass = useCallback((status) => {
-    switch (status) {
-      case "Pending":
-        return "bg-blue-100 text-blue-800";
-      case "Confirmed":
-        return "bg-yellow-100 text-yellow-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const formatServices = useCallback((services) => {
+    if (!services || services.length === 0) return 'N/A';
+    return services.map(s => s.service?.name).filter(Boolean).join(', ') || 'N/A';
   }, []);
 
   const handleViewDetails = useCallback(
     (bookingId) => {
-      console.log("Viewing details for booking:", bookingId);
-
-      // Find the booking object by ID
       const bookingDetails = bookings.find(
         (booking) =>
           booking.bookingId === bookingId || booking._id === bookingId
       );
 
       if (bookingDetails) {
-        console.log("Found booking details:", bookingDetails);
-
-        // Navigate to details page with state containing booking information
         navigate(`/crew/booking/details/${bookingId}`, {
           state: { bookingDetails },
         });
@@ -132,23 +88,12 @@ const BookingTable = () => {
     [bookings, navigate]
   );
 
-  // Function to handle downloading booking details as PDF
   const handleDownloadPDF = useCallback(
     (booking) => {
-      console.log(
-        "Downloading PDF for booking:",
-        booking.bookingId || booking._id
-      );
-
       try {
-        // Create a new PDF document
         const doc = new jsPDF();
-
-        // Add title
         doc.setFontSize(20);
         doc.text("Booking Details", 14, 22);
-
-        // Add booking ID and date
         doc.setFontSize(12);
         doc.text(
           `Booking ID: ${booking.bookingId || booking._id || "N/A"}`,
@@ -165,13 +110,11 @@ const BookingTable = () => {
           38
         );
 
-        // Add vendor information
         doc.setFontSize(16);
         doc.text("Vendor Information", 14, 48);
         doc.setFontSize(12);
         doc.text(`Vendor: ${booking.vendorName || "N/A"}`, 14, 54);
 
-        // Add service details
         doc.setFontSize(16);
         doc.text("Service Details", 14, 64);
         doc.setFontSize(12);
@@ -201,25 +144,10 @@ const BookingTable = () => {
         doc.text(`Price: ${servicePrice}`, 14, 82);
         doc.text(`Status: ${booking.status || "Pending"}`, 14, 88);
 
-        // Add service description if available
-        if (
-          booking.services &&
-          booking.services.length > 0 &&
-          booking.services[0].service &&
-          booking.services[0].service.description
-        ) {
-          doc.setFontSize(16);
-          doc.text("Service Description", 14, 98);
-          doc.setFontSize(12);
-          doc.text(booking.services[0].service.description, 14, 104);
-        }
-
-        // Generate filename with booking ID
         const filename = `booking-${
           booking.bookingId || booking._id || "details"
         }.pdf`;
 
-        // Save the PDF
         doc.save(filename);
       } catch (error) {
         console.error("Error generating PDF:", error);
@@ -229,279 +157,378 @@ const BookingTable = () => {
     [showError]
   );
 
-  // Show loading state
   if (loading) {
     return (
-      <div className="bg-white p-4 m-4 flex justify-center items-center h-64">
-        <p>Loading bookings...</p>
-      </div>
+      <Box sx={{ marginTop: 2 }}>
+        {isMobile ? (
+          <Grid container spacing={2}>
+            {[...Array(3)].map((_, index) => (
+              <Grid item xs={12} key={index}>
+                <Card sx={{ borderRadius: 3, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+                  <CardContent sx={{ p: 3 }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                      <Skeleton variant="text" width={120} height={28} />
+                      <Skeleton variant="rounded" width={80} height={24} />
+                    </Box>
+                    <Box mb={2}>
+                      <Skeleton variant="text" width="100%" height={20} sx={{ mb: 1 }} />
+                      <Skeleton variant="text" width="80%" height={20} sx={{ mb: 1 }} />
+                      <Skeleton variant="text" width="90%" height={20} sx={{ mb: 1 }} />
+                      <Skeleton variant="text" width="70%" height={20} />
+                    </Box>
+                    <Divider sx={{ my: 2 }} />
+                    <Box display="flex" justifyContent="flex-end" gap={1}>
+                      <Skeleton variant="circular" width={32} height={32} />
+                      <Skeleton variant="circular" width={32} height={32} />
+                      <Skeleton variant="circular" width={32} height={32} />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <Table>
+              <TableHead sx={{ bgcolor: 'grey.50' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Booking ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Services</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Vendor</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Location</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Date & Time</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2 }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 600, py: 2, textAlign: 'center' }}>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {[...Array(5)].map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell><Skeleton variant="text" width={100} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={150} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={120} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={130} /></TableCell>
+                    <TableCell><Skeleton variant="text" width={140} /></TableCell>
+                    <TableCell><Skeleton variant="rounded" width={80} height={24} /></TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>
+                      <Box display="flex" justifyContent="center" gap={1}>
+                        <Skeleton variant="circular" width={32} height={32} />
+                        <Skeleton variant="circular" width={32} height={32} />
+                        <Skeleton variant="circular" width={32} height={32} />
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
     );
   }
 
-  // Show error state
   if (error) {
     return (
-      <div className="bg-white p-4 m-4 w-full">
-        <div className="p-4 bg-red-100 text-red-700 rounded-md">
-          <p>Error: {error}</p>
-          <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
-            onClick={() => window.location.reload()}
-          >
+      <Alert 
+        severity="error" 
+        action={
+          <Button color="inherit" size="small" onClick={() => window.location.reload()}>
             Try Again
-          </button>
-        </div>
-      </div>
+          </Button>
+        }
+        sx={{ m: 2 }}
+      >
+        {error}
+      </Alert>
+    );
+  }
+
+  if (bookings.length === 0) {
+    return (
+      <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 3 }}>
+        <Typography variant="h6" color="text.secondary">
+          No bookings found
+        </Typography>
+      </Paper>
     );
   }
 
   return (
-    <>
-      {/* Booking Table */}
-      <div
-        className="pl-2 pr-2 pb-2 rounded-xl shadow-sm mt-1 bg-white overflow-x-auto"
-        style={{ borderRadius: "10px" }}
-      >
-        {bookings.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
-            No bookings found.
-          </div>
-        ) : (
-          <div
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}
-          >
-            <table
-              style={{
-                width: "100%",
-                minWidth: "800px",
-                paddingLeft: "1rem",
-                paddingRight: "1rem",
-              }}
-            >
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("bookingId")}
-                  >
-                    <div className="flex items-center">
-                      Booking ID {getSortIcon("bookingId")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("serviceType")}
-                  >
-                    <div className="flex items-center">
-                      Service Type {getSortIcon("serviceType")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("vendorName")}
-                  >
-                    <div className="flex items-center">
-                      Vendor Name {getSortIcon("vendorName")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("location")}
-                  >
-                    <div className="flex items-center">
-                      Location {getSortIcon("location")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("dateTime")}
-                  >
-                    <div className="flex items-center">
-                      Date & Time {getSortIcon("dateTime")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("status")}
-                  >
-                    <div className="flex items-center">
-                      Status {getSortIcon("status")}
-                    </div>
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      padding: "12px 8px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                    onClick={() => handleSort("status")}
-                  >
-                    <div className="flex items-center">
-                      Actions {getSortIcon("status")}
-                    </div>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((item, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        whiteSpace: "nowrap",
+    <Box sx={{ mt: 1 }}>
+      {isMobile ? (
+        // Mobile Card Layout
+        <Grid container spacing={2}>
+          {bookings.map((item, index) => (
+            <Grid item xs={12} key={index}>
+              <Card 
+                sx={{ 
+                  borderRadius: 3,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                    <Typography variant="h6" fontWeight={600} color="primary">
+                      {item.bookingId || 'N/A'}
+                    </Typography>
+                    <Chip 
+                      label={item.bookingStatus || 'Pending'} 
+                      color={getStatusColor(item.bookingStatus)}
+                      size="small"
+                      sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+                    />
+                  </Box>
+                  
+                  <Box mb={2}>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
+                      <Typography variant="body2" fontWeight={500}>
+                        {formatServices(item.services)}
+                      </Typography>
+                    </Box>
+                    
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <Typography variant="body2" color="text.secondary" sx={{ minWidth: 60 }}>
+                        Vendor:
+                      </Typography>
+                      <Typography variant="body2" fontWeight={500}>
+                        {item.vendorName || 'N/A'}
+                      </Typography>
+                    </Box>
+                    
+                    <Box display="flex" alignItems="center" mb={1}>
+                      <LocationIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
+                      <Typography variant="body2" noWrap>
+                        {item.serviceLocation || item.deliveryAddress || 'N/A'}
+                      </Typography>
+                    </Box>
+                    
+                    <Box display="flex" alignItems="center">
+                      <CalendarIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
+                      <Typography variant="body2">
+                        {item.dateTime ? new Date(item.dateTime).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        }) : 'N/A'}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Divider sx={{ my: 2 }} />
+                  
+                  <Box display="flex" justifyContent="flex-end" gap={1}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleViewDetails(item.bookingId || item._id)}
+                      sx={{ 
+                        bgcolor: 'primary.main', 
+                        color: 'white',
+                        '&:hover': { bgcolor: 'primary.dark' }
                       }}
                     >
-                      {item.bookingId || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        maxWidth: "200px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton 
+                      size="small"
+                      sx={{ 
+                        bgcolor: 'secondary.main', 
+                        color: 'white',
+                        '&:hover': { bgcolor: 'secondary.dark' }
                       }}
                     >
-                      {item.services &&
-                      item.services.length > 0 &&
-                      item.services[0].service
-                        ? item.services[0].service.name || "N/A"
-                        : "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        maxWidth: "150px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleDownloadPDF(item)}
+                      sx={{ 
+                        bgcolor: 'success.main', 
+                        color: 'white',
+                        '&:hover': { bgcolor: 'success.dark' }
                       }}
                     >
-                      {item.vendorName || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        maxWidth: "150px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        fontSize: isMobile ? "11px" : "12px",
-                      }}
-                    >
-                      {item.serviceLocation || item.deliveryAddress || "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {item.dateTime
-                        ? new Date(item.dateTime).toLocaleString()
-                        : "N/A"}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                          item.status || ""
-                        )}`}
+                      <GetAppIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : (
+        // Desktop Table Layout
+        <TableContainer 
+          component={Paper} 
+          sx={{ 
+            borderRadius: 3,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            overflow: 'hidden'
+          }}
+        >
+          <Table>
+            <TableHead sx={{ bgcolor: 'grey.50' }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>
+                  <TableSortLabel
+                    active={sortField === 'bookingId'}
+                    direction={sortField === 'bookingId' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('bookingId')}
+                  >
+                    Booking ID
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>
+                  <TableSortLabel
+                    active={sortField === 'serviceType'}
+                    direction={sortField === 'serviceType' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('serviceType')}
+                  >
+                    Services
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>
+                  <TableSortLabel
+                    active={sortField === 'vendorName'}
+                    direction={sortField === 'vendorName' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('vendorName')}
+                  >
+                    Vendor
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>Location</TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>
+                  <TableSortLabel
+                    active={sortField === 'dateTime'}
+                    direction={sortField === 'dateTime' ? sortDirection : 'asc'}
+                    onClick={() => handleSort('dateTime')}
+                  >
+                    Date & Time
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2, textAlign: 'center' }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {bookings.map((item, index) => (
+                <TableRow 
+                  key={index}
+                  sx={{ 
+                    '&:hover': { bgcolor: 'grey.50' },
+                    transition: 'background-color 0.2s ease'
+                  }}
+                >
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2" fontWeight={500} color="primary">
+                      {item.bookingId || 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2, maxWidth: 200 }}>
+                    <Typography variant="body2" noWrap>
+                      {formatServices(item.services)}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2, maxWidth: 150 }}>
+                    <Typography variant="body2" noWrap>
+                      {item.vendorName || 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2, maxWidth: 150 }}>
+                    <Typography variant="body2" noWrap>
+                      {item.serviceLocation || item.deliveryAddress || 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2">
+                      {item.dateTime ? new Date(item.dateTime).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                      }) : 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Chip 
+                      label={item.bookingStatus || 'Pending'} 
+                      color={getStatusColor(item.bookingStatus)}
+                      size="small"
+                      sx={{ textTransform: 'capitalize', fontWeight: 500 }}
+                    />
+                  </TableCell>
+                  <TableCell sx={{ py: 2, textAlign: 'center' }}>
+                    <Box display="flex" justifyContent="center" gap={1}>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleViewDetails(item.bookingId || item._id)}
+                        sx={{ 
+                          bgcolor: 'primary.main', 
+                          color: 'white',
+                          '&:hover': { bgcolor: 'primary.dark' }
+                        }}
                       >
-                        {item.status || "Pending"}
-                      </span>
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 8px",
-                        borderBottom: "1px solid #eee",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      <div className="flex justify-end gap-3">
-                        <button
-                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
-                          onClick={() =>
-                            handleViewDetails(item.bookingId || item._id)
-                          }
-                          title="View Details"
-                        >
-                          <FiEye size={16} />
-                        </button>
-                        <button
-                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
-                          title="Edit Booking"
-                        >
-                          <FiEdit size={16} />
-                        </button>
-                        <button
-                          className="p-1 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
-                          onClick={() => handleDownloadPDF(item)}
-                          title="Download PDF"
-                        >
-                          <FiDownload size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Pagination */}
+                        <VisibilityIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton 
+                        size="small"
+                        sx={{ 
+                          bgcolor: 'secondary.main', 
+                          color: 'white',
+                          '&:hover': { bgcolor: 'secondary.dark' }
+                        }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => handleDownloadPDF(item)}
+                        sx={{ 
+                          bgcolor: 'success.main', 
+                          color: 'white',
+                          '&:hover': { bgcolor: 'success.dark' }
+                        }}
+                      >
+                        <GetAppIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      
+      <Box mt={3}>
         <Pagination
           currentPage={page}
           totalPages={totalPages}
           totalItems={totalItems}
           itemsPerPage={limit}
-          onPageChange={setPage}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+            fetchBookings({ page: newPage, limit });
+          }}
+          onItemsPerPageChange={(newLimit) => {
+            setLimit(newLimit);
+            setPage(1);
+            fetchBookings({ page: 1, limit: newLimit });
+          }}
           isMobile={isMobile}
         />
-      </div>
-    </>
+      </Box>
+    </Box>
   );
 };
 

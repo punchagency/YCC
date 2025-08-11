@@ -12,7 +12,6 @@ import departmentLogo from "../assets/images/departmentLogo.png";
 import websiteLogo from "../assets/images/websiteLogo.png";
 import areaLogo from "../assets/images/areaLogo.png";
 import roleLogo from "../assets/images/roleLogo.png";
-import uploadfileLogo from "../assets/images/uploadfileLogo.png";
 import serviceLogo from "../assets/images/serviceLogo.png";
 import { signup } from "../services/authService";
 import thumbsLogo from "../assets/images/thumbsLogo.png";
