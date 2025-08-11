@@ -272,6 +272,61 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // AI Parser: send Excel to Python parser and get normalized products
+  const parseInventoryWithAI = async (file) => {
+    const aiBase = process.env.REACT_APP_AI_PARSER_URL;
+    if (!aiBase) {
+      throw new Error("AI parser URL not configured (REACT_APP_AI_PARSER_URL)");
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    const resp = await fetch(`${aiBase}/parse-inventory`, {
+      method: "POST",
+      body: formData,
+    });
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      if (resp.status === 422 && json?.errors) {
+        // Return structured validation errors from Python
+        const first = json.errors[0];
+        const msg = first
+          ? `Row ${first.row}: ${first.field} - ${first.message}`
+          : "Validation error";
+        throw new Error(msg);
+      }
+      throw new Error(json?.message || "AI parsing failed");
+    }
+    if (!json?.products || !Array.isArray(json.products)) {
+      throw new Error("AI parser returned an invalid response");
+    }
+    return json.products;
+  };
+
+  // Import normalized products into Node inventory
+  const importParsedInventoryToNode = async ({
+    userId,
+    supplierId,
+    products,
+  }) => {
+    const body = supplierId ? { supplierId, products } : { userId, products };
+    const resp = await fetch(
+      `${process.env.REACT_APP_API_URL}/inventory/import`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok || json?.status === false) {
+      throw new Error(json?.message || "Import failed");
+    }
+    return json;
+  };
+
   const uploadServicesData = async (selectedFile, userId) => {
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -443,6 +498,8 @@ export const UserProvider = ({ children }) => {
         createStripeAccount,
         refreshStripeAccountLink,
         uploadInventoryData,
+        parseInventoryWithAI,
+        importParsedInventoryToNode,
         uploadServicesData,
         verifyOnboardingStep1,
         completeOnboarding,
