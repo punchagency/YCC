@@ -26,7 +26,12 @@ import { useParams, useLocation } from "react-router-dom";
 const SupplierOnboardingStep1 = ({ handleNext }) => {
   const { id: userId } = useParams();
   const location = useLocation();
-  const { uploadInventoryData, verifyOnboardingStep1 } = useUser();
+  const {
+    uploadInventoryData,
+    verifyOnboardingStep1,
+    parseInventoryWithAI,
+    importParsedInventoryToNode,
+  } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [apiEndpoint, setApiEndpoint] = useState(null);
@@ -256,6 +261,10 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       };
 
       reader.readAsArrayBuffer(file);
+    } else if (dialogType === "ai") {
+      // AI path: accept Excel file and let server perform all parsing/validation
+      setSelectedFile(file);
+      setError(null);
     }
   };
 
@@ -264,7 +273,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
     try {
       if (apiEndpoint) {
         //console.log("Submitting API endpoint:", apiEndpoint);
-      } else if (selectedFile) {
+      } else if (selectedFile && dialogType === "excel") {
         //console.log("Submitting file:", selectedFile);
         const result = await uploadInventoryData(selectedFile, userId);
 
@@ -293,6 +302,20 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
               result.message || "Failed to upload file. Please try again.",
           });
         }
+      } else if (selectedFile && dialogType === "ai") {
+        // AI flow: parse on Python, then import to Node
+        const products = await parseInventoryWithAI(selectedFile);
+        const result = await importParsedInventoryToNode({ userId, products });
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail:
+            result?.message || "Inventory parsed and imported successfully",
+          life: 5000,
+        });
+        handleNext();
+        handleCloseDialog();
       }
     } catch (err) {
       // Display detailed error messages from backend validation
@@ -340,10 +363,9 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         </StyledButton>
         <StyledButton
           variant="contained"
-          disabled={true}
-          onClick={() => handleOpenDialog("api")}
+          onClick={() => handleOpenDialog("ai")}
         >
-          Enter API for bulk upload
+          Use AI to parse Excel
         </StyledButton>
       </Box>
 
@@ -374,7 +396,9 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
               fontSize: { xs: "1.1rem", sm: "1.25rem" },
             }}
           >
-            {dialogType === "api"
+            {dialogType === "ai"
+              ? "Upload your inventory spreadsheet"
+              : dialogType === "api"
               ? "Enter API Endpoint"
               : `Upload ${dialogType?.toUpperCase()} File`}
           </DialogTitle>
@@ -485,16 +509,50 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
             </>
           )}
 
-          {dialogType === "api" && (
-            <TextField
-              fullWidth
-              label="API Endpoint"
-              value={apiEndpoint}
-              onChange={(e) => setApiEndpoint(e.target.value)}
-              margin="normal"
-              placeholder="https://api.example.com/products"
-              size="small"
-            />
+          {dialogType === "ai" && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  alignItems: "flex-start",
+                  backgroundColor: "#F5F5F5",
+                  padding: { xs: "15px", sm: "20px" },
+                  borderRadius: "8px",
+                }}
+              >
+                <DescriptionText>
+                  <InfoOutlined /> Select your Excel file. We’ll parse and
+                  normalize it automatically, then save it to your inventory.
+                </DescriptionText>
+              </Box>
+              <input
+                type="file"
+                accept={".xlsx,.xls"}
+                onChange={(e) => handleFileUpload(e, "ai")}
+                style={{ display: "none" }}
+                id={`ai-upload`}
+              />
+              <label htmlFor={`ai-upload`} style={{ width: "100%" }}>
+                <StyledButton
+                  variant="contained"
+                  component="span"
+                  fullWidth={true}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                    minWidth: { xs: "100%", sm: "220px" },
+                  }}
+                >
+                  <CloudUploadOutlined /> Choose Excel File
+                </StyledButton>
+              </label>
+              {selectedFile && (
+                <Typography sx={{ mt: 1 }}>
+                  Selected: {selectedFile.name}
+                </Typography>
+              )}
+            </>
           )}
 
           <Typography variant="body2" sx={{ mt: 2, mb: 2 }}>
