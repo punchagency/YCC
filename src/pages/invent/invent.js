@@ -1491,9 +1491,15 @@ const Invent = () => {
           <Table>
             <TableHead sx={{
               backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
+              width: "100%",
               borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
             }}>
-              <TableRow>
+              <TableRow 
+                sx={{
+                  width: "100%",
+                  backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
+                }}
+              >
                 <TableCell padding="checkbox">
                   <Checkbox
                     checked={selectAll}

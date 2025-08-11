@@ -37,6 +37,10 @@ import {
   AccountBalance as RevenueIcon,
 } from "@mui/icons-material";
 import { fetchServiceProviderDashboard } from '../../../services/service/newServiceEndpoints';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 
 const Dashboard = () => {
@@ -70,6 +74,65 @@ const Dashboard = () => {
   React.useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  const popularServicesChart = React.useMemo(() => {
+    const services = dashboardData?.popularServices || [];
+    if (!services.length) return null;
+
+    const labelColor = theme === 'light' ? '#2b2b2b' : '#e0e0e0';
+    const gridColor = theme === 'light' ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.12)';
+    const borderColor = theme === 'light' ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.2)';
+
+    const palette = ['#003366', '#0066cc', '#4caf50', '#ff9800', '#9c27b0', '#2196f3', '#795548'];
+    const topServices = services.slice(0, 10);
+
+    const labels = topServices.map((s) => (s.name?.length > 20 ? `${s.name.substring(0, 20)}...` : s.name));
+    const dataPoints = topServices.map((s) => s.bookings || 0);
+    const backgroundColors = topServices.map((_, i) => alpha(palette[i % palette.length], 0.8));
+    const hoverBackgroundColors = topServices.map((_, i) => alpha(palette[i % palette.length], 1));
+
+    return {
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Bookings',
+            data: dataPoints,
+            backgroundColor: backgroundColors,
+            hoverBackgroundColor: hoverBackgroundColors,
+            borderColor,
+            borderWidth: 1,
+            borderRadius: 6,
+            maxBarThickness: 36,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: (items) => items[0]?.label || '',
+              label: (item) => `Bookings: ${item.parsed.y}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: labelColor, maxRotation: 0, autoSkip: true },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: gridColor, drawBorder: false },
+            ticks: { color: labelColor, precision: 0 },
+          },
+        },
+      },
+    };
+  }, [dashboardData?.popularServices, theme]);
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -274,42 +337,10 @@ const Dashboard = () => {
                     ))}
                   </Stack>
                 ) : dashboardData?.popularServices?.length > 0 ? (
-                  <Box sx={{ mt: 2 }}>
-                    {(() => {
-                      const maxBookings = Math.max(...dashboardData.popularServices.map(s => s.bookings));
-                      return dashboardData.popularServices.map((service, index) => {
-                        const percentage = (service.bookings / maxBookings) * 100;
-                        const colors = ['#003366', '#0066cc', '#4caf50', '#ff9800', '#9c27b0'];
-                        const color = colors[index % colors.length];
-
-                        return (
-                          <Box key={service._id} sx={{ mb: 2.5 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.875rem' }}>
-                                {service.name.length > 20 ? `${service.name.substring(0, 20)}...` : service.name}
-                              </Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600, color }}>
-                                {service.bookings}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ position: 'relative', height: 8, bgcolor: alpha(color, 0.1), borderRadius: 4, overflow: 'hidden' }}>
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  left: 0,
-                                  top: 0,
-                                  height: '100%',
-                                  width: `${percentage}%`,
-                                  bgcolor: color,
-                                  borderRadius: 4,
-                                  transition: 'width 0.8s ease-in-out',
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                        );
-                      });
-                    })()}
+                  <Box sx={{ mt: 1, height: 300 }}>
+                    {popularServicesChart && (
+                      <Bar data={popularServicesChart.data} options={popularServicesChart.options} />
+                    )}
                   </Box>
                 ) : (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
