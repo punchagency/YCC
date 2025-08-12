@@ -45,7 +45,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null);
-  const [modalError, setModalError] = useState(null);
+  const [modalError, setModalError] = useState(null); // string | { title?: string; bullets?: string[]; hint?: string; message?: string }
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
@@ -336,17 +336,50 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
         handleCloseDialog();
       }
     } catch (err) {
-      // Display detailed error messages from backend validation inside modal
-      let errorMessage =
-        err?.message || "An error occurred while uploading the file";
+      // Prefer friendly AI errors if provided by backend
+      const data = err?.response?.data || err?.data || err; // support various client libs
+      const friendly = data?.friendly;
       if (
-        typeof errorMessage === "string" &&
-        errorMessage.includes("Row") &&
-        errorMessage.includes(":")
+        friendly &&
+        (friendly.title || friendly.message || friendly.bullets)
       ) {
-        errorMessage = `Validation Error: ${errorMessage}`;
+        setModalError({
+          title: friendly.title,
+          message: friendly.message,
+          bullets: friendly.bullets,
+          hint: friendly.hint,
+        });
+      } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
+        // Fallback: build a compact human message from errors
+        const missing = data.errors
+          .filter((e) => e?.row == null && /required/i.test(String(e?.message)))
+          .map((e) => String(e?.field || "field"));
+        if (missing.length) {
+          setModalError({
+            title: "We couldn't find some required columns.",
+            bullets: missing.map((f) => `- ${f}`),
+            message: `Missing required columns: ${missing.join(", ")}`,
+            hint: "Tip: Rename your headers to match our expected fields and re-upload.",
+          });
+        } else {
+          setModalError(
+            data?.message ||
+              err?.message ||
+              "An error occurred while uploading the file"
+          );
+        }
+      } else {
+        let errorMessage =
+          err?.message || "An error occurred while uploading the file";
+        if (
+          typeof errorMessage === "string" &&
+          errorMessage.includes("Row") &&
+          errorMessage.includes(":")
+        ) {
+          errorMessage = `Validation Error: ${errorMessage}`;
+        }
+        setModalError(errorMessage);
       }
-      setModalError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -391,7 +424,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
             <span role="img" aria-label="sparkles">
               ✨
             </span>
-            Parse with AI
+            Upload with AI
           </Box>
         </StyledButton>
       </Box>
@@ -618,7 +651,7 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
                 }}
               >
                 <DescriptionText>
-                  <InfoOutlined /> Upload your product inventory Excel file and
+                  <InfoOutlined /> Upload your product inventory spreadsheet and
                   let our intelligent AI system analyze, standardize and
                   seamlessly integrate your catalog into our platform.
                 </DescriptionText>
@@ -682,14 +715,52 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
             </>
           )}
 
-          {modalError && (
-            <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
-              <AlertTitle>We couldn't process that</AlertTitle>
-              <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                {modalError}
-              </Typography>
-            </Alert>
-          )}
+          {modalError &&
+            (typeof modalError === "object" ? (
+              <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                <AlertTitle>
+                  {modalError.title || "We couldn't process that"}
+                </AlertTitle>
+                {/* If we have bullets, prefer showing only the list to avoid duplicating content contained in message */}
+                {!(
+                  Array.isArray(modalError.bullets) &&
+                  modalError.bullets.length > 0
+                ) &&
+                  modalError.message && (
+                    <Typography
+                      variant="body2"
+                      sx={{ whiteSpace: "pre-wrap", mb: 1 }}
+                    >
+                      {modalError.message}
+                    </Typography>
+                  )}
+                {Array.isArray(modalError.bullets) &&
+                  modalError.bullets.length > 0 && (
+                    <Box
+                      component="ul"
+                      sx={{ pl: 2, mt: 0, mb: modalError.hint ? 1 : 0 }}
+                    >
+                      {modalError.bullets.map((b, i) => (
+                        <li key={i}>
+                          <Typography variant="body2">{b}</Typography>
+                        </li>
+                      ))}
+                    </Box>
+                  )}
+                {modalError.hint && (
+                  <Typography variant="body2" color="text.secondary">
+                    {modalError.hint}
+                  </Typography>
+                )}
+              </Alert>
+            ) : (
+              <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                <AlertTitle>We couldn't process that</AlertTitle>
+                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                  {modalError}
+                </Typography>
+              </Alert>
+            ))}
 
           <Box
             sx={{
