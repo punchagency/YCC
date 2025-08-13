@@ -320,6 +320,30 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
             result.message || "Failed to upload file. Please try again."
           );
         }
+      } else if (selectedFile && dialogType === "csv") {
+        // Submit CSV using the same backend endpoint as Excel
+        const result = await uploadInventoryData(selectedFile, userId);
+
+        if (result.status) {
+          let successMessage = "File uploaded successfully";
+          if (result.data && result.data.inventoryDetails) {
+            const details = result.data.inventoryDetails;
+            successMessage = `Upload successful! ${details.totalProducts} products processed. ${details.newProductsCreated} new products created, ${details.existingProductsUpdated} existing products updated.`;
+          }
+
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: successMessage,
+            life: 5000,
+          });
+          handleNext();
+          handleCloseDialog();
+        } else {
+          setModalError(
+            result.message || "Failed to upload file. Please try again."
+          );
+        }
       } else if (selectedFile && dialogType === "ai") {
         // AI flow: parse on Python, then import to Node
         const products = await parseInventoryWithAI(selectedFile);
