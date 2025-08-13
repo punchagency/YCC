@@ -286,15 +286,14 @@ export const UserProvider = ({ children }) => {
     });
     const json = await resp.json().catch(() => ({}));
     if (!resp.ok) {
-      if (resp.status === 422 && json?.errors) {
-        // Return structured validation errors from Python
-        const first = json.errors[0];
-        const msg = first
-          ? `Row ${first.row}: ${first.field} - ${first.message}`
-          : "Validation error";
-        throw new Error(msg);
-      }
-      throw new Error(json?.message || "AI parsing failed");
+      // Bubble up friendly structured errors so UI can render them nicely
+      const error = new Error(
+        json?.message ||
+          (resp.status === 422 ? "Validation error" : "AI parsing failed")
+      );
+      error.response = { status: resp.status, data: json };
+      error.data = json;
+      throw error;
     }
     if (!json?.products || !Array.isArray(json.products)) {
       throw new Error("AI parser returned an invalid response");
