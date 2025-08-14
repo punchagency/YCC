@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  useNavigate,
-  useParams,
-  useLocation,
-  useOutletContext,
+  useOutletContext, useNavigate
 } from "react-router-dom";
 
 import { useTheme } from "../../context/theme/themeContext";
@@ -22,16 +19,12 @@ import {
   Checkbox,
   IconButton,
   Paper,
-  Tooltip,
   Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Select,
-  MenuItem,
-  InputLabel,
   FormControl,
   Button,
   Autocomplete,
@@ -56,14 +49,12 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ImageIcon from "@mui/icons-material/Image";
 import EmailIcon from "@mui/icons-material/Email";
 import CircularProgress from "@mui/material/CircularProgress";
-import Container from "@mui/material/Container";
+import { updateInventoryItem } from "../../services/supplier/supplierService";
 
 import {
   createInventoryData,
   getAllInventories,
-  updateInventoryItem,
   deleteInventoryItem,
-  getInventoryItemById,
   sendInventoryEmail,
   getAllSuppliers,
 } from "../../services/inventory/inventoryService";
@@ -179,8 +170,6 @@ const Invent = () => {
   const [imagePreview, setImagePreview] = useState(null);
 
   // Add these state variables with your other state declarations
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const [hasPrevPage, setHasPrevPage] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
 
   // Add these state variables

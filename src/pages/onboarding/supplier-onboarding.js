@@ -22,6 +22,7 @@ import SupplierOnboardingStep1 from "../../components/onboarding/supplier/suppli
 import SupplierOnboardingStep2 from "../../components/onboarding/supplier/supplier-onboarding-step2";
 import SupplierOnboardingStep3 from "../../components/onboarding/supplier/supplier-onboarding-step3";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import StepCompletedCard from "../../components/onboarding/supplier/step-completed-card";
 import { useUser } from "../../context/userContext"; // Added this import
 
 const QontoStepIconRoot = styled("div")(({ theme }) => ({
@@ -189,9 +190,11 @@ const SupplierOnboarding = () => {
   const { id } = useParams();
   const { stripeAccount } = useUser(); // Added this to access Stripe account state
   const [activeStep, setActiveStep] = React.useState(0);
+  const [suppressAutoAdvance, setSuppressAutoAdvance] = React.useState(false);
+  const [completedSteps, setCompletedSteps] = React.useState([false, false, false]);
 
   // Add step validation logic
-  const canAdvanceToStep = (stepIndex) => {
+  const canAdvanceToStep = React.useCallback((stepIndex) => {
     //console.log('SupplierOnboarding - canAdvanceToStep called with:', stepIndex);
     //console.log('SupplierOnboarding - Current stripeAccount:', stripeAccount);
     
@@ -212,9 +215,9 @@ const SupplierOnboarding = () => {
       default:
         return false;
     }
-  };
+  }, [stripeAccount]);
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     //console.log('SupplierOnboarding - handleNext called, current step:', activeStep);
     
     const nextStep = activeStep + 1;
@@ -222,12 +225,45 @@ const SupplierOnboarding = () => {
     // Check if we can advance to the next step
     if (canAdvanceToStep(nextStep)) {
       //console.log('SupplierOnboarding - Advancing to step:', nextStep);
+      setSuppressAutoAdvance(false);
+      // Mark current step as completed when moving forward (steps 0..2)
+      setCompletedSteps((prev) => {
+        const updated = [...prev];
+        if (activeStep >= 0 && activeStep <= 2) {
+          updated[activeStep] = true;
+        }
+        return updated;
+      });
       setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
     } else {
       //console.log('SupplierOnboarding - Cannot advance to step:', nextStep, 'Requirements not met');
       // Optionally show a message to user that requirements aren't met
     }
-  };
+  }, [activeStep, canAdvanceToStep]);
+
+  // Handle clicking on a step in the Stepper
+  const handleStepClick = React.useCallback((index) => {
+    // Going back is always allowed
+    if (index < activeStep) {
+      setSuppressAutoAdvance(true);
+      setActiveStep(index);
+      return;
+    }
+
+    // Allow forward jump only if requirements for that step are satisfied
+    if (index > activeStep && canAdvanceToStep(index)) {
+      setSuppressAutoAdvance(false);
+      // Mark current step as completed when jumping forward
+      setCompletedSteps((prev) => {
+        const updated = [...prev];
+        if (activeStep >= 0 && activeStep <= 2) {
+          updated[activeStep] = true;
+        }
+        return updated;
+      });
+      setActiveStep(index);
+    }
+  }, [activeStep, canAdvanceToStep]);
 
   const handleReset = () => {
     setActiveStep(0);
@@ -243,7 +279,7 @@ const SupplierOnboarding = () => {
       //console.log('SupplierOnboarding - Step 3 requirements no longer met, going back to Step 2');
       setActiveStep(1);
     }
-  }, [stripeAccount, activeStep]);
+  }, [stripeAccount, activeStep, canAdvanceToStep]);
 
   return (
     <Box
@@ -261,9 +297,14 @@ const SupplierOnboarding = () => {
         activeStep={activeStep}
         connector={<ColorlibConnector />}
       >
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
+        {steps.map((label, index) => (
+          <Step key={label} sx={{ cursor: index <= activeStep || canAdvanceToStep(index) ? 'pointer' : 'default' }}>
+            <StepLabel
+              StepIconComponent={ColorlibStepIcon}
+              onClick={() => handleStepClick(index)}
+            >
+              {label}
+            </StepLabel>
           </Step>
         ))}
       </Stepper>
@@ -286,15 +327,51 @@ const SupplierOnboarding = () => {
         ) : (
           <>
             {activeStep === 0 && (
-              <SupplierOnboardingStep1 handleNext={handleNext} userId={id} />
+              completedSteps[0] ? (
+                <StepCompletedCard
+                  title="Inventory Upload Complete"
+                  description="Your inventory data has been uploaded successfully."
+                  onContinue={handleNext}
+                />
+              ) : (
+                <SupplierOnboardingStep1
+                  handleNext={handleNext}
+                  userId={id}
+                  suppressAutoAdvance={suppressAutoAdvance}
+                />
+              )
             )}
 
             {activeStep === 1 && (
-              <SupplierOnboardingStep2 handleNext={handleNext} userId={id} />
+              completedSteps[1] ? (
+                <StepCompletedCard
+                  title="Stripe Setup Complete"
+                  description="Your Stripe account is connected and ready to receive payments."
+                  onContinue={handleNext}
+                />
+              ) : (
+                <SupplierOnboardingStep2
+                  handleNext={handleNext}
+                  userId={id}
+                  suppressAutoAdvance={suppressAutoAdvance}
+                />
+              )
             )}
 
             {activeStep === 2 && (
-              <SupplierOnboardingStep3 handleNext={handleNext} userId={id} />
+              completedSteps[2] ? (
+                <StepCompletedCard
+                  title="Inventory Confirmation Complete"
+                  description="Your inventory has been confirmed."
+                  onContinue={handleNext}
+                />
+              ) : (
+                <SupplierOnboardingStep3
+                  handleNext={handleNext}
+                  userId={id}
+                  suppressAutoAdvance={suppressAutoAdvance}
+                />
+              )
             )}
 
             {activeStep === 3 && (

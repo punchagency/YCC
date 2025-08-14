@@ -14,7 +14,7 @@ const ExteriorLandingPage = () => {
     const header = (
         <>
             Empowering <GradientText>Exterior</GradientText>{" "}
-            <GradientText>Yatch</GradientText> crew with the Right Resources
+            <GradientText>Yacht</GradientText> crew with the Right Resources
         </>    
     );
     const subtext2 = 'Master the art of yacht maintenance, safety, and watersports with expert advice and trusted tools designed for exterior crew.'
