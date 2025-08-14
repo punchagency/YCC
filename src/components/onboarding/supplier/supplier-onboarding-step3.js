@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 import { useParams, useLocation } from "react-router-dom";
 
-const SupplierOnboardingStep3 = ({ handleNext }) => {
+const SupplierOnboardingStep3 = ({ handleNext, suppressAutoAdvance }) => {
   const { id: userId } = useParams();
   const location = useLocation();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } =
@@ -21,6 +21,10 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
     : "service_provider";
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      // If user navigated back, do not auto redirect forward
+      return;
+    }
     // if (hasRunRef.current) return; // prevent second run
     // hasRunRef.current = true;
 
@@ -71,7 +75,7 @@ const SupplierOnboardingStep3 = ({ handleNext }) => {
     };
 
     verifyInventoryUpload();
-  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role]);
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role, suppressAutoAdvance]);
 
   const handleFinish = async () => {
     try {

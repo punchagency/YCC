@@ -201,22 +201,23 @@ const Settings = () => {
     };
 
     return (
-        <Box sx={{ p: { xs: 1, md: 2, lg: 3 }, paddingTop: '70px !important' }}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: 500, }}>
+        <Box sx={{ p: { xs: 1, md: 3, lg: 4 }, paddingTop: '70px !important', mx: 'auto' }}>
+            <Typography variant="h5" sx={{ mb: 4, fontWeight: 600, color: '#1a1a1a' }}>
                 Service Provider Settings
             </Typography>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
                 {/* Business Information */}
                 <Grid item xs={12}>
                     <Card sx={{
-                        borderRadius: 3,
-                        // boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                        // border: '1px solid rgba(3, 77, 146, 0.1)'
+                        borderRadius: 2,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        border: '1px solid #e0e0e0',
+                        backgroundColor: '#fff'
                     }}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h5" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
-                                <BusinessIcon /> Business Information
+                        <CardContent sx={{ p: 4 }}>
+                            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#333', fontSize: '1.25rem' }}>
+                                Business Information
                             </Typography>
 
                             <Grid container spacing={3}>
@@ -224,20 +225,26 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Business Name"
+                                        placeholder="Enter business name"
                                         value={formData.businessName}
                                         onChange={(e) => handleInputChange('businessName', e.target.value)}
-                                        InputProps={{
-                                            startAdornment: <BusinessIcon sx={{ mr: 1, color: '#123F66' }} />
-                                        }}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -247,20 +254,26 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Phone Number"
+                                        placeholder="Enter phone number"
                                         value={formData.phone}
                                         onChange={(e) => handleInputChange('phone', e.target.value)}
-                                        InputProps={{
-                                            startAdornment: <PhoneIcon sx={{ mr: 1, color: '#123F66' }} />
-                                        }}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -270,22 +283,28 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Business Address"
+                                        placeholder="Enter business address"
                                         value={formData.businessAddress}
                                         onChange={(e) => handleInputChange('businessAddress', e.target.value)}
                                         multiline
-                                        rows={2}
-                                        InputProps={{
-                                            startAdornment: <LocationIcon sx={{ mr: 1, color: '#123F66', alignSelf: 'flex-start', mt: 1 }} />
-                                        }}
+                                        rows={3}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -295,20 +314,26 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Business Website"
+                                        placeholder="Enter website URL"
                                         value={formData.businessWebsite}
                                         onChange={(e) => handleInputChange('businessWebsite', e.target.value)}
-                                        InputProps={{
-                                            startAdornment: <WebsiteIcon sx={{ mr: 1, color: '#123F66' }} />
-                                        }}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -321,13 +346,14 @@ const Settings = () => {
                 {/* Service Information */}
                 <Grid item xs={12}>
                     <Card sx={{
-                        borderRadius: 3,
-                        // boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                        // border: '1px solid rgba(3, 77, 146, 0.1)'
+                        borderRadius: 2,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        border: '1px solid #e0e0e0',
+                        backgroundColor: '#fff'
                     }}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
-                                <ServiceIcon /> Service Information
+                        <CardContent sx={{ p: 4 }}>
+                            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#333', fontSize: '1.25rem' }}>
+                                Service Information
                             </Typography>
 
                             <Grid container spacing={3}>
@@ -344,9 +370,9 @@ const Settings = () => {
                                                     label={option}
                                                     {...getTagProps({ index })}
                                                     sx={{
-                                                        backgroundColor: alpha('#123F66', 0.1),
-                                                        borderColor: '#123F66',
-
+                                                        backgroundColor: alpha('#1976d2', 0.1),
+                                                        borderColor: '#1976d2',
+                                                        color: '#1976d2'
                                                     }}
                                                 />
                                             ))
@@ -355,15 +381,24 @@ const Settings = () => {
                                             <TextField
                                                 {...params}
                                                 label="Departments Served"
+                                                placeholder="Select departments"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 2,
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#123F66'
+                                                        borderRadius: 1.5,
+                                                        backgroundColor: '#fafafa',
+                                                        '& fieldset': {
+                                                            borderColor: '#e0e0e0'
                                                         },
-                                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                            // borderColor: '#123F66'
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#bdbdbd'
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: '#1976d2'
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: '#666',
+                                                        fontWeight: 500
                                                     }
                                                 }}
                                             />
@@ -373,19 +408,23 @@ const Settings = () => {
 
                                 <Grid item xs={12} md={6}>
                                     <FormControl fullWidth>
-                                        <InputLabel>Booking Method</InputLabel>
+                                        <InputLabel sx={{ color: '#666', fontWeight: 500 }}>Booking Method</InputLabel>
                                         <Select
                                             value={formData.bookingMethod}
                                             onChange={(e) => handleInputChange('bookingMethod', e.target.value)}
                                             input={<OutlinedInput label="Booking Method" />}
-                                            startAdornment={<BookingIcon sx={{ mr: 1, color: '#123F66' }} />}
+                                            displayEmpty
                                             sx={{
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
                                             }}
                                         >
@@ -409,8 +448,9 @@ const Settings = () => {
                                                     label={option}
                                                     {...getTagProps({ index })}
                                                     sx={{
-                                                        backgroundColor: alpha('#123F66', 0.1),
-                                                        borderColor: '#123F66',
+                                                        backgroundColor: alpha('#1976d2', 0.1),
+                                                        borderColor: '#1976d2',
+                                                        color: '#1976d2',
                                                         fontSize: '0.75rem'
                                                     }}
                                                 />
@@ -420,16 +460,25 @@ const Settings = () => {
                                             <TextField
                                                 {...params}
                                                 label="Services Offered"
+                                                placeholder="Select services"
                                                 helperText="Select departments first to see available services"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 2,
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#123F66'
+                                                        borderRadius: 1.5,
+                                                        backgroundColor: '#fafafa',
+                                                        '& fieldset': {
+                                                            borderColor: '#e0e0e0'
                                                         },
-                                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                            // borderColor: '#123F66'
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#bdbdbd'
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: '#1976d2'
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: '#666',
+                                                        fontWeight: 500
                                                     }
                                                 }}
                                             />
@@ -444,18 +493,23 @@ const Settings = () => {
                                         value={formData.availability}
                                         onChange={(e) => handleInputChange('availability', e.target.value)}
                                         placeholder="e.g., Mon-Fri 9AM-5PM"
-                                        InputProps={{
-                                            startAdornment: <ScheduleIcon sx={{ mr: 1, color: '#123F66' }} />
-                                        }}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -474,9 +528,9 @@ const Settings = () => {
                                                     label={option}
                                                     {...getTagProps({ index })}
                                                     sx={{
-                                                        backgroundColor: alpha('#123F66', 0.1),
-                                                        borderColor: '#123F66',
-
+                                                        backgroundColor: alpha('#1976d2', 0.1),
+                                                        borderColor: '#1976d2',
+                                                        color: '#1976d2'
                                                     }}
                                                 />
                                             ))
@@ -485,24 +539,24 @@ const Settings = () => {
                                             <TextField
                                                 {...params}
                                                 label="Service Areas"
-                                                InputProps={{
-                                                    ...params.InputProps,
-                                                    startAdornment: (
-                                                        <>
-                                                            <MapIcon sx={{ mr: 1, color: '#123F66' }} />
-                                                            {params.InputProps.startAdornment}
-                                                        </>
-                                                    )
-                                                }}
+                                                placeholder="Select service areas"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 2,
-                                                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                            borderColor: '#123F66'
+                                                        borderRadius: 1.5,
+                                                        backgroundColor: '#fafafa',
+                                                        '& fieldset': {
+                                                            borderColor: '#e0e0e0'
                                                         },
-                                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                            // borderColor: '#123F66'
+                                                        '&:hover fieldset': {
+                                                            borderColor: '#bdbdbd'
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: '#1976d2'
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: '#666',
+                                                        fontWeight: 500
                                                     }
                                                 }}
                                             />
@@ -517,13 +571,14 @@ const Settings = () => {
                 {/* Contact Person */}
                 <Grid item xs={12}>
                     <Card sx={{
-                        borderRadius: 3,
-                        // boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                        // border: '1px solid rgba(3, 77, 146, 0.1)'
+                        borderRadius: 2,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        border: '1px solid #e0e0e0',
+                        backgroundColor: '#fff'
                     }}>
-                        <CardContent sx={{ p: 3 }}>
-                            <Typography variant="h6" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#123F66' }}>
-                                <PersonIcon /> Contact Person
+                        <CardContent sx={{ p: 4 }}>
+                            <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#333', fontSize: '1.25rem' }}>
+                                Contact Person
                             </Typography>
 
                             <Grid container spacing={3}>
@@ -531,20 +586,26 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Full Name"
+                                        placeholder="Enter full name"
                                         value={formData.contactPerson.fullName}
                                         onChange={(e) => handleInputChange('contactPerson.fullName', e.target.value)}
-                                        InputProps={{
-                                            startAdornment: <PersonIcon sx={{ mr: 1, color: '#123F66' }} />
-                                        }}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -554,17 +615,26 @@ const Settings = () => {
                                     <TextField
                                         fullWidth
                                         label="Role/Position"
+                                        placeholder="Enter role or position"
                                         value={formData.contactPerson.role}
                                         onChange={(e) => handleInputChange('contactPerson.role', e.target.value)}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
-                                                borderRadius: 2,
-                                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                    borderColor: '#123F66'
+                                                borderRadius: 1.5,
+                                                backgroundColor: '#fafafa',
+                                                '& fieldset': {
+                                                    borderColor: '#e0e0e0'
                                                 },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                                    // borderColor: '#123F66'
+                                                '&:hover fieldset': {
+                                                    borderColor: '#bdbdbd'
+                                                },
+                                                '&.Mui-focused fieldset': {
+                                                    borderColor: '#1976d2'
                                                 }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: '#666',
+                                                fontWeight: 500
                                             }
                                         }}
                                     />
@@ -574,36 +644,54 @@ const Settings = () => {
                     </Card>
                 </Grid>
 
-                {/* Save Button */}
+                {/* Action Buttons */}
                 <Grid item xs={12}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}>
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            sx={{
+                                borderRadius: "8px",
+                                px: 4,
+                                py: 1,
+                                fontSize: '1rem',
+                                fontWeight: 500,
+                                textTransform: 'none',
+                                borderColor: '#e0e0e0',
+                                backgroundColor: "#EF4444",
+                                color: '#fff',
+                                '&:hover': {
+                                    opacity: 0.8
+                                }
+                            }}
+                        >
+                            Cancel
+                        </Button>
                         <Button
                             variant="contained"
                             size="large"
                             onClick={handleUpdate}
                             disabled={loading}
-                            startIcon={<SaveIcon />}
                             sx={{
-                                // background: 'linear-gradient(45deg, #123F66, #123F66)',
-                                borderRadius: 3,
-                                width: '100%',
+                                borderRadius: 1.5,
                                 px: 4,
-                                py: 1,
-                                fontSize: '1.1rem',
+                                py: 1.5,
+                                fontSize: '1rem',
                                 fontWeight: 500,
                                 textTransform: 'none',
-                                // boxShadow: '0 4px 15px rgba(3, 77, 146, 0.3)',
+                                backgroundColor: '#1976d2',
+                                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
                                 '&:hover': {
-                                    // background: 'linear-gradient(45deg, #023a7a, #0366b3)',
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: '0 6px 20px rgba(3, 77, 146, 0.4)'
+                                    backgroundColor: '#1565c0',
+                                    boxShadow: '0 4px 12px rgba(25, 118, 210, 0.4)'
                                 },
                                 '&:disabled': {
-                                    background: '#ccc'
+                                    backgroundColor: '#ccc',
+                                    boxShadow: 'none'
                                 }
                             }}
                         >
-                            {loading ? 'Updating...' : 'Update Settings'}
+                            {loading ? 'Saving...' : 'Save'}
                         </Button>
                     </Box>
                 </Grid>

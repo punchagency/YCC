@@ -63,52 +63,6 @@ const SupplierTransaction = () => {
         severity: "success",
     });
 
-    // Mock data for transactions
-    const mockTransactions = [
-        {
-            orderId: "507f1f77bcf86cd799439011",
-            bookingId: "507f1f77bcf86cd799439012",
-            customerName: "John Doe",
-            customerEmail: "john.doe@example.com",
-            customerId: "507f1f77bcf86cd799439013",
-            supplierId: "507f1f77bcf86cd799439014",
-            vendorId: "507f1f77bcf86cd799439015",
-            transactionId: "TR-5e9f8b3a2c",
-            transactionDate: "2023-10-01T12:00:00Z",
-            transactionAmount: 150.75,
-            transactionStatus: "completed",
-            stripeInvoiceId: "in_123456789",
-            invoicePdfUrl: "https://example.com/invoices/invoice123.pdf",
-            invoiceUrl: "https://example.com/invoices/invoice123",
-            platformFee: 5.75,
-            netAmount: 145.00,
-            quoteId: "507f1f77bcf86cd799439016",
-            createdAt: "2023-10-01T12:00:00Z",
-            updatedAt: "2023-10-01T12:00:00Z"
-        },
-        {
-            orderId: "507f1f77bcf86cd799439021",
-            bookingId: "507f1f77bcf86cd799439022",
-            customerName: "Jane Smith",
-            customerEmail: "jane.smith@example.com",
-            customerId: "507f1f77bcf86cd799439023",
-            supplierId: "507f1f77bcf86cd799439024",
-            vendorId: "507f1f77bcf86cd799439025",
-            transactionId: "TR-6f9e8d3b2a",
-            transactionDate: "2023-10-02T10:30:00Z",
-            transactionAmount: 200.50,
-            transactionStatus: "pending",
-            stripeInvoiceId: "in_987654321",
-            invoicePdfUrl: "https://example.com/invoices/invoice456.pdf",
-            invoiceUrl: "https://example.com/invoices/invoice456",
-            platformFee: 7.50,
-            netAmount: 193.00,
-            quoteId: "507f1f77bcf86cd799439026",
-            createdAt: "2023-10-02T10:30:00Z",
-            updatedAt: "2023-10-02T10:30:00Z"
-        }
-    ];
-
     const { setPageTitle } = useOutletContext() || {};
     useEffect(() => {
         if (setPageTitle) setPageTitle("Transactions");
@@ -118,18 +72,13 @@ const SupplierTransaction = () => {
         setIsLoading(true);
         try {
             // In a real app, we would use the service to fetch data
-            // const response = await getTransactionsService({
-            //     page: page + 1,
-            //     limit: rowsPerPage,
-            //     transactionStatus: transactionStatus !== "all" ? transactionStatus : undefined,
-            //     search: searchQuery || undefined
-            // });
-            
-            // Using mock data instead
-            setTimeout(() => {
-                setTransactions(mockTransactions);
-                setIsLoading(false);
-            }, 800);
+            const response = await getTransactionsService({
+                page: page + 1,
+                limit: rowsPerPage,
+                transactionStatus: transactionStatus !== "all" ? transactionStatus : undefined,
+                search: searchQuery || undefined
+            });
+            setTransactions(response.data.pagination.result);
         } catch (error) {
             console.error("Error fetching transactions:", error);
             setSnackbar({

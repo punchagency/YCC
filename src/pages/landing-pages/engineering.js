@@ -14,7 +14,7 @@ const EngineeringLandingPage = () => {
     const backgroundImage = banner
     const header = (
         <>
-            Supporting <GradientText>Yatch</GradientText>{" "}
+            Supporting <GradientText>Yacht</GradientText>{" "}
             <GradientText>Engineers</GradientText> with Tools for Success
         </>    
     );

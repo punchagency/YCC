@@ -8,6 +8,7 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
 }
 
 html {
@@ -31,7 +32,7 @@ html {
 }
 
 .plus-jakarta-sans {
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif ;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;

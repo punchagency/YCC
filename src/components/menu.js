@@ -549,34 +549,38 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
     style.textContent = `      
       /* Make all menu items white background, including on hover */
       .p-panelmenu .p-panelmenu-header > a,
-      .p-panelmenu .p-panelmenu-header > a:hover,
       .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link,
-      .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:hover,
+      .p-panelmenu .p-panelmenu-header > a:not(.menu-red-background):hover,
+      .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:not(.menu-red-background):hover,
       .p-panelmenu .p-menuitem .p-menuitem-link:focus,
       .p-panelmenu-content,
       .p-submenu-list {
         background-color: #FFFFFF !important;
+        display: flex;
+        align-items: end;
+        padding: 12px 10px !important;
+      }
+      .p-panelmenu-header-link{
+        display: flex;
+        align-items: end;
+        padding: 12px 10px !important;
+        height: 100%;
       }
       
-      /* Make all text black explicitly */
-      .p-panelmenu .p-panelmenu-header > a .p-menuitem-text,
-      .p-panelmenu .p-menuitem-link .p-menuitem-text {
+      /* Make all text black explicitly for non-active items */
+      .p-panelmenu .p-panelmenu-header > a:not(.menu-red-background) .p-menuitem-text,
+      .p-panelmenu .p-menuitem-link:not(.menu-red-background) .p-menuitem-text {
         color: #000000 !important;
       }
       
       /* For dark mode compatibility - keep dark mode with black text */
       .dark .p-panelmenu .p-panelmenu-header > a,
-      .dark .p-panelmenu .p-panelmenu-header > a:hover,
       .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link,
-      .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:hover {
+      .dark .p-panelmenu .p-panelmenu-header > a:not(.menu-red-background):hover,
+      .dark .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-link:not(.menu-red-background):hover {
         background-color: #03141F !important;
       }
       
-      /* Even in dark mode, keep text black */
-      .dark .p-panelmenu .p-panelmenu-header > a .p-menuitem-text,
-      .dark .p-panelmenu .p-menuitem-link .p-menuitem-text {
-        color: #000000 !important;
-      }
       
       /* Remove hover effects for all menu items but keep black text */
       .p-panelmenu .p-menuitem-link:hover .p-menuitem-text,
