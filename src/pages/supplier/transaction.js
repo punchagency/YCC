@@ -86,6 +86,7 @@ const SupplierTransaction = () => {
                 message: "An error occurred while fetching transactions",
                 severity: "error",
             });
+        }finally{
             setIsLoading(false);
         }
     };
