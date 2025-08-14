@@ -11,6 +11,10 @@ html, body, #root {
   font-family: "Plus Jakarta Sans", sans-serif !important;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 #root {
   display: flex;
   flex-direction: column;

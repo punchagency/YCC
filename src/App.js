@@ -10,7 +10,7 @@ import VendorSignup from "./pages/auth/vendor.signup";
 import SupplierSignup from "./pages/auth/supplier.signup";
 import Invent from "./pages/invent/invent";
 import Order from "./pages/order/order";
-import Reports from "./pages/report/report";
+import Reports from "./pages/report/";
 import Bookings from "./pages/bookings/bookings";
 import VendorStarted from "./pages/auth/vendors-started";
 // end of new import

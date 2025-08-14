@@ -272,6 +272,60 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // AI Parser: send Excel to Python parser and get normalized products
+  const parseInventoryWithAI = async (file) => {
+    const aiBase = process.env.REACT_APP_AI_PARSER_URL;
+    if (!aiBase) {
+      throw new Error("AI parser URL not configured (REACT_APP_AI_PARSER_URL)");
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    const resp = await fetch(`${aiBase}/parse-inventory`, {
+      method: "POST",
+      body: formData,
+    });
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      // Bubble up friendly structured errors so UI can render them nicely
+      const error = new Error(
+        json?.message ||
+          (resp.status === 422 ? "Validation error" : "AI parsing failed")
+      );
+      error.response = { status: resp.status, data: json };
+      error.data = json;
+      throw error;
+    }
+    if (!json?.products || !Array.isArray(json.products)) {
+      throw new Error("AI parser returned an invalid response");
+    }
+    return json.products;
+  };
+
+  // Import normalized products into Node inventory
+  const importParsedInventoryToNode = async ({
+    userId,
+    supplierId,
+    products,
+  }) => {
+    const body = supplierId ? { supplierId, products } : { userId, products };
+    const resp = await fetch(
+      `${process.env.REACT_APP_API_URL}/inventory/import`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok || json?.status === false) {
+      throw new Error(json?.message || "Import failed");
+    }
+    return json;
+  };
+
   const uploadServicesData = async (selectedFile, userId) => {
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -443,6 +497,8 @@ export const UserProvider = ({ children }) => {
         createStripeAccount,
         refreshStripeAccountLink,
         uploadInventoryData,
+        parseInventoryWithAI,
+        importParsedInventoryToNode,
         uploadServicesData,
         verifyOnboardingStep1,
         completeOnboarding,

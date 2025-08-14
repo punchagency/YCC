@@ -199,7 +199,7 @@ const AdminOrder = () => {
         mx: "auto",
         mt: { md: 2 },
         p: { md: 2 },
-        px: { md: 2 },
+        px: { md: 3 },
       }}
     >
       {/* Admin Filter/Search Bar */}
