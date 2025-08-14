@@ -15,7 +15,7 @@ const CrewLandingPage = () => {
     const backgroundImage = banner
     const header = (
         <>
-         Supporting <GradientText>yatch</GradientText>{" "}
+         Supporting <GradientText>yacht</GradientText>{" "}
           <GradientText>crew</GradientText> at every step of their journey
         </>
     );

@@ -183,3 +183,29 @@ export const updateSupplierProfile = async ({supplierId, data}) => {
     };
   }
 };
+export const updateInventoryItem = async (id, itemData, isFormData = false) => {
+  try {
+    // Check if we're dealing with FormData
+    // const isFormData = itemData instanceof FormData;
+
+    // Set the appropriate headers
+    const headers = {
+      ...getAuthHeader(),
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
+    };
+
+    const response = await axios.patch(`${API_URL}/suppliers/${id}`, itemData, { // NOTE: Changed from /suppliers to /inventory. Very critical for the onboarding process.
+      headers: headers,
+    });
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    console.error(`Error updating inventory item ${id}:`, error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to update inventory item",
+    };
+  }
+};

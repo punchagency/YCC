@@ -23,7 +23,7 @@ import { useUser } from "../../../context/userContext";
 import * as XLSX from "xlsx";
 import { useParams, useLocation } from "react-router-dom";
 
-const SupplierOnboardingStep1 = ({ handleNext }) => {
+const SupplierOnboardingStep1 = ({ handleNext, suppressAutoAdvance }) => {
   const { id: userId } = useParams();
   const location = useLocation();
   const { uploadInventoryData, verifyOnboardingStep1 } = useUser();
@@ -34,7 +34,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
 
   // const requiredHeaders = ["product name", "product category", "product description", "product price", "product stock level", "delivery region"];
   const requiredHeaders = ["product name"];
@@ -66,6 +65,9 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
   }, [error]);
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      return;
+    }
     const verifyInventoryUpload = async () => {
       if (!userId) {
         //console.log('Step 1 - No userId found in URL params');
@@ -75,7 +77,6 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       // console.log('Step 1 - Verifying inventory for userId:', userId);
       // console.log('Step 1 - Current path:', location.pathname);
 
-      setIsVerifying(true);
       try {
         const data = await verifyOnboardingStep1(userId, role);
         //console.log('Step 1 - Verification response:', data);
@@ -87,13 +88,11 @@ const SupplierOnboardingStep1 = ({ handleNext }) => {
       } catch (error) {
         //console.error('Step 1 - Verification error:', error);
         setError("Error verifying inventory. Please try uploading again.");
-      } finally {
-        setIsVerifying(false);
       }
     };
 
     verifyInventoryUpload();
-  }, [userId, location.pathname, handleNext, verifyOnboardingStep1]);
+  }, [userId, location.pathname, handleNext, verifyOnboardingStep1, suppressAutoAdvance, role]);
 
   const handleOpenDialog = (type) => {
     setDialogType(type);

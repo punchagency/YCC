@@ -592,7 +592,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: "Plus Jakarta Sans", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
