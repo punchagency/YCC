@@ -28,6 +28,9 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import OptionsIcon from "@mui/icons-material/MoreVert";
 import BotModalIcon from "../../assets/images/chatbot/chatbot-modal-icon.png";
 import BotOnlineIcon from "../../assets/images/chatbot/chatbot-online-icon.png";
+import SendRounded from "@mui/icons-material/SendRounded";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
+import TypingDots from "./TypingDots";
 
 const Chatbot = (props) => {
   const { isAIAssistantOpen: _, ...rest } = props;
@@ -53,7 +56,7 @@ const Chatbot = (props) => {
         behavior: "smooth", // Adds smooth scrolling
       });
     }
-  }, [chatData]);
+  }, [chatData, typingState]);
 
   function formatUtcTo12Hour(utcTimestamp) {
     const date = new Date(utcTimestamp);
@@ -75,31 +78,6 @@ const Chatbot = (props) => {
   const [mobileChatbotOpen, setMobileChatbotOpen] = useState(false);
   const handleClose = () => {
     setMobileChatbotOpen(false);
-  };
-
-  const [mobileTyping, setMobileTyping] = useState(false);
-
-  const sendMobileMessage = () => {
-    if (!message.trim()) return;
-    setMobileTyping(true);
-    let previousChatData = { ...chatData };
-    previousChatData.messages.push({ role: "user", content: message });
-    setMessage("");
-    setChatData(previousChatData);
-    // Simulate AI response for now (will be replaced with API)
-    setTimeout(() => {
-      setChatData((prev) => ({
-        ...prev,
-        messages: [
-          ...prev.messages,
-          {
-            role: "assistant",
-            content: "Thank you for your message. This is a demo response.",
-          },
-        ],
-      }));
-      setMobileTyping(false);
-    }, 1200);
   };
 
   // Add chatbotPulse keyframes for the pulsing animation if not already present
@@ -233,7 +211,7 @@ const Chatbot = (props) => {
                 <SimpleBar
                   style={{
                     maxHeight: "100%",
-                    width: "100vw",
+                    width: "100%",
                     overflowX: "hidden",
                   }}
                   scrollableNodeProps={{ ref: chatContainerRef }}
@@ -380,16 +358,16 @@ const Chatbot = (props) => {
                 sx={{
                   display: "flex",
                   width: "100%",
-                  padding: "10px 30px",
+                  px: 2,
+                  py: 1,
                   borderLeft: "1px solid #A6C2D4",
                   borderRight: "1px solid #A6C2D4",
                   backgroundColor: "#F3F3F3",
                 }}
               >
-                <Typography>
-                  Typing{" "}
-                  <img src={chatbotTypingLoader} alt="Typing Indicator" />{" "}
-                </Typography>
+                <Box sx={{ width: "70%", pl: "15px" }}>
+                  <TypingDots />
+                </Box>
               </Box>
             )}
 
@@ -422,14 +400,19 @@ const Chatbot = (props) => {
                       <IconButton
                         disabled={!message.trim()}
                         onClick={sendMessage}
+                        sx={{
+                          cursor: "pointer",
+                          transition:
+                            "background-color 0.2s ease, transform 0.15s ease",
+                          "&:hover": {
+                            backgroundColor: "rgba(4,135,217,0.08)",
+                          },
+                          "&:active": { transform: "scale(0.98)" },
+                        }}
+                        disableRipple
                       >
-                        <img
-                          src={SendIcon}
-                          alt="Send"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                          }}
+                        <SendRounded
+                          sx={{ color: "#0487D9", width: 24, height: 24 }}
                         />
                       </IconButton>
                     </InputAdornment>
@@ -463,54 +446,15 @@ const Chatbot = (props) => {
                 },
               }}
             >
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[0] || "how chatbot works?"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[0] || "how chatbot works?"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[1] || "vendors services"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[1] || "vendors services"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[2] || "supplier profile"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[2] || "supplier profile"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[3] || "contractors"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[3] || "contractors"}
-                </CustomOPtionText>
-              </CustomOptionButton>
+              {Array.isArray(chatData.chatSuggestions) &&
+                chatData.chatSuggestions.map((s, idx) => (
+                  <CustomOptionButton
+                    key={idx}
+                    onClick={() => preDefinedMessages(s)}
+                  >
+                    <CustomOPtionText>{s}</CustomOPtionText>
+                  </CustomOptionButton>
+                ))}
             </Box>
           </Box>
         </Box>
@@ -556,6 +500,8 @@ const Chatbot = (props) => {
         onClose={handleClose}
         aria-labelledby="chat-modal-title"
         aria-describedby="chat-modal-description"
+        disableScrollLock
+        keepMounted
         sx={{
           border: "none",
           display: {
@@ -563,6 +509,7 @@ const Chatbot = (props) => {
             md: "none",
           },
         }}
+        BackdropProps={{ sx: { backgroundColor: "rgba(3,77,146,0.24)" } }}
       >
         <Box
           sx={{
@@ -597,8 +544,9 @@ const Chatbot = (props) => {
               xl: "400px",
               "@media (max-width:1100px)": "280px",
             },
-            maxHeight: "85vh",
-            minHeight: "200px",
+            height: "92vh",
+            maxHeight: "92vh",
+            minHeight: "60vh",
           }}
         >
           {/* Chat section */}
@@ -611,48 +559,6 @@ const Chatbot = (props) => {
               flexDirection: "column",
             }}
           >
-            {/* Header section */}
-
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                p: 1,
-                bgcolor: "#034D92",
-                borderTopLeftRadius: "24px",
-                borderTopRightRadius: "24px",
-                paddingLeft: "20px",
-              }}
-            >
-              <ChatHeadingText>Supplier Profile</ChatHeadingText>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                  textAlign: "center",
-                }}
-              >
-                <IconButton
-                  onClick={() => setIsAIAssistantOpen(false)}
-                  sx={{ color: "white" }}
-                >
-                  <RemoveIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => setIsAIAssistantOpen(false)}
-                  sx={{ color: "white" }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            </Box>
-
             {/* subheader section */}
 
             <Box
@@ -662,7 +568,8 @@ const Chatbot = (props) => {
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                p: 2,
+                py: 1,
+                px: 1.5,
                 background:
                   "linear-gradient(79.56deg, #034D92 12.26%, #0487D9 71.92%)",
               }}
@@ -672,7 +579,7 @@ const Chatbot = (props) => {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
-                  gap: "10px",
+                  gap: "8px",
                 }}
               >
                 <img src={BotOnlineIcon} alt="user" />
@@ -680,16 +587,21 @@ const Chatbot = (props) => {
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "3px",
+                    gap: "2px",
                   }}
                 >
                   <Typography
-                    sx={{ color: "white", padding: "0px", fontSize: "20px" }}
+                    sx={{
+                      color: "white",
+                      padding: 0,
+                      fontSize: "16px",
+                      fontWeight: 600,
+                    }}
                   >
                     Chatbot
                   </Typography>
                   <Typography
-                    sx={{ color: "white", padding: "0px", fontSize: "15px" }}
+                    sx={{ color: "#E6F1FA", padding: 0, fontSize: "13px" }}
                   >
                     Support Agent
                   </Typography>
@@ -700,8 +612,9 @@ const Chatbot = (props) => {
                 <IconButton
                   onClick={() => setIsAIAssistantOpen(false)}
                   sx={{ color: "white" }}
+                  aria-label="Close chat"
                 >
-                  <OptionsIcon />
+                  <CloseIcon />
                 </IconButton>
               </Box>
             </Box>
@@ -715,7 +628,7 @@ const Chatbot = (props) => {
                 justifyContent: "flex-start",
                 width: "100%",
                 backgroundColor: "#F3F3F3",
-                padding: "15px 20px 10px 20px",
+                padding: "10px 12px 8px 12px",
                 gap: "10px",
                 flexWrap: "nowrap",
                 overflowX: "auto",
@@ -725,54 +638,17 @@ const Chatbot = (props) => {
                 },
               }}
             >
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[0] || "how chatbot works?"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[0] || "how chatbot works?"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[1] || "vendors services"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[1] || "vendors services"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[2] || "supplier profile"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[2] || "supplier profile"}
-                </CustomOPtionText>
-              </CustomOptionButton>
-              <CustomOptionButton
-                onClick={() =>
-                  preDefinedMessages(
-                    chatData.chatSuggestions[3] || "contractors"
-                  )
-                }
-              >
-                <CustomOPtionText>
-                  {" "}
-                  {chatData.chatSuggestions[3] || "contractors"}
-                </CustomOPtionText>
-              </CustomOptionButton>
+              {Array.isArray(chatData.chatSuggestions) &&
+                chatData.chatSuggestions.map((s, idx) => (
+                  <CustomOptionButton
+                    key={idx}
+                    onClick={() => preDefinedMessages(s)}
+                  >
+                    <CustomOPtionText sx={{ fontSize: 14 }}>
+                      {s}
+                    </CustomOPtionText>
+                  </CustomOptionButton>
+                ))}
             </Box>
 
             {/* Main chat section */}
@@ -780,7 +656,7 @@ const Chatbot = (props) => {
             <Box
               sx={{
                 display: "flex",
-                height: "250px",
+                height: "55vh",
                 width: "100%",
                 backgroundColor: "#F3F3F3",
                 padding: "5px",
@@ -789,7 +665,7 @@ const Chatbot = (props) => {
               <SimpleBar
                 style={{
                   maxHeight: "100%",
-                  width: "100vw",
+                  width: "100%",
                   overflowX: "hidden",
                 }}
                 scrollableNodeProps={{ ref: chatContainerRef }}
@@ -800,7 +676,7 @@ const Chatbot = (props) => {
                     flexDirection: "column",
                     alignItems: "center",
                     width: "100%",
-                    height: "300px",
+                    height: "100%",
                     backgroundColor: "#F3F3F3",
                   }}
                 >
@@ -812,7 +688,7 @@ const Chatbot = (props) => {
                         flexDirection: "column",
                         alignSelf:
                           item.role === "assistant" ? "flex-start" : "flex-end",
-                        width: "70%",
+                        width: "88%",
                         paddingX: "15px",
                       }}
                     >
@@ -865,22 +741,9 @@ const Chatbot = (props) => {
                       >
                         {item.role === "assistant" ? (
                           <BotChatMessage>
-                            {mobileTyping && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "flex-start",
-                                  mb: 2,
-                                }}
-                              >
-                                <img
-                                  src={chatbotTypingLoader}
-                                  alt="Typing..."
-                                  style={{ width: "40px", height: "40px" }}
-                                />
-                              </Box>
-                            )}
-                            <Typography>
+                            <Typography
+                              sx={{ fontSize: 14, lineHeight: "20px" }}
+                            >
                               {parseAIMessage(item.content)}
                             </Typography>
                           </BotChatMessage>
@@ -889,6 +752,7 @@ const Chatbot = (props) => {
                             <Typography
                               sx={{
                                 color: "white",
+                                fontSize: 14,
                               }}
                             >
                               {item.content}
@@ -948,16 +812,16 @@ const Chatbot = (props) => {
                 sx={{
                   display: "flex",
                   width: "100%",
-                  padding: "10px 30px",
+                  px: 2,
+                  py: 1,
                   borderLeft: "1px solid #A6C2D4",
                   borderRight: "1px solid #A6C2D4",
                   backgroundColor: "#F3F3F3",
                 }}
               >
-                <Typography>
-                  Typing{" "}
-                  <img src={chatbotTypingLoader} alt="Typing Indicator" />{" "}
-                </Typography>
+                <Box sx={{ width: "88%", pl: "15px" }}>
+                  <TypingDots />
+                </Box>
               </Box>
             )}
 
@@ -980,13 +844,21 @@ const Chatbot = (props) => {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton
-                        onClick={sendMobileMessage}
+                        onClick={sendMessage}
                         disabled={!message.trim()}
+                        sx={{
+                          cursor: "pointer",
+                          transition:
+                            "background-color 0.2s ease, transform 0.15s ease",
+                          "&:hover": {
+                            backgroundColor: "rgba(4,135,217,0.08)",
+                          },
+                          "&:active": { transform: "scale(0.98)" },
+                        }}
+                        disableRipple
                       >
-                        <img
-                          src={SendIcon}
-                          alt="Send"
-                          style={{ width: "24px", height: "24px" }}
+                        <SendRounded
+                          sx={{ color: "#0487D9", width: 24, height: 24 }}
                         />
                       </IconButton>
                     </InputAdornment>
@@ -1008,12 +880,16 @@ const Chatbot = (props) => {
                 padding: "10px",
               }}
             >
-              <ChatbotFooterText>
-                By chatting, you agree to our{" "}
-                <a href="/privacy-policy" style={{ color: "inherit" }}>
-                  Privacy Policy
-                </a>
-                .
+              <ChatbotFooterText
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <InfoOutlined sx={{ fontSize: 14, color: "#9BBAD0" }} />
+                AI may make mistakes. Consider checking important info.
               </ChatbotFooterText>
             </Box>
           </Box>
