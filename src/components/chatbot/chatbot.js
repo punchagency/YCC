@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import SendIcon from "../../assets/images/chatbot/send-icon.png";
 import BotIcon from "../../assets/images/chatbot/chatbot-profile-icon.png";
-import chatbotTypingLoader from "../../assets/images/chatbot/chatbot-typing-state.png";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { useState, useRef, useEffect } from "react";
@@ -25,8 +24,6 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; // Ensure you import KaTeX CSS for proper styling
 import CloseIcon from "@mui/icons-material/Close";
 import RemoveIcon from "@mui/icons-material/Remove";
-import OptionsIcon from "@mui/icons-material/MoreVert";
-import BotModalIcon from "../../assets/images/chatbot/chatbot-modal-icon.png";
 import BotOnlineIcon from "../../assets/images/chatbot/chatbot-online-icon.png";
 import SendRounded from "@mui/icons-material/SendRounded";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
