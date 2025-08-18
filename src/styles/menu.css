@@ -1,6 +1,18 @@
 /* Add these styles for the active menu item */
+.left-menu,
+.top-nav-container,
+.p-panelmenu,
+.p-panelmenu * {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+}
 .menu-red-background,
 .p-panelmenu .p-panelmenu-header.menu-red-background>a {
+  background-color: #0387d9 !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+.menu-red-background:hover,
+.p-panelmenu:hover .p-panelmenu-header.menu-red-background>a:hover {
   background-color: #0387d9 !important;
   color: white !important;
   border-radius: 8px !important;
@@ -57,5 +69,18 @@
 .p-panelmenu .p-panelmenu-header.menu-red-background>a .p-menuitem-icon,
 .menu-red-background .p-menuitem-text,
 .menu-red-background .p-menuitem-icon {
+  color: white !important;
+}
+
+/* Enforce white color on hover for active menu items */
+.active-menu-item.menu-red-background:hover,
+.active-menu-item.menu-red-background:hover .p-menuitem-text,
+.active-menu-item.menu-red-background:hover .p-menuitem-icon,
+.p-panelmenu .p-panelmenu-header.active-menu-item.menu-red-background>a:hover,
+.p-panelmenu .p-panelmenu-header.active-menu-item.menu-red-background>a:hover .p-menuitem-text,
+.p-panelmenu .p-panelmenu-header.active-menu-item.menu-red-background>a:hover .p-menuitem-icon,
+.p-panelmenu .p-menuitem .p-menuitem-link.active-menu-item.menu-red-background:hover,
+.p-panelmenu .p-menuitem .p-menuitem-link.active-menu-item.menu-red-background:hover .p-menuitem-text,
+.p-panelmenu .p-menuitem .p-menuitem-link.active-menu-item.menu-red-background:hover .p-menuitem-icon {
   color: white !important;
 }

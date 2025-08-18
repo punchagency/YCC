@@ -1,5 +1,6 @@
 import "./App.css";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
 import GetStarted from "./pages/auth/get-started"; // Adjust the import according to your file structure
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/crew.signup";
@@ -65,6 +66,7 @@ import CrewNotification from "./pages/crew/notification/notification";
 import CrewSettings from "./pages/crew/crewSettings/crewsettings";
 import CrewReports from "./pages/crew/report-screen/report";
 import CrewBooking from "./pages/crew/booking/booking";
+import CrewCompletedBookingDetails from "./pages/crew/booking/completed-booking-details";
 import CrewLegal from "./pages/crew/legal/legal";
 import CrewTraining from "./pages/crew/training/training";
 import CrewAccomodation from "./pages/crew/accomodation/accomo";
@@ -157,14 +159,20 @@ const AuthCheck = ({ children }) => {
 };
 
 function App() {
+  const theme = createTheme({
+    typography: {
+      fontFamily: 'Plus Jakarta Sans, Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',
+    },
+  });
   return (
     <AuthProvider>
       <UserProvider>
         <ToastProvider>
           <NotificationsProvider>
             <CartProvider>
-              <AuthCheck>
-                <Routes>
+              <MuiThemeProvider theme={theme}>
+                <AuthCheck>
+                  <Routes>
                   {/* Landing Page Routes - Public Access */}
                   <Route element={<LandingPageLayout />}>
                     <Route path="/" element={<HomeLandingPage />} />
@@ -421,6 +429,14 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+                    <Route
+                      path="/crew/bookings/completed/details"
+                      element={
+                        <ProtectedRoute requiredRoles={["crew_member"]}>
+                          <CrewCompletedBookingDetails />
+                        </ProtectedRoute>
+                      }
+                    />
 
                     <Route
                       path="/crew/legal-resources"
@@ -642,8 +658,9 @@ function App() {
                     element={<VendorOnboardingStep2 />}
                   />
                   <Route path="/verify-otp" element={<VerifyOtp />} />
-                </Routes>
-              </AuthCheck>
+                  </Routes>
+                </AuthCheck>
+              </MuiThemeProvider>
             </CartProvider>
           </NotificationsProvider>
         </ToastProvider>

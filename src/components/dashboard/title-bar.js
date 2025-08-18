@@ -57,6 +57,7 @@ const DashboardTitleBar = ({ title, button, backArrow = false }) => {
         marginTop: { xs: "10px", sm: 0 },
         boxSizing: "border-box",
         overflow: "visible",
+        fontFamily: '"Plus Jakarta Sans", sans-serif',
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: "12px" }}>
