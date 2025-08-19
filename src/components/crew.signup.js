@@ -1241,7 +1241,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 <span style={{ fontSize: 14, color: '#333', fontFamily: 'Inter, sans-serif' }}>
                   By signing up, you acknowledge that you have read and agree to our{" "}
                   <span
-                    onClick={() => setIsPrivacyModalOpen(true)}
+                    onClick={() => navigate("/privacy-policy")}
                     style={{ 
                       color: '#034D92', 
                       textDecoration: 'underline', 
@@ -1253,7 +1253,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   </span>
                   {" "}and{" "}
                   <span
-                    onClick={() => setIsTermsModalOpen(true)}
+                    onClick={() => navigate("/terms-and-conditions")}
                     style={{ 
                       color: '#034D92', 
                       textDecoration: 'underline', 

@@ -51,7 +51,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
               borderRadius: "16px",
               width: "100%",
               height: "100%",
-              maxWidth: "900px",
+              maxWidth: "95vw",
               maxHeight: "95vh",
               display: "flex",
               flexDirection: "column",
@@ -224,6 +224,7 @@ const TermsModal = ({ isOpen, onClose, pdfUrl, title, fileName }) => {
                   transition: "opacity 0.3s ease",
                   backgroundColor: "white",
                   borderRadius: "0 0 16px 16px",
+                  minHeight: "600px",
                 }}
                 onLoad={handleIframeLoad}
                 title={title || "Document"}

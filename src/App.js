@@ -41,6 +41,8 @@ import VendorAndServices from "./pages/landing-pages/vendor-services";
 import AboutUs from "./pages/landing-pages/about-us";
 import ResourceCenter from "./pages/landing-pages/resource-center";
 import ContactUs from "./pages/landing-pages/contact-us";
+import PrivacyPolicy from "./pages/privacy-policy/privacy-policy";
+import TermsAndConditions from "./pages/terms-and-conditions/terms-and-conditions";
 
 import Calendar from "./pages/calendar/calendar";
 import { NotificationsProvider } from "./context/notificationsContext";
@@ -137,6 +139,8 @@ const AuthCheck = ({ children }) => {
     "/services/onboarding/refresh-stripe-account",
     "/reset-password",
     "/supplier/orders/confirm/:subOrderId/:token",
+    "/privacy-policy",
+    "/terms-and-conditions",
   ];
 
   // Check if the current path is a public route
@@ -212,6 +216,8 @@ function App() {
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/coming-soon" element={<ComingSoon />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                   <Route
                     path="/service/quotes/respond/:quoteId"
                     element={<RespondToQuote />}

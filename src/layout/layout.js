@@ -547,7 +547,7 @@ const AdminLayout = ({ role }) => {
                                   title={pageTitle}
                                   backArrow={backArrow}
                                   button={
-                                    shouldShowCreateBookingButton && user.role.name === 'crew' ? (
+                                    shouldShowCreateBookingButton && user.role.name === 'crew_member' ? (
                                       createBookingButton
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton

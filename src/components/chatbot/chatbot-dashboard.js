@@ -18,9 +18,11 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css"; 
 import { useUser } from "../../context/userContext";
+import { useNavigate } from "react-router-dom";
 
 const ChatbotDashboard = () => {
     const { user } = useUser();
+    const navigate = useNavigate();
     let role = 'guest';
     if (user) {
       if (typeof user.role === 'string') {
@@ -445,7 +447,7 @@ const ChatbotDashboard = () => {
                             padding: '10px',
                         }}>
                             <ChatbotFooterText>
-                                By chatting, you agree to our <a href="/privacy-policy" style={{ color: 'inherit' }}>Privacy Policy</a>.
+                                By chatting, you agree to our <span onClick={() => navigate("/privacy-policy")} style={{ color: 'inherit' }}>Privacy Policy</span> and <span onClick={() => navigate("/terms-and-conditions")} style={{ color: 'inherit' }}>Terms and Conditions</span>.
                             </ChatbotFooterText>
                         </Box>
                     </Box>
