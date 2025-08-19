@@ -14,7 +14,7 @@ import SendIcon from "../../assets/images/chatbot/send-icon.png";
 import BotIcon from "../../assets/images/chatbot/chatbot-profile-icon.png";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { DoneAll } from "@mui/icons-material";
 import { useLandingPageAI } from "../../context/AIAssistant/landingPageAIContext";
 import ReactMarkdown from "react-markdown";
@@ -45,15 +45,58 @@ const Chatbot = (props) => {
   } = useLandingPageAI();
 
   const chatContainerRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
 
-  useEffect(() => {
+  // Robust scroll to bottom function
+  const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth", // Adds smooth scrolling
+      const container = chatContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
       });
     }
-  }, [chatData, typingState]);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatData, typingState, scrollToBottom]);
+
+  // Auto-scroll to bottom when modal opens - robust implementation
+  useEffect(() => {
+    if (isAIAssistantOpen) {
+      // Clear any existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      // Multiple attempts with increasing delays to handle various rendering scenarios
+      const timeouts = [0, 50, 150, 300, 500, 1000];
+
+      timeouts.forEach((delay) => {
+        scrollTimeoutRef.current = setTimeout(() => {
+          scrollToBottom();
+        }, delay);
+      });
+
+      // Also set up a ResizeObserver to scroll when content changes size
+      if (chatContainerRef.current) {
+        const resizeObserver = new ResizeObserver(() => {
+          scrollToBottom();
+        });
+
+        resizeObserver.observe(chatContainerRef.current);
+
+        // Cleanup function
+        return () => {
+          resizeObserver.disconnect();
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+        };
+      }
+    }
+  }, [isAIAssistantOpen, scrollToBottom]);
 
   function formatUtcTo12Hour(utcTimestamp) {
     const date = new Date(utcTimestamp);
@@ -179,7 +222,7 @@ const Chatbot = (props) => {
                 <Typography
                   sx={{ color: "white", fontWeight: 600, fontSize: 16 }}
                 >
-                  Chatbot (Click to restore)
+                  Yacht Agent (Click to restore)
                 </Typography>
                 <IconButton
                   onClick={(e) => {
@@ -255,7 +298,7 @@ const Chatbot = (props) => {
                                 <img src={BotIcon} alt="Chatbot Icon" />
                               </Box>
                               <ChatbotTime>
-                                Chatbot{" "}
+                                Yacht Agent{" "}
                                 {formatUtcTo12Hour(
                                   item.createdAt
                                     ? item.createdAt
@@ -268,7 +311,7 @@ const Chatbot = (props) => {
                           {item.role === "user" && (
                             <>
                               <ChatbotTime>
-                                visitor{" "}
+                                you{" "}
                                 {formatUtcTo12Hour(
                                   item.createdAt
                                     ? item.createdAt
@@ -595,12 +638,12 @@ const Chatbot = (props) => {
                       fontWeight: 600,
                     }}
                   >
-                    Chatbot
+                    Yacht Agent
                   </Typography>
                   <Typography
                     sx={{ color: "#E6F1FA", padding: 0, fontSize: "13px" }}
                   >
-                    Support Agent
+                    AI assistant
                   </Typography>
                 </Box>
               </Box>
@@ -707,7 +750,7 @@ const Chatbot = (props) => {
                               <img src={BotIcon} alt="user" />
                             </Box>
                             <ChatbotTime>
-                              Chatbot{" "}
+                              Yacht Agent{" "}
                               {formatUtcTo12Hour(
                                 item.createdAt
                                   ? item.createdAt
@@ -720,7 +763,7 @@ const Chatbot = (props) => {
                         {item.role === "user" && (
                           <>
                             <ChatbotTime>
-                              visitor{" "}
+                              you{" "}
                               {formatUtcTo12Hour(
                                 item.createdAt
                                   ? item.createdAt
