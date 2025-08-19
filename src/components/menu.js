@@ -624,6 +624,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         className={`left-menu ${isCollapsed ? "collapsed" : ""}`}
         style={{
           // backgroundColor: theme === "light" ? "#F8FBFF" : "#03141F",
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
         }}
       >
         <div className="flex justify-content-center align-items-center logo-wraper">

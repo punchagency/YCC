@@ -391,6 +391,7 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
         flexDirection: "column",
         overflow: "auto",
         padding: "20px",
+        fontFamily: '"Plus Jakarta Sans", sans-serif',
       }}
     >
       <div
