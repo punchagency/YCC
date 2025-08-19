@@ -1,0 +1,130 @@
+.privacy-policy-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+.privacy-policy-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.privacy-policy-header h1 {
+    color: #333;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.privacy-policy-header p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.pdf-viewer-container {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.pdf-viewer-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.pdf-viewer {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: white;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2480 / 3508;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: auto;
+}
+
+.privacy-policy-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 2px solid #e0e0e0;
+}
+
+.privacy-policy-footer p {
+    color: #666;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.download-link {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.download-link:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.download-link:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .privacy-policy-container {
+        padding: 15px;
+    }
+
+    .privacy-policy-header h1 {
+        font-size: 2rem;
+    }
+
+    .privacy-policy-header p {
+        font-size: 1rem;
+    }
+
+
+
+    .pdf-viewer-container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .privacy-policy-header h1 {
+        font-size: 1.8rem;
+    }
+
+
+
+    .download-link {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}

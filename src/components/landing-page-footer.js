@@ -10,7 +10,7 @@ import {
 import { GradientButton } from "./landing-page-header";
 import { styled } from "@mui/material/styles";
 import logo from "../assets/images/icons/plain-white-icon.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
@@ -19,6 +19,7 @@ import TermsModal from "./TermsModal";
 const LandingPageFooter = () => {
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const footerData = [
     {
@@ -139,9 +140,9 @@ const LandingPageFooter = () => {
                       © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
                     </CopyrightText>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
-                    <FooterButton onClick={() => setIsTermsModalOpen(true)}>Terms and Conditions</FooterButton>
+                    <FooterButton onClick={() => navigate("/terms-and-conditions")}>Terms and Conditions</FooterButton>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
-                    <FooterButton onClick={() => setIsPrivacyModalOpen(true)}>Privacy Policy</FooterButton>
+                    <FooterButton onClick={() => navigate("/privacy-policy")}>Privacy Policy</FooterButton>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -172,7 +173,7 @@ const LandingPageFooter = () => {
       <TermsModal
         isOpen={isTermsModalOpen}
         onClose={() => setIsTermsModalOpen(false)}
-        pdfUrl="/Terms-and-Conditions.pdf"
+        pdfUrl="/terms-and-conditions"
         title="Yacht Crew Center Terms and Conditions"
         fileName="YCC-Terms-and-Conditions.pdf"
       />
@@ -181,7 +182,7 @@ const LandingPageFooter = () => {
       <TermsModal
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
-        pdfUrl="/Privacy-Policy.pdf"
+        pdfUrl="/privacy-policy"
         title="Yacht Crew Center Privacy Policy"
         fileName="YCC-Privacy-Policy.pdf"
       />
