@@ -28,8 +28,10 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import OptionsIcon from "@mui/icons-material/MoreVert";
 import BotModalIcon from "../../assets/images/chatbot/chatbot-modal-icon.png";
 import BotOnlineIcon from "../../assets/images/chatbot/chatbot-online-icon.png";
+import { useNavigate } from "react-router-dom";
 
 const Chatbot = (props) => {
+  const navigate = useNavigate();
   const { isAIAssistantOpen: _, ...rest } = props;
   // Destructure only what we need, comment out unused variables
   const {
@@ -1010,9 +1012,13 @@ const Chatbot = (props) => {
             >
               <ChatbotFooterText>
                 By chatting, you agree to our{" "}
-                <a href="/privacy-policy" style={{ color: "inherit" }}>
+                <span onClick={() => navigate("/privacy-policy")} style={{ color: "inherit" }}>
                   Privacy Policy
-                </a>
+                </span>
+                and{" "}
+                <span onClick={() => navigate("/terms-and-conditions")} style={{ color: "inherit" }}>
+                  Terms and Conditions
+                </span>
                 .
               </ChatbotFooterText>
             </Box>

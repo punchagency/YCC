@@ -514,7 +514,7 @@ const AdminLayout = ({ role }) => {
                     <BookingProvider>
                       <ServiceProvider>
                         <CalendarProvider>
-                          <main className="flex page relative wrapper">
+                          <main className="flex page relative wrapper" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                             {!shouldHideLeftPanel && (
                               <LeftMenu
                                 role={actualRole}
@@ -547,7 +547,7 @@ const AdminLayout = ({ role }) => {
                                   title={pageTitle}
                                   backArrow={backArrow}
                                   button={
-                                    shouldShowCreateBookingButton && user.role.name === 'crew' ? (
+                                    shouldShowCreateBookingButton && user.role.name === 'crew_member' ? (
                                       createBookingButton
                                     ) : shouldShowCreateOrderButton ? (
                                       createOrderButton

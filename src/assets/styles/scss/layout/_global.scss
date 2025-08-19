@@ -1,9 +1,8 @@
 @use "./variables" as vars;
 @use "../mixins/transition" as *;
 @use "../mixins/breakpoints" as bp;
-@use "../mixins/scalable-font" as fs;
 
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap");
+/* Removed external Google Fonts import to enforce local Plus Jakarta Sans */
 
 :root {
   --bg-color: #ffffff;
@@ -610,7 +609,6 @@ h1 {
 
 h2 {
   font-size: vars.$h2-font-size;
-  @include fs.fs(20, 24);
   line-height: 30px;
   font-weight: vars.$bold;
   color: vars.$light-black;
@@ -619,7 +617,6 @@ h2 {
 
 h6 {
   font-size: vars.$h6-font-size;
-  @include fs.fs(15, 19);
   line-height: 23px;
   color: vars.$light-black;
   font-weight: vars.$medium;
