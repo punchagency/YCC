@@ -24,27 +24,7 @@ const PrivacyPolicy = () => {
                     className="pdf-viewer"
                     width="100%"
                 >
-                    <p>
-                        Your browser does not support PDFs.
-                        <a href="/Privacy-Policy.pdf" target="_blank" rel="noopener noreferrer">
-                            Click here to download the Privacy Policy PDF
-                        </a>
-                    </p>
                 </iframe>
-            </div>
-
-            <div className="privacy-policy-footer">
-                <p>
-                    If you have any questions about this Privacy Policy, please contact us.
-                </p>
-                <a
-                    href="/Privacy-Policy.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="download-link"
-                >
-                    Download PDF
-                </a>
             </div>
         </div>
     )
