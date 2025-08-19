@@ -17,11 +17,24 @@ export const getResponseFromAI = async (chat) => {
       return chat;
     }
 
+    // Resolve userId from chat, userContext persisted localStorage, or null
+    let userId = chat?.userId || null;
+    if (!userId) {
+      try {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          userId = parsed?.id || parsed?._id || null;
+        }
+      } catch (_) {}
+    }
+
     const response = await axios.post(
       N8N_WEBHOOK_URL,
       {
         chatInput: latestUserMessage,
         sessionId: N8N_SESSION_ID || "",
+        userId: userId || null,
       },
       {
         headers: { "Content-Type": "application/json" },
