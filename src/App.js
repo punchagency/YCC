@@ -545,6 +545,14 @@ function App() {
                       }
                     />
                     <Route
+                      path="/supplier/notifications"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                          <Notifications />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
                       path="/supplier/orders"
                       element={
                         <ProtectedRoute requiredRoles={["supplier"]}>
@@ -617,6 +625,14 @@ function App() {
                       element={
                         <ProtectedRoute requiredRoles={["service_provider"]}>
                           <ServiceProvidersTransactions />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/service-provider/notifications"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                          <Notifications />
                         </ProtectedRoute>
                       }
                     />

@@ -20,6 +20,7 @@ import orderSvgLogo from "../assets/images/crew/orderIcon.svg";
 import bookingSvgLogo from "../assets/images/crew/bookingIcon.svg";
 import financeSvgLogo from "../assets/images/crew/financeIcon.svg";
 import settingsSvgLogo from "../assets/images/crew/settingsIcon.svg";
+import notificationSvgLogo from "../assets/images/crew/notificationIcon.svg";
 import reportSvgLogo from "../assets/images/crew/reportIcon.svg";
 import logoutLogo from "../assets/images/crew/logout.png";
 import { useTheme } from "../context/theme/themeContext";
@@ -233,7 +234,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       label: "Notifications",
       icon: (
         <img
-          src={notificationLogo}
+          src={location.pathname === "/crew/notifications" ? notificationSvgLogo : notificationLogo}
           alt="Notifications"
           width={15}
           height={15}
@@ -354,7 +355,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       label: "Notifications",
       icon: (
         <img
-          src={notificationLogo}
+          src={location.pathname === "/admin/notifications" ? notificationSvgLogo : notificationLogo}
           alt="Compliance Tracking"
           width={15}
           height={15}
@@ -442,6 +443,23 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       },
     },
     {
+      label: "Notifications",
+      icon: (
+        <img
+          src={location.pathname === "/supplier/notifications" ? notificationSvgLogo : notificationLogo}
+          alt="Notifications"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/supplier/notifications"
+          ? "active-menu-item menu-red-background"
+          : "",
+
+      command: () => navigate("/supplier/notifications"),
+    },
+    {
       label: "Settings",
       icon: <img src={location.pathname === "/supplier/settings" ? settingsSvgLogo : settingsLogo} alt="Settings" width={15} height={15} style={{
         fill: "#000000",
@@ -514,6 +532,23 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
       command: () => {
         navigate("/service-provider/transactions");
       },
+    },
+    {
+      label: "Notifications",
+      icon: (
+        <img
+          src={location.pathname === "/service-provider/notifications" ? notificationSvgLogo : notificationLogo}
+          alt="Notifications"
+          width={15}
+          height={15}
+        />
+      ),
+      className:
+        location.pathname === "/service-provider/notifications"
+          ? "active-menu-item menu-red-background"
+          : "",
+
+      command: () => navigate("/service-provider/notifications"),
     },
     {
       label: "Settings",
