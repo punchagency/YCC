@@ -5,7 +5,7 @@ const getAuthHeader = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getCrewQuotes = async ({page, limit, status}) => {
+export const getCrewQuotes = async ({ page, limit, status }) => {
     try {
         const queryParams = new URLSearchParams();
         if (page) queryParams.append('page', page.toString());
@@ -54,5 +54,38 @@ export const declineQuote = async (quoteId, reason) => {
     } catch (error) {
         console.error("Error declining quote:", error);
         throw error;
+    }
+}
+export const getUnapprovedBookings = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/quotes/unapproved-bookings`, {
+            headers: getAuthHeader(),
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error declining quote:", error);
+        throw error;
+    }
+}
+export const approveCompletedBooking = async ({ bookingId, rating, feedback }) => {
+    try {
+        const response = await axios.post(`${API_URL}/quotes/approve-completed-booking/${bookingId}`, { rating, feedback }, {
+            headers: getAuthHeader(),
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error declining quote:", error);
+        return { status: false, message: error.response.data.message };
+    }
+}
+export const objectCompletedBooking = async ({ bookingId, objectionReason, details }) => {
+    try {
+        const response = await axios.post(`${API_URL}/quotes/object-completed-booking/${bookingId}`, { objectionReason, details }, {
+            headers: getAuthHeader(),
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error declining quote:", error);
+        return { status: false, message: error.response.data.message };
     }
 }

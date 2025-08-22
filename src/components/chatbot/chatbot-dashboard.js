@@ -28,6 +28,7 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { useUser } from "../../context/userContext";
 import TypingDots from "./TypingDots";
+import { useNavigate } from "react-router-dom";
 
 const ChatbotDashboard = () => {
   const { user } = useUser();

@@ -13,7 +13,7 @@ const CaptainLandingPage = () => {
 const backgroundImage = banner
   const header = (
     <>
-     Supporting <GradientText>yatch</GradientText>{" "}
+     Supporting <GradientText>yacht</GradientText>{" "}
       <GradientText>captains</GradientText> in leadership and excellence
     </>
   );

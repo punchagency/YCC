@@ -28,8 +28,10 @@ import BotOnlineIcon from "../../assets/images/chatbot/chatbot-online-icon.png";
 import SendRounded from "@mui/icons-material/SendRounded";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import TypingDots from "./TypingDots";
+import { useNavigate } from "react-router-dom";
 
 const Chatbot = (props) => {
+  const navigate = useNavigate();
   const { isAIAssistantOpen: _, ...rest } = props;
   // Destructure only what we need, comment out unused variables
   const {

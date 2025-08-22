@@ -15,7 +15,7 @@ const InteriorLandingPage = () => {
     const header = (
         <>
             Empowering <GradientText>Interior</GradientText>{" "}
-            <GradientText>Yatch</GradientText> Crew for Excellence
+            <GradientText>Yacht</GradientText> Crew for Excellence
         </>   
     );
     const subtext2 = 'From décor to hospitality, discover resources designed to help stewards and stewardesses create luxurious onboard experiences.'

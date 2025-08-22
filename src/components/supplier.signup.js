@@ -1082,7 +1082,7 @@ const SupplierSignUpForm = ({
                 <span
                   onClick={(e) => {
                     e.preventDefault();
-                    setIsPrivacyModalOpen(true);
+                    navigate("/privacy-policy");
                   }}
                   style={{
                     color: "#034D92",
@@ -1104,7 +1104,7 @@ const SupplierSignUpForm = ({
                 <span
                   onClick={(e) => {
                     e.preventDefault();
-                    setIsTermsConditionsModalOpen(true);
+                    navigate("/terms-and-conditions");
                   }}
                   style={{
                     color: "#034D92",
@@ -1199,7 +1199,7 @@ const SupplierSignUpForm = ({
       <TermsModal
         isOpen={isPrivacyModalOpen}
         onClose={() => setIsPrivacyModalOpen(false)}
-        pdfUrl="/Privacy-Policy.pdf"
+        pdfUrl="/privacy-policy"
         title="Yacht Crew Center Privacy Policy"
         fileName="YCC-Privacy-Policy.pdf"
       />
@@ -1208,7 +1208,7 @@ const SupplierSignUpForm = ({
       <TermsModal
         isOpen={isTermsConditionsModalOpen}
         onClose={() => setIsTermsConditionsModalOpen(false)}
-        pdfUrl="/Terms-and-Conditions.pdf"
+        pdfUrl="/terms-and-conditions"
         title="Yacht Crew Center Terms and Conditions"
         fileName="YCC-Terms-and-Conditions.pdf"
       />

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import { useUser } from "../../../context/userContext";
-// import { useTheme } from "../../../context/theme/themeContext";
 import { useLocation, useOutletContext, useNavigate } from "react-router-dom";
 import {
     Box,

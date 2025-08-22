@@ -5,16 +5,11 @@ import { Payments as StripeIcon } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 import { useParams, useLocation, useSearchParams } from "react-router-dom";
 
-const SupplierOnboardingStep2 = ({ handleNext }) => {
+const SupplierOnboardingStep2 = ({ handleNext, suppressAutoAdvance }) => {
   const { id: userId } = useParams();
   const location = useLocation();
+  const { stripeAccount, getStripeAccount, createStripeAccount, refreshStripeAccountLink } = useUser();
   const [searchParams] = useSearchParams();
-  const {
-    stripeAccount,
-    getStripeAccount,
-    createStripeAccount,
-    refreshStripeAccountLink,
-  } = useUser();
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -49,6 +44,10 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
   }, [userId, role]);
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      // Do not auto-navigate when user intentionally navigated backwards
+      return;
+    }
     //console.log('Stripe Step 2 - stripeAccount updated:', stripeAccount);
 
     // If stripeAccount is null, we need to stay on this step and show setup button
@@ -73,7 +72,7 @@ const SupplierOnboardingStep2 = ({ handleNext }) => {
       //console.log('Stripe Step 2 - Stripe account exists but setup incomplete, showing continue button');
       setShowContinueButton(true);
     }
-  }, [stripeAccount]);
+  }, [stripeAccount, suppressAutoAdvance, handleNext]);
 
   const handleCreateStripeAccount = async () => {
     setIsLoading(true);
