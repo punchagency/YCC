@@ -308,6 +308,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       path: "/supplier/transactions",
     },
     {
+      label: "Notifications",
+      icon: notificationLogo,
+      path: "/supplier/notifications",
+    },
+    {
       label: "Settings",
       icon: settingsLogo,
       path: "/supplier/settings"
@@ -345,6 +350,11 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       label: "Transactions",
       icon: transactionLogo,
       path: "/service-provider/transactions",
+    },
+    {
+      label: "Notifications",
+      icon: notificationLogo,
+      path: "/service-provider/notifications",
     },
     {
       label: "Settings",

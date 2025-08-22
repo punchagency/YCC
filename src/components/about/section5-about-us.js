@@ -120,7 +120,7 @@ const Section5AboutUs = () => {
                                 <CloseIcon />
                             </IconButton>
                             <iframe
-                                src="https://www.youtube.com/embed/YOUR_VIDEO_ID?autoplay=1"
+                                src="https://www.youtube.com/embed/6RYeNFtDJds?autoplay=1"
                                 title="Company Mission"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen

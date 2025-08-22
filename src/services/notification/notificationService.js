@@ -177,6 +177,253 @@ export const updateComplaintStatus = async (complaintId, status) => {
   }
 };
 
+export const getSupplierNotifications = async ({page = 1, limit = 10, priority,}) => {
+  try {
+    console.log("Fetching notifications with params:", {
+      page,
+      limit,
+      priority,
+    });
+
+    const response = await axios.get(`${API_URL}/notifications/supplier`, {
+      headers: getAuthHeader(),
+      params: {
+        page,
+        limit,
+        priority,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch notifications",
+    };
+  }
+};
+
+// Supplier notification functions
+export const markSupplierNotificationAsRead = async (notificationId) => {
+  try {
+    console.log(`Marking supplier notification ${notificationId} as read`);
+
+    const response = await axios.patch(
+      `${API_URL}/notifications/supplier/${notificationId}/read`,
+      {},
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message || "Notification marked as read",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to mark notification as read",
+      };
+    }
+  } catch (error) {
+    console.error("Error marking supplier notification as read:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to mark notification as read",
+    };
+  }
+};
+
+export const markAllSupplierNotificationsAsRead = async () => {
+  try {
+    console.log("Marking all supplier notifications as read");
+
+    const response = await axios.patch(
+      `${API_URL}/notifications/supplier/read-all`,
+      {},
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        message: response.data.message || "All notifications marked as read",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to mark all notifications as read",
+      };
+    }
+  } catch (error) {
+    console.error("Error marking all supplier notifications as read:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to mark all notifications as read",
+    };
+  }
+};
+
+export const deleteSupplierNotification = async (notificationId) => {
+  try {
+    console.log(`Deleting supplier notification ${notificationId}`);
+
+    const response = await axios.delete(
+      `${API_URL}/notifications/supplier/${notificationId}`,
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        message: response.data.message || "Notification deleted successfully",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to delete notification",
+      };
+    }
+  } catch (error) {
+    console.error("Error deleting supplier notification:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete notification",
+    };
+  }
+};
+
+// Vendor notification functions
+export const getVendorNotifications = async ({ page = 1, limit = 10, priority } = {}) => {
+  try {
+    console.log("Fetching vendor notifications with params:", {
+      page,
+      limit,
+      priority,
+    });
+
+    const response = await axios.get(`${API_URL}/notifications/vendor`, {
+      headers: getAuthHeader(),
+      params: {
+        page,
+        limit,
+        priority,
+      },
+    });
+
+    if (response.data.status) {
+      return {
+        success: true,
+        data: response.data.data.notifications,
+        pagination: response.data.data.pagination,
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to fetch notifications",
+      };
+    }
+  } catch (error) {
+    console.error("Error fetching vendor notifications:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch notifications",
+    };
+  }
+};
+
+export const markVendorNotificationAsRead = async (notificationId) => {
+  try {
+    console.log(`Marking vendor notification ${notificationId} as read`);
+
+    const response = await axios.patch(
+      `${API_URL}/notifications/vendor/${notificationId}/read`,
+      {},
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message || "Notification marked as read",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to mark notification as read",
+      };
+    }
+  } catch (error) {
+    console.error("Error marking vendor notification as read:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to mark notification as read",
+    };
+  }
+};
+
+export const markAllVendorNotificationsAsRead = async () => {
+  try {
+    console.log("Marking all vendor notifications as read");
+
+    const response = await axios.patch(
+      `${API_URL}/notifications/vendor/read-all`,
+      {},
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        message: response.data.message || "All notifications marked as read",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to mark all notifications as read",
+      };
+    }
+  } catch (error) {
+    console.error("Error marking all vendor notifications as read:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to mark all notifications as read",
+    };
+  }
+};
+
+export const deleteVendorNotification = async (notificationId) => {
+  try {
+    console.log(`Deleting vendor notification ${notificationId}`);
+
+    const response = await axios.delete(
+      `${API_URL}/notifications/vendor/${notificationId}`,
+      { headers: getAuthHeader() }
+    );
+
+    if (response.data.status) {
+      return {
+        success: true,
+        message: response.data.message || "Notification deleted successfully",
+      };
+    } else {
+      return {
+        success: false,
+        error: response.data.message || "Failed to delete notification",
+      };
+    }
+  } catch (error) {
+    console.error("Error deleting vendor notification:", error);
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to delete notification",
+    };
+  }
+};
+
 export const updateNotificationStatus = async (notificationId, status) => {
   console.warn("updateNotificationStatus is deprecated. Use markNotificationAsRead instead.");
   return markNotificationAsRead(notificationId);

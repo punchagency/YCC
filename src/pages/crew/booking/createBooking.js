@@ -44,7 +44,7 @@ const CreateBooking = ({
     internalNotes: ''
   });
 
-  
+
   const [searchTerm, setSearchTerm] = React.useState('');
 
   // Get all service categories
@@ -174,9 +174,11 @@ const CreateBooking = ({
         services: selectedServices.map(service => service._id),
         vendorAssigned: selectedVendor._id,
         vendorName: selectedVendor.businessName,
-        vendorLocation: Array.isArray(selectedVendor.businessAddress)
-          ? selectedVendor.businessAddress.join(', ')
-          : selectedVendor.businessAddress || 'Not specified',
+        vendorLocation: selectedVendor.address ?
+          [selectedVendor.address.street, selectedVendor.address.city, selectedVendor.address.state, selectedVendor.address.zip]
+            .filter(Boolean)
+            .join(', ') || 'Not specified'
+          : 'Not specified',
         dateTime: bookingForm.dateTime,
         internalNotes: bookingForm.internalNotes || '',
         serviceLocation: bookingForm.serviceLocation,
@@ -184,7 +186,7 @@ const CreateBooking = ({
       };
 
       const response = await createBooking(bookingData);
-      
+
       if (response.status) {
         showSuccess(`Booking created successfully with ${selectedServices.length} service(s)!`);
         handleCloseAll();
@@ -437,7 +439,7 @@ const CreateBooking = ({
                             {vendor.businessName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {vendor.businessAddress}
+                            {vendor?.address?.street || ""} {vendor?.address?.city || ""} {vendor?.address?.state || ""} {vendor?.address?.zip || ""}
                           </Typography>
                         </Box>
                       </Box>
@@ -670,7 +672,18 @@ const CreateBooking = ({
               <Typography variant="subtitle2">Contact Information:</Typography>
               <Typography variant="body2">Email: {selectedVendor.user.email}</Typography>
               <Typography variant="body2">Phone: {selectedVendor.phone}</Typography>
-              <Typography variant="body2">Address: {selectedVendor.businessAddress}</Typography>
+              <Typography variant="body2">Address: {(() => {
+                const address = selectedVendor?.address;
+                if (address && typeof address === "object") {
+                  const parts = [];
+                  if (address.street) parts.push(address.street);
+                  if (address.city) parts.push(address.city);
+                  if (address.state) parts.push(address.state);
+                  if (address.zip) parts.push(address.zip);
+                  return parts.length > 0 ? parts.join(", ") : "Address not provided";
+                }
+                return "Address not provided";
+              })()}</Typography>
             </Box>
           )}
         </DialogContent>

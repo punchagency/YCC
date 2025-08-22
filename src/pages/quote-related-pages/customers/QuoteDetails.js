@@ -165,8 +165,10 @@ const QuoteDetails = () => {
           message: "Quote approved successfully! Redirecting to payment...",
           severity: "success"
         });
-        // TODO: Open invoice URL in new tab if provided
-        window.open(response.data.invoiceUrl, '_blank');
+        // Open invoice URL in new tab
+        if (response.data.invoiceUrl) {
+          window.open(response.data.invoiceUrl, '_blank');
+        }
         // setTimeout(() => navigate('/crew/booking'), 2000);
       } else {
         throw new Error(response.error || "Failed to approve quote");

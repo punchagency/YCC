@@ -358,9 +358,10 @@ const LandingPageHeader = () => {
                           fontWeight: 600,
                           fontSize: 16,
                           lineHeight: 1,
+                          fontFamily: "Plus Jakarta Sans, Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif",
                         }}
                       >
-                        {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.name || user.fullName || "User"}
+                        {user.crewProfile ? `${user.crewProfile.firstName} ${user.crewProfile.lastName}` : user.email || user.fullName || "User"}
                       </Typography>
                       <KeyboardArrowDownIcon sx={{ color: "white", fontSize: 20 }} />
                     </Box>
@@ -370,6 +371,7 @@ const LandingPageHeader = () => {
                         fontSize: 13,
                         opacity: 0.85,
                         lineHeight: 1,
+                        fontFamily: "Plus Jakarta Sans, Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif",
                       }}
                     >
                       {user.role?.name
@@ -413,7 +415,15 @@ const LandingPageHeader = () => {
                 <MenuItem
                   onClick={() => {
                     handleProfileClose();
-                    window.location.href = "/crew/dashboard";
+                    if (user.role.name === "crew_member") {
+                      navigate("/crew/dashboard");
+                    } else if (user.role.name === "admin") {
+                      navigate("/admin/dashboard");
+                    } else if (user.role.name === "supplier") {
+                      navigate("/supplier/dashboard");
+                    } else if (user.role.name === "service_provider") {
+                      navigate("/service-provider/dashboard");
+                    }
                   }}
                 >
                   Dashboard
