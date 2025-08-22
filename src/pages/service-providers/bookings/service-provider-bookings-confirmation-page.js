@@ -489,7 +489,18 @@ const ServiceProviderBookingsConfirmationPage = () => {
                                                 Contact: {vendor?.contactPerson?.fullName || "N/A"} <span>{vendor?.contactPerson?.role}</span>
                                             </Typography>
                                             <Typography variant="body2" mb={0.5} color="#6c757d">
-                                                Address: {vendor?.businessAddress || "N/A"}
+                                                Address: {(() => {
+                                                    const address = vendor?.address;
+                                                    if (address && typeof address === "object") {
+                                                        const parts = [];
+                                                        if (address.street) parts.push(address.street);
+                                                        if (address.city) parts.push(address.city);
+                                                        if (address.state) parts.push(address.state);
+                                                        if (address.zip) parts.push(address.zip);
+                                                        return parts.length > 0 ? parts.join(", ") : "Address not provided";
+                                                    }
+                                                    return "Address not provided";
+                                                })()}
                                             </Typography>
                                             <Typography variant="body2" color="#6c757d">
                                                 Phone: {vendor?.phone || "N/A"}

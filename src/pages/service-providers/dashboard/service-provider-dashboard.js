@@ -440,7 +440,18 @@ const Dashboard = () => {
                   </Box>
                   <Box>
                     <Typography variant="body2" color="text.secondary" fontWeight={500}>Address</Typography>
-                    <Typography variant="body1">{dashboardData.vendor.businessAddress}</Typography>
+                    <Typography variant="body1">{(() => {
+                      const address = dashboardData?.address;
+                      if (address && typeof address === "object") {
+                        const parts = [];
+                        if (address.street) parts.push(address.street);
+                        if (address.city) parts.push(address.city);
+                        if (address.state) parts.push(address.state);
+                        if (address.zip) parts.push(address.zip);
+                        return parts.length > 0 ? parts.join(", ") : "Address not provided";
+                      }
+                      return "Address not provided";
+                    })()}</Typography>
                   </Box>
                 </Stack>
               </Grid>

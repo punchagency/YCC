@@ -549,12 +549,12 @@ const Bookings = () => {
             <span className="detail-value">
               {booking.dateTime
                 ? new Date(booking.dateTime).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : "N/A"}
             </span>
           </div>
@@ -976,8 +976,8 @@ const Bookings = () => {
                             fontSize: isMobile
                               ? "12px"
                               : isTablet
-                              ? "13px"
-                              : "14px",
+                                ? "13px"
+                                : "14px",
                             tableLayout: "fixed",
                           }}
                         >
@@ -1189,124 +1189,124 @@ const Bookings = () => {
                             {loading
                               ? renderSkeletonLoader()
                               : bookingData.map((booking, index) => (
-                                  <tr
-                                    key={index}
+                                <tr
+                                  key={index}
+                                  style={{
+                                    borderBottom: "1px solid #eee",
+                                    color:
+                                      theme === "light"
+                                        ? "#103B57"
+                                        : "#FFFFFF",
+                                  }}
+                                >
+                                  <td>
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedBookings.includes(
+                                        booking._id
+                                      )}
+                                      onChange={(e) =>
+                                        handleSelectBooking(e, booking._id)
+                                      }
+                                    />
+                                  </td>
+                                  <td
                                     style={{
-                                      borderBottom: "1px solid #eee",
-                                      color:
-                                        theme === "light"
-                                          ? "#103B57"
-                                          : "#FFFFFF",
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
                                     }}
                                   >
-                                    <td>
-                                      <input
-                                        type="checkbox"
-                                        checked={selectedBookings.includes(
-                                          booking._id
-                                        )}
-                                        onChange={(e) =>
-                                          handleSelectBooking(e, booking._id)
-                                        }
-                                      />
-                                    </td>
-                                    <td
+                                    {booking.bookingId}
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    {booking.serviceName}
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    {booking.vendorName}
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    <span
                                       style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      {booking.bookingId}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      {booking.serviceName}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      {booking.vendorName}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      <span
-                                        style={{
-                                          backgroundColor:
-                                            booking.status === "confirmed"
-                                              ? "#e6f7ee"
-                                              : booking.status === "pending"
+                                        backgroundColor:
+                                          booking.status === "confirmed"
+                                            ? "#e6f7ee"
+                                            : booking.status === "pending"
                                               ? "#fff8e6"
                                               : booking.status === "completed"
-                                              ? "#e6f0ff"
-                                              : booking.status === "declined"
-                                              ? "#ffebeb"
-                                              : "#ffebeb",
-                                          color:
-                                            booking.status === "confirmed"
-                                              ? "#1d9d74"
-                                              : booking.status === "pending"
+                                                ? "#e6f0ff"
+                                                : booking.status === "declined"
+                                                  ? "#ffebeb"
+                                                  : "#ffebeb",
+                                        color:
+                                          booking.status === "confirmed"
+                                            ? "#1d9d74"
+                                            : booking.status === "pending"
                                               ? "#ff9800"
                                               : booking.status === "completed"
-                                              ? "#3366ff"
-                                              : "#ff4d4f",
-                                          padding: "2px 6px",
-                                          borderRadius: "4px",
-                                          fontSize: "10px",
-                                        }}
-                                      >
-                                        {booking.status
-                                          .charAt(0)
-                                          .toUpperCase() +
-                                          booking.status.slice(1)}
-                                      </span>
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
+                                                ? "#3366ff"
+                                                : "#ff4d4f",
+                                        padding: "2px 6px",
+                                        borderRadius: "4px",
+                                        fontSize: "10px",
                                       }}
                                     >
-                                      $
-                                      {booking.totalAmount?.toFixed(2) ||
-                                        "0.00"}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      {new Date(
-                                        booking.dateTime
-                                      ).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "short",
-                                        day: "numeric",
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      })}
-                                    </td>
-                                    <td
-                                      style={{
-                                        padding: "8px",
-                                        fontSize: isMobile ? "11px" : "10px",
-                                      }}
-                                    >
-                                      {booking.location}
-                                    </td>
-                                  </tr>
-                                ))}
+                                      {booking.status
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                        booking.status.slice(1)}
+                                    </span>
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    $
+                                    {booking.totalAmount?.toFixed(2) ||
+                                      "0.00"}
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    {new Date(
+                                      booking.dateTime
+                                    ).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </td>
+                                  <td
+                                    style={{
+                                      padding: "8px",
+                                      fontSize: isMobile ? "11px" : "10px",
+                                    }}
+                                  >
+                                    {booking.location}
+                                  </td>
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </div>
@@ -1597,18 +1597,18 @@ const Bookings = () => {
                       viewBooking.status === "confirmed"
                         ? "#fff8e6"
                         : viewBooking.status === "completed"
-                        ? "#e6f0ff"
-                        : viewBooking.status === "pending"
-                        ? "#fff8e6"
-                        : "#ffebeb",
+                          ? "#e6f0ff"
+                          : viewBooking.status === "pending"
+                            ? "#fff8e6"
+                            : "#ffebeb",
                     color:
                       viewBooking.status === "confirmed"
                         ? "#ff9800"
                         : viewBooking.status === "completed"
-                        ? "#3366ff"
-                        : viewBooking.status === "pending"
-                        ? "#ff9800"
-                        : "#ff4d4f",
+                          ? "#3366ff"
+                          : viewBooking.status === "pending"
+                            ? "#ff9800"
+                            : "#ff4d4f",
                     padding: "2px 10px",
                     borderRadius: "12px",
                     fontSize: "0.85rem",
@@ -2067,7 +2067,18 @@ const Bookings = () => {
                   <strong>Type:</strong> {vendor.businessType}
                 </p>
                 <p style={{ marginBottom: "5px", color: "#666" }}>
-                  <strong>Location:</strong> {vendor.businessAddress}
+                  <strong>Location:</strong> {(() => {
+                    const address = vendor?.address;
+                    if (address && typeof address === "object") {
+                      const parts = [];
+                      if (address.street) parts.push(address.street);
+                      if (address.city) parts.push(address.city);
+                      if (address.state) parts.push(address.state);
+                      if (address.zip) parts.push(address.zip);
+                      return parts.length > 0 ? parts.join(", ") : "Address not provided";
+                    }
+                    return "Address not provided";
+                  })()}
                 </p>
                 <p style={{ marginBottom: "5px", color: "#666" }}>
                   <strong>Contact:</strong> {vendor.email}

@@ -169,7 +169,7 @@ const AnimatedBox = styled(Box)({
 });
 
 const AnimatedIcon = styled(Box)({
-    // transition: "transform 0.3s ease-in-out",
+    transition: "transform 0.3s ease-in-out",
     // "&:hover": {
     //     transform: "scale(1.1) rotate(5deg)",
     // }
@@ -181,12 +181,12 @@ const AnimatedButton = styled(Button)({
     fontFamily: "Inter, sans-serif",
     textTransform: "none",
     padding: "15px 41px",
-    // transition: "all 0.3s ease-in-out",
-    // "&:hover": {
-    //     background: linearGradient2,
-    //     transform: "translateY(-3px)",
-    //     boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
-    // },
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+        background: linearGradient2,
+        transform: "translateY(-3px)",
+        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
+    },
 });
 
 const SecondarySubTextBlack = styled(Typography)({

@@ -89,13 +89,13 @@ const Section2Engineering = () => {
                         >
                             <AnimatedBox>
                                 <Box sx={{ 
-                                    px: 4, 
-                                    py: 7, 
+                                    px: "36px", 
+                                    py: "46px", 
                                     display: "flex", 
                                     background: "#E6EFF28A", 
                                     borderRadius: '13px', 
                                     flexDirection: "column", 
-                                    gap: "28px", 
+                                    gap: "10px", 
                                     justifyContent: "space-between",
                                     height: "100%",
                                     transition: "all 0.3s ease-in-out",
@@ -107,7 +107,7 @@ const Section2Engineering = () => {
                                 }}>
                                     <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                                         <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "48px", height: "48px" }}/>
+                                            <img src={item.image} alt={item.title} style={{ width: "76px", height: "76px" }}/>
                                         </AnimatedIcon>
                                         <Box>
                                             <SecondaryHeadingText>
@@ -119,8 +119,14 @@ const Section2Engineering = () => {
                                         </Box>
                                     </Box>
                                     <Box>
-                                        <AnimatedButton>
-                                            <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
+                                        <AnimatedButton
+                                            sx={{
+                                                width: '171px',
+                                                height: '48px',
+                                                borderRadius: "6px",
+                                            }}
+                                        >
+                                            <ButtonTypography sx={{ color: "white", fontWeight: 600, fontSize: '16px' }}>Learn More</ButtonTypography>
                                         </AnimatedButton>
                                     </Box>
                                 </Box>
@@ -142,9 +148,9 @@ const AnimatedBox = styled(Box)({
 
 const AnimatedIcon = styled(Box)({
     transition: "transform 0.3s ease-in-out",
-    "&:hover": {
-        transform: "scale(1.1) rotate(5deg)",
-    }
+    // "&:hover": {
+    //     transform: "scale(1.1) rotate(5deg)",
+    // }
 });
 
 const AnimatedButton = styled(Button)({
@@ -168,6 +174,7 @@ const SecondarySubTextBlack = styled(Typography)({
     lineHeight: "26.55px",
     letterSpacing: "0%",
     color: "#373737",
+    marginTop: "10px",
 });
 
 const HeadingText = styled(Typography)(({ theme }) => ({
