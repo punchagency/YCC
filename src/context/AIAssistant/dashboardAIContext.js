@@ -1,5 +1,6 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { getResponseFromAI } from "../../services/AIAssistant/dashboardPageAIService";
+import { fetchChatHistory } from "../../services/AIAssistant/chatHistoryService";
 import { useUser } from "../userContext";
 
 const DashboardAIContext = createContext();
@@ -11,7 +12,7 @@ export const useDashboardAI = () => {
 export const DashboardAIProvider = ({ children }) => {
   const { user } = useUser();
 
-  const userId = user?.id || null;
+  const userId = user?.id || user?._id || null;
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [chatData, setChatData] = useState({
     _id: "",
@@ -21,6 +22,50 @@ export const DashboardAIProvider = ({ children }) => {
   });
   const [typingState, setTypingState] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState(null);
+
+  // Load chat history when modal opens
+  useEffect(() => {
+    const loadChatHistory = async () => {
+      if (isAIAssistantOpen && userId && chatData.messages.length === 0) {
+        setIsLoadingHistory(true);
+        setHistoryError(null);
+
+        try {
+          const result = await fetchChatHistory(userId);
+
+          if (result.success && result.chatData) {
+            setChatData((prevData) => ({
+              ...prevData,
+              _id: result.chatData._id,
+              messages: result.chatData.messages || [],
+              chatSuggestions:
+                result.chatData.chatSuggestions || prevData.chatSuggestions,
+            }));
+          } else if (!result.success) {
+            console.warn("Could not load chat history:", result.error);
+            setHistoryError(result.error);
+          }
+        } catch (error) {
+          console.error("Error loading chat history:", error);
+          setHistoryError("Failed to load chat history");
+        } finally {
+          setIsLoadingHistory(false);
+        }
+      }
+    };
+
+    loadChatHistory();
+  }, [isAIAssistantOpen, userId]);
+
+  // Update userId in chatData when user changes
+  useEffect(() => {
+    setChatData((prevData) => ({
+      ...prevData,
+      userId: userId,
+    }));
+  }, [userId]);
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -90,6 +135,8 @@ export const DashboardAIProvider = ({ children }) => {
         sendMessage,
         getResponse,
         preDefinedMessages,
+        isLoadingHistory,
+        historyError,
       }}
     >
       {children}

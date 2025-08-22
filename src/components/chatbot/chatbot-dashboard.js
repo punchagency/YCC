@@ -51,6 +51,8 @@ const ChatbotDashboard = () => {
     setMessage,
     sendMessage,
     preDefinedMessages,
+    isLoadingHistory,
+    historyError,
   } = useDashboardAI();
 
   const chatContainerRef = useRef(null);
@@ -157,10 +159,12 @@ const ChatbotDashboard = () => {
       "recent complaints",
     ],
     crew: [
-      "my bookings for this month",
-      "my account",
-      "crew profile",
-      "contractors",
+      "what's my latest order?",
+      "how many units of Life Jackets are available?",
+      "can you list my last 5 bookings?",
+      "who supplied my most recent order?",
+      "what products can I check out?",
+      "what should I do if I have no orders yet?",
     ],
     guest: [
       "how to sign up",
@@ -336,7 +340,9 @@ const ChatbotDashboard = () => {
               <CustomOptionButton
                 onClick={() =>
                   preDefinedMessages(
-                    chatData.chatSuggestions[0] || "my bookings for this month"
+                    chatData.chatSuggestions[0] ||
+                      chatSuggestions[role]?.[0] ||
+                      chatSuggestions.guest[0]
                   )
                 }
               >
@@ -423,7 +429,7 @@ const ChatbotDashboard = () => {
                     backgroundColor: "#F3F3F3",
                   }}
                 >
-                  {chatData.messages.length === 0 ? (
+                  {isLoadingHistory ? (
                     <Box
                       sx={{
                         width: "85%",
@@ -434,7 +440,50 @@ const ChatbotDashboard = () => {
                     >
                       <BotChatMessage>
                         <Typography sx={{ fontSize: 14, lineHeight: "20px" }}>
-                          Welcome! I’m your AI assistant. Ask anything or tap a
+                          Loading your chat history...
+                        </Typography>
+                      </BotChatMessage>
+                    </Box>
+                  ) : historyError ? (
+                    <Box
+                      sx={{
+                        width: "85%",
+                        paddingX: "15px",
+                        mt: 2,
+                        alignSelf: "flex-start",
+                      }}
+                    >
+                      <BotChatMessage>
+                        <Typography
+                          sx={{
+                            fontSize: 14,
+                            lineHeight: "20px",
+                            color: "#FF6B6B",
+                          }}
+                        >
+                          Could not load chat history. Starting fresh
+                          conversation.
+                        </Typography>
+                      </BotChatMessage>
+                      <BotChatMessage sx={{ mt: 1 }}>
+                        <Typography sx={{ fontSize: 14, lineHeight: "20px" }}>
+                          Welcome! I'm your AI assistant. Ask anything or tap a
+                          suggestion above to get started.
+                        </Typography>
+                      </BotChatMessage>
+                    </Box>
+                  ) : chatData.messages.length === 0 ? (
+                    <Box
+                      sx={{
+                        width: "85%",
+                        paddingX: "15px",
+                        mt: 2,
+                        alignSelf: "flex-start",
+                      }}
+                    >
+                      <BotChatMessage>
+                        <Typography sx={{ fontSize: 14, lineHeight: "20px" }}>
+                          Welcome! I'm your AI assistant. Ask anything or tap a
                           suggestion above to get started.
                         </Typography>
                       </BotChatMessage>
