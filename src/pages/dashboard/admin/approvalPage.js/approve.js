@@ -273,20 +273,34 @@ const ApprovePage = () => {
                     if (address && typeof address === "object") {
                       const parts = [];
                       if (address.street) parts.push(address.street);
-                      if (address.state && address.country) {
-                        parts.push(`${address.state}, ${address.country}`);
-                      } else if (address.state) {
-                        parts.push(address.state);
-                      } else if (address.country) {
-                        parts.push(address.country);
-                      }
+                      if (address.city) parts.push(address.city);
+                      if (address.state) parts.push(address.state);
+                      if (address.zip) parts.push(address.zip);
+                      if (address.country) parts.push(address.country);
                       return parts.length > 0
                         ? parts.join(", ")
                         : "Address not provided";
                     }
                     return "Address not provided";
                   })()
-                : vendor.businessAddress}
+                : (() => {
+                    const address = vendor.address;
+                    if (typeof address === "string") {
+                      return address;
+                    }
+                    if (address && typeof address === "object") {
+                      const parts = [];
+                      if (address.street) parts.push(address.street);
+                      if (address.city) parts.push(address.city);
+                      if (address.state) parts.push(address.state);
+                      if (address.zip) parts.push(address.zip);
+                      if (address.country) parts.push(address.country);
+                      return parts.length > 0
+                        ? parts.join(", ")
+                        : "Address not provided";
+                    }
+                    return "Address not provided";
+                  })()}
             </span>
           </div>
           <div className="detail-row">

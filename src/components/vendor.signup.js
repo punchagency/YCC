@@ -19,6 +19,7 @@ import TermsModal from "./TermsModal";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
+import countryList from "react-select-country-list";
 
 // Custom scrollbar styles for supplier and service provider forms
 if (
@@ -57,6 +58,42 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
     useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Get country options with European countries prioritized
+  const getCountryOptions = () => {
+    const countries = countryList().getData();
+    
+    // Priority European countries to show first
+    const priorityCountries = [
+      'US', // United States
+      'IT', // Italy
+      'FR', // France
+      'ES', // Spain
+      'DE', // Germany
+      'GB', // United Kingdom
+      'NL', // Netherlands
+      'CH', // Switzerland
+      'AT', // Austria
+      'BE', // Belgium
+      'PT', // Portugal
+      'GR', // Greece
+      'SE', // Sweden
+      'NO', // Norway
+      'DK', // Denmark
+      'FI', // Finland
+      'IE', // Ireland
+    ];
+    
+    // Create priority and regular country lists
+    const priorityList = priorityCountries
+      .map(code => countries.find(c => c.value === code))
+      .filter(Boolean);
+    
+    const regularList = countries.filter(c => !priorityCountries.includes(c.value));
+    
+    // Return combined list with priority countries first
+    return [...priorityList, ...regularList];
+  };
 
   // Ensure email is always initialized in formData
   useEffect(() => {
@@ -113,7 +150,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       formDataObj.append("password", formData.password);
       formDataObj.append("confirmPassword", formData.confirmPassword);
       formDataObj.append("businessName", formData.businessName);
-      formDataObj.append("businessAddress", formData.businessAddress);
+      formDataObj.append("address", JSON.stringify(formData.address));
       formDataObj.append("phone", formData.phone);
 
       // Append files if they exist
@@ -129,7 +166,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
       const vendorDetails = {
         businessName: formData.businessName,
-        businessAddress: formData.businessAddress,
+        address: formData.address,
         phone: formData.phone,
         businessWebsite: normalizeWebsiteUrl(formData.businessWebsite),
         departments: formData.departments?.map((dept) => dept.value) || [],
@@ -619,22 +656,151 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       <div className="form-group2">
         <div className="input-field">
           <div>
-            <label htmlFor="businessAddress">Business Address</label>
+            <label>Business Address</label>
           </div>
-          <div className="inputBorder">
+          
+          {/* Street Address */}
+          <div className="inputBorder" style={{ marginBottom: "8px" }}>
             <img
               src={location}
               style={{ width: "12px", height: "12px" }}
-              alt="business address"
+              alt="street address"
             />
             <input
               type="text"
-              id="businessAddress"
-              placeholder="Enter Business Address"
-              value={formData.businessAddress}
+              placeholder="Street Address"
+              value={formData.address?.street || ""}
               onChange={(e) =>
-                handleInputChange("businessAddress", e.target.value)
+                handleInputChange("address", {
+                  ...formData.address,
+                  street: e.target.value
+                })
               }
+            />
+          </div>
+          
+          {/* Street Address 2 */}
+          <div className="inputBorder" style={{ marginBottom: "8px" }}>
+            <img
+              src={location}
+              style={{ width: "12px", height: "12px" }}
+              alt="street address 2"
+            />
+            <input
+              type="text"
+              placeholder="Apartment, suite, etc. (optional)"
+              value={formData.address?.street2 || ""}
+              onChange={(e) =>
+                handleInputChange("address", {
+                  ...formData.address,
+                  street2: e.target.value
+                })
+              }
+            />
+          </div>
+          
+          {/* City, State, ZIP */}
+          <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
+            <div className="inputBorder" style={{ flex: 2 }}>
+              <input
+                type="text"
+                placeholder="City"
+                value={formData.address?.city || ""}
+                onChange={(e) =>
+                  handleInputChange("address", {
+                    ...formData.address,
+                    city: e.target.value
+                  })
+                }
+              />
+            </div>
+            <div className="inputBorder" style={{ flex: 1 }}>
+              <input
+                type="text"
+                placeholder="State"
+                value={formData.address?.state || ""}
+                onChange={(e) =>
+                  handleInputChange("address", {
+                    ...formData.address,
+                    state: e.target.value
+                  })
+                }
+              />
+            </div>
+            <div className="inputBorder" style={{ flex: 1 }}>
+              <input
+                type="text"
+                placeholder="ZIP Code"
+                value={formData.address?.zip || ""}
+                onChange={(e) =>
+                  handleInputChange("address", {
+                    ...formData.address,
+                    zip: e.target.value
+                  })
+                }
+              />
+            </div>
+          </div>
+          
+          {/* Country Select */}
+          <div className="inputBorder">
+            <Select
+              options={getCountryOptions()}
+              value={getCountryOptions().find(c => c.value === formData.address?.country)}
+              onChange={(option) =>
+                handleInputChange("address", {
+                  ...formData.address,
+                  country: option?.value || ""
+                })
+              }
+              placeholder="Select Country"
+              formatOptionLabel={(option) => (
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "16px" }}>
+                    {String.fromCodePoint(
+                      ...option.value
+                        .toUpperCase()
+                        .split("")
+                        .map(char => 127397 + char.charCodeAt())
+                    )}
+                  </span>
+                  <span>{option.label}</span>
+                </div>
+              )}
+              classNamePrefix="select"
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  background: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                  minHeight: "35px",
+                }),
+                container: (provided) => ({
+                  ...provided,
+                  width: "100%",
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  width: "100%",
+                }),
+                menuList: (provided) => ({
+                  ...provided,
+                  "&::-webkit-scrollbar": { display: "none" },
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }),
+                singleValue: (provided) => ({
+                  ...provided,
+                  display: "flex",
+                  alignItems: "center",
+                }),
+                option: (provided) => ({
+                  ...provided,
+                  display: "flex",
+                  alignItems: "center",
+                }),
+              }}
             />
           </div>
         </div>

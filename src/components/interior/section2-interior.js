@@ -1,30 +1,43 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, styled, Container, Grid, Badge } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import { ButtonTypography, linearGradient } from '../landing-page-header'
+import { linearGradient } from '../landing-page-header'
+import SectionPointCard from '../section-point-card'
 
 const Section2Interior = () => {
     const gridData = [
         {
             title: "Master the Art of Luxury Hospitality",
-            description: 'Access resources for fine dining service, table settings, and personalized guest care. Discover how to create luxurious spaces with the right lighting, flowers and bespoke table settings.',
+            points: [
+                "Access resources for fine dining service, table settings, and personalized guest care.",
+                "Discover how to create luxurious spaces with the right lighting, flowers and bespoke table settings."
+            ],
             image: shipIcon,
         },
         {
             title: "Interior Maintenance Made Simple",
-            description: "Learn best practices for cleaning and caring for delicate materials like linens, carpets, and furniture. Find & book recommended suppliers for cleaning products, décor and organizational tools tailored for yachts.",
+            points: [
+                "Learn best practices for cleaning and caring for delicate materials like linens, carpets, and furniture.",
+                "Find & book recommended suppliers for cleaning products, décor and organizational tools tailored for yachts."
+            ],
             image: crewIcon,
         },
         {
             title: "Simplify your Department Management",
-            description: "Manage your service bookings with our worldwide Interior dedicated network. Order your every Interior department needs through our network & platform.",
+            points: [
+                "Manage your service bookings with our worldwide Interior dedicated network.",
+                "Order your every Interior department needs through our network & platform."
+            ],
             image: shipIcon,
         },
         {
             title: "Advance Your Career In Yacht Interior Management",
-            description: 'Access training resources focused on leadership, inventory management and guest services. Join the Preferred Crew Network to access department managing tools, grow your professional network and simplify your life.',
+            points: [
+                "Access training resources focused on leadership, inventory management and guest services.",
+                "Join the Preferred Crew Network to access department managing tools, grow your professional network and simplify your life."
+            ],
             image: engineeringIcon,
         }
     ]
@@ -79,7 +92,9 @@ const Section2Interior = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -88,42 +103,11 @@ const Section2Interior = () => {
                             }}
                         >
                             <AnimatedBox>
-                                <Box sx={{ 
-                                    px: 4, 
-                                    py: 7, 
-                                    display: "flex", 
-                                    background: "#E6EFF28A", 
-                                    borderRadius: '13px', 
-                                    flexDirection: "column", 
-                                    gap: "28px", 
-                                    justifyContent: "space-between",
-                                    height: "100%",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
-                                        background: "#E6EFF2",
-                                    }
-                                }}>
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                        <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "48px", height: "48px" }}/>
-                                        </AnimatedIcon>
-                                        <Box>
-                                            <SecondaryHeadingText>
-                                                {item.title}
-                                            </SecondaryHeadingText>
-                                            <SecondarySubTextBlack>
-                                                {item.description}
-                                            </SecondarySubTextBlack>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <AnimatedButton>
-                                            <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
-                                        </AnimatedButton>
-                                    </Box>
-                                </Box>
+                                <SectionPointCard
+                                    image={item.image}
+                                    title={item.title}
+                                    points={item.points}
+                                />
                             </AnimatedBox>
                         </Grid>
                     ))}
@@ -133,41 +117,9 @@ const Section2Interior = () => {
     )
 }
 
-const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
-
 const AnimatedBox = styled(Box)({
     width: "100%",
     transition: "transform 0.3s ease-in-out",
-});
-
-const AnimatedIcon = styled(Box)({
-    transition: "transform 0.3s ease-in-out",
-    "&:hover": {
-        transform: "scale(1.1) rotate(5deg)",
-    }
-});
-
-const AnimatedButton = styled(Button)({
-    background: linearGradient,
-    fontSize: "16px",
-    fontFamily: "Inter, sans-serif",
-    textTransform: "none",
-    padding: "15px 41px",
-    transition: "all 0.3s ease-in-out",
-    "&:hover": {
-        background: linearGradient2,
-        transform: "translateY(-3px)",
-        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
-    },
-});
-
-const SecondarySubTextBlack = styled(Typography)({
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontSize: "18px",
-    lineHeight: "26.55px",
-    letterSpacing: "0%",
-    color: "#373737",
 });
 
 const HeadingText = styled(Typography)(({ theme }) => ({
@@ -185,15 +137,6 @@ const HeadingText = styled(Typography)(({ theme }) => ({
     letterSpacing: "-2%",
     textAlign: "center",
 }));
-
-const SecondaryHeadingText = styled(Typography)({
-    color: "#131313",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "30px",
-    lineHeight: "36.6px",
-    letterSpacing: "1%",
-});
 
 const GradientText = styled(Typography)({
     background: linearGradient,

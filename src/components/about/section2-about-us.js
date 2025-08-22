@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, Button, styled, Container, Grid, useTheme, useMediaQuery } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
@@ -8,7 +8,9 @@ import { ButtonTypography, linearGradient } from '../landing-page-header'
 import { useNavigate } from 'react-router-dom'
 
 const Section2AboutUs = () => {
+    const theme = useTheme();
     const navigate = useNavigate();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const gridData = [
         {
@@ -41,6 +43,7 @@ const Section2AboutUs = () => {
         <Box component="section" sx={{
             minHeight: "100vh",
             width: "100%",
+            marginTop: isMobile ? "40px" : "80px",
         }}>
             <Container maxWidth="lg" sx={{
                 display: "flex",
@@ -68,19 +71,23 @@ const Section2AboutUs = () => {
                         alignItems: "center",
                     }}>
 
-                        <Badge variant='dot' sx={{
+                        {/* <Badge variant='dot' sx={{
                             "& .MuiBadge-dot": {
                                 background: linearGradient,
                             },
-                        }} />
-                        <GradientText>
+                        }} /> */}
+                        {/* <GradientText>
                             Navigate to department-specific tools and resources
-                        </GradientText>
+                        </GradientText> */}
 
                     </Box>
 
-                    <HeadingText>
-                        Explore Resources For Every Department
+                    <HeadingText
+                        sx={{
+                            textAlign: "center",
+                        }}
+                    >
+                        What We Offer
                     </HeadingText>
                 </Box>
 
@@ -89,23 +96,25 @@ const Section2AboutUs = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",
-                                justifyContent: "start",
-                                textAlign: "left",
+                                justifyContent: "center",
+                                textAlign: "center",
                             }}
                         >
                             <AnimatedBox>
                                 <Box sx={{ 
-                                    px: 4, 
-                                    py: 7, 
+                                    px: "36px", 
+                                    py: "46px", 
                                     display: "flex", 
                                     background: "#E6EFF28A", 
                                     borderRadius: '13px', 
                                     flexDirection: "column", 
-                                    gap: "28px", 
+                                    gap: "10px", 
                                     justifyContent: "space-between",
                                     height: "100%",
                                     transition: "all 0.3s ease-in-out",
@@ -117,7 +126,7 @@ const Section2AboutUs = () => {
                                 }}>
                                     <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                                         <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "48px", height: "48px" }}/>
+                                            <img src={item.image} alt={item.title} style={{ width: "76px", height: "76px" }}/>
                                         </AnimatedIcon>
                                         <Box>
                                             <SecondaryHeadingText>
@@ -128,11 +137,17 @@ const Section2AboutUs = () => {
                                             </SecondarySubTextBlack>
                                         </Box>
                                     </Box>
-                                    <Box>
-                                        <AnimatedButton onClick={() => navigate(item.path)}>
-                                            <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
+                                    {/* <Box>
+                                        <AnimatedButton onClick={() => navigate(item.path)}
+                                            sx={{
+                                                width: "171px",
+                                                height: "48px",
+                                                borderRadius: "6px"
+                                            }}
+                                            >
+                                            <ButtonTypography sx={{ color: "white", fontWeight: 600, fontSize: '16px' }}>Learn More</ButtonTypography>
                                         </AnimatedButton>
-                                    </Box>
+                                    </Box> */}
                                 </Box>
                             </AnimatedBox>
                         </Grid>
@@ -157,6 +172,7 @@ const SecondarySubTextBlack = styled(Typography)({
     lineHeight: "26.55px",
     letterSpacing: "0%",
     color: "#373737",
+    marginTop: "10px",
 })
 
 const HeadingText = styled(Typography)(({ theme }) => ({
@@ -220,9 +236,9 @@ const AnimatedBox = styled(Box)({
 
 const AnimatedIcon = styled(Box)({
     transition: "transform 0.3s ease-in-out",
-    "&:hover": {
-        transform: "scale(1.1) rotate(5deg)",
-    }
+    // "&:hover": {
+    //     transform: "scale(1.1) rotate(5deg)",
+    // }
 });
 
 const AnimatedButton = styled(Button)({

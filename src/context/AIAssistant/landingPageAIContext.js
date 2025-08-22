@@ -4,37 +4,44 @@ import { getResponseFromAI } from "../../services/AIAssistant/landingPageAIServi
 const LandingPageAIContext = createContext();
 
 export const useLandingPageAI = () => {
-    return useContext(LandingPageAIContext);
-}
+  return useContext(LandingPageAIContext);
+};
 
 export const LandingPageAIProvider = ({ children }) => {
-    const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-    const [chatData, setChatData] = useState({
-      messages: [],
-      chatSuggestions: ["how chatbot works?", "vendors services", "supplier profile", "contractors"]  
-    });
-    const [typingState, setTypingState] = useState(false)
-    const [message, setMessage] = useState('')
-    
-  const sendMessage = () => {
-    if (!(message.trim())) return;
-    if (!isAIAssistantOpen) {
-      setIsAIAssistantOpen(true)
-    }
-    setTypingState(true)
-    console.log(' message being sent', message)
-    let previousChatData = chatData
-    console.log('previousChatData', previousChatData)
-    previousChatData.messages.push({role: 'user', content: message})
-    setChatData(previousChatData)
-    console.log('chatData on sending message', previousChatData)
-    getResponse(previousChatData)
-    setMessage("");
-  }
+  const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
+  const [chatData, setChatData] = useState({
+    messages: [],
+    chatSuggestions: [
+      "What is YCC?",
+      "How does YCC work?", 
+      "How to become a vendor?",
+      "How to register as a supplier?",
+      "How to become a crew member?",
+      "Getting started guide"
+    ],
+  });
+  const [typingState, setTypingState] = useState(false);
+  const [message, setMessage] = useState("");
 
+  const sendMessage = () => {
+    if (!message.trim()) return;
+    if (!isAIAssistantOpen) {
+      setIsAIAssistantOpen(true);
+    }
+    setTypingState(true);
+    console.log(" message being sent", message);
+    const nextChatData = {
+      ...chatData,
+      messages: [...chatData.messages, { role: "user", content: message }],
+    };
+    console.log("chatData on sending message", nextChatData);
+    setChatData(nextChatData);
+    setMessage("");
+    getResponse(nextChatData);
+  };
 
   const getResponse = async (previousChatData) => {
-  /*  setTimeout(() => {
+    /*  setTimeout(() => {
 
 
       setChatData((prevChatData) => [
@@ -48,50 +55,50 @@ export const LandingPageAIProvider = ({ children }) => {
       setTypingState(false);
     }, 2000);
     */
-    console.log('chatData on getting response', previousChatData)
-    const response = await getResponseFromAI(previousChatData)
-    console.log('response from AI', response)
-    setChatData(response)
+    console.log("chatData on getting response", previousChatData);
+    const response = await getResponseFromAI(previousChatData);
+    console.log("response from AI", response);
+    setChatData(response);
     setTypingState(false);
-  }
+  };
 
-  
   const preDefinedMessages = (predefinedMessage) => {
-      console.log('message sent', predefinedMessage)
-      if (!(predefinedMessage.trim())) return;
-      if (!isAIAssistantOpen) {
-        setIsAIAssistantOpen(true)
-      }
-      setTypingState(true)
-      let previousChatData = chatData
-      previousChatData.messages.push({role: 'user', content: predefinedMessage})
-      setChatData(previousChatData)
-      getResponse(previousChatData)
+    console.log("message sent", predefinedMessage);
+    if (!predefinedMessage.trim()) return;
+    if (!isAIAssistantOpen) {
+      setIsAIAssistantOpen(true);
+    }
+    setTypingState(true);
+    const nextChatData = {
+      ...chatData,
+      messages: [
+        ...chatData.messages,
+        { role: "user", content: predefinedMessage },
+      ],
+    };
+    setChatData(nextChatData);
+    getResponse(nextChatData);
+  };
 
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return (
-        <LandingPageAIContext.Provider value={{ isAIAssistantOpen, setIsAIAssistantOpen, chatData, setChatData, typingState, setTypingState, message, setMessage, sendMessage, getResponse, preDefinedMessages }}>
-            {children}
-        </LandingPageAIContext.Provider>
-    );
+  return (
+    <LandingPageAIContext.Provider
+      value={{
+        isAIAssistantOpen,
+        setIsAIAssistantOpen,
+        chatData,
+        setChatData,
+        typingState,
+        setTypingState,
+        message,
+        setMessage,
+        sendMessage,
+        getResponse,
+        preDefinedMessages,
+      }}
+    >
+      {children}
+    </LandingPageAIContext.Provider>
+  );
 };
 
 export default LandingPageAIContext;

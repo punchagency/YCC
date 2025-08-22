@@ -7,7 +7,7 @@ const Section1AboutUs = () => {
         title:' Who We Are',
         image : collage,
         subText1: 'Yacht Crew Center, LLC is dedicated to empowering yachting professionals globally with innovative solutions that simplify life at sea and onshore. More than just a resource hub, we are your trusted partner in navigating the complexities of the yachting industry. Driven by our passion for excellence, we are committed to integrating cutting-edge AI support technology into our platform, redefining what’s possible for yachting professionals. ',
-        subText2: 'Our tools are designed to streamline tasks, enhance efficiency, and enable crew to focus on what truly matters. Whether it’s delivering exceptional service, growing professionally, or enjoying life’s meaningful moments. At Yacht Crew Center, we believe in transforming the yachting industry through innovation, collaboration, and a shared vision of success.'
+        // subText2: 'Our tools are designed to streamline tasks, enhance efficiency, and enable crew to focus on what truly matters. Whether it’s delivering exceptional service, growing professionally, or enjoying life’s meaningful moments. At Yacht Crew Center, we believe in transforming the yachting industry through innovation, collaboration, and a shared vision of success.'
     }
     return (
         <Box component="section" sx={{
@@ -50,9 +50,9 @@ const Section1AboutUs = () => {
                         <SecondarySubTextBlack variant='body1'>
                             {data.subText1}
                         </SecondarySubTextBlack>
-                        <SecondarySubTextBlack variant='body1'>
+                        {/* <SecondarySubTextBlack variant='body1'>
                             {data.subText2}
-                        </SecondarySubTextBlack>
+                        </SecondarySubTextBlack> */}
                     </Grid>
                 </Grid>
 

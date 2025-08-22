@@ -53,6 +53,9 @@ const SupplierProfile = () => {
   useEffect(() => {
     if (setPageTitle) setPageTitle("Profile");
   }, [setPageTitle]);
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const [formData, setFormData] = useState({
     businessName: "",
@@ -186,7 +189,7 @@ const SupplierProfile = () => {
         formDataToSend.append("profileImage", profileImage);
       }
       const result = await updateSupplierProfile({ supplierId: user.supplierProfile._id, data: formDataToSend });
-      console.log("Update result:", result);
+
       if (result.success) {
         setSnackbar({
           open: true,
@@ -245,10 +248,10 @@ const SupplierProfile = () => {
     <Box sx={{ p: 4, paddingTop: "80px" }}>
       {/* Profile Status Banner */}
       {!isEditing && (
-        <Box 
-          sx={{ 
-            mb: 3, 
-            p: 2, 
+        <Box
+          sx={{
+            mb: 3,
+            p: 2,
             borderRadius: 2,
             display: 'flex',
             alignItems: 'center',
@@ -261,10 +264,10 @@ const SupplierProfile = () => {
           <Typography>
             Your profile is complete and visible to yacht captains.
           </Typography>
-          <Button 
-            variant="outlined" 
-            color="success" 
-            size="small" 
+          <Button
+            variant="outlined"
+            color="success"
+            size="small"
             startIcon={<EditIcon />}
             onClick={() => setIsEditing(true)}
             sx={{ ml: 'auto' }}
@@ -287,19 +290,19 @@ const SupplierProfile = () => {
             }}
           >
             {/* Background header */}
-            <Box 
-              sx={{ 
-                height: '120px', 
+            <Box
+              sx={{
+                height: '120px',
                 bgcolor: '#003366',
                 background: 'linear-gradient(135deg, #003366 0%, #0066cc 100%)',
               }}
             />
-            
+
             <CardContent sx={{ position: 'relative', pt: 7 }}>
               {/* Avatar positioned to overlap the header */}
-              <Box 
-                sx={{ 
-                  position: "absolute", 
+              <Box
+                sx={{
+                  position: "absolute",
                   top: -60,
                   left: 32,
                   display: 'flex',
@@ -347,8 +350,8 @@ const SupplierProfile = () => {
               </Box>
 
               <Box sx={{ ml: { xs: 0, sm: 20 }, mt: { xs: 10, sm: 0 } }}>
-                <Stack 
-                  direction={{ xs: 'column', sm: 'row' }} 
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
                   justifyContent="space-between"
                   alignItems={{ xs: 'flex-start', sm: 'center' }}
                   spacing={2}
@@ -357,19 +360,19 @@ const SupplierProfile = () => {
                   <Typography variant="h4" sx={{ fontWeight: 700 }}>
                     {formData.businessName || "Business Name"}
                   </Typography>
-                  
+
                   {isEditing && (
                     <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button 
-                        variant="contained" 
-                        color="primary" 
+                      <Button
+                        variant="contained"
+                        color="primary"
                         onClick={handleSave}
                         startIcon={<SaveIcon />}
                       >
                         Save Changes
                       </Button>
-                      <Button 
-                        variant="outlined" 
+                      <Button
+                        variant="outlined"
                         color="inherit"
                         onClick={handleCancel}
                         startIcon={<CancelIcon />}
@@ -379,7 +382,7 @@ const SupplierProfile = () => {
                     </Box>
                   )}
                 </Stack>
-                
+
                 <Typography
                   variant="h6"
                   color="text.secondary"
@@ -394,7 +397,7 @@ const SupplierProfile = () => {
                       key={index}
                       label={area}
                       size="small"
-                      sx={{ 
+                      sx={{
                         bgcolor: alpha(muiTheme.palette.primary.main, 0.1),
                         color: muiTheme.palette.primary.main,
                         fontWeight: 500,
@@ -429,11 +432,11 @@ const SupplierProfile = () => {
                   Business Information
                 </Typography>
                 {isEditing && (
-                  <Chip 
-                    label="Editing" 
-                    size="small" 
-                    color="primary" 
-                    sx={{ ml: 'auto' }} 
+                  <Chip
+                    label="Editing"
+                    size="small"
+                    color="primary"
+                    sx={{ ml: 'auto' }}
                   />
                 )}
               </Stack>
@@ -548,7 +551,7 @@ const SupplierProfile = () => {
                     Address Information
                   </Typography>
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -576,7 +579,7 @@ const SupplierProfile = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -599,7 +602,7 @@ const SupplierProfile = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -622,7 +625,7 @@ const SupplierProfile = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -645,7 +648,7 @@ const SupplierProfile = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -668,7 +671,7 @@ const SupplierProfile = () => {
                     }}
                   />
                 </Grid>
-                
+
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -818,11 +821,11 @@ const SupplierProfile = () => {
                   Contact Person
                 </Typography>
                 {isEditing && (
-                  <Chip 
-                    label="Editing" 
-                    size="small" 
-                    color="primary" 
-                    sx={{ ml: 'auto' }} 
+                  <Chip
+                    label="Editing"
+                    size="small"
+                    color="primary"
+                    sx={{ ml: 'auto' }}
                   />
                 )}
               </Stack>
@@ -872,16 +875,16 @@ const SupplierProfile = () => {
           </Card>
         </Grid>
       </Grid>
-      
+
       {/* Bottom action bar for mobile */}
       {isEditing && isMobile && (
-        <Paper 
+        <Paper
           elevation={3}
-          sx={{ 
-            position: 'fixed', 
-            bottom: 0, 
-            left: 0, 
-            right: 0, 
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
             p: 2,
             zIndex: 10,
             display: 'flex',
@@ -889,8 +892,8 @@ const SupplierProfile = () => {
             borderTop: `1px solid ${theme === "light" ? "#e0e0e0" : "#333"}`,
           }}
         >
-          <Button 
-            variant="outlined" 
+          <Button
+            variant="outlined"
             color="inherit"
             onClick={handleCancel}
             startIcon={<CancelIcon />}
@@ -898,9 +901,9 @@ const SupplierProfile = () => {
           >
             Cancel
           </Button>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             onClick={handleSave}
             startIcon={<SaveIcon />}
             sx={{ flex: 1 }}
@@ -909,7 +912,7 @@ const SupplierProfile = () => {
           </Button>
         </Paper>
       )}
-      
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
