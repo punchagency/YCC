@@ -15,6 +15,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import TermsModal from "./TermsModal";
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const LandingPageFooter = () => {
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
@@ -153,6 +154,9 @@ const LandingPageFooter = () => {
                     </SocialIconLink>
                     <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
                       <YouTubeIcon sx={{ color: "white" }} />
+                    </SocialIconLink>
+                    <SocialIconLink href="https://www.linkedin.com/company/106474229/dashboard/" target="_blank" rel="noopener noreferrer">
+                      <LinkedInIcon sx={{ color: "white" }} />
                     </SocialIconLink>
                   </Box>
                 </Grid>

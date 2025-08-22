@@ -78,6 +78,7 @@ const Section2Home = () => {
                         gap: "10px",
                         justifyContent: "center",
                         alignItems: "center",
+                        textAlign: "center",
                     }}>
                         <Badge variant='dot' sx={{
                             "& .MuiBadge-dot": {
@@ -89,7 +90,11 @@ const Section2Home = () => {
                         </GradientText>
                     </Box>
 
-                    <HeadingText>
+                    <HeadingText
+                        sx={{
+                            textAlign: "center",
+                        }}
+                    >
                         Explore Resources For Every Department
                     </HeadingText>
                 </Box>
@@ -99,7 +104,9 @@ const Section2Home = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",

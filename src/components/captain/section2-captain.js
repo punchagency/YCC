@@ -4,27 +4,40 @@ import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
 import { ButtonTypography, linearGradient } from '../landing-page-header'
+import SectionPointCard from '../section-point-card'
 
 const Section2Captain = () => {
     const gridData = [
         {
             title: "Compliance And Certification for Captains",
-            description: 'Access resources for flag state regulations, licensing, and certification renewals. Stay updated on international maritime laws and safety requirements for seamless operations.',
             image: shipIcon,
+            points: [
+                "Access resources for flag state regulations, licensing, and certification renewals.",
+                "Stay updated on international maritime laws and safety requirements for seamless operations."
+            ]
         },
         {
             title: "Enhancing Guest Experiences at Sea",
-            description: 'Discover connections for creating tailored itineraries, coordinating private events, and managing luxury guest services. Access resources for managing guest preferences, entertainment options, and VIP experiences.',
             image: crewIcon,
+            points: [
+                "Discover connections for creating tailored itineraries, coordinating private events, and managing luxury guest services.",
+                "Access resources for managing guest preferences, entertainment options, and VIP experiences."
+            ]
         },
         {
             title: "Leadership and Crew Management",
-            description: 'Learn techniques for recruiting, training, and leading a cohesive crew. Gain insights into conflict resolution, team-building, and maintaining morale onboard.',
             image: engineeringIcon,
+            points: [
+                "Learn techniques for recruiting, training, and leading a cohesive crew.",
+                "Gain insights into conflict resolution, team-building, and maintaining morale onboard."
+            ]
         },
         {
             title: "Stay Ahead of the Game",
-            description: 'Keep your skills sharp with tools for social media & promotion. Learn what AI can do for your vessel. Explore the future of a Globally Connected Network.',
+            points: [
+                "Keep your skills sharp with tools for social media & promotion.",
+                "Learn what AI can do for your vessel. Explore the future of a Globally Connected Network.",
+            ],
             image: shipIcon,
         }
     ]
@@ -79,7 +92,9 @@ const Section2Captain = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -88,48 +103,11 @@ const Section2Captain = () => {
                             }}
                         >
                             <AnimatedBox>
-                                <Box sx={{ 
-                                    px: "36px", 
-                                    py: "46px", 
-                                    display: "flex", 
-                                    background: "#E6EFF28A", 
-                                    borderRadius: '13px', 
-                                    flexDirection: "column", 
-                                    gap: "10px", 
-                                    justifyContent: "space-between",
-                                    height: "100%",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
-                                        background: "#E6EFF2",
-                                    }
-                                }}>
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                        <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "76px", height: "76px" }}/>
-                                        </AnimatedIcon>
-                                        <Box>
-                                            <SecondaryHeadingText>
-                                                {item.title}
-                                            </SecondaryHeadingText>
-                                            <SecondarySubTextBlack>
-                                                {item.description}
-                                            </SecondarySubTextBlack>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <AnimatedButton
-                                            sx={{
-                                                width: '171px',
-                                                height: '48px',
-                                                borderRadius: "6px",
-                                            }}
-                                        >
-                                            <ButtonTypography sx={{ color: "white", fontWeight: 600, fontSize: '16px' }}>Learn More</ButtonTypography>
-                                        </AnimatedButton>
-                                    </Box>
-                                </Box>
+                                <SectionPointCard
+                                    image={item.image}
+                                    title={item.title}
+                                    points={item.points}
+                                />
                             </AnimatedBox>
                         </Grid>
                     ))}

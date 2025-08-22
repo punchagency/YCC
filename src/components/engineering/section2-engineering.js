@@ -3,28 +3,42 @@ import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/ma
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import { ButtonTypography, linearGradient } from '../landing-page-header'
+import { linearGradient } from '../landing-page-header'
+import SectionPointCard from '../section-point-card'
 
 const Section2Engineering = () => {
     const gridData = [
         {
             title: "Maintenance and Repair Essentials",
-            description: 'Access trusted suppliers for your engine room needs. Access top-tier engineering services through our global network of trusted professionals.',
+            points: [
+                "Access trusted suppliers for your engine room needs.",
+                "Access top-tier engineering services through our global network of trusted professionals."
+            ],
             image: shipIcon,
         },
         {
             title: "Cutting-Edge Technology and Tools",
-            description: 'Stay up to date with the latest diagnostics, calibration equipment, and technical innovations. Discover tools and systems for efficient troubleshooting and system upgrades.',
+            points: [
+                "Stay up to date with the latest diagnostics, calibration equipment, and technical innovations.",
+                "Discover tools and systems for efficient troubleshooting and system upgrades."
+            ],
             image: crewIcon,
         },
         {
             title: "Safety and Compliance for Engineers",
-            description: 'Learn how to meet international safety standards, including flag state regulations and MLC compliance. Stay up to date with changing practices — Access resources for maintaining safety equipment and online access to their data in one place.',
+            points: [
+                "Learn how to meet international safety standards, including flag state regulations and MLC compliance.",
+                "Stay up to date with changing practices — Access resources for maintaining safety equipment and online access to their data in one place."
+            ],
             image: shipIcon,
         },
         {
             title: "Training and Certification Programs",
-            description: 'Advance your skills with career progression courses, and advanced technical systems. Prepare for certifications with access to our coach resources. Simplify your career management and focus on your development.',
+            points: [
+                "Advance your skills with career progression courses, and advanced technical systems.",
+                "Prepare for certifications with access to our coach resources.",
+                "Simplify your career management and focus on your development."
+            ],
             image: engineeringIcon,
         }
     ]
@@ -79,7 +93,9 @@ const Section2Engineering = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -88,48 +104,11 @@ const Section2Engineering = () => {
                             }}
                         >
                             <AnimatedBox>
-                                <Box sx={{ 
-                                    px: "36px", 
-                                    py: "46px", 
-                                    display: "flex", 
-                                    background: "#E6EFF28A", 
-                                    borderRadius: '13px', 
-                                    flexDirection: "column", 
-                                    gap: "10px", 
-                                    justifyContent: "space-between",
-                                    height: "100%",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
-                                        background: "#E6EFF2",
-                                    }
-                                }}>
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                        <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "76px", height: "76px" }}/>
-                                        </AnimatedIcon>
-                                        <Box>
-                                            <SecondaryHeadingText>
-                                                {item.title}
-                                            </SecondaryHeadingText>
-                                            <SecondarySubTextBlack>
-                                                {item.description}
-                                            </SecondarySubTextBlack>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <AnimatedButton
-                                            sx={{
-                                                width: '171px',
-                                                height: '48px',
-                                                borderRadius: "6px",
-                                            }}
-                                        >
-                                            <ButtonTypography sx={{ color: "white", fontWeight: 600, fontSize: '16px' }}>Learn More</ButtonTypography>
-                                        </AnimatedButton>
-                                    </Box>
-                                </Box>
+                                <SectionPointCard
+                                    image={item.image}
+                                    title={item.title}
+                                    points={item.points}
+                                />
                             </AnimatedBox>
                         </Grid>
                     ))}

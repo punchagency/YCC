@@ -184,8 +184,8 @@ const SecondarySubText = styled(Typography)({
 const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px",
-    lineHeight: "22.51px",
+    fontSize: "18px",
+    lineHeight: "148%",
     letterSpacing: "0%",
     color: "#373737",
     textAlign: { xs: "center", md: "left" },
