@@ -19,7 +19,7 @@ const ChefGalleryLandingPage = () => {
     );
     const subtext2 = 'From gourmet provisioning to top-tier galley equipment, discover everything you need to elevate onboard dining.'
     const button1 = {
-        text: 'Join Our Crew Network',
+        text: 'Join Now',
         path: '/get-started'
     }
 

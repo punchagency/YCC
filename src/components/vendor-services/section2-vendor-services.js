@@ -1,9 +1,9 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, styled, Container, Grid, Badge } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import { ButtonTypography, linearGradient } from '../landing-page-info-section'
+import { linearGradient } from '../landing-page-info-section'
 import SectionPointCard from '../section-point-card'
 
 const Section2VendorServices = () => {
@@ -105,10 +105,10 @@ const Section2VendorServices = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
-                                height: "100%"
+                                textAlign: "left",
                             }}
                         >
-                            <AnimatedBox sx={{ height: "100%" }}>
+                            <AnimatedBox>
                                 <SectionPointCard
                                     image={item.image}
                                     title={item.title}
@@ -126,6 +126,7 @@ const Section2VendorServices = () => {
 
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%", // Ensure the box stretches to fill grid item height
     transition: "transform 0.3s ease-in-out",
 });
 

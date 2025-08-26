@@ -19,7 +19,7 @@ const ContactUs = () => {
     );
     const subtext2 = "Have questions or need specialized assistance? Connect with our dedicated team for personalized support. Tailored specifically for the Yachting community."
     const button1 = {
-        text: 'Join Our Crew Network',
+        text: 'Join Now',
         path: '/get-started'
     }
     return (

@@ -36,7 +36,7 @@ const Section3Home = () => {
                     }}
                 >
                     <Box>
-                        <HeadingText>Book the Best Vendors & Suppliers Instantly with Our AI Agent!</HeadingText>
+                        <HeadingText>Let our Business Management tools and AI Agentic workflows manage your operations.</HeadingText>
                     </Box>
 
                     <Box>
