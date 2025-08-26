@@ -1,11 +1,8 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CloseIcon from '@mui/icons-material/Close';
-import { useTranslation } from "react-i18next";
 
 const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
-  const { t } = useTranslation();
-
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
       onHide();
@@ -194,7 +191,7 @@ const NotificationDetailsModal = ({ visible, onHide, notificationData }) => {
                     fontWeight: '600',
                     color: '#1F2937',
                   }}>
-                    {t("Notification Details")}
+                    Notification Details
                   </h2>
                   <p style={{
                     margin: '4px 0 0 0',
