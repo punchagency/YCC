@@ -119,6 +119,7 @@ const Section2ChefGallery = () => {
 
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%",
     transition: "transform 0.3s ease-in-out",
 });
 

@@ -15,6 +15,7 @@ const LandingPageExitCard = ({ sectionData }) => {
                     backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
                     display: 'flex',
+                    // backgroundColor: "#02214B",
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',

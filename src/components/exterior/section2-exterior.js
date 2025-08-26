@@ -1,12 +1,15 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, Button, styled, Container, Grid, Badge, useMediaQuery, useTheme } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
 import { linearGradient } from '../landing-page-header'
 import SectionPointCard from '../section-point-card'
+import { MdHealthAndSafety } from "react-icons/md";
 
 const Section2Exterior = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const gridData = [
         {
             title: "Essential Maintenance",
@@ -22,7 +25,8 @@ const Section2Exterior = () => {
                 "Maintain stock of essential safety gear, including life jackets, EPIRB's, PLB's and fire suppression with services available worldwide.",
                 "Access resources on flag state regulations and maritime safety standards to ensure safety and compliance."
             ],
-            image: crewIcon,
+            image: undefined,
+            icon: <MdHealthAndSafety size={isMobile ? "25px" : "37.57px"} color='#fff' />,
         },
         {
             title: "Advance Your Career as an Exterior Yacht Crewmen",
@@ -109,6 +113,7 @@ const Section2Exterior = () => {
                                     image={item.image}
                                     title={item.title}
                                     points={item.points}
+                                    icon={item.icon}
                                 />
                             </AnimatedBox>
                         </Grid>
@@ -121,6 +126,7 @@ const Section2Exterior = () => {
 
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%", // Ensure the box stretches to fill grid item height
     transition: "transform 0.3s ease-in-out",
 });
 

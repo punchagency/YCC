@@ -12,9 +12,10 @@ const Section4Home = () => {
         }}>
             <Box
                 sx={{
-                    backgroundImage: `url(${banner})`,
+                    // backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
+                    backgroundColor: "#02214B",
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -53,7 +54,7 @@ const Section4Home = () => {
                                     <ButtonTypography
                                         sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
                                     >
-                                        Join Our Network Now
+                                        Join Now
                                     </ButtonTypography>
                                 </GradientButton>
                             </Link>
@@ -127,12 +128,12 @@ const Section4Home = () => {
                                     </Box>
 
                                     <HeadingTextBlack>
-                                        Expert Advice, Tips, And Trends for Yachting Professionals
+                                        Access our Resource Center and see our Yachting Marketplace
                                     </HeadingTextBlack>
                                 </Box>
-                                <SecondarySubTextBlack>
+                                {/* <SecondarySubTextBlack>
                                     Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you're managing operations or advancing your career, our blog is your resource for success.
-                                </SecondarySubTextBlack>
+                                </SecondarySubTextBlack> */}
 
                                 <Box sx={{ padding: { xs: "0 20px 0 20px", md: "0 0 0 0" } }}>
                                     <Link to='/resource-center' style={{ textDecoration: 'none' }}>

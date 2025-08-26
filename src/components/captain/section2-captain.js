@@ -1,9 +1,9 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, styled, Container, Grid, Badge } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import { ButtonTypography, linearGradient } from '../landing-page-header'
+import { linearGradient } from '../landing-page-header'
 import SectionPointCard from '../section-point-card'
 
 const Section2Captain = () => {
@@ -35,7 +35,7 @@ const Section2Captain = () => {
         {
             title: "Stay Ahead of the Game",
             points: [
-                "Keep your skills sharp with tools for social media & promotion.",
+                "Follow how AI is poised to bring the next era of Yacht Management.",
                 "Learn what AI can do for your vessel. Explore the future of a Globally Connected Network.",
             ],
             image: shipIcon,
@@ -117,42 +117,10 @@ const Section2Captain = () => {
     )
 }
 
-const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
-
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%", // Ensure the box stretches to fill grid item height
     transition: "transform 0.3s ease-in-out",
-});
-
-const AnimatedIcon = styled(Box)({
-    transition: "transform 0.3s ease-in-out",
-    // "&:hover": {
-    //     transform: "scale(1.1) rotate(5deg)",
-    // }
-});
-
-const AnimatedButton = styled(Button)({
-    background: linearGradient,
-    fontSize: "16px",
-    fontFamily: "Inter, sans-serif",
-    textTransform: "none",
-    padding: "15px 41px",
-    transition: "all 0.3s ease-in-out",
-    "&:hover": {
-        background: linearGradient2,
-        transform: "translateY(-3px)",
-        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
-    },
-});
-
-const SecondarySubTextBlack = styled(Typography)({
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontSize: "18px",
-    lineHeight: "26.55px",
-    letterSpacing: "0%",
-    color: "#373737",
-    marginTop: "10px",
 });
 
 const HeadingText = styled(Typography)(({ theme }) => ({

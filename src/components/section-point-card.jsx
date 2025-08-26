@@ -4,6 +4,7 @@ import checkIcon from '../assets/images/ckeckIcon.svg';
 
 const SectionPointCard = ({
     image,
+    icon,
     title = "Essential Maintenance",
     points = [
         "Discover expert techniques for teak care, hull cleaning, and polishing.",
@@ -22,8 +23,8 @@ const SectionPointCard = ({
                 borderRadius: '13px',
                 flexDirection: "column",
                 gap: "10px",
-                justifyContent: "space-between",
-                height: "100%",
+                // justifyContent: "space-between",
+                height: "100%", // Changed from "auto" to "100%" to fill grid item height
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                     transform: "translateY(-10px)",
@@ -33,18 +34,33 @@ const SectionPointCard = ({
                 [theme.breakpoints.down("md")]: {
                     px: "20px",
                     py: "20px",
+                    height: "auto", // Keep auto height on mobile for better mobile experience
                 }
             }}
         >
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <AnimatedIcon>
+                    {image ? <img src={image} alt={title} style={{ width: isMobile ? "50px" : "76px", height: isMobile ? "50px" : "76px" }} /> : (
+                        <Box sx={{
+                            width: isMobile ? "50px" : "76px",
+                            height: isMobile ? "50px" : "76px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            backgroundColor: "#02214B",
+                            borderRadius: "50%",
+                        }}>
+                            {icon}
+                        </Box>
+                    )}
+                </AnimatedIcon>
 
-            <AnimatedIcon>
-                <img src={image} alt={title} style={{ width: isMobile ? "50px" : "76px", height: isMobile ? "50px" : "76px" }} />
-            </AnimatedIcon>
+                {/* Title */}
+                <SecondaryHeadingText>
+                    {title}
+                </SecondaryHeadingText>
+            </div>
 
-            {/* Title */}
-            <SecondaryHeadingText>
-                {title}
-            </SecondaryHeadingText>
 
             {/* Points List */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

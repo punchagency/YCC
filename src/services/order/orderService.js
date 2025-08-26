@@ -261,10 +261,19 @@ export const deleteOrder = async (orderId) => {
 };
 
 // Get order summary
-export const getOrderSummary = async () => {
+export const getOrderSummary = async (query = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/orders?limit=5`, {
+    const { page = 1, limit = 5, status, filter, search, sort } = query;
+    
+    const params = { page, limit };
+    if (status) params.status = status;
+    if (filter) params.filter = typeof filter === 'object' ? JSON.stringify(filter) : filter;
+    if (search) params.search = search;
+    if (sort) params.sort = typeof sort === 'object' ? JSON.stringify(sort) : sort;
+    
+    const response = await axios.get(`${API_URL}/orders`, {
       headers: getAuthHeader(),
+      params
     });
 
     return {

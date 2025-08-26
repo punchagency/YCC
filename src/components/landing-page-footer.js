@@ -43,14 +43,7 @@ const LandingPageFooter = () => {
         { name: "Interior", path: "/interior" },
         { name: "Exterior", path: "/exterior" },
       ],
-    },
-    {
-      title: "CONTACTS",
-      links: [
-        { name: "contact@yachtcrewcenter.com", path: "mailto:contact@yachtcrewcenter.com" },
-        { name: "+1 954 532 0550", path: "tel:+19545320550" },
-      ],
-    },
+    }
   ];
 
   return (
@@ -152,9 +145,9 @@ const LandingPageFooter = () => {
                     <SocialIconLink href=" https://www.instagram.com/yachtcrewcenter" target="_blank" rel="noopener noreferrer">
                       <InstagramIcon sx={{ color: "white" }} />
                     </SocialIconLink>
-                    <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                    {/* <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
                       <YouTubeIcon sx={{ color: "white" }} />
-                    </SocialIconLink>
+                    </SocialIconLink> */}
                     <SocialIconLink href="https://www.linkedin.com/company/106474229/dashboard/" target="_blank" rel="noopener noreferrer">
                       <LinkedInIcon sx={{ color: "white" }} />
                     </SocialIconLink>
