@@ -122,6 +122,7 @@ const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%", // Ensure the box stretches to fill grid item height
     transition: "transform 0.3s ease-in-out",
 });
 

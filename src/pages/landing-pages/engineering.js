@@ -20,7 +20,7 @@ const EngineeringLandingPage = () => {
     );
     const subtext2 = 'From maintenance resources to technical training, find everything you need to keep yachts running at peak performance.'
     const button1 = {
-        text: 'Join Our Crew Network',
+        text: 'Join Now',
         path: '/get-started'
     }
 

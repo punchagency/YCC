@@ -61,7 +61,7 @@ const LeftMenu = ({ isCollapsed, setIsCollapsed }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("id");
         localStorage.removeItem("user");
-        window.location.href = "/login";
+        window.location.href = "/";
       },
       footer: (options) => (
         <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>

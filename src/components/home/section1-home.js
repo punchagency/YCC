@@ -57,13 +57,13 @@ const Section1Home = () => {
                         >
                         Welcome to the future of yachting support. This AI Assistant is designed to empower all Crew member, Captain, Engineer, Chef, Exterior and Interior teams alike. Whether you’re seeking answers to complex questions, service providers, suppliers or retrieving yacht-specific information.
                         </SecondarySubTextBlack>
-                        <SecondarySubTextBlack variant='body1'
+                        {/* <SecondarySubTextBlack variant='body1'
                             sx={{
                                 fontSize: "18px",
                             }}
                         >
                             Our AI Assistant delivers instant, accurate support tailored to your needs. Ready to experience the power of the AI Assistant? Ask a question now and get tailored solutions in seconds!
-                        </SecondarySubTextBlack>
+                        </SecondarySubTextBlack> */}
                     </Grid>
                 </Grid>
 

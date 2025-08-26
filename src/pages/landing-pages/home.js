@@ -21,7 +21,7 @@ const HomeLandingPage = () => {
       <GradientText>Vessel</GradientText> Management
     </>
   );
-  const subtext1 = 'Find local service providers and order your departments supplies. Through our AI supported Global Network. No matter the ask or the time Yacht Crew Center is here to help you succeed.'
+  const subtext1 = 'Find local service providers and order your departments supplies. Through our AI supported Global Assistant. No matter the ask or the time Yacht Crew Center is here to help you succeed.'
   const subtext2 = 'Welcome to Yacht Crew Center, LLC —the trusted hub for Yachting professionals worldwide. Founded by yacht crew for yacht crew, our platform combines industry expertise, personalized support, and global reach to empower your career and simplify vessel management. Whatever your position, Yacht Crew Center is here to help you succeed on and off the water.'
   const button1 = {
     text: 'About Yacht Crew Center',

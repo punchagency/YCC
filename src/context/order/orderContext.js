@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import { getOrders, getOrderSummary } from "../../services/order/orderService";
 
 const OrderContext = createContext();
@@ -14,13 +14,15 @@ export const useOrder = () => {
 
 export const OrderProvider = ({ children }) => {
     const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [orderSummary, setOrderSummary] = useState({});
 
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         try {
+            setLoading(true);
+            setError(null);
             const response = await getOrders();
             setOrders(response.data);
         } catch (error) {
@@ -28,18 +30,20 @@ export const OrderProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };  
+    }, []);
 
-    const fetchOrderSummary = async () => {
+    const fetchOrderSummary = useCallback(async (query) => {
         try {
-            const response = await getOrderSummary();
+            setLoading(true);
+            setError(null);
+            const response = await getOrderSummary(query);
             setOrderSummary(response.data.data);
         } catch (error) {
             setError(error);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
 
     const value = {

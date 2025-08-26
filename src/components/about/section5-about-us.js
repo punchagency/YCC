@@ -18,10 +18,11 @@ const Section5AboutUs = () => {
         }}>
             <Box
                 sx={{
-                    backgroundImage: `url(${banner})`,
+                    // backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     display: 'flex',
+                    backgroundColor: "#02214B",
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -45,7 +46,7 @@ const Section5AboutUs = () => {
                         width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
                     }}>
-                        <Box 
+                        {/* <Box 
                             onClick={handleOpen}
                             sx={{ 
                                 cursor: 'pointer',
@@ -67,7 +68,7 @@ const Section5AboutUs = () => {
                             }}
                         >
                             <img src={playIcon} alt="play" width='91px' height='91px' />
-                        </Box>
+                        </Box> */}
 
                         <Box>
                             <HeadingText>Our Mission</HeadingText>
