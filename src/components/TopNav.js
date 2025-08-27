@@ -58,7 +58,8 @@ const TopNav = ({ isOpen, onClose, role = "admin" }) => {
       rejectLabel: "Cancel",
       accept: () => {
         localStorage.removeItem("token");
-        navigate("/login");
+        localStorage.removeItem("user");
+        navigate("/");
       },
       reject: () => { },
       footer: (options) => (
