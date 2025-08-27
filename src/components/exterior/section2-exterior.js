@@ -1,30 +1,49 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, Button, styled, Container, Grid, Badge, useMediaQuery, useTheme } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
-import { ButtonTypography, linearGradient } from '../landing-page-header'
+import { linearGradient } from '../landing-page-header'
+import SectionPointCard from '../section-point-card'
+import { MdHealthAndSafety } from "react-icons/md";
 
 const Section2Exterior = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const gridData = [
         {
             title: "Essential Maintenance",
-            description: 'Discover expert techniques for teak care, hull cleaning, and polishing. Simplify your Exterior Department management with service bookings and a worldwide supply network.',
+            points: [
+                "Discover expert techniques for teak care, hull cleaning, and polishing.",
+                "Simplify your Exterior Department management with service bookings and a worldwide supply network."
+            ],
             image: shipIcon,
         },
         {
             title: "Safety and Compliance",
-            description: "Maintain stock of essential safety gear, including life jackets, EPIRB's, PLB's and fire suppression with services available worldwide. Access resources on flag state regulations and maritime safety standards to ensure safety and compliance.",
-            image: crewIcon,
+            points: [
+                "Maintain stock of essential safety gear, including life jackets, EPIRB's, PLB's and fire suppression with services available worldwide.",
+                "Access resources on flag state regulations and maritime safety standards to ensure safety and compliance."
+            ],
+            image: undefined,
+            icon: <MdHealthAndSafety size={isMobile ? "25px" : "37.57px"} color='#fff' />,
         },
         {
             title: "Advance Your Career as an Exterior Yacht Crewmen",
-            description: 'Build your skills with training resources on deck maintenance, safety procedures and access to career advancing certifications. Join our Preferred Crew Network to connect with service providers. Access department management tools wherever you are.',
+            points: [
+                "Build your skills with training resources on deck maintenance, safety procedures and access to career advancing certifications.",
+                "Join our Preferred Crew Network to connect with service providers.",
+                "Access department management tools wherever you are."
+            ],
             image: shipIcon,
         },
         {
             title: "Elevate Guest Experiences with Watersports Expertise",
-            description: 'Explore top-tier watersports equipment, from jet skis to paddleboards, to keep guests entertained. Gain watersport expertise for dynamic guest experiences. Expand your exterior capabilities.',
+            points: [
+                "Explore top-tier watersports equipment, from jet skis to paddleboards, to keep guests entertained.",
+                "Gain watersport expertise for dynamic guest experiences.",
+                "Expand your exterior capabilities."
+            ],
             image: engineeringIcon,
         }
     ]
@@ -79,7 +98,9 @@ const Section2Exterior = () => {
                         <Grid
                             item
                             xs={12}
-                            sm={6}
+                            sm={12}
+                            md={6}
+                            lg={6}
                             key={index}
                             sx={{
                                 display: "flex",
@@ -88,42 +109,12 @@ const Section2Exterior = () => {
                             }}
                         >
                             <AnimatedBox>
-                                <Box sx={{ 
-                                    px: 4, 
-                                    py: 7, 
-                                    display: "flex", 
-                                    background: "#E6EFF28A", 
-                                    borderRadius: '13px', 
-                                    flexDirection: "column", 
-                                    gap: "28px", 
-                                    justifyContent: "space-between",
-                                    height: "100%",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
-                                        background: "#E6EFF2",
-                                    }
-                                }}>
-                                    <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
-                                        <AnimatedIcon>
-                                            <img src={item.image} alt={item.title} style={{ width: "48px", height: "48px" }}/>
-                                        </AnimatedIcon>
-                                        <Box>
-                                            <SecondaryHeadingText>
-                                                {item.title}
-                                            </SecondaryHeadingText>
-                                            <SecondarySubTextBlack>
-                                                {item.description}
-                                            </SecondarySubTextBlack>
-                                        </Box>
-                                    </Box>
-                                    <Box>
-                                        <AnimatedButton>
-                                            <ButtonTypography sx={{ color: "white" }}>Learn More</ButtonTypography>
-                                        </AnimatedButton>
-                                    </Box>
-                                </Box>
+                                <SectionPointCard
+                                    image={item.image}
+                                    title={item.title}
+                                    points={item.points}
+                                    icon={item.icon}
+                                />
                             </AnimatedBox>
                         </Grid>
                     ))}
@@ -133,41 +124,10 @@ const Section2Exterior = () => {
     )
 }
 
-const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
-
 const AnimatedBox = styled(Box)({
     width: "100%",
+    height: "100%", // Ensure the box stretches to fill grid item height
     transition: "transform 0.3s ease-in-out",
-});
-
-const AnimatedIcon = styled(Box)({
-    transition: "transform 0.3s ease-in-out",
-    "&:hover": {
-        transform: "scale(1.1) rotate(5deg)",
-    }
-});
-
-const AnimatedButton = styled(Button)({
-    background: linearGradient,
-    fontSize: "16px",
-    fontFamily: "Inter, sans-serif",
-    textTransform: "none",
-    padding: "15px 41px",
-    transition: "all 0.3s ease-in-out",
-    "&:hover": {
-        background: linearGradient2,
-        transform: "translateY(-3px)",
-        boxShadow: "0 5px 15px rgba(4, 135, 217, 0.3)",
-    },
-});
-
-const SecondarySubTextBlack = styled(Typography)({
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontSize: "18px",
-    lineHeight: "26.55px",
-    letterSpacing: "0%",
-    color: "#373737",
 });
 
 const HeadingText = styled(Typography)(({ theme }) => ({
@@ -185,15 +145,6 @@ const HeadingText = styled(Typography)(({ theme }) => ({
     letterSpacing: "-2%",
     textAlign: "center",
 }));
-
-const SecondaryHeadingText = styled(Typography)({
-    color: "#131313",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "30px",
-    lineHeight: "36.6px",
-    letterSpacing: "1%",
-});
 
 const GradientText = styled(Typography)({
     background: linearGradient,

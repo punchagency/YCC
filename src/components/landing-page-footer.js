@@ -15,6 +15,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import TermsModal from "./TermsModal";
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const LandingPageFooter = () => {
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
@@ -23,7 +24,7 @@ const LandingPageFooter = () => {
 
   const footerData = [
     {
-      title: "Quick Links",
+      title: "QUICK LINKS",
       links: [
         { name: "Home", path: "/" },
         { name: "Vendor & Services", path: "/vendor-services" },
@@ -33,7 +34,7 @@ const LandingPageFooter = () => {
       ],
     },
     {
-      title: "Departments",
+      title: "DEPARTMENTS",
       links: [
         { name: "Captain", path: "/captain" },
         { name: "Chef/Galley", path: "/chef-galley" },
@@ -42,7 +43,7 @@ const LandingPageFooter = () => {
         { name: "Interior", path: "/interior" },
         { name: "Exterior", path: "/exterior" },
       ],
-    },
+    }
   ];
 
   return (
@@ -65,9 +66,10 @@ const LandingPageFooter = () => {
     >
       <Container maxWidth="lg">
         <Grid container spacing={3} sx={{ py: 4 }}>
+          
           <Grid item xs={12} md={4}>
-            <Box sx={{ 
-              display: 'flex', 
+            <Box sx={{
+              display: 'flex',
               flexDirection: 'column',
               alignItems: { xs: 'center', md: 'flex-start' },
               gap: 2
@@ -85,59 +87,44 @@ const LandingPageFooter = () => {
 
           <Grid item xs={12} md={8}>
             <Grid container spacing={3}>
-              <Grid item xs={6}>
-                <Box>
-                  <FooterHeadingTypography>{footerData[0].title}</FooterHeadingTypography>
-                  <List>
-                    {footerData[0].links.map((linkItem, idx) => (
-                      <ListItem
-                        key={idx}
-                        component={Link}
-                        to={linkItem.path}
-                        sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
-                      >
-                        <FooterTypography>{linkItem.name}</FooterTypography>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              </Grid>
-              <Grid item xs={6}>
-                <Box>
-                  <FooterHeadingTypography>{footerData[1].title}</FooterHeadingTypography>
-                  <List>
-                    {footerData[1].links.map((linkItem, idx) => (
-                      <ListItem
-                        key={idx}
-                        component={Link}
-                        to={linkItem.path}
-                        sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
-                      >
-                        <FooterTypography>{linkItem.name}</FooterTypography>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              </Grid>
+              {footerData.map((item, idx) => (
+                <Grid item key={idx} xs={12} md={4}>
+                  <Box>
+                    <FooterHeadingTypography>{item.title}</FooterHeadingTypography>
+                    <List>
+                      {item.links.map((linkItem, idx) => (
+                        <ListItem
+                          key={idx}
+                          component={Link}
+                          to={linkItem.path}
+                          sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
+                        >
+                          <FooterTypography>{linkItem.name}</FooterTypography>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
+                </Grid>
+              ))}
             </Grid>
           </Grid>
 
           <Grid item xs={12}>
-            <Box sx={{ 
+            <Box sx={{
               borderTop: '1px solid rgba(255,255,255,0.1)',
               mt: 3,
               pt: 3,
             }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
-                  <Box sx={{ 
+                  <Box sx={{
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: 'row' },
                     alignItems: { xs: 'center', md: 'flex-start' },
                     gap: { xs: '10px', sm: '0' },
                   }}>
                     <CopyrightText>
-                      © 2025 SC Yacht Crew Center LLC . All Rights Reserved.
+                      © {new Date().getFullYear()} SC Yacht Crew Center LLC . All Rights Reserved.
                     </CopyrightText>
                     <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, mx: 2, color: '#E0E0E0' }}>|</Box>
                     <FooterButton onClick={() => navigate("/terms-and-conditions")}>Terms and Conditions</FooterButton>
@@ -158,8 +145,11 @@ const LandingPageFooter = () => {
                     <SocialIconLink href=" https://www.instagram.com/yachtcrewcenter" target="_blank" rel="noopener noreferrer">
                       <InstagramIcon sx={{ color: "white" }} />
                     </SocialIconLink>
-                    <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
+                    {/* <SocialIconLink href="https://youtube.com" target="_blank" rel="noopener noreferrer">
                       <YouTubeIcon sx={{ color: "white" }} />
+                    </SocialIconLink> */}
+                    <SocialIconLink href="https://www.linkedin.com/company/106474229/dashboard/" target="_blank" rel="noopener noreferrer">
+                      <LinkedInIcon sx={{ color: "white" }} />
                     </SocialIconLink>
                   </Box>
                 </Grid>
@@ -203,19 +193,21 @@ const FooterHeadingTypography = styled(Typography)({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 600,
   fontSize: "20px",
-  lineHeight: "24px",
+  lineHeight: "120%",
   letterSpacing: "0%",
   color: "#FFFFFF",
-  whiteSpace: "nowrap"
+  whiteSpace: "nowrap",
+  textTransform: "uppercase",
+  textAlign: "start"
 });
 
 const FooterTypography = styled(Typography)(({ theme }) => ({
   fontFamily: "Plus Jakarta Sans",
   fontWeight: 400,
   fontSize: "16px",
-  lineHeight: "21px",
+  lineHeight: "24px",
   letterSpacing: "0%",
-  color: "#E0E0E0",
+  color: "#fff",
   transition: "all 0.3s ease-in-out",
   position: "relative",
   "&:hover": {
@@ -305,6 +297,7 @@ const CopyrightText = styled(Typography)(({ theme }) => ({
   lineHeight: "21px",
   letterSpacing: "0%",
   color: "#E0E0E0",
+  textAlign: "center",
   [theme.breakpoints.up("md")]: {
     whiteSpace: "nowrap",
   },

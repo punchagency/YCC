@@ -1,11 +1,9 @@
 import { Box, Tab, Tabs, Typography, styled } from "@mui/material";
-import { useState } from "react";
 import BasicTable from "./basic-table";
 import { useTheme } from "../../context/theme/themeContext";
 
-const CurrentOrderSummary = ({ orderSummary }) => {
+const CurrentOrderSummary = ({ orderSummary, onStatusChange, currentStatus }) => {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState('total');
 
   const summaryData = [
     {
@@ -26,34 +24,8 @@ const CurrentOrderSummary = ({ orderSummary }) => {
   ];
 
   const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
-
-  const getFilteredOrders = () => {
-    if (!orderSummary?.result) return [];
-    
-    switch (activeTab) {
-      case 'total':
-        return orderSummary.result;
-      case 'pending':
-        return orderSummary.result.filter(order => order.status === 'pending');
-      case 'completed':
-        return orderSummary.result.filter(order => order.status === 'completed');
-      default:
-        return orderSummary.result;
-    }
-  };
-
-  const getCurrentValue = () => {
-    switch (activeTab) {
-      case 'total':
-        return orderSummary.totalData;
-      case 'pending':
-        return orderSummary.pendingOrders;
-      case 'completed':
-        return orderSummary.completedOrders;
-      default:
-        return orderSummary.totalData;
+    if (onStatusChange) {
+      onStatusChange(newValue);
     }
   };
 
@@ -81,7 +53,7 @@ const CurrentOrderSummary = ({ orderSummary }) => {
         </DashBoardDescriptionText>
 
         <Tabs
-          value={activeTab}
+          value={currentStatus}
           onChange={handleTabChange}
           textColor="primary"
           indicatorColor="primary"
@@ -107,7 +79,7 @@ const CurrentOrderSummary = ({ orderSummary }) => {
 
         {/* Table */}
         <Box sx={{ marginTop: "10px" }}>
-          {orderSummary && <BasicTable orders={getFilteredOrders()} />}
+          {orderSummary && <BasicTable orders={orderSummary.result} />}
         </Box>
       </Box>
     </Box>
@@ -128,33 +100,6 @@ const DashBoardDescriptionText = styled(Typography)(({ mode }) => ({
   fontWeight: 400,
   fontSize: "12px",
   color: mode === "light" ? "#212121" : "white",
-}));
-
-const CurrentSummarySubText = styled(Typography)(({ mode }) => ({
-  fontFamily: "Plus Jakarta Sans",
-  fontWeight: 500,
-  fontSize: 14,
-  marginTop: "10px",
-  padding: 0,
-  letterSpacing: 0,
-  color: mode === "light" ? "#212121" : "white",
-}));
-
-const SummaryWidgetBox = styled(Box)(({ mode }) => ({
-  display: "flex",
-  width: "100%",
-  height: "100%",
-  gap: "10px",
-  paddingTop: 14,
-  paddingRight: 20,
-  paddingBottom: 14,
-  paddingLeft: 20,
-  borderRadius: 12,
-  boxShadow: "0px 1px 6px 0px #00000024",
-  textAlign: "center",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: mode === "light" ? "white" : "#7A7A7A",
 }));
 
 export default CurrentOrderSummary;

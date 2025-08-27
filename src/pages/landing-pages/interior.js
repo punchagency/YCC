@@ -20,7 +20,7 @@ const InteriorLandingPage = () => {
     );
     const subtext2 = 'From décor to hospitality, discover resources designed to help stewards and stewardesses create luxurious onboard experiences.'
     const button1 = {
-        text: 'Join Our Crew Network',
+        text: 'Join Now',
         path: '/get-started'
     }
     return (

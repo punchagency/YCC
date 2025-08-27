@@ -28,6 +28,7 @@ const CrewDashboard = () => {
     }
   };
   React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     fetchUnapprovedBookings();
   }, []);
 

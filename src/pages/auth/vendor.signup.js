@@ -76,10 +76,16 @@ const VendorSignup = () => {
   const [formData, setFormData] = useState({
     // Business Information
     businessName: "",
-    businessAddress: "",
+    address: {
+      street: "",
+      street2: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "",
+    },
     department: null,
     phone: "",
-    businessWebsite: "",
     email: "",
     taxId: "",
 

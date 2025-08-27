@@ -19,7 +19,7 @@ const backgroundImage = banner
   );
   const subtext2 = 'From compliance to guest experiences, access the resources you need to master every aspect of yacht operations.'
   const button1 = {
-    text: 'Join Our Crew Network',
+    text: 'Join Now',
     path: '/get-started'
 
   }

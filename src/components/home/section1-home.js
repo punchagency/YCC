@@ -50,12 +50,20 @@ const Section1Home = () => {
                             Meet Your AI Assistant for All Things Yachting
                         </HeadingText>
 
-                        <SecondarySubTextBlack variant='body1'>
+                        <SecondarySubTextBlack variant='body1'
+                            sx={{
+                                fontSize: "18px",
+                            }}
+                        >
                         Welcome to the future of yachting support. This AI Assistant is designed to empower all Crew member, Captain, Engineer, Chef, Exterior and Interior teams alike. Whether you’re seeking answers to complex questions, service providers, suppliers or retrieving yacht-specific information.
                         </SecondarySubTextBlack>
-                        <SecondarySubTextBlack variant='body1'>
+                        {/* <SecondarySubTextBlack variant='body1'
+                            sx={{
+                                fontSize: "18px",
+                            }}
+                        >
                             Our AI Assistant delivers instant, accurate support tailored to your needs. Ready to experience the power of the AI Assistant? Ask a question now and get tailored solutions in seconds!
-                        </SecondarySubTextBlack>
+                        </SecondarySubTextBlack> */}
                     </Grid>
                 </Grid>
 
@@ -71,10 +79,11 @@ const Section1Home = () => {
 export const SecondarySubTextBlack = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px",
-    lineHeight: "22.51px",
+    fontSize: "18px",
+    lineHeight: "128%",
     letterSpacing: "0%",
     color: "#373737",
+    textAlign: "justify",
 })
 
 const HeadingText = styled(Typography)(({ theme }) => ({

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState} from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 import { getInvoices } from "../../services/invoice/invoiceService";
 
 const InvoiceContext = createContext();
@@ -14,20 +14,24 @@ export const useInvoice = () => {
 
 export const InvoiceProvider = ({ children }) => {
     const [invoices, setInvoices] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
 
-    const fetchInvoices = async () => {
+    const fetchInvoices = useCallback(async (query) => {
         try {
-            const response = await getInvoices();
+            setLoading(true);
+            setError(null);
+            const response = await getInvoices({
+                ...query,
+            });
             setInvoices(response.data);
         } catch (error) {
             setError(error);
         } finally {
             setLoading(false);
         }
-    }; 
+    }, []);
 
     const value = {
         invoices,
