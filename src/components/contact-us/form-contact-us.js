@@ -5,11 +5,78 @@ import {
   Typography,
   styled,
   MenuItem,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
-// import { useState } from 'react'
+import { useState } from "react";
+import { sendContactMessage } from "../../services/contactService";
 
 const FormContactUs = () => {
-  // Remove all unused state variables
+  const [formValues, setFormValues] = useState({
+    fullName: "",
+    email: "",
+    subject: "",
+    location: "",
+    message: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [errorText, setErrorText] = useState("");
+  const [successText, setSuccessText] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const handleChange = (field) => (event) => {
+    setFormValues((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const validateClient = () => {
+    const { fullName, email, subject, message } = formValues;
+    if (
+      !fullName.trim() ||
+      !email.trim() ||
+      !subject.trim() ||
+      !message.trim()
+    ) {
+      return "Please fill in Full Name, Email, Subject, and Message.";
+    }
+    const simpleEmailRegex = /.+@.+\..+/;
+    if (!simpleEmailRegex.test(email.trim())) {
+      return "Please enter a valid email address.";
+    }
+    return "";
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setErrorText("");
+    setSuccessText("");
+    const validationError = validateClient();
+    if (validationError) {
+      setErrorText(validationError);
+      return;
+    }
+    try {
+      setSubmitting(true);
+      await sendContactMessage(formValues);
+      setSuccessText("Your message has been sent successfully.");
+      setOpenSnackbar(true);
+      setFormValues({
+        fullName: "",
+        email: "",
+        subject: "",
+        location: "",
+        message: "",
+      });
+    } catch (error) {
+      const serverMessage =
+        error?.response?.data?.error || error?.response?.data?.message;
+      const message =
+        serverMessage || error?.message || "Failed to send message.";
+      setErrorText(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const subjectOptions = [
     { label: "General Question", value: "General Question" },
@@ -80,6 +147,8 @@ const FormContactUs = () => {
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit}
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -91,10 +160,22 @@ const FormContactUs = () => {
         padding: "20px",
       }}
     >
+      {errorText ? (
+        <Typography color="error" sx={{ fontSize: "14px" }}>
+          {errorText}
+        </Typography>
+      ) : null}
+      {successText ? (
+        <Typography color="success.main" sx={{ fontSize: "14px" }}>
+          {successText}
+        </Typography>
+      ) : null}
       <TextField
         label="Full Name"
         variant="outlined"
         fullWidth
+        value={formValues.fullName}
+        onChange={handleChange("fullName")}
         sx={{
           backgroundColor: "white",
         }}
@@ -103,6 +184,8 @@ const FormContactUs = () => {
         label="Email"
         variant="outlined"
         fullWidth
+        value={formValues.email}
+        onChange={handleChange("email")}
         sx={{
           backgroundColor: "white",
         }}
@@ -112,6 +195,8 @@ const FormContactUs = () => {
         label="Subject"
         variant="outlined"
         fullWidth
+        value={formValues.subject}
+        onChange={handleChange("subject")}
         SelectProps={{
           MenuProps: {
             PaperProps: {
@@ -166,6 +251,8 @@ const FormContactUs = () => {
         label="Location"
         variant="outlined"
         fullWidth
+        value={formValues.location}
+        onChange={handleChange("location")}
         sx={{
           backgroundColor: "white",
         }}
@@ -176,13 +263,33 @@ const FormContactUs = () => {
         fullWidth
         multiline
         rows={7}
+        value={formValues.message}
+        onChange={handleChange("message")}
         sx={{
           backgroundColor: "white",
         }}
       />
-      <StyledButton>
-        <ButtonTypography sx={{ color: "white" }}>Submit</ButtonTypography>
+      <StyledButton type="submit" disabled={submitting}>
+        {submitting ? (
+          <CircularProgress size={22} sx={{ color: "white" }} />
+        ) : (
+          <ButtonTypography sx={{ color: "white" }}>Submit</ButtonTypography>
+        )}
       </StyledButton>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successText}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

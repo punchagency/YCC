@@ -20,7 +20,7 @@ const Section4Home = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: { xs: "500px", sm: "700px", md: "900px", lg: "1032px" },
+                    height: { xs: "500px", sm: "700px", md: "650px", lg: "718px" },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',
@@ -50,7 +50,11 @@ const Section4Home = () => {
 
                         <Box>
                             <Link to='/get-started'>
-                                <GradientButton>
+                                <GradientButton
+                                    sx={{
+                                        minWidth: "240px",
+                                    }}
+                                >
                                     <ButtonTypography
                                         sx={{ fontSize: "14px", fontWeight: "600", color: "white" }}
                                     >
@@ -180,6 +184,7 @@ const SecondarySubText = styled(Typography)({
     lineHeight: "22.51px",
     letterSpacing: "0%",
     color: "white",
+    textAlign: "center",
 })
 
 const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({

@@ -18,66 +18,66 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     xs: "100vh", // Reduce height on smaller screens
                     sm: "100vh",
                     md: "100vh",
-                  },
+                },
                 maxHeight: '100vh',
                 width: "100%",
                 padding: {
                     xs: "0", // Add padding for mobile
                     md: "0", // Remove padding for desktop
-                  },
+                },
                 marginTop: {
                     xs: '0',
                     md: '0'
                 },
             }}
         >
-{
+            {
 
-    page==='home'?(   
-        <>
-                 {/* First Box - 75% of the parent, starting from the left */}
-        <Box
-            sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "70.3%",
-                height: "100%",
-                background: "radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.9) 20%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%)",
-                filter: "blur(30.8px)",
-            }}
-        />
+                page === 'home' ? (
+                    <>
+                        {/* First Box - 75% of the parent, starting from the left */}
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "70.3%",
+                                height: "100%",
+                                background: "radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.9) 20%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0) 100%)",
+                                filter: "blur(30.8px)",
+                            }}
+                        />
 
-        {/* Second Box - Covers 50% of the parent width */}
-        <Box
-            sx={{
-                position: "absolute",
-                top: "0", // Adjust this so it doesn't overlap
-                left: 0,
-                width: "55%", // Covers 50% of the parent
-                height: "95%",
-                background: "radial-gradient(ellipse at bottom right, rgba(0, 0, 0, 0.9) 70%, rgba(0, 0, 0, 0.3) 100%, rgba(0, 0, 0, 0) 100%)",
-                filter: "blur(30.8px)",
-                alignItems: "center",
-                justifyContent: "center",
-            }}
-        />
-        </>
-): (
+                        {/* Second Box - Covers 50% of the parent width */}
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: "0", // Adjust this so it doesn't overlap
+                                left: 0,
+                                width: "55%", // Covers 50% of the parent
+                                height: "95%",
+                                background: "radial-gradient(ellipse at bottom right, rgba(0, 0, 0, 0.9) 70%, rgba(0, 0, 0, 0.3) 100%, rgba(0, 0, 0, 0) 100%)",
+                                filter: "blur(30.8px)",
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        />
+                    </>
+                ) : (
 
-    <Box
-    sx={{
-        position: "absolute",
-        top: 0, // Adjust this so it doesn't overlap
-        left: 0,
-        width: "92%", // Covers 92% of the parent
-        height: "100%",
-        background: "linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 100%);",
-    }}
-/>
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            top: 0, // Adjust this so it doesn't overlap
+                            left: 0,
+                            width: "92%", // Covers 92% of the parent
+                            height: "100%",
+                            background: "linear-gradient(90deg, #000000 0%, rgba(0, 0, 0, 0) 100%);",
+                        }}
+                    />
 
-)
-}
+                )
+            }
 
 
 
@@ -90,33 +90,33 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                 top: {
                     xs: "50%", // Adjust for better centering on small screens
                     md: "60%",
-                  },
-                  left: {
+                },
+                left: {
                     xs: "50%", // Center on mobile
                     md: "40%", // Keep original positioning for larger screens
                     lg: "30%",
-                  },
-                  transform: {
+                },
+                transform: {
                     xs: "translate(-50%, -50%)", // Full centering on mobile
                     md: "translate(-50%, -50%)",
-                  },
-                  textAlign: {
+                },
+                textAlign: {
                     xs: "center", // Center text on mobile
                     md: "left",
-                  },
-                  width: '90%',
-                  maxWidth: {
+                },
+                width: '90%',
+                maxWidth: {
                     xs: "100%", // Reduce width on small screens
                     sm: "80%",
                     md: "690px", // Keep original for larger screens
-                  },
-                  padding: {
+                },
+                padding: {
                     xs: "10px", // Add padding on small screens
                     md: "0",
-                  },
+                },
 
             }}>
-                <Box sx={{ display: "flex",width: '100%', flexDirection: "column", gap: "14px"}}>
+                <Box sx={{ display: "flex", width: '100%', flexDirection: "column", gap: "14px" }}>
                     <Typography sx={{
                         color: "white",
                         fontFamily: "Plus Jakarta Sans, sans-serif",
@@ -126,33 +126,36 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                             sm: "35px",  // Slightly bigger for small tablets
                             md: "40px",  // Medium screens
                             lg: "50px",  // Default for large screens
-                          },
-                          lineHeight: {
+                        },
+                        lineHeight: {
                             xs: "38px", // Smaller line height for mobile
                             sm: "45px", // Medium screens
                             md: "52px", // Larger screens
                             lg: "60px", // Default for large screens
-                          },
+                        },
                         letterSpacing: "-2%",
                         textTransform: "uppercase",
                     }}>
-                        { header }
+                        {header}
                     </Typography>
 
-                    <PrimarySubText sx={{ display: {xs: 'none', md: 'flex'} }} >
-                        { subtext1 }
+                    <PrimarySubText sx={{ display: { xs: 'none', md: 'flex' } }} >
+                        {subtext1}
                     </PrimarySubText>
                 </Box>
                 {subtext2 && <SecondarySubText>
                     {subtext2}
                 </SecondarySubText>}
 
-              { button1 && <Box sx={{ display: "flex",  gap: button2 ? "15px" : 0, justifyContent: {xs: 'center', md: 'start'} }}>
+                {button1 && <Box sx={{ display: "flex", gap: button2 ? "15px" : 0, justifyContent: { xs: 'center', md: 'start' } }}>
                     <Link to={button1.path}>
-                    <GradientButton>
-                        <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography></GradientButton>
-                        </Link>
-                  {button2 &&   <Button variant='outlined' component={Link} to={button2.path}
+                        <GradientButton sx={{
+                            minWidth: "240px"
+                        }}>
+                            <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography>
+                        </GradientButton>
+                    </Link>
+                    {button2 && <Button variant='outlined' component={Link} to={button2.path}
 
                         sx={{
                             position: "relative",
@@ -198,9 +201,9 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         }}
 
                     >
-                        <ButtonTypography 
+                        <ButtonTypography
                             className="button-text"
-                            sx={{ 
+                            sx={{
                                 color: "white",
                                 transition: "color 0.3s ease-in-out"
                             }}
@@ -208,8 +211,8 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                             {button2.text}
                         </ButtonTypography>
                     </Button>
-                  }
-                </Box>   }   
+                    }
+                </Box>}
             </Box>
 
         </Box >
