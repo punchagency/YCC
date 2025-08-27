@@ -23,6 +23,10 @@ const ProtectedRoute = ({ children, requiredRoles = [] }) => {
       return <Navigate to="/crew/dashboard" replace />;
     } else if (userRole === "admin") {
       return <Navigate to="/admin/dashboard" replace />;
+    } else if (userRole === "supplier") {
+      return <Navigate to="/supplier/dashboard" replace />;
+    } else if (userRole === "service_provider") {
+      return <Navigate to="/service-provider/dashboard" replace />;
     } else {
       return <Navigate to="/login" replace />;
     }

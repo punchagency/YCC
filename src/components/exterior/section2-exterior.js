@@ -1,7 +1,6 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Typography, styled, Container, Grid, Badge, useMediaQuery, useTheme } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
-import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
 import { linearGradient } from '../landing-page-header'
 import SectionPointCard from '../section-point-card'
@@ -29,20 +28,18 @@ const Section2Exterior = () => {
             icon: <MdHealthAndSafety size={isMobile ? "25px" : "37.57px"} color='#fff' />,
         },
         {
-            title: "Advance Your Career as an Exterior Yacht Crewmen",
+            title: "Advance Your Career",
             points: [
-                "Build your skills with training resources on deck maintenance, safety procedures and access to career advancing certifications.",
-                "Join our Preferred Crew Network to connect with service providers.",
-                "Access department management tools wherever you are."
+                "Build your skills with training resources, on deck maintenance, safety procedures and access to career advancing resources.",
+                "Join our Network to connect with service providers. Access department management tools wherever you are.",
             ],
             image: shipIcon,
         },
         {
-            title: "Elevate Guest Experiences with Watersports Expertise",
+            title: "Access your personal AI assistant",
             points: [
-                "Explore top-tier watersports equipment, from jet skis to paddleboards, to keep guests entertained.",
-                "Gain watersport expertise for dynamic guest experiences.",
-                "Expand your exterior capabilities."
+                "Let our system streamline your operations on a daily basis. ",
+                "Your AI Assistant improves on every interaction. So it becomes personally tailored to you and your department.",
             ],
             image: engineeringIcon,
         }

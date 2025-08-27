@@ -5,6 +5,7 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import Section2VendorServices from '../../components/vendor-services/section2-vendor-services'
 import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
+import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
 
 const VendorAndServices = () => {
     useEffect(() => {
@@ -38,6 +39,7 @@ const VendorAndServices = () => {
                 subtext2={subtext2}
                 button1={button1}
             />
+            <Section1VendorServices />
             <Section2VendorServices />
             <LandingPageFooter />
             <LandingPageChatbot />
