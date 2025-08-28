@@ -10,16 +10,14 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import SendIcon from "../../assets/images/chatbot/send-icon.png";
-import RemoveIcon from "@mui/icons-material/Remove";
-import OptionsIcon from "@mui/icons-material/MoreVert";
+import SendRounded from "@mui/icons-material/SendRounded";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
 
 import BotModalIcon from "../../assets/images/chatbot/chatbot-modal-icon.png";
 import BotOnlineIcon from "../../assets/images/chatbot/chatbot-online-icon.png";
-import chatbotTypingLoader from "../../assets/images/chatbot/chatbot-typing-state.png";
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { DoneAll } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -27,34 +25,78 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { getResponseFromAI } from "../../services/AIAssistant/landingPageAIService";
+import TypingDots from "./TypingDots";
 
 const LandingPageChatbot = () => {
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [chatData, setChatData] = useState({
     messages: [],
     chatSuggestions: [
-      "how to sign up",
-      "available services",
-      "vendor information",
-      "contact support",
+      "What is YCC?",
+      "How does YCC work?",
+      "How to become a vendor?",
+      "How to register as a supplier?",
+      "How to become a crew member?",
+      "Getting started guide",
     ],
   });
   const [typingState, setTypingState] = useState(false);
   const [message, setMessage] = useState("");
 
   const chatContainerRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
+
+  // Robust scroll to bottom function (mirrors dashboard behavior)
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      const container = chatContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      const scrollableNode = chatContainerRef.current.getScrollElement();
-      if (scrollableNode) {
-        scrollableNode.scrollTo({
-          top: scrollableNode.scrollHeight,
-          behavior: "smooth",
+    scrollToBottom();
+  }, [chatData, typingState, scrollToBottom]);
+
+  // Auto-scroll to bottom when modal opens
+  useEffect(() => {
+    if (isAIAssistantOpen) {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      const timeouts = [0, 50, 150, 300, 500, 1000];
+      timeouts.forEach((delay) => {
+        scrollTimeoutRef.current = setTimeout(() => {
+          scrollToBottom();
+        }, delay);
+      });
+      if (chatContainerRef.current) {
+        const resizeObserver = new ResizeObserver(() => {
+          scrollToBottom();
         });
+        resizeObserver.observe(chatContainerRef.current);
+        return () => {
+          resizeObserver.disconnect();
+          if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+          }
+        };
       }
     }
-  }, [chatData]);
+  }, [isAIAssistantOpen, scrollToBottom]);
+
+  function formatUtcTo12Hour(utcTimestamp) {
+    const date = new Date(utcTimestamp);
+    let hours = date.getUTCHours();
+    const minutes = date.getUTCMinutes();
+    const amPm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    const formattedMinutes = minutes.toString().padStart(2, "0");
+    return `${hours}:${formattedMinutes} ${amPm}`;
+  }
 
   const sendMessage = async () => {
     if (!message.trim()) return;
@@ -186,6 +228,7 @@ const LandingPageChatbot = () => {
         sx={{
           border: "none",
         }}
+        BackdropProps={{ sx: { backgroundColor: "rgba(3,77,146,0.24)" } }}
       >
         <Box
           sx={{
@@ -220,8 +263,11 @@ const LandingPageChatbot = () => {
               xl: "400px",
               "@media (max-width:1100px)": "280px",
             },
-            maxHeight: "85vh",
-            minHeight: "200px",
+            height: "90vh",
+            maxHeight: "90vh",
+            minHeight: "60vh",
+            borderRadius: "24px",
+            overflow: "hidden",
           }}
         >
           {/* Chat section */}
@@ -233,47 +279,6 @@ const LandingPageChatbot = () => {
               flexDirection: "column",
             }}
           >
-            {/* Header section */}
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                p: 1,
-                bgcolor: "#034D92",
-                borderTopLeftRadius: "24px",
-                borderTopRightRadius: "24px",
-                paddingLeft: "20px",
-              }}
-            >
-              <ChatHeadingText>Guest Profile</ChatHeadingText>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "10px",
-                  justifyContent: "center",
-                  textAlign: "center",
-                }}
-              >
-                <IconButton
-                  onClick={() => setIsAIAssistantOpen(false)}
-                  sx={{ color: "white" }}
-                >
-                  <RemoveIcon />
-                </IconButton>
-                <IconButton
-                  onClick={() => setIsAIAssistantOpen(false)}
-                  sx={{ color: "white" }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            </Box>
-
             {/* subheader section */}
             <Box
               sx={{
@@ -306,159 +311,282 @@ const LandingPageChatbot = () => {
                   <Typography
                     sx={{ color: "white", padding: "0px", fontSize: "20px" }}
                   >
-                    Chatbot
+                    Yacht Agent
                   </Typography>
                   <Typography
                     sx={{ color: "white", padding: "0px", fontSize: "15px" }}
                   >
-                    Support Agent
+                    AI assistant
                   </Typography>
                 </Box>
               </Box>
+              <Box>
+                <IconButton
+                  onClick={() => setIsAIAssistantOpen(false)}
+                  sx={{ color: "white" }}
+                  aria-label="Close chat"
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
             </Box>
-
-            {/* Chat messages */}
+            {/* List of buttons options (scrollable) */}
             <Box
               sx={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
                 width: "100%",
-                height: "300px",
-                overflowY: "auto",
-                p: 2,
-                bgcolor: "#f5f8fa",
+                backgroundColor: "#F3F3F3",
+                padding: "15px 20px 10px 20px",
+                gap: "10px",
+                flexWrap: "nowrap",
+                overflowX: "auto",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
               }}
             >
-              <SimpleBar ref={chatContainerRef} style={{ height: "100%" }}>
-                {chatData.messages.map((item, index) => (
-                  <Box
+              {Array.isArray(chatData.chatSuggestions) &&
+                chatData.chatSuggestions.map((suggestion, index) => (
+                  <CustomOptionButton
                     key={index}
-                    sx={{
-                      display: "flex",
-                      justifyContent:
-                        item.role === "assistant" ? "flex-start" : "flex-end",
-                      mb: 2,
-                    }}
+                    onClick={() => preDefinedMessages(suggestion)}
                   >
+                    <CustomOPtionText>{suggestion}</CustomOPtionText>
+                  </CustomOptionButton>
+                ))}
+            </Box>
+
+            {/* Main chat section */}
+            <Box
+              sx={{
+                display: "flex",
+                height: "55vh",
+                width: "100%",
+                backgroundColor: "#F3F3F3",
+                padding: "5px",
+              }}
+            >
+              <SimpleBar
+                style={{
+                  maxHeight: "100%",
+                  width: "100%",
+                  overflowX: "hidden",
+                }}
+                scrollableNodeProps={{ ref: chatContainerRef }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "#F3F3F3",
+                  }}
+                >
+                  {chatData.messages.length === 0 ? (
                     <Box
                       sx={{
-                        width: "100%",
+                        width: "85%",
+                        paddingX: "15px",
+                        mt: 2,
+                        alignSelf: "flex-start",
                       }}
                     >
-                      {item.role === "assistant" ? (
-                        <BotChatMessage>
-                          <Typography>
-                            {parseAIMessage(item.content)}
-                          </Typography>
-                        </BotChatMessage>
-                      ) : (
-                        <UserChatMessage>
-                          <Typography
-                            sx={{
-                              color: "white",
-                            }}
-                          >
-                            {item.content}
-                          </Typography>
-                        </UserChatMessage>
-                      )}
+                      <BotChatMessage>
+                        <Typography sx={{ fontSize: 14, lineHeight: "20px" }}>
+                          Welcome! I'm your AI assistant. Ask anything or tap a
+                          suggestion above to get started.
+                        </Typography>
+                      </BotChatMessage>
                     </Box>
-                  </Box>
-                ))}
-                {typingState && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      mb: 2,
-                    }}
-                  >
-                    <BotChatMessage>
-                      <img
-                        src={chatbotTypingLoader}
-                        alt="Typing..."
-                        style={{ width: "40px", height: "40px" }}
-                      />
-                    </BotChatMessage>
-                  </Box>
-                )}
+                  ) : (
+                    chatData.messages.map((item, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignSelf:
+                            item.role === "assistant"
+                              ? "flex-start"
+                              : "flex-end",
+                          width: "85%",
+                          paddingX: "15px",
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            width: "100%",
+                            justifyContent:
+                              item.role === "assistant"
+                                ? "flex-start"
+                                : "flex-end",
+                          }}
+                        >
+                          {item.role === "assistant" && (
+                            <>
+                              <Box></Box>
+                              <ChatbotTime>
+                                Yacht Agent{" "}
+                                {formatUtcTo12Hour(new Date().toISOString())}
+                              </ChatbotTime>
+                            </>
+                          )}
+                          {item.role === "user" && (
+                            <>
+                              <ChatbotTime>
+                                you{" "}
+                                {formatUtcTo12Hour(new Date().toISOString())}
+                              </ChatbotTime>
+                            </>
+                          )}
+                        </Box>
+
+                        <Box sx={{ width: "100%" }}>
+                          {item.role === "assistant" ? (
+                            <BotChatMessage>
+                              <Typography>
+                                {parseAIMessage(item.content)}
+                              </Typography>
+                            </BotChatMessage>
+                          ) : (
+                            <UserChatMessage>
+                              <Typography sx={{ color: "white" }}>
+                                {item.content}
+                              </Typography>
+                            </UserChatMessage>
+                          )}
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            width: "100%",
+                            justifyContent:
+                              item.role === "assistant"
+                                ? "flex-start"
+                                : "flex-end",
+                            gap: "5px",
+                          }}
+                        >
+                          {item.role === "assistant" && (
+                            <ChatbotTime>sent</ChatbotTime>
+                          )}
+                          {item.role === "user" && (
+                            <ChatbotTime>
+                              <DoneAll sx={{ height: "13px", width: "13px" }} />
+                              Read
+                            </ChatbotTime>
+                          )}
+                        </Box>
+                      </Box>
+                    ))
+                  )}
+                </Box>
               </SimpleBar>
             </Box>
 
-            {/* Chat suggestions */}
+            {/* Typing state */}
+            {typingState && (
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "100%",
+                  px: 2,
+                  py: 1,
+                  borderLeft: "1px solid #A6C2D4",
+                  borderRight: "1px solid #A6C2D4",
+                  backgroundColor: "#F3F3F3",
+                }}
+              >
+                <Box sx={{ width: "85%", pl: "15px" }}>
+                  <TypingDots />
+                </Box>
+              </Box>
+            )}
+
+            {/* Chat input */}
             <Box
               sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 width: "100%",
-                p: 2,
-                bgcolor: "#fff",
-                borderTop: "1px solid #e0e0e0",
+                backgroundColor: "transparent",
               }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 1,
-                  mb: 2,
+              <ChatInput
+                placeholder="Type a message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value || "")}
+                onKeyDown={(e) => {
+                  if (
+                    (e.key === "Enter" && !e.shiftKey) ||
+                    message.trim() === ""
+                  ) {
+                    sendMessage();
+                  }
                 }}
-              >
-                {chatData.chatSuggestions.map((suggestion, index) => (
-                  <Button
-                    key={index}
-                    variant="outlined"
-                    onClick={() => preDefinedMessages(suggestion)}
-                    sx={{
-                      borderRadius: "20px",
-                      textTransform: "none",
-                      borderColor: "#0487D9",
-                      color: "#0487D9",
-                      "&:hover": {
-                        borderColor: "#034D92",
-                        backgroundColor: "#f5f8fa",
-                      },
-                    }}
-                  >
-                    {suggestion}
-                  </Button>
-                ))}
-              </Box>
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        disabled={!message.trim()}
+                        onClick={sendMessage}
+                        disableRipple
+                        sx={{
+                          cursor: "pointer",
+                          transition:
+                            "background-color 0.2s ease, transform 0.15s ease",
+                          "&:hover": {
+                            backgroundColor: "rgba(4,135,217,0.08)",
+                          },
+                          "&:active": { transform: "scale(0.98)" },
+                        }}
+                      >
+                        <SendRounded
+                          sx={{ color: "#0487D9", width: 24, height: 24 }}
+                        />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
 
-              {/* Message input */}
-              <Box
+            {/* Footer text */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                backgroundColor: "#F3F3F3",
+                borderBottomLeftRadius: "24px",
+                borderBottomRightRadius: "24px",
+                padding: "10px",
+              }}
+            >
+              <ChatbotFooterText
                 sx={{
                   display: "flex",
-                  gap: 1,
+                  alignItems: "center",
+                  gap: 0.5,
+                  whiteSpace: "nowrap",
                 }}
               >
-                <TextField
-                  fullWidth
-                  placeholder="Type your message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      sendMessage();
-                    }
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={sendMessage}>
-                          <img
-                            src={SendIcon}
-                            alt="Send"
-                            style={{ width: "24px", height: "24px" }}
-                          />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "24px",
-                      backgroundColor: "#f5f8fa",
-                    },
-                  }}
-                />
-              </Box>
+                <InfoOutlined sx={{ fontSize: 14, color: "#9BBAD0" }} />
+                AI may make mistakes. Consider checking important info.
+              </ChatbotFooterText>
             </Box>
           </Box>
         </Box>
@@ -467,26 +595,102 @@ const LandingPageChatbot = () => {
   );
 };
 
-const ChatHeadingText = styled(Typography)({
-  color: "#fff",
-  fontSize: "20px",
-  fontWeight: 600,
+const ChatInput = styled(TextField)(() => ({
+  width: "100%",
+  backgroundColor: "white",
+  padding: "10px",
+  borderBottom: "none",
+  outline: "none",
+  "& .MuiInputBase-input::placeholder": {
+    color: "#1E1E1E",
+    fontFamily: "Inter",
+    fontWeight: "400",
+    fontSize: "16px",
+    lineHeight: "24px",
+    letterSpacing: "0%",
+  },
+  "& .MuiOutlinedInput-root": {
+    maxHeight: "36px",
+    padding: "0 10px",
+    display: "flex",
+    alignItems: "center",
+    "& fieldset": {
+      border: "none",
+    },
+  },
+  "& .MuiOutlinedInput-notchedOutline": {
+    border: "none",
+  },
+}));
+
+const CustomOptionButton = styled(Button)({
+  height: "50px",
+  gap: "10px",
+  borderRadius: "14px",
+  borderWidth: "1px",
+  padding: "10px",
+  border: "1px solid #E3E3E3",
+  backgroundColor: "#FFFFFF",
+  textTransform: "none",
+  minWidth: "200px",
+  flex: "0 0 auto",
+  "&:hover": {
+    backgroundColor: "#f0f0f0",
+  },
+});
+
+const CustomOPtionText = styled(Typography)({
+  fontFamily: "Inter",
+  fontWeight: "400",
+  fontSize: "16px",
+  lineHeight: "24px",
+  letterSpacing: "0%",
+  color: "#353535",
+  textAlign: "center",
+  width: "100%",
+  overflow: "visible",
+  textOverflow: "clip",
+  whiteSpace: "nowrap",
 });
 
 const BotChatMessage = styled(Box)({
-  backgroundColor: "#fff",
-  borderRadius: "16px",
-  padding: "12px 16px",
-  maxWidth: "80%",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "flex-start",
+  backgroundColor: "white",
+  width: "100%",
+  padding: "16px 10px",
+  borderRadius: "14px",
+  border: "1px solid #E3E3E3",
 });
 
 const UserChatMessage = styled(Box)({
-  backgroundColor: "#0487D9",
-  borderRadius: "16px",
-  padding: "12px 16px",
-  maxWidth: "80%",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "flex-end",
+  background: "linear-gradient(80.24deg, #034D92 12.46%, #0487D9 84.7%)",
+  width: "100%",
+  padding: "16px 10px",
+  borderRadius: "14px",
+  border: "1px solid #E3E3E3",
+});
+
+const ChatbotTime = styled(Typography)({
+  fontFamily: "Inter",
+  fontWeight: "400",
+  fontSize: "12px",
+  lineHeight: "30px",
+  letterSpacing: "0%",
+  color: "#646464",
+});
+
+const ChatbotFooterText = styled(Typography)({
+  fontFamily: "Inter",
+  fontWeight: "400",
+  fontSize: "12px",
+  lineHeight: "30px",
+  letterSpacing: "0%",
+  color: "#667085",
 });
 
 export default LandingPageChatbot;
