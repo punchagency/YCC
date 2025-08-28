@@ -96,7 +96,6 @@ const ServiceProvidersBookings = () => {
       };
       
       const response = await getServiceProviderBookings(params);
-      console.log("Response Bookings: ", response);
       if (response.status) {
         setBookings(response.data.bookings || []);
         
@@ -121,7 +120,6 @@ const ServiceProvidersBookings = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching bookings:", error);
       setSnackbar({
         open: true,
         message: "An error occurred while fetching bookings",

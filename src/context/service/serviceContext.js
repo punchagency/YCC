@@ -19,7 +19,6 @@ export const ServiceProvider = ({ children }) => {
     const fetchServices = async () => {
         try {
             const response = await getAllServices();
-            console.log("Services response:", response);
             setServices(response.data); 
         } catch (error) {
            toast.current.show({ severity: 'error', summary: 'Error', detail: error.message || 'Failed to fetch services' });

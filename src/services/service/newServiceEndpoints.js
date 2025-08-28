@@ -22,7 +22,6 @@ export const createService = async ({ name, price, description }) => {
             data: response.data,
         };
     } catch (error) {
-        console.error("Error creating event:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to create event",
@@ -42,7 +41,6 @@ export const getAllServices = async ({ search, page = 1, limit = 20}) => {
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching events:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to fetch events",
@@ -61,7 +59,6 @@ export const updateService = async (service_id, { name, price, description}) => 
             data: response.data,
         };
     } catch (error) {
-        console.error("Error updating event:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to update event",
@@ -80,7 +77,6 @@ export const deleteService = async (service_id) => {
             data: response.data,
         };
     } catch (error) {
-        console.error("Error deleting event:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to delete event",
@@ -96,7 +92,6 @@ export const fetchServiceProviderDashboard = async()=> {
 
         return response.data;
     } catch (error) {
-        console.error("Error fetching dashboard:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to fetch dashboard",
@@ -111,8 +106,7 @@ export const updateServiceProviderSettings = async (formData) => {
         });
 
         return response.data;
-    } catch (error) {
-        console.error("Error updating settings:", error);
+    } catch (error) {   
         return {
             success: false,
             error: error.response?.data?.message || "Failed to update settings",
@@ -134,7 +128,6 @@ export const fetchFinancialAnalysis = async ({page, limit, status, period, start
         });
         return response.data;
     } catch (error) {
-        console.log("Error fetching financial analysis:", error);
         return {
             success: false,
             error: error.response?.data?.message || "Failed to fetch financial analysis",

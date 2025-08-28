@@ -3,12 +3,11 @@ import { useUser } from '../../../context/userContext';
 import { useEffect, useState } from 'react';
 import { Payments as StripeIcon } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
-import { useParams, useLocation, useSearchParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 const VendorOnboardingStep2 = ({ handleNext }) => {
   const { id: userId } = useParams();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const { stripeAccount, getStripeAccount, createStripeAccount, refreshStripeAccountLink } = useUser();
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,10 +69,10 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
     try {
       //console.log('Stripe Step 2 - Creating/Refreshing account with:', { userId, role });
       if (stripeAccount) {
-        const response = await refreshStripeAccountLink(userId, role);
+        await refreshStripeAccountLink(userId, role);
         //console.log('Stripe Step 2 - refreshStripeAccountLink response:', response);
       } else {
-        const response = await createStripeAccount(userId, role);
+        await createStripeAccount(userId, role);
         //console.log('Stripe Step 2 - createStripeAccount response:', response);
       }
     } catch (error) {

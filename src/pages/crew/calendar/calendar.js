@@ -19,7 +19,7 @@ import {
 } from "../../../services/calendar/calendarService";
 import { Calendar } from "primereact/calendar";
 import { useOutletContext } from "react-router-dom";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 
 
 
@@ -35,7 +35,6 @@ export default function CrewCalendarPage() {
   const [activeView, setActiveView] = useState("events");
   const [calendarEvents, setCalendarEvents] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDay, setSelectedDay] = useState(null);
   const toast = useRef(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [newEvent, setNewEvent] = useState({
@@ -331,7 +330,6 @@ export default function CrewCalendarPage() {
   }, []);
 
   const loadEvents = useCallback(async () => {
-    console.log("Loading events...");
     setLoading(true);
     try {
       const firstDay = new Date(
@@ -347,14 +345,10 @@ export default function CrewCalendarPage() {
         59,
         59
       );
-      console.log("Fetching events from", firstDay, "to", lastDay);
       const response = await fetchEvents(firstDay, lastDay);
-      console.log("API response:", response);
       if (response.success) {
-        console.log("Successfully fetched events:", response.data);
         setCalendarEvents(response.data);
       } else {
-        console.error("Failed to fetch events:", response.error);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -363,7 +357,6 @@ export default function CrewCalendarPage() {
         });
       }
     } catch (error) {
-      console.error("Exception in loadEvents:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -371,18 +364,15 @@ export default function CrewCalendarPage() {
         life: 3000,
       });
     } finally {
-      console.log("Setting loading to false");
       setLoading(false);
     }
   }, [currentDate]);
 
   useEffect(() => {
-    console.log("currentDate changed:", currentDate);
     loadEvents();
 
     // Fallback: ensure loading is set to false after 10 seconds
     const timeout = setTimeout(() => {
-      console.log("Fallback: forcing loading to false");
       setLoading(false);
     }, 10000);
 
@@ -740,7 +730,6 @@ export default function CrewCalendarPage() {
 
   // Update the click handler for calendar days
   const handleDayClick = (day) => {
-    setSelectedDay(day);
     const date = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth(),
@@ -753,7 +742,6 @@ export default function CrewCalendarPage() {
   };
 
   const handleEventUpdate = async (event) => {
-    console.log("handleEventUpdate event: ", event);
     const eventCopy = { ...event };
     setSelectedEvent(eventCopy);
     setShowUpdateEventModal(true);
@@ -1328,7 +1316,6 @@ export default function CrewCalendarPage() {
                     onDragOver={(day) => setDragOverDay(day)}
                     onDrop={(day, e) => {
                       // Handle drag and drop functionality here
-                      console.log("Dropped on day:", day);
                     }}
                   />
                 );

@@ -94,7 +94,6 @@ function ShipmentRates({ subOrders, refreshOrder }) {
     if (selections.length === 0) return;
     setBuying(true);
     try {
-      console.log("selections:", selections);
       const data = await buyLabels(selections);
 
       // Check if this is an error response (invoice creation failed)
@@ -127,12 +126,7 @@ function ShipmentRates({ subOrders, refreshOrder }) {
         if (window.rewardful && user?.email) {
           try {
             window.rewardful("convert", { email: user.email });
-            console.log("Rewardful conversion tracked for:", user.email);
           } catch (rewardfulError) {
-            console.error(
-              "Error tracking Rewardful conversion:",
-              rewardfulError
-            );
           }
         }
       } else {
@@ -141,7 +135,6 @@ function ShipmentRates({ subOrders, refreshOrder }) {
           summary: "Partial",
           detail: `${failed.length} label(s) failed to purchase`,
         });
-        console.log("Failed to purchase labels:", failed);
       }
       setSelectedRates({});
       // No refreshOrder call here

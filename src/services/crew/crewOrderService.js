@@ -23,8 +23,6 @@ export const createOrder = async (orderData) => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error creating order:", error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -49,7 +47,6 @@ export const createOrder = async (orderData) => {
  */
 export const getOrders = async (params = {}) => {
   try {
-    console.log("Fetching orders with params:", params);
 
     // Build query parameters
     const queryParams = {
@@ -68,8 +65,6 @@ export const getOrders = async (params = {}) => {
         ...getAuthHeader(),
       },
     });
-
-    console.log("Raw API response:", response.data);
 
     // Extract and process the response data
     let ordersData = [];
@@ -108,12 +103,6 @@ export const getOrders = async (params = {}) => {
       };
     }
 
-    console.log("Processed response data:", {
-      ordersCount: ordersData.length,
-      statusCounts,
-      pagination: paginationData,
-    });
-
     return {
       status: true,
       data: {
@@ -123,8 +112,6 @@ export const getOrders = async (params = {}) => {
       },
     };
   } catch (error) {
-    console.error("Error fetching orders:", error);
-
     // Enhanced error handling with specific error messages
     let errorMessage = "Failed to fetch orders";
 
@@ -188,8 +175,6 @@ export const getOrderById = async (orderId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error fetching order ${orderId}:`, error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -231,8 +216,6 @@ export const updateOrder = async (orderId, orderData) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error updating order ${orderId}:`, error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -268,8 +251,6 @@ export const deleteOrder = async (orderId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error deleting order ${orderId}:`, error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -311,8 +292,6 @@ export const updateOrderStatus = async (orderId, status) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error updating order status ${orderId}:`, error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -347,8 +326,6 @@ export const getOrderStats = async () => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error fetching order statistics:", error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(
@@ -382,8 +359,6 @@ export const getProductsWithVendors = async () => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error fetching products with vendors:", error);
-
     // Handle 401 authentication errors
     if (error.response?.status === 401) {
       const authError = new Error(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   useOutletContext, useNavigate
 } from "react-router-dom";
@@ -59,43 +59,42 @@ import {
   getAllSuppliers,
 } from "../../services/inventory/inventoryService";
 
-const InventoryTableSkeleton = () => {
-  const { theme } = useTheme();
-  return (
-    <div className="inventory-skeleton">
-      {[...Array(10)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            display: "flex",
-            padding: "10px",
-            borderBottom: "1px solid #eaecf0",
-            backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
-          }}
-        >
-          {[...Array(7)].map((_, j) => (
-            <div
-              key={j}
-              style={{
-                flex: j === 0 ? "2" : "1",
-                height: "20px",
-                backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
-                marginRight: "10px",
-                borderRadius: "4px",
-                animation: "pulse 1.5s infinite",
-              }}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-};
+// const InventoryTableSkeleton = () => {
+//   const { theme } = useTheme();
+//   return (
+//     <div className="inventory-skeleton">
+//       {[...Array(10)].map((_, i) => (
+//         <div
+//           key={i}
+//           style={{
+//             display: "flex",
+//             padding: "10px",
+//             borderBottom: "1px solid #eaecf0",
+//             backgroundColor: theme === "light" ? "#FFFFFF" : "#03141F",
+//           }}
+//         >
+//           {[...Array(7)].map((_, j) => (
+//             <div
+//               key={j}
+//               style={{
+//                 flex: j === 0 ? "2" : "1",
+//                 height: "20px",
+//                 backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
+//                 marginRight: "10px",
+//                 borderRadius: "4px",
+//                 animation: "pulse 1.5s infinite",
+//               }}
+//             />
+//           ))}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
 
 const Invent = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -174,9 +173,8 @@ const Invent = () => {
 
   // Add these state variables
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const observer = useRef();
   const [totalItems, setTotalItems] = useState(0);
   const isRequestInProgress = useRef(false); // Add this ref to track ongoing requests
 
@@ -184,7 +182,7 @@ const Invent = () => {
 
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize] = useState(10);
 
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState("");
@@ -204,7 +202,7 @@ const Invent = () => {
 
   // Add state for supplier search and pagination
   const [supplierSearch, setSupplierSearch] = useState("");
-  const [supplierPage, setSupplierPage] = useState(1);
+  const [supplierPage] = useState(1);
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const SUPPLIERS_PER_PAGE = 10;
 
@@ -252,46 +250,45 @@ const Invent = () => {
     });
   };
 
-  const onPageChange = (event, newPage) => {
-    console.log("Pagination clicked, newPage:", newPage);
-    setPage(newPage - 1);
-    // Fetch new page data here if needed
-  };
+  // const onPageChange = (event, newPage) => {
+  //   setPage(newPage - 1);
+  //   // Fetch new page data here if needed
+  // };
 
-  const onRowsPerPageChange = (event) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setPage(0);
-    // Fetch new page data here if needed
-  };
+  // const onRowsPerPageChange = (event) => {
+  //   setPageSize(parseInt(event.target.value, 10));
+  //   setPage(0);
+  //   // Fetch new page data here if needed
+  // };
 
-  // Add this function to handle infinite scroll
-  const lastInventoryElementRef = useCallback(
-    (node) => {
-      if (isLoadingMore) return;
-      if (observer.current) observer.current.disconnect();
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            loadMoreData();
-          }
-        },
-        {
-          root: null,
-          rootMargin: "20px",
-          threshold: 1.0,
-        }
-      );
-      if (node) observer.current.observe(node);
-    },
-    [isLoadingMore, hasMore]
-  );
+  // // Add this function to handle infinite scroll
+  // const lastInventoryElementRef = useCallback(
+  //   (node) => {
+  //     if (isLoadingMore) return;
+  //     if (observer.current) observer.current.disconnect();
+  //     observer.current = new IntersectionObserver(
+  //       (entries) => {
+  //         if (entries[0].isIntersecting && hasMore) {
+  //           loadMoreData();
+  //         }
+  //       },
+  //       {
+  //         root: null,
+  //         rootMargin: "20px",
+  //         threshold: 1.0,
+  //       }
+  //     );
+  //     if (node) observer.current.observe(node);
+  //   },
+  //   [isLoadingMore, hasMore]
+  // );
 
-  // Inside your component, define the service area options
-  const serviceAreaOptions = [
-    { label: "Caribbean", value: "caribbean" },
-    { label: "Mediterranean", value: "mediterranean" },
-    { label: "USA", value: "usa" },
-  ];
+  // // Inside your component, define the service area options
+  // const serviceAreaOptions = [
+  //   { label: "Caribbean", value: "caribbean" },
+  //   { label: "Mediterranean", value: "mediterranean" },
+  //   { label: "USA", value: "usa" },
+  // ];
 
   // Add new state for email modal
   const [showEmailModal, setShowEmailModal] = useState(false);
@@ -382,13 +379,11 @@ const Invent = () => {
         setInventoryItems([]);
         setTotalItems(0);
         setTotalPages(1);
-        console.error("Failed to load inventory data:", result.error);
       }
     } catch (error) {
       setInventoryItems([]);
       setTotalItems(0);
       setTotalPages(1);
-      console.error("Error fetching inventory data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -405,7 +400,6 @@ const Invent = () => {
       const nextPage = page + 1;
       await fetchInventoryData(nextPage);
     } catch (error) {
-      console.error("Error loading more data:", error);
     } finally {
       setIsLoadingMore(false);
       isRequestInProgress.current = false;
@@ -489,8 +483,6 @@ const Invent = () => {
           isFormData
         );
 
-        console.log("Update result:", result);
-
         if (result.success) {
           // Handle the nested response structure
           const responseData = result.data?.data || result.data;
@@ -550,7 +542,6 @@ const Invent = () => {
         }
 
       } catch (error) {
-        console.error("Error updating inventory:", error);
         setSnackbar({
           open: true,
           message: error.message || "An unexpected error occurred",
@@ -587,10 +578,8 @@ const Invent = () => {
           prevItems.filter((_, index) => index !== itemToDelete.index)
         );
       } else {
-        console.error("Failed to delete product:", result.error);
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
     } finally {
       setIsLoading(false);
       setShowDeleteConfirmation(false);
@@ -671,7 +660,6 @@ const Invent = () => {
 
       // Append the image file if one was selected
       if (productImage) {
-        console.log("Appending inventoryImage to FormData:", productImage);
         formData.append("inventoryImage", productImage);
       }
 
@@ -728,10 +716,8 @@ const Invent = () => {
           open: true,
           severity: "error",
         });
-        console.error("Failed to add inventory:", result.error);
       }
     } catch (error) {
-      console.error("Error adding inventory:", error);
       setSnackbar({
         message: "An unexpected error occurred. Please try again.",
         open: true,
@@ -744,7 +730,6 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
-    console.log("Selected Item t be viewed:c ", item)
     setViewItem({ ...item, length_: item['length'] });
     setShowViewModal(true);
   };
@@ -1770,7 +1755,6 @@ const Invent = () => {
             totalItems={totalItems}
             itemsPerPage={pageSize}
             onPageChange={(newPage) => {
-              console.log("Pagination clicked, newPage:", newPage);
               setPage(newPage - 1);
             }}
           />
@@ -1790,11 +1774,9 @@ const Invent = () => {
       } else if (result.success && Array.isArray(result.data)) {
         setSuppliers(result.data);
       } else {
-        console.error("Invalid suppliers data:", result.data);
         setSuppliers([]);
       }
     } catch (error) {
-      console.error("Error fetching suppliers:", error);
       setSuppliers([]);
     } finally {
       setSuppliersLoading(false);

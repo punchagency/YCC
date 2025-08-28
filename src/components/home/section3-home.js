@@ -56,14 +56,13 @@ const Section3Home = () => {
                         height: { xs: "100%", md: "235px" },
                         maxWidth: { xs: "100%", md: "236px" },
                         maxHeight: { xs: "100%", md: "235px" },
-                        borderBottomRightRadius: 20, 
+                        borderBottomRightRadius: 20,
                         borderBottomLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
                         borderTopLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
-                        display: "block", 
+                        display: "block",
+                        marginRight: { xs: 0, md: "20px" },
                     }}
                 />
-
-
 
             </Box>
         </Container>

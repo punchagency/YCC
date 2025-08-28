@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Grid,
-  Typography,
   Alert,
   IconButton,
   Tooltip,
@@ -52,20 +51,15 @@ export default function ReportsChartsRow() {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching charts data for period:", period);
 
       const res = await getReportsCharts(period);
-      console.log("Charts API response:", res);
 
       if (res && res.data) {
         setData(res.data);
-        console.log("Charts data set:", res.data);
       } else {
-        console.error("Invalid API response structure:", res);
         setError("Invalid data structure received from API");
       }
     } catch (err) {
-      console.error("Error fetching charts:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -95,7 +89,6 @@ export default function ReportsChartsRow() {
    * @param {Object} data - Clicked data point information
    */
   const handleChartClick = (chartType, data) => {
-    console.log(`${chartType} chart clicked:`, data);
     // TODO: Implement detailed view modal or navigation
   };
 

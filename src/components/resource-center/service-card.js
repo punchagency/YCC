@@ -1,6 +1,7 @@
-import { Box, Typography, Card, CardContent, CardActions, Button, Stack, Avatar, Chip } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import EmailIcon from '@mui/icons-material/Email';
+import { Box, Typography, Card, CardContent, CardActions, Button, Stack, Avatar, Chip, useTheme, useMediaQuery } from '@mui/material';
+import LocationOnIcon from "../../assets/images/pin-location.svg";
+import EmailIcon from "../../assets/images/email.svg";
+// import StarIcon from '@mui/icons-material/Star';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 import { getCategoryIcon } from './section4-resource-center';
@@ -8,14 +9,16 @@ import { getCategoryIcon } from './section4-resource-center';
 const ServiceCard = ({ service }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleAction = () => {
     const token = localStorage.getItem('token');
     if (!isAuthenticated || !token) {
-      navigate('/login', { 
-        state: { 
+      navigate('/login', {
+        state: {
           from: '/resource-center'  // Redirect back to resource center after login
-        } 
+        }
       });
       return;
     }
@@ -28,21 +31,21 @@ const ServiceCard = ({ service }) => {
   }
 
   return (
-    <Card 
+    <Card
       className="service-card-hover"
-      sx={{ 
-        borderRadius: 4, 
-        boxShadow: 0, 
-        background: '#f5f8fa', 
-        p: 2, 
+      sx={{
+        borderRadius: 4,
+        boxShadow: 0,
+        background: '#f5f8fa',
+        p: 2,
         height: '400px',
-        display: 'flex', 
+        display: 'flex',
         flexDirection: 'column',
         transition: 'box-shadow 0.2s, transform 0.2s',
       }}
     >
-      <CardContent 
-        sx={{ 
+      <CardContent
+        sx={{
           p: 0,
           flex: 1,
           display: 'flex',
@@ -50,25 +53,41 @@ const ServiceCard = ({ service }) => {
           '&:last-child': { pb: 0 }
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2} mb={1}>
-          <Avatar sx={{ width: 56, height: 56, bgcolor: '#e3f2fd' }}>
+        <Stack direction="row" alignItems="flex-start" spacing={2} mb={2}>
+          <Avatar sx={{ width: isMobile ? 56 : 76, height: isMobile ? 56 : 76, bgcolor: '#e3f2fd' }}>
             {getCategoryIcon(service.category)}
           </Avatar>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 0 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5, fontSize: "24px", color: "#131313", textTransform: 'capitalize' }}>
               {service.name}
             </Typography>
-            <Stack direction="row" spacing={1} mt={0.5}>
-              {service.category && (
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {Array.isArray(service?.categories) ? (
+                service.categories.map((cat, index) => (
+                  <Chip
+                    key={index}
+                    label={cat}
+                    size="small"
+                    sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
+                  />
+                ))
+              ) : service?.categories ? (
+                <Chip
+                  label={service.categories}
+                  size="small"
+                  sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
+                />
+              ) : service?.category ? (
                 <Chip
                   label={service.category}
                   size="small"
-                  sx={{ bgcolor: '#b3e0fc', color: '#034D92', fontWeight: 600, fontSize: 14 }}
+                  sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
                 />
-              )}
+              ) : null}
             </Stack>
           </Box>
         </Stack>
+
         <Typography 
           sx={{ 
             color: '#222', 
@@ -85,17 +104,31 @@ const ServiceCard = ({ service }) => {
         >
           {service.description}
         </Typography>
-        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-          <LocationOnIcon sx={{ color: '#0487D9' }} />
-          <Typography sx={{ color: '#222', fontWeight: 500, fontSize: 15 }}>
-            {service.location || 'Location not specified'}
-          </Typography>
-        </Stack>
-        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-          <EmailIcon sx={{ color: '#0487D9' }} />
-          <Typography sx={{ color: '#222', fontSize: 15, wordBreak: 'break-all' }}>
-            {service.email || 'Email not available'}
-          </Typography>
+
+        <Stack spacing={1} mb={2}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <img src={LocationOnIcon} alt="Location" style={{ width: "24px", height: "24px" }} />
+            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
+              {service.supplier?.location || service.location || 'Location not specified'}
+            </Typography>
+          </Stack>
+
+          {/* <Stack direction="row" alignItems="center" spacing={1}>
+            <StarIcon sx={{ color: '#FFD700', fontSize: 20 }} />
+            <Typography sx={{ color: '#333', fontSize: 14, fontWeight: 600 }}>
+              {service.rating || '4.9'}
+            </Typography>
+            <Typography sx={{ color: '#666', fontSize: 14 }}>
+              ({service.reviewCount || '86'} reviews)
+            </Typography>
+          </Stack> */}
+
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <img src={EmailIcon} alt="Email" style={{ width: "24px", height: "24px" }} />
+            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
+              {service.supplier?.email || service.email || service.vendor?.email || 'Email not specified'}
+            </Typography>
+          </Stack>
         </Stack>
       </CardContent>
       <CardActions sx={{ pt: 0, mt: 'auto' }}>

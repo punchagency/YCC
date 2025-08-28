@@ -32,15 +32,6 @@ const ProfilePage = () => {
     user?.role?.name === "crew_member" || user?.role === "crew_member";
   const outletContext = useOutletContext();
 
-  // Debug: Log user data
-  console.log("Profile - User data:", {
-    user: user,
-    crewProfile: user?.crewProfile,
-    profilePicture: user?.profilePicture,
-    role: user?.role,
-    isCrew: isCrew,
-  });
-
   // Helper to always prefix phone with + if not empty
   const formatPhone = (phone) => {
     if (!phone) return "";
@@ -134,19 +125,15 @@ const ProfilePage = () => {
         replyToEmail: replyToEmail,
       };
 
-      console.log("Updating admin profile with:", updateData);
       const response = await updateUserSettings(updateData);
 
       if (response.status) {
-        console.log("Profile updated successfully");
         await refreshUser(); // Refresh user data from context
         setIsEditing(false);
       } else {
-        console.error("Failed to update profile:", response.message);
         alert(response.message || "Failed to update profile");
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
       alert("An error occurred while updating your profile");
     } finally {
       setSaveLoading(false);
@@ -166,15 +153,11 @@ const ProfilePage = () => {
     const file = e.target.files[0];
     if (!file) return;
     setPicLoading(true);
-    console.log("Uploading profile picture:", file.name);
     const res = await uploadProfilePicture(file);
-    console.log("Upload response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log("Upload successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error("Upload failed:", res.message);
       alert(res.message || "Failed to upload profile picture");
     }
   };
@@ -182,15 +165,11 @@ const ProfilePage = () => {
   const handleRemovePicture = async () => {
     if (!window.confirm("Remove your profile picture?")) return;
     setPicLoading(true);
-    console.log("Removing profile picture...");
     const res = await removeProfilePicture();
-    console.log("Remove response:", res);
     setPicLoading(false);
     if (res.status) {
-      console.log("Remove successful, refreshing user data...");
       await refreshUser();
     } else {
-      console.error("Remove failed:", res.message);
       alert(res.message || "Failed to remove profile picture");
     }
   };

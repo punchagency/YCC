@@ -32,8 +32,6 @@ export const fetchCrewNotifications = async (params = {}) => {
   try {
     const { page = 1, limit = 10, type, status } = params;
 
-    console.log("Fetching notifications with params:", { page, limit, type, status });
-
     const response = await axios.get(
       `${API_URL}/crew-notifications/notify`,
       {
@@ -46,8 +44,6 @@ export const fetchCrewNotifications = async (params = {}) => {
         },
       }
     );
-
-    console.log("API Response for notifications:", response.data);
 
     if (response.data.status) {
       return {
@@ -62,7 +58,6 @@ export const fetchCrewNotifications = async (params = {}) => {
       };
     }
   } catch (error) {
-    console.error("Error fetching crew notifications:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch notifications",
@@ -78,8 +73,6 @@ export const fetchCrewNotifications = async (params = {}) => {
  */
 export const updateNotificationStatus = async (id, status) => {
   try {
-    console.log(`Updating notification ${id} status to:`, status);
-
     const response = await axios.patch(
       `${API_URL}/crew-notifications/${id}/status`,
       { status },
@@ -91,14 +84,11 @@ export const updateNotificationStatus = async (id, status) => {
       }
     );
 
-    console.log("Status update response:", response.data);
-
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error updating notification status for ${id}:`, error);
     return {
       success: false,
       error:
@@ -114,8 +104,6 @@ export const updateNotificationStatus = async (id, status) => {
  */
 export const markNotificationAsRead = async (id) => {
   try {
-    console.log(`Marking notification ${id} as read`);
-
     const response = await axios.patch(
       `${API_URL}/crew-notifications/${id}/read`,
       {},
@@ -124,14 +112,11 @@ export const markNotificationAsRead = async (id) => {
       }
     );
 
-    console.log("Mark as read response:", response.data);
-
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error marking notification ${id} as read:`, error);
     return {
       success: false,
       error:
@@ -146,8 +131,6 @@ export const markNotificationAsRead = async (id) => {
  */
 export const getUnreadNotificationsCount = async () => {
   try {
-    console.log("Fetching unread notifications count");
-
     const response = await axios.get(
       `${API_URL}/crew-notifications/unread/count`,
       {
@@ -155,14 +138,11 @@ export const getUnreadNotificationsCount = async () => {
       }
     );
 
-    console.log("Unread count response:", response.data);
-
     return {
       success: true,
       count: response.data.count,
     };
   } catch (error) {
-    console.error("Error fetching unread notifications count:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch unread count",

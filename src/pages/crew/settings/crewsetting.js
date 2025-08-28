@@ -5,9 +5,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 // import { Checkbox } from "primereact/checkbox";
 
-import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
-import { useNotifications } from "../../../context/notificationsContext";
 import { Toast } from "primereact/toast";
 import { updateUserSettings } from "../../../services/crewSettings/crewsettings";
 
@@ -15,24 +13,23 @@ import { updateUserSettings } from "../../../services/crewSettings/crewsettings"
 // import { confirmDialog } from "primereact/confirmdialog";
 
 // Define these arrays outside the component to prevent infinite loops
-const LANGUAGES = [
-  { name: "English", code: "en" },
-  { name: "Spanish", code: "es" },
-  { name: "French", code: "fr" },
-  { name: "German", code: "de" },
-  { name: "Italian", code: "it" },
-  { name: "Portuguese", code: "pt" },
-  { name: "Russian", code: "ru" },
-  { name: "Chinese", code: "zh" },
-  { name: "Japanese", code: "ja" },
-  { name: "Arabic", code: "ar" },
-];
+// const LANGUAGES = [
+//   { name: "English", code: "en" },
+//   { name: "Spanish", code: "es" },
+//   { name: "French", code: "fr" },
+//   { name: "German", code: "de" },
+//   { name: "Italian", code: "it" },
+//   { name: "Portuguese", code: "pt" },
+//   { name: "Russian", code: "ru" },
+//   { name: "Chinese", code: "zh" },
+//   { name: "Japanese", code: "ja" },
+//   { name: "Arabic", code: "ar" },
+// ];
 
 const AdminSetting = () => {
   const navigate = useNavigate();
   const { setPageTitle } = useOutletContext() || {};
   const { user } = useUser();
-  const { notificationsEnabled, toggleNotifications } = useNotifications();
 
   const toast = React.useRef(null);
   // const deleteMenuRef = useRef(null);
@@ -43,9 +40,6 @@ const AdminSetting = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [phone, setPhone] = useState("");
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [accountVisibility, setAccountVisibility] = useState(true);
-  const [theme, setTheme] = useState("light");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -66,10 +60,8 @@ const AdminSetting = () => {
       // Set phone from crewProfile
       setPhone(user.crewProfile?.phoneNumber || user.phone || "");
       // Set two-factor authentication status if available
-      setTwoFactorEnabled(user.twoFactorEnabled || false);
 
       // Set account visibility if available
-      setAccountVisibility(user.accountVisibility !== false);
     }
   }, [user, setPageTitle]);
 
@@ -183,10 +175,10 @@ const AdminSetting = () => {
   //   }, 3000);
   // };
 
-  const changeTheme = () => {
-    // Implement theme change logic here
-    setTheme(theme === "light" ? "dark" : "light");
-  };
+  // const changeTheme = () => {
+  //   // Implement theme change logic here
+  //   setTheme(theme === "light" ? "dark" : "light");
+  // };
 
   return (
     <>

@@ -135,7 +135,6 @@ const SupplierOrderConfirmationPage = () => {
           ? baseUrl.slice(0, -4)
           : baseUrl;
         const apiUrl = `${cleanBaseUrl}/api/suborders/${subOrderId}/${token}/details`;
-        console.log("Fetching from:", apiUrl);
 
         const response = await fetch(apiUrl, {
           method: "GET",
@@ -143,9 +142,6 @@ const SupplierOrderConfirmationPage = () => {
             "Content-Type": "application/json",
           },
         });
-
-        console.log("Response status:", response.status);
-        console.log("Response headers:", response.headers);
 
         // Check if response is JSON
         const contentType = response.headers.get("content-type");
@@ -156,7 +152,6 @@ const SupplierOrderConfirmationPage = () => {
         }
 
         const data = await response.json();
-        console.log("Response data:", data);
 
         if (!response.ok) {
           throw new Error(
@@ -171,7 +166,6 @@ const SupplierOrderConfirmationPage = () => {
 
         setOrderData(data.data);
       } catch (err) {
-        console.error("Error fetching order details:", err);
         setError(err.message || "Failed to load order details");
       } finally {
         setLoading(false);
@@ -361,11 +355,6 @@ const SupplierOrderConfirmationPage = () => {
   }
 
   const { subOrder, supplier, order } = orderData;
-
-  // Debug logging
-  console.log("Supplier data:", supplier);
-  console.log("Order data:", order);
-  console.log("SubOrder data:", subOrder);
 
   return (
     <Box

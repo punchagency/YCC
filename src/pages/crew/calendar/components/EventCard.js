@@ -35,7 +35,6 @@ export const EventCard = ({
 
   const handleUpdate = () => {
     handleMenuClose();
-    console.log("Event to update: ", event);
     onUpdate(event);
   };
 

@@ -1,11 +1,9 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Menu } from "primereact/menu";
 import { Toast } from "primereact/toast";
 import { useMediaQuery } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
@@ -19,7 +17,7 @@ import NotificationsSkeleton from "../../../components/NotificationsSkeleton";
 import { useToast } from "../../../components/Toast";
 import { Pagination } from "../../../components/pagination";
 import React from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 
 // Mobile notification card component
 const MobileNotificationCard = ({
@@ -43,7 +41,7 @@ const MobileNotificationCard = ({
         }
       } catch (error) {
         // Silently handle any errors to prevent ugly error messages
-        console.warn("Menu close error:", error);
+        // console.warn("Menu close error:", error);
       }
     };
 
@@ -187,73 +185,73 @@ const MobileNotificationCard = ({
   );
 };
 
-const StatusCell = React.memo(
-  ({ rowData, handleStatusChange, statusLoading }) => {
-    const cellStatusMenu = useRef(null);
+// const StatusCell = React.memo(
+//   ({ rowData, handleStatusChange, statusLoading }) => {
+//     const cellStatusMenu = useRef(null);
 
-    // Add click outside handler for desktop menu
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        try {
-          if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
-            const menuElement = cellStatusMenu.current.getElement();
-            if (menuElement && !menuElement.contains(event.target)) {
-              cellStatusMenu.current.hide();
-            }
-          }
-        } catch (error) {
-          // Silently handle any errors to prevent ugly error messages
-          console.warn("Menu close error:", error);
-        }
-      };
+//     // Add click outside handler for desktop menu
+//     useEffect(() => {
+//       const handleClickOutside = (event) => {
+//         try {
+//           if (cellStatusMenu.current && cellStatusMenu.current.getElement) {
+//             const menuElement = cellStatusMenu.current.getElement();
+//             if (menuElement && !menuElement.contains(event.target)) {
+//               cellStatusMenu.current.hide();
+//             }
+//           }
+//         } catch (error) {
+//           // Silently handle any errors to prevent ugly error messages
+//           // console.warn("Menu close error:", error);
+//         }
+//       };
 
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
-    }, []);
+//       document.addEventListener("mousedown", handleClickOutside);
+//       return () => {
+//         document.removeEventListener("mousedown", handleClickOutside);
+//       };
+//     }, []);
 
-    const statusOptions = [{ label: "Mark as Read", value: "read" }];
+//     const statusOptions = [{ label: "Mark as Read", value: "read" }];
 
-    const statusMenuItems = statusOptions.map((option) => ({
-      label: option.label,
-      command: () => handleStatusChange(rowData._id, option.value),
-    }));
+//     const statusMenuItems = statusOptions.map((option) => ({
+//       label: option.label,
+//       command: () => handleStatusChange(rowData._id, option.value),
+//     }));
 
-    return (
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <span
-          style={{
-            backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
-            color: rowData.read ? "#027A48" : "#B42318",
-            padding: "2px 8px",
-            borderRadius: "16px",
-            fontSize: "12px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          {rowData.read ? "Read" : "Unread"}
-        </span>
-        <Button
-          icon="pi pi-check-circle"
-          className="p-button-rounded p-button-text p-button-sm"
-          tooltip="Change Status"
-          tooltipOptions={{ position: "top" }}
-          onClick={(e) => cellStatusMenu.current.toggle(e)}
-          disabled={statusLoading}
-        />
-        <Menu
-          model={statusMenuItems}
-          popup
-          ref={cellStatusMenu}
-          id={`status-menu-${rowData._id}`}
-        />
-      </div>
-    );
-  }
-);
+//     return (
+//       <div style={{ display: "flex", alignItems: "center" }}>
+//         <span
+//           style={{
+//             backgroundColor: rowData.read ? "#ECFDF3" : "#FEF3F2",
+//             color: rowData.read ? "#027A48" : "#B42318",
+//             padding: "2px 8px",
+//             borderRadius: "16px",
+//             fontSize: "12px",
+//             display: "inline-flex",
+//             alignItems: "center",
+//             gap: "4px",
+//           }}
+//         >
+//           {rowData.read ? "Read" : "Unread"}
+//         </span>
+//         <Button
+//           icon="pi pi-check-circle"
+//           className="p-button-rounded p-button-text p-button-sm"
+//           tooltip="Change Status"
+//           tooltipOptions={{ position: "top" }}
+//           onClick={(e) => cellStatusMenu.current.toggle(e)}
+//           disabled={statusLoading}
+//         />
+//         <Menu
+//           model={statusMenuItems}
+//           popup
+//           ref={cellStatusMenu}
+//           id={`status-menu-${rowData._id}`}
+//         />
+//       </div>
+//     );
+//   }
+// );
 
 // Modern Compact Filter Component with Dropdowns
 const NotificationFilter = ({
@@ -688,7 +686,6 @@ export default function Notifications({ role }) {
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
   const { theme } = useMuiTheme();
 
-  const navigate = useNavigate();
   const outletContext = useOutletContext();
 
   useEffect(() => {
@@ -700,16 +697,6 @@ export default function Notifications({ role }) {
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      console.log(
-        "Fetching notifications with page:",
-        page,
-        "limit:",
-        limit,
-        "filter:",
-        activeFilter,
-        "statusFilter:",
-        activeStatusFilter
-      );
 
       const response = await fetchCrewNotifications({
         page,
@@ -717,8 +704,6 @@ export default function Notifications({ role }) {
         type: activeFilter !== "all" ? activeFilter : undefined,
         status: activeStatusFilter !== "all" ? activeStatusFilter : undefined,
       });
-
-      console.log("Notifications response:", response);
 
       if (response.success) {
         setNotifications(response.data);
@@ -730,7 +715,6 @@ export default function Notifications({ role }) {
         showError(response.error || "Failed to fetch notifications");
       }
     } catch (err) {
-      console.error("Error loading notifications:", err);
       setError("Failed to fetch notifications");
       showError("Failed to fetch notifications");
     } finally {
@@ -743,13 +727,11 @@ export default function Notifications({ role }) {
   }, [fetchNotifications]);
 
   const handleFilterClick = (filter) => {
-    console.log("Filter clicked:", filter);
     setActiveFilter(filter);
     setPage(1); // Reset to first page when filter changes
   };
 
   const handleStatusFilterClick = (filter) => {
-    console.log("Status filter clicked:", filter);
     setActiveStatusFilter(filter);
     setPage(1); // Reset to first page when status filter changes
   };
@@ -777,7 +759,6 @@ export default function Notifications({ role }) {
         }
       } catch (error) {
         // Silently handle errors - don't show error for auto-read
-        console.warn("Auto-read error:", error);
       }
     }
   };
@@ -877,9 +858,6 @@ export default function Notifications({ role }) {
       />
     );
   };
-
-  // Calculate unread notifications count
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   // --- Filtering logic ---
   const filteredNotifications = notifications.filter((notif) => {

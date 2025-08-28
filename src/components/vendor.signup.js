@@ -194,17 +194,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       };
 
       formDataObj.append("vendorDetails", JSON.stringify(vendorDetails));
-      console.log("Email is being sent", formDataObj.email);
-
-      console.log("Submitting vendor application with data:", {
-        email: formDataObj.email,
-        role: "service_provider",
-        vendorDetails,
-      });
-
-      for (let pair of formDataObj.entries()) {
-        console.log("Form Data:", pair[0], pair[1]);
-      }
 
       const response = await signup(formDataObj);
 
@@ -217,7 +206,6 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       }
     } catch (error) {
       setError(error.message || "Failed to sign up. Please try again.");
-      console.error("Signup error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -251,62 +239,58 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   //   });
   // };
 
-  const [licenseFile, setLicenseFile] = useState(null);
-  const [taxIdFile, setTaxIdFile] = useState(null);
-  const [insuranceFile, setInsuranceFile] = useState(null);
+  // const handleFileUpload = async (file, type) => {
+  //   if (!file) return;
 
-  const handleFileUpload = async (file, type) => {
-    if (!file) return;
+  //   // Validate file size (e.g., max 10MB)
+  //   const maxSize = 10 * 1024 * 1024;
+  //   if (file.size > maxSize) {
+  //     setError("File size should not exceed 10MB");
+  //     return;
+  //   }
 
-    // Validate file size (e.g., max 10MB)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError("File size should not exceed 10MB");
-      return;
-    }
+  //   // Validate file type
+  //   const validTypes = [
+  //     "application/pdf",
+  //     "image/jpeg",
+  //     "image/png",
+  //     "image/jpg",
+  //   ];
+  //   if (!validTypes.includes(file.type)) {
+  //     setError("Please upload a PDF, JPG, or PNG file");
+  //     return;
+  //   }
 
-    // Validate file type
-    const validTypes = [
-      "application/pdf",
-      "image/jpeg",
-      "image/png",
-      "image/jpg",
-    ];
-    if (!validTypes.includes(file.type)) {
-      setError("Please upload a PDF, JPG, or PNG file");
-      return;
-    }
+  //   setError("");
 
-    setError("");
+  //   setIsSubmitting(true);
+  //   try {
+  //     // Simulate upload delay (remove in production)
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    setIsSubmitting(true);
-    try {
-      // Simulate upload delay (remove in production)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      switch (type) {
-        case "license":
-          setLicenseFile(file);
-          handleInputChange("licenseFile", file);
-          break;
-        case "taxId":
-          setTaxIdFile(file);
-          handleInputChange("taxId", file);
-          break;
-        case "insurance":
-          setInsuranceFile(file);
-          handleInputChange("liabilityInsurance", file);
-          break;
-        default:
-          setError("Invalid file type. Please try again.");
-          return;
-      }
-    } catch (error) {
-      setError("File upload failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  //     switch (type) {
+  //       case "license":
+  //         setLicenseFile(file);
+  //         handleInputChange("licenseFile", file);
+  //         break;
+  //       case "taxId":
+  //         setTaxIdFile(file);
+  //         handleInputChange("taxId", file);
+  //         break;
+  //       case "insurance":
+  //         setInsuranceFile(file);
+  //         handleInputChange("liabilityInsurance", file);
+  //         break;
+  //       default:
+  //         setError("Invalid file type. Please try again.");
+  //         return;
+  //     }
+  //   } catch (error) {
+  //     setError("File upload failed. Please try again.");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   // Define department-specific service options
   const departmentServiceOptions = {
