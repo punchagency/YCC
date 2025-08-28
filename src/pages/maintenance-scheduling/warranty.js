@@ -161,16 +161,16 @@ const Warranty = () => {
       </OverlayPanel>
     </>
   );
-  const attachmentTemplate = (rowData) => {
-    return (
-      <Button
-        icon="pi pi-paperclip"
-        className="p-button-text"
-        tooltip={`Download ${rowData.attachment}`}
-        tooltipOptions={{ position: "top" }}
-      />
-    );
-  };
+  // const attachmentTemplate = (rowData) => {
+  //   return (
+  //     <Button
+  //       icon="pi pi-paperclip"
+  //       className="p-button-text"
+  //       tooltip={`Download ${rowData.attachment}`}
+  //       tooltipOptions={{ position: "top" }}
+  //     />
+  //   );
+  // };
   const skeletonTemplate = () => (
     <>
       <Skeleton width="18%" className="mr-2" />

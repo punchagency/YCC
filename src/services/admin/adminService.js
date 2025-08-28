@@ -11,7 +11,6 @@ export const checkPendingVendors = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error checking pending vendors:', error);
     throw error;
   }
 };
@@ -30,13 +29,11 @@ export const fetchPendingVendors = async (type, lastId = null, limit = 20) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching pending vendors:', error);
     throw error;
   }
 };
 
 export const approveVendor = async (vendorId, type, emailData) => {
-  console.log('Approving vendor:', vendorId, type, emailData);
   try {
     const response = await axios.put(
       `${API_URL}/admin/vendors/${vendorId}/approve`,
@@ -53,13 +50,11 @@ export const approveVendor = async (vendorId, type, emailData) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error approving vendor:', error);
     throw error;
   }
 };
 
 export const rejectVendor = async (vendorId, type, emailData) => {
-  console.log('Rejecting vendor:', vendorId, type, emailData);
   try {
     const response = await axios.put(
       `${API_URL}/admin/vendors/${vendorId}/reject`,
@@ -75,7 +70,6 @@ export const rejectVendor = async (vendorId, type, emailData) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error rejecting vendor:', error);
     throw error;
   }
 }; 

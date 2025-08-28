@@ -128,7 +128,6 @@ const Signup = () => {
   const handleFormDataChange = (newData) => {
     setFormData((prev) => {
       const updated = { ...prev, ...newData };
-      console.log("Updated Form Data:", updated);
       return updated;
     });
   };

@@ -181,7 +181,7 @@ const Compliance = () => {
           label="Delete"
           icon="pi pi-trash"
           className="p-button-text w-full"
-          onClick={() => console.log("Delete", rowData)}
+          onClick={() => {}}
         />
       </OverlayPanel>
     </>

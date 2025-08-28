@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
-import LeftMenu from "../../components/menu";
-import AdminHeader from "../../components/header";
 import PDFIcon from "../../assets/images/pdf.svg";
 
 const MaintenanceDetails = () => {
@@ -15,14 +13,11 @@ const MaintenanceDetails = () => {
       url: "path/to/example.pdf",
     },
   ]);
-
-  const [isEditing, setIsEditing] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const handleEdit = () => {
-    setIsEditing(!isEditing);
-    console.log(isEditing ? "Editing disabled" : "Editing enabled");
-  };
+  // const handleEdit = () => {
+  //   setIsEditing(!isEditing);
+  // };
 
   const downloadAllFiles = () => {
     uploadedFiles.forEach((file) => {
@@ -135,9 +130,10 @@ const MaintenanceDetails = () => {
                                     {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
                                     <img
                                       src={PDFIcon}
+                                      alt="PDF Icon"
                                       className="file-icon p-mr-2"
                                       style={{ fontSize: "2rem" }}
-                                    ></img>
+                                    />
                                     <span className="flex align-items-center">
                                       {file.name}
                                     </span>

@@ -45,17 +45,11 @@ export const createCrewInventoryData = async (inventoryData) => {
         dataToSend[key] = value;
       }
       headers["Content-Type"] = "application/json";
-
-      console.log("Converted FormData to JSON object:", dataToSend);
     } else {
       // Use JSON data as is
       dataToSend = inventoryData;
       headers["Content-Type"] = "application/json";
     }
-
-    console.log("Sending request to:", `${API_URL}/crew-inventory/`);
-    console.log("With data:", dataToSend);
-    console.log("With headers:", headers);
 
     // Use the crew-specific endpoint
     const response = await axios.post(
@@ -65,8 +59,6 @@ export const createCrewInventoryData = async (inventoryData) => {
         headers: headers,
       }
     );
-
-    console.log("Response from server:", response.data);
 
     return {
       success: true,

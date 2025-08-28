@@ -33,7 +33,7 @@ const Booking = () => {
   const [error, setError] = React.useState(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const [showVendorModal, setShowVendorModal] = React.useState(false);
+  const [showVendorModal] = React.useState(false);
 
   const fetchBookings = React.useCallback(async (params = {}) => {
     const currentPage = params.page || page;
@@ -41,7 +41,6 @@ const Booking = () => {
     setLoading(true);
     try {
       const response = await getBookings({ page: currentPage, limit: currentLimit });
-      console.log("Fetched bookings:", response);
 
       if (response.status) {
         setBookings(response.data.data || []);
@@ -53,7 +52,6 @@ const Booking = () => {
         showError(response.error || "Failed to fetch bookings");
       }
     } catch (err) {
-      console.error("Error in fetching bookings:", err);
       setError("An unexpected error occurred");
       showError("An unexpected error occurred");
     } finally {
@@ -74,7 +72,6 @@ const Booking = () => {
         setVendors(uniqueVendors);
       }
     } catch (error) {
-      console.error("Error fetching vendors:", error);
       showError("Failed to fetch vendors");
     } finally {
       setLoading(false);

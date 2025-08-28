@@ -22,7 +22,6 @@ export const AllEventsModal = ({
     const toast = useRef(null);
 
     const handleUpdateClick = (event) => {
-        console.log("handleUpdateClick event: ", event);
         setSelectedEvent({ ...event }); // Create a copy of the event
         setShowUpdateEventModal(true);
     };

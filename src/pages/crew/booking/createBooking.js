@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 
 import { fetchVendorsByServiceCategories, fetchServicesByVendor, createBooking } from "../../../services/crew/crewBookingService";
-import { useUser } from "../../../context/userContext";
 import { useToast } from "../../../components/Toast";
 
 const CreateBooking = ({
@@ -35,7 +34,6 @@ const CreateBooking = ({
   vendorServices, setVendorServices,
   loading, setLoading, fetchBookings
 }) => {
-  const { user } = useUser();
   const { showSuccess, showError } = useToast();
   const [bookingForm, setBookingForm] = React.useState({
     serviceLocation: '',
@@ -98,7 +96,6 @@ const CreateBooking = ({
         showError(response.error || 'Failed to fetch vendors');
       }
     } catch (error) {
-      console.error('Error fetching vendors:', error);
       showError('An error occurred while fetching vendors');
     } finally {
       setLoading(false);
@@ -107,12 +104,10 @@ const CreateBooking = ({
 
   // Handle vendor selection
   const handleVendorSelect = async (vendor) => {
-    console.log('Selected vendor:', vendor);
     setSelectedVendor(vendor);
     setLoading(true);
     try {
       const response = await fetchServicesByVendor({ vendorId: vendor._id });
-      console.log('Vendor services response:', response);
       if (response.status) {
         setVendorServices(response.data.services || []);
         setOpenSelectVendors(false);
@@ -121,7 +116,6 @@ const CreateBooking = ({
         showError(response.error || 'Failed to fetch vendor services');
       }
     } catch (error) {
-      console.error('Error fetching services:', error);
       showError('An error occurred while fetching services');
     } finally {
       setLoading(false);
@@ -195,7 +189,6 @@ const CreateBooking = ({
         showError(response.error || response.message || 'Failed to create booking');
       }
     } catch (error) {
-      console.error('Error creating booking:', error);
       showError('An error occurred while creating the booking');
     } finally {
       setLoading(false);

@@ -13,8 +13,6 @@ import { useToast } from "../../../components/Toast";
 import { useUser } from "../../../context/userContext";
 
 const Order = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isHovered, setIsHovered] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Modal state
@@ -104,7 +102,6 @@ const Order = () => {
         setError(response.error);
       }
     } catch (error) {
-      console.error("Error in fetchOrdersData:", error);
 
       // Handle 401 authentication errors
       if (error.isAuthError && error.status === 401) {
@@ -135,7 +132,6 @@ const Order = () => {
 
   // Handle filter changes from ActiveOrders component
   const handleFilterChange = (filterCriteria) => {
-    console.log("Filter criteria changed:", filterCriteria);
 
     // Extract status from filter criteria
     let newStatus = "all";

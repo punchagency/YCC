@@ -10,27 +10,13 @@ const api = axios.create({
   }
 });
 
-const getAuthHeader = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
 // Get all services (public route - no auth required)
-export const getAllServices = async () => {
+export const getAllServices = async (type) => {
   try {
-    const url = `/public/services`;
-    console.log("Fetching all services from URL:", url);
-    console.log("API_URL value:", API_URL);
-    console.log("Full URL:", `${API_URL}${url}`);
+    const url = `/public/services?type=${type}`;
     const response = await api.get(url);
-    console.log("Services response:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error fetching services:", error);
-    console.error("Error Message:", error.message);
-    console.error("Request URL:", error.config?.url);
-    console.error("Request method:", error.config?.method);
-    console.error("Request headers:", error.config?.headers);
     throw error;
   }
 };
@@ -41,7 +27,6 @@ export const getServiceByName = async (name) => {
     const response = await axios.get(`${API_URL}/public/services/${name}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching service:", error);
     throw error;
   }
 };
@@ -61,7 +46,6 @@ export const createService = async (serviceData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error creating service:", error);
     throw error;
   }
 };
@@ -80,7 +64,6 @@ export const updateService = async (id, serviceData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating service:", error);
     throw error;
   }
 };
@@ -95,7 +78,6 @@ export const deleteService = async (id) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting service:", error);
     throw error;
   }
 };
@@ -110,7 +92,6 @@ export const getAllVendorServices = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching vendor services:", error);
     throw error;
   }
 };
@@ -129,7 +110,6 @@ export const uploadServices = async (file) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error uploading services:", error);
     throw error;
   }
 };

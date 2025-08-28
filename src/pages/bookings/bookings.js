@@ -14,21 +14,15 @@ import { Menu } from "primereact/menu";
 // import sourceData from "../../data/sourceData.json";
 // import analyticsData from "../../data/analyticsData.json";
 // import sort from "../../assets/images/crew/sort.png";
-import editLogo from "../../assets/images/crew/editLogo.png";
 // import deleteLogo from "../../assets/images/crew/deleteLogo.png";
-import plus from "../../assets/images/crew/plus.png";
 // import eyesIn from "../../assets/images/crew/eyes-in.png";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 // import { InputTextarea } from "primereact/inputtextarea";
-import uploadBooking from "../../assets/images/crew/uploadBooking.png";
 // import downloadIcon from "../../assets/images/crew/downloadIcon.png";
 // import times from "../../assets/images/crew/times.png";
-import check from "../../assets/images/crew/check.png";
-import eyeblock from "../../assets/images/crew/eyeblock.png";
 import sortIcon from "../../assets/images/crew/sort.png";
-import deleteIcon from "../../assets/images/crew/delete.png";
 // import axios from "axios";
 import "./bookings.css";
 import {
@@ -54,7 +48,6 @@ const Bookings = () => {
 
   // Context
   const {
-    bookings,
     // deleteBooking,
     fetchBookings,
     updateBooking,
@@ -67,14 +60,14 @@ const Bookings = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedReview] = useState("");
   const statusMenuRef = useRef(null);
-  const [selectedBookingForStatus, setSelectedBookingForStatus] =
+  const [selectedBookingForStatus] =
     useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewBooking, setViewBooking] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingBooking, setEditingBooking] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedBookingForUpload, setSelectedBookingForUpload] =
+  const [selectedBookingForUpload] =
     useState(null);
   // fetching of services
   // const [getServices, setGetServices] = useState([]);
@@ -175,10 +168,6 @@ const Bookings = () => {
       // Convert status to lowercase to match backend expectations
       const lowercaseStatus = newStatus.toLowerCase();
 
-      console.log(
-        `Updating booking ${booking._id} status to ${lowercaseStatus}`
-      );
-
       // Call the API directly to ensure immediate update
       const result = await updateBookingStatusService(
         booking._id,
@@ -203,7 +192,6 @@ const Bookings = () => {
         showError(result.message || "Failed to update booking status");
       }
     } catch (error) {
-      console.error("Error updating booking status:", error);
       showError("An error occurred while updating the booking status");
     } finally {
       setLoading(false);
@@ -215,14 +203,13 @@ const Bookings = () => {
     setShowViewModal(true);
   };
 
-  const handleEditBooking = (booking) => {
-    setEditingBooking({ ...booking });
-    setShowEditForm(true);
-  };
+  // const handleEditBooking = (booking) => {
+  //   setEditingBooking({ ...booking });
+  //   setShowEditForm(true);
+  // };
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setEditingBooking({
       ...editingBooking,
       [name]: value,
@@ -254,7 +241,6 @@ const Bookings = () => {
 
   const handleSaveBooking = () => {
     try {
-      console.log("Starting to save booking with data:", editingBooking);
 
       // Create a properly formatted booking object for the API
       const bookingData = {
@@ -273,12 +259,10 @@ const Bookings = () => {
         internalNotes: editingBooking.reviews,
       };
 
-      console.log("Formatted booking data for API:", bookingData);
 
       // Call the updateBooking function with the formatted data
       updateBooking(editingBooking._id, bookingData)
         .then((success) => {
-          console.log("Update booking response:", success);
           if (success) {
             showSuccess("Booking updated successfully");
             setShowEditForm(false);
@@ -288,25 +272,23 @@ const Bookings = () => {
           }
         })
         .catch((error) => {
-          console.error("Error in updateBooking:", error);
           showError("An error occurred while updating the booking");
         });
     } catch (error) {
-      console.error("Error in handleSaveBooking:", error);
       showError("An error occurred while preparing the booking update");
     }
   };
 
-  const handleUploadBooking = (booking) => {
-    setSelectedBookingForUpload(booking);
-    setUploadForm({
-      invoiceNumber: "",
-      date: null,
-      amount: "",
-      file: null,
-    });
-    setShowUploadModal(true);
-  };
+  // const handleUploadBooking = (booking) => {
+  //   setSelectedBookingForUpload(booking);
+  //   setUploadForm({
+  //     invoiceNumber: "",
+  //     date: null,
+  //     amount: "",
+  //     file: null,
+  //   });
+  //   setShowUploadModal(true);
+  // };
 
   const handleUploadFormChange = (e) => {
     const { name, value } = e.target;
@@ -362,7 +344,6 @@ const Bookings = () => {
         setVendors(uniqueVendors);
       }
     } catch (error) {
-      console.error("Error fetching vendors:", error);
       showError("Failed to fetch vendors");
     }
   };
@@ -437,7 +418,6 @@ const Bookings = () => {
         showError(response.message || "Failed to create booking");
       }
     } catch (error) {
-      console.error("Error creating booking:", error);
       showError("An error occurred while creating the booking");
     } finally {
       setLoading(false);
@@ -456,7 +436,6 @@ const Bookings = () => {
     try {
       setLoading(true);
       const response = await getAllBookingService(currentPage, pageSize);
-      console.log("Fetched bookings response:", response);
 
       if (response.status) {
         const formattedBookings = response.data.map((booking) => ({
@@ -482,11 +461,9 @@ const Bookings = () => {
         setBookingData(formattedBookings);
         setTotalRecords(response.pagination?.total || formattedBookings.length);
       } else {
-        console.error("Error fetching bookings data:", response.message);
         showError(response.message || "Failed to fetch bookings");
       }
     } catch (error) {
-      console.error("Error fetching bookings data:", error);
       showError("Failed to fetch bookings");
     } finally {
       setLoading(false);
@@ -659,17 +636,14 @@ const Bookings = () => {
       // Select all bookings
       const allBookingIds = bookingData.map((booking) => booking._id);
       setSelectedBookings(allBookingIds);
-      console.log("Selected all bookings:", allBookingIds);
     } else {
       // Deselect all
       setSelectedBookings([]);
-      console.log("Deselected all bookings");
     }
   };
 
   const handleSelectBooking = (e, bookingId) => {
     const checked = e.target.checked;
-    console.log(`${checked ? "Selecting" : "Deselecting"} booking:`, bookingId);
 
     if (checked) {
       setSelectedBookings((prev) => [...prev, bookingId]);
@@ -689,8 +663,6 @@ const Bookings = () => {
       return;
     }
 
-    console.log("Initiating bulk delete for bookings:", selectedBookings);
-
     setBookingToDelete({
       multiple: true,
       ids: selectedBookings,
@@ -699,24 +671,21 @@ const Bookings = () => {
     setShowDeleteConfirmation(true);
   };
 
-  const handleDeleteClick = (booking) => {
-    setBookingToDelete({
-      _id: booking._id,
-      multiple: false,
-    });
-    setShowDeleteConfirmation(true);
-  };
+  // const handleDeleteClick = (booking) => {
+  //   setBookingToDelete({
+  //     _id: booking._id,
+  //     multiple: false,
+  //   });
+  //   setShowDeleteConfirmation(true);
+  // };
 
   const confirmDelete = async () => {
     try {
       setLoading(true);
-      console.log("Confirming deletion for:", bookingToDelete);
 
       if (bookingToDelete?.multiple) {
-        console.log("Performing bulk deletion for IDs:", bookingToDelete.ids);
 
         const response = await bulkDeleteBookings(bookingToDelete.ids);
-        console.log("Bulk delete response:", response);
 
         if (response.success) {
           // Remove the deleted bookings from the state
@@ -738,10 +707,8 @@ const Bookings = () => {
         }
       } else {
         // Single booking deletion
-        console.log("Deleting single booking:", bookingToDelete);
 
         const response = await deleteBookingService(bookingToDelete._id);
-        console.log("Single delete response:", response);
 
         if (response.success) {
           setBookingData((prevBookings) =>
@@ -756,7 +723,6 @@ const Bookings = () => {
         }
       }
     } catch (error) {
-      console.error("Error in confirmDelete:", error);
       showError("An error occurred while deleting");
     } finally {
       setLoading(false);
@@ -841,11 +807,9 @@ const Bookings = () => {
                         }
                         options={getFormattedServices()}
                         onChange={(e) => {
-                          console.log("Selected Service:", e.value);
                           const selectedService = getFormattedServices().find(
                             (s) => s.value === e.value
                           );
-                          console.log("Service Details:", selectedService);
 
                           // First update the service selection
                           handleEditServiceChange(e);
@@ -1892,11 +1856,9 @@ const Bookings = () => {
               value={newBooking.serviceType}
               options={getFormattedServices()}
               onChange={(e) => {
-                console.log("Selected Service:", e.value);
                 const selectedService = getFormattedServices().find(
                   (s) => s.value === e.value
                 );
-                console.log("Service Details:", selectedService);
 
                 handleNewBookingChange("serviceType", e.value);
 

@@ -1,5 +1,5 @@
 import { Box, Typography, styled } from '@mui/material'
-import banner from '../../assets/images/interior/YCC-interior-banner.png'
+import banner from '../../assets/images/interior/interior-banner.jpg'
 import LandingPageBanner from '../../components/landing-page-banner'
 import LandingPageFooter from '../../components/landing-page-footer'
 import Section2Interior from '../../components/interior/section2-interior'

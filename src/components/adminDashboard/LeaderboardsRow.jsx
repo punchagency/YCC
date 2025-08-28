@@ -59,7 +59,6 @@ const LeaderboardsRow = () => {
    * @param {number} index - User rank index
    */
   const handleUserClick = (user, index) => {
-    console.log(`User clicked: ${user.name} (Rank ${index + 1})`, user);
     // TODO: Implement detailed user view modal or navigation
   };
 
@@ -69,10 +68,6 @@ const LeaderboardsRow = () => {
    * @param {number} index - Supplier rank index
    */
   const handleSupplierClick = (supplier, index) => {
-    console.log(
-      `Supplier clicked: ${supplier.name} (Rank ${index + 1})`,
-      supplier
-    );
     // TODO: Implement detailed supplier view modal or navigation
   };
 
@@ -82,10 +77,6 @@ const LeaderboardsRow = () => {
    * @param {number} index - Provider rank index
    */
   const handleProviderClick = (provider, index) => {
-    console.log(
-      `Service provider clicked: ${provider.name} (Rank ${index + 1})`,
-      provider
-    );
     // TODO: Implement detailed provider view modal or navigation
   };
 

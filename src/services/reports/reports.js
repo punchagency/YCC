@@ -175,7 +175,6 @@ const downloadBookingReport = async () => {
 
 const downloadFinancialReport = async () => {
   try {
-    console.log("Starting financial report download...");
     const response = await axios.get(
       `${API_URL}/reports/financial-report?format=pdf`,
       {
@@ -183,7 +182,6 @@ const downloadFinancialReport = async () => {
         responseType: "blob",
       }
     );
-    console.log("Financial report API response received:", response);
 
     // Create a blob from the PDF content
     const blob = new Blob([response.data], { type: "application/pdf" });
@@ -200,8 +198,6 @@ const downloadFinancialReport = async () => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error in downloadFinancialReport:", error);
-    console.error("Error response:", error.response);
     return {
       success: false,
       error:

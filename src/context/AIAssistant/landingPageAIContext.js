@@ -29,12 +29,10 @@ export const LandingPageAIProvider = ({ children }) => {
       setIsAIAssistantOpen(true);
     }
     setTypingState(true);
-    console.log(" message being sent", message);
     const nextChatData = {
       ...chatData,
       messages: [...chatData.messages, { role: "user", content: message }],
     };
-    console.log("chatData on sending message", nextChatData);
     setChatData(nextChatData);
     setMessage("");
     getResponse(nextChatData);
@@ -55,15 +53,12 @@ export const LandingPageAIProvider = ({ children }) => {
       setTypingState(false);
     }, 2000);
     */
-    console.log("chatData on getting response", previousChatData);
     const response = await getResponseFromAI(previousChatData);
-    console.log("response from AI", response);
     setChatData(response);
     setTypingState(false);
   };
 
   const preDefinedMessages = (predefinedMessage) => {
-    console.log("message sent", predefinedMessage);
     if (!predefinedMessage.trim()) return;
     if (!isAIAssistantOpen) {
       setIsAIAssistantOpen(true);

@@ -57,13 +57,10 @@ export const getReportsCharts = async (period = 30) => {
     );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Error Response:", errorText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
-    console.log("Reports Charts API Response:", result); // Debug log
 
     if (!result.success) {
       throw new Error(result.message || "API request failed");
@@ -75,7 +72,6 @@ export const getReportsCharts = async (period = 30) => {
 
     return result;
   } catch (error) {
-    console.error("Error fetching reports charts:", error);
     throw new Error(`Failed to fetch reports charts data: ${error.message}`);
   }
 };
