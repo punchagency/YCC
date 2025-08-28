@@ -1,6 +1,6 @@
 import { Box, Typography, Card, CardContent, CardActions, Button, Stack, Avatar, Chip, useTheme, useMediaQuery } from '@mui/material';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import EmailIcon from '@mui/icons-material/Email';
+import LocationOnIcon from "../../assets/images/pin-location.svg";
+import EmailIcon from "../../assets/images/email.svg";
 // import StarIcon from '@mui/icons-material/Star';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
@@ -107,8 +107,8 @@ const ServiceCard = ({ service }) => {
 
         <Stack spacing={1} mb={2}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <LocationOnIcon sx={{ color: '#0487D9', fontSize: 20 }} />
-            <Typography sx={{ color: '#666', fontSize: 14 }}>
+            <img src={LocationOnIcon} alt="Location" style={{ width: "24px", height: "24px" }} />
+            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
               {service.supplier?.location || service.location || 'Location not specified'}
             </Typography>
           </Stack>
@@ -124,8 +124,8 @@ const ServiceCard = ({ service }) => {
           </Stack> */}
 
           <Stack direction="row" alignItems="center" spacing={1}>
-            <EmailIcon sx={{ color: '#0487D9', fontSize: 20 }} />
-            <Typography sx={{ color: '#666', fontSize: 14, wordBreak: 'break-all' }}>
+            <img src={EmailIcon} alt="Email" style={{ width: "24px", height: "24px" }} />
+            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
               {service.supplier?.email || service.email || service.vendor?.email || 'Email not specified'}
             </Typography>
           </Stack>
