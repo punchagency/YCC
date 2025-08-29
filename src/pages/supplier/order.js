@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useUser } from "../../context/userContext";
 import { useTheme } from "../../context/theme/themeContext";
 import { useOutletContext } from "react-router-dom";
 import {
@@ -37,13 +36,11 @@ import {
 } from "@mui/material";
 import {
     Search as SearchIcon,
-    MoreVert as MoreVertIcon,
     CheckCircle as CheckCircleIcon,
     LocalShipping as LocalShippingIcon,
     Cancel as CancelIcon,
     Visibility as VisibilityIcon,
     Done as DoneIcon,
-    Close as CloseIcon,
     ShoppingCart as ShoppingCartIcon,
     Inventory as InventoryIcon,
     Person as PersonIcon,
@@ -56,7 +53,6 @@ import { format } from 'date-fns';
 import { useNavigate } from "react-router-dom";
 
 const SupplierOrder = () => {
-    const { user } = useUser();
     const navigate = useNavigate();
     const { theme } = useTheme();
     const muiTheme = useMuiTheme();
@@ -384,7 +380,7 @@ const SupplierOrder = () => {
     };
 
     return (
-        <Box sx={{ p: 4, paddingTop: "80px" }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
             {/* Header with gradient background */}
             <Paper
                 elevation={0}

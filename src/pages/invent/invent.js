@@ -1202,13 +1202,6 @@ const Invent = () => {
     // Return null when there are items (they'll be rendered by desktop or mobile view)
     return null;
   };
-
-  // Add this style to your component
-  const dropdownStyles = {
-    border: "none",
-    boxShadow: "none",
-  };
-
   // Add this to your component's useEffect
   useEffect(() => {
     // Add custom styles to remove borders from dropdown
@@ -1633,6 +1626,7 @@ const Invent = () => {
                           }}
                         />
                       </TableCell>
+                      {user.role.name === 'admin' && (
                       <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
                         {typeof item.supplier === "object"
                           ? item.supplier.businessName ||
@@ -1643,6 +1637,7 @@ const Invent = () => {
                             ? item.supplier
                             : "Not available"}
                       </TableCell>
+                      )}
                       <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
                         {item.productName}
                       </TableCell>
@@ -2084,7 +2079,7 @@ const Invent = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}>
           <Stack spacing={3}>
             <Box>
               <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
@@ -2787,7 +2782,7 @@ const Invent = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: { xs: 2, sm: 3 }, pb: { xs: 10, sm: 8 } }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}>
           <Stack spacing={3}>
             <Box>
               <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
@@ -3744,7 +3739,7 @@ const Invent = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 } }}>
           <Stack spacing={3}>
             <Box sx={{
               display: "flex",

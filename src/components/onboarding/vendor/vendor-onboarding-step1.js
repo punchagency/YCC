@@ -502,9 +502,9 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
       >
         <DialogContent 
           sx={{ 
-            p: { xs: 2, sm: 3 },
+            p: { xs: 0.8, sm: 1, md: 2, lg: 3 },
             '&.MuiDialogContent-root': {
-              paddingTop: { xs: 2, sm: 3 }
+              paddingTop: { xs: 0.8, sm: 1, md: 2, lg: 3 }
             },
             overflow: 'auto'
           }}

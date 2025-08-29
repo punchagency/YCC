@@ -282,14 +282,7 @@ const ServiceProvidersCalendar = () => {
 
   return (
     <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: customTheme.theme === 'dark'
-          ? muiTheme.palette.grey[900]
-          : muiTheme.palette.grey[50],
-        p: { xs: 2, sm: 3 },
-        paddingTop: '80px !important',
-      }}
+      sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}
     >
       {/* Header Section */}
       <Paper

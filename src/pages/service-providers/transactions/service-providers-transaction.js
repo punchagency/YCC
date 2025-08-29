@@ -14,7 +14,6 @@ import {
   CardContent,
   Avatar,
   Chip,
-  Container,
   Skeleton,
   Table,
   TableBody,
@@ -37,10 +36,6 @@ import {
   Divider,
   useMediaQuery,
   useTheme as useMuiTheme,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
 } from "@mui/material";
 import {
   AttachMoney as MoneyIcon,
@@ -167,7 +162,7 @@ const ServiceProvidersTransactions = () => {
       }}
     >
       <Box sx={{ height: '4px', width: '100%', bgcolor: color }} />
-      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+      <CardContent sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 } }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
           <Typography variant="body1" color="text.secondary" fontWeight={500}>
             {title}
@@ -247,14 +242,21 @@ const ServiceProvidersTransactions = () => {
               <Typography variant="body2">{formatDate(invoice.invoiceDate)}</Typography>
             </Box>
             <Stack direction="row" spacing={1}>
-              <IconButton
-                size="small"
+              <Button
                 onClick={() => setSelectedInvoice(invoice)}
-                sx={{ color: '#003366' }}
+                sx={{
+                  color: '#333',
+                  borderColor: '#ccc',
+                  borderRadius: '12px',
+                  '&:hover': {
+                    borderColor: '#999',
+                    backgroundColor: alpha('#ccc', 0.1)
+                  },
+                }}
               >
-                <ViewIcon fontSize="small" />
+                <ViewIcon fontSize="small" sx={{ mr: 1 }} />
                 View Details
-              </IconButton>
+              </Button>
             </Stack>
           </Stack>
         </Stack>
@@ -321,7 +323,7 @@ const ServiceProvidersTransactions = () => {
 
   return (
     <>
-      <Box sx={{ p: { xs: 0.8, sm: 1, md: 3 }, paddingTop: "60px" }}>
+      <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
         {/* Header */}
         <Paper
           elevation={0}
@@ -480,7 +482,7 @@ const ServiceProvidersTransactions = () => {
         {/* Invoices Table */}
         <Card elevation={1} sx={{ background: theme === "light" ? "#ffffff" : "#1a1a1a", borderRadius: 3 }}>
           <CardContent sx={{ p: 0 }}>
-            <Box sx={{ p: { xs: 2, sm: 3 }, borderBottom: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, borderBottom: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <ReceiptIcon fontSize="small" color="primary" />
                 Invoices ({pagination.total || 0})
@@ -597,14 +599,21 @@ const ServiceProvidersTransactions = () => {
                             </TableCell>
                             <TableCell sx={{ textAlign: 'left' }}>
                               <Stack direction="row" spacing={1}>
-                                <IconButton
-                                  size="small"
+                                <Button
                                   onClick={() => setSelectedInvoice(invoice)}
-                                  sx={{ color: '#003366' }}
+                                  sx={{
+                                    color: '#333',
+                                    borderColor: '#ccc',
+                                    borderRadius: '12px',
+                                    '&:hover': {
+                                      borderColor: '#999',
+                                      backgroundColor: alpha('#ccc', 0.1)
+                                    },
+                                  }}
                                 >
-                                  <ViewIcon fontSize="small" />
+                                  <ViewIcon fontSize="small" sx={{ mr: 1 }} />
                                   View Details
-                                </IconButton>
+                                </Button>
                               </Stack>
                             </TableCell>
                           </TableRow>
@@ -615,7 +624,7 @@ const ServiceProvidersTransactions = () => {
                 )}
 
                 {pagination.pages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: { xs: 2, sm: 3 } }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: { xs: 0.8, sm: 1, md: 2, lg: 3 } }}>
                     <Pagination
                       count={pagination.pages}
                       page={pagination.page}
@@ -835,7 +844,7 @@ const ServiceProvidersTransactions = () => {
             </Grid>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: { xs: 2, sm: 3 }, bgcolor: alpha('#f5f5f5', 0.5) }}>
+        <DialogActions sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, bgcolor: alpha('#f5f5f5', 0.5) }}>
           <Button
             variant="contained"
             onClick={() => setSelectedInvoice(null)}

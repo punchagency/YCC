@@ -431,7 +431,7 @@ const BookingDetails = () => {
     };
 
     return (
-        <Box sx={{ p: {xs: 1, sm: 1.4, lg: 4}, paddingTop: "70px !important" }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
             {/* Back button and booking status */}
             <Stack 
                 direction="row" 

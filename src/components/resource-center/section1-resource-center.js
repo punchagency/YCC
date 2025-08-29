@@ -1,13 +1,7 @@
-import { Box, Container, Typography, styled, ToggleButton, ToggleButtonGroup, TextField, InputAdornment, Button } from '@mui/material'
+import { Box, Container, Typography, styled, TextField, InputAdornment, Button } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search';
-import CaptainIcon from '@mui/icons-material/Person';
-import CrewIcon from '@mui/icons-material/Groups';
-import EngineeringIcon from '@mui/icons-material/Build';
 import ExteriorIcon from '@mui/icons-material/Deck';
-import GalleyIcon from '@mui/icons-material/Restaurant';
-import InteriorIcon from '@mui/icons-material/Weekend';
-import { useState } from 'react';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 const categories = [
   { label: 'Captain', icon: <img src="/RescourceIcon/captain.png" alt="Captain" style={{ width: 28, height: 28 }} /> },
@@ -18,7 +12,195 @@ const categories = [
   { label: 'Interior', icon: <img src="/RescourceIcon/Extiorior.png" alt="Interior" style={{ width: 28, height: 28 }} /> },
 ];
 
-const Section1ResourceCenter = ({ toggle, setToggle, category, setCategory, search, setSearch }) => {
+const serviceOptions = [
+  'Vessel Management & Administration',
+  'Maritime Legal & Compliance Assistance',
+  'Crew Recruitment & Placement Services',
+  'Customs & Immigration Assistance',
+  'Insurance & Risk Management',
+  'Security & Anti-Piracy Training',
+  'Safety Equipment Inspections & Compliance',
+  'IT & Cybersecurity Services for Yachts',
+  'Charter & Itinerary Planning Assistance',
+  'Satellite & Internet Connectivity Solutions',
+  'Fresh Produce & Gourmet Food Provisioning',
+  'Butcher & Seafood Supply Services',
+  'Specialty Ingredient Sourcing',
+  'Custom Catering & Onboard Chef Services',
+  'Galley Equipment Maintenance & Repair',
+  'Wine, Spirits & Specialty Beverages Supply',
+  'Specialty Coffee & Tea Provisioning',
+  'Dry & Frozen Goods Supply',
+  'Galley Deep Cleaning & Sanitation Services',
+  'Kitchenware & Culinary Equipment Supply',
+  'Marine Engine Servicing & Repairs',
+  'Generator Installation & Maintenance',
+  'HVAC & Refrigeration Services',
+  'Watermaker Installation & Repairs',
+  'Fuel System Cleaning & Maintenance',
+  'Electrical System Troubleshooting',
+  'Navigation & Communication System Setup',
+  'Hydraulic System Servicing',
+  'Welding & Metal Fabrication Services',
+  'Spare Parts Sourcing & Logistics',
+  'Yacht Interior Cleaning & Housekeeping',
+  'Laundry & Dry Cleaning Services',
+  'Custom Interior Design & Refurbishment',
+  'Florist & Fresh Flower Arrangements',
+  'Carpet & Upholstery Cleaning',
+  'Event & Party Planning Services',
+  'Provisioning for Guest Supplies',
+  'Bar & Beverage Supply Services',
+  'AV & Entertainment System Installation',
+  'Crew Uniform Tailoring & Embroidery',
+  'Yacht Detailing & Washdowns',
+  'Teak Deck Sanding & Restoration',
+  'Varnishing & Paintwork Services',
+  'Fiberglass & Gelcoat Repairs',
+  'Docking & Line Handling Assistance',
+  'Diving & Underwater Hull Cleaning',
+  'Fender & Rope Supply & Maintenance',
+  'Tender & Jet Ski Servicing',
+  'Watersports Equipment Rental & Repairs',
+  'Exterior Upholstery & Canvas Work',
+  'Mental Health Support',
+  'Confidential Therapy',
+  'Career Guidance',
+  'Legal Consultation',
+  'Financial Advisory',
+];
+
+const categoryOptions = [
+  {
+    label: "Navigation Equipment",
+    value: "Navigation Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/navigation1.png",
+  },
+  {
+    label: "Safety Gear",
+    value: "Safety Gear",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/safety1.png",
+  },
+  {
+    label: "Marine Electronics",
+    value: "Marine Electronics",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/electronics1.png",
+  },
+  {
+    label: "Deck Equipment",
+    value: "Deck_Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/deck1.png",
+  },
+  {
+    label: "Engine & Propulsion",
+    value: "Engine & Propulsion",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/engine1.png",
+  },
+  {
+    label: "Anchoring System",
+    value: "Anchoring System",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/anchor1.png",
+  },
+  {
+    label: "Sailing Equipment",
+    value: "Sailing Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/sailing1.png",
+  },
+  {
+    label: "Water Sports Gear",
+    value: "Water Sports Gear",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/sports1.png",
+  },
+  {
+    label: "Fishing Equipment",
+    value: "Fishing Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/fishing1.png",
+  },
+  {
+    label: "Marine Furniture",
+    value: "Marine Furniture",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/furniture1.png",
+  },
+  {
+    label: "Galley Equipment",
+    value: "Galley Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/galley1.png",
+  },
+  {
+    label: "Refrigeration",
+    value: "Refrigeration",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/refrigeration1.png",
+  },
+  {
+    label: "Water Systems",
+    value: "Water Systems",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/water1.png",
+  },
+  {
+    label: "Electrical Systems",
+    value: "Electrical Systems",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/electrical1.png",
+  },
+  {
+    label: "Hull Maintenance",
+    value: "Hull Maintenance",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/maintenance1.png",
+  },
+  {
+    label: "Mooring Equipment",
+    value: "Mooring Equipment",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/mooring1.png",
+  },
+  {
+    label: "Communication Systems",
+    value: "Communication Systems",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/communication1.png",
+  },
+  {
+    label: "Sea Food Storage",
+    value: "Sea Food Storage",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/food_storage1.png",
+  },
+  {
+    label: "Bilge Systems",
+    value: "Bilge Systems",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/bilge1.png",
+  },
+  {
+    label: "HVAC Systems",
+    value: "HVAC Systems",
+    icon: process.env.PUBLIC_URL + "/RescourceIcon/hvac1.png",
+  },
+];
+
+// Helper function to get random items from an array
+const getRandomItems = (array, count) => {
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
+const Section1ResourceCenter = ({ toggle, setToggle, category, setCategory, search, setSearch, type }) => {
+  // Get 6 random categories based on the type
+  const displayCategories = useMemo(() => {
+    if (type === 'product') {
+      // For products, use categoryOptions
+      return getRandomItems(categoryOptions, 6);
+    } else {
+      // For services, use serviceOptions keys
+      return getRandomItems(serviceOptions, 6).map(key => ({
+        label: key.charAt(0).toUpperCase() + key.slice(1),
+        value: key,
+        icon: categories.find(cat => cat.label.toLowerCase() === key)?.icon || categories[0].icon
+      }));
+    }
+  }, [type]);
+
+  // Reset category when type changes to avoid invalid selections
+  useEffect(() => {
+    setCategory('');
+  }, [type, setCategory]);
+
+
   return (
     <Container maxWidth="lg" sx={{
       display: 'flex',
@@ -83,17 +265,17 @@ const Section1ResourceCenter = ({ toggle, setToggle, category, setCategory, sear
         </Button>
       </Box>
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', justifyContent: 'center', mb: 2.5 }}>
-        {categories.map(cat => {
+        {displayCategories.map(cat => {
           const isSelected = category === cat.label;
           return (
             <Button
               key={cat.label}
               variant={isSelected ? 'contained' : 'outlined'}
-              startIcon={React.cloneElement(cat.icon, { sx: { color: isSelected ? '#fff' : '#1976d2', fontSize: 28 } })}
+              // startIcon={React.cloneElement(cat.icon, { sx: { color: isSelected ? '#fff' : '#1976d2', fontSize: 28 } })}
               onClick={() => setCategory(isSelected ? '' : cat.label)}
-              sx={{ 
-                borderRadius: 2, 
-                minWidth: 120, 
+              sx={{
+                borderRadius: 2,
+                minWidth: 120,
                 fontWeight: 500,
                 fontFamily: 'Inter, sans-serif',
                 fontSize: 16,
@@ -135,9 +317,9 @@ const Section1ResourceCenter = ({ toggle, setToggle, category, setCategory, sear
                 <SearchIcon />
               </InputAdornment>
             ),
-            sx: { 
-              borderRadius: 4, 
-              background: '#fff', 
+            sx: {
+              borderRadius: 4,
+              background: '#fff',
               fontFamily: 'Inter, sans-serif',
               fontSize: 16,
               height: 56,
@@ -158,22 +340,22 @@ const Section1ResourceCenter = ({ toggle, setToggle, category, setCategory, sear
 }
 
 const HeadingText = styled(Typography)({
-    color: "#131313",
-    fontFamily: "Plus Jakarta Sans, sans-serif",
-    fontWeight: 500,
-    fontSize: "45px",
-    lineHeight: "51px",
-    letterSpacing: "-0.02em",
+  color: "#131313",
+  fontFamily: "Plus Jakarta Sans, sans-serif",
+  fontWeight: 500,
+  fontSize: "45px",
+  lineHeight: "51px",
+  letterSpacing: "-0.02em",
 })
 
 const SecondarySubTextBlack = styled(Typography)({
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontSize: "18px",
-    lineHeight: "26px",
-    letterSpacing: "-0.03em",
-    color: "#373737",
-    textAlign: "justify",
+  fontFamily: "Inter",
+  fontWeight: 400,
+  fontSize: "18px",
+  lineHeight: "26px",
+  letterSpacing: "-0.03em",
+  color: "#373737",
+  textAlign: "justify",
 })
 
 export default Section1ResourceCenter
