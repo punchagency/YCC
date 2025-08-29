@@ -23,7 +23,7 @@ import {
 import { useCart } from "../../../../context/cart/cartContext";
 import SearchInterface from "./SearchInterface";
 
-const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
+const CreateOrderModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { addToCart: addToCartContext } = useCart();
 
@@ -32,7 +32,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [loading, setLoading] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
 
   // Pagination states
@@ -68,7 +67,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         setCategories(response.data);
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
       showNotification("Failed to load categories", "error");
     }
   };
@@ -108,7 +106,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
           showNotification(response.message || "Search failed", "error");
         }
       } catch (error) {
-        console.error("Search error:", error);
         showNotification("Failed to search products", "error");
         setSearchResults([]);
       } finally {
@@ -130,12 +127,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
     try {
       setAddToCartLoadingId(product.inventoryId);
 
-      console.log("[CreateOrderModal] Adding product to cart:", {
-        inventoryId: product.inventoryId,
-        productId: product.productId,
-        quantity,
-      });
-
       const response = await addToCart({
         inventoryId: product.inventoryId,
         productId: product.productId, // Now required!
@@ -149,7 +140,6 @@ const CreateOrderModal = ({ open, onClose, onOrderCreated }) => {
         showNotification(response.message || "Failed to add to cart", "error");
       }
     } catch (error) {
-      console.error("Add to cart error:", error);
       showNotification(
         error.message || "Failed to add product to cart",
         "error"

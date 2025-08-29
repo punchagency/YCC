@@ -5,13 +5,8 @@ import {
   TextField,
   Button,
   Typography,
-  Grid,
   Paper,
   CircularProgress,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   Chip,
   Snackbar,
   Alert,
@@ -113,12 +108,6 @@ const EditInventory = () => {
         formData.append("inventoryImage", form.productImage);
       }
 
-      // Debug: Log what's being sent
-      console.log("Sending form data:");
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-
       const result = await updateInventoryItem(id, formData);
 
       if (result.success) {
@@ -138,7 +127,6 @@ const EditInventory = () => {
         });
       }
     } catch (error) {
-      console.error("Error updating inventory:", error);
       setSnackbar({
         open: true,
         message: "An error occurred while updating the inventory item",

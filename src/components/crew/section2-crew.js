@@ -9,7 +9,7 @@ import SectionPointCard from '../section-point-card'
 const Section2Crew = () => {
     const gridData = [
         {
-            title: "Training and Certification Resources",
+            title: "Training And Certification Resources",
             points: [
                 "Access courses and certifications to build your skills and meet industry standards.",
                 "Explore training options for all crew roles, from deckhands to captains."
@@ -17,7 +17,7 @@ const Section2Crew = () => {
             image: shipIcon,
         },
         {
-            title: "Financial Planning and Career Development",
+            title: "Financial Planning And Career Development",
             points: [
                 "Find tailored financial solutions for yacht crew, including retirement planning and asset protection.",
                 "Access resources to help you manage your income and plan for the future."
@@ -25,7 +25,7 @@ const Section2Crew = () => {
             image: crewIcon,
         },
         {
-            title: "Legal and Compliance Support",
+            title: "Legal And Compliance Support",
             points: [
                 "Get help with visa requirements, wage disputes, and injury claims.",
                 "Stay informed about international labor laws and flag state regulations."
@@ -33,7 +33,7 @@ const Section2Crew = () => {
             image: shipIcon,
         },
         {
-            title: "Mental Health and Wellness Services",
+            title: "Mental Health And Wellness Services",
             points: [
                 "Access resources for managing stress, staying connected, and maintaining a healthy work-life balance.",
                 "Explore counseling options and support networks tailored to yacht crew."

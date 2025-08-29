@@ -3,12 +3,9 @@ import Stock from "./stock";
 import green from "../../../assets/images/crew/green.png";
 import danger from "../../../assets/images/crew/danger.png";
 import {
-  FaChevronDown,
   FaSortAmountDown,
   FaSortAmountUp,
 } from "react-icons/fa";
-import { FiEye, FiDownload, FiEdit } from "react-icons/fi";
-import sort from "../../../assets/images/crew/sort.png";
 import eyesIn from "../../../assets/images/crew/eyes-in.png";
 import editLogo from "../../../assets/images/crew/editLogo.png";
 import deleteLogo from "../../../assets/images/crew/deleteLogo.png";
@@ -25,8 +22,6 @@ import {
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
-import { Dropdown } from "primereact/dropdown";
 import { Pagination } from "../../../components/pagination";
 
 const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
@@ -61,31 +56,27 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   });
   const [editLoading, setEditLoading] = useState(false);
 
-  const categories = [
-    { label: "Food & Beverage", value: "Food & Beverage" },
-    { label: "Cleaning Supplies", value: "Cleaning Supplies" },
-    { label: "Safety Equipment", value: "Safety Equipment" },
-    { label: "Nautical Equipment", value: "Nautical Equipment" },
-    { label: "Decor & Furnishings", value: "Decor & Furnishings" },
-  ];
+  // const categories = [
+  //   { label: "Food & Beverage", value: "Food & Beverage" },
+  //   { label: "Cleaning Supplies", value: "Cleaning Supplies" },
+  //   { label: "Safety Equipment", value: "Safety Equipment" },
+  //   { label: "Nautical Equipment", value: "Nautical Equipment" },
+  //   { label: "Decor & Furnishings", value: "Decor & Furnishings" },
+  // ];
 
-  const dropdownStyles = {
-    border: "none",
-    boxShadow: "none",
-  };
+  // const dropdownStyles = {
+  //   border: "none",
+  //   boxShadow: "none",
+  // };
 
   const fetchLowStockItems = useCallback(async () => {
     setLowStockLoading(true);
     try {
-      console.log("Fetching low stock items");
       const result = await getLowStockCrewInventory();
-      console.log("Low stock items:", result);
       if (result.success) {
         const limitedItems = result.data.slice(0, 2);
-        console.log("Limited low stock items", limitedItems);
         setLowStockItems(limitedItems);
       } else {
-        console.error("Failed to fetch low stock items:", result.error);
         toast.current?.show({
           severity: "error",
           summary: "Error",
@@ -94,7 +85,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         });
       }
     } catch (error) {
-      console.error("Error fetching low stock items:", error);
       toast.current?.show({
         severity: "error",
         summary: "Error",
@@ -114,7 +104,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
     setLoading(true);
     try {
       const result = await getCrewInventoryData({ page: pagination.page });
-      console.log("Inventory crew data:", result);
       if (result.success) {
         // Extract the result array from the data object
         const inventoryData = result.data?.result || [];
@@ -138,7 +127,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         });
       }
     } catch (error) {
-      console.error("Error fetching inventory data:", error);
       toast.current?.show({
         severity: "error",
         summary: "Error",
@@ -246,7 +234,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         });
       }
     } catch (error) {
-      console.error("Error deleting items:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -257,14 +244,12 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   };
 
   const handleViewItem = (item) => {
-    console.log("Viewing item:", item);
     setItemToView(item);
     setViewModalVisible(true);
     addActivity("viewed", item.product?.name || "Unknown item");
   };
 
   const handleEditItem = (item) => {
-    console.log("Editing item:", item);
     setItemToEdit(item);
     setEditFormData({
       productName: item.product?.name || "",
@@ -278,7 +263,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
   };
 
   const handleDelete = (item) => {
-    console.log("Deleting item:", item);
     setItemToDelete(item);
     setDeleteModalVisible(true);
   };
@@ -313,7 +297,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         });
       }
     } catch (error) {
-      console.error("Error deleting item:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -343,7 +326,6 @@ const Table = ({ inventoryItems = [], onRefresh, refreshTrigger = 0 }) => {
         setRecentActivities(JSON.parse(storedActivities));
       }
     } catch (error) {
-      console.error("Error loading activities from localStorage:", error);
     }
   }, []);
 

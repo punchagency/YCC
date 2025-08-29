@@ -26,7 +26,7 @@ const Section5AboutUs = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: { xs: "500px", sm: "700px", md: "900px", lg: "1032px" },
+                    height: { xs: "500px", sm: "700px", md: "650px", lg: "718px" },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',

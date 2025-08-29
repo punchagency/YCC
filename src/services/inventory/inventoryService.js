@@ -1,27 +1,15 @@
 import axios from "axios";
-// import { useUser } from "../../context/userContext"; // Import at the top level
 
-// Use the base API URL, not the auth URL
 const API_URL = process.env.REACT_APP_API_URL;
 
 // Add authentication token to requests
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
-  console.log(
-    "Token from localStorage:",
-    token ? `Token exists (${token.substring(0, 10)}...)` : "No token found"
-  );
-
   if (!token) {
-    console.warn("No authentication token found in localStorage");
-    console.log("Available localStorage keys:", Object.keys(localStorage));
     return {};
   }
 
   const header = { Authorization: `Bearer ${token}` };
-  console.log("Auth header created:", {
-    Authorization: `Bearer ${token.substring(0, 10)}...`,
-  });
   return header;
 };
 
@@ -67,38 +55,21 @@ export const createInventoryData = async (inventoryData) => {
     // Check if we're dealing with FormData
     const isFormData = inventoryData instanceof FormData;
 
-    // For debugging - log what's in the FormData
-    if (isFormData) {
-      console.log("FormData contents:");
-      for (let pair of inventoryData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-    }
-
     // Set the appropriate headers
     const headers = {
       ...getAuthHeader(),
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
     };
 
-    console.log("Request headers:", headers);
-    console.log("API URL:", `${API_URL}/inventory`);
-
     const response = await axios.post(`${API_URL}/inventory`, inventoryData, {
       headers: headers,
     });
-
-    console.log("API Response:", response.data);
 
     return {
       success: true,
       data: response.data,
     };
   } catch (error) {
-    console.error("Error creating inventory:", error);
-    console.error("Error response:", error.response?.data);
-    console.error("Error status:", error.response?.status);
-
     return {
       success: false,
       error:
@@ -127,7 +98,6 @@ export const getInventoryData = async (params = {}) => {
       message: response.data.message,
     };
   } catch (error) {
-    console.error("Error fetching inventory data:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch inventory data",
@@ -150,10 +120,7 @@ export const getAllInventoryItems = async () => {
         headers: getAuthHeader(),
       });
 
-      console.log("API Response:", response.data);
-
       if (!response.data || !response.data.status) {
-        console.error("Invalid API response:", response.data);
         return {
           success: false,
           error: "Invalid response from server",
@@ -162,7 +129,6 @@ export const getAllInventoryItems = async () => {
 
       const inventoryItems = response.data.data;
       if (!Array.isArray(inventoryItems)) {
-        console.error("Invalid inventory data format:", inventoryItems);
         return {
           success: false,
           error: "Invalid inventory data format",
@@ -178,7 +144,6 @@ export const getAllInventoryItems = async () => {
 
     return allInventoryItems;
   } catch (error) {
-    console.error("Error fetching all inventory items:", error);
     return {
       success: false,
       error:
@@ -205,7 +170,6 @@ export const updateInventoryItem = async (id, itemData, isFormData = false) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error updating inventory item ${id}:`, error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to update inventory item",
@@ -225,7 +189,6 @@ export const deleteInventoryItem = async (inventoryId, productId) => {
     );
     return { success: true, data: response.data };
   } catch (error) {
-    console.error(`Error deleting inventory item ${inventoryId}:`, error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete inventory item",
@@ -240,7 +203,6 @@ export const getLowInventory = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching low inventory:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch low inventory",
@@ -260,7 +222,7 @@ export const deleteAllInventoryItems = async (inventoryIds) => {
       message: response.data.message,
     };
   } catch (error) {
-    console.error("Error in deleteAllInventoryItems:", error);
+
     return {
       success: false,
       error:
@@ -299,7 +261,6 @@ export const updateProductInventoryStatus = async (
       data: response.data,
     };
   } catch (error) {
-    console.error(`Error updating product inventory status:`, error);
     return {
       success: false,
       error:
@@ -321,7 +282,6 @@ export const getInventoryItemById = async (id) => {
       message: response.data.message,
     };
   } catch (error) {
-    console.error(`Error fetching inventory item ${id}:`, error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch inventory item",
@@ -336,13 +296,6 @@ export const getAllInventories = async (
   stockStatus = "all"
 ) => {
   try {
-    console.log("Fetching inventories with params:", {
-      page,
-      limit,
-      searchText,
-      stockStatus,
-    });
-
     // Build query parameters
     const params = new URLSearchParams({
       page: page.toString(),
@@ -359,14 +312,10 @@ export const getAllInventories = async (
     }
 
     const url = `${API_URL}/inventory/all-inventories?${params.toString()}`;
-    console.log("Request URL:", url);
 
     const response = await axios.get(url, {
       headers: getAuthHeader(),
     });
-
-    console.log("Raw API Response:", response);
-    console.log("Response Data:", response.data);
 
     // Check if the response has the expected structure
     if (response.data && response.data.status) {
@@ -377,19 +326,12 @@ export const getAllInventories = async (
         message: response.data.message,
       };
     } else {
-      console.warn("API returned unexpected structure:", response.data);
       return {
         success: false,
         error: "Invalid response structure from server",
       };
     }
   } catch (error) {
-    console.error("Error fetching all inventories:", error);
-    console.error("Error details:", {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
-    });
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch inventories",
@@ -416,7 +358,6 @@ export const sendInventoryEmail = async (to, subject, message) => {
       data: response.data,
     };
   } catch (error) {
-    console.error("Error sending inventory email:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to send email",
@@ -435,7 +376,6 @@ export const getAllSuppliers = async () => {
       data: response.data.data || response.data,
     };
   } catch (error) {
-    console.error("Error fetching suppliers:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch suppliers",

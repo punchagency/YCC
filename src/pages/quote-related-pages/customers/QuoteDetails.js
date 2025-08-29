@@ -225,7 +225,6 @@ const QuoteDetails = () => {
   };
 
   const getAvailableActions = (status, awaitingPayment) => {
-    console.log({ status, awaitingPayment });
     if (status === "quoted" && !awaitingPayment) {
       return [
         { action: "accept", label: "Accept & Pay", color: "success", handler: handleApproveAndPay },

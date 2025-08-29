@@ -187,9 +187,7 @@ const Reports = () => {
   const fetchDashboardSummary = async (params = {}) => {
     try {
       setLoading(true);
-      console.log("Fetching dashboard summary...", params);
       const response = await getDashboardSummary(params);
-      console.log("Dashboard Response:", response);
 
       if (response.status && response.data && response.data.data) {
         setDashboardSummary(response.data.data);
@@ -198,7 +196,6 @@ const Reports = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching dashboard summary:", error);
     } finally {
       setLoading(false);
     }

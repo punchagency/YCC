@@ -12,14 +12,14 @@ const LandingPageExitCard = ({ sectionData }) => {
         }}>
             <Box
                 sx={{
-                    backgroundImage: `url(${banner})`,
+                    // backgroundImage: `url(${banner})`,
                     backgroundSize: "cover",
                     display: 'flex',
-                    // backgroundColor: "#02214B",
+                    backgroundColor: "#02214B",
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: { xs: '40vh', md: '30vh', lg: '50vh' },
+                    height: { xs: '50vh', md: '40vh', lg: '40vh' },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',
@@ -64,7 +64,7 @@ const LandingPageExitCard = ({ sectionData }) => {
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "28px",
-                                textAlign: { xs: "center", md: "left" },
+                                textAlign: "left",
                                 padding: { xs: '16px', sm: '24px', md: '32px', lg: '40px' }, // Adds padding for better spacing
                                 justifyContent: 'center'
 
@@ -84,9 +84,15 @@ const LandingPageExitCard = ({ sectionData }) => {
                                     {sectionData.subText}
                                 </SecondarySubTextBlack>
 
-                                <Box sx={{ display: "flex", gap: "15px", justifyContent: 'center' }}>
+                                <Box sx={{ display: "flex", gap: "15px", justifyContent: 'start' }}>
                                     <Link to={sectionData.button.path}>
-                                        <GradientButton>
+                                        <GradientButton
+                                            sx={{
+                                                width: "240px",
+                                                height: "51px",
+                                                borderRadius: "6.15px",
+                                            }}
+                                        >
                                             <ButtonTypography sx={{ color: "white" }}>{sectionData.button.text}</ButtonTypography>
                                         </GradientButton>
                                     </Link>
@@ -133,23 +139,22 @@ export const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px", // Default for large screens
-    lineHeight: "22.51px",
+    fontSize: "18px", // Default for large screens
+    lineHeight: "148%",
     letterSpacing: "0%",
     color: "#373737",
     display: "inline-block",
     width: "100%", // Makes it flexible
 
     [theme.breakpoints.down("md")]: {
-        fontSize: "14px",
-        lineHeight: "20px",
+        fontSize: "16px",
+        lineHeight: "148%",
         width: "500px", // Reduce width on tablets
     },
     [theme.breakpoints.down("sm")]: {
-        fontSize: "13px",
-        lineHeight: "18px",
+        fontSize: "16px",
+        lineHeight: "148%",
         width: "100%", // Full width on mobile
-        padding: "0 20px 0 20px"
     },
 }));
 
@@ -179,8 +184,8 @@ export const HeadingTextBlack = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: "46px", // Default for large screens
-    lineHeight: "51px",
+    fontSize: "45px", // Default for large screens
+    lineHeight: "111%",
     letterSpacing: "-2%",
 
     [theme.breakpoints.down("lg")]: {
@@ -208,7 +213,6 @@ const GradientButton = styled(Button)({
     "&:hover": {
         background: linearGradient2,
     },
-    padding: "17.5px 89px",
 });
 
 

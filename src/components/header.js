@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useTheme } from "../context/theme/themeContext";
+import { useNavigate } from "react-router-dom";
 import TopNav from "./TopNav";
 import GlobalSearchModal from "./GlobalSearchModal";
 import hamburger from "../assets/images/crew/hamburger.png";
@@ -15,21 +14,11 @@ import { useUser } from "../context/userContext";
 import { useCart } from "../context/cart/cartContext";
 import { checkPendingVendors } from "../services/admin/adminService";
 import { getNotifications } from "../services/notification/notificationService";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useUser();
   const { cartCount, loading: cartCountLoading } = useCart();
-
-  // Debug: Log user data
-  console.log("Header - User data:", {
-    user: user,
-    crewProfile: user?.crewProfile,
-    profilePicture: user?.profilePicture,
-    role: user?.role,
-  });
 
   // Helper function to get role name
   const getRoleName = (roleObj) => {
@@ -50,7 +39,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
     userRole = getRoleName(userRole);
   }
 
-  console.log("User role:", userRole);
 
   // const overlayPanelRef = useRef(null);
   // const { user } = useUser(); // Get user data from context
@@ -62,13 +50,10 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   const [showSearchModal, setShowSearchModal] = useState(false);
   //  const [role, setRole] = useState("Captain");
   const [notifications, setNotifications] = useState([]);
-  const [userName, setUserName] = useState("Admin User");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [showExcelModal, setShowExcelModal] = useState(false);
+  const [userName] = useState("Admin User");
 
   // Update your searchFilters state to include sorting preferences
-  const [searchFilters, setSearchFilters] = useState({
+  const [searchFilters] = useState({
     type: "all",
     status: "all",
     sortField: "relevance",
@@ -102,7 +87,6 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   }, [userRole]);
 
   const fetchNotifications = async () => {
-    setLoading(true);
     try {
       const response = await getNotifications();
       if (response.success) {
@@ -115,177 +99,166 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
           _id: item._id,
         }));
         setNotifications(transformedData);
-        setError(null);
-      } else {
-        setError(response.error);
       }
     } catch (err) {
-      setError("Failed to fetch notifications");
-    } finally {
-      setLoading(false);
+      console.error("Failed to fetch notifications:", err);
     }
   };
 
-  // Add refs for the new menus
-  const filterMenuRef = useRef(null);
-  const sortMenuRef = useRef(null);
-
   // Update your sort menu items
-  const sortItems = [
-    {
-      label: "Relevance",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "relevance",
-          sortDirection: "desc",
-        });
-        if (showSearchModal) {
-          setShowSearchModal(false);
-          setTimeout(() => setShowSearchModal(true), 0);
-        } else {
-          setShowSearchModal(true);
-        }
-      },
-    },
-    {
-      label: "Date (Newest)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "date",
-          sortDirection: "desc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Date (Oldest)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "date",
-          sortDirection: "asc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Name (A-Z)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "name",
-          sortDirection: "asc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Name (Z-A)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "name",
-          sortDirection: "desc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Status",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "status",
-          sortDirection: "asc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Price (High to Low)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "price",
-          sortDirection: "desc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Price (Low to High)",
-      command: () => {
-        setSearchFilters({
-          ...searchFilters,
-          sortField: "price",
-          sortDirection: "asc",
-        });
-        setShowSearchModal(true);
-      },
-    },
-  ];
+  // const sortItems = [
+  //   {
+  //     label: "Relevance",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "relevance",
+  //         sortDirection: "desc",
+  //       });
+  //       if (showSearchModal) {
+  //         setShowSearchModal(false);
+  //         setTimeout(() => setShowSearchModal(true), 0);
+  //       } else {
+  //         setShowSearchModal(true);
+  //       }
+  //     },
+  //   },
+  //   {
+  //     label: "Date (Newest)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "date",
+  //         sortDirection: "desc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Date (Oldest)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "date",
+  //         sortDirection: "asc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Name (A-Z)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "name",
+  //         sortDirection: "asc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Name (Z-A)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "name",
+  //         sortDirection: "desc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Status",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "status",
+  //         sortDirection: "asc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Price (High to Low)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "price",
+  //         sortDirection: "desc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Price (Low to High)",
+  //     command: () => {
+  //       setSearchFilters({
+  //         ...searchFilters,
+  //         sortField: "price",
+  //         sortDirection: "asc",
+  //       });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  // ];
 
   // Define menu items for Filter and Sort
-  const filterItems = [
-    {
-      label: "All Items",
-      command: () => {
-        setSearchFilters({ ...searchFilters, type: "all" });
-        if (showSearchModal) {
-          // If modal is already open, this will apply the filter
-          setShowSearchModal(false);
-          setTimeout(() => setShowSearchModal(true), 0);
-        }
-      },
-    },
-    {
-      label: "Vendors",
-      command: () => {
-        setSearchFilters({ ...searchFilters, type: "vendors" });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Orders",
-      command: () => {
-        setSearchFilters({ ...searchFilters, type: "orders" });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Bookings",
-      command: () => {
-        setSearchFilters({ ...searchFilters, type: "bookings" });
-        setShowSearchModal(true);
-      },
-    },
-    {
-      label: "Inventory",
-      command: () => {
-        setSearchFilters({ ...searchFilters, type: "inventories" });
-        setShowSearchModal(true);
-      },
-    },
-  ];
+  // const filterItems = [
+  //   {
+  //     label: "All Items",
+  //     command: () => {
+  //       setSearchFilters({ ...searchFilters, type: "all" });
+  //       if (showSearchModal) {
+  //         // If modal is already open, this will apply the filter
+  //         setShowSearchModal(false);
+  //         setTimeout(() => setShowSearchModal(true), 0);
+  //       }
+  //     },
+  //   },
+  //   {
+  //     label: "Vendors",
+  //     command: () => {
+  //       setSearchFilters({ ...searchFilters, type: "vendors" });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Orders",
+  //     command: () => {
+  //       setSearchFilters({ ...searchFilters, type: "orders" });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Bookings",
+  //     command: () => {
+  //       setSearchFilters({ ...searchFilters, type: "bookings" });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  //   {
+  //     label: "Inventory",
+  //     command: () => {
+  //       setSearchFilters({ ...searchFilters, type: "inventories" });
+  //       setShowSearchModal(true);
+  //     },
+  //   },
+  // ];
 
   // Refs and hooks
   // const navigate = useNavigate();
-  const theme = useTheme();
   const overlayPanelRef = useRef();
-  const shareMenuRef = useRef();
 
   // Share menu items
-  const shareItems = [
-    {
-      label: "Export as Excel",
-      icon: "pi pi-file-excel",
-      command: () => {
-        setShowExcelModal(true);
-      },
-    },
-  ];
+  // const shareItems = [
+  //   {
+  //     label: "Export as Excel",
+  //     icon: "pi pi-file-excel",
+  //     command: () => {
+  //       setShowExcelModal(true);
+  //     },
+  //   },
+  // ];
 
   const viewAllNotifications = () => {
     if (userRole === "Captain") {
@@ -301,20 +274,19 @@ const AdminHeader = ({ isCollapsed, setIsCollapsed, role, toggleSidebar }) => {
   // Detect iPad Pro specifically
   const isIpadPro = window.innerWidth === 1024 && window.innerHeight === 1366;
 
-  const landingPages = [
-    "/",
-    "/resource-center",
-    "/about-us",
-    "/contact-us",
-    "/crew",
-    "/captain",
-    "/exterior",
-    "/interior",
-    "/engineering",
-    "/chef-galley",
-    "/vendor-services",
-  ];
-  const isLandingPage = landingPages.includes(location.pathname);
+  // const landingPages = [
+  //   "/",
+  //   "/resource-center",
+  //   "/about-us",
+  //   "/contact-us",
+  //   "/crew",
+  //   "/captain",
+  //   "/exterior",
+  //   "/interior",
+  //   "/engineering",
+  //   "/chef-galley",
+  //   "/vendor-services",
+  // ];
 
   const start = (
     <>

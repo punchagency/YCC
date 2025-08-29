@@ -37,22 +37,17 @@ export const BookingProvider = ({ children }) => {
         // setLimit(result.data.limit);
         return true;
       } else {
-        console.error("Error fetching bookings:", result.message);
         return false;
       }
     } catch (error) {
-      console.error("Error fetching bookings:", error);
       return false;
     }
   }, []);
 
   const updateBooking = useCallback(async (bookingId, bookingData) => {
     try {
-      console.log("Updating booking with ID:", bookingId);
-      console.log("Booking data being sent to API:", bookingData);
 
       const response = await updateBookingService(bookingId, bookingData);
-      console.log("Update booking service response:", response);
 
       if (response.status) {
         // Update the local state with the updated booking
@@ -79,11 +74,9 @@ export const BookingProvider = ({ children }) => {
 
         return true;
       } else {
-        console.error("Error updating booking:", response.message);
         return false;
       }
     } catch (error) {
-      console.error("Error in updateBooking:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",

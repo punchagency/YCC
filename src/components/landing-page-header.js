@@ -464,6 +464,7 @@ const LandingPageHeader = () => {
                   overflow: "hidden",
                   "&:hover": {
                     background: "linear-gradient(90deg, #034D92, #0487D9)",
+                    color: "white",
                   },
                 }}
                 className="sign-in-btn"
@@ -700,6 +701,7 @@ const LandingPageHeader = () => {
                     padding: "8px 24px",
                     "&:hover": {
                       background: "linear-gradient(90deg, #034D92, #0487D9)",
+                      color: "white",
                     },
                   }}
                 >
