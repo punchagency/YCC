@@ -20,6 +20,7 @@ import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { Pagination as SharedPagination } from "../../components/pagination";
 import LaunchIcon from "@mui/icons-material/Launch";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../utils/formatters";
 
 // Using shared formatter from utils to render e.g. 28 Aug 2025
@@ -80,6 +81,7 @@ const AdminBookingsTable = ({
   onPageChange = () => {},
   onLimitChange = () => {},
 }) => {
+  const navigate = useNavigate();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(muiTheme.breakpoints.between("sm", "md"));
@@ -187,8 +189,9 @@ const AdminBookingsTable = ({
                       <IconButton
                         size="small"
                         title="View details"
-                        href="#"
-                        onClick={(e) => e.preventDefault()}
+                        onClick={() =>
+                          navigate(`/admin/bookings-management/${bk._id}`)
+                        }
                       >
                         <VisibilityIcon fontSize="small" />
                       </IconButton>

@@ -1,6 +1,9 @@
 import "./App.css";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
+import {
+  ThemeProvider as MuiThemeProvider,
+  createTheme,
+} from "@mui/material/styles";
 import GetStarted from "./pages/auth/get-started"; // Adjust the import according to your file structure
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/crew.signup";
@@ -13,6 +16,7 @@ import Invent from "./pages/invent/invent";
 import Order from "./pages/order/order";
 import Reports from "./pages/report/";
 import Bookings from "./pages/bookings/bookings";
+import AdminBookingDetails from "./pages/bookings/adminBookingDetails";
 import VendorStarted from "./pages/auth/vendors-started";
 // end of new import
 
@@ -101,10 +105,10 @@ import ServiceProviderDashboard from "./pages/service-providers/dashboard/servic
 import ServiceProviderSettings from "./pages/service-providers/settings/service-provider-settings.js";
 import ServiceProvidersBookings from "./pages/service-providers/bookings/service-providers-bookings.js";
 import ServiceProvidersBookingDetails from "./pages/service-providers/bookings/booking-details.js";
-import ServiceProvidersCalendar from './pages/service-providers/calendar/service-providers-calendar.js';
+import ServiceProvidersCalendar from "./pages/service-providers/calendar/service-providers-calendar.js";
 import ServiceProvidersServiceManagement from "./pages/service-providers/services-management/service-providers-services-management.js";
 import ServiceProvidersTransactions from "./pages/service-providers/transactions/service-providers-transaction.js";
-import ServiceProviderBookingsConfirmationPage from './pages/service-providers/bookings/service-provider-bookings-confirmation-page.js';
+import ServiceProviderBookingsConfirmationPage from "./pages/service-providers/bookings/service-provider-bookings-confirmation-page.js";
 
 // Add AuthCheck component
 const AuthCheck = ({ children }) => {
@@ -165,7 +169,8 @@ const AuthCheck = ({ children }) => {
 function App() {
   const theme = createTheme({
     typography: {
-      fontFamily: 'Plus Jakarta Sans, Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif',
+      fontFamily:
+        "Plus Jakarta Sans, Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif",
     },
   });
   return (
@@ -176,15 +181,20 @@ function App() {
             <CartProvider>
               <MuiThemeProvider theme={theme}>
                 <AuthCheck>
-                  
                   <Routes>
                     {/* Landing Page Routes - Public Access */}
                     <Route element={<LandingPageLayout />}>
                       <Route path="/" element={<HomeLandingPage />} />
                       <Route path="/captain" element={<CaptainLandingPage />} />
                       <Route path="/crew" element={<CrewLandingPage />} />
-                      <Route path="/exterior" element={<ExteriorLandingPage />} />
-                      <Route path="/interior" element={<InteriorLandingPage />} />
+                      <Route
+                        path="/exterior"
+                        element={<ExteriorLandingPage />}
+                      />
+                      <Route
+                        path="/interior"
+                        element={<InteriorLandingPage />}
+                      />
                       <Route
                         path="/chef-galley"
                         element={<ChefGalleryLandingPage />}
@@ -202,7 +212,10 @@ function App() {
                         path="/resource-center"
                         element={<ResourceCenter />}
                       />
-                      <Route path="/resource-center/test" element={<TestApi />} />
+                      <Route
+                        path="/resource-center/test"
+                        element={<TestApi />}
+                      />
                       <Route path="/contact-us" element={<ContactUs />} />
                     </Route>
                     {/* Auth Routes - Public Access */}
@@ -213,11 +226,17 @@ function App() {
                     <Route path="/crew/signup" element={<CrewSignup />} />
                     <Route path="/service/signup" element={<VendorSignup />} />
                     <Route path="/vendor/signup" element={<SupplierSignup />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route
+                      path="/forgot-password"
+                      element={<ForgotPassword />}
+                    />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/coming-soon" element={<ComingSoon />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                    <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                    <Route
+                      path="/terms-and-conditions"
+                      element={<TermsAndConditions />}
+                    />
                     <Route
                       path="/service/quotes/respond/:quoteId"
                       element={<RespondToQuote />}
@@ -247,6 +266,10 @@ function App() {
                       <Route
                         path="/admin/bookings-management"
                         element={<Bookings />}
+                      />
+                      <Route
+                        path="/admin/bookings-management/:id"
+                        element={<AdminBookingDetails />}
                       />
                       <Route
                         path="/admin/orders-management"
@@ -295,6 +318,10 @@ function App() {
                       <Route
                         path="/admin/bookings-management"
                         element={<Bookings />}
+                      />
+                      <Route
+                        path="/admin/bookings-management/:id"
+                        element={<AdminBookingDetails />}
                       />
                       <Route
                         path="/admin/orders-management"
