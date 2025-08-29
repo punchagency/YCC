@@ -53,14 +53,14 @@ const ResourceCenter = () => {
         <Box sx={{ mt: 1 }}>
           {toggle === "Supplies" && (
             <ResourceCenterSection4
-              type="supplies"
+              type="product"
               category={category}
               search={search}
             />
           )}
           {toggle === "Services" && (
             <ResourceCenterSection4
-              type="services"
+              type="service"
               category={category}
               search={search}
             />

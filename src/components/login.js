@@ -71,18 +71,15 @@ const LoginForm = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Role before submission:", formData.role);
     if (!validateForm()) return;
 
     try {
       setLoading(true);
       const response = await login(formData);
-      console.log("Login response:", response);
 
       if (response.status === "success") {
         // Store the token from the nested data object
         if (response.data && response.data.token) {
-          console.log("Saving token to localStorage:", response.data.token);
           localStorage.setItem("token", response.data.token);
         }
 
@@ -99,7 +96,6 @@ const LoginForm = ({ onClose }) => {
         try {
           await refreshUser();
         } catch (error) {
-          console.error("Error refreshing user data:", error);
           // Continue with navigation even if refresh fails
         }
 
@@ -117,7 +113,6 @@ const LoginForm = ({ onClose }) => {
         setError(response.message || "Login failed. Please try again.");
       }
     } catch (error) {
-      console.log("Error during login:", error);
       setError(error.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);

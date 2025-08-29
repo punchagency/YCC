@@ -44,11 +44,10 @@ export const DashboardAIProvider = ({ children }) => {
                 result.chatData.chatSuggestions || prevData.chatSuggestions,
             }));
           } else if (!result.success) {
-            console.warn("Could not load chat history:", result.error);
+            //console.warn("Could not load chat history:", result.error);
             setHistoryError(result.error);
           }
         } catch (error) {
-          console.error("Error loading chat history:", error);
           setHistoryError("Failed to load chat history");
         } finally {
           setIsLoadingHistory(false);
@@ -73,12 +72,9 @@ export const DashboardAIProvider = ({ children }) => {
       setIsAIAssistantOpen(true);
     }
     setTypingState(true);
-    console.log(" message being sent", message);
     let previousChatData = chatData;
-    console.log("previousChatData", previousChatData);
     previousChatData.messages.push({ role: "user", content: message });
     setChatData(previousChatData);
-    console.log("chatData on sending message", previousChatData);
     getResponse(previousChatData);
     setMessage("");
   };
@@ -98,15 +94,12 @@ export const DashboardAIProvider = ({ children }) => {
             setTypingState(false);
           }, 2000);
           */
-    console.log("chatData on getting response", previousChatData);
     const response = await getResponseFromAI(previousChatData);
-    console.log("response from AI", response);
     setChatData(response);
     setTypingState(false);
   };
 
   const preDefinedMessages = (predefinedMessage) => {
-    console.log("message sent", predefinedMessage);
     if (!predefinedMessage.trim()) return;
     if (!isAIAssistantOpen) {
       setIsAIAssistantOpen(true);

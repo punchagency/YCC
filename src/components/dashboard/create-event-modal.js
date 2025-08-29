@@ -23,7 +23,6 @@ const CreateEventModal = ({ open, handleClose }) => {
   });
 
   const handleChange = (e) => {
-    console.log(e.target);
     const { name, value } = e.target;
     setEvent((prev) => ({ ...prev, [name]: value }));
   };
@@ -34,7 +33,6 @@ const CreateEventModal = ({ open, handleClose }) => {
 
   const handleSubmit = () => {
     // Handle event submission (e.g., save to the database)
-    console.log(event);
     event.start = new Date(event.start).toISOString();
     event.end = new Date(event.end).toISOString();
     addEvent(event);

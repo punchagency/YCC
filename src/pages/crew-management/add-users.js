@@ -22,7 +22,6 @@ const AddUser = () => {
   const [selectedNationality, setSelectedNationality] = useState(
     nationalities.find((country) => country.code === "AD") || null
   );
-  console.log("selectedNationality", selectedNationality);
   const [selectedJobRole, setSelectedJobRole] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedExperience, setSelectedExperience] = useState(null);

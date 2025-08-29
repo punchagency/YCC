@@ -176,6 +176,7 @@ function App() {
             <CartProvider>
               <MuiThemeProvider theme={theme}>
                 <AuthCheck>
+                  
                   <Routes>
                     {/* Landing Page Routes - Public Access */}
                     <Route element={<LandingPageLayout />}>

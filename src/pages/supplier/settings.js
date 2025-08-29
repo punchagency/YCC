@@ -160,7 +160,6 @@ const SupplierSettings = () => {
       formDataToSend.append("notifications.newOrders", formData.notifications.newOrders);
       
       const result = await updateSupplierProfile({ supplierId: user.supplierProfile._id, data: formDataToSend });
-      console.log("Update result:", result);
       
       if (result.success) {
         setSnackbar({

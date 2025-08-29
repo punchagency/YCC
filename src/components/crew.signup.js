@@ -6,10 +6,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
 import countryData from "../data/countries.json";
-import whatsappLogo from "../assets/images/whatsapp.png";
-import chatLogo from "../assets/images/mesLogo.png";
 import { motion, AnimatePresence } from "framer-motion";
-import mailLogo from "../assets/images/maillogo.png";
 
 import captainLogo from "../assets/images/captain.png";
 import exteriorLogo from "../assets/images/exterior.png";
@@ -19,18 +16,13 @@ import engineeringLogo from "../assets/images/engineering.png";
 import positionLogo from "../assets/images/positionLogo.png";
 import experienceLogo from "../assets/images/experience.png";
 import LocationLogo from "../assets/images/locationLogo.png";
-import uploadLogo from "../assets/images/uploadLogo.png";
-import searchLogo from "../assets/images/searchLogo.png";
 import profileLogo from "../assets/images/profileUploadLogo.png";
-import { certificationsList } from "../data/certificationList";
+// import { certificationsList } from "../data/certificationList";
 import cvUploadLogo from "../assets/images/cvUploadLogo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { signup } from "../services/authService";
 import TermsModal from "./TermsModal";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { normalizeWebsiteUrl } from "../utils/urlUtils";
-import { useUser } from "../context/userContext";
 
 const formattedCountries = countryData.map((country) => ({
   value: country.cca2,
@@ -41,9 +33,6 @@ const formattedCountries = countryData.map((country) => ({
 const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [phone, setPhone] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const [noResults, setNoResults] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +45,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const [certificationFiles, setCertificationFiles] = useState([]);
-  const { signup: userSignup } = useUser();
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
@@ -130,18 +118,12 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         certifications: formData.certification ? [formData.certification] : [],
       };
 
-      console.log("Complete crewDetails:", crewDetails);
-
-      console.log("Submitting crew details:", crewDetails);
-
       formDataObj.append("crewDetails", JSON.stringify(crewDetails));
 
       if (selectedFiles[0]) {
-        console.log("Appending profile picture:", selectedFiles[0]);
         formDataObj.append("profilePicture", selectedFiles[0]);
       }
       if (selectedCV) {
-        console.log("Appending CV:", selectedCV);
         formDataObj.append("cv", selectedCV);
       }
       if (certificationFiles.length < 3) {
@@ -152,18 +134,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       certificationFiles.forEach((file, idx) => {
         formDataObj.append(`certificationFiles`, file);
       });
-      for (let pair of formDataObj.entries()) {
-        console.log(pair[0], pair[1]);
-      }
 
-      console.log("Submitting form data:", {
-        crewDetails,
-        files: {
-          profilePicture: selectedFiles[0]?.name,
-          cv: selectedCV?.name,
-          certificationFiles: certificationFiles.map((file) => file.name),
-        },
-      });
 
       if (
         !crewDetails.firstName ||
@@ -184,7 +155,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
       }
     } catch (err) {
       setError(err.message || "Failed to sign up. Please try again.");
-      console.error("Signup error:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +168,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setSelectedFiles([file]);
       } catch (error) {
-        console.error("Upload failed:", error);
       } finally {
         setIsProfileUploading(false);
       }
@@ -221,30 +190,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const triggerFileInput = (e) => {
     e.stopPropagation();
     fileInputRef.current.click();
-  };
-
-  const handleCertificationSearch = (searchTerm) => {
-    handleInputChange("certification", searchTerm);
-
-    if (searchTerm.trim() === "") {
-      setSearchResults([]);
-      setShowResults(false);
-      setNoResults(false);
-      return;
-    }
-
-    const filteredResults = certificationsList.filter((cert) =>
-      cert.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (filteredResults.length === 0) {
-      setNoResults(true);
-      setShowResults(true);
-    } else {
-      setNoResults(false);
-      setSearchResults(filteredResults.slice(0, 20));
-      setShowResults(true);
-    }
   };
 
   const handleCertificationFilesChange = (e) => {
@@ -343,7 +288,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setSelectedCV(file);
       } catch (error) {
-        console.error("Upload failed:", error);
       } finally {
         setIsCVUploading(false);
       }
@@ -387,7 +331,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setSelectedCV(file);
       } catch (error) {
-        console.error("Upload failed", error);
       } finally {
         setIsCVUploading(false);
       }

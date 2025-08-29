@@ -1,17 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Table from "./table";
-import plus from "../../../assets/images/crew/plus.png";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import {
   createCrewInventoryData,
   getCrewInventoryData,
 } from "../../../services/crew/crewInventoryService";
-import { useUser } from "../../../context/userContext";
 import { useOutletContext } from "react-router-dom";
 import "./inventory.css";
 
@@ -30,9 +27,6 @@ const Inventory = () => {
     warehouseLocation: "",
   });
   const toast = useRef(null);
-
-  // Get user data from context
-  const { user } = useUser();
 
   const { setPageTitle } = useOutletContext() || {};
   useEffect(() => {
@@ -56,13 +50,13 @@ const Inventory = () => {
     };
   }, [setPageTitle]);
 
-  const categories = [
-    { label: "Food & Beverage", value: "Food & Beverage" },
-    { label: "Cleaning Supplies", value: "Cleaning Supplies" },
-    { label: "Safety Equipment", value: "Safety Equipment" },
-    { label: "Nautical Equipment", value: "Nautical Equipment" },
-    { label: "Decor & Furnishings", value: "Decor & Furnishings" },
-  ];
+  // const categories = [
+  //   { label: "Food & Beverage", value: "Food & Beverage" },
+  //   { label: "Cleaning Supplies", value: "Cleaning Supplies" },
+  //   { label: "Safety Equipment", value: "Safety Equipment" },
+  //   { label: "Nautical Equipment", value: "Nautical Equipment" },
+  //   { label: "Decor & Furnishings", value: "Decor & Furnishings" },
+  // ];
 
   const serviceAreaOptions = [
     { label: "Caribbean", value: "caribbean" },
@@ -91,7 +85,6 @@ const Inventory = () => {
         const inventoryData = result.data?.result || [];
         setInventoryItems(inventoryData);
       } else {
-        console.error("Failed to load inventory data:", result.error);
         if (toast.current) {
           toast.current.show({
             severity: "error",
@@ -102,7 +95,6 @@ const Inventory = () => {
         }
       }
     } catch (error) {
-      console.error("Error fetching inventory data:", error);
     }
   }, []);
 
@@ -144,8 +136,6 @@ const Inventory = () => {
         inventoryData.warehouseLocation = newItem.warehouseLocation;
       }
 
-      console.log("Submitting inventory data:", inventoryData);
-
       // Call the inventory service to create the inventory item
       const result = await createCrewInventoryData(inventoryData);
 
@@ -185,7 +175,6 @@ const Inventory = () => {
         });
       }
     } catch (error) {
-      console.error("Error adding product:", error);
       toast.current.show({
         severity: "error",
         summary: "Error",

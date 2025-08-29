@@ -18,14 +18,10 @@ export const getBookingService = async (vendorId) => {
 
 export const updateBookingService = async (bookingId, booking) => {
   try {
-    console.log("Calling API to update booking:", bookingId);
-    console.log("Data being sent to API:", booking);
 
     const response = await axios.patch(`${API_URL}/${bookingId}`, booking, {
       headers: getAuthHeader(),
     });
-
-    console.log("API response for booking update:", response.data);
 
     return {
       status: true,
@@ -33,9 +29,6 @@ export const updateBookingService = async (bookingId, booking) => {
       message: "Booking updated successfully",
     };
   } catch (error) {
-    console.error("Error in updateBookingService:", error);
-    console.error("Error response:", error.response?.data);
-
     return {
       status: false,
       message: error.response?.data?.message || "Failed to update booking",
@@ -58,7 +51,6 @@ export const updateBookingStatusService = async (bookingId, status) => {
       message: "Status updated successfully",
     };
   } catch (error) {
-    console.error("Error updating booking status:", error);
     return {
       status: false,
       message:
@@ -89,7 +81,6 @@ export const createBookingService = async (bookingData) => {
 
 export const getAllBookingService = async (page = 1, limit = 10) => {
   try {
-    console.log("Fetching user bookings with:", { page, limit });
     const response = await axios.get(`${API_URL}/user/bookings`, {
       headers: getAuthHeader(),
       params: {
@@ -97,8 +88,6 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
         limit,
       },
     });
-
-    console.log("User Bookings API Response:", response.data);
 
     if (response.data.status) {
       return {
@@ -111,7 +100,6 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
         },
       };
     } else {
-      console.error("Error in API response:", response.data.message);
       return {
         status: false,
         message: response.data.message || "Failed to fetch bookings",
@@ -124,8 +112,6 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
       };
     }
   } catch (error) {
-    console.error("Error in getAllBookingService:", error);
-    console.error("Error response:", error.response?.data);
     return {
       status: false,
       message: error.response?.data?.message || "Failed to fetch bookings",
@@ -141,8 +127,6 @@ export const getAllBookingService = async (page = 1, limit = 10) => {
 
 export const bulkDeleteBookings = async (bookingIds) => {
   try {
-    console.log("Calling bulkDeleteBookings API with IDs:", bookingIds);
-
     const response = await axios.post(
       `${API_URL}/bulk-delete-bookings`, // Make sure this endpoint matches your backend
       { bookingIds },
@@ -151,15 +135,11 @@ export const bulkDeleteBookings = async (bookingIds) => {
       }
     );
 
-    console.log("Bulk delete API response:", response.data);
-
     return {
       success: true,
       message: response.data.message || "Bookings deleted successfully",
     };
   } catch (error) {
-    console.error("Error in bulkDeleteBookings:", error);
-    console.error("Error response:", error.response?.data);
 
     return {
       success: false,
@@ -185,9 +165,6 @@ export const getServiceProviderBookings = async ({ page = 1, limit = 10, status,
 
     return response.data;
   } catch (error) {
-    console.error("Error in getServiceProviderBookings:", error);
-    console.error("Error response:", error.response?.data);
-
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete bookings",
@@ -200,7 +177,6 @@ export const updateStatusOfBooking = async ({bookingId, status, reason, notes, r
     const response = await axios.patch(`${API_URL}/${bookingId}/status`, { status, reason, notes, requiresQuote, quoteItems }, { headers: getAuthHeader() });
     return response.data;
   } catch (error) {
-    console.log("Error in updateStatusOfBooking:", error);
     return {
       success: false,
       error: error.response?.data?.message || "Failed to update booking status",

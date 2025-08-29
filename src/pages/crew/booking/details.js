@@ -120,7 +120,6 @@ const BookingDetails = () => {
   const handleSubmitIssue = () => {
     if (!issueDescription.trim()) return;
     // Handle issue submission logic here
-    console.log('Issue submitted:', issueDescription);
     setIssueDescription('');
     // Show success message
   };

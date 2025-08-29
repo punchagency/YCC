@@ -191,7 +191,6 @@ export const generateReport = async (params = {}) => {
         responseType,
       }
     );
-    console.log(response.data);
     if (fileType === 'csv') {
       const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
       const link = document.createElement("a");

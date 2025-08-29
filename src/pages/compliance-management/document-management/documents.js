@@ -185,57 +185,57 @@ const Documents = () => {
     },
   };
 
-  const actionBodyTemplate = (rowData) => (
-    <>
-      <Button
-        icon="pi pi-ellipsis-v"
-        className="p-button-rounded p-button-text"
-        onClick={(e) => menuRef.current.toggle(e)}
-      />
-      <OverlayPanel
-        ref={menuRef}
-        dismissable
-        className="datatable-overlaypanel"
-        hideOverlaysOnDocumentScrolling={false}
-      >
-        <Button
-          label="Edit"
-          icon="pi pi-pencil"
-          className="p-button-text w-full"
-          onClick={(e) => navigate(`/document-management/documents/edit`)}
-        />
-        <Button
-          label="Update"
-          icon="pi pi-list-check"
-          className="p-button-text w-full"
-          onClick={() => console.log("Update", rowData)}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-text w-full"
-          onClick={() => console.log("Delete", rowData)}
-        />
-        <Button
-          label="Renew"
-          icon="pi pi-refresh"
-          className="p-button-text w-full"
-          onClick={() => console.log("Renew", rowData)}
-        />
-      </OverlayPanel>
-    </>
-  );
+  // const actionBodyTemplate = (rowData) => (
+  //   <>
+  //     <Button
+  //       icon="pi pi-ellipsis-v"
+  //       className="p-button-rounded p-button-text"
+  //       onClick={(e) => menuRef.current.toggle(e)}
+  //     />
+  //     <OverlayPanel
+  //       ref={menuRef}
+  //       dismissable
+  //       className="datatable-overlaypanel"
+  //       hideOverlaysOnDocumentScrolling={false}
+  //     >
+  //       <Button
+  //         label="Edit"
+  //         icon="pi pi-pencil"
+  //         className="p-button-text w-full"
+  //         onClick={(e) => navigate(`/document-management/documents/edit`)}
+  //       />
+  //       <Button
+  //         label="Update"
+  //         icon="pi pi-list-check"
+  //         className="p-button-text w-full"
+  //         onClick={() => console.log("Update", rowData)}
+  //       />
+  //       <Button
+  //         label="Delete"
+  //         icon="pi pi-trash"
+  //         className="p-button-text w-full"
+  //         onClick={() => console.log("Delete", rowData)}
+  //       />
+  //       <Button
+  //         label="Renew"
+  //         icon="pi pi-refresh"
+  //         className="p-button-text w-full"
+  //         onClick={() => console.log("Renew", rowData)}
+  //       />
+  //     </OverlayPanel>
+  //   </>
+  // );
 
-  const skeletonTemplate = () => (
-    <>
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="10%" />
-    </>
-  );
+  // const skeletonTemplate = () => (
+  //   <>
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="10%" />
+  //   </>
+  // );
 
   return (
     <>

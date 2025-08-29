@@ -283,8 +283,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
   // Handle bulk delete function
   const handleBulkDelete = () => {
     if (selectedItems.length === 0) return;
-    // Implement delete functionality here
-    console.log("Deleting items:", selectedItems);
+    // TODO: Implement delete functionality here
   };
 
   // View item handler
@@ -301,14 +300,12 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
 
   // Edit handler
   const handleEdit = (index) => {
-    console.log("Editing item:", invoices[index]);
-    // Implement edit functionality
+    // TODO: Implement edit functionality
   };
 
   // Delete handler
   const handleDelete = (index) => {
-    console.log("Deleting item:", invoices[index]);
-    // Implement delete functionality
+    // TODO: Implement delete functionality
   };
 
   if (isMobile) {

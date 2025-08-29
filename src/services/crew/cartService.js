@@ -24,14 +24,11 @@ export const addToCart = async (params) => {
       throw new Error("Both inventoryId and productId are required");
     }
 
-    console.log("[CartService] Adding to cart:", params);
-
     const response = await axios.post(buildApiUrl("carts/add"), params, {
       headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
-    console.error("Error adding to cart:", error);
     throw error;
   }
 };
@@ -47,7 +44,6 @@ export const getCart = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching cart:", error);
     throw error;
   }
 };
@@ -63,7 +59,6 @@ export const getCartSummary = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching cart summary:", error);
     throw error;
   }
 };
@@ -83,8 +78,6 @@ export const updateCartQuantity = async (params) => {
       throw new Error("Both inventoryId and productId are required");
     }
 
-    console.log("[CartService] Updating cart quantity:", params);
-
     const response = await axios.put(
       buildApiUrl("carts/update-quantity"),
       params,
@@ -92,7 +85,6 @@ export const updateCartQuantity = async (params) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error updating cart quantity:", error);
     throw error;
   }
 };
@@ -111,15 +103,12 @@ export const removeFromCart = async (params) => {
       throw new Error("Both inventoryId and productId are required");
     }
 
-    console.log("[CartService] Removing from cart:", params);
-
     const response = await axios.delete(buildApiUrl("carts/remove"), {
       data: params,
       headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
-    console.error("Error removing from cart:", error);
     throw error;
   }
 };
@@ -135,7 +124,6 @@ export const clearCart = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error clearing cart:", error);
     throw error;
   }
 };
@@ -155,7 +143,6 @@ export const checkout = async (params) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error during checkout:", error);
     throw error;
   }
 };

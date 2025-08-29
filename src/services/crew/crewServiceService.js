@@ -14,9 +14,6 @@ const getAuthHeader = () => {
  */
 export const getServices = async (params = {}) => {
   try {
-    console.log("Calling getServices API with params:", params);
-    console.log("API URL:", `${API_URL}/services/all/services`);
-
     const response = await axios.get(`${API_URL}/services/all/services`, {
       params,
       headers: {
@@ -24,16 +21,11 @@ export const getServices = async (params = {}) => {
       },
     });
 
-    console.log("API response status:", response.status);
-    console.log("API response data structure:", Object.keys(response.data));
-
     return {
       status: true,
       data: response.data,
     };
   } catch (error) {
-    console.error("Error fetching services:", error);
-    console.error("Error response:", error.response?.data);
     return {
       status: false,
       error: error.response?.data?.message || "Failed to fetch services",
@@ -43,8 +35,6 @@ export const getServices = async (params = {}) => {
 
 export const createBooking = async (bookingData) => {
   try {
-    console.log("Creating booking with data:", bookingData);
-
     const response = await axios.post(`${API_URL}/bookings`, bookingData, {
       headers: {
         ...getAuthHeader(),
@@ -52,15 +42,11 @@ export const createBooking = async (bookingData) => {
       },
     });
 
-    console.log("Booking creation response:", response.data);
-
     return {
       status: true,
       data: response.data,
     };
   } catch (error) {
-    console.error("Error creating booking:", error);
-    console.error("Error response:", error.response?.data);
     return {
       status: false,
       error: error.response?.data?.message || "Failed to create booking",

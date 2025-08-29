@@ -4,7 +4,6 @@ import {
   Grid,
   Card,
   CardContent,
-  Typography,
   Alert,
   IconButton,
   Tooltip,
@@ -72,7 +71,6 @@ const PlatformTrendsRow = () => {
    * @param {Object} data - Clicked data point information
    */
   const handleChartClick = (chartType, data) => {
-    console.log(`${chartType} chart clicked:`, data);
     // TODO: Implement detailed view modal or navigation
   };
 

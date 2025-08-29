@@ -3,13 +3,12 @@ import { useUser } from "../../../context/userContext";
 import { useEffect, useState } from "react";
 import { Payments as StripeIcon } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
-import { useParams, useLocation, useSearchParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 const SupplierOnboardingStep2 = ({ handleNext, suppressAutoAdvance }) => {
   const { id: userId } = useParams();
   const location = useLocation();
   const { stripeAccount, getStripeAccount, createStripeAccount, refreshStripeAccountLink } = useUser();
-  const [searchParams] = useSearchParams();
   const [showContinueButton, setShowContinueButton] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);

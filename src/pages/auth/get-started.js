@@ -46,7 +46,6 @@ const GetStarted = ({ name }) => {
 
   // Function to handle navigation
   const handleRoleSelect = (path, role) => {
-    console.log("navigating to:", path, "with role ", role);
     localStorage.setItem("selectedRole", role);
     navigate(path, { state: { role } }); // Pass the role as state
   };

@@ -176,8 +176,6 @@ const BookingDetails = () => {
             items: [{ item: '', unitPrice: '', quantity: 1 }]
         })) || []
     );
-    console.log({ quoteItems });
-    console.log({ booking });
     const [requiresQuote, setRequiresQuote] = useState(false);
 
     useEffect(() => {
@@ -246,7 +244,6 @@ const BookingDetails = () => {
             } else {
                 requestData.requiresQuote = false;
             }
-            console.log({ requestData });
             const response = await updateStatusOfBooking(requestData);
 
             if (response.status) {
@@ -341,7 +338,6 @@ const BookingDetails = () => {
                 )
             };
 
-            console.log({ requestData });
             const response = await updateStatusOfBooking(requestData);
 
             if (response.status) {

@@ -12,14 +12,14 @@ import { InputTextarea } from "primereact/inputtextarea";
 
 const EditCompliance = () => {
   const [documents, setDocuments] = useState([]);
-  const [filteredDocument, setFilteredDocument] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [filteredDocument, setFilteredDocument] = useState([]);
+  // const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
 
   // State for filters
   const [selectedAuthority, setSelectedAuthority] = useState(null);
-  const [selectedDocumentType, setSelectedDocumentType] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedDocumentType] = useState(null);
+  const [selectedStatus] = useState(null);
 
   const [date, setDate] = useState(null);
   const [selectedInspection, setSelectedInspection] = useState(null);
@@ -73,18 +73,18 @@ const EditCompliance = () => {
     );
   };
 
-  const nationalities = [
-    { name: "American", code: "US" },
-    { name: "Indian", code: "IN" },
-    { name: "British", code: "UK" },
-    { name: "Australian", code: "AU" },
-  ];
+  // const nationalities = [
+  //   { name: "American", code: "US" },
+  //   { name: "Indian", code: "IN" },
+  //   { name: "British", code: "UK" },
+  //   { name: "Australian", code: "AU" },
+  // ];
 
-  const vessel = [{ name: "Motor Yacht" }, { name: "Sailboat Yacht" }];
+  // const vessel = [{ name: "Motor Yacht" }, { name: "Sailboat Yacht" }];
 
-  const status = [{ name: "Active" }, { name: "Inactive" }];
+  // const status = [{ name: "Active" }, { name: "Inactive" }];
 
-  const engine = [{ name: "Gas Turbine" }, { name: "Oil Turbine" }];
+  // const engine = [{ name: "Gas Turbine" }, { name: "Oil Turbine" }];
 
   const inspection = [
     { name: "Flag State Inspection 1" },
@@ -112,21 +112,21 @@ const EditCompliance = () => {
     { name: "Inspection" },
   ];
 
-  const taskCategories = [
-    { name: "Engine & Propulsion Systems" },
-    { name: "Engine & Propulsion" },
-  ];
+  // const taskCategories = [
+  //   { name: "Engine & Propulsion Systems" },
+  //   { name: "Engine & Propulsion" },
+  // ];
 
-  const serviceTypes = [
-    { name: "Internal (Crew)" },
-    { name: "External (Crew)" },
-  ];
+  // const serviceTypes = [
+  //   { name: "Internal (Crew)" },
+  //   { name: "External (Crew)" },
+  // ];
 
-  const financeCategories = [
-    { name: "Maintenance" },
-    { name: "Maintenance 2" },
-  ];
-  const revenueSources = [{ name: "Charter" }, { name: "Charter 2" }];
+  // const financeCategories = [
+  //   { name: "Maintenance" },
+  //   { name: "Maintenance 2" },
+  // ];
+  // const revenueSources = [{ name: "Charter" }, { name: "Charter 2" }];
 
   const navigate = useNavigate();
 
@@ -175,32 +175,32 @@ const EditCompliance = () => {
         },
       ];
       setDocuments(fetchedDocument);
-      setFilteredDocument(fetchedDocument); // Initially, all vessels are displayed
-      setLoading(false);
+      // setFilteredDocument(fetchedDocument); // Initially, all vessels are displayed
+      // setLoading(false);
     }, 500);
   }, []);
 
   // Handle filter logic
   const applyFilters = useCallback(() => {
-    let filteredData = documents;
+    // let filteredData = documents;
 
     if (selectedAuthority) {
-      filteredData = filteredData.filter(
-        (vessel) => vessel.type === selectedAuthority
-      );
+      // filteredData = filteredData.filter(
+      //   (vessel) => vessel.type === selectedAuthority
+      // );
     }
     if (selectedDocumentType) {
-      filteredData = filteredData.filter(
-        (vessel) => vessel.yearbuilt === selectedDocumentType
-      );
+      // filteredData = filteredData.filter(
+      //   (vessel) => vessel.yearbuilt === selectedDocumentType
+      // );
     }
     if (selectedStatus) {
-      filteredData = filteredData.filter(
-        (vessel) => vessel.status === selectedStatus
-      );
+      // filteredData = filteredData.filter(
+      //   (vessel) => vessel.status === selectedStatus
+      // );
     }
 
-    setFilteredDocument(filteredData);
+    // setFilteredDocument(filteredData);
   }, [documents, selectedAuthority, selectedDocumentType, selectedStatus]);
 
   // Apply filters when dependencies change
@@ -209,81 +209,81 @@ const EditCompliance = () => {
   }, [applyFilters]);
 
   // Dropdown options
-  const issueAuthorities = [
-    ...new Set(documents.map((document) => document.issuingAuthority)),
-  ].map((issueAuthority) => ({ name: issueAuthority, value: issueAuthority }));
+  // const issueAuthorities = [
+  //   ...new Set(documents.map((document) => document.issuingAuthority)),
+  // ].map((issueAuthority) => ({ name: issueAuthority, value: issueAuthority }));
 
-  const types = [...new Set(documents.map((vessel) => vessel.type))].map(
-    (type) => ({ name: type, value: type })
-  );
+  // const types = [...new Set(documents.map((vessel) => vessel.type))].map(
+  //   (type) => ({ name: type, value: type })
+  // );
 
-  const statuses = [...new Set(documents.map((vessel) => vessel.status))].map(
-    (status) => ({ name: status, value: status })
-  );
+  // const statuses = [...new Set(documents.map((vessel) => vessel.status))].map(
+  //   (status) => ({ name: status, value: status })
+  // );
 
-  const goToAddCompliancePage = () => {
-    navigate("/compliance-management/compliance/new");
-  };
+  // const goToAddCompliancePage = () => {
+  //   navigate("/compliance-management/compliance/new");
+  // };
 
-  const statusStyles = {
-    InCompliance: {
-      backgroundColor: "#94E0ED",
-      color: "#047F94",
-    },
-    CompliancePending: {
-      backgroundColor: "#F59E0B",
-      color: "#FFFFFF",
-    },
-    NonCompliance: {
-      backgroundColor: "#3B82F6",
-      color: "#FFFFFF",
-    },
+  // const statusStyles = {
+  //   InCompliance: {
+  //     backgroundColor: "#94E0ED",
+  //     color: "#047F94",
+  //   },
+  //   CompliancePending: {
+  //     backgroundColor: "#F59E0B",
+  //     color: "#FFFFFF",
+  //   },
+  //   NonCompliance: {
+  //     backgroundColor: "#3B82F6",
+  //     color: "#FFFFFF",
+  //   },
 
-    Default: {
-      backgroundColor: "#F0F0F0",
-      color: "#000000",
-    },
-  };
+  //   Default: {
+  //     backgroundColor: "#F0F0F0",
+  //     color: "#000000",
+  //   },
+  // };
 
-  const actionBodyTemplate = (rowData) => (
-    <>
-      <Button
-        icon="pi pi-ellipsis-v"
-        className="p-button-rounded p-button-text"
-        onClick={(e) => menuRef.current.toggle(e)}
-      />
-      <OverlayPanel
-        ref={menuRef}
-        dismissable
-        className="datatable-overlaypanel"
-        hideOverlaysOnDocumentScrolling={false}
-      >
-        <Button
-          label="Edit"
-          icon="pi pi-pencil"
-          className="p-button-text w-full"
-          onClick={() => console.log("Edit", rowData)}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-text w-full"
-          onClick={() => console.log("Delete", rowData)}
-        />
-      </OverlayPanel>
-    </>
-  );
+  // const actionBodyTemplate = (rowData) => (
+  //   <>
+  //     <Button
+  //       icon="pi pi-ellipsis-v"
+  //       className="p-button-rounded p-button-text"
+  //       onClick={(e) => menuRef.current.toggle(e)}
+  //     />
+  //     <OverlayPanel
+  //       ref={menuRef}
+  //       dismissable
+  //       className="datatable-overlaypanel"
+  //       hideOverlaysOnDocumentScrolling={false}
+  //     >
+  //       <Button
+  //         label="Edit"
+  //         icon="pi pi-pencil"
+  //         className="p-button-text w-full"
+  //         onClick={() => console.log("Edit", rowData)}
+  //       />
+  //       <Button
+  //         label="Delete"
+  //         icon="pi pi-trash"
+  //         className="p-button-text w-full"
+  //         onClick={() => console.log("Delete", rowData)}
+  //       />
+  //     </OverlayPanel>
+  //   </>
+  // );
 
-  const skeletonTemplate = () => (
-    <>
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="18%" className="mr-2" />
-      <Skeleton width="10%" />
-    </>
-  );
+  // const skeletonTemplate = () => (
+  //   <>
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="18%" className="mr-2" />
+  //     <Skeleton width="10%" />
+  //   </>
+  // );
 
   return (
     <>

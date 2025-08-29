@@ -15,11 +15,6 @@ const getAuthHeader = () => {
 
 export const createOrder = async (orderData) => {
   try {
-    console.log(
-      "Creating order with data:",
-      JSON.stringify(orderData, null, 2)
-    );
-
     // Validate required fields
     if (
       !orderData.supplierId ||
@@ -27,12 +22,6 @@ export const createOrder = async (orderData) => {
       !orderData.deliveryAddress ||
       !orderData.deliveryDate
     ) {
-      console.error("Missing required fields:", {
-        supplierId: !orderData.supplierId,
-        products: !orderData.products,
-        deliveryAddress: !orderData.deliveryAddress,
-        deliveryDate: !orderData.deliveryDate,
-      });
       return {
         status: false,
         error: "Missing required fields",
@@ -41,7 +30,6 @@ export const createOrder = async (orderData) => {
 
     // Validate products array
     if (!Array.isArray(orderData.products) || orderData.products.length === 0) {
-      console.error("Invalid products array:", orderData.products);
       return {
         status: false,
         error: "Products must be a non-empty array",
@@ -51,7 +39,6 @@ export const createOrder = async (orderData) => {
     // Validate each product
     for (const product of orderData.products) {
       if (!product.id || !product.quantity || !product.price) {
-        console.error("Invalid product data:", product);
         return {
           status: false,
           error: "Each product must have id, quantity, and price",
@@ -66,13 +53,11 @@ export const createOrder = async (orderData) => {
       },
     });
 
-    console.log("Order creation response:", response.data);
     return {
       status: true,
       data: response.data,
     };
   } catch (error) {
-    console.error("Error creating order:", error.response?.data || error);
     return {
       status: false,
       error: error.response?.data?.message || "Failed to create order",
@@ -95,10 +80,6 @@ export const getOrders = async (params = {}) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error fetching orders:",
-      error.response?.data || error.message
-    );
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch orders",
@@ -118,10 +99,6 @@ export const getOrderById = async (id) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error fetching order:",
-      error.response?.data || error.message
-    );
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch order",
@@ -145,10 +122,6 @@ export const getOrdersBySupplierId = async (supplierId, params = {}) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error fetching supplier orders:",
-      error.response?.data || error.message
-    );
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch supplier orders",
@@ -172,10 +145,6 @@ export const updateOrderStatus = async (orderId, status) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error updating order status:",
-      error.response?.data || error.message
-    );
     return {
       success: false,
       error: error.response?.data?.message || "Failed to update order status",
@@ -199,10 +168,6 @@ export const updateOrder = async (orderId, orderData) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error updating order:",
-      error.response?.data || error.message
-    );
     return {
       success: false,
       error: error.response?.data?.message || "Failed to update order",
@@ -226,10 +191,7 @@ export const cancelOrder = async (orderId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error cancelling order:",
-      error.response?.data || error.message
-    );
+
     return {
       success: false,
       error: error.response?.data?.message || "Failed to cancel order",
@@ -249,10 +211,7 @@ export const deleteOrder = async (orderId) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error deleting order:",
-      error.response?.data || error.message
-    );
+    
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete order",
@@ -281,10 +240,7 @@ export const getOrderSummary = async (query = {}) => {
       data: response.data,
     };
   } catch (error) {
-    console.error(
-      "Error fetching order summary:",
-      error.response?.data || error.message
-    );
+    
     return {
       success: false,
       error: error.response?.data?.message || "Failed to fetch order summary",
@@ -308,10 +264,7 @@ export const bulkDeleteOrders = async (orderIds) => {
       message: response.data.message || "Orders deleted successfully",
     };
   } catch (error) {
-    console.error(
-      "Error bulk deleting orders:",
-      error.response?.data || error.message
-    );
+    
     return {
       success: false,
       error: error.response?.data?.message || "Failed to delete orders",
@@ -343,7 +296,7 @@ export const searchProducts = async (params = {}) => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error searching products:', error);
+    
     throw error;
   }
 };
@@ -360,7 +313,7 @@ export const getProductCategories = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    
     throw error;
   }
 };
@@ -375,10 +328,6 @@ export const getSupplierOrders = async (status) => {
             data: response.data,
         };
     } catch (error) {
-        console.error(
-            "Error fetching supplier orders:",
-            error.response?.data || error.message
-        );
         return {
             success: false,
             error: error.response?.data?.message || "Failed to fetch supplier orders",

@@ -22,7 +22,7 @@ import {
   Schedule
 } from "@mui/icons-material";
 
-const Outstanding = ({financeData, fetchData, setFinanceData}) => {
+const Outstanding = () => {
   // New expense modal state
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [newExpense, setNewExpense] = useState({
@@ -65,7 +65,6 @@ const Outstanding = ({financeData, fetchData, setFinanceData}) => {
   // Handle saving the expense
   const handleSaveExpense = () => {
     // Here you would typically save the expense data
-    console.log("Saving expense:", newExpense);
     setShowExpenseModal(false);
     // Reset form
     setNewExpense({
@@ -74,13 +73,6 @@ const Outstanding = ({financeData, fetchData, setFinanceData}) => {
       date: null,
       description: "",
     });
-  };
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
   };
 
   const theme = useTheme();

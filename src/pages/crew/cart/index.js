@@ -9,19 +9,14 @@ import {
   Divider,
   Grid,
   IconButton,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Chip,
-  Avatar,
   Badge,
   Alert,
-  Snackbar,
   CircularProgress,
-  useTheme,
-  useMediaQuery,
   Tooltip,
 } from "@mui/material";
 import {
@@ -33,9 +28,7 @@ import {
   ShoppingBag as ShoppingBagIcon,
   LocalShipping as ShippingIcon,
   Payment as PaymentIcon,
-  CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
-  Notes as NotesIcon,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import {
@@ -112,8 +105,6 @@ const CartPage = () => {
   const { setPageTitle } = useOutletContext() || {};
   const { toast } = useToast();
   const { updateCart, clearCart: clearCartContext } = useCart();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   // State management
   const [cart, setCart] = useState(null);
@@ -191,11 +182,6 @@ const CartPage = () => {
     try {
       setUpdatingItem(`${supplierIndex}-${productIndex}`);
 
-      console.log("[CartPage] Updating quantity:", {
-        inventoryId: product.inventoryId,
-        productId: product.productId,
-        quantity: newQuantity,
-      });
 
       const response = await updateCartQuantity({
         inventoryId: product.inventoryId,
@@ -239,11 +225,6 @@ const CartPage = () => {
 
     try {
       setRemovingItem(`${supplierIndex}-${productIndex}`);
-
-      console.log("[CartPage] Removing product:", {
-        inventoryId: product.inventoryId,
-        productId: product.productId,
-      });
 
       const response = await removeFromCart({
         inventoryId: product.inventoryId,
