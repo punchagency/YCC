@@ -182,7 +182,6 @@ const CartPage = () => {
     try {
       setUpdatingItem(`${supplierIndex}-${productIndex}`);
 
-
       const response = await updateCartQuantity({
         inventoryId: product.inventoryId,
         productId: product.productId, // Now required!
@@ -824,7 +823,7 @@ const CartPage = () => {
                   }}
                 >
                   <Typography variant="body1" sx={{ color: "#6b7280" }}>
-                    Platform Fee (5%):
+                    Platform Fee (10%):
                   </Typography>
                   <Typography variant="body1" sx={{ fontWeight: 600 }}>
                     {formatCurrency(cart.platformFee)}
