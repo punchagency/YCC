@@ -45,3 +45,24 @@ export async function searchAdminBookings(params = {}) {
     return { status: false, message: error.message };
   }
 }
+
+/**
+ * Fetch a single booking by ID for admin
+ * @param {string} id - Booking ID
+ * @returns {Promise}
+ */
+export async function getAdminBookingById(id) {
+  try {
+    const response = await axios.get(buildApiUrl(`/admin/bookings/${id}`), {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      return error.response.data;
+    }
+    return { status: false, message: error.message };
+  }
+}

@@ -20,13 +20,9 @@ import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { Pagination as SharedPagination } from "../../components/pagination";
 import LaunchIcon from "@mui/icons-material/Launch";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { formatDate } from "../../utils/formatters";
 
-const formatDateTime = (value) => {
-  if (!value) return "N/A";
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return "Invalid Date";
-  return date.toLocaleString();
-};
+// Using shared formatter from utils to render e.g. 28 Aug 2025
 
 const statusChipProps = (status) => {
   const map = {
@@ -96,10 +92,10 @@ const AdminBookingsTable = ({
   };
 
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box sx={{ mt: 0 }}>
       <TableContainer
         component={Paper}
-        sx={{ borderRadius: 2, boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
+        sx={{ borderRadius: 2, boxShadow: "0 1px 2px rgba(0,0,0,0.05)", px: 1 }}
       >
         <Table>
           <TableHead>
@@ -186,7 +182,7 @@ const AdminBookingsTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell>{formatDateTime(bk.dateTime)}</TableCell>
+                    <TableCell>{formatDate(bk.dateTime)}</TableCell>
                     <TableCell align="right">
                       <IconButton
                         size="small"
