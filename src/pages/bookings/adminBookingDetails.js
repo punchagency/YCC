@@ -16,6 +16,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { getAdminBookingById } from "../../services/admin/adminBookingsService";
 import { formatDate } from "../../utils/formatters";
+import BookingDetailsSkeleton from "../../components/AdminBookingSkeletons/BookingDetailsSkeleton";
 import LaunchIcon from "@mui/icons-material/Launch";
 import {
   CopyIcon,
@@ -170,13 +171,7 @@ const AdminBookingDetails = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography variant="body1" sx={{ color: "#6b7280" }}>
-          Loading booking details...
-        </Typography>
-      </Box>
-    );
+    return <BookingDetailsSkeleton />;
   }
 
   if (error) {
