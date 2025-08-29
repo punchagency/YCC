@@ -6,24 +6,39 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 import { getCategoryIcon } from './section4-resource-center';
 
-const ServiceCard = ({ service }) => {
+const ServiceCard = ({ service, type }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleAction = () => {
+  const handleAction = ({service}) => {
     const token = localStorage.getItem('token');
     if (!isAuthenticated || !token) {
       navigate('/login', {
         state: {
-          from: '/resource-center'  // Redirect back to resource center after login
+          from: '/resource-center',
+          service: service,
+          type: type
         }
       });
       return;
     }
+    // TODO: Manage the routing conection between login and the service page
     // If already authenticated, go to crew dashboard
-    navigate('/crew/dashboard');
+    if(type === 'service') {
+      navigate("/crew/booking", {
+        state: {
+          service: service
+        }
+      });
+    } else {
+      navigate("/crew/orders-management", {
+        state: {
+          service: service
+        }
+      });
+    }
   };
 
   if (!service) {
@@ -107,7 +122,7 @@ const ServiceCard = ({ service }) => {
 
         <Stack spacing={1} mb={2}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <img src={LocationOnIcon} alt="Location" style={{ width: "24px", height: "24px" }} />
+            <img src={LocationOnIcon} alt="Location" style={{ width: "20px", height: "20px" }} />
             <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
               {service.supplier?.location || service.location || 'Location not specified'}
             </Typography>
@@ -124,14 +139,14 @@ const ServiceCard = ({ service }) => {
           </Stack> */}
 
           <Stack direction="row" alignItems="center" spacing={1}>
-            <img src={EmailIcon} alt="Email" style={{ width: "24px", height: "24px" }} />
+            <img src={EmailIcon} alt="Email" style={{ width: "20px", height: "20px" }} />
             <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
               {service.supplier?.email || service.email || service.vendor?.email || 'Email not specified'}
             </Typography>
           </Stack>
         </Stack>
       </CardContent>
-      <CardActions sx={{ pt: 0, mt: 'auto' }}>
+      <CardActions sx={{ pt: 0, px: 0, mt: 'auto' }}>
         <Button 
           fullWidth 
           variant="contained" 
@@ -149,9 +164,9 @@ const ServiceCard = ({ service }) => {
               boxShadow: 'none',
             },
           }}
-          onClick={handleAction}
+          onClick={() => handleAction({service})}
         >
-          Request Quote
+          {type === 'service' ? 'Request Quote' : 'Order Now'}
         </Button>
       </CardActions>
     </Card>

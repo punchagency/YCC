@@ -23,12 +23,12 @@ import {
 import { useCart } from "../../../../context/cart/cartContext";
 import SearchInterface from "./SearchInterface";
 
-const CreateOrderModal = ({ open, onClose }) => {
+const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
   const navigate = useNavigate();
   const { addToCart: addToCartContext } = useCart();
 
   // Search states
-  const [searchQuery, setSearchQuery] = useState("");
+  // const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("all");

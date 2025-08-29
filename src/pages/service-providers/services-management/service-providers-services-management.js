@@ -38,6 +38,7 @@ import {
     Menu,
     MenuItem,
     ListItemIcon,
+    Autocomplete,
 } from "@mui/material";
 import {
     Search as SearchIcon,
@@ -49,15 +50,15 @@ import {
     AttachMoney as MoneyIcon,
     Description as DescriptionIcon,
     Close as CloseIcon,
+    Category as CategoryIcon,
 } from "@mui/icons-material";
 import { format } from 'date-fns';
-import { useNavigate } from "react-router-dom";
 import { createService, deleteService, getAllServices, updateService } from '../../../services/service/newServiceEndpoints';
 
 
 const ServiceProviderServiceManagement = () => {
     const { user } = useUser();
-    const navigate = useNavigate();
+    const userServiceCategories = user?.vendorProfile.services
     const { theme } = useTheme();
     const muiTheme = useMuiTheme();
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
@@ -66,7 +67,7 @@ const ServiceProviderServiceManagement = () => {
     const [modalOpen, setModalOpen] = React.useState(false);
     const [modalMode, setModalMode] = React.useState('create');
     const [selectedService, setSelectedService] = React.useState({});
-    const [formData, setFormData] = React.useState({ name: '', price: '', description: '' });
+    const [formData, setFormData] = React.useState({ name: '', price: '', description: '', category: '' });
     const [searchQuery, setSearchQuery] = React.useState('');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -130,14 +131,14 @@ const ServiceProviderServiceManagement = () => {
 
     const handleCreateService = () => {
         setModalMode('create');
-        setFormData({ name: '', price: '', description: '' });
+        setFormData({ name: '', price: '', description: '', category: '' });
         setSelectedService({});
         setModalOpen(true);
     };
 
     const handleEditService = (service) => {
         setModalMode('update');
-        setFormData({ name: service.name, price: service.price.toString(), description: service.description });
+        setFormData({ name: service.name, price: service.price.toString(), description: service.description, category: service.category });
         setSelectedService(service);
         setModalOpen(true);
         handleMenuClose();
@@ -174,7 +175,8 @@ const ServiceProviderServiceManagement = () => {
             const serviceData = {
                 name: formData.name,
                 price: parseFloat(formData.price),
-                description: formData.description || null
+                description: formData.description || null,
+                category: formData.category || null
             };
 
             const response = modalMode === 'create'
@@ -200,7 +202,11 @@ const ServiceProviderServiceManagement = () => {
     };
 
     const handleFormChange = (field) => (event) => {
-        setFormData(prev => ({ ...prev, [field]: event.target.value }));
+        if (field === 'category') {
+            setFormData(prev => ({ ...prev, [field]: event }));
+        } else {
+            setFormData(prev => ({ ...prev, [field]: event.target.value }));
+        }
     };
 
     const formatDate = (dateString) => {
@@ -250,6 +256,12 @@ const ServiceProviderServiceManagement = () => {
 
                 <Stack spacing={2}>
                     <Stack direction="row" spacing={1} alignItems="center">
+                        <CategoryIcon fontSize="small" color="action" />
+                        <Typography variant="body1" fontWeight={500}>
+                            {service.category}
+                        </Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1} alignItems="center">
                         <MoneyIcon fontSize="small" color="action" />
                         <Typography variant="h6" fontWeight={500} color="primary">
                             ${service.price.toFixed(2)}
@@ -281,7 +293,7 @@ const ServiceProviderServiceManagement = () => {
     }, []);
 
     return (
-        <Box sx={{ p: { xs: 1, sm: 1.4, lg: 4 }, paddingTop: "70px !important" }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
             {/* Header */}
             <Paper
                 elevation={0}
@@ -411,6 +423,7 @@ const ServiceProviderServiceManagement = () => {
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>Service Name</TableCell>
+                                                <TableCell>Category</TableCell>
                                                 <TableCell>Price</TableCell>
                                                 <TableCell>Description</TableCell>
                                                 <TableCell>Created Date</TableCell>
@@ -423,6 +436,11 @@ const ServiceProviderServiceManagement = () => {
                                                     <TableCell>
                                                         <Typography variant="body1" fontWeight={500}>
                                                             {service.name}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography variant="body1" fontWeight={500}>
+                                                            {service.category}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell>
@@ -540,6 +558,42 @@ const ServiceProviderServiceManagement = () => {
                             onChange={handleFormChange('name')}
                             variant="outlined"
                             placeholder="Enter service name"
+                        />
+                        {/* Add a dropdown atocomplete to the service category 
+                        The userServiceCategories is an array of strings with the following structure:
+                        [
+                    "Vessel Management & Administration",
+                    "Maritime Legal & Compliance Assistance",
+                    "Crew Recruitment & Placement Services",
+                    "Customs & Immigration Assistance",
+                    "Insurance & Risk Management",
+                    "Security & Anti-Piracy Training",
+                    "Safety Equipment Inspections & Compliance",
+                    "IT & Cybersecurity Services for Yachts",
+                    "Charter & Itinerary Planning Assistance",
+                    "Satellite & Internet Connectivity Solutions",
+                    "Yacht Detailing & Washdowns",
+                    "Teak Deck Sanding & Restoration",
+                    "Varnishing & Paintwork Services",
+                    "Fiberglass & Gelcoat Repairs",
+                    "Docking & Line Handling Assistance",
+                    "Diving & Underwater Hull Cleaning",
+                    "Fender & Rope Supply & Maintenance",
+                    "Tender & Jet Ski Servicing",
+                    "Watersports Equipment Rental & Repairs",
+                    "Exterior Upholstery & Canvas Work",
+                    "Yacht Interior Cleaning & Housekeeping",
+                    "Custom Interior Design & Refurbishment",
+                    "Event & Party Planning Services"
+                ]
+                        */}
+                        <Autocomplete
+                            fullWidth
+                            options={userServiceCategories}
+                            getOptionLabel={(option) => option}
+                            renderInput={(params) => <TextField {...params} label="Service Category" />}
+                            value={formData.category}
+                            onChange={(e, value) => handleFormChange('category')(value)}
                         />
                         <TextField
                             fullWidth

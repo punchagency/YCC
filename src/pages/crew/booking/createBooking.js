@@ -32,7 +32,7 @@ const CreateBooking = ({
   selectedServices, setSelectedServices,
   vendors, setVendors,
   vendorServices, setVendorServices,
-  loading, setLoading, fetchBookings
+  loading, setLoading, fetchBookings, searchTerm, setSearchTerm
 }) => {
   const { showSuccess, showError } = useToast();
   const [bookingForm, setBookingForm] = React.useState({
@@ -42,8 +42,6 @@ const CreateBooking = ({
     internalNotes: ''
   });
 
-
-  const [searchTerm, setSearchTerm] = React.useState('');
 
   // Get all service categories
   const getAllServiceCategories = () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useOutletContext } from "react-router-dom";
+import { Routes, Route, useOutletContext, useLocation } from "react-router-dom";
 import CrewBookingsAndQuotes from "./CrewBookingsAndQuotes";
 import BookingDetails from "./details";
 import ModifyService from "./modifyservice";
@@ -32,8 +32,10 @@ const Booking = () => {
   const [totalItems, setTotalItems] = React.useState(0);
   const [error, setError] = React.useState(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
-
+  const location = useLocation();
+  const { service } = location.state || {};
   const [showVendorModal] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const fetchBookings = React.useCallback(async (params = {}) => {
     const currentPage = params.page || page;
@@ -101,6 +103,22 @@ const Booking = () => {
       window.removeEventListener("bookingCreated", handleBookingCreated);
     };
   }, [fetchBookings]);
+
+  React.useEffect(() => {
+    if (service) {
+      setOpenSelectServiceCategories(true);
+      console.log("service", service);
+      const serviceCategories = service.categories;
+      if(Array.isArray(serviceCategories) && serviceCategories.length > 0) {
+        setSearchTerm(serviceCategories[0]);
+      }else if(typeof serviceCategories === 'string' && serviceCategories.length > 0) {
+        setSearchTerm(serviceCategories);
+      } else{
+        setSearchTerm("");
+      }
+    }
+  }, [service]);
+
   return (
     <Box sx={{ p: isMobile ? 0 : 2, paddingTop: isMobile ? "10px !important" : "40px !important", mx: "auto" }}>
       <Routes>
@@ -135,6 +153,8 @@ const Booking = () => {
                 setVendorServices={setVendorServices}
                 loading={loading}
                 setLoading={setLoading}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
               />
               <CrewBookingsAndQuotes 
                 bookings={bookings}

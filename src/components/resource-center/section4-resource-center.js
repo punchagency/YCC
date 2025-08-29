@@ -82,15 +82,37 @@ const ResourceCenterSection4 = ({ type, category, search }) => {
       filtered = filtered.filter(service =>
         service.name?.toLowerCase().includes(searchLower) ||
         service.description?.toLowerCase().includes(searchLower) ||
-        service.category?.toLowerCase().includes(searchLower)
+        (service.categories && (
+          Array.isArray(service.categories) 
+            ? service.categories.some(cat => cat?.toLowerCase().includes(searchLower))
+            : service.categories.toLowerCase().includes(searchLower)
+        ))
       );
     }
 
     // Filter by category
     if (category && category !== 'all') {
-      filtered = filtered.filter(service =>
-        service.category?.toLowerCase() === category.toLowerCase()
-      );
+      filtered = filtered.filter(service => {
+        const serviceCategories = service.categories;
+        const selectedCategory = category.toLowerCase();
+        
+        // Handle categories field which can be string or array
+        if (Array.isArray(serviceCategories)) {
+          // If categories is an array, check if any category matches
+          return serviceCategories.some(cat => 
+            cat?.toLowerCase() === selectedCategory ||
+            cat?.toLowerCase().includes(selectedCategory) ||
+            selectedCategory.includes(cat?.toLowerCase())
+          );
+        } else if (typeof serviceCategories === 'string') {
+          // If categories is a string, do direct comparison
+          return serviceCategories.toLowerCase() === selectedCategory ||
+                 serviceCategories.toLowerCase().includes(selectedCategory) ||
+                 selectedCategory.includes(serviceCategories.toLowerCase());
+        }
+        
+        return false;
+      });
     }
 
     setFilteredServices(filtered);
@@ -196,7 +218,7 @@ const ResourceCenterSection4 = ({ type, category, search }) => {
                   }}
                 >
                   <Box sx={{ width: '100%', maxWidth: '100%' }}>
-                    <ServiceCard service={service} />
+                    <ServiceCard service={service} type={type} />
                   </Box>
                 </Grid>
               ))}

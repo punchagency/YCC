@@ -14,7 +14,6 @@ import {
   CardContent,
   Avatar,
   Chip,
-  Container,
   Skeleton,
   ListItem,
   ListItemText,
@@ -39,12 +38,15 @@ import {
 import { fetchServiceProviderDashboard } from '../../../services/service/newServiceEndpoints';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { useUser } from '../../../context/userContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 
 const Dashboard = () => {
   const { setPageTitle } = useOutletContext() || {};
+  const { user } = useUser();
+
   React.useEffect(() => {
     if (setPageTitle) setPageTitle("Dashboard");
   }, [setPageTitle]);
@@ -187,7 +189,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <Container maxWidth="xl" sx={{ py: 4, paddingTop: "80px" }}>
+      <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
         {/* Header */}
         <Paper
           elevation={0}
@@ -209,7 +211,7 @@ const Dashboard = () => {
             <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="center">
               <Box>
                 <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                  Welcome back, {loading ? <Skeleton variant="text" width={150} sx={{ display: 'inline-block' }} /> : dashboardData?.vendor?.businessName || "Service Provider"}!
+                  Welcome back, {user?.vendorProfile?.businessName || "Service Provider"}!
                 </Typography>
                 <Typography sx={{ opacity: 0.9, color: '#fafafa' }}>
                   Manage your services and business operations
@@ -480,7 +482,7 @@ const Dashboard = () => {
             </Grid>
           </Paper>
         )}
-      </Container>
+      </Box>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
