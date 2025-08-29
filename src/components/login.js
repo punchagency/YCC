@@ -99,7 +99,51 @@ const LoginForm = ({ onClose }) => {
           // Continue with navigation even if refresh fails
         }
 
-        // Navigate based on role
+        // Check if user came from resource center and handle service routing
+        // This handles the case where a user clicks on a service in the resource center
+        // but needs to log in first. After login, we redirect them to the appropriate service page.
+        // If navigation fails for any reason, we fall back to the default role-based navigation.
+        if (location.state?.from === "/resource-center" && location.state?.service) {
+          const { service, type } = location.state;
+          
+          console.log("User came from resource center:", { service, type });
+          
+          // Validate service object has required properties
+          if (!service || typeof service !== 'object') {
+            console.warn("Invalid service object received:", service);
+            // Fall back to role-based navigation
+          } else if (!type) {
+            console.warn("Service type not specified, falling back to role-based navigation");
+            // Fall back to role-based navigation
+          } else {
+            // Route based on service type
+            if (type === 'service') {
+              console.log("Routing to crew booking with service:", service);
+              try {
+                navigate("/crew/booking", {
+                  state: { service: service }
+                });
+                return; // Exit early to prevent role-based navigation
+              } catch (error) {
+                console.error("Navigation to crew booking failed:", error);
+                // Fall back to role-based navigation
+              }
+            } else {
+              console.log("Routing to crew orders management with service:", service);
+              try {
+                navigate("/crew/orders-management", {
+                  state: { service: service }
+                });
+                return; // Exit early to prevent role-based navigation
+              } catch (error) {
+                console.error("Navigation to crew orders management failed:", error);
+                // Fall back to role-based navigation
+              }
+            }
+          }
+        }
+
+        // Navigate based on role (fallback for resource center navigation failures or default behavior)
         if (userRole === "crew_member") {
           navigate("/crew/dashboard");
         } else if (userRole === "admin") {

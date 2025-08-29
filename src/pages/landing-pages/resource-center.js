@@ -23,7 +23,7 @@ const ResourceCenter = () => {
   );
 
   // LIFTED STATE
-  const [toggle, setToggle] = useState("Supplies");
+  const [toggle, setToggle] = useState("Services");
   const [category, setCategory] = useState("");
   const [search, setSearch] = useState("");
 
@@ -48,8 +48,10 @@ const ResourceCenter = () => {
           setCategory={setCategory}
           search={search}
           setSearch={setSearch}
+          type={toggle === "Supplies" ? "product" : "service"}
         />
         <Section3ResourceCenter />
+
         <Box sx={{ mt: 1 }}>
           {toggle === "Supplies" && (
             <ResourceCenterSection4
@@ -66,6 +68,7 @@ const ResourceCenter = () => {
             />
           )}
         </Box>
+        
         <Box
           sx={{
             width: "100%",

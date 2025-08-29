@@ -11,9 +11,9 @@ const getAuthHeader = () => {
     };
 };
 
-export const createService = async ({ name, price, description }) => {
+export const createService = async ({ name, price, description, category }) => {
     try {
-        const response = await axios.post(`${API_URL}/services/create-service`, { name, price, description }, {
+        const response = await axios.post(`${API_URL}/services/create-service`, { name, price, description, category }, {
             headers: getAuthHeader(),
         });
 
@@ -48,9 +48,9 @@ export const getAllServices = async ({ search, page = 1, limit = 20}) => {
     }
 }
 
-export const updateService = async (service_id, { name, price, description}) => {
+export const updateService = async (service_id, { name, price, description, category}) => {
     try {
-        const response = await axios.put(`${API_URL}/services/update-service/${service_id}`, { name, price, description}, {
+        const response = await axios.put(`${API_URL}/services/update-service/${service_id}`, { name, price, description, category}, {
             headers: getAuthHeader(),
         });
 

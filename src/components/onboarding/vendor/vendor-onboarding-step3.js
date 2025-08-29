@@ -97,7 +97,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      p: { xs: 2, sm: 3 },
+      p: { xs: 0.8, sm: 1, md: 2, lg: 3 },
       overflow: 'hidden',
       gap: 2
     }}>

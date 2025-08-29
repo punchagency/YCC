@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useUser } from "../../../context/userContext";
 import { useInventory } from "../../../context/inventory/inventoryContext";
 import { useTheme } from "../../../context/theme/themeContext";
 import {
@@ -12,27 +11,18 @@ import {
   Button,
   Avatar,
   Chip,
-  LinearProgress,
-  IconButton,
-  Tooltip,
-  Container,
   Stack,
-  useMediaQuery,
-  useTheme as useMuiTheme,
   alpha,
   Paper,
-  Divider,
 } from "@mui/material";
 import {
   Inventory as InventoryIcon,
   Settings as SettingsIcon,
   Person as PersonIcon,
-  Add as AddIcon,
   TrendingUp as TrendingUpIcon,
   Warning as WarningIcon,
   Dashboard as DashboardIcon,
   ArrowForward as ArrowForwardIcon,
-  Notifications as NotificationsIcon,
   ShoppingCart as ShoppingCartIcon,
 } from "@mui/icons-material";
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
@@ -42,8 +32,6 @@ const SupplierDashboard = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user')) || {};
   const { theme } = useTheme();
-  const muiTheme = useMuiTheme();
-  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
   const { lowInventory, fetchLowInventory } = useInventory();
   const { setPageTitle } = useOutletContext() || {};
   React.useEffect(() => {
@@ -92,7 +80,7 @@ const SupplierDashboard = () => {
     }
   };
   return (
-    <Container maxWidth="xl" sx={{ py: 4, paddingTop: "80px" }}>
+    <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
       {/* Header with gradient background */}
       <Paper 
         elevation={0}
@@ -710,7 +698,7 @@ const SupplierDashboard = () => {
           </Paper>
         </Box>
       )}
-    </Container>
+    </Box>
   );
 };
 

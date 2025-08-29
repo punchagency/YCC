@@ -37,7 +37,10 @@ const SearchInterface = ({
 
   useEffect(() => {
     // Fetch products on mount if none loaded yet
-    if (!loading && searchResults.length === 0) {
+    if (!loading && searchResults.length === 0 && searchQuery.trim().length > 2) {
+      setLocalSearchQuery(searchQuery);
+      onSearch(searchQuery, "all", 1);
+    } else if(!loading && searchResults.length === 0) {
       setLocalSearchQuery("");
       onSearch("", "all", 1);
     }

@@ -273,7 +273,7 @@ const SupplierTransaction = () => {
     };
 
     return (
-        <Box sx={{ p: 4, paddingTop: "80px" }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
             {/* Header with gradient background */}
             <Paper
                 elevation={0}

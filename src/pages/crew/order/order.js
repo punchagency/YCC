@@ -8,13 +8,16 @@ import {
   useOutletContext,
   useSearchParams,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import { useToast } from "../../../components/Toast";
 import { useUser } from "../../../context/userContext";
 
 const Order = () => {
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const location = useLocation();
+  const { service } = location.state || {};
   // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -61,6 +64,13 @@ const Order = () => {
       );
     };
   }, []);
+
+  useEffect(() => {
+    if (service) {
+      setShowCreateModal(true);
+      setSearchQuery(service.name);
+    }
+  }, [service]);
 
   // Initialize pagination state from URL
   useEffect(() => {
@@ -254,6 +264,8 @@ const Order = () => {
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onOrderCreated={handleOrderCreated}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
     </>
   );

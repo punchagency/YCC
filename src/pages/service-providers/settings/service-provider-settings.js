@@ -289,7 +289,7 @@ const Settings = () => {
     
 
     return (
-        <Box sx={{ p: { xs: 1, md: 3, lg: 4 }, paddingTop: '40px !important', mx: 'auto' }}>
+        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
             <Typography variant="h5" sx={{ mb: 4, fontWeight: 600, color: '#1a1a1a' }}>
                 Service Provider Settings
             </Typography>
