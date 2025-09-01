@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 const Section4Home = () => {
     return (
         <Box sx={{
-            paddingBottom: { xs: "710px", md: "288px" },
+            paddingBottom: { xs: "330px", md: "288px" },
         }}>
             <Box
                 sx={{
@@ -20,7 +20,7 @@ const Section4Home = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: { xs: "500px", sm: "700px", md: "650px", lg: "718px" },
+                    height: { xs: "700px", sm: "700px", md: "650px", lg: "718px" },
                     width: '100%',
                     position: 'relative',
                     overflow: 'visible',
@@ -34,11 +34,12 @@ const Section4Home = () => {
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        alignItems: { xs: "start", md: 'center' },
+                        justifyContent: { xs: "left", md: 'center' },
                         height: '100%',
                         width: { xs: "100%", sm: "90%", md: "80%", lg: "944px" },
                         gap: { xs: "20px", sm: "25px", md: "30px" },
+                        marginTop: { xs: "-250px", md: "-60px" },
                     }}>
                         <Box>
                             <HeadingText>Join Our Crew Network</HeadingText>
@@ -48,8 +49,8 @@ const Section4Home = () => {
                             <SecondarySubText>Become part of a safer, better managed and transparent yachting community. By joining our Crew Network, you'll connect with verified industry professionals. Access management tools, personalized AI assistants and a worldwide network. Join our journey and help shape the future of Yachting today.</SecondarySubText>
                         </Box>
 
-                        <Box>
-                            <Link to='/get-started'>
+                        <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", md: "center" }, alignItems: "center" }}>
+                            <Link to='/get-started' style={{ textDecoration: 'none' }}>
                                 <GradientButton
                                     sx={{
                                         minWidth: "240px",
@@ -67,8 +68,9 @@ const Section4Home = () => {
 
                     <Box sx={{
                         position: 'absolute',
-                        bottom: '0',
+                        bottom: { xs: "240px", sm: "-8%", md: '0'},
                         left: '50%',
+                        marginTop: { xs: "20px", md: "200px" },
                         transform: {
                             xs: "translate(-50%, 100%)",
                             sm: "translate(-50%, 30%)",
@@ -103,7 +105,8 @@ const Section4Home = () => {
                                 flexDirection: "column",
                                 gap: "28px",
                                 textAlign: { xs: "center", md: "left" },
-                                alignItems: { xs: "center", md: "flex-start" },
+                                alignItems: { xs: "flex-start", md: "flex-start" },
+                                position: "relative",
                             }}>
                                 <Box sx={{
                                     display: "flex",
@@ -131,7 +134,12 @@ const Section4Home = () => {
                                         </BadgeText>
                                     </Box>
 
-                                    <HeadingTextBlack>
+                                    <HeadingTextBlack
+                                        sx={{
+                                            textAlign: { xs: "left", md: "left" },
+                                            padding: { xs: "0 20px 0 20px", md: "0 0 0 0" },
+                                        }}
+                                    >
                                         Access our Resource Center and see our Yachting Marketplace
                                     </HeadingTextBlack>
                                 </Box>
@@ -139,7 +147,7 @@ const Section4Home = () => {
                                     Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you're managing operations or advancing your career, our blog is your resource for success.
                                 </SecondarySubTextBlack> */}
 
-                                <Box sx={{ padding: { xs: "0 20px 0 20px", md: "0 0 0 0" } }}>
+                                <Box sx={{ padding: { xs: "0 20px 0 20px", md: "0 0 0 0" }, position: { md: "absolute" }, bottom: { md: "20px" }, left: { md: "20px" } }}>
                                     <Link to='/resource-center' style={{ textDecoration: 'none' }}>
                                         <GradientButton>
                                             <ButtonTypography sx={{ color: "white" }}>Resource Center</ButtonTypography>
@@ -154,8 +162,8 @@ const Section4Home = () => {
                                         position: 'relative',
                                         height: '100%'
                                     }}>
-                                    <img src={yatch} alt="Yacht Crew Center"
-                                        style={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: "8px", borderBottomRightRadius: "8px" }} />
+                                    <Box component="img" src={yatch} alt="Yacht Crew Center"
+                                        sx={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: { xs: "0", md: "8px"}, borderBottomRightRadius: { xs: "8px", md: "8px" }, borderBottomLeftRadius: { xs: "8px", md: "0" }, backgroundColor: "transparent" }} />
                                     <Box
                                         sx={{
                                             position: "absolute",
@@ -180,11 +188,11 @@ const Section4Home = () => {
 const SecondarySubText = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 400,
-    fontSize: "15.26px",
-    lineHeight: "22.51px",
+    fontSize: "18px",
+    lineHeight: "128%",
     letterSpacing: "0%",
     color: "white",
-    textAlign: "center",
+    textAlign: { xs: "left", md: "center" },
 })
 
 const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
@@ -197,24 +205,52 @@ const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     textAlign: { xs: "center", md: "left" },
 }))
 
-const HeadingText = styled(Typography)({
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: 600,
+const HeadingText = styled(Typography)(({ theme }) => ({
+    color: "white",
+    fontFamily: "Plus Jakarta Sans, sans-serif",
+    fontWeight: 500,
     fontSize: "46px",
     lineHeight: "51px",
     letterSpacing: "-2%",
-    color: "white",
     textAlign: "center",
-})
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "42px",
+        textAlign: "center",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "34px",
+        textAlign: "left",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "22px",
+        lineHeight: "28px",
+        textAlign: "left",
+    },
+}));
 
-const HeadingTextBlack = styled(Typography)({
-    fontFamily: "Plus Jakarta Sans",
-    fontWeight: 600,
+const HeadingTextBlack = styled(Typography)(({ theme }) => ({
+    color: "#131313",
+    fontFamily: "Plus Jakarta Sans, sans-serif",
+    fontWeight: 500,
     fontSize: "30px",
     lineHeight: "40px",
-    letterSpacing: "0%",
-    color: "#131313",
-})
+    letterSpacing: "-2%",
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "42px",
+        textAlign: "center",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "34px",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "22px",
+        lineHeight: "28px",
+    },
+}))
 
 const BadgeText = styled(Typography)({
     fontFamily: "Inter",

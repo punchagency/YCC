@@ -29,6 +29,7 @@ const Section1Home = () => {
                         flexDirection: "column",
                         gap: "28px",
                         textAlign: { xs: "center", md: "left" },
+                        marginTop: { xs: "20px", md: "0px" },
                     }}>
 
                         <Box sx={{
@@ -76,15 +77,15 @@ const Section1Home = () => {
 }
 
 
-export const SecondarySubTextBlack = styled(Typography)({
+export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
     fontSize: "18px",
     lineHeight: "128%",
     letterSpacing: "0%",
     color: "#373737",
-    textAlign: "justify",
-})
+    textAlign: {xs: "justify", sm: "justify", md: "left"},
+}))
 
 const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",

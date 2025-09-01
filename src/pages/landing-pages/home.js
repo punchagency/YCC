@@ -8,6 +8,7 @@ import LandingPageFooter from "../../components/landing-page-footer";
 import Section4Home from "../../components/home/section4-home";
 import LandingPageBanner from "../../components/landing-page-banner";
 import Chatbot from "../../components/chatbot/chatbot";
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 
 const HomeLandingPage = () => {
   useEffect(() => {
@@ -34,6 +35,7 @@ const HomeLandingPage = () => {
   };
   const page = "home";
   return (
+  <>
     <Box
       sx={{
         display: "flex",
@@ -45,6 +47,7 @@ const HomeLandingPage = () => {
           lg: "120px", // Default gap for large screens
         },
         maxWidth: "100vw",
+        marginBottom: {xs: "45px", sm: "23px", md: "30px"},
       }}
     >
       <LandingPageBanner
@@ -61,8 +64,10 @@ const HomeLandingPage = () => {
       <Section2Home />
       <Section3Home />
       <Section4Home />
-      <LandingPageFooter />
     </Box>
+    <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+    <LandingPageFooter />
+  </>
   );
 };
 
