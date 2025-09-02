@@ -180,7 +180,7 @@ const LandingPageHeader = () => {
         {/* Desktop Navigation */}
         <Box
           sx={{
-            display: { xs: "none", sm: "flex" },
+            display: { xs: "none", md: "flex" },
             gap: { sm: "5px", lg: "40px" },
             alignItems: "center",
           }}

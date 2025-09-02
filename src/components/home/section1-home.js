@@ -19,16 +19,17 @@ const Section1Home = () => {
                     flexWrap: "wrap",
                 }}>
 
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
                         <img src={yatch} alt="Yacht Crew Center"
                             style={{ width: "100%", height: "auto", maxWidth: "100%" }} />
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={12} md={6} sx={{
                         display: "flex",
                         flexDirection: "column",
                         gap: "28px",
                         textAlign: { xs: "center", md: "left" },
+                        marginTop: { xs: "20px", md: "0px" },
                     }}>
 
                         <Box sx={{
@@ -76,15 +77,15 @@ const Section1Home = () => {
 }
 
 
-export const SecondarySubTextBlack = styled(Typography)({
+export const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
     fontFamily: "Inter",
     fontWeight: 400,
     fontSize: "18px",
     lineHeight: "128%",
     letterSpacing: "0%",
     color: "#373737",
-    textAlign: "justify",
-})
+    textAlign: {xs: "justify", sm: "justify", md: "left"},
+}))
 
 const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",

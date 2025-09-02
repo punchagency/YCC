@@ -6,6 +6,7 @@ import Section2ChefGallery from '../../components/chef-gallery/section2-chef-gal
 import Section3ChefGallery from '../../components/chef-gallery/section3-chef-gallery'   
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const ChefGalleryLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -24,6 +25,7 @@ const ChefGalleryLandingPage = () => {
     }
 
     return (
+        <>
         <Box sx={{
             display: "flex",
             flexDirection: "column",
@@ -32,6 +34,7 @@ const ChefGalleryLandingPage = () => {
                 md: "120px",
                 lg: "60px"
             },
+            marginBottom: { xs: "45px", sm: "23px", md: "60px" },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -42,8 +45,10 @@ const ChefGalleryLandingPage = () => {
             <Chatbot />
             <Section2ChefGallery />
             <Section3ChefGallery />
-            <LandingPageFooter />
         </Box>
+        <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+        <LandingPageFooter />
+        </>
     )
 
 }

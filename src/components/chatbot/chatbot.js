@@ -11,7 +11,7 @@ import {
   IconButton,
 } from "@mui/material";
 import SendIcon from "../../assets/images/chatbot/send-icon.png";
-import BotIcon from "../../assets/images/chatbot/chatbot-profile-icon.png";
+import BotIcon from "../../assets/images/ai-chat.svg"
 import SimpleBar from "simplebar-react";
 import "simplebar-react/dist/simplebar.min.css";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -508,8 +508,9 @@ const Chatbot = (props) => {
           variant="extended"
           sx={{
             position: "fixed",
-            bottom: 19,
-            right: 19,
+            bottom: { xs: 15, md: 19 },
+            right: { xs: 5, md: 19 },
+            padding: 0,
             display: {
               xs: "flex",
               md: "none",

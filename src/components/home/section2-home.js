@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, Button, styled, Container, Grid, Badge } from '@mui/material'
+import { Box, Typography, Button, styled, Container, Grid, Badge, useTheme, useMediaQuery } from '@mui/material'
 import shipIcon from '../../assets/images/icons/home-page-ship.png'
 import crewIcon from '../../assets/images/icons/home-page-crew.png'
 import engineeringIcon from '../../assets/images/icons/home-page-engineering.png'
@@ -10,6 +10,8 @@ import { ButtonTypography, linearGradient } from '../landing-page-header'
 import { Link } from 'react-router-dom'
 
 const Section2Home = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const gridData = [
         {
             title: "Captains",
@@ -37,7 +39,7 @@ const Section2Home = () => {
         },
         {
             title: "Chef/Galley",
-            description: "Search suggestions for recipes based on diet restrictions and what you have on hand.  Assistance with sourcing for local provisions. Focus on your art and leave the suggestions and sourcing to us.",
+            description: "Use our AI Assistant and management dashboards to better run your galley. Keeping everything in place and using your Assistant. Brings your focus back to your artwork.",
             image: chefGalleryIcon,
             path: '/chef-galley'
         },
@@ -78,7 +80,7 @@ const Section2Home = () => {
                         gap: "10px",
                         justifyContent: "center",
                         alignItems: "center",
-                        textAlign: "center",
+                        textAlign: "left",
                     }}>
                         <Badge variant='dot' sx={{
                             "& .MuiBadge-dot": {
@@ -125,16 +127,16 @@ const Section2Home = () => {
                                     gap: "10px", 
                                     justifyContent: "space-between",
                                     height: "100%",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
-                                        background: "#E6EFF2",
-                                    }
+                                    // transition: "all 0.3s ease-in-out",
+                                    // "&:hover": {
+                                    //     transform: "translateY(-10px)",
+                                    //     boxShadow: "0 10px 20px rgba(4, 135, 217, 0.2)",
+                                    //     background: "#E6EFF2",
+                                    // }
                                 }}>
                                     <Box sx={{ display: "flex", flexDirection: "column", gap: "28px" }}>
                                         <AnimatedIcon>
-                                            <img src={item.image} alt="yacht" style={{ width: "76px", height: "76px" }}/>
+                                            <img src={item.image} alt="yacht" style={{ width: isMobile ? '60px' : '76px', height: isMobile ? '60px' : '76px' }}/>
                                         </AnimatedIcon>
                                         <Box>
                                             <SecondaryHeadingText>
@@ -210,15 +212,21 @@ const HeadingText = styled(Typography)(({ theme }) => ({
     color: "#131313",
     fontFamily: "Plus Jakarta Sans, sans-serif",
     fontWeight: 500,
-    fontSize: theme.breakpoints.values.xs ? "36px" :
-        theme.breakpoints.values.sm ? "40px" :
-            theme.breakpoints.values.md ? "42px" :
-                "46px",
-    lineHeight: theme.breakpoints.values.xs ? "36px" :
-        theme.breakpoints.values.sm ? "40px" :
-            theme.breakpoints.values.md ? "46px" :
-                "51px",
+    fontSize: "46px",
+    lineHeight: "51px",
     letterSpacing: "-2%",
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "42px",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "34px",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "22px",
+        lineHeight: "28px",
+    },
 }));
 
 const SecondaryHeadingText = styled(Typography)({
