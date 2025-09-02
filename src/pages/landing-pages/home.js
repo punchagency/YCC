@@ -59,7 +59,7 @@ const HomeLandingPage = () => {
         button2={button2}
         page={page}
       />
-      <Section1Home />
+      {/* <Section1Home /> */}
       <Chatbot />
       <Section2Home />
       <Section3Home />

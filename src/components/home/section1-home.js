@@ -19,10 +19,10 @@ const Section1Home = () => {
                     flexWrap: "wrap",
                 }}>
 
-                    <Grid item xs={12} md={6}>
+                    {/* <Grid item xs={12} md={6}>
                         <img src={yatch} alt="Yacht Crew Center"
                             style={{ width: "100%", height: "auto", maxWidth: "100%" }} />
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={12} md={6} sx={{
                         display: "flex",

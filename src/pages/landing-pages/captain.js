@@ -5,15 +5,16 @@ import LandingPageFooter from '../../components/landing-page-footer'
 import { Typography, Box } from '@mui/material'
 import Section2Captain from '../../components/captain/section2-captain'
 import Section3Captain from '../../components/captain/section3-captain'
-import Chatbot from '../../components/chatbot/chatbot'
+import Chatbot from '../../components/chatbot/chatbot';
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const CaptainLandingPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-const backgroundImage = banner
+  const backgroundImage = banner
   const header = (
     <>
-     Supporting <GradientText>yacht</GradientText>{" "}
+      Supporting <GradientText>yacht</GradientText>{" "}
       <GradientText>captains</GradientText> in leadership and excellence
     </>
   );
@@ -25,31 +26,34 @@ const backgroundImage = banner
   }
 
   return (
-    <Box sx={{
+    <>
+      <Box sx={{
         display: "flex",
         flexDirection: "column",
         gap: {
           xs: "120px",
           md: "120px",
           lg: "60px"
-      },
+        },
+        marginBottom: { xs: "45px", sm: "23px", md: "70px" },
       }}>
         <LandingPageBanner
-        backgroundImage={backgroundImage}
-        header={header}
-        subtext2={subtext2}
-        button1={button1}
+          backgroundImage={backgroundImage}
+          header={header}
+          subtext2={subtext2}
+          button1={button1}
         />
         <Chatbot />
         <Section2Captain />
         <Section3Captain />
-
-        <LandingPageFooter />
       </Box>
+      <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+      <LandingPageFooter />
+    </>
   )
 }
 
-const linearGradientLight =  `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
+const linearGradientLight = `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
 const GradientText = (props) => (
   <Typography
     component="span"

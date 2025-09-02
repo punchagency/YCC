@@ -6,11 +6,11 @@ import Section2Interior from '../../components/interior/section2-interior'
 import Section3Interior from '../../components/interior/section3-interior'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
-
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const InteriorLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
-      }, []);
+        }, []);
     const backgroundImage = banner
     const header = (
         <>
@@ -24,6 +24,7 @@ const InteriorLandingPage = () => {
         path: '/get-started'
     }
     return (
+        <>
         <Box sx={{
             display: "flex",
             flexDirection: "column",
@@ -32,6 +33,7 @@ const InteriorLandingPage = () => {
                     md: "120px",
                     lg: "60px"
             },
+            marginBottom: { xs: "45px", sm: "23px", md: "60px" },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -42,8 +44,10 @@ const InteriorLandingPage = () => {
             <Chatbot />
             <Section2Interior />
             <Section3Interior />
-            <LandingPageFooter />
         </Box>
+        <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+        <LandingPageFooter />
+        </>
     )
 }
 
