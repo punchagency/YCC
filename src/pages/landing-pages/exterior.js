@@ -6,6 +6,7 @@ import Section2Exterior from '../../components/exterior/section2-exterior'
 import Section3Exterior from '../../components/exterior/section3-exterior'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const ExteriorLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -24,6 +25,7 @@ const ExteriorLandingPage = () => {
     }
 
     return (
+        <>
         <Box sx={{
             display: "flex",
             flexDirection: "column",
@@ -32,6 +34,7 @@ const ExteriorLandingPage = () => {
                 md: "120px",
                 lg: "60px"
             },
+            marginBottom: { xs: "45px", sm: "23px", md: "60px" },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -42,8 +45,10 @@ const ExteriorLandingPage = () => {
             <Chatbot />
             <Section2Exterior />
             <Section3Exterior />
-            <LandingPageFooter />
         </Box>
+            <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+            <LandingPageFooter />
+        </>
     )
 }
 

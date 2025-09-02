@@ -6,7 +6,7 @@ import Section2VendorServices from '../../components/vendor-services/section2-ve
 import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
 import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
-
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const VendorAndServices = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -24,6 +24,7 @@ const VendorAndServices = () => {
         path: '/apply'
     }
     return (
+        <>
         <Box sx={{
             display: "flex",
             flexDirection: "column",
@@ -32,6 +33,7 @@ const VendorAndServices = () => {
                 md: "120px",
                 lg: "60px"
             },
+            marginBottom: { xs: "45px", sm: "23px", md: "35px" },
         }}>
             <LandingPageBanner
                 backgroundImage={backgroundImage}
@@ -41,9 +43,11 @@ const VendorAndServices = () => {
             />
             <Section1VendorServices />
             <Section2VendorServices />
-            <LandingPageFooter />
             <LandingPageChatbot />
         </Box>
+        <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+        <LandingPageFooter />
+        </>
     )
 }
 

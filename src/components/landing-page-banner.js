@@ -94,7 +94,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                 left: {
                     xs: "50%", // Center on mobile
                     md: "40%", // Keep original positioning for larger screens
-                    lg: "30%",
+                    lg: "27%",
                 },
                 transform: {
                     xs: "translate(-50%, -50%)", // Full centering on mobile
@@ -147,10 +147,12 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                     {subtext2}
                 </SecondarySubText>}
 
-                {button1 && <Box sx={{ display: "flex", gap: button2 ? "15px" : 0, justifyContent: { xs: 'center', md: 'start' } }}>
-                    <Link to={button1.path}>
+                {button1 && <Box sx={{ display: "flex", flexDirection: { xs: 'column', md: 'row' }, gap: button2 ? "15px" : 0, justifyContent: { xs: 'center', md: 'start' }, alignItems: { xs: 'center', md: 'start' } }}>
+                    <Link to={button1.path} style={{ display: "flex", alignItems: "center" }} >
                         <GradientButton sx={{
-                            minWidth: "240px"
+                            minWidth: "240px",
+                            verticalAlign: "center",
+                            textAlign: "center"
                         }}>
                             <ButtonTypography sx={{ color: "white" }}>{button1.text}</ButtonTypography>
                         </GradientButton>
@@ -161,11 +163,14 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                             position: "relative",
                             overflow: "hidden",
                             border: "none",
+                            width: { xs: '240px', md: 'auto' },
                             borderRadius: "8px",
-                            padding: "10px 20px",
                             background: "transparent",
                             textTransform: "none",
                             transition: "all 0.3s ease-in-out",
+                            fontSize: "16px",
+                            fontFamily: "Inter, sans-serif",
+                            padding: "12px 14px",
                             "&:hover": {
                                 transform: "translateY(-3px)",
                                 "& .button-text": {

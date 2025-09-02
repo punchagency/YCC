@@ -6,17 +6,17 @@ import Section2Engineering from '../../components/engineering/section2-engineeri
 import Section3Engineering from '../../components/engineering/section3-engineering'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
-
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const EngineeringLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
-      }, []);
+    }, []);
     const backgroundImage = banner
     const header = (
         <>
             Supporting <GradientText>Yacht</GradientText>{" "}
             <GradientText>Engineers</GradientText> with Tools for Success
-        </>    
+        </>
     );
     const subtext2 = 'From maintenance resources to technical training, find everything you need to keep yachts running at peak performance.'
     const button1 = {
@@ -25,25 +25,29 @@ const EngineeringLandingPage = () => {
     }
 
     return (
-        <Box sx={{
-            display: "flex",
-            flexDirection: "column",
+        <>
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
                 gap: {
                     md: "120px",
                     lg: "60px"
                 },
-        }}>
-            <LandingPageBanner
-                backgroundImage={backgroundImage}
-                header={header}
-                subtext2={subtext2}
-                button1={button1}
-            />
-            <Chatbot />
-            <Section2Engineering />
-            <Section3Engineering />
+                marginBottom: { xs: "45px", sm: "23px", md: "60px" },
+            }}>
+                <LandingPageBanner
+                    backgroundImage={backgroundImage}
+                    header={header}
+                    subtext2={subtext2}
+                    button1={button1}
+                />
+                <Chatbot />
+                <Section2Engineering />
+                <Section3Engineering />
+            </Box>
+            <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
             <LandingPageFooter />
-        </Box>
+        </>
     )
 }
 
