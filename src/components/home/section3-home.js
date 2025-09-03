@@ -9,7 +9,7 @@ const Section3Home = () => {
     return (
         <Container disableGutters component="section" maxWidth="md" sx={{
             display: "flex",
-            padding: 0,
+            padding: {xs: "0 16px 0 16px", md: 0},
         }}>
             <Box
                 sx={{
@@ -21,7 +21,7 @@ const Section3Home = () => {
                     justifyContent: { xs: "center", md: "space-between" },
                     alignItems: "center",
                     borderRadius: "20px",
-                    marginBottom: { xs: "80px", md: "200px" },
+                    marginBottom: { xs: "80px", md: "0" },
                     padding: { xs: 0, md: 0 }, // Add padding for spacing on mobile
                 }}
             >
@@ -30,7 +30,7 @@ const Section3Home = () => {
                     sx={{
                         display: "flex",
                         flexDirection: "column",
-                        padding: "40px",
+                        padding: {xs: "16px", md: "40px"},
                         gap: "20px",
                         textAlign: "left",
                     }}
@@ -56,9 +56,9 @@ const Section3Home = () => {
                         height: { xs: "100%", md: "235px" },
                         maxWidth: { xs: "100%", md: "236px" },
                         maxHeight: { xs: "100%", md: "235px" },
-                        borderBottomRightRadius: 20,
-                        borderBottomLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
-                        borderTopLeftRadius: { xs: 30, md: 0 }, // Bottom-left rounded only on mobile
+                        borderBottomRightRadius: "16px",
+                        borderBottomLeftRadius: { xs: "16px", md: 0 }, // Bottom-left rounded only on mobile
+                        borderTopLeftRadius: { xs: "16px", md: 0 }, // Bottom-left rounded only on mobile
                         display: "block",
                         marginRight: { xs: 0, md: "20px" },
                     }}

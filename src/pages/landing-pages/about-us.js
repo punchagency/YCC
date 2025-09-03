@@ -9,52 +9,56 @@ import Section4AboutUs from '../../components/about/section4-about-us'
 import Section5AboutUs from '../../components/about/section5-about-us'
 import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
-
+import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const AboutUs = () => {
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-    const backgroundImage = banner
-    const header = (
-        <>
-            Yacht Crew <br /> Center - Here To <br /> <GradientText>Assist</GradientText>{" "}
-            <GradientText>You</GradientText>
-        </> 
-    );
-    const subtext2 = "Have questions or need assistance? Connect with our dedicated team for personalized support tailored to the yachting community."
-    const button1 = {
-        text: 'Join Now',
-        path: '/get-started'
-    }
-    return (
-        <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: {
-                xs: "0px",
-                md: "120px",
-                lg: "60px"
-            },
-        }}>
-            <LandingPageBanner
-                backgroundImage={backgroundImage}
-                header={header}
-                subtext2={subtext2}
-                button1={button1}
-            />
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  const backgroundImage = banner
+  const header = (
+    <>
+      Yacht Crew <br /> Center - Here To <br /> <GradientText>Assist</GradientText>{" "}
+      <GradientText>You</GradientText>
+    </>
+  );
+  const subtext2 = "Have questions or need assistance? Connect with our dedicated team for personalized support tailored to the yachting community."
+  const button1 = {
+    text: 'Join Now',
+    path: '/get-started'
+  }
+  return (
+    <>
+      <Box sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: {
+          xs: "0px",
+          md: "120px",
+          lg: "60px"
+        },
+        marginBottom: { xs: "45px", sm: "23px", md: "35px" },
+      }}>
+        <LandingPageBanner
+          backgroundImage={backgroundImage}
+          header={header}
+          subtext2={subtext2}
+          button1={button1}
+        />
 
-            <Section1AboutUs />
-            <Section2AboutUs />
-            <Section3AboutUs />
-            <Section4AboutUs />
-            <Section5AboutUs />
-            <LandingPageFooter />
-            <LandingPageChatbot />
-        </Box>
-    )
+        <Section1AboutUs />
+        <Section2AboutUs />
+        <Section3AboutUs />
+        <Section4AboutUs />
+        <Section5AboutUs />
+        <LandingPageChatbot />
+      </Box>
+      <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
+      <LandingPageFooter />
+    </>
+  )
 }
 
-const linearGradientLight =  `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
+const linearGradientLight = `linear-gradient(86.8deg, #FFFFFF -51.91%, #209DEB 84.68%)`;
 const GradientText = (props) => (
   <Typography
     component="span"
