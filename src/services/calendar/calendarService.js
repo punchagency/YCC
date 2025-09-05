@@ -44,10 +44,10 @@ export const fetchEvents = async (startDate, endDate) => {
     const response = await axios.get(`${API_URL}/events`, requestConfig);
 
     // Fix: Return the events array directly instead of the wrapper object
-    if (response.data.status && response.data.data) {
+    if (response.status && response.data) {
       return {
         success: true,
-        data: response.data.data, // Return the events array directly
+        data: response.data, // Return the events array directly
       };
     } else {
       return {

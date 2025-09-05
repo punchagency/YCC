@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useUser } from "../../../context/userContext";
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTheme } from "../../../context/theme/themeContext";
 import { useOutletContext } from "react-router-dom";
 import {
@@ -47,7 +46,6 @@ import {
   Cancel as CancelIcon,
   Pending as PendingIcon,
   Done as DoneIcon,
-  Close as CloseIcon,
   BookOnline as BookingIcon,
 } from "@mui/icons-material";
 import { format } from 'date-fns';
@@ -55,13 +53,20 @@ import { useNavigate } from "react-router-dom";
 import { getServiceProviderBookings } from '../../../services/bookings/bookingService';
 
 const ServiceProvidersBookings = () => {
-  const { user } = useUser();
   const navigate = useNavigate();
   const { theme } = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
-  
+
   const [bookings, setBookings] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalCount: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 10
+  });
   const [bookingCounts, setBookingCounts] = useState({
     pending: 0,
     confirmed: 0,
@@ -75,6 +80,7 @@ const ServiceProvidersBookings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTimeout, setSearchTimeout] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -86,19 +92,20 @@ const ServiceProvidersBookings = () => {
     if (setPageTitle) setPageTitle("Bookings");
   }, [setPageTitle]);
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = {
         page: page + 1,
         limit: rowsPerPage,
         ...(bookingStatus !== "all" && { status: bookingStatus }),
+        ...(searchQuery && { search: searchQuery }),
       };
-      
+
       const response = await getServiceProviderBookings(params);
       if (response.status) {
         setBookings(response.data.bookings || []);
-        
+        setPagination(response.data.pagination || {});
         // Calculate counts from summary or bookings
         const summary = response.data.summary;
         if (summary) {
@@ -128,14 +135,36 @@ const ServiceProvidersBookings = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page, rowsPerPage, bookingStatus, searchQuery]);
 
   useEffect(() => {
     fetchBookings();
-  }, [bookingStatus, page, rowsPerPage]);
+  }, [fetchBookings]);
+
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
   const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
+    const value = event.target.value;
+    setSearchQuery(value);
+    
+    // Clear existing timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    // Set new timeout for debounced search
+    const timeout = setTimeout(() => {
+      setPage(0); // Reset to first page when searching
+    }, 500);
+    
+    setSearchTimeout(timeout);
   };
 
   const handleStatusChange = (event, newValue) => {
@@ -205,21 +234,133 @@ const ServiceProvidersBookings = () => {
     }
   };
 
-  const filteredBookings = bookings.filter(booking => {
-    if (!searchQuery) return true;
+  // Since we're using server-side pagination, we don't need client-side filtering
+  const displayBookings = bookings;
 
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      booking.bookingId?.toLowerCase().includes(searchLower) ||
-      booking.crew?.firstName?.toLowerCase().includes(searchLower) ||
-      booking.crew?.lastName?.toLowerCase().includes(searchLower) ||
-      booking.vendorName?.toLowerCase().includes(searchLower) ||
-      booking.services.some(s => s.service?.name?.toLowerCase().includes(searchLower))
-    );
-  });
+  // Desktop Table Skeleton Component
+  const DesktopTableSkeleton = () => (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Booking ID</TableCell>
+            <TableCell>Customer</TableCell>
+            <TableCell>Services</TableCell>
+            <TableCell>Total</TableCell>
+            <TableCell>Booking Date</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Payment</TableCell>
+            <TableCell align="center">Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {Array.from({ length: rowsPerPage }).map((_, index) => (
+            <TableRow key={index}>
+              <TableCell>
+                <Skeleton variant="text" width={120} height={20} />
+              </TableCell>
+              <TableCell>
+                <Box>
+                  <Skeleton variant="text" width={140} height={20} />
+                  <Skeleton variant="text" width={100} height={16} sx={{ mt: 0.5 }} />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Box>
+                  <Skeleton variant="text" width={160} height={20} />
+                  <Skeleton variant="text" width={120} height={20} sx={{ mt: 0.5 }} />
+                </Box>
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="text" width={80} height={20} />
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="text" width={100} height={20} />
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 12 }} />
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="rectangular" width={70} height={24} sx={{ borderRadius: 12 }} />
+              </TableCell>
+              <TableCell align="center">
+                <Skeleton variant="rectangular" width={100} height={32} sx={{ borderRadius: 12 }} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 
-  const paginatedBookings = filteredBookings
-    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // Mobile Card Skeleton Component
+  const MobileCardSkeleton = () => (
+    <Card sx={{ mb: 2, borderRadius: 2, overflow: 'hidden' }}>
+      <Box sx={{
+        height: '8px',
+        bgcolor: alpha(muiTheme.palette.primary.main, 0.1),
+        width: '100%'
+      }} />
+      <CardContent sx={{ p: 2 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Skeleton variant="text" width={120} height={24} />
+          <Stack spacing={0.5}>
+            <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 12 }} />
+            <Skeleton variant="rectangular" width={70} height={24} sx={{ borderRadius: 12 }} />
+          </Stack>
+        </Stack>
+
+        <Stack spacing={2} sx={{ mt: 2 }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Skeleton variant="circular" width={20} height={20} />
+            <Box>
+              <Skeleton variant="text" width={140} height={20} />
+              <Skeleton variant="text" width={100} height={16} sx={{ mt: 0.5 }} />
+            </Box>
+          </Stack>
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Skeleton variant="circular" width={20} height={20} />
+            <Skeleton variant="text" width={80} height={20} />
+          </Stack>
+
+          <Stack direction="row" spacing={1} alignItems="flex-start">
+            <Skeleton variant="circular" width={20} height={20} sx={{ mt: 0.5 }} />
+            <Box>
+              <Skeleton variant="text" width={160} height={20} />
+              <Skeleton variant="text" width={120} height={20} sx={{ mt: 0.5 }} />
+            </Box>
+          </Stack>
+
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Skeleton variant="circular" width={20} height={20} />
+                <Box>
+                  <Skeleton variant="text" width={80} height={16} />
+                  <Skeleton variant="text" width={100} height={20} sx={{ mt: 0.5 }} />
+                </Box>
+              </Stack>
+            </Grid>
+            <Grid item xs={6}>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Skeleton variant="circular" width={20} height={20} />
+                <Box>
+                  <Skeleton variant="text" width={60} height={16} />
+                  <Skeleton variant="text" width={100} height={20} sx={{ mt: 0.5 }} />
+                </Box>
+              </Stack>
+            </Grid>
+          </Grid>
+        </Stack>
+      </CardContent>
+
+      <Divider />
+      <CardActions sx={{ p: 2, pt: 1, display: 'flex', justifyContent: 'end' }}>
+        <Skeleton variant="rectangular" width={120} height={36} sx={{ borderRadius: 12 }} />
+      </CardActions>
+    </Card>
+  );
 
   // Mobile booking card component
   const MobileBookingCard = ({ booking }) => {
@@ -488,14 +629,20 @@ const ServiceProvidersBookings = () => {
       {/* Bookings - Table for Desktop, Cards for Mobile */}
       <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
         {isLoading ? (
-          <Box sx={{ p: 3 }}>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Box key={index} sx={{ mb: 2 }}>
-                <Skeleton variant="rectangular" height={80} sx={{ borderRadius: 1 }} />
+          <>
+            {/* Desktop Table Skeleton */}
+            {!isMobile && <DesktopTableSkeleton />}
+            
+            {/* Mobile Card Skeleton */}
+            {isMobile && (
+              <Box sx={{ p: 2 }}>
+                {Array.from({ length: rowsPerPage }).map((_, index) => (
+                  <MobileCardSkeleton key={index} />
+                ))}
               </Box>
-            ))}
-          </Box>
-        ) : filteredBookings.length === 0 ? (
+            )}
+          </>
+        ) : displayBookings.length === 0 ? (
           <Box sx={{
             py: 8,
             display: 'flex',
@@ -546,7 +693,7 @@ const ServiceProvidersBookings = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {paginatedBookings.map((booking) => (
+                      {displayBookings.map((booking) => (
                         <TableRow key={booking.id} hover>
                           <TableCell>
                             <Typography variant="body2" fontWeight={500}>
@@ -629,7 +776,7 @@ const ServiceProvidersBookings = () => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25]}
                   component="div"
-                  count={filteredBookings.length}
+                  count={pagination.totalCount || 0}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
@@ -641,13 +788,13 @@ const ServiceProvidersBookings = () => {
             {/* Mobile Card View */}
             {isMobile && (
               <Box sx={{ p: 2 }}>
-                {paginatedBookings.map(booking => (
+                {displayBookings.map(booking => (
                   <MobileBookingCard key={booking.id} booking={booking} />
                 ))}
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                   <Pagination
-                    count={Math.ceil(filteredBookings.length / rowsPerPage)}
+                    count={pagination.totalPages || 1}
                     page={page + 1}
                     onChange={(e, newPage) => handleChangePage(e, newPage - 1)}
                     color="primary"
