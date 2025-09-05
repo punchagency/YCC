@@ -128,7 +128,6 @@ const AdminLayout = ({ role }) => {
 
   // Determine if we should show the create booking button
   const shouldShowCreateBookingButton = pageTitle === "Bookings";
-  const shouldShowCreateEventButton = pageTitle === "Calendar" && user.role.name === "service_provider";
 
   // Determine if we should show the create order button
   const shouldShowCreateOrderButton =
@@ -449,59 +448,6 @@ const AdminLayout = ({ role }) => {
     </button>
   );
 
-  // Create New Event button for service providers
-  const CreateNewEventButton = (
-    <button
-      onClick={() => {
-        // Trigger the existing modal in the calendar pages
-        const event = new CustomEvent("openCreateEventModal");
-        window.dispatchEvent(event);
-      }}
-      style={{
-        backgroundColor: "#0387D9",
-        color: "white",
-        padding: "8px 16px",
-        borderRadius: "8px",
-        border: "none",
-        cursor: "pointer",
-        fontWeight: "600",
-        fontSize: "14px",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        transition: "background 0.2s, transform 0.2s",
-        outline: "none",
-      }}
-      onMouseOver={(e) => {
-        e.currentTarget.style.backgroundColor = "#026bb3";
-        e.currentTarget.style.transform = "scale(1.02)";
-      }}
-      onMouseOut={(e) => {
-        e.currentTarget.style.backgroundColor = "#0387D9";
-        e.currentTarget.style.transform = "scale(1)";
-      }}
-      onFocus={(e) => {
-        e.currentTarget.style.outline = "2px solid #026bb3";
-      }}
-      onBlur={(e) => {
-        e.currentTarget.style.outline = "none";
-      }}
-    >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-      Create New Event
-    </button>
-  );
-
   return (
     <ThemeProvider>
       <ToastProvider>
@@ -562,7 +508,7 @@ const AdminLayout = ({ role }) => {
                                         {user.role.name === "supplier" &&
                                           importCSVButton}
                                       </div>
-                                    ) : showCreateServiceButton ? CreateNewServiceButton : shouldShowCreateEventButton ? CreateNewEventButton : null
+                                    ) : showCreateServiceButton ? CreateNewServiceButton : null
                                   }
                                 />
                               </div>

@@ -230,7 +230,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
 const PrimarySubText = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: "15.65px",
+    fontSize: "18px",
     lineHeight: "27.52px",
     letterSpacing: "0%",
     color: "white",
@@ -239,8 +239,8 @@ const PrimarySubText = styled(Typography)({
 const SecondarySubText = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 300,
-    fontSize: "15.26px",
-    lineHeight: "22.51px",
+    fontSize: "18px",
+    lineHeight: "148%",
     letterSpacing: "0%",
     color: "white",
 })
