@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { updateUserContext, clearUserContext } from "../services/sentry/sentryService";
 import { getUserSettings } from "../services/crewSettings/crewsettings";
 
 // Create the context
@@ -44,6 +45,10 @@ export const UserProvider = ({ children }) => {
         if (response.status && response.data && response.data.user) {
           setUser(response.data.user);
           localStorage.setItem("user", JSON.stringify(response.data.user));
+          
+          // Update Sentry user context
+          updateUserContext(response.data.user);
+          
           return response.data.user;
         } else {
         }
@@ -67,12 +72,18 @@ export const UserProvider = ({ children }) => {
   const loginUser = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    
+    // Update Sentry user context
+    updateUserContext(userData);
   };
 
   // Function to handle user signup (same logic as login)
   const signupUser = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    
+    // Update Sentry user context
+    updateUserContext(userData);
   };
 
   // Function to log out the user
@@ -80,6 +91,9 @@ export const UserProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    
+    // Clear Sentry user context
+    clearUserContext();
   };
 
   // Function to refresh user data
