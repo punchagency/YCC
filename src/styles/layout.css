@@ -72,6 +72,7 @@ Main layout wrapper .wrapper {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px 0;
+  padding-bottom: 80px; /* Add space for fixed logout button */
 }
 
 /* Ensure PanelMenu takes full available space */
@@ -110,11 +111,31 @@ Main layout wrapper .wrapper {
 
 /* Logout container - fixed at bottom */
 .left-menu .logout-container {
-  flex-shrink: 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 280px;
   background: white;
   z-index: 10;
   padding: 16px 24px;
   border-top: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  transition: width 0.3s ease;
+}
+
+/* Adjust logout container width when menu is collapsed */
+.left-menu.collapsed .logout-container {
+  width: 80px;
+  padding: 16px 8px; /* Reduce padding for collapsed state */
+}
+
+/* Hide logout text when collapsed, show only icon */
+.left-menu.collapsed .logout-container button {
+  justify-content: center;
+}
+
+.left-menu.collapsed .logout-container button span:not(:first-child) {
+  display: none;
 }
 
 /* Right panel component (main content area) */
@@ -179,6 +200,11 @@ Main layout wrapper .wrapper {
     width: 100%;
     z-index: 1000;
   }
+
+  /* Hide logout container on mobile as left menu is hidden */
+  .left-menu .logout-container {
+    display: none;
+  }
 }
 
 /* Ensure proper scrolling behavior */
@@ -203,13 +229,20 @@ Main layout wrapper .wrapper {
 @media (max-height: 1030px) {
   .left-menu .menu-container {
     height: calc(100vh - 160px);
+    padding-bottom: 80px; /* Ensure space for fixed logout button */
   }
 
   .left-menu .logout-container {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
-    right: 0;
+    width: 280px;
+    box-sizing: border-box;
+  }
+
+  .left-menu.collapsed .logout-container {
+    width: 80px;
+    padding: 16px 8px;
   }
 }
 

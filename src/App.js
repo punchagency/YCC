@@ -4,6 +4,8 @@ import {
   ThemeProvider as MuiThemeProvider,
   createTheme,
 } from "@mui/material/styles";
+import SentryErrorBoundary from "./components/SentryErrorBoundary";
+import { SentryRouteTracker } from "./components/sentry/SentryRouterIntegration";
 import GetStarted from "./pages/auth/get-started"; // Adjust the import according to your file structure
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/crew.signup";
@@ -55,7 +57,7 @@ import AdminFinancialManagement from "./pages/dashboard/admin/financial-manageme
 import AdminDashboard1 from "./pages/dashboard/admin/dashboard";
 import Profile from "./pages/profile/profile";
 import SupplierOnboarding from "./pages/onboarding/supplier-onboarding";
-import OnboardingPageLayout from "./layout/onboarding-page-layout";
+// import OnboardingPageLayout from "./layout/onboarding-page-layout";
 import SupplierOnboardingStep2 from "./components/onboarding/supplier/supplier-onboarding-step2";
 import VendorOnboarding from "./pages/onboarding/vendor-onboarding";
 import VendorOnboardingStep2 from "./components/onboarding/vendor/vendor-onboarding-step2";
@@ -77,7 +79,7 @@ import CrewLegal from "./pages/crew/legal/legal";
 import CrewTraining from "./pages/crew/training/training";
 import CrewAccomodation from "./pages/crew/accomodation/accomo";
 import CrewDocument from "./pages/crew/document/document";
-import BookingDetails from "./pages/crew/booking/details";
+// import BookingDetails from "./pages/crew/booking/details";
 import { UserProvider } from "./context/userContext";
 import RespondToQuote from "./pages/quote-related-pages/service-providers/respondToQuoteRequest";
 import QuoteDetails from "./pages/quote-related-pages/customers/QuoteDetails";
@@ -85,7 +87,7 @@ import QuotePayment from "./pages/quote-related-pages/customers/QuotePayment";
 import ApprovePage from "./pages/dashboard/admin/approvalPage.js/approve";
 import { AuthProvider } from "./context/authContext";
 import TestApi from "./components/TestApi";
-import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
+// import { DashboardAIProvider } from "./context/AIAssistant/dashboardAIContext";
 import OrderDetails from "./pages/crew/order/details";
 import DocumentList from "./pages/crew/document/documentlist";
 import DocumentView from "./pages/crew/document/documentview";
@@ -180,8 +182,10 @@ function App() {
           <NotificationsProvider>
             <CartProvider>
               <MuiThemeProvider theme={theme}>
-                <AuthCheck>
-                  <Routes>
+                <SentryErrorBoundary>
+                  <SentryRouteTracker />
+                  <AuthCheck>
+                    <Routes>
                     {/* Landing Page Routes - Public Access */}
                     <Route element={<LandingPageLayout />}>
                       <Route path="/" element={<HomeLandingPage />} />
@@ -692,8 +696,9 @@ function App() {
                       element={<VendorOnboardingStep2 />}
                     />
                     <Route path="/verify-otp" element={<VerifyOtp />} />
-                  </Routes>
-                </AuthCheck>
+                    </Routes>
+                  </AuthCheck>
+                </SentryErrorBoundary>
               </MuiThemeProvider>
             </CartProvider>
           </NotificationsProvider>

@@ -51,7 +51,7 @@ const InteriorLandingPage = () => {
     )
 }
 
-const GradientText = styled(Typography)({
+const GradientText = styled(Typography)(({ theme }) => ({
     fontWeight: 600,
     color: "#0487D9",
     fontFamily: "Plus Jakarta Sans, sans-serif",
@@ -60,6 +60,18 @@ const GradientText = styled(Typography)({
     letterSpacing: "-2%",
     textTransform: "uppercase",
     display: "inline-block",
-});
+    [theme.breakpoints.down("md")]: {
+        fontSize: "36px",
+        lineHeight: "42px",
+    },
+    [theme.breakpoints.down("sm")]: {
+        fontSize: "28px",
+        lineHeight: "34px",
+    },
+    [theme.breakpoints.down("xs")]: {
+        fontSize: "22px",
+        lineHeight: "28px",
+    },
+}));
 
 export default InteriorLandingPage  
