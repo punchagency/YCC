@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import * as Sentry from "@sentry/react";
 import "primereact/resources/themes/lara-light-indigo/theme.css"; // Theme
 import "primereact/resources/primereact.min.css"; // Core CSS
 import "primeicons/primeicons.css";
@@ -10,6 +11,27 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./context/userContext";
+import { sentryConfig } from "./config/sentry";
+
+// Initialize Sentry
+Sentry.init({
+  dsn: sentryConfig.dsn,
+  environment: sentryConfig.environment,
+  integrations: [
+    Sentry.browserTracingIntegration({
+      tracePropagationTargets: sentryConfig.tracePropagationTargets,
+    }),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: sentryConfig.tracesSampleRate,
+  replaysSessionSampleRate: sentryConfig.replaysSessionSampleRate,
+  replaysOnErrorSampleRate: sentryConfig.replaysOnErrorSampleRate,
+  beforeSend: sentryConfig.beforeSend,
+  initialScope: sentryConfig.initialScope,
+});
+
+// Make Sentry available globally for helper functions
+window.Sentry = Sentry;
 
 // Global error handler to suppress PrimeReact overlay errors
 const originalError = console.error;
@@ -56,15 +78,17 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
+const SentryBrowserRouter = Sentry.withSentryRouting(BrowserRouter);
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <UserProvider>
-      <BrowserRouter>
+      <SentryBrowserRouter>
         <Routes>
           <Route path="/*" element={<App />} />
         </Routes>
-      </BrowserRouter>
+      </SentryBrowserRouter>
     </UserProvider>
   </React.StrictMode>
 );
