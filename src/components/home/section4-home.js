@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Typography, Container, styled, Grid } from '@mui/material'
-import { GradientButton, ButtonTypography, linearGradient } from '../landing-page-header'
+import { GradientButton, ButtonTypography } from '../landing-page-header'
 import yatch from '../../assets/images/YCC-yatch.png'
 import banner from '../../assets/images/water-wide.png'
 import { Link } from 'react-router-dom'
@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 const Section4Home = () => {
     return (
         <Box sx={{
-            paddingBottom: { xs: "330px", md: "288px" },
+            paddingBottom: { xs: "330px", md: "120px" },
         }}>
             <Box
                 sx={{
@@ -90,7 +90,7 @@ const Section4Home = () => {
                         height: {
                             xs: "300px",
                             sm: "400px",
-                            md: "480px",
+                            md: "0px",            
                         },
                         flexWrap: { xs: "wrap", md: "nowrap" },
                     }}>
@@ -143,9 +143,6 @@ const Section4Home = () => {
                                         Access our Resource Center and see our Yachting Marketplace
                                     </HeadingTextBlack>
                                 </Box>
-                                {/* <SecondarySubTextBlack>
-                                    Gain access to valuable knowledge, practical tips, and industry updates tailored for yacht crew. Whether you're managing operations or advancing your career, our blog is your resource for success.
-                                </SecondarySubTextBlack> */}
 
                                 <Box sx={{ padding: { xs: "0 20px 0 20px", md: "0 0 0 0" }, position: { md: "absolute" }, bottom: { md: "20px" }, left: { md: "20px" } }}>
                                     <Link to='/resource-center' style={{ textDecoration: 'none' }}>
@@ -163,7 +160,7 @@ const Section4Home = () => {
                                         height: '100%'
                                     }}>
                                     <Box component="img" src={yatch} alt="Yacht Crew Center"
-                                        sx={{ width: "100%", height: "100%", maxWidth: "100%", borderTopRightRadius: { xs: "0", md: "8px"}, borderBottomRightRadius: { xs: "8px", md: "8px" }, borderBottomLeftRadius: { xs: "8px", md: "0" }, backgroundColor: "transparent" }} />
+                                        sx={{ width: "100%", height: {xs: "100%", md: "30vh"}, maxWidth: "100%", borderTopRightRadius: { xs: "0", md: "8px"}, borderBottomRightRadius: { xs: "8px", md: "8px" }, borderBottomLeftRadius: { xs: "8px", md: "0" }, backgroundColor: "transparent" }} />
                                     <Box
                                         sx={{
                                             position: "absolute",
@@ -194,16 +191,6 @@ const SecondarySubText = styled(Typography)({
     color: "white",
     textAlign: { xs: "left", md: "center" },
 })
-
-const SecondarySubTextBlack = styled(Typography)(({ theme }) => ({
-    fontFamily: "Inter",
-    fontWeight: 400,
-    fontSize: "18px",
-    lineHeight: "148%",
-    letterSpacing: "0%",
-    color: "#373737",
-    textAlign: { xs: "center", md: "left" },
-}))
 
 const HeadingText = styled(Typography)(({ theme }) => ({
     color: "white",
