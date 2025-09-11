@@ -42,7 +42,7 @@ const Section4Home = () => {
                         marginTop: { xs: "-250px", md: "-60px" },
                     }}>
                         <Box>
-                            <HeadingText>Join Our Crew Network</HeadingText>
+                            <HeadingText variant='h3'>Join Our Crew Network</HeadingText>
                         </Box>
 
                         <Box>

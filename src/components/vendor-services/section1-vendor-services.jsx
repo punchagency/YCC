@@ -5,14 +5,11 @@ import {
     Button,
     Container,
     Grid,
-    Card,
-    CardMedia,
     styled
 } from '@mui/material';
 import { Link } from 'react-router-dom'
 import { ButtonTypography, linearGradient } from '../landing-page-header';
 import Section1A from '../../assets/images/vendor-services/Yacht-Crew-Center-09-10-2025_03_40_PM.png'
-import Section1B from '../../assets/images/vendor-services/section1b.png'
 
 const Section1VendorServices = () => {
     return (

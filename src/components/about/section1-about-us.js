@@ -43,7 +43,7 @@ const Section1AboutUs = () => {
                         alignItems: "start",
                     }}>
 
-                        <HeadingText>
+                        <HeadingText variant='h3'>
                             {data.title}
                         </HeadingText>
 

@@ -66,7 +66,7 @@ const StepInfo = ({ currentStep, onBack }) => {
         </button>
       </div>
       <div>
-        <img src={check} className="checkImg" alt="" />
+        <img src={check} className="checkImg" alt="Check icon" />
       </div>
       <div style={{ textAlign: "center", width: "100%" }}>
         <p

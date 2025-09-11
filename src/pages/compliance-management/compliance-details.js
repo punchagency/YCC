@@ -260,6 +260,7 @@ const ComplianceDetails = () => {
                                       <img
                                         src={PDFIcon}
                                         className="file-icon mr-2"
+                                        alt="PDF Icon"
                                       />
                                       <span className="flex align-items-center">
                                         {file.name}
@@ -336,6 +337,7 @@ const ComplianceDetails = () => {
                                         <img
                                           src={PDFIcon}
                                           className="file-icon mr-2"
+                                          alt="PDF Icon"
                                         />
                                         <span className="flex align-items-center">
                                           {file.name}

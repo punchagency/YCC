@@ -85,7 +85,7 @@ const Section2Exterior = () => {
                         </GradientText>
                     </Box>
 
-                    <HeadingText>
+                    <HeadingText variant='h3'>
                         Master Your Exterior Operations
                     </HeadingText>
                 </Box>

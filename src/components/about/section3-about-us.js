@@ -68,7 +68,7 @@ const Section3AboutUs = () => {
                                 transition: 'all 0.8s ease-out',
                             }}
                         >
-                            <HeadingText>
+                            <HeadingText variant='h3'>
                                 {data.title}
                             </HeadingText>
 

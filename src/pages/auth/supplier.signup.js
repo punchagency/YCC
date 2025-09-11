@@ -51,7 +51,7 @@ const StepInfo = ({ currentStep }) => {
       >
         <img
           src={check}
-          alt=""
+          alt="Check Icon"
           style={{ width: "100%", height: "100%", objectFit: "contain" }}
         />
       </div>
@@ -188,7 +188,7 @@ const SupplierSignup = () => {
             }}
           >
             <div className="login-content">
-              <img src={yachtCrew} style={{ width: "200px" }} alt="" />
+              <img src={yachtCrew} style={{ width: "200px" }} alt="Yacht Crew Center logo" />
             </div>
           </div>
 
