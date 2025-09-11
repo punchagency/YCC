@@ -178,7 +178,7 @@ const Login = () => {
           {!isMobile() && (
             <div className="logo-wraper">
               <div className="logo">
-                <img src={logo} alt="Company logo" className="image-full" />
+                <img src={logo} alt="Yacht Crew Center logo" className="image-full" />
               </div>
             </div>
           )}

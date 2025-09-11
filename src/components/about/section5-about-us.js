@@ -175,11 +175,11 @@ const Section5AboutUs = () => {
                                     flexDirection: "column",
                                     gap: "12px",
                                 }}>
-                                    <HeadingTextBlack>
+                                    <HeadingTextBlack variant='h3'>
                                     Ready To Enhance Your Yachting Career?
                                     </HeadingTextBlack>
                                 </Box>
-                                <SecondarySubTextBlack >
+                                <SecondarySubTextBlack variant='body1'>
                                 Connect with us and explore the resources that can make a difference in your career.
                                 </SecondarySubTextBlack>
 

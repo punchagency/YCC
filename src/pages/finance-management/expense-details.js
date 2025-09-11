@@ -141,7 +141,7 @@ const ExpenseDetails = () => {
                                 {isPdf ? (
                                   <>
                                     {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
-                                    <img src={PDFIcon} alt=""/>
+                                    <img src={PDFIcon} alt="PDF Icon"/>
                                     <span className="flex align-items-center">
                                       {file.name}
                                     </span>

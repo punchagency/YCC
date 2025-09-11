@@ -129,10 +129,11 @@ const WarrantyDetails = () => {
                                   <>
                                     {/* <i className="pi pi-file-pdf file-icon p-mr-2" style={{ fontSize: '2rem' }}></i> */}
                                     <img
+                                      alt="PDF Icon"
                                       src={PDFIcon}
                                       className="file-icon p-mr-2"
                                       style={{ fontSize: "2rem" }}
-                                    ></img>
+                                    />
                                     <span className="flex align-items-center">
                                       {file.name}
                                     </span>

@@ -493,7 +493,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         <span style={{ display: "flex", alignItems: "center" }}>
                           <img
                             src="https://flagcdn.com/w40/gb.png"
-                            alt=""
+                            alt='Country logo'
                             style={{ width: 20, height: 15, marginRight: 10 }}
                           />
                           Select...
@@ -602,7 +602,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         <div style={{ display: "flex", alignItems: "center" }}>
                           <img
                             src={positionLogo}
-                            alt=""
+                            alt='Position logo'
                             style={{
                               width: "12px",
                               height: "12px",
@@ -692,7 +692,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <img
                             src={experienceLogo}
-                            alt=""
+                            alt="Experience logo"
                             style={{ width: '12px', height: '12px', marginRight: '8px' }}
                           />
                           <span>Years of Experience</span>
@@ -762,7 +762,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                       <img
                         src={LocationLogo}
-                        alt=""
+                        alt="Location logo"
                         style={{ width: '12px', height: '12px', marginRight: '8px' }}
                       />
                       <input

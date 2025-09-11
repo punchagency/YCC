@@ -246,7 +246,7 @@ const DashboardCrew = () => {
     <div>
       <img
         src={rowData.imageUrl}
-        alt=""
+        alt="File Type"
         style={{
           width: "25px",
           height: "25px",
