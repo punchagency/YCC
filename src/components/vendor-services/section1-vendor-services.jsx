@@ -5,14 +5,11 @@ import {
     Button,
     Container,
     Grid,
-    Card,
-    CardMedia,
     styled
 } from '@mui/material';
 import { Link } from 'react-router-dom'
 import { ButtonTypography, linearGradient } from '../landing-page-header';
-import Section1A from '../../assets/images/vendor-services/section1a.png'
-import Section1B from '../../assets/images/vendor-services/section1b.png'
+import Section1A from '../../assets/images/vendor-services/Yacht-Crew-Center-09-10-2025_03_40_PM.png'
 
 const Section1VendorServices = () => {
     return (
@@ -47,10 +44,10 @@ const Section1VendorServices = () => {
                         }}>
                             <img 
                                 src={Section1A} 
-                                alt="" 
+                                alt="Vendor Dashboard" 
                                 style={{ 
-                                    width: "150%", 
-                                    height: "150%", 
+                                    width: "100%", 
+                                    height: "100%", 
                                     objectFit: "cover",
                                     borderRadius: "10px"
                                 }} 

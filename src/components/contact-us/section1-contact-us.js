@@ -47,8 +47,8 @@ const Section1ContactUs = () => {
                 textAlign: "left",
               }}
             >
-              <HeadingText>Get In Contact Today</HeadingText>
-              <SecondarySubTextBlack>
+              <HeadingText variant='h2'>Get In Contact Today</HeadingText>
+              <SecondarySubTextBlack variant='body1'>
                 Need Specialized Assistance? We're Here to Help. At Yacht Crew
                 Center, we understand that urgent situations can arise onboard.
                 Finding the right service or product quickly is crucial. If
@@ -94,8 +94,8 @@ const Section1ContactUs = () => {
                       gap: "7px",
                     }}
                   >
-                    <SecondaryHeadingText>{item.title}</SecondaryHeadingText>
-                    <SecondarySubTextBlack>
+                    <SecondaryHeadingText variant='h3'>{item.title}</SecondaryHeadingText>
+                    <SecondarySubTextBlack variant='body1'>
                       {item.subtext}
                     </SecondarySubTextBlack>
                   </Box>

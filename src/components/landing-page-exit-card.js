@@ -78,11 +78,11 @@ const LandingPageExitCard = ({ sectionData }) => {
 
                                     }}>
 
-                                        <HeadingTextBlack>
+                                        <HeadingTextBlack variant='h3'>
                                             {sectionData.title}
                                         </HeadingTextBlack>
                                     </Box>
-                                    <SecondarySubTextBlack >
+                                    <SecondarySubTextBlack variant='body1'>
                                         {sectionData.subText}
                                     </SecondarySubTextBlack>
 

@@ -206,7 +206,7 @@ const DocumentDetails = () => {
                                       <img
                                         src={PDFIcon}
                                         className="file-icon mr-2"
-                                        alt=""
+                                        alt="PDF Icon"
                                       />
                                       <span className="flex align-items-center">
                                         {file.name}

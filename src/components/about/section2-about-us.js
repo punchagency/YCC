@@ -83,6 +83,7 @@ const Section2AboutUs = () => {
                     </Box>
 
                     <HeadingText
+                        variant='h3'
                         sx={{
                             textAlign: "center",
                         }}
@@ -129,10 +130,10 @@ const Section2AboutUs = () => {
                                             <img src={item.image} alt={item.title} style={{ width: "76px", height: "76px" }}/>
                                         </AnimatedIcon>
                                         <Box>
-                                            <SecondaryHeadingText>
+                                            <SecondaryHeadingText variant='h3'>
                                                 {item.title}
                                             </SecondaryHeadingText>
-                                            <SecondarySubTextBlack>
+                                            <SecondarySubTextBlack variant='body1'>
                                                 {item.description}
                                             </SecondarySubTextBlack>
                                         </Box>
