@@ -725,33 +725,69 @@ const LandingPageHeader = () => {
                 </Button>
               </>
             ) : (
-              // If user is logged in, show Logout button
-              <Button
-                onClick={handleLogout}
-                fullWidth
-                variant="outlined"
-                sx={{
-                  backgroundColor: "transparent",
-                  color: "#FF4B4B",
-                  border: "2px solid #FF4B4B",
-                  borderRadius: 2,
-                  fontWeight: 700,
-                  fontSize: 16,
-                  transition: "all 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 1,
-                  mt: 1,
-                  "&:hover": {
-                    backgroundColor: "#FF4B4B",
-                    color: "#fff",
-                  },
-                }}
-              >
-                <LogoutIcon sx={{ mr: 1 }} />
-                Logout
-              </Button>
+              // If user is logged in, show Dashboard and Logout buttons
+              <>
+                <Button
+                  onClick={() => {
+                    toggleDrawer();
+                    if (user.role.name === "crew_member") {
+                      navigate("/crew/dashboard");
+                    } else if (user.role.name === "admin") {
+                      navigate("/admin/dashboard");
+                    } else if (user.role.name === "supplier") {
+                      navigate("/supplier/dashboard");
+                    } else if (user.role.name === "service_provider") {
+                      navigate("/service-provider/dashboard");
+                    }
+                  }}
+                  fullWidth
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "white",
+                    color: "#0487D9",
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    fontSize: 16,
+                    transition: "all 0.2s",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                    mb: 1,
+                    "&:hover": {
+                      backgroundColor: "#f0f8ff",
+                      transform: "translateY(-1px)",
+                    },
+                  }}
+                >
+                  Dashboard
+                </Button>
+                <Button
+                  onClick={handleLogout}
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "transparent",
+                    color: "#FF4B4B",
+                    border: "2px solid #FF4B4B",
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    fontSize: 16,
+                    transition: "all 0.2s",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                    "&:hover": {
+                      backgroundColor: "#FF4B4B",
+                      color: "#fff",
+                    },
+                  }}
+                >
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  Logout
+                </Button>
+              </>
             )}
           </Box>
         </Box>
