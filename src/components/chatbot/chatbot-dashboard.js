@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SendRounded from "@mui/icons-material/SendRounded";
-import OptionsIcon from "@mui/icons-material/MoreVert";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 
 import BotModalIcon from "../../assets/images/chatbot/chatbot-modal-icon.png";
@@ -28,7 +27,6 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import { useUser } from "../../context/userContext";
 import TypingDots from "./TypingDots";
-import { useNavigate } from "react-router-dom";
 
 const ChatbotDashboard = () => {
   const { user } = useUser();
