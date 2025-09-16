@@ -457,6 +457,22 @@ const LandingPageHeader = () => {
                   </ButtonTypography>
                 </GradientButton>
               </Link>
+              <Link to="/get-started">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    Join Now
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
               <Button
                 variant="contained"
                 component={Link}
@@ -489,22 +505,6 @@ const LandingPageHeader = () => {
               >
                 Sign In
               </Button>
-              <Link to="/get-started">
-                <GradientButton
-                  variant="contained"
-                  sx={{
-                    textTransform: "none",
-                    height: 40,
-                    minWidth: 120,
-                    fontSize: 16,
-                    padding: "8px 24px",
-                  }}
-                >
-                  <ButtonTypography sx={{ color: "white" }}>
-                    Join Now
-                  </ButtonTypography>
-                </GradientButton>
-              </Link>
             </>
           )}
         </Box>
