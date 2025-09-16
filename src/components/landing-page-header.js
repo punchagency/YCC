@@ -47,7 +47,6 @@ const LandingPageHeader = () => {
     { title: "About Us", link: "/about-us" },
     { title: "Resource Center", link: "/resource-center" },
     { title: "Contact", link: "/contact-us" },
-    { title: "Join Our Affiliate Program", link: "https://affiliate.yachtcrewcenter.com/", external: true },
   ];
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -226,7 +225,7 @@ const LandingPageHeader = () => {
                   >
                     {item.title}
                   </Typography>
-                  <KeyboardArrowDownIcon sx={{ 
+                  <KeyboardArrowDownIcon sx={{
                     color: "white",
                     transition: "color 0.3s ease-in-out",
                     "&:hover": {
@@ -288,13 +287,13 @@ const LandingPageHeader = () => {
               <Button
                 key={item.title}
                 component={item.external ? "a" : Link}
-                {...(item.external 
-                  ? { 
-                      href: item.link, 
-                      target: "_blank", 
-                      rel: "noopener noreferrer",
-                      style: { textDecoration: "none" }
-                    } 
+                {...(item.external
+                  ? {
+                    href: item.link,
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    style: { textDecoration: "none" }
+                  }
                   : { to: item.link }
                 )}
                 sx={{
@@ -442,6 +441,54 @@ const LandingPageHeader = () => {
             </>
           ) : (
             <>
+              <Link to="https://affiliate.yachtcrewcenter.com/" target="_blank" rel="noopener noreferrer">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    Join Our Affiliate Program
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
+              <Button
+                variant="contained"
+                component={Link}
+                to="/login"
+                sx={{
+                  backgroundColor: "transparent",
+                  color: "#fff",
+                  border: "2px solid #0487D9",
+                  borderRadius: 2,
+                  fontWeight: 700,
+                  fontSize: 16,
+                  textTransform: "none",
+                  height: 40,
+                  minWidth: 120,
+                  padding: "8px 24px",
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                  "&:hover": {
+                    // backgroundColor: "",
+                    color: linearGradient,
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 12px rgba(4, 135, 217, 0.3)",
+                  },
+                }}
+              >
+                Sign In
+              </Button>
               <Link to="/get-started">
                 <GradientButton
                   variant="contained"
@@ -458,30 +505,6 @@ const LandingPageHeader = () => {
                   </ButtonTypography>
                 </GradientButton>
               </Link>
-              <Button
-                variant="contained"
-                component={Link}
-                to="/login"
-                sx={{
-                  backgroundColor: "white",
-                  textTransform: "none",
-                  height: 40,
-                  minWidth: 120,
-                  fontSize: 16,
-                  padding: "8px 24px",
-                  position: "relative",
-                  overflow: "hidden",
-                  "&:hover": {
-                    background: "linear-gradient(90deg, #034D92, #0487D9)",
-                    color: "white",
-                  },
-                }}
-                className="sign-in-btn"
-              >
-                <ButtonTypography className="sign-in-btn-text">
-                  Sign In
-                </ButtonTypography>
-              </Button>
             </>
           )}
         </Box>
@@ -639,13 +662,13 @@ const LandingPageHeader = () => {
                   key={item.title}
                   component={item.external ? "a" : Link}
                   to={item.link}
-                  {...(item.external 
-                    ? { 
-                        href: item.link, 
-                        target: "_blank", 
-                        rel: "noopener noreferrer",
-                        style: { textDecoration: "none" }
-                      } 
+                  {...(item.external
+                    ? {
+                      href: item.link,
+                      target: "_blank",
+                      rel: "noopener noreferrer",
+                      style: { textDecoration: "none" }
+                    }
                     : { to: item.link }
                   )}
                   onClick={toggleDrawer}
