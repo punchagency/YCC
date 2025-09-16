@@ -11,10 +11,17 @@ import {
   styled,
   IconButton,
   Alert,
+  AlertTitle,
   Snackbar,
   useMediaQuery,
   useTheme,
+  LinearProgress,
+  Stack,
+  Chip,
 } from "@mui/material";
+import {
+  PsychologyRounded,
+} from "@mui/icons-material";
 import { useState, useEffect, useRef, useCallback } from "react";
 import csvTemplate from '../../../assets/vendor-onboarding-template.csv';
 // import excelTemplate from '../../../assets/vendor-onboarding-template-old.xlsx';
@@ -25,19 +32,31 @@ import * as XLSX from 'xlsx';
 import { useParams, useLocation } from 'react-router-dom';
 import { formatAmount, unformatAmount } from '../../../utils/formatAmount';
 
-const VendorOnboardingStep1 = ({ handleNext }) => {
+const aiGradient =
+  "linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #06B6D4 100%)";
+const aiGradientHover =
+  "linear-gradient(135deg, #7C3AED 0%, #4F46E5 50%, #0891B2 100%)";
+
+const VendorOnboardingStep1 = ({ handleNext, userId, suppressAutoAdvance }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dialogRef = useRef(null);
   const resizeTimeoutRef = useRef(null);
-  const { id: userId } = useParams();
+  const { id: userIdFromParams } = useParams();
+  const actualUserId = userId || userIdFromParams;
   const location = useLocation();
-  const { uploadServicesData, verifyOnboardingStep1 } = useUser();
+  const {
+    uploadServicesData,
+    verifyOnboardingStep1,
+    parseServicesWithAI,
+    importParsedServicesToNode
+  } = useUser();
   const toast = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
   const [error, setError] = useState(null);
+  const [modalError, setModalError] = useState(null); // string | { title?: string; bullets?: string[]; hint?: string; message?: string }
   const [isLoading, setIsLoading] = useState(false);
   const hasRunRef = useRef(false);
   const [services, setServices] = useState([]);
@@ -48,11 +67,11 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  
+
   // Determine role based on URL path
   const role = location.pathname.includes('/services/onboarding/') ? 'service_provider' : 'supplier';
 
-  const requiredHeaders = ["service name", "description", "price"];
+  const requiredHeaders = ["service name", "service category", "description", "price"];
 
   const validateFile = (file, type) => {
     const maxSize = 5 * 1024 * 1024; // 5MB
@@ -83,7 +102,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     const templateUrl = fileType === "csv" ? csvTemplate : excelTemplate;
     const link = document.createElement("a");
     link.href = templateUrl;
-    
+
     // Set proper file extension and MIME type
     if (fileType === "excel") {
       link.download = "service-onboarding-template.xlsx";
@@ -93,7 +112,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
       link.download = "service-onboarding-template.csv";
       link.type = "text/csv";
     }
-    
+
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
@@ -109,19 +128,22 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
   }, [error]);
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      return;
+    }
     if (hasRunRef.current) return;
     hasRunRef.current = true;
 
     const verifyInventoryUpload = async () => {
       try {
-        if (!userId) {
-          //console.error('Missing userId:', { userId });
+        if (!actualUserId) {
+          //console.error('Missing userId:', { actualUserId });
           return;
         }
 
-        const data = await verifyOnboardingStep1(userId, role);
+        const data = await verifyOnboardingStep1(actualUserId, role);
         //console.log('Step 1 - Verification response:', data);
-        
+
         if (data?.data?.length > 0) {
           handleNext();
         }
@@ -136,7 +158,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     };
 
     verifyInventoryUpload();
-  }, [handleNext, verifyOnboardingStep1, userId, role]);
+  }, [handleNext, verifyOnboardingStep1, actualUserId, role, suppressAutoAdvance]);
 
   const handleOpenDialog = (type) => {
     setDialogType(type);
@@ -150,6 +172,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     setServices([]);
     setNewService({ name: '', price: '', description: '' });
     setShowSuccess(false);
+    setModalError(null);
   };
 
   const validateHeaders = (headers) => {
@@ -164,11 +187,13 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    try {
-      validateFile(file, dialogType);
-    } catch (error) {
-      setError(error.message);
-      return;
+    if (dialogType !== 'ai') {
+      try {
+        validateFile(file, dialogType);
+      } catch (error) {
+        setError(error.message);
+        return;
+      }
     }
 
     if (dialogType === 'csv') {
@@ -193,7 +218,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           const workbook = XLSX.read(data, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-          
+
           if (jsonData.length === 0) {
             throw new Error('Excel file is empty');
           }
@@ -209,6 +234,13 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         setError('Error reading file');
       };
       reader.readAsArrayBuffer(file);
+    } else if (dialogType === 'ai') {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size exceeds 5MB limit. Please choose a smaller file.");
+        return;
+      }
+      setSelectedFile(file);
+      setError(null);
     }
   };
 
@@ -269,12 +301,12 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userId,
+            userId: actualUserId,
             services: servicesWithUnformattedPrices
           })
         });
         const data = await response.json();
-        
+
         if (!data.status) {
           throw new Error(data.message);
         }
@@ -283,28 +315,90 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         if (!data.data?.services || data.data.services.length === 0) {
           throw new Error('No services were created');
         }
-        
+
         toast.current.show({
           severity: "success",
           summary: "Success",
           detail: `Successfully added ${data.data.count} service(s)`,
         });
-        
+
+        handleNext();
+        handleCloseDialog();
+      } else if (selectedFile && dialogType === 'ai') {
+        // AI flow: parse on Python, then import to Node
+        const services = await parseServicesWithAI(selectedFile);
+        const result = await importParsedServicesToNode({ userId: actualUserId, services });
+
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: result?.message || "Services parsed and imported successfully",
+          life: 5000,
+        });
         handleNext();
         handleCloseDialog();
       } else if (selectedFile) {
-        const status = await uploadServicesData(selectedFile, userId, role);
+        const status = await uploadServicesData(selectedFile, actualUserId, role);
         if (status) {
           handleNext();
           handleCloseDialog();
         }
       }
-    } catch (error) {
-      setError(error.message);
+    } catch (err) {
+      // Enhanced error handling for AI responses (similar to supplier component)
+      if (dialogType === 'ai') {
+        // Prefer friendly AI errors if provided by backend
+        const data = err?.response?.data || err?.data || err; // support various client libs
+        const friendly = data?.friendly;
+        if (
+          friendly &&
+          (friendly.title || friendly.message || friendly.bullets)
+        ) {
+          setModalError({
+            title: friendly.title,
+            message: friendly.message,
+            bullets: friendly.bullets,
+            hint: friendly.hint,
+          });
+        } else if (Array.isArray(data?.errors) && data.errors.length > 0) {
+          // Fallback: build a compact human message from errors
+          const missing = data.errors
+            .filter((e) => e?.row == null && /required/i.test(String(e?.message)))
+            .map((e) => String(e?.field || "field"));
+          if (missing.length) {
+            setModalError({
+              title: "We couldn't find some required columns.",
+              bullets: missing.map((f) => `- ${f}`),
+              message: `Missing required columns: ${missing.join(", ")}`,
+              hint: "Tip: Rename your headers to match our expected fields and re-upload.",
+            });
+          } else {
+            setModalError(
+              data?.message ||
+              err?.message ||
+              "An error occurred while uploading the file"
+            );
+          }
+        } else {
+          let errorMessage =
+            err?.message || "An error occurred while uploading the file";
+          if (
+            typeof errorMessage === "string" &&
+            errorMessage.includes("Row") &&
+            errorMessage.includes(":")
+          ) {
+            errorMessage = `Validation Error: ${errorMessage}`;
+          }
+          setModalError(errorMessage);
+        }
+      } else {
+        setError(err.message);
+      }
+
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: error.message,
+        detail: typeof err === 'object' && err.message ? err.message : 'An error occurred',
       });
     } finally {
       setIsLoading(false);
@@ -314,7 +408,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
 
   const renderManualUploadDialog = () => (
     <>
-      <DialogTitle sx={{ 
+      <DialogTitle sx={{
         p: { xs: 1, sm: 2 },
         display: 'flex',
         justifyContent: 'space-between',
@@ -327,20 +421,20 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           onClick={handleCloseDialog}
           aria-label="close"
         >
-        <CloseIcon />
+          <CloseIcon />
         </IconButton>
       </DialogTitle>
-      
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
+
+      <Box sx={{
+        display: 'flex',
+        flexDirection: 'column',
         gap: 2,
         p: { xs: 1, sm: 2 }
       }}>
         <TextField
           label="Service Name"
           value={newService.name}
-          onChange={(e) => setNewService({...newService, name: e.target.value})}
+          onChange={(e) => setNewService({ ...newService, name: e.target.value })}
           fullWidth
           required
         />
@@ -349,7 +443,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           value={newService.price}
           onChange={(e) => {
             const formattedValue = formatAmount(e.target.value);
-            setNewService({...newService, price: formattedValue});
+            setNewService({ ...newService, price: formattedValue });
           }}
           fullWidth
           required
@@ -360,26 +454,26 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         <TextField
           label="Description"
           value={newService.description}
-          onChange={(e) => setNewService({...newService, description: e.target.value})}
+          onChange={(e) => setNewService({ ...newService, description: e.target.value })}
           fullWidth
           multiline
           rows={2}
         />
 
-        <Box sx={{ 
-          display: 'flex', 
+        <Box sx={{
+          display: 'flex',
           gap: 2,
           justifyContent: 'flex-end',
           mt: 2
         }}>
-          <Button 
+          <Button
             onClick={handleAddService}
             variant="contained"
             color="primary"
           >
             {services.length > 0 ? 'Add Another Service' : 'Add Service'}
           </Button>
-          
+
           {services.length > 0 && (
             <Button
               onClick={handleSubmit}
@@ -402,11 +496,11 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
               Added Services ({services.length})
             </Typography>
             {services.map((service, index) => (
-              <Box 
+              <Box
                 key={index}
-                sx={{ 
-                  p: 1, 
-                  mb: 1, 
+                sx={{
+                  p: 1,
+                  mb: 1,
                   border: '1px solid #ddd',
                   borderRadius: 1,
                   backgroundColor: '#f5f5f5'
@@ -432,8 +526,8 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         onClose={() => setShowSuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setShowSuccess(false)} 
+        <Alert
+          onClose={() => setShowSuccess(false)}
           severity="success"
           sx={{ width: '100%' }}
         >
@@ -481,10 +575,30 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         <StyledButton variant="contained" onClick={() => handleOpenDialog("manual")}>
           Enter manually
         </StyledButton>
+
+        <StyledButton
+          variant="contained"
+          onClick={() => handleOpenDialog("ai")}
+        >
+          <Box
+            component="span"
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 1,
+              px: 0.5,
+            }}
+          >
+            <Typography variant="body2" sx={{ fontSize: "1.05rem", textShadow: "0 0 8px rgba(255,255,255,0.9), 0 0 14px rgba(99,102,241,0.5)" }} aria-label="sparkles">
+              ✨
+            </Typography>
+            Upload with AI
+          </Box>
+        </StyledButton>
       </Box>
 
-      <Dialog 
-        open={showDialog} 
+      <Dialog
+        open={showDialog}
         onClose={handleCloseDialog}
         maxWidth="md"
         fullWidth
@@ -500,8 +614,8 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           }
         }}
       >
-        <DialogContent 
-          sx={{ 
+        <DialogContent
+          sx={{
             p: { xs: 0.8, sm: 1, md: 2, lg: 3 },
             '&.MuiDialogContent-root': {
               paddingTop: { xs: 0.8, sm: 1, md: 2, lg: 3 }
@@ -511,9 +625,237 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
         >
           {dialogType === 'manual' ? (
             renderManualUploadDialog()
+          ) : dialogType === 'ai' ? (
+            <>
+              {/* AI header */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  p: { xs: 1.25, sm: 1.5 },
+                  mb: 2,
+                  borderRadius: 2,
+                  background: aiGradient,
+                  color: "#fff",
+                  boxShadow: "0 10px 26px rgba(99,102,241,.35)",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 36,
+                    height: 36,
+                    borderRadius: 1.5,
+                    bgcolor: "rgba(255,255,255,0.18)",
+                  }}
+                >
+                  <PsychologyRounded fontSize="small" />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      lineHeight: 1.15,
+                      color: "#fff",
+                      fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                    }}
+                  >
+                    AI Service Parser
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ opacity: 0.9, color: "rgba(255,255,255,0.92)" }}
+                  >
+                    <Box
+                      component="span"
+                      role="img"
+                      aria-label="sparkles"
+                      sx={{
+                        mr: 0.75,
+                        fontSize: "1.05rem",
+                        textShadow:
+                          "0 0 8px rgba(255,255,255,0.9), 0 0 14px rgba(99,102,241,0.5)",
+                      }}
+                    >
+                      ✨
+                    </Box>
+                    Smart mapping, clean normalization
+                  </Typography>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  alignItems: "flex-start",
+                  backgroundColor: "#F5F5F5",
+                  padding: { xs: "15px", sm: "20px" },
+                  borderRadius: "8px",
+                }}
+              >
+                <DescriptionText>
+                  <InfoOutlined /> Upload your service offerings spreadsheet and
+                  let our intelligent AI system analyze, standardize and
+                  seamlessly integrate your services into our platform.
+                </DescriptionText>
+              </Box>
+              <input
+                type="file"
+                accept={".xlsx,.xls,.csv"}
+                onChange={(e) => handleFileUpload(e, "ai")}
+                style={{ display: "none" }}
+                id={`ai-upload`}
+              />
+              <label htmlFor={`ai-upload`} style={{ width: "100%" }}>
+                <Button
+                  variant="contained"
+                  component="span"
+                  fullWidth={true}
+                  startIcon={<CloudUploadOutlined />}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                    minWidth: { xs: "100%", sm: "220px" },
+                    textTransform: "none",
+                    fontWeight: 700,
+                    background: aiGradient,
+                    boxShadow: "0 10px 26px rgba(99,102,241,.28)",
+                    border: "1px solid rgba(255,255,255,.14)",
+                    mt: 2,
+                    "&:hover": {
+                      background: aiGradientHover,
+                      boxShadow: "0 8px 16px rgba(79,70,229,.24)",
+                    },
+                  }}
+                >
+                  Choose Excel File
+                </Button>
+              </label>
+              {selectedFile && (
+                <Typography sx={{ mt: 1 }}>
+                  Selected: {selectedFile.name}
+                </Typography>
+              )}
+
+              {isLoading && (
+                <Box sx={{ mt: 3 }}>
+                  <LinearProgress
+                    sx={{
+                      height: 8,
+                      borderRadius: 8,
+                      bgcolor: "rgba(99,102,241,.12)",
+                      "& .MuiLinearProgress-bar": {
+                        borderRadius: 8,
+                        background: aiGradient,
+                      },
+                    }}
+                  />
+                  <Stack direction="row" spacing={1} sx={{ mt: 1.25 }}>
+                    <Chip label="Understanding columns" size="small" />
+                    <Chip label="Mapping schema" size="small" />
+                  </Stack>
+                </Box>
+              )}
+
+              {modalError &&
+                (typeof modalError === "object" ? (
+                  <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                    <AlertTitle>
+                      {modalError.title || "We couldn't process that"}
+                    </AlertTitle>
+                    {/* If we have bullets, prefer showing only the list to avoid duplicating content contained in message */}
+                    {!(
+                      Array.isArray(modalError.bullets) &&
+                      modalError.bullets.length > 0
+                    ) &&
+                      modalError.message && (
+                        <Typography
+                          variant="body2"
+                          sx={{ whiteSpace: "pre-wrap", mb: 1 }}
+                        >
+                          {modalError.message}
+                        </Typography>
+                      )}
+                    {Array.isArray(modalError.bullets) &&
+                      modalError.bullets.length > 0 && (
+                        <Box
+                          component="ul"
+                          sx={{ pl: 2, mt: 0, mb: modalError.hint ? 1 : 0 }}
+                        >
+                          {modalError.bullets.map((b, i) => (
+                            <li key={i}>
+                              <Typography variant="body2">{b}</Typography>
+                            </li>
+                          ))}
+                        </Box>
+                      )}
+                    {modalError.hint && (
+                      <Typography variant="body2" color="text.secondary">
+                        {modalError.hint}
+                      </Typography>
+                    )}
+                  </Alert>
+                ) : (
+                  <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+                    <AlertTitle>We couldn't process that</AlertTitle>
+                    <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                      {modalError}
+                    </Typography>
+                  </Alert>
+                ))}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: { xs: "column", sm: "row" },
+                  gap: 2,
+                  justifyContent: "flex-end",
+                  mt: 2,
+                  width: "100%",
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={handleCloseDialog}
+                  disabled={isLoading}
+                  fullWidth={true}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                    minWidth: { xs: "100%", sm: "120px" },
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={!selectedFile || isLoading}
+                  fullWidth={true}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                    minWidth: { xs: "100%", sm: "120px" },
+                    background: aiGradient,
+                    boxShadow: "0 10px 26px rgba(99,102,241,.28)",
+                    "&:hover": {
+                      background: aiGradientHover,
+                      boxShadow: "0 8px 16px rgba(79,70,229,.24)",
+                    },
+                  }}
+                >
+                  {isLoading ? (
+                    <CircularProgress size={20} sx={{ color: "white" }} />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Box>
+            </>
           ) : (
             <>
-              <DialogTitle sx={{ 
+              <DialogTitle sx={{
                 p: { xs: 1, sm: 2 },
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -530,17 +872,17 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                 </IconButton>
               </DialogTitle>
 
-              <Box sx={{ 
-                display: "flex", 
-                flexDirection: "column", 
-                gap: 2, 
-                alignItems: "flex-start", 
-                backgroundColor: "#F5F5F5", 
-                padding: { xs: "15px", sm: "20px" }, 
-                borderRadius: "8px" 
+              <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                alignItems: "flex-start",
+                backgroundColor: "#F5F5F5",
+                padding: { xs: "15px", sm: "20px" },
+                borderRadius: "8px"
               }}>
                 <DescriptionText>
-                  <InfoOutlined/> It is important to download the template to see the required format. This ensures your data will be processed correctly.
+                  <InfoOutlined /> It is important to download the template to see the required format. This ensures your data will be processed correctly.
                 </DescriptionText>
               </Box>
 
@@ -552,11 +894,11 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                 id={`${dialogType}-upload`}
               />
 
-              <Box sx={{ 
-                display: "flex", 
-                flexDirection: { xs: "column", sm: "row" }, 
-                gap: 2, 
-                alignItems: { xs: "stretch", sm: "flex-start" }, 
+              <Box sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 2,
+                alignItems: { xs: "stretch", sm: "flex-start" },
                 paddingY: "10px",
                 width: '100%'
               }}>
@@ -564,7 +906,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                   variant="outlined"
                   onClick={() => downloadTemplate(dialogType)}
                   fullWidth={true}
-                  sx={{ 
+                  sx={{
                     width: { xs: '100%', sm: 'auto' },
                     minWidth: { xs: '100%', sm: '220px' },
                     whiteSpace: 'nowrap',
@@ -579,7 +921,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                     }
                   }}
                 >
-                  <CloudDownloadOutlined/> Download Template
+                  <CloudDownloadOutlined /> Download Template
                 </StyledSecondaryButton>
 
                 <label htmlFor={`${dialogType}-upload`} style={{ width: '100%' }}>
@@ -587,7 +929,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                     variant="contained"
                     component="span"
                     fullWidth={true}
-                    sx={{ 
+                    sx={{
                       width: { xs: '100%', sm: 'auto' },
                       minWidth: { xs: '100%', sm: '220px' },
                       whiteSpace: 'nowrap',
@@ -602,16 +944,16 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                       }
                     }}
                   >
-                    <CloudUploadOutlined/> Upload File
+                    <CloudUploadOutlined /> Upload File
                   </StyledButton>
                 </label>
               </Box>
 
               {selectedFile && (
-                <Typography sx={{ 
-                  mb: 2, 
-                  fontSize: { xs: "13px", sm: "14px" }, 
-                  fontWeight: "400", 
+                <Typography sx={{
+                  mb: 2,
+                  fontSize: { xs: "13px", sm: "14px" },
+                  fontWeight: "400",
                   color: "#000000",
                   wordBreak: 'break-word'
                 }}>
@@ -620,8 +962,8 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
               )}
 
               {error && (
-                <Typography sx={{ 
-                  color: "error.main", 
+                <Typography sx={{
+                  color: "error.main",
                   mb: 2,
                   fontSize: { xs: "13px", sm: "14px" },
                   wordBreak: 'break-word'
@@ -630,20 +972,20 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                 </Typography>
               )}
 
-              <Box sx={{ 
-                display: "flex", 
+              <Box sx={{
+                display: "flex",
                 flexDirection: { xs: "column", sm: "row" },
-                justifyContent: "flex-end", 
-                gap: 2, 
+                justifyContent: "flex-end",
+                gap: 2,
                 mt: 2,
                 width: '100%'
               }}>
-                <Button 
-                  variant="outlined" 
-                  onClick={handleCloseDialog} 
+                <Button
+                  variant="outlined"
+                  onClick={handleCloseDialog}
                   disabled={isLoading}
                   fullWidth={true}
-                  sx={{ 
+                  sx={{
                     width: { xs: '100%', sm: 'auto' },
                     minWidth: { xs: '100%', sm: '120px' }
                   }}
@@ -655,7 +997,7 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
                   onClick={handleSubmit}
                   disabled={!selectedFile || isLoading}
                   fullWidth={true}
-                  sx={{ 
+                  sx={{
                     width: { xs: '100%', sm: 'auto' },
                     minWidth: { xs: '100%', sm: '120px' }
                   }}
@@ -685,8 +1027,8 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           }
         }}
       >
-        <DialogContent 
-          sx={{ 
+        <DialogContent
+          sx={{
             p: 3,
             overflow: 'auto'
           }}
@@ -694,13 +1036,13 @@ const VendorOnboardingStep1 = ({ handleNext }) => {
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
             Confirm Submission
           </Typography>
-          
+
           <Typography sx={{ mb: 3, color: 'text.secondary' }}>
             Please confirm that you have added all your services. You will be taken to the next step after submission.
           </Typography>
 
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             gap: 2,
             justifyContent: 'flex-end',
             flexWrap: 'wrap'
