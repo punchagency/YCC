@@ -43,6 +43,12 @@ const LandingPageFooter = () => {
         { name: "Interior", path: "/interior" },
         { name: "Exterior", path: "/exterior" },
       ],
+    },
+    {
+      title: "AFFILIATE PROGRAM",
+      links: [
+        { name: "Join Our Affiliate Program", path: "https://affiliate.yachtcrewcenter.com/", external: true },
+      ],
     }
   ];
 
@@ -67,7 +73,7 @@ const LandingPageFooter = () => {
       <Container maxWidth="lg">
         <Grid container spacing={3} sx={{ py: 4 }}>
           
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={5}>
             <Box sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -86,7 +92,7 @@ const LandingPageFooter = () => {
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={7}>
             <Grid container spacing={3}>
               {footerData.map((item, idx) => (
                 <Grid item key={idx} xs={12} md={4}>
@@ -96,8 +102,16 @@ const LandingPageFooter = () => {
                       {item.links.map((linkItem, idx) => (
                         <ListItem
                           key={idx}
-                          component={Link}
-                          to={linkItem.path}
+                          component={linkItem.external ? "a" : Link}
+                          {...(linkItem.external 
+                            ? { 
+                                href: linkItem.path, 
+                                target: "_blank", 
+                                rel: "noopener noreferrer",
+                                style: { textDecoration: "none" }
+                              } 
+                            : { to: linkItem.path }
+                          )}
                           sx={{ paddingLeft: "0px", paddingBlock: "5px" }}
                         >
                           <FooterTypography>{linkItem.name}</FooterTypography>

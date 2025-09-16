@@ -56,7 +56,7 @@ const SectionPointCard = ({
                 </AnimatedIcon>
 
                 {/* Title */}
-                <SecondaryHeadingText>
+                <SecondaryHeadingText variant='h3'>
                     {title}
                 </SecondaryHeadingText>
             </div>
@@ -74,7 +74,7 @@ const SectionPointCard = ({
                         }}
                     >
                         <img src={checkIcon} alt="check" style={{ width: isMobile ? "20px" : "26px", height: isMobile ? "20px" : "26px" }} />
-                        <SecondarySubTextBlack>
+                        <SecondarySubTextBlack variant='body1'>
                             {point}
                         </SecondarySubTextBlack>
                     </Box>

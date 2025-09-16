@@ -117,7 +117,10 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
 
             }}>
                 <Box sx={{ display: "flex", width: '100%', flexDirection: "column", gap: "14px" }}>
-                    <Typography sx={{
+                    <Typography 
+                    variant='h1'
+                    component='h1'
+                    sx={{
                         color: "white",
                         fontFamily: "Plus Jakarta Sans, sans-serif",
                         fontWeight: 600,
@@ -135,15 +138,15 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
                         },
                         letterSpacing: "-2%",
                         textTransform: "uppercase",
-                    }}>
+                    }} gutterBottom>
                         {header}
                     </Typography>
 
-                    <PrimarySubText sx={{ display: { xs: 'none', md: 'flex' } }} >
+                    <PrimarySubText variant='body1' sx={{ display: { xs: 'none', md: 'flex' } }} >
                         {subtext1}
                     </PrimarySubText>
                 </Box>
-                {subtext2 && <SecondarySubText>
+                {subtext2 && <SecondarySubText variant='body1'>
                     {subtext2}
                 </SecondarySubText>}
 
@@ -230,7 +233,7 @@ const LandingPageBanner = ({ page, backgroundImage, header, subtext1, subtext2, 
 const PrimarySubText = styled(Typography)({
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: "15.65px",
+    fontSize: "18px",
     lineHeight: "27.52px",
     letterSpacing: "0%",
     color: "white",
@@ -238,9 +241,9 @@ const PrimarySubText = styled(Typography)({
 
 const SecondarySubText = styled(Typography)({
     fontFamily: "Inter",
-    fontWeight: 300,
-    fontSize: "15.26px",
-    lineHeight: "22.51px",
+    fontWeight: 500,
+    fontSize: "18px",
+    lineHeight: "148%",
     letterSpacing: "0%",
     color: "white",
 })

@@ -56,7 +56,7 @@ const ForgotPasswordDesktop = () => {
           >
             <img
               src={logo}
-              alt="Company logo"
+              alt="Yacht Crew Center logo"
               className="image-full"
               style={{ maxHeight: 120, width: "100%", objectFit: "contain" }}
             />
@@ -160,7 +160,7 @@ const ForgotPasswordDesktop = () => {
           {!isMobile() && (
             <div className="logo-wraper">
               <div className="logo">
-                <img src={logo} alt="Company logo" className="image-full" />
+                <img src={logo} alt="Yacht Crew Center logo" className="image-full" />
               </div>
             </div>
           )}

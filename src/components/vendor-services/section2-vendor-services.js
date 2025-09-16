@@ -45,7 +45,7 @@ const Section2VendorServices = () => {
     return (
         <Box component="section" sx={{
             width: "100%",
-            pb: { xs: 6, sm: 8, md: 10 },
+            pb: 0,
         }}>
             <Container maxWidth="lg" sx={{
                 display: "flex",
@@ -82,7 +82,7 @@ const Section2VendorServices = () => {
                         </GradientText>
                     </Box>
 
-                    <HeadingText>
+                    <HeadingText variant='h3'>
                         Connect with the Global Yachting Network
                     </HeadingText>
                 </Box>

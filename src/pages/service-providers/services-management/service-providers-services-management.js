@@ -1,7 +1,7 @@
 import React from 'react';
 import { useUser } from "../../../context/userContext";
 import { useTheme } from "../../../context/theme/themeContext";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import {
     Box,
     Card,
@@ -58,6 +58,7 @@ import { createService, deleteService, getAllServices, updateService } from '../
 
 const ServiceProviderServiceManagement = () => {
     const { user } = useUser();
+    const navigate = useNavigate();
     const userServiceCategories = user?.vendorProfile.services
     const { theme } = useTheme();
     const muiTheme = useMuiTheme();
@@ -216,14 +217,25 @@ const ServiceProviderServiceManagement = () => {
             return "Invalid Date";
         }
     };
+    const handleImportFromCSV = () => {
+        navigate(`/service-provider/services/onboarding/${user._id}`);
+    };
     React.useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         const handleOpenCreateOrderModal = () => handleCreateService();
         window.addEventListener("openCreateServiceModal", handleOpenCreateOrderModal);
+        window.addEventListener(
+            "openImportInventoryCSVModal",
+            handleImportFromCSV
+        );
         return () => {
             window.removeEventListener(
                 "openCreateServiceModal",
                 handleOpenCreateOrderModal
+            );
+            window.removeEventListener(
+                "openImportInventoryCSVModal",
+                handleImportFromCSV
             );
         };
     }, []);
