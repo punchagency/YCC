@@ -5,8 +5,9 @@ import { Payments as StripeIcon } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import { useParams, useLocation } from 'react-router-dom';
 
-const VendorOnboardingStep2 = ({ handleNext }) => {
-  const { id: userId } = useParams();
+const VendorOnboardingStep2 = ({ handleNext, userId, suppressAutoAdvance }) => {
+  const { id: userIdFromParams } = useParams();
+  const actualUserId = userId || userIdFromParams;
   const location = useLocation();
   const { stripeAccount, getStripeAccount, createStripeAccount, refreshStripeAccountLink } = useUser();
   const [showContinueButton, setShowContinueButton] = useState(false);
@@ -24,7 +25,7 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
         // console.log('Stripe Step 2 - Current path:', location.pathname);
         // console.log('Stripe Step 2 - Search params:', Object.fromEntries(searchParams.entries()));
         
-        const response = await getStripeAccount(userId, role);
+        const response = await getStripeAccount(actualUserId, role);
         //console.log('Stripe Step 2 - getStripeAccount full response:', response);
         
         if (!response.status) {
@@ -39,9 +40,13 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
 
     fetchStripeAccount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, role]);
+  }, [actualUserId, role]);
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      // Do not auto-navigate when user intentionally navigated backwards
+      return;
+    }
     //console.log('Stripe Step 2 - stripeAccount updated:', stripeAccount);
     
     // If stripeAccount is null, we need to stay on this step and show setup button
@@ -61,18 +66,18 @@ const VendorOnboardingStep2 = ({ handleNext }) => {
       //console.log('Stripe Step 2 - Stripe account exists but setup incomplete, showing continue button');
       setShowContinueButton(true);
     }
-  }, [stripeAccount]);
+  }, [stripeAccount, suppressAutoAdvance, handleNext]);
 
   const handleCreateStripeAccount = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      //console.log('Stripe Step 2 - Creating/Refreshing account with:', { userId, role });
+      //console.log('Stripe Step 2 - Creating/Refreshing account with:', { actualUserId, role });
       if (stripeAccount) {
-        await refreshStripeAccountLink(userId, role);
+        await refreshStripeAccountLink(actualUserId, role);
         //console.log('Stripe Step 2 - refreshStripeAccountLink response:', response);
       } else {
-        await createStripeAccount(userId, role);
+        await createStripeAccount(actualUserId, role);
         //console.log('Stripe Step 2 - createStripeAccount response:', response);
       }
     } catch (error) {

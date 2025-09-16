@@ -1779,7 +1779,7 @@ const Invent = () => {
   };
 
   const handleImportFromCSV = () => {
-    navigate(`/vendors/onboarding/${user._id}`);
+    navigate(`/supplier/products/onboarding/${user._id}`);
   };
   // Set page title and add event listener for create inventory button
   useEffect(() => {

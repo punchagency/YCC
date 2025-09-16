@@ -309,6 +309,59 @@ export const UserProvider = ({ children }) => {
     return json;
   };
 
+  // AI Parser: send Excel to Python parser and get normalized services
+  const parseServicesWithAI = async (file) => {
+    const aiBase = process.env.REACT_APP_AI_PARSER_URL;
+    if (!aiBase) {
+      throw new Error("AI parser URL not configured (REACT_APP_AI_PARSER_URL)");
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    const resp = await fetch(`${aiBase}/parse-services`, {
+      method: "POST",
+      body: formData,
+    });
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok) {
+      // Bubble up friendly structured errors so UI can render them nicely
+      const error = new Error(
+        json?.message ||
+          (resp.status === 422 ? "Validation error" : "AI parsing failed")
+      );
+      error.response = { status: resp.status, data: json };
+      error.data = json;
+      throw error;
+    }
+    if (!json?.services || !Array.isArray(json.services)) {
+      throw new Error("AI parser returned an invalid response");
+    }
+    return json.services;
+  };
+
+  // Import normalized services into Node services
+  const importParsedServicesToNode = async ({
+    userId,
+    services,
+  }) => {
+    const body = { userId, services };
+    const resp = await fetch(
+      `${process.env.REACT_APP_API_URL}/services/import`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(body),
+      }
+    );
+    const json = await resp.json().catch(() => ({}));
+    if (!resp.ok || json?.status === false) {
+      throw new Error(json?.message || "Import failed");
+    }
+    return json;
+  };
+
   const uploadServicesData = async (selectedFile, userId) => {
     const formData = new FormData();
     formData.append("file", selectedFile);
@@ -482,6 +535,8 @@ export const UserProvider = ({ children }) => {
         uploadInventoryData,
         parseInventoryWithAI,
         importParsedInventoryToNode,
+        parseServicesWithAI,
+        importParsedServicesToNode,
         uploadServicesData,
         verifyOnboardingStep1,
         completeOnboarding,
