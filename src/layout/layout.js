@@ -508,7 +508,18 @@ const AdminLayout = ({ role }) => {
                                         {user.role.name === "supplier" &&
                                           importCSVButton}
                                       </div>
-                                    ) : showCreateServiceButton ? CreateNewServiceButton : null
+                                    ) : showCreateServiceButton ? 
+                                    <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                        }}
+                                      >
+                                        {CreateNewServiceButton}
+                                        {user.role.name === "service_provider" &&
+                                          importCSVButton}
+                                      </div>
+                                    : null
                                   }
                                 />
                               </div>

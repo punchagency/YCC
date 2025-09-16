@@ -5,10 +5,11 @@ import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
 import { useParams, useLocation } from 'react-router-dom';
 
-const VendorOnboardingStep3 = ({ handleNext }) => {
+const VendorOnboardingStep3 = ({ handleNext, userId, suppressAutoAdvance }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { id: userId } = useParams();
+  const { id: userIdFromParams } = useParams();
+  const actualUserId = userId || userIdFromParams;
   const location = useLocation();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } = useUser();
   const hasRunRef = useRef(false);
@@ -20,17 +21,22 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
   const role = location.pathname.includes('/services/onboarding/') ? 'service_provider' : 'supplier';
 
   useEffect(() => {
+    if (suppressAutoAdvance) {
+      // If user navigated back, do not auto redirect forward
+      return;
+    }
+    
     const verifyInventoryUpload = async () => {
       if (hasRunRef.current) return;
       hasRunRef.current = true;
 
       try {
-        // console.log('Step 3 - Current userId:', userId);
+        // console.log('Step 3 - Current actualUserId:', actualUserId);
         // console.log('Step 3 - Current role:', role);
         // console.log('Step 3 - Current path:', location.pathname);
 
         //check onboarding status
-        const status = await checkOnboardingStatus(userId, role);
+        const status = await checkOnboardingStatus(actualUserId, role);
         //console.log('Step 3 - checkOnboardingStatus response:', status);
         
         if(status === true){
@@ -38,7 +44,7 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
           return;
         }
 
-        const data = await verifyOnboardingStep1(userId, role);
+        const data = await verifyOnboardingStep1(actualUserId, role);
         //console.log('Step 3 - verifyOnboardingStep1 response:', data);
         
         if (data.data.length > 0) {
@@ -57,12 +63,12 @@ const VendorOnboardingStep3 = ({ handleNext }) => {
     };
 
     verifyInventoryUpload();
-  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role]);
+  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, actualUserId, role, suppressAutoAdvance]);
 
   const handleFinish = async () => {
     try {
-      //console.log('Step 3 - Completing onboarding with:', { userId, role });
-      const status = await completeOnboarding(userId, role);
+      //console.log('Step 3 - Completing onboarding with:', { actualUserId, role });
+      const status = await completeOnboarding(actualUserId, role);
       //console.log('Step 3 - completeOnboarding response:', status);
       
       if (status) {

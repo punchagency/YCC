@@ -68,8 +68,10 @@ const Profile = lazy(() => import("./pages/profile/profile"));
 // Lazy load onboarding pages
 const SupplierOnboarding = lazy(() => import("./pages/onboarding/supplier-onboarding"));
 const SupplierOnboardingStep2 = lazy(() => import("./components/onboarding/supplier/supplier-onboarding-step2"));
+const ImportProducts = lazy(() => import("./pages/supplier/ImportProducts"));
 const VendorOnboarding = lazy(() => import("./pages/onboarding/vendor-onboarding"));
 const VendorOnboardingStep2 = lazy(() => import("./components/onboarding/vendor/vendor-onboarding-step2"));
+const ImportServices = lazy(() => import("./pages/service-providers/importcsv/ImportServices"));
 
 // Lazy load dashboard pages
 const CrewDashboard = lazy(() => import("./pages/dashboard/crew/dashboard"));
@@ -656,6 +658,14 @@ function App() {
                           </ProtectedRoute>
                         }
                       />
+                      <Route
+                      path="/supplier/products/onboarding/:id"
+                      element={
+                        <ProtectedRoute requiredRoles={["supplier"]}>
+                            <ImportProducts />
+                          </ProtectedRoute>
+                      }
+                    />
                     </Route>
 
                     {/* Service Provider's Routes */}
@@ -728,6 +738,14 @@ function App() {
                           </ProtectedRoute>
                         }
                       />
+                      <Route
+                      path="/service-provider/services/onboarding/:id"
+                      element={
+                        <ProtectedRoute requiredRoles={["service_provider"]}>
+                            <ImportServices />
+                          </ProtectedRoute>
+                      }
+                    />
                     </Route>
 
                     <Route path="/crew/settings" element={<CrewSettings />} />
