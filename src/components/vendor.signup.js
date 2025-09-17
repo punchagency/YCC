@@ -20,6 +20,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
 import countryList from "react-select-country-list";
+import Tooltip from "@mui/material/Tooltip";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 // Custom scrollbar styles for supplier and service provider forms
 if (
@@ -62,35 +64,37 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   // Get country options with European countries prioritized
   const getCountryOptions = () => {
     const countries = countryList().getData();
-    
+
     // Priority European countries to show first
     const priorityCountries = [
-      'US', // United States
-      'IT', // Italy
-      'FR', // France
-      'ES', // Spain
-      'DE', // Germany
-      'GB', // United Kingdom
-      'NL', // Netherlands
-      'CH', // Switzerland
-      'AT', // Austria
-      'BE', // Belgium
-      'PT', // Portugal
-      'GR', // Greece
-      'SE', // Sweden
-      'NO', // Norway
-      'DK', // Denmark
-      'FI', // Finland
-      'IE', // Ireland
+      "US", // United States
+      "IT", // Italy
+      "FR", // France
+      "ES", // Spain
+      "DE", // Germany
+      "GB", // United Kingdom
+      "NL", // Netherlands
+      "CH", // Switzerland
+      "AT", // Austria
+      "BE", // Belgium
+      "PT", // Portugal
+      "GR", // Greece
+      "SE", // Sweden
+      "NO", // Norway
+      "DK", // Denmark
+      "FI", // Finland
+      "IE", // Ireland
     ];
-    
+
     // Create priority and regular country lists
     const priorityList = priorityCountries
-      .map(code => countries.find(c => c.value === code))
+      .map((code) => countries.find((c) => c.value === code))
       .filter(Boolean);
-    
-    const regularList = countries.filter(c => !priorityCountries.includes(c.value));
-    
+
+    const regularList = countries.filter(
+      (c) => !priorityCountries.includes(c.value)
+    );
+
     // Return combined list with priority countries first
     return [...priorityList, ...regularList];
   };
@@ -642,7 +646,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
           <div>
             <label>Business Address</label>
           </div>
-          
+
           {/* Street Address */}
           <div className="inputBorder" style={{ marginBottom: "8px" }}>
             <img
@@ -657,12 +661,12 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               onChange={(e) =>
                 handleInputChange("address", {
                   ...formData.address,
-                  street: e.target.value
+                  street: e.target.value,
                 })
               }
             />
           </div>
-          
+
           {/* Street Address 2 */}
           <div className="inputBorder" style={{ marginBottom: "8px" }}>
             <img
@@ -677,12 +681,12 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               onChange={(e) =>
                 handleInputChange("address", {
                   ...formData.address,
-                  street2: e.target.value
+                  street2: e.target.value,
                 })
               }
             />
           </div>
-          
+
           {/* City, State, ZIP */}
           <div style={{ display: "flex", gap: "8px", marginBottom: "8px" }}>
             <div className="inputBorder" style={{ flex: 2 }}>
@@ -693,7 +697,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 onChange={(e) =>
                   handleInputChange("address", {
                     ...formData.address,
-                    city: e.target.value
+                    city: e.target.value,
                   })
                 }
               />
@@ -706,7 +710,7 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 onChange={(e) =>
                   handleInputChange("address", {
                     ...formData.address,
-                    state: e.target.value
+                    state: e.target.value,
                   })
                 }
               />
@@ -719,33 +723,37 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 onChange={(e) =>
                   handleInputChange("address", {
                     ...formData.address,
-                    zip: e.target.value
+                    zip: e.target.value,
                   })
                 }
               />
             </div>
           </div>
-          
+
           {/* Country Select */}
           <div className="inputBorder">
             <Select
               options={getCountryOptions()}
-              value={getCountryOptions().find(c => c.value === formData.address?.country)}
+              value={getCountryOptions().find(
+                (c) => c.value === formData.address?.country
+              )}
               onChange={(option) =>
                 handleInputChange("address", {
                   ...formData.address,
-                  country: option?.value || ""
+                  country: option?.value || "",
                 })
               }
               placeholder="Select Country"
               formatOptionLabel={(option) => (
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <span style={{ fontSize: "16px" }}>
                     {String.fromCodePoint(
                       ...option.value
                         .toUpperCase()
                         .split("")
-                        .map(char => 127397 + char.charCodeAt())
+                        .map((char) => 127397 + char.charCodeAt())
                     )}
                   </span>
                   <span>{option.label}</span>
@@ -901,8 +909,26 @@ const VendorSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         {/* Phone Number */}
         <div className="form-group4" style={{ flex: 1, minWidth: 0 }}>
           <div className="input-field">
-            <div>
-              <label htmlFor="phone">Phone Number</label>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                lineHeight: 1,
+              }}
+            >
+              <label htmlFor="phone">WhatsApp number</label>
+              <Tooltip title="Lets YCC AI recognize you on WhatsApp so you can chat and manage bookings/orders.">
+                <span style={{ display: "inline-flex", alignItems: "center" }}>
+                  <InfoOutlinedIcon
+                    sx={{
+                      fontSize: 16,
+                      color: "#6b7280",
+                      verticalAlign: "middle",
+                    }}
+                  />
+                </span>
+              </Tooltip>
             </div>
             <div
               className="inputBorder"

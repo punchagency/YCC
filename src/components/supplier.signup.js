@@ -18,6 +18,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { normalizeWebsiteUrl } from "../utils/urlUtils";
 import countryList from "react-select-country-list";
+import Tooltip from "@mui/material/Tooltip";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 // Replace the static supplierTypeOptions with a mapping of departments to their options
 const departmentSupplierTypes = {
@@ -463,8 +465,26 @@ const SupplierSignUpForm = ({
       {/* Phone */}
       <div className="form-group1">
         <div className="input-field">
-          <div>
-            <label htmlFor="phone">Phone Number</label>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              lineHeight: 1,
+            }}
+          >
+            <label htmlFor="phone">WhatsApp number</label>
+            <Tooltip title="Lets YCC AI recognize you on WhatsApp so you can chat and manage bookings/orders.">
+              <span style={{ display: "inline-flex", alignItems: "center" }}>
+                <InfoOutlinedIcon
+                  sx={{
+                    fontSize: 16,
+                    color: "#6b7280",
+                    verticalAlign: "middle",
+                  }}
+                />
+              </span>
+            </Tooltip>
           </div>
           <div
             className="inputBorder"
