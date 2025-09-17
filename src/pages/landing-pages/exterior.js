@@ -6,17 +6,16 @@ import Section2Exterior from '../../components/exterior/section2-exterior'
 import Section3Exterior from '../../components/exterior/section3-exterior'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
-import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const ExteriorLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
-      }, []);
+    }, []);
     const backgroundImage = banner
     const header = (
         <>
             Empowering <GradientText>Exterior</GradientText>{" "}
             <GradientText>Yacht</GradientText> crew with the Right Resources
-        </>    
+        </>
     );
     const subtext2 = 'Master the art of yacht maintenance, safety, and watersports with expert advice and trusted tools designed for exterior crew.'
     const button1 = {
@@ -26,28 +25,27 @@ const ExteriorLandingPage = () => {
 
     return (
         <>
-        <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: {
-                xs: "120px",
-                md: "120px",
-                lg: "60px"
-            },
-            marginBottom: { xs: "45px", sm: "23px", md: "60px" },
-        }}>
-            <LandingPageBanner
-                backgroundImage={backgroundImage}
-                header={header}
-                subtext2={subtext2}
-                button1={button1}
-            />
-            <Chatbot />
-            <Section2Exterior />
-            <Section3Exterior />
-        </Box>
-            <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
-            <LandingPageFooter />
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: {
+                    xs: "120px",
+                    md: "120px",
+                    lg: "60px"
+                },
+                marginBottom: { xs: "45px", sm: "23px", md: "60px" },
+            }}>
+                <LandingPageBanner
+                    backgroundImage={backgroundImage}
+                    header={header}
+                    subtext2={subtext2}
+                    button1={button1}
+                />
+                <Chatbot />
+                <Section2Exterior />
+                <Section3Exterior />
+                <LandingPageFooter />
+            </Box>
         </>
     )
 }

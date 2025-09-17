@@ -47,7 +47,7 @@ const LandingPageFooter = () => {
     {
       title: "AFFILIATE PROGRAM",
       links: [
-        { name: "Join Our Affiliate Program", path: "https://affiliate.yachtcrewcenter.com/", external: true },
+        { name: "Affiliate Signup", path: "https://affiliate.yachtcrewcenter.com/", external: true },
       ],
     }
   ];
