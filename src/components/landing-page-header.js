@@ -47,7 +47,7 @@ const LandingPageHeader = () => {
     { title: "About Us", link: "/about-us" },
     { title: "Resource Center", link: "/resource-center" },
     { title: "Contact", link: "/contact-us" },
-    { title: "Affiliate Signup", link: "https://affiliate.yachtcrewcenter.com/" },
+    { title: "Affiliate Signup", link: "https://affiliate.yachtcrewcenter.com/", external: true },
   ];
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -298,6 +298,23 @@ const LandingPageHeader = () => {
                   ))}
                 </Menu>
               </Box>
+            ) : item.external ? (
+              <Link to={item.link} target="_blank" rel="noopener noreferrer">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    {item.title}
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
             ) : (
               <Button
                 key={item.title}
@@ -457,22 +474,6 @@ const LandingPageHeader = () => {
             </>
           ) : (
             <>
-              <Link to="/get-started">
-                <GradientButton
-                  variant="contained"
-                  sx={{
-                    textTransform: "none",
-                    height: 40,
-                    minWidth: 120,
-                    fontSize: 16,
-                    padding: "8px 24px",
-                  }}
-                >
-                  <ButtonTypography sx={{ color: "white" }}>
-                    Join Now
-                  </ButtonTypography>
-                </GradientButton>
-              </Link>
               <Button
                 variant="contained"
                 component={Link}
@@ -505,6 +506,22 @@ const LandingPageHeader = () => {
               >
                 Sign In
               </Button>
+              <Link to="/get-started">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    Join Now
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
             </>
           )}
         </Box>
