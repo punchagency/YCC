@@ -6,7 +6,6 @@ import Section2Engineering from '../../components/engineering/section2-engineeri
 import Section3Engineering from '../../components/engineering/section3-engineering'
 import { useEffect } from 'react'
 import Chatbot from '../../components/chatbot/chatbot'
-import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const EngineeringLandingPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -44,9 +43,8 @@ const EngineeringLandingPage = () => {
                 <Chatbot />
                 <Section2Engineering />
                 <Section3Engineering />
+                <LandingPageFooter />
             </Box>
-            <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
-            <LandingPageFooter />
         </>
     )
 }

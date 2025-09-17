@@ -31,22 +31,23 @@ const LandingPageHeader = () => {
   const navigate = useNavigate();
   const navItems = [
     { title: "Home", link: "/" },
-    {
-      title: "Departments",
-      link: "/departments",
-      options: [
-        { title: "Captain", route: "/captain" },
-        { title: "Crew", route: "/crew" },
-        { title: "Engineering", route: "/engineering" },
-        { title: "Exterior", route: "/exterior" },
-        { title: "Chef/Galley", route: "/chef-galley" },
-        { title: "Interior", route: "/interior" },
-      ],
-    },
+    // {
+    //   title: "Departments",
+    //   link: "/departments",
+    //   options: [
+    //     { title: "Captain", route: "/captain" },
+    //     { title: "Crew", route: "/crew" },
+    //     { title: "Engineering", route: "/engineering" },
+    //     { title: "Exterior", route: "/exterior" },
+    //     { title: "Chef/Galley", route: "/chef-galley" },
+    //     { title: "Interior", route: "/interior" },
+    //   ],
+    // },
     { title: "Vendor & Services", link: "/vendor-services" },
     { title: "About Us", link: "/about-us" },
     { title: "Resource Center", link: "/resource-center" },
     { title: "Contact", link: "/contact-us" },
+    { title: "Affiliate Signup", link: "https://affiliate.yachtcrewcenter.com/", external: true },
   ];
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -128,8 +129,20 @@ const LandingPageHeader = () => {
         sx={{
           width: "100%",
           display: "flex",
-          justifyContent: { xs: "space-between", md: "center" },
+          justifyContent: { xs: "space-between", md: "space-between" },
           gap: "30px",
+          paddingLeft: {
+            xs: "20px",
+            sm: "40px",
+            md: "max(0px, calc(40% - 345px))",
+            lg: "max(0px, calc(27% - 345px))"
+          },
+          paddingRight: {
+            xs: "20px",
+            sm: "40px",
+            md: "80px",
+            lg: "110px"
+          }
         }}
       >
         {/* Back Button */}
@@ -169,13 +182,15 @@ const LandingPageHeader = () => {
         </IconButton>
 
         {/* Logo */}
-        <Box display="flex" alignItems="center">
+        <Link display="flex" alignItems="center"
+          to='/'
+        >
           <img
             src={logo}
             alt="Logo"
             style={{ width: 50, height: 50, marginRight: 10 }}
           />
-        </Box>
+        </Link>
 
         {/* Desktop Navigation */}
         <Box
@@ -283,6 +298,23 @@ const LandingPageHeader = () => {
                   ))}
                 </Menu>
               </Box>
+            ) : item.external ? (
+              <Link to={item.link} target="_blank" rel="noopener noreferrer">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    {item.title}
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
             ) : (
               <Button
                 key={item.title}
@@ -304,6 +336,7 @@ const LandingPageHeader = () => {
                     position: "absolute",
                     bottom: -2,
                     left: 0,
+                    textWrap: item.external ? "nowrap" : "wrap",
                     width: "100%",
                     height: "2px",
                     background: linearGradient,
@@ -441,38 +474,6 @@ const LandingPageHeader = () => {
             </>
           ) : (
             <>
-              <Link to="https://affiliate.yachtcrewcenter.com/" target="_blank" rel="noopener noreferrer">
-                <GradientButton
-                  variant="contained"
-                  sx={{
-                    textTransform: "none",
-                    height: 40,
-                    minWidth: 120,
-                    fontSize: 16,
-                    padding: "8px 24px",
-                  }}
-                >
-                  <ButtonTypography sx={{ color: "white" }}>
-                    Join Our Affiliate Program
-                  </ButtonTypography>
-                </GradientButton>
-              </Link>
-              <Link to="/get-started">
-                <GradientButton
-                  variant="contained"
-                  sx={{
-                    textTransform: "none",
-                    height: 40,
-                    minWidth: 120,
-                    fontSize: 16,
-                    padding: "8px 24px",
-                  }}
-                >
-                  <ButtonTypography sx={{ color: "white" }}>
-                    Join Now
-                  </ButtonTypography>
-                </GradientButton>
-              </Link>
               <Button
                 variant="contained"
                 component={Link}
@@ -505,6 +506,22 @@ const LandingPageHeader = () => {
               >
                 Sign In
               </Button>
+              <Link to="/get-started">
+                <GradientButton
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    height: 40,
+                    minWidth: 120,
+                    fontSize: 16,
+                    padding: "8px 24px",
+                  }}
+                >
+                  <ButtonTypography sx={{ color: "white" }}>
+                    Join Now
+                  </ButtonTypography>
+                </GradientButton>
+              </Link>
             </>
           )}
         </Box>
@@ -845,12 +862,7 @@ export const linearGradient2 = "linear-gradient(90deg, #0487D9, #034D92)";
 const TransparentAppBar = styled(AppBar)({
   backgroundColor: "transparent",
   boxShadow: "none",
-  padding: {
-    xs: "20px 20px", // Small screens (mobile)
-    sm: "20px 40px", // Small tablets
-    md: "20px 80px", // Medium screens (larger tablets, small laptops)
-    lg: "20px 110px", // Large screens (desktops)
-  },
+  padding: "0px 0",
   color: "white",
   fontSize: "16px",
   fontFamily: "Manrope, sans-serif",

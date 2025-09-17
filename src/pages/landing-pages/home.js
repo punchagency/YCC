@@ -1,14 +1,12 @@
 import React, { useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import banner from "../../assets/images/YCC-home-banner-new.png";
-import Section1Home from "../../components/home/section1-home";
 import Section2Home from "../../components/home/section2-home";
 import Section3Home from "../../components/home/section3-home";
 import LandingPageFooter from "../../components/landing-page-footer";
 import Section4Home from "../../components/home/section4-home";
 import LandingPageBanner from "../../components/landing-page-banner";
 import Chatbot from "../../components/chatbot/chatbot";
-import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 
 const HomeLandingPage = () => {
   useEffect(() => {
@@ -35,39 +33,38 @@ const HomeLandingPage = () => {
   };
   const page = "home";
   return (
-  <>
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: {
-          xs: "47px", // Smaller gap on mobile
-          sm: "60px", // Medium gap on small screens
-          md: "90px", // Larger gap on tablets
-          lg: "120px", // Default gap for large screens
-        },
-        maxWidth: "100vw",
-        marginBottom: {xs: "45px", sm: "23px", md: "30px"},
-      }}
-    >
-      <LandingPageBanner
-        backgroundImage={backgroundImage}
-        header={header}
-        subtext1={subtext1}
-        subtext2={subtext2}
-        button1={button1}
-        button2={button2}
-        page={page}
-      />
-      {/* <Section1Home /> */}
-      <Chatbot />
-      <Section2Home />
-      <Section3Home />
-      <Section4Home />
-    </Box>
-    <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
-    <LandingPageFooter />
-  </>
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: {
+            xs: "47px", // Smaller gap on mobile
+            sm: "60px", // Medium gap on small screens
+            md: "90px", // Larger gap on tablets
+            lg: "120px", // Default gap for large screens
+          },
+          maxWidth: "100vw",
+          marginBottom: { xs: "45px", sm: "23px", md: "30px" },
+        }}
+      >
+        <LandingPageBanner
+          backgroundImage={backgroundImage}
+          header={header}
+          subtext1={subtext1}
+          subtext2={subtext2}
+          button1={button1}
+          button2={button2}
+          page={page}
+        />
+        {/* <Section1Home /> */}
+        <Chatbot />
+        <Section2Home />
+        <Section3Home />
+        <Section4Home />
+        <LandingPageFooter />
+      </Box>
+    </>
   );
 };
 
