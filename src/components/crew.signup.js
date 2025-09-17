@@ -23,6 +23,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { signup } from "../services/authService";
 import TermsModal from "./TermsModal";
+import Tooltip from "@mui/material/Tooltip";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 const formattedCountries = countryData.map((country) => ({
   value: country.cca2,
@@ -127,14 +129,13 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
         formDataObj.append("cv", selectedCV);
       }
       if (certificationFiles.length < 3) {
-        setError('Please upload at least 3 certifications.');
+        setError("Please upload at least 3 certifications.");
         setIsSubmitting(false);
         return;
       }
       certificationFiles.forEach((file, idx) => {
         formDataObj.append(`certificationFiles`, file);
       });
-
 
       if (
         !crewDetails.firstName ||
@@ -195,7 +196,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const handleCertificationFilesChange = (e) => {
     const files = Array.from(e.target.files);
     if (certificationFiles.length + files.length > 15) {
-      setError('You can upload a maximum of 15 certifications.');
+      setError("You can upload a maximum of 15 certifications.");
       return;
     }
     setCertificationFiles((prev) => [...prev, ...files]);
@@ -240,10 +241,10 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   ];
 
   const experienceOptions = [
-    { value: '0-2', label: '0-2 Years' },
-    { value: '2-4', label: '2-4 Years' },
-    { value: '4-10', label: '4-10 Years' },
-    { value: '10+', label: '10+ Years' },
+    { value: "0-2", label: "0-2 Years" },
+    { value: "2-4", label: "2-4 Years" },
+    { value: "4-10", label: "4-10 Years" },
+    { value: "10+", label: "10+ Years" },
   ];
 
   const handleChange = (selectedOption) => {
@@ -445,8 +446,28 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
               <div className="form-group1">
                 <div className="input-field">
-                  <div>
-                    <label htmlFor="phone">Phone Number</label>
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      lineHeight: 1,
+                    }}
+                  >
+                    <label htmlFor="phone">WhatsApp number</label>
+                    <Tooltip title="Lets YCC AI recognize you on WhatsApp so you can chat and manage bookings/orders.">
+                      <span
+                        style={{ display: "inline-flex", alignItems: "center" }}
+                      >
+                        <InfoOutlinedIcon
+                          sx={{
+                            fontSize: 16,
+                            color: "#6b7280",
+                            verticalAlign: "middle",
+                          }}
+                        />
+                      </span>
+                    </Tooltip>
                   </div>
                   <div className="inputBorder" style={{ marginBottom: 16 }}>
                     <PhoneInput
@@ -620,8 +641,19 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                           boxShadow: "none",
                           width: "100%",
                           minHeight: 44,
-                          input: (provided) => ({ ...provided, fontFamily: 'Inter, sans-serif', fontSize: 14, paddingLeft: 36 }),
-                          placeholder: (provided) => ({ ...provided, fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#888', paddingLeft: 36 }),
+                          input: (provided) => ({
+                            ...provided,
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: 14,
+                            paddingLeft: 36,
+                          }),
+                          placeholder: (provided) => ({
+                            ...provided,
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: 14,
+                            color: "#888",
+                            paddingLeft: 36,
+                          }),
                         }),
                         container: (provided) => ({
                           ...provided,
@@ -687,13 +719,19 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <Select
                       options={experienceOptions}
                       value={formData.yearsOfExperience}
-                      onChange={(option) => handleInputChange('yearsOfExperience', option)}
+                      onChange={(option) =>
+                        handleInputChange("yearsOfExperience", option)
+                      }
                       placeholder={
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ display: "flex", alignItems: "center" }}>
                           <img
                             src={experienceLogo}
                             alt="Experience logo"
-                            style={{ width: '12px', height: '12px', marginRight: '8px' }}
+                            style={{
+                              width: "12px",
+                              height: "12px",
+                              marginRight: "8px",
+                            }}
                           />
                           <span>Years of Experience</span>
                         </div>
@@ -701,50 +739,50 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       styles={{
                         control: (provided) => ({
                           ...provided,
-                          background: 'transparent',
-                          border: 'none',
-                          boxShadow: 'none',
-                          width: '100%',
+                          background: "transparent",
+                          border: "none",
+                          boxShadow: "none",
+                          width: "100%",
                           minHeight: 44,
                         }),
                         container: (provided) => ({
                           ...provided,
-                          width: '100%',
+                          width: "100%",
                         }),
                         menu: (provided) => ({
                           ...provided,
-                          width: '100%',
+                          width: "100%",
                         }),
                         menuList: (provided) => ({
                           ...provided,
-                          maxHeight: '200px',
-                          scrollbarWidth: 'thin',
-                          scrollbarColor: '#034D92 #f0f0f0',
-                          '&::-webkit-scrollbar': {
-                            width: '6px',
+                          maxHeight: "200px",
+                          scrollbarWidth: "thin",
+                          scrollbarColor: "#034D92 #f0f0f0",
+                          "&::-webkit-scrollbar": {
+                            width: "6px",
                           },
-                          '&::-webkit-scrollbar-track': {
-                            background: '#f0f0f0',
-                            borderRadius: '3px',
+                          "&::-webkit-scrollbar-track": {
+                            background: "#f0f0f0",
+                            borderRadius: "3px",
                           },
-                          '&::-webkit-scrollbar-thumb': {
-                            background: '#034D92',
-                            borderRadius: '3px',
+                          "&::-webkit-scrollbar-thumb": {
+                            background: "#034D92",
+                            borderRadius: "3px",
                           },
                         }),
                         singleValue: (provided) => ({
                           ...provided,
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: "flex",
+                          alignItems: "center",
                         }),
                         option: (provided) => ({
                           ...provided,
-                          display: 'flex',
-                          alignItems: 'center',
+                          display: "flex",
+                          alignItems: "center",
                         }),
                         valueContainer: (provided) => ({
                           ...provided,
-                          width: '100%',
+                          width: "100%",
                         }),
                       }}
                       components={{ IndicatorSeparator: () => null }}
@@ -759,29 +797,41 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <label>Location</label>
                   </div>
                   <div className="inputBorder" style={{ marginBottom: 16 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                      }}
+                    >
                       <img
                         src={LocationLogo}
                         alt="Location logo"
-                        style={{ width: '12px', height: '12px', marginRight: '8px' }}
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          marginRight: "8px",
+                        }}
                       />
                       <input
                         type="text"
                         placeholder="Enter your location"
                         value={formData.location}
-                        onChange={(e) => handleInputChange('location', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("location", e.target.value)
+                        }
                         style={{
-                          border: 'none',
-                          background: 'transparent',
-                          width: '100%',
-                          outline: 'none',
-                          fontSize: '14px',
+                          border: "none",
+                          background: "transparent",
+                          width: "100%",
+                          outline: "none",
+                          fontSize: "14px",
                           minHeight: 44,
-                          fontFamily: 'Inter, sans-serif',
-                          color: formData.location ? '#222' : '#888',
-                          '::placeholder': {
-                            color: '#888',
-                            fontFamily: 'Inter, sans-serif',
+                          fontFamily: "Inter, sans-serif",
+                          color: formData.location ? "#222" : "#888",
+                          "::placeholder": {
+                            color: "#888",
+                            fontFamily: "Inter, sans-serif",
                             fontSize: 14,
                             opacity: 1,
                           },
@@ -821,7 +871,10 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   <div>
                     <label>Upload Certifications (min 3, max 15)</label>
                   </div>
-                  <div className="inputBorder" style={{ position: "relative", marginBottom: 16 }}>
+                  <div
+                    className="inputBorder"
+                    style={{ position: "relative", marginBottom: 16 }}
+                  >
                     <input
                       id="certification-upload"
                       type="file"
@@ -829,24 +882,53 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       multiple
                       onChange={handleCertificationFilesChange}
                       disabled={certificationFiles.length >= 15}
-                      style={{ display: 'block', marginBottom: 8 }}
+                      style={{ display: "block", marginBottom: 8 }}
                     />
-                    <div style={{ fontSize: 12, color: '#666' }}>
+                    <div style={{ fontSize: 12, color: "#666" }}>
                       {certificationFiles.length} file(s) selected
                     </div>
-                    <ul style={{ fontSize: 12, color: '#666', margin: 0, padding: 0 }}>
+                    <ul
+                      style={{
+                        fontSize: 12,
+                        color: "#666",
+                        margin: 0,
+                        padding: 0,
+                      }}
+                    >
                       {certificationFiles.map((file, idx) => (
-                        <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <li
+                          key={idx}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
                           {file.name}
-                          <button type="button" onClick={() => removeCertificationFile(idx)} style={{ border: 'none', background: 'none', color: '#999', cursor: 'pointer' }}>×</button>
+                          <button
+                            type="button"
+                            onClick={() => removeCertificationFile(idx)}
+                            style={{
+                              border: "none",
+                              background: "none",
+                              color: "#999",
+                              cursor: "pointer",
+                            }}
+                          >
+                            ×
+                          </button>
                         </li>
                       ))}
                     </ul>
                     {certificationFiles.length < 3 && (
-                      <div style={{ color: 'red', fontSize: 12 }}>Please upload at least 3 certifications.</div>
+                      <div style={{ color: "red", fontSize: 12 }}>
+                        Please upload at least 3 certifications.
+                      </div>
                     )}
                     {certificationFiles.length > 15 && (
-                      <div style={{ color: 'red', fontSize: 12 }}>You can upload a maximum of 15 certifications.</div>
+                      <div style={{ color: "red", fontSize: 12 }}>
+                        You can upload a maximum of 15 certifications.
+                      </div>
                     )}
                   </div>
                 </div>
@@ -920,21 +1002,24 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 className="file-upload-container"
                 style={{ marginBottom: 32, width: "100%" }}
               >
-                <div className="profile-upload-box" style={{
-                  cursor: "pointer",
-                  width: "100%",
-                  height: "160px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  border: "2px dashed #b3e0fc",
-                  borderRadius: 12,
-                  background: "#f8fbfd",
-                  boxShadow: "0 2px 8px rgba(4,135,217,0.04)",
-                  marginBottom: 16,
-                  position: "relative"
-                }}>
+                <div
+                  className="profile-upload-box"
+                  style={{
+                    cursor: "pointer",
+                    width: "100%",
+                    height: "160px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    border: "2px dashed #b3e0fc",
+                    borderRadius: 12,
+                    background: "#f8fbfd",
+                    boxShadow: "0 2px 8px rgba(4,135,217,0.04)",
+                    marginBottom: 16,
+                    position: "relative",
+                  }}
+                >
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -943,37 +1028,88 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     style={{ display: "none" }}
                   />
                   {isProfileUploading ? (
-                    <div className="loading-spinner"><div className="spinner"></div></div>
+                    <div className="loading-spinner">
+                      <div className="spinner"></div>
+                    </div>
                   ) : selectedFiles.length > 0 ? (
                     <>
                       <img
                         src={URL.createObjectURL(selectedFiles[0])}
                         className="profileLogo"
-                        style={{ width: "40px", height: "40px", borderRadius: 8, marginBottom: 8, objectFit: 'cover' }}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: 8,
+                          marginBottom: 8,
+                          objectFit: "cover",
+                        }}
                         alt="profile"
                       />
                       <button
                         className="browse-button"
-                        onClick={e => { e.stopPropagation(); setSelectedFiles([]); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedFiles([]);
+                        }}
                         type="button"
-                        style={{ marginTop: 12, background: "#fff", color: "#034D92", border: "1px solid #034D92", borderRadius: 6, padding: "4px 14px", fontWeight: 500, fontSize: 13, cursor: "pointer" }}
-                      >Remove Photo</button>
+                        style={{
+                          marginTop: 12,
+                          background: "#fff",
+                          color: "#034D92",
+                          border: "1px solid #034D92",
+                          borderRadius: 6,
+                          padding: "4px 14px",
+                          fontWeight: 500,
+                          fontSize: 13,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Remove Photo
+                      </button>
                     </>
                   ) : (
                     <>
                       <img
                         src={profileLogo}
                         className="profileLogo"
-                        style={{ width: "40px", height: "40px", borderRadius: 8, marginBottom: 8 }}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: 8,
+                          marginBottom: 8,
+                        }}
                         alt="profile"
                       />
-                      <p style={{ fontSize: 13, fontWeight: 500, color: "#0487D9", margin: 0, textAlign: 'center' }}>Upload Photo</p>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: "#0487D9",
+                          margin: 0,
+                          textAlign: "center",
+                        }}
+                      >
+                        Upload Photo
+                      </p>
                       <button
                         className="browse-button"
                         onClick={triggerFileInput}
                         type="button"
-                        style={{ marginTop: 12, background: "linear-gradient(to right, #034d92, #0487d9)", color: "#fff", border: "none", borderRadius: 6, padding: "6px 18px", fontWeight: 500, fontSize: 14, cursor: "pointer" }}
-                      >Browse Files</button>
+                        style={{
+                          marginTop: 12,
+                          background:
+                            "linear-gradient(to right, #034d92, #0487d9)",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 6,
+                          padding: "6px 18px",
+                          fontWeight: 500,
+                          fontSize: 14,
+                          cursor: "pointer",
+                        }}
+                      >
+                        Browse Files
+                      </button>
                     </>
                   )}
                 </div>
@@ -1015,17 +1151,48 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                       <div className="spinner"></div>
                     </div>
                   ) : selectedCV ? (
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <i className="fas fa-file-alt" style={{ fontSize: 40, color: '#0487D9', marginBottom: 8 }}></i>
-                      <p className="file-name" style={{ fontSize: 13, marginBottom: 2, marginTop: 8, color: "#222", textAlign: "center" }}>
-                        {selectedCV.name.length > 20 ? selectedCV.name.substring(0, 20) + "..." : selectedCV.name}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <i
+                        className="fas fa-file-alt"
+                        style={{
+                          fontSize: 40,
+                          color: "#0487D9",
+                          marginBottom: 8,
+                        }}
+                      ></i>
+                      <p
+                        className="file-name"
+                        style={{
+                          fontSize: 13,
+                          marginBottom: 2,
+                          marginTop: 8,
+                          color: "#222",
+                          textAlign: "center",
+                        }}
+                      >
+                        {selectedCV.name.length > 20
+                          ? selectedCV.name.substring(0, 20) + "..."
+                          : selectedCV.name}
                       </p>
-                      <span className="file-size" style={{ fontSize: 11, color: "#888" }}>
+                      <span
+                        className="file-size"
+                        style={{ fontSize: 11, color: "#888" }}
+                      >
                         ({(selectedCV.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                       <button
                         className="change-cv"
-                        onClick={e => { e.stopPropagation(); setSelectedCV(null); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedCV(null);
+                        }}
                         style={{
                           marginTop: 12,
                           background: "#fff",
@@ -1045,17 +1212,30 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <>
                       <img
                         src={cvUploadLogo}
-                        style={{ width: "40px", height: "40px", marginBottom: 8 }}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          marginBottom: 8,
+                        }}
                         alt="cv"
                       />
                       <div style={{ width: "100%", textAlign: "center" }}>
                         <div className="upload-icon">
                           <i className="fas fa-file-alt"></i>
                         </div>
-                        <p style={{ fontSize: 13, fontWeight: 500, color: "#0487D9", margin: 0 }}>
+                        <p
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 500,
+                            color: "#0487D9",
+                            margin: 0,
+                          }}
+                        >
                           Upload CV
                         </p>
-                        <span style={{ fontSize: 11, color: "#888" }}>(PDF, DOC, DOCX)</span>
+                        <span style={{ fontSize: 11, color: "#888" }}>
+                          (PDF, DOC, DOCX)
+                        </span>
                       </div>
                     </>
                   )}
@@ -1174,38 +1354,52 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', margin: '16px 0' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "16px 0",
+                }}
+              >
                 <input
                   type="checkbox"
                   checked={acceptTerms}
                   onChange={() => setAcceptTerms(!acceptTerms)}
                   style={{ marginRight: 8 }}
                 />
-                <span style={{ fontSize: 14, color: '#333', fontFamily: 'Inter, sans-serif' }}>
-                  By signing up, you acknowledge that you have read and agree to our{" "}
+                <span
+                  style={{
+                    fontSize: 14,
+                    color: "#333",
+                    fontFamily: "Inter, sans-serif",
+                  }}
+                >
+                  By signing up, you acknowledge that you have read and agree to
+                  our{" "}
                   <span
                     onClick={() => navigate("/privacy-policy")}
-                    style={{ 
-                      color: '#034D92', 
-                      textDecoration: 'underline', 
-                      cursor: 'pointer',
-                      fontWeight: '500'
+                    style={{
+                      color: "#034D92",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontWeight: "500",
                     }}
                   >
                     Privacy Policy
-                  </span>
-                  {" "}and{" "}
+                  </span>{" "}
+                  and{" "}
                   <span
                     onClick={() => navigate("/terms-and-conditions")}
-                    style={{ 
-                      color: '#034D92', 
-                      textDecoration: 'underline', 
-                      cursor: 'pointer',
-                      fontWeight: '500'
+                    style={{
+                      color: "#034D92",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      fontWeight: "500",
                     }}
                   >
                     Terms & Conditions
-                  </span>.
+                  </span>
+                  .
                 </span>
               </div>
 
