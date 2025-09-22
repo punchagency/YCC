@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  useOutletContext, useNavigate
-} from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 
 import { useTheme } from "../../context/theme/themeContext";
 import AddIcon from "@mui/icons-material/Add";
-import InventoryIcon from '@mui/icons-material/Inventory';
+import InventoryIcon from "@mui/icons-material/Inventory";
 import { TableSkeleton } from "../../components/TableSkeleton";
 import { Pagination } from "../../components/pagination";
 
@@ -50,6 +48,8 @@ import ImageIcon from "@mui/icons-material/Image";
 import EmailIcon from "@mui/icons-material/Email";
 import CircularProgress from "@mui/material/CircularProgress";
 import { updateInventoryItem } from "../../services/supplier/supplierService";
+import { default as ReactSelect } from "react-select";
+import countryList from "react-select-country-list";
 
 import {
   createInventoryData,
@@ -58,6 +58,9 @@ import {
   sendInventoryEmail,
   getAllSuppliers,
 } from "../../services/inventory/inventoryService";
+
+// Use shared country options (label shows full name, value is ISO-2 code)
+const countryOptions = countryList().getData();
 
 // const InventoryTableSkeleton = () => {
 //   const { theme } = useTheme();
@@ -110,14 +113,14 @@ const Invent = () => {
     stockQuantity: "",
     price: "",
     productImage: null,
-    hsCode: '',
-    countryOfOrigin: '',
+    hsCode: "",
+    countryOfOrigin: "",
     height: 1,
     width: 1,
     length_: 1,
     weight: 1,
   });
-  const user = JSON.parse(localStorage.getItem('user')) || {};
+  const user = JSON.parse(localStorage.getItem("user")) || {};
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   // Initialize with empty array
@@ -133,8 +136,8 @@ const Invent = () => {
     stockQuantity: "",
     price: "",
     productImage: null,
-    hsCode: '',
-    countryOfOrigin: '',
+    hsCode: "",
+    countryOfOrigin: "",
     height: 1,
     width: 1,
     length_: 1,
@@ -150,8 +153,8 @@ const Invent = () => {
     supplier: "",
     description: "",
     fileName: "",
-    hsCode: '',
-    countryOfOrigin: '',
+    hsCode: "",
+    countryOfOrigin: "",
     height: 1,
     width: 1,
     length_: 1,
@@ -353,24 +356,33 @@ const Invent = () => {
       );
 
       if (result.success) {
-        const formattedItems = result.data.flatMap((item) =>
-          item.products?.map(product => ({
-            id: item._id,
-            productId: product.productId,
-            productName: product.productName || "Unknown Product",
-            category: typeof product.category === 'string' ? [product.category] : Array.isArray(product.category) ? product.category : ["Uncategorized"],
-            description: product.description || "Not available",
-            supplier: item.supplier?.businessName || item.userInfo?.businessName || "Not available",
-            stockQuantity: product.quantity || 0,
-            price: product.price || 0,
-            productImage: product.productImage || null,
-            hsCode: product.hsCode || "",
-            countryOfOrigin: product.countryOfOrigin || "",
-            height: product.height || 0,
-            width: product.width || 0,
-            length: product['length'] || 0,
-            weight: product.weight || 0,
-          })) || []
+        const formattedItems = result.data.flatMap(
+          (item) =>
+            item.products?.map((product) => ({
+              id: item._id,
+              productId: product.productId,
+              productName: product.productName || "Unknown Product",
+              category:
+                typeof product.category === "string"
+                  ? [product.category]
+                  : Array.isArray(product.category)
+                  ? product.category
+                  : ["Uncategorized"],
+              description: product.description || "Not available",
+              supplier:
+                item.supplier?.businessName ||
+                item.userInfo?.businessName ||
+                "Not available",
+              stockQuantity: product.quantity || 0,
+              price: product.price || 0,
+              productImage: product.productImage || null,
+              hsCode: product.hsCode || "",
+              countryOfOrigin: product.countryOfOrigin || "",
+              height: product.height || 0,
+              width: product.width || 0,
+              length: product["length"] || 0,
+              weight: product.weight || 0,
+            })) || []
         );
         setInventoryItems(formattedItems);
         setTotalItems(result.pagination?.totalItems || formattedItems.length);
@@ -433,11 +445,11 @@ const Invent = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);;
+  }, []);
 
   const handleUpdate = async () => {
     setIsLoading(true);
@@ -473,7 +485,7 @@ const Invent = () => {
           height: editItem.height,
           width: editItem.width,
           length: editItem.length_,
-          weight: editItem.weight
+          weight: editItem.weight,
         };
       }
       try {
@@ -488,7 +500,7 @@ const Invent = () => {
           const responseData = result.data?.data || result.data;
 
           if (!responseData) {
-            throw new Error('Invalid response structure');
+            throw new Error("Invalid response structure");
           }
 
           // Update UI with new data
@@ -496,12 +508,15 @@ const Invent = () => {
 
           // Enhanced formatting with better error handling
           const formattedItems = inventory.products.map((prod) => {
-
             return {
               id: inventory._id,
               productId: prod.productId, // Use productId from response instead of nested product._id
               productName: prod.productName || "Unknown Product",
-              category: Array.isArray(prod.category) ? prod.category : typeof prod.category === 'string' ? [prod.category] : ["Uncategorized"],
+              category: Array.isArray(prod.category)
+                ? prod.category
+                : typeof prod.category === "string"
+                ? [prod.category]
+                : ["Uncategorized"],
               description: prod.description || "Not available",
               supplier: inventory.supplier?.businessName || "Not available",
               stockQuantity: Number(prod.quantity) || 0,
@@ -512,12 +527,12 @@ const Invent = () => {
               countryOfOrigin: prod.countryOfOrigin || "",
               height: Number(prod.height) || 0, // Changed default from 1 to 0 to match API
               width: Number(prod.width) || 0,
-              length: Number(prod['length']) || 0, // Fixed typo: was length_
+              length: Number(prod["length"]) || 0, // Fixed typo: was length_
               weight: Number(prod.weight) || 0,
               // Additional fields that might be useful
               warehouseLocation: inventory.warehouseLocation || "",
               createdAt: inventory.createdAt,
-              updatedAt: inventory.updatedAt
+              updatedAt: inventory.updatedAt,
             };
           });
 
@@ -531,7 +546,6 @@ const Invent = () => {
             message: result.data?.message || "Product updated successfully!",
             severity: "success",
           });
-
         } else {
           // Handle failure case
           setSnackbar({
@@ -540,7 +554,6 @@ const Invent = () => {
             severity: "error",
           });
         }
-
       } catch (error) {
         setSnackbar({
           open: true,
@@ -571,7 +584,10 @@ const Invent = () => {
     setIsLoading(true);
     try {
       // Call deleteInventoryItem with inventoryId and productId
-      const result = await deleteInventoryItem(itemToDelete.inventoryId, itemToDelete.productId);
+      const result = await deleteInventoryItem(
+        itemToDelete.inventoryId,
+        itemToDelete.productId
+      );
       if (result.success) {
         // Remove the deleted item from the state
         setInventoryItems((prevItems) =>
@@ -670,7 +686,11 @@ const Invent = () => {
           id: inventory._id,
           productId: prod.product._id,
           productName: prod.product.name || "Unknown Product",
-          category: Array.isArray(prod.product.category) ? prod.product.category : typeof prod.product.category === 'string' ? [prod.product.category] : ["Uncategorized"],
+          category: Array.isArray(prod.product.category)
+            ? prod.product.category
+            : typeof prod.product.category === "string"
+            ? [prod.product.category]
+            : ["Uncategorized"],
           description: prod.product.description || "Not available",
           supplier: inventory.supplier?.businessName || "Not available",
           stockQuantity: prod.quantity || 0,
@@ -680,7 +700,7 @@ const Invent = () => {
           countryOfOrigin: prod.product.countryOfOrigin || "",
           height: prod.product.height || 1,
           width: prod.product.width || 1,
-          length: prod.product['length'] || 1,
+          length: prod.product["length"] || 1,
           weight: prod.product.weight || 1,
         }));
         setInventoryItems(formattedItems);
@@ -721,7 +741,7 @@ const Invent = () => {
       setSnackbar({
         message: "An unexpected error occurred. Please try again.",
         open: true,
-        severity: "error"
+        severity: "error",
       });
     } finally {
       setIsLoading(false);
@@ -730,11 +750,11 @@ const Invent = () => {
 
   // Update the view item handler
   const handleViewItem = (item) => {
-    setViewItem({ ...item, length_: item['length'] });
+    setViewItem({ ...item, length_: item["length"] });
     setShowViewModal(true);
   };
   const handleEditModal = (item) => {
-    setEditItem({ ...item, length_: item['length'] });
+    setEditItem({ ...item, length_: item["length"] });
     setShowEditModal(true);
   };
 
@@ -750,8 +770,8 @@ const Invent = () => {
       stockQuantity: "",
       price: "",
       productImage: null,
-      hsCode: '',
-      countryOfOrigin: '',
+      hsCode: "",
+      countryOfOrigin: "",
       height: 1,
       width: 1,
       length_: 1,
@@ -825,8 +845,8 @@ const Invent = () => {
             p: 2,
             mb: 3,
             borderRadius: 3,
-            border: '1px solid #e2e8f0',
-            background: theme === "light" ? '#fff' : '#1a1a1a',
+            border: "1px solid #e2e8f0",
+            background: theme === "light" ? "#fff" : "#1a1a1a",
           }}
         >
           <Stack
@@ -845,7 +865,10 @@ const Invent = () => {
                   textTransform: "none",
                   borderRadius: 2,
                   border: "1px solid #e2e8f0",
-                  background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+                  background:
+                    theme === "light"
+                      ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)"
+                      : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
                   fontWeight: 500,
                   display: "flex",
                   alignItems: "center",
@@ -856,11 +879,13 @@ const Invent = () => {
                   height: 40,
                 }}
                 fullWidth
-                endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
+                endIcon={
+                  <span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>
+                }
               >
                 {stockStatusFilter === "all" && "All Status"}
                 {stockStatusFilter === "high" && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <RadioButtonUncheckedIcon
                       sx={{ color: "#059669", fontSize: 18 }}
                     />
@@ -868,16 +893,14 @@ const Invent = () => {
                   </Box>
                 )}
                 {stockStatusFilter === "medium" && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
                     <span style={{ color: "#D97706" }}>Medium Stock</span>
                   </Box>
                 )}
                 {stockStatusFilter === "low" && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ErrorOutlineIcon
-                      sx={{ color: "#DC2626", fontSize: 18 }}
-                    />
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <ErrorOutlineIcon sx={{ color: "#DC2626", fontSize: 18 }} />
                     <span style={{ color: "#DC2626" }}>Low Stock</span>
                   </Box>
                 )}
@@ -895,7 +918,7 @@ const Invent = () => {
                     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                     zIndex: 10,
                     mt: 0.5,
-                    overflow: 'hidden',
+                    overflow: "hidden",
                   }}
                 >
                   {[
@@ -913,9 +936,7 @@ const Invent = () => {
                       key: "medium",
                       label: "Medium Stock",
                       icon: (
-                        <RemoveIcon
-                          sx={{ color: "#D97706", fontSize: 18 }}
-                        />
+                        <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
                       ),
                     },
                     {
@@ -930,8 +951,9 @@ const Invent = () => {
                   ].map((opt) => (
                     <Box
                       key={opt.key}
-                      className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
-                        }`}
+                      className={`custom-dropdown-item${
+                        stockStatusFilter === opt.key ? " active" : ""
+                      }`}
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -944,14 +966,16 @@ const Invent = () => {
                           opt.key === "high"
                             ? "#059669"
                             : opt.key === "medium"
-                              ? "#D97706"
-                              : opt.key === "low"
-                                ? "#DC2626"
-                                : "#374151",
+                            ? "#D97706"
+                            : opt.key === "low"
+                            ? "#DC2626"
+                            : "#374151",
                         background:
-                          stockStatusFilter === opt.key ?
-                            theme === "light" ? "#eff6ff" : "#1e293b" :
-                            undefined,
+                          stockStatusFilter === opt.key
+                            ? theme === "light"
+                              ? "#eff6ff"
+                              : "#1e293b"
+                            : undefined,
                         "&:hover": {
                           background: theme === "light" ? "#f8fafc" : "#1e293b",
                         },
@@ -977,11 +1001,11 @@ const Invent = () => {
               fullWidth
               size="small"
               sx={{
-                '& .MuiOutlinedInput-root': {
+                "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                   height: 40,
-                  '&.Mui-focused': {
-                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  "&.Mui-focused": {
+                    boxShadow: "0 0 0 3px rgba(0, 102, 204, 0.2)",
                   },
                 },
               }}
@@ -997,7 +1021,7 @@ const Invent = () => {
                 minWidth: { sm: 120 },
                 height: 40,
                 borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             >
               Search
@@ -1009,9 +1033,11 @@ const Invent = () => {
           // Determine stock status color
           const stockStatus = getStockStatus(item.stockQuantity);
           const statusColor =
-            stockStatus === 'high' ? '#059669' :
-              stockStatus === 'medium' ? '#D97706' :
-                '#DC2626';
+            stockStatus === "high"
+              ? "#059669"
+              : stockStatus === "medium"
+              ? "#D97706"
+              : "#DC2626";
 
           return (
             <Paper
@@ -1019,28 +1045,33 @@ const Invent = () => {
               elevation={1}
               sx={{
                 borderRadius: 3,
-                overflow: 'hidden',
+                overflow: "hidden",
                 mb: 2,
-                transition: 'transform 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                transition: "transform 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.1)",
                 },
-                position: 'relative',
-                background: theme === "light" ? '#fff' : '#1a1a1a',
+                position: "relative",
+                background: theme === "light" ? "#fff" : "#1a1a1a",
               }}
             >
               {/* Status indicator line at top */}
               <Box
                 sx={{
-                  height: '4px',
-                  width: '100%',
+                  height: "4px",
+                  width: "100%",
                   bgcolor: statusColor,
                 }}
               />
 
               <Box sx={{ p: 2 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1.5}
+                >
                   <Typography variant="subtitle1" fontWeight={600}>
                     {item.productName}
                   </Typography>
@@ -1049,9 +1080,9 @@ const Invent = () => {
                       size="small"
                       onClick={() => handleViewItem(item)}
                       sx={{
-                        bgcolor: 'rgba(0, 102, 204, 0.1)',
-                        color: '#0066cc',
-                        '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                        bgcolor: "rgba(0, 102, 204, 0.1)",
+                        color: "#0066cc",
+                        "&:hover": { bgcolor: "rgba(0, 102, 204, 0.2)" },
                       }}
                     >
                       <VisibilityIcon fontSize="small" />
@@ -1060,9 +1091,9 @@ const Invent = () => {
                       size="small"
                       onClick={() => handleEditModal(item)}
                       sx={{
-                        bgcolor: 'rgba(5, 150, 105, 0.1)',
-                        color: '#059669',
-                        '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                        bgcolor: "rgba(5, 150, 105, 0.1)",
+                        color: "#059669",
+                        "&:hover": { bgcolor: "rgba(5, 150, 105, 0.2)" },
                       }}
                     >
                       <EditIcon fontSize="small" />
@@ -1071,9 +1102,9 @@ const Invent = () => {
                       size="small"
                       onClick={() => handleDelete(index)}
                       sx={{
-                        bgcolor: 'rgba(220, 38, 38, 0.1)',
-                        color: '#DC2626',
-                        '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                        bgcolor: "rgba(220, 38, 38, 0.1)",
+                        color: "#DC2626",
+                        "&:hover": { bgcolor: "rgba(220, 38, 38, 0.2)" },
                       }}
                     >
                       <DeleteIcon fontSize="small" />
@@ -1083,15 +1114,28 @@ const Invent = () => {
 
                 <Grid container spacing={1} sx={{ mb: 2 }}>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Category
                     </Typography>
                     <Typography variant="body2">
-                      {item.category && item.category.length > 0 && item.category.slice(0, 1).map(cat => cat).join(", ")}
+                      {item.category &&
+                        item.category.length > 0 &&
+                        item.category
+                          .slice(0, 1)
+                          .map((cat) => cat)
+                          .join(", ")}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Stock
                     </Typography>
                     <Typography
@@ -1103,7 +1147,11 @@ const Invent = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      fontWeight={500}
+                    >
                       Price
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
@@ -1121,12 +1169,13 @@ const Invent = () => {
                   onClick={() => handleSendEmail(item)}
                   sx={{
                     borderRadius: 2,
-                    textTransform: 'none',
+                    textTransform: "none",
                     py: 1,
-                    background: 'linear-gradient(135deg, #0066cc 0%, #0044aa 100%)',
-                    boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
-                    '&:hover': {
-                      boxShadow: '0 6px 16px rgba(0, 102, 204, 0.3)',
+                    background:
+                      "linear-gradient(135deg, #0066cc 0%, #0044aa 100%)",
+                    boxShadow: "0 4px 12px rgba(0, 102, 204, 0.2)",
+                    "&:hover": {
+                      boxShadow: "0 6px 16px rgba(0, 102, 204, 0.3)",
                     },
                   }}
                 >
@@ -1143,12 +1192,15 @@ const Invent = () => {
             sx={{
               p: 4,
               borderRadius: 3,
-              textAlign: 'center',
-              border: '1px dashed #cbd5e1',
-              bgcolor: theme === "light" ? 'rgba(241, 245, 249, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+              textAlign: "center",
+              border: "1px dashed #cbd5e1",
+              bgcolor:
+                theme === "light"
+                  ? "rgba(241, 245, 249, 0.6)"
+                  : "rgba(30, 41, 59, 0.6)",
             }}
           >
-            <InventoryIcon sx={{ fontSize: 48, color: '#94a3b8', mb: 2 }} />
+            <InventoryIcon sx={{ fontSize: 48, color: "#94a3b8", mb: 2 }} />
             <Typography variant="h6" fontWeight={600} color="text.secondary">
               No inventory items found
             </Typography>
@@ -1161,7 +1213,7 @@ const Invent = () => {
               onClick={handleAddProduct}
               sx={{
                 borderRadius: 2,
-                textTransform: 'none',
+                textTransform: "none",
                 px: 3,
               }}
             >
@@ -1191,9 +1243,9 @@ const Invent = () => {
   const renderInventoryItems = () => {
     if (isLoading) {
       return (
-        <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Box sx={{ p: 4, textAlign: "center" }}>
           <CircularProgress size={40} thickness={4} />
-          <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+          <Typography variant="body1" sx={{ mt: 2, color: "text.secondary" }}>
             Loading inventory items...
           </Typography>
         </Box>
@@ -1236,9 +1288,9 @@ const Invent = () => {
   }, []);
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -1266,7 +1318,9 @@ const Invent = () => {
         >
           <Stack direction="row" alignItems="center" spacing={1}>
             <FilterListIcon color="primary" fontSize="small" />
-            <Typography variant="subtitle2" fontWeight={600}>Filters:</Typography>
+            <Typography variant="subtitle2" fontWeight={600}>
+              Filters:
+            </Typography>
           </Stack>
 
           <Box
@@ -1274,7 +1328,7 @@ const Invent = () => {
             sx={{
               minWidth: 180,
               position: "relative",
-              flex: { xs: '1 1 100%', sm: '0 1 auto' },
+              flex: { xs: "1 1 100%", sm: "0 1 auto" },
               mt: { xs: 1, sm: 0 },
             }}
           >
@@ -1285,7 +1339,10 @@ const Invent = () => {
                 textTransform: "none",
                 borderRadius: 2,
                 border: "1px solid #e2e8f0",
-                background: theme === "light" ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)" : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
+                background:
+                  theme === "light"
+                    ? "linear-gradient(135deg, #fff 0%, #f8fafc 100%)"
+                    : "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)",
                 fontWeight: 500,
                 display: "flex",
                 alignItems: "center",
@@ -1295,11 +1352,13 @@ const Invent = () => {
                 height: 40,
               }}
               fullWidth
-              endIcon={<span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>}
+              endIcon={
+                <span style={{ fontSize: 12, color: "#6b7280" }}>▼</span>
+              }
             >
               {stockStatusFilter === "all" && "All Status"}
               {stockStatusFilter === "high" && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <RadioButtonUncheckedIcon
                     sx={{ color: "#059669", fontSize: 18 }}
                   />
@@ -1307,16 +1366,14 @@ const Invent = () => {
                 </Box>
               )}
               {stockStatusFilter === "medium" && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
                   <span style={{ color: "#D97706" }}>Medium Stock</span>
                 </Box>
               )}
               {stockStatusFilter === "low" && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ErrorOutlineIcon
-                    sx={{ color: "#DC2626", fontSize: 18 }}
-                  />
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <ErrorOutlineIcon sx={{ color: "#DC2626", fontSize: 18 }} />
                   <span style={{ color: "#DC2626" }}>Low Stock</span>
                 </Box>
               )}
@@ -1334,7 +1391,7 @@ const Invent = () => {
                   boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
                   zIndex: 10,
                   mt: 0.5,
-                  overflow: 'hidden',
+                  overflow: "hidden",
                 }}
               >
                 {[
@@ -1352,9 +1409,7 @@ const Invent = () => {
                     key: "medium",
                     label: "Medium Stock",
                     icon: (
-                      <RemoveIcon
-                        sx={{ color: "#D97706", fontSize: 18 }}
-                      />
+                      <RemoveIcon sx={{ color: "#D97706", fontSize: 18 }} />
                     ),
                   },
                   {
@@ -1369,8 +1424,9 @@ const Invent = () => {
                 ].map((opt) => (
                   <Box
                     key={opt.key}
-                    className={`custom-dropdown-item${stockStatusFilter === opt.key ? " active" : ""
-                      }`}
+                    className={`custom-dropdown-item${
+                      stockStatusFilter === opt.key ? " active" : ""
+                    }`}
                     sx={{
                       display: "flex",
                       alignItems: "center",
@@ -1383,14 +1439,16 @@ const Invent = () => {
                         opt.key === "high"
                           ? "#059669"
                           : opt.key === "medium"
-                            ? "#D97706"
-                            : opt.key === "low"
-                              ? "#DC2626"
-                              : "#374151",
+                          ? "#D97706"
+                          : opt.key === "low"
+                          ? "#DC2626"
+                          : "#374151",
                       background:
-                        stockStatusFilter === opt.key ?
-                          theme === "light" ? "#eff6ff" : "#1e293b" :
-                          undefined,
+                        stockStatusFilter === opt.key
+                          ? theme === "light"
+                            ? "#eff6ff"
+                            : "#1e293b"
+                          : undefined,
                       "&:hover": {
                         background: theme === "light" ? "#f8fafc" : "#1e293b",
                       },
@@ -1410,7 +1468,14 @@ const Invent = () => {
             )}
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 2, flex: 1, maxWidth: { xs: '100%', md: '50%' } }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flex: 1,
+              maxWidth: { xs: "100%", md: "50%" },
+            }}
+          >
             <TextField
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -1418,11 +1483,11 @@ const Invent = () => {
               fullWidth
               size="small"
               sx={{
-                '& .MuiOutlinedInput-root': {
+                "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                   height: 40,
-                  '&.Mui-focused': {
-                    boxShadow: '0 0 0 3px rgba(0, 102, 204, 0.2)',
+                  "&.Mui-focused": {
+                    boxShadow: "0 0 0 3px rgba(0, 102, 204, 0.2)",
                   },
                 },
               }}
@@ -1438,7 +1503,7 @@ const Invent = () => {
                 minWidth: 100,
                 height: 40,
                 borderRadius: 2,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             >
               Search
@@ -1450,18 +1515,23 @@ const Invent = () => {
           component={Paper}
           sx={{
             borderRadius: 3,
-            boxShadow: theme === "light" ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+            boxShadow:
+              theme === "light" ? "0 1px 3px rgba(0,0,0,0.05)" : "none",
             border: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
-            overflow: 'hidden',
+            overflow: "hidden",
           }}
         >
           <Table>
-            <TableHead sx={{
-              backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
-              width: "100%",
-              borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
-            }}>
-              <TableRow 
+            <TableHead
+              sx={{
+                backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
+                width: "100%",
+                borderBottom: `1px solid ${
+                  theme === "light" ? "#EAECF0" : "#333"
+                }`,
+              }}
+            >
+              <TableRow
                 sx={{
                   width: "100%",
                   backgroundColor: theme === "light" ? "#F9FAFB" : "#1a1a1a",
@@ -1474,63 +1544,120 @@ const Invent = () => {
                     inputProps={{ "aria-label": "select all products" }}
                     sx={{
                       color: theme === "light" ? "#94a3b8" : "#64748b",
-                      '&.Mui-checked': {
-                        color: '#0066cc',
+                      "&.Mui-checked": {
+                        color: "#0066cc",
                       },
                     }}
                   />
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Product ID
-                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                    <IconButton
+                      size="small"
+                      sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}
+                    >
                       <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                {user.role.name === 'admin' && (
-                  <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                {user.role.name === "admin" && (
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      color: theme === "light" ? "#374151" : "#e2e8f0",
+                    }}
+                  >
+                    <Box
+                      sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                    >
                       Supplier's Name
-                      <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                      <IconButton
+                        size="small"
+                        sx={{
+                          color: theme === "light" ? "#94a3b8" : "#64748b",
+                        }}
+                      >
                         <FilterListIcon fontSize="small" />
                       </IconButton>
                     </Box>
                   </TableCell>
                 )}
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Product Name
-                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                    <IconButton
+                      size="small"
+                      sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}
+                    >
                       <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Category
-                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                    <IconButton
+                      size="small"
+                      sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}
+                    >
                       <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Stock Quantity
-                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                    <IconButton
+                      size="small"
+                      sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}
+                    >
                       <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Price
-                    <IconButton size="small" sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}>
+                    <IconButton
+                      size="small"
+                      sx={{ color: theme === "light" ? "#94a3b8" : "#64748b" }}
+                    >
                       <FilterListIcon fontSize="small" />
                     </IconButton>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                <TableCell
+                  sx={{
+                    fontWeight: 600,
+                    color: theme === "light" ? "#374151" : "#e2e8f0",
+                  }}
+                >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                     Actions
                   </Box>
@@ -1541,13 +1668,31 @@ const Invent = () => {
               {inventoryItems.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
-                      <InventoryIcon sx={{ fontSize: 64, color: '#94a3b8', mb: 2 }} />
-                      <Typography variant="h5" fontWeight={600} color="text.secondary">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        py: 4,
+                      }}
+                    >
+                      <InventoryIcon
+                        sx={{ fontSize: 64, color: "#94a3b8", mb: 2 }}
+                      />
+                      <Typography
+                        variant="h5"
+                        fontWeight={600}
+                        color="text.secondary"
+                      >
                         No inventory items found
                       </Typography>
-                      <Typography variant="body1" color="text.secondary" sx={{ mb: 4, mt: 1, maxWidth: 400, mx: 'auto' }}>
-                        Start by adding your first product to manage your inventory effectively
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ mb: 4, mt: 1, maxWidth: 400, mx: "auto" }}
+                      >
+                        Start by adding your first product to manage your
+                        inventory effectively
                       </Typography>
                       <Button
                         variant="contained"
@@ -1556,11 +1701,11 @@ const Invent = () => {
                         startIcon={<AddIcon />}
                         sx={{
                           borderRadius: 2,
-                          textTransform: 'none',
+                          textTransform: "none",
                           px: 4,
                           py: 1.5,
                           fontWeight: 600,
-                          boxShadow: '0 4px 12px rgba(0, 102, 204, 0.2)',
+                          boxShadow: "0 4px 12px rgba(0, 102, 204, 0.2)",
                         }}
                       >
                         Add Your First Product
@@ -1572,13 +1717,17 @@ const Invent = () => {
                 inventoryItems.map((item, idx) => {
                   const stockStatus = getStockStatus(item.stockQuantity);
                   const statusColor =
-                    stockStatus === 'high' ? '#059669' :
-                      stockStatus === 'medium' ? '#D97706' :
-                        '#DC2626';
+                    stockStatus === "high"
+                      ? "#059669"
+                      : stockStatus === "medium"
+                      ? "#D97706"
+                      : "#DC2626";
                   const statusBgColor =
-                    stockStatus === 'high' ? '#ECFDF3' :
-                      stockStatus === 'medium' ? '#FFFAEB' :
-                        '#FEF3F2';
+                    stockStatus === "high"
+                      ? "#ECFDF3"
+                      : stockStatus === "medium"
+                      ? "#FFFAEB"
+                      : "#FEF3F2";
 
                   return (
                     <TableRow
@@ -1586,16 +1735,27 @@ const Invent = () => {
                       hover
                       selected={selectedItems.includes(item.id)}
                       sx={{
-                        '&:hover': {
-                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.04)' : 'rgba(0, 102, 204, 0.08)',
+                        "&:hover": {
+                          backgroundColor:
+                            theme === "light"
+                              ? "rgba(0, 102, 204, 0.04)"
+                              : "rgba(0, 102, 204, 0.08)",
                         },
-                        '&.Mui-selected': {
-                          backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.08)' : 'rgba(0, 102, 204, 0.12)',
-                          '&:hover': {
-                            backgroundColor: theme === "light" ? 'rgba(0, 102, 204, 0.12)' : 'rgba(0, 102, 204, 0.16)',
+                        "&.Mui-selected": {
+                          backgroundColor:
+                            theme === "light"
+                              ? "rgba(0, 102, 204, 0.08)"
+                              : "rgba(0, 102, 204, 0.12)",
+                          "&:hover": {
+                            backgroundColor:
+                              theme === "light"
+                                ? "rgba(0, 102, 204, 0.12)"
+                                : "rgba(0, 102, 204, 0.16)",
                           },
                         },
-                        borderBottom: `1px solid ${theme === "light" ? "#EAECF0" : "#333"}`,
+                        borderBottom: `1px solid ${
+                          theme === "light" ? "#EAECF0" : "#333"
+                        }`,
                       }}
                     >
                       <TableCell padding="checkbox">
@@ -1607,55 +1767,79 @@ const Invent = () => {
                           }}
                           sx={{
                             color: theme === "light" ? "#94a3b8" : "#64748b",
-                            '&.Mui-checked': {
-                              color: '#0066cc',
+                            "&.Mui-checked": {
+                              color: "#0066cc",
                             },
                           }}
                         />
                       </TableCell>
-                      <TableCell sx={{ color: theme === "light" ? "#374151" : "#e2e8f0" }}>
+                      <TableCell
+                        sx={{
+                          color: theme === "light" ? "#374151" : "#e2e8f0",
+                        }}
+                      >
                         <Chip
-                          label={`#${item.productId?.slice?.(-6) || item.productId || idx + 1}`}
+                          label={`#${
+                            item.productId?.slice?.(-6) ||
+                            item.productId ||
+                            idx + 1
+                          }`}
                           size="small"
                           sx={{
-                            bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
-                            color: theme === "light" ? '#334155' : '#94a3b8',
+                            bgcolor: theme === "light" ? "#f1f5f9" : "#1e293b",
+                            color: theme === "light" ? "#334155" : "#94a3b8",
                             fontWeight: 500,
-                            fontSize: '0.75rem',
+                            fontSize: "0.75rem",
                             height: 24,
                           }}
                         />
                       </TableCell>
-                      {user.role.name === 'admin' && (
-                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
-                        {typeof item.supplier === "object"
-                          ? item.supplier.businessName ||
-                          item.supplier.user?.email ||
-                          "Not available"
-                          : typeof item.supplier === "string" &&
-                            item.supplier.trim() !== ""
+                      {user.role.name === "admin" && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 500,
+                            color: theme === "light" ? "#111827" : "#f8fafc",
+                          }}
+                        >
+                          {typeof item.supplier === "object"
+                            ? item.supplier.businessName ||
+                              item.supplier.user?.email ||
+                              "Not available"
+                            : typeof item.supplier === "string" &&
+                              item.supplier.trim() !== ""
                             ? item.supplier
                             : "Not available"}
-                      </TableCell>
+                        </TableCell>
                       )}
-                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: theme === "light" ? "#111827" : "#f8fafc",
+                        }}
+                      >
                         {item.productName}
                       </TableCell>
-                      <TableCell sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {item.category && item.category.length > 0 && item.category.slice(0, 2).map((cat) => (
-                          <Chip
-                            key={cat}
-                            label={cat}
-                            size="small"
-                            sx={{
-                              bgcolor: theme === "light" ? '#f1f5f9' : '#1e293b',
-                              color: theme === "light" ? '#334155' : '#94a3b8',
-                              fontWeight: 500,
-                              fontSize: '0.75rem',
-                              height: 24,
-                            }}
-                          />
-                        ))}
+                      <TableCell
+                        sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                      >
+                        {item.category &&
+                          item.category.length > 0 &&
+                          item.category.slice(0, 2).map((cat) => (
+                            <Chip
+                              key={cat}
+                              label={cat}
+                              size="small"
+                              sx={{
+                                bgcolor:
+                                  theme === "light" ? "#f1f5f9" : "#1e293b",
+                                color:
+                                  theme === "light" ? "#334155" : "#94a3b8",
+                                fontWeight: 500,
+                                fontSize: "0.75rem",
+                                height: 24,
+                              }}
+                            />
+                          ))}
                       </TableCell>
                       <TableCell>
                         <Box
@@ -1666,20 +1850,31 @@ const Invent = () => {
                             px: 1.5,
                             borderRadius: 2,
                             display: "inline-flex",
-                            alignItems: 'center',
+                            alignItems: "center",
                             gap: 0.5,
                             fontSize: "0.75rem",
                             fontWeight: 600,
-                            width: 'fit-content',
+                            width: "fit-content",
                           }}
                         >
-                          {stockStatus === 'high' && <RadioButtonUncheckedIcon sx={{ fontSize: 14 }} />}
-                          {stockStatus === 'medium' && <RemoveIcon sx={{ fontSize: 14 }} />}
-                          {stockStatus === 'low' && <ErrorOutlineIcon sx={{ fontSize: 14 }} />}
+                          {stockStatus === "high" && (
+                            <RadioButtonUncheckedIcon sx={{ fontSize: 14 }} />
+                          )}
+                          {stockStatus === "medium" && (
+                            <RemoveIcon sx={{ fontSize: 14 }} />
+                          )}
+                          {stockStatus === "low" && (
+                            <ErrorOutlineIcon sx={{ fontSize: 14 }} />
+                          )}
                           {item.stockQuantity} units
                         </Box>
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 500, color: theme === "light" ? "#111827" : "#f8fafc" }}>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: theme === "light" ? "#111827" : "#f8fafc",
+                        }}
+                      >
                         {!isNaN(Number(item.price))
                           ? formatCurrency(Number(item.price))
                           : "$0.00"}
@@ -1690,9 +1885,9 @@ const Invent = () => {
                             size="small"
                             onClick={() => handleViewItem(item)}
                             sx={{
-                              bgcolor: 'rgba(0, 102, 204, 0.1)',
-                              color: '#0066cc',
-                              '&:hover': { bgcolor: 'rgba(0, 102, 204, 0.2)' },
+                              bgcolor: "rgba(0, 102, 204, 0.1)",
+                              color: "#0066cc",
+                              "&:hover": { bgcolor: "rgba(0, 102, 204, 0.2)" },
                             }}
                           >
                             <VisibilityIcon fontSize="small" />
@@ -1701,9 +1896,9 @@ const Invent = () => {
                             size="small"
                             onClick={() => handleEditModal(item)}
                             sx={{
-                              bgcolor: 'rgba(5, 150, 105, 0.1)',
-                              color: '#059669',
-                              '&:hover': { bgcolor: 'rgba(5, 150, 105, 0.2)' },
+                              bgcolor: "rgba(5, 150, 105, 0.1)",
+                              color: "#059669",
+                              "&:hover": { bgcolor: "rgba(5, 150, 105, 0.2)" },
                             }}
                           >
                             <EditIcon fontSize="small" />
@@ -1712,9 +1907,9 @@ const Invent = () => {
                             size="small"
                             onClick={() => handleDelete(idx)}
                             sx={{
-                              bgcolor: 'rgba(220, 38, 38, 0.1)',
-                              color: '#DC2626',
-                              '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.2)' },
+                              bgcolor: "rgba(220, 38, 38, 0.1)",
+                              color: "#DC2626",
+                              "&:hover": { bgcolor: "rgba(220, 38, 38, 0.2)" },
                             }}
                           >
                             <DeleteIcon fontSize="small" />
@@ -1732,7 +1927,6 @@ const Invent = () => {
                               <EmailIcon fontSize="small" />
                             </IconButton>
                           )} */}
-
                         </Stack>
                       </TableCell>
                     </TableRow>
@@ -1797,10 +1991,7 @@ const Invent = () => {
       "openCreateInventoryModal",
       handleCreateInventoryModal
     );
-    window.addEventListener(
-      "openImportInventoryCSVModal",
-      handleImportFromCSV
-    );
+    window.addEventListener("openImportInventoryCSVModal", handleImportFromCSV);
 
     return () => {
       window.removeEventListener(
@@ -1813,7 +2004,6 @@ const Invent = () => {
       );
     };
   }, [setPageTitle]);
-
 
   const categoryOptions = [
     {
@@ -2019,8 +2209,8 @@ const Invent = () => {
             productImage: null,
             fileName: "",
             height: 1,
-            hsCode: '',
-            countryOfOrigin: '',
+            hsCode: "",
+            countryOfOrigin: "",
             weight: 1,
             width: 1,
             length_: 1,
@@ -2047,20 +2237,22 @@ const Invent = () => {
           },
         }}
       >
-        <Box sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          backgroundColor: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          px: 3,
-          py: 2,
-          borderTopLeftRadius: { xs: 0, sm: "16px" },
-          borderTopRightRadius: { xs: 0, sm: "16px" },
-        }}>
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "#fff",
+            borderBottom: "1px solid #f0f0f0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 3,
+            py: 2,
+            borderTopLeftRadius: { xs: 0, sm: "16px" },
+            borderTopRightRadius: { xs: 0, sm: "16px" },
+          }}
+        >
           <Typography variant="h6" fontWeight="600" color="#111827">
             Edit Product
           </Typography>
@@ -2079,10 +2271,17 @@ const Invent = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}>
+        <Box
+          sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}
+        >
           <Stack spacing={3}>
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Product Image
               </Typography>
               <Box
@@ -2107,7 +2306,9 @@ const Invent = () => {
                 }}
               >
                 {editItem.productImage || imagePreview ? (
-                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                  <Box
+                    sx={{ position: "relative", width: "100%", height: "100%" }}
+                  >
                     <img
                       src={imagePreview || editItem.productImage}
                       alt="Preview"
@@ -2130,7 +2331,8 @@ const Invent = () => {
                         e.stopPropagation();
                         setEditItem({ ...editItem, productImage: null });
                         setImagePreview(null);
-                        if (fileInputRef.current) fileInputRef.current.value = null;
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = null;
                       }}
                     >
                       <CloseIcon fontSize="small" />
@@ -2177,7 +2379,12 @@ const Invent = () => {
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Product Name
               </Typography>
               <TextField
@@ -2209,7 +2416,12 @@ const Invent = () => {
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Category
               </Typography>
               <Autocomplete
@@ -2217,21 +2429,26 @@ const Invent = () => {
                 options={categoryOptions}
                 getOptionLabel={(option) => option.label}
                 filterOptions={(options, state) =>
-                  options.filter(opt =>
-                    !editItem.category.includes(opt.value) &&
-                    (!state.inputValue ||
-                      opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                  options.filter(
+                    (opt) =>
+                      !editItem.category.includes(opt.value) &&
+                      (!state.inputValue ||
+                        opt.label
+                          .toLowerCase()
+                          .includes(state.inputValue.toLowerCase()))
                   )
                 }
                 open={categoryDropdownOpen}
                 onOpen={() => setCategoryDropdownOpen(true)}
                 onClose={() => setCategoryDropdownOpen(false)}
                 openOnFocus
-                value={categoryOptions.filter(opt => editItem.category.includes(opt.value))}
+                value={categoryOptions.filter((opt) =>
+                  editItem.category.includes(opt.value)
+                )}
                 onChange={(event, newValue) => {
                   setEditItem({
                     ...editItem,
-                    category: newValue.map(opt => opt.value),
+                    category: newValue.map((opt) => opt.value),
                   });
                 }}
                 disablePortal
@@ -2267,11 +2484,14 @@ const Invent = () => {
                     {...props}
                     key={option.value || index}
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
+                      display: "flex",
+                      alignItems: "center",
                       gap: 1,
                       py: 1.5,
-                      borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                      borderBottom:
+                        index < categoryOptions.length - 1
+                          ? "1px solid #F3F4F6"
+                          : "none",
                     }}
                   >
                     {/* <img
@@ -2280,7 +2500,9 @@ const Invent = () => {
                       style={{ width: 24, height: 24, objectFit: "contain" }}
                       loading="lazy"
                     /> */}
-                    <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                    <span style={{ fontWeight: 500, color: "#111827" }}>
+                      {option.label}
+                    </span>
                   </Box>
                 )}
                 renderTags={(tagValue, getTagProps) =>
@@ -2291,25 +2513,36 @@ const Invent = () => {
                       // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
                       {...getTagProps({ index })}
                       sx={{
-                        bgcolor: '#f1f5f9',
-                        color: '#334155',
+                        bgcolor: "#f1f5f9",
+                        color: "#334155",
                         fontWeight: 500,
-                        fontSize: '0.8rem',
+                        fontSize: "0.8rem",
                         height: 24,
-                        borderRadius: '6px',
+                        borderRadius: "6px",
                         mr: 0.5,
                       }}
                     />
                   ))
                 }
-                isOptionEqualToValue={(option, value) => option.value === value.value}
-                noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                isOptionEqualToValue={(option, value) =>
+                  option.value === value.value
+                }
+                noOptionsText={
+                  categoryOptions.length === 0
+                    ? "No categories found"
+                    : "No match"
+                }
                 disabled={categoryOptions.length === 0}
               />
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Description
               </Typography>
               <TextField
@@ -2340,9 +2573,20 @@ const Invent = () => {
               />
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Price (per unit)
                 </Typography>
                 <TextField
@@ -2356,7 +2600,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     startAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ mr: 1 }}
+                      >
                         $
                       </Typography>
                     ),
@@ -2379,7 +2627,12 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Stock Quantity
                 </Typography>
                 <TextField
@@ -2393,7 +2646,11 @@ const Invent = () => {
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         units
                       </Typography>
                     ),
@@ -2417,9 +2674,20 @@ const Invent = () => {
               </Box>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   HS Code
                 </Typography>
                 <TextField
@@ -2437,9 +2705,7 @@ const Invent = () => {
                   fullWidth
                   variant="outlined"
                   placeholder="Enter the HS Code"
-                  InputProps={{
-
-                  }}
+                  InputProps={{}}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "10px",
@@ -2458,37 +2724,64 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Country Of Origin
                 </Typography>
-                <TextField
-                  type="text"
-                  value={editItem.countryOfOrigin || ""}
-                  onChange={(e) => setEditItem({ ...editItem, countryOfOrigin: e.target.value })}
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Enter the country"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: "#F9FAFB",
-                      "& fieldset": {
-                        borderColor: "#E5E7EB",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#D1D5DB",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#0387D9",
-                      },
-                    },
+                <ReactSelect
+                  options={countryOptions}
+                  value={
+                    countryOptions.find(
+                      (c) => c.value === (editItem.countryOfOrigin || "")
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    setEditItem({
+                      ...editItem,
+                      countryOfOrigin: option ? option.value : "",
+                    })
+                  }
+                  placeholder="Select country..."
+                  isSearchable
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: 8,
+                      borderColor: state.isFocused ? "#0387D9" : "#d1d5db",
+                      boxShadow: "none",
+                      minHeight: 40,
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected
+                        ? "#0387D9"
+                        : state.isFocused
+                        ? "#e0f2fe"
+                        : "white",
+                      color: state.isSelected ? "white" : "#111827",
+                    }),
                   }}
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Height (inches)
                 </Typography>
                 <TextField
@@ -2514,7 +2807,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -2537,19 +2834,30 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Width (inches)
                 </Typography>
                 <TextField
                   type="number"
                   value={editItem.width || ""}
-                  onChange={(e) => setEditItem({ ...editItem, width: e.target.value })}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, width: e.target.value })
+                  }
                   fullWidth
                   variant="outlined"
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -2572,9 +2880,20 @@ const Invent = () => {
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Weight (ounces)
                 </Typography>
                 <TextField
@@ -2600,7 +2919,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         oz
                       </Typography>
                     ),
@@ -2623,19 +2946,30 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Length (inches)
                 </Typography>
                 <TextField
                   type="number"
                   value={editItem.length_ || ""}
-                  onChange={(e) => setEditItem({ ...editItem, length_: e.target.value })}
+                  onChange={(e) =>
+                    setEditItem({ ...editItem, length_: e.target.value })
+                  }
                   fullWidth
                   variant="outlined"
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -2716,7 +3050,10 @@ const Invent = () => {
           >
             {isLoading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span
+                  className="pi pi-spin pi-spinner"
+                  style={{ fontSize: "1rem" }}
+                ></span>
                 <span>Updating...</span>
               </Box>
             ) : (
@@ -2750,20 +3087,22 @@ const Invent = () => {
           },
         }}
       >
-        <Box sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          backgroundColor: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          px: 3,
-          py: 2,
-          borderTopLeftRadius: { xs: 0, sm: "16px" },
-          borderTopRightRadius: { xs: 0, sm: "16px" },
-        }}>
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "#fff",
+            borderBottom: "1px solid #f0f0f0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 3,
+            py: 2,
+            borderTopLeftRadius: { xs: 0, sm: "16px" },
+            borderTopRightRadius: { xs: 0, sm: "16px" },
+          }}
+        >
           <Typography variant="h6" fontWeight="600" color="#111827">
             Add New Product
           </Typography>
@@ -2782,10 +3121,17 @@ const Invent = () => {
           </IconButton>
         </Box>
 
-        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}>
+        <Box
+          sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, pb: { xs: 10, sm: 8 } }}
+        >
           <Stack spacing={3}>
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Product Image
               </Typography>
               <Box
@@ -2810,7 +3156,9 @@ const Invent = () => {
                 }}
               >
                 {imagePreview ? (
-                  <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                  <Box
+                    sx={{ position: "relative", width: "100%", height: "100%" }}
+                  >
                     <img
                       src={imagePreview}
                       alt="Preview"
@@ -2834,7 +3182,8 @@ const Invent = () => {
                         setProductImage(null);
                         setImagePreview(null);
                         setNewItem({ ...newItem, fileName: "" });
-                        if (fileInputRef.current) fileInputRef.current.value = null;
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = null;
                       }}
                     >
                       <CloseIcon fontSize="small" />
@@ -2875,12 +3224,19 @@ const Invent = () => {
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Product Name
               </Typography>
               <TextField
                 value={newItem.productName}
-                onChange={(e) => setNewItem({ ...newItem, productName: e.target.value })}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, productName: e.target.value })
+                }
                 fullWidth
                 variant="outlined"
                 placeholder="Enter product name"
@@ -2904,12 +3260,19 @@ const Invent = () => {
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Description
               </Typography>
               <TextField
                 value={newItem.description}
-                onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                onChange={(e) =>
+                  setNewItem({ ...newItem, description: e.target.value })
+                }
                 fullWidth
                 variant="outlined"
                 placeholder="Enter product description"
@@ -2934,7 +3297,12 @@ const Invent = () => {
             </Box>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Category
               </Typography>
               <FormControl fullWidth>
@@ -2943,21 +3311,26 @@ const Invent = () => {
                   options={categoryOptions}
                   getOptionLabel={(option) => option.label}
                   filterOptions={(options, state) =>
-                    options.filter(opt =>
-                      !newItem.category.includes(opt.value) &&
-                      (!state.inputValue ||
-                        opt.label.toLowerCase().includes(state.inputValue.toLowerCase()))
+                    options.filter(
+                      (opt) =>
+                        !newItem.category.includes(opt.value) &&
+                        (!state.inputValue ||
+                          opt.label
+                            .toLowerCase()
+                            .includes(state.inputValue.toLowerCase()))
                     )
                   }
                   open={categoryDropdownOpen}
                   onOpen={() => setCategoryDropdownOpen(true)}
                   onClose={() => setCategoryDropdownOpen(false)}
                   openOnFocus
-                  value={categoryOptions.filter(opt => newItem.category.includes(opt.value))}
+                  value={categoryOptions.filter((opt) =>
+                    newItem.category.includes(opt.value)
+                  )}
                   onChange={(event, newValue) => {
                     setNewItem({
                       ...newItem,
-                      category: newValue.map(opt => opt.value),
+                      category: newValue.map((opt) => opt.value),
                     });
                   }}
                   disablePortal
@@ -2993,11 +3366,14 @@ const Invent = () => {
                       {...props}
                       key={option.value || index}
                       sx={{
-                        display: 'flex',
-                        alignItems: 'center',
+                        display: "flex",
+                        alignItems: "center",
                         gap: 1,
                         py: 1.5,
-                        borderBottom: index < categoryOptions.length - 1 ? "1px solid #F3F4F6" : "none"
+                        borderBottom:
+                          index < categoryOptions.length - 1
+                            ? "1px solid #F3F4F6"
+                            : "none",
                       }}
                     >
                       {/* <img
@@ -3006,7 +3382,9 @@ const Invent = () => {
                       style={{ width: 24, height: 24, objectFit: "contain" }}
                       loading="lazy"
                     /> */}
-                      <span style={{ fontWeight: 500, color: "#111827" }}>{option.label}</span>
+                      <span style={{ fontWeight: 500, color: "#111827" }}>
+                        {option.label}
+                      </span>
                     </Box>
                   )}
                   renderTags={(tagValue, getTagProps) =>
@@ -3017,26 +3395,43 @@ const Invent = () => {
                         // avatar={<img src={option.icon} alt={option.label} style={{ width: 20, height: 20 }} />}
                         {...getTagProps({ index })}
                         sx={{
-                          bgcolor: '#f1f5f9',
-                          color: '#334155',
+                          bgcolor: "#f1f5f9",
+                          color: "#334155",
                           fontWeight: 500,
-                          fontSize: '0.8rem',
+                          fontSize: "0.8rem",
                           height: 24,
-                          borderRadius: '6px',
+                          borderRadius: "6px",
                           mr: 0.5,
                         }}
                       />
                     ))
                   }
-                  isOptionEqualToValue={(option, value) => option.value === value.value}
-                  noOptionsText={categoryOptions.length === 0 ? "No categories found" : "No match"}
+                  isOptionEqualToValue={(option, value) =>
+                    option.value === value.value
+                  }
+                  noOptionsText={
+                    categoryOptions.length === 0
+                      ? "No categories found"
+                      : "No match"
+                  }
                   disabled={categoryOptions.length === 0}
                 />
               </FormControl>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Price (per unit)
                 </Typography>
                 <TextField
@@ -3062,7 +3457,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     startAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ mr: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ mr: 1 }}
+                      >
                         $
                       </Typography>
                     ),
@@ -3085,19 +3484,30 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Stock Quantity
                 </Typography>
                 <TextField
                   type="number"
                   value={newItem.stockQuantity || ""}
-                  onChange={(e) => setNewItem({ ...newItem, stockQuantity: e.target.value })}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, stockQuantity: e.target.value })
+                  }
                   fullWidth
                   variant="outlined"
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         units
                       </Typography>
                     ),
@@ -3120,9 +3530,20 @@ const Invent = () => {
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   HS Code
                 </Typography>
                 <TextField
@@ -3140,9 +3561,7 @@ const Invent = () => {
                   fullWidth
                   variant="outlined"
                   placeholder="Enter the HS Code"
-                  InputProps={{
-
-                  }}
+                  InputProps={{}}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "10px",
@@ -3161,37 +3580,64 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Country Of Origin
                 </Typography>
-                <TextField
-                  type="text"
-                  value={newItem.countryOfOrigin || ""}
-                  onChange={(e) => setNewItem({ ...newItem, countryOfOrigin: e.target.value })}
-                  fullWidth
-                  variant="outlined"
-                  placeholder="Enter the country"
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: "#F9FAFB",
-                      "& fieldset": {
-                        borderColor: "#E5E7EB",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "#D1D5DB",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#0387D9",
-                      },
-                    },
+                <ReactSelect
+                  options={countryOptions}
+                  value={
+                    countryOptions.find(
+                      (c) => c.value === (newItem.countryOfOrigin || "")
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    setNewItem({
+                      ...newItem,
+                      countryOfOrigin: option ? option.value : "",
+                    })
+                  }
+                  placeholder="Select country..."
+                  isSearchable
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderRadius: 8,
+                      borderColor: state.isFocused ? "#0387D9" : "#d1d5db",
+                      boxShadow: "none",
+                      minHeight: 40,
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected
+                        ? "#0387D9"
+                        : state.isFocused
+                        ? "#e0f2fe"
+                        : "white",
+                      color: state.isSelected ? "white" : "#111827",
+                    }),
                   }}
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Height (inches)
                 </Typography>
                 <TextField
@@ -3217,7 +3663,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -3240,19 +3690,30 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Width (inches)
                 </Typography>
                 <TextField
                   type="number"
                   value={newItem.width || ""}
-                  onChange={(e) => setNewItem({ ...newItem, width: e.target.value })}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, width: e.target.value })
+                  }
                   fullWidth
                   variant="outlined"
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -3275,9 +3736,20 @@ const Invent = () => {
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", sm: "row" } }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: { xs: "column", sm: "row" },
+              }}
+            >
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Weight (ounces)
                 </Typography>
                 <TextField
@@ -3303,7 +3775,11 @@ const Invent = () => {
                   placeholder="0.00"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         oz
                       </Typography>
                     ),
@@ -3326,19 +3802,30 @@ const Invent = () => {
                 />
               </Box>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Length (inches)
                 </Typography>
                 <TextField
                   type="number"
                   value={newItem.length_ || ""}
-                  onChange={(e) => setNewItem({ ...newItem, length_: e.target.value })}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, length_: e.target.value })
+                  }
                   fullWidth
                   variant="outlined"
                   placeholder="0"
                   InputProps={{
                     endAdornment: (
-                      <Typography variant="body2" color="#6B7280" sx={{ ml: 1 }}>
+                      <Typography
+                        variant="body2"
+                        color="#6B7280"
+                        sx={{ ml: 1 }}
+                      >
                         in
                       </Typography>
                     ),
@@ -3362,9 +3849,14 @@ const Invent = () => {
               </Box>
             </Box>
 
-            {user?.role?.name === 'admin' && (
+            {user?.role?.name === "admin" && (
               <Box>
-                <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                <Typography
+                  variant="subtitle2"
+                  fontWeight="600"
+                  color="#374151"
+                  mb={1}
+                >
                   Supplier
                 </Typography>
                 <Autocomplete
@@ -3421,7 +3913,7 @@ const Invent = () => {
                           : "Search by business name, company name, or email"
                       }
                       FormHelperTextProps={{
-                        sx: { color: "#9CA3AF", mt: 0.5, ml: 1 }
+                        sx: { color: "#9CA3AF", mt: 0.5, ml: 1 },
                       }}
                     />
                   )}
@@ -3438,12 +3930,17 @@ const Invent = () => {
                       }
                       sx={{
                         py: 1.5,
-                        borderBottom: index < filteredSuppliers.length - 1 ? "1px solid #F3F4F6" : "none"
+                        borderBottom:
+                          index < filteredSuppliers.length - 1
+                            ? "1px solid #F3F4F6"
+                            : "none",
                       }}
                     >
                       <Box>
                         <Box sx={{ fontWeight: "600", color: "#111827" }}>
-                          {option.businessName || option.companyName || option.name}
+                          {option.businessName ||
+                            option.companyName ||
+                            option.name}
                         </Box>
                         <Box sx={{ fontSize: "0.875rem", color: "#6B7280" }}>
                           {option.user?.email}
@@ -3451,7 +3948,9 @@ const Invent = () => {
                       </Box>
                     </Box>
                   )}
-                  isOptionEqualToValue={(option, value) => option._id === value._id}
+                  isOptionEqualToValue={(option, value) =>
+                    option._id === value._id
+                  }
                   noOptionsText={
                     suppliersLoading ? "Loading..." : "No suppliers found"
                   }
@@ -3460,39 +3959,42 @@ const Invent = () => {
                 />
               </Box>
             )}
-
           </Stack>
         </Box>
 
         {saveError && (
-          <Box sx={{
-            backgroundColor: "#FEF2F2",
-            color: "#B91C1C",
-            p: 2,
-            mx: 3,
-            mb: 2,
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: 1
-          }}>
+          <Box
+            sx={{
+              backgroundColor: "#FEF2F2",
+              color: "#B91C1C",
+              p: 2,
+              mx: 3,
+              mb: 2,
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <ErrorOutlineIcon fontSize="small" />
             <Typography variant="body2">{saveError}</Typography>
           </Box>
         )}
 
         {saveSuccess && (
-          <Box sx={{
-            backgroundColor: "#ECFDF5",
-            color: "#065F46",
-            p: 2,
-            mx: 3,
-            mb: 2,
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: 1
-          }}>
+          <Box
+            sx={{
+              backgroundColor: "#ECFDF5",
+              color: "#065F46",
+              p: 2,
+              mx: 3,
+              mb: 2,
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+            }}
+          >
             <CheckCircleIcon fontSize="small" />
             <Typography variant="body2">{saveSuccess}</Typography>
           </Box>
@@ -3552,7 +4054,10 @@ const Invent = () => {
           >
             {isLoading ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                <span
+                  className="pi pi-spin pi-spinner"
+                  style={{ fontSize: "1rem" }}
+                ></span>
                 <span>Saving...</span>
               </Box>
             ) : (
@@ -3583,15 +4088,17 @@ const Invent = () => {
           },
         }}
       >
-        <Box sx={{
-          position: "relative",
-          backgroundColor: "#FEF2F2",
-          py: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}>
+        <Box
+          sx={{
+            position: "relative",
+            backgroundColor: "#FEF2F2",
+            py: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <Box
             sx={{
               width: 64,
@@ -3601,12 +4108,17 @@ const Invent = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              mb: 2
+              mb: 2,
             }}
           >
             <DeleteIcon sx={{ fontSize: 32, color: "#DC2626" }} />
           </Box>
-          <Typography variant="h6" fontWeight="600" color="#111827" align="center">
+          <Typography
+            variant="h6"
+            fontWeight="600"
+            color="#111827"
+            align="center"
+          >
             Delete Product
           </Typography>
           <IconButton
@@ -3627,16 +4139,24 @@ const Invent = () => {
         </Box>
 
         <Box sx={{ p: 3 }}>
-          <Typography variant="body1" align="center" color="#4B5563" sx={{ mb: 3 }}>
-            Are you sure you want to delete this product? This action cannot be undone.
+          <Typography
+            variant="body1"
+            align="center"
+            color="#4B5563"
+            sx={{ mb: 3 }}
+          >
+            Are you sure you want to delete this product? This action cannot be
+            undone.
           </Typography>
 
-          <Box sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            gap: 2,
-            justifyContent: "center"
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              gap: 2,
+              justifyContent: "center",
+            }}
+          >
             <Button
               onClick={() => setShowDeleteConfirmation(false)}
               variant="outlined"
@@ -3672,7 +4192,10 @@ const Invent = () => {
             >
               {isLoading ? (
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <span className="pi pi-spin pi-spinner" style={{ fontSize: "1rem" }}></span>
+                  <span
+                    className="pi pi-spin pi-spinner"
+                    style={{ fontSize: "1rem" }}
+                  ></span>
                   <span>Deleting...</span>
                 </Box>
               ) : (
@@ -3707,20 +4230,22 @@ const Invent = () => {
           },
         }}
       >
-        <Box sx={{
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          backgroundColor: "#fff",
-          borderBottom: "1px solid #f0f0f0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          px: 3,
-          py: 2,
-          borderTopLeftRadius: { xs: 0, sm: "16px" },
-          borderTopRightRadius: { xs: 0, sm: "16px" },
-        }}>
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "#fff",
+            borderBottom: "1px solid #f0f0f0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 3,
+            py: 2,
+            borderTopLeftRadius: { xs: 0, sm: "16px" },
+            borderTopRightRadius: { xs: 0, sm: "16px" },
+          }}
+        >
           <Typography variant="h6" fontWeight="600" color="#111827">
             Product Details
           </Typography>
@@ -3741,12 +4266,14 @@ const Invent = () => {
 
         <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 } }}>
           <Stack spacing={3}>
-            <Box sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: 3,
-              alignItems: { xs: "flex-start", sm: "center" }
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                gap: 3,
+                alignItems: { xs: "flex-start", sm: "center" },
+              }}
+            >
               {viewItem.productImage ? (
                 <Box
                   sx={{
@@ -3758,7 +4285,7 @@ const Invent = () => {
                     backgroundColor: "#F9FAFB",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center"
+                    justifyContent: "center",
                   }}
                 >
                   <img
@@ -3794,31 +4321,44 @@ const Invent = () => {
               )}
 
               <Box sx={{ flex: 1 }}>
-                <Typography variant="h5" fontWeight="600" color="#111827" gutterBottom>
+                <Typography
+                  variant="h5"
+                  fontWeight="600"
+                  color="#111827"
+                  gutterBottom
+                >
                   {viewItem.productName}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
-                  {viewItem.category && viewItem.category.length > 0 && viewItem.category.map((cat) => (
-                    <Chip
-                      key={cat}
-                      label={cat}
-                      size="small"
-                      sx={{
-                        backgroundColor: "#F3F4F6",
-                        color: "#374151",
-                        fontWeight: 500,
-                        borderRadius: "6px"
-                      }}
-                    />
-                  ))}
+                <Box
+                  sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}
+                >
+                  {viewItem.category &&
+                    viewItem.category.length > 0 &&
+                    viewItem.category.map((cat) => (
+                      <Chip
+                        key={cat}
+                        label={cat}
+                        size="small"
+                        sx={{
+                          backgroundColor: "#F3F4F6",
+                          color: "#374151",
+                          fontWeight: 500,
+                          borderRadius: "6px",
+                        }}
+                      />
+                    ))}
                   <Chip
-                    label={`ID: ${viewItem.productId?.slice?.(-6) || viewItem.productId || "—"}`}
+                    label={`ID: ${
+                      viewItem.productId?.slice?.(-6) ||
+                      viewItem.productId ||
+                      "—"
+                    }`}
                     size="small"
                     sx={{
                       backgroundColor: "#F3F4F6",
                       color: "#374151",
                       fontWeight: 500,
-                      borderRadius: "6px"
+                      borderRadius: "6px",
                     }}
                   />
                 </Box>
@@ -3827,7 +4367,9 @@ const Invent = () => {
                     Price
                   </Typography>
                   <Typography variant="body1" fontWeight="600" color="#111827">
-                    {viewItem.price ? formatCurrency(Number(viewItem.price)) + " per unit" : "—"}
+                    {viewItem.price
+                      ? formatCurrency(Number(viewItem.price)) + " per unit"
+                      : "—"}
                   </Typography>
                 </Box>
               </Box>
@@ -3847,15 +4389,17 @@ const Invent = () => {
                         backgroundColor:
                           getStockStatus(viewItem.stockQuantity) === "high"
                             ? "#ECFDF3"
-                            : getStockStatus(viewItem.stockQuantity) === "medium"
-                              ? "#FFFAEB"
-                              : "#FEF3F2",
+                            : getStockStatus(viewItem.stockQuantity) ===
+                              "medium"
+                            ? "#FFFAEB"
+                            : "#FEF3F2",
                         color:
                           getStockStatus(viewItem.stockQuantity) === "high"
                             ? "#059669"
-                            : getStockStatus(viewItem.stockQuantity) === "medium"
-                              ? "#D97706"
-                              : "#DC2626",
+                            : getStockStatus(viewItem.stockQuantity) ===
+                              "medium"
+                            ? "#D97706"
+                            : "#DC2626",
                         py: 0.5,
                         px: 1.5,
                         borderRadius: "6px",
@@ -3870,8 +4414,8 @@ const Invent = () => {
                       {getStockStatus(viewItem.stockQuantity) === "high"
                         ? "High stock"
                         : getStockStatus(viewItem.stockQuantity) === "medium"
-                          ? "Medium stock"
-                          : "Low stock"}
+                        ? "Medium stock"
+                        : "Low stock"}
                     </Typography>
                   </Box>
                 </Box>
@@ -3884,12 +4428,12 @@ const Invent = () => {
                   <Typography variant="body1" fontWeight="600" color="#111827">
                     {typeof viewItem.supplier === "object"
                       ? viewItem.supplier.businessName ||
-                      viewItem.supplier.user?.email ||
-                      "Not available"
+                        viewItem.supplier.user?.email ||
+                        "Not available"
                       : typeof viewItem.supplier === "string" &&
                         viewItem.supplier.trim() !== ""
-                        ? viewItem.supplier
-                        : "Not available"}
+                      ? viewItem.supplier
+                      : "Not available"}
                   </Typography>
                 </Box>
               </Grid>
@@ -3915,7 +4459,12 @@ const Invent = () => {
             </Grid>
 
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Description
               </Typography>
               <Paper
@@ -3928,7 +4477,11 @@ const Invent = () => {
                   minHeight: "100px",
                 }}
               >
-                <Typography variant="body2" color="#4B5563" whiteSpace="pre-wrap">
+                <Typography
+                  variant="body2"
+                  color="#4B5563"
+                  whiteSpace="pre-wrap"
+                >
                   {viewItem.description || "No description available"}
                 </Typography>
               </Paper>
@@ -3936,7 +4489,12 @@ const Invent = () => {
 
             {/* Physical Attributes Section */}
             <Box>
-              <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+              <Typography
+                variant="subtitle2"
+                fontWeight="600"
+                color="#374151"
+                mb={1}
+              >
                 Physical Attributes
               </Typography>
               <Grid container spacing={2}>
@@ -3974,7 +4532,6 @@ const Invent = () => {
                 </Grid>
               </Grid>
             </Box>
-
           </Stack>
         </Box>
 
