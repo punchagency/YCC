@@ -22,7 +22,7 @@ import VendorOnboardingStep2 from "../../components/onboarding/vendor/vendor-onb
 import VendorOnboardingStep3 from "../../components/onboarding/vendor/vendor-onboarding-step3";
 import StepCompletedCard from "../../components/onboarding/supplier/step-completed-card";
 import { useUser } from "../../context/userContext";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const QontoStepIconRoot = styled("div")(({ theme }) => ({
   color: "#eaeaf0",
@@ -190,37 +190,47 @@ const VendorOnboarding = () => {
   const { stripeAccount } = useUser();
   const [activeStep, setActiveStep] = React.useState(0);
   const [suppressAutoAdvance, setSuppressAutoAdvance] = React.useState(false);
-  const [completedSteps, setCompletedSteps] = React.useState([false, false, false]);
+  const [completedSteps, setCompletedSteps] = React.useState([
+    false,
+    false,
+    false,
+  ]);
+  const navigate = useNavigate();
+  const redirectTimeoutRef = React.useRef(null);
 
   // Add step validation logic
-  const canAdvanceToStep = React.useCallback((stepIndex) => {
-    //console.log('VendorOnboarding - canAdvanceToStep called with:', stepIndex);
-    //console.log('VendorOnboarding - Current stripeAccount:', stripeAccount);
-    
-    switch (stepIndex) {
-      case 0: // Step 1 - Always accessible
-        return true;
-      case 1: // Step 2 - Always accessible after step 1
-        return true;
-      case 2: // Step 3 - Only if Stripe account is fully set up
-        const canAdvance = stripeAccount && 
-                          stripeAccount?.chargesEnabled && 
-                          stripeAccount?.transfersEnabled && 
-                          stripeAccount?.detailsSubmitted;
-        //console.log('VendorOnboarding - Can advance to Step 3:', canAdvance);
-        return canAdvance;
-      case 3: // Final step
-        return true;
-      default:
-        return false;
-    }
-  }, [stripeAccount]);
+  const canAdvanceToStep = React.useCallback(
+    (stepIndex) => {
+      //console.log('VendorOnboarding - canAdvanceToStep called with:', stepIndex);
+      //console.log('VendorOnboarding - Current stripeAccount:', stripeAccount);
+
+      switch (stepIndex) {
+        case 0: // Step 1 - Always accessible
+          return true;
+        case 1: // Step 2 - Always accessible after step 1
+          return true;
+        case 2: // Step 3 - Only if Stripe account is fully set up
+          const canAdvance =
+            stripeAccount &&
+            stripeAccount?.chargesEnabled &&
+            stripeAccount?.transfersEnabled &&
+            stripeAccount?.detailsSubmitted;
+          //console.log('VendorOnboarding - Can advance to Step 3:', canAdvance);
+          return canAdvance;
+        case 3: // Final step
+          return true;
+        default:
+          return false;
+      }
+    },
+    [stripeAccount]
+  );
 
   const handleNext = React.useCallback(() => {
     //console.log('VendorOnboarding - handleNext called, current step:', activeStep);
-    
+
     const nextStep = activeStep + 1;
-    
+
     // Check if we can advance to the next step
     if (canAdvanceToStep(nextStep)) {
       //console.log('VendorOnboarding - Advancing to step:', nextStep);
@@ -241,38 +251,72 @@ const VendorOnboarding = () => {
   }, [activeStep, canAdvanceToStep]);
 
   // Handle clicking on a step in the Stepper
-  const handleStepClick = React.useCallback((index) => {
-    // Going back is always allowed
-    if (index < activeStep) {
-      setSuppressAutoAdvance(true);
-      setActiveStep(index);
-      return;
-    }
+  const handleStepClick = React.useCallback(
+    (index) => {
+      // Going back is always allowed
+      if (index < activeStep) {
+        setSuppressAutoAdvance(true);
+        setActiveStep(index);
+        return;
+      }
 
-    // Allow forward jump only if requirements for that step are satisfied
-    if (index > activeStep && canAdvanceToStep(index)) {
-      setSuppressAutoAdvance(false);
-      // Mark current step as completed when jumping forward
-      setCompletedSteps((prev) => {
-        const updated = [...prev];
-        if (activeStep >= 0 && activeStep <= 2) {
-          updated[activeStep] = true;
-        }
-        return updated;
-      });
-      setActiveStep(index);
-    }
-  }, [activeStep, canAdvanceToStep]);
+      // Allow forward jump only if requirements for that step are satisfied
+      if (index > activeStep && canAdvanceToStep(index)) {
+        setSuppressAutoAdvance(false);
+        // Mark current step as completed when jumping forward
+        setCompletedSteps((prev) => {
+          const updated = [...prev];
+          if (activeStep >= 0 && activeStep <= 2) {
+            updated[activeStep] = true;
+          }
+          return updated;
+        });
+        setActiveStep(index);
+      }
+    },
+    [activeStep, canAdvanceToStep]
+  );
 
   const handleReset = () => {
     setActiveStep(0);
   };
 
+  // Redirect after success step is shown
+  React.useEffect(() => {
+    if (activeStep === 3) {
+      redirectTimeoutRef.current = setTimeout(() => {
+        // Clear any residual auth/session keys before redirecting
+        try {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          localStorage.removeItem("auth");
+          sessionStorage.removeItem("token");
+          sessionStorage.removeItem("user");
+          sessionStorage.removeItem("auth");
+        } catch (e) {
+          // ignore storage errors
+        }
+        // Use hard redirect to avoid SPA-level redirects overriding
+        if (typeof window !== "undefined") {
+          window.location.assign("/login");
+          return;
+        }
+        // Fallback to SPA navigate if window is unavailable
+        navigate("/login", { replace: true });
+      }, 1500);
+    }
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, [activeStep, navigate]);
+
   // Add effect to monitor step validation changes
   React.useEffect(() => {
     //console.log('VendorOnboarding - Step validation check, activeStep:', activeStep);
     //console.log('VendorOnboarding - stripeAccount state:', stripeAccount);
-    
+
     // If we're on step 3 but no longer meet requirements, go back to step 2
     if (activeStep === 2 && !canAdvanceToStep(2)) {
       //console.log('VendorOnboarding - Step 3 requirements no longer met, going back to Step 2');
@@ -297,7 +341,15 @@ const VendorOnboarding = () => {
         connector={<ColorlibConnector />}
       >
         {steps.map((label, index) => (
-          <Step key={label} sx={{ cursor: index <= activeStep || canAdvanceToStep(index) ? 'pointer' : 'default' }}>
+          <Step
+            key={label}
+            sx={{
+              cursor:
+                index <= activeStep || canAdvanceToStep(index)
+                  ? "pointer"
+                  : "default",
+            }}
+          >
             <StepLabel
               StepIconComponent={ColorlibStepIcon}
               onClick={() => handleStepClick(index)}
@@ -325,8 +377,8 @@ const VendorOnboarding = () => {
           </>
         ) : (
           <>
-            {activeStep === 0 && (
-              completedSteps[0] ? (
+            {activeStep === 0 &&
+              (completedSteps[0] ? (
                 <StepCompletedCard
                   title="Services Upload Complete"
                   description="Your services data has been uploaded successfully."
@@ -338,11 +390,10 @@ const VendorOnboarding = () => {
                   userId={id}
                   suppressAutoAdvance={suppressAutoAdvance}
                 />
-              )
-            )}
+              ))}
 
-            {activeStep === 1 && (
-              completedSteps[1] ? (
+            {activeStep === 1 &&
+              (completedSteps[1] ? (
                 <StepCompletedCard
                   title="Stripe Setup Complete"
                   description="Your Stripe account is connected and ready to receive payments."
@@ -354,11 +405,10 @@ const VendorOnboarding = () => {
                   userId={id}
                   suppressAutoAdvance={suppressAutoAdvance}
                 />
-              )
-            )}
+              ))}
 
-            {activeStep === 2 && (
-              completedSteps[2] ? (
+            {activeStep === 2 &&
+              (completedSteps[2] ? (
                 <StepCompletedCard
                   title="Service Confirmation Complete"
                   description="Your services have been confirmed."
@@ -370,8 +420,7 @@ const VendorOnboarding = () => {
                   userId={id}
                   suppressAutoAdvance={suppressAutoAdvance}
                 />
-              )
-            )}
+              ))}
 
             {activeStep === 3 && (
               <Box
