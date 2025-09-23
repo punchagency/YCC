@@ -19,8 +19,8 @@ import {
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 import { useState, useRef } from "react";
-import { updateInventoryItem } from "../../../services/inventory/inventoryService";
 import { Toast } from "primereact/toast";
+import { updateInventoryItem } from "../../../services/inventory/inventoryService";
 import { useParams } from "react-router-dom";
 import { formatAmount, unformatAmount } from "../../../utils/formatAmount";
 
