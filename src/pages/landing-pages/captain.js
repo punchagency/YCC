@@ -6,7 +6,6 @@ import { Typography, Box } from '@mui/material'
 import Section2Captain from '../../components/captain/section2-captain'
 import Section3Captain from '../../components/captain/section3-captain'
 import Chatbot from '../../components/chatbot/chatbot';
-import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const CaptainLandingPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -46,9 +45,8 @@ const CaptainLandingPage = () => {
         <Chatbot />
         <Section2Captain />
         <Section3Captain />
+        <LandingPageFooter />
       </Box>
-      <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
-      <LandingPageFooter />
     </>
   )
 }

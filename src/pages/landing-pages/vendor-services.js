@@ -6,17 +6,16 @@ import Section2VendorServices from '../../components/vendor-services/section2-ve
 import LandingPageChatbot from '../../components/chatbot/landing-page-chatbot'
 import { useEffect } from 'react'
 import Section1VendorServices from '../../components/vendor-services/section1-vendor-services'
-import crewCenterWatermark from "../../assets/images/crew-center-watermark.svg";
 const VendorAndServices = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
-      }, []);
+    }, []);
     const backgroundImage = banner
     const header = (
         <>
             VendorS & Services for Yachts: <GradientText>Trusted</GradientText>{" "}
-            <GradientText>Solutions</GradientText> at Your Fingertips 
-        </> 
+            <GradientText>Solutions</GradientText> at Your Fingertips
+        </>
     );
     const subtext2 = "Find and connect directly with Yacht Crew. Simplify your order & booking management with Yacht Crew Center's platform .Onboard your Yacht Services and Supplies to simplify Business Management.";
     const button1 = {
@@ -25,28 +24,27 @@ const VendorAndServices = () => {
     }
     return (
         <>
-        <Box sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: {
-                xs: "120px",
-                md: "120px",
-                lg: "60px"
-            },
-            marginBottom: { xs: "45px", sm: "23px", md: "35px" },
-        }}>
-            <LandingPageBanner
-                backgroundImage={backgroundImage}
-                header={header}
-                subtext2={subtext2}
-                button1={button1}
-            />
-            <Section1VendorServices />
-            <Section2VendorServices />
-            <LandingPageChatbot />
-        </Box>
-        <img src={crewCenterWatermark} alt="Yacht Crew Center" style={{ width: "100%", height: "auto" }} />
-        <LandingPageFooter />
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: {
+                    xs: "120px",
+                    md: "120px",
+                    lg: "60px"
+                },
+                marginBottom: { xs: "45px", sm: "23px", md: "35px" },
+            }}>
+                <LandingPageBanner
+                    backgroundImage={backgroundImage}
+                    header={header}
+                    subtext2={subtext2}
+                    button1={button1}
+                />
+                <Section1VendorServices />
+                <Section2VendorServices />
+                <LandingPageChatbot />
+                <LandingPageFooter />
+            </Box>
         </>
     )
 }

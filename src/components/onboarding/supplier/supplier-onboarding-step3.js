@@ -3,17 +3,19 @@ import InventoryWrapper from "./inventorywrapper";
 import { useUser } from "../../../context/userContext";
 import { useEffect, useState, useRef } from "react";
 import { Toast } from "primereact/toast";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 const SupplierOnboardingStep3 = ({ handleNext, suppressAutoAdvance }) => {
   const { id: userId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { verifyOnboardingStep1, completeOnboarding, checkOnboardingStatus } =
     useUser();
   //const hasRunRef = useRef(false);
   const toast = useRef(null);
   const [inventoryData, setInventoryData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const redirectTimeoutRef = useRef(null);
 
   // Determine role based on URL path
   const role = location.pathname.includes("/vendors/onboarding/")
@@ -28,13 +30,30 @@ const SupplierOnboardingStep3 = ({ handleNext, suppressAutoAdvance }) => {
     // if (hasRunRef.current) return; // prevent second run
     // hasRunRef.current = true;
 
+    const navigateToDashboard = () => {
+      if (role === "supplier") {
+        navigate("/supplier/dashboard", { replace: true });
+      } else {
+        navigate("/service-provider/dashboard", { replace: true });
+      }
+    };
+
+    const showSuccessThenRedirect = () => {
+      // Advance to final step to show success message
+      handleNext();
+      // Delay navigation briefly for UX
+      redirectTimeoutRef.current = setTimeout(() => {
+        navigateToDashboard();
+      }, 1500);
+    };
+
     const verifyInventoryUpload = async () => {
       try {
         //check onboarding status
         const status = await checkOnboardingStatus(userId, role);
         if (status === true) {
-          //console.log('Step 3 - Onboarding status is true');
-          handleNext();
+          // If onboarding already complete, show success and then redirect
+          showSuccessThenRedirect();
           return;
         }
 
@@ -75,13 +94,35 @@ const SupplierOnboardingStep3 = ({ handleNext, suppressAutoAdvance }) => {
     };
 
     verifyInventoryUpload();
-  }, [checkOnboardingStatus, handleNext, verifyOnboardingStep1, userId, role, suppressAutoAdvance]);
+
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, [
+    checkOnboardingStatus,
+    handleNext,
+    verifyOnboardingStep1,
+    userId,
+    role,
+    suppressAutoAdvance,
+    navigate,
+  ]);
 
   const handleFinish = async () => {
     try {
       const status = await completeOnboarding(userId, role);
       if (status) {
+        // Show success screen briefly, then redirect to dashboard
         handleNext();
+        redirectTimeoutRef.current = setTimeout(() => {
+          if (role === "supplier") {
+            navigate("/supplier/dashboard", { replace: true });
+          } else {
+            navigate("/service-provider/dashboard", { replace: true });
+          }
+        }, 1500);
       } else {
         toast.current.show({
           severity: "error",
