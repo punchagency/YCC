@@ -41,6 +41,7 @@ import {
 } from "@mui/icons-material";
 import { format } from 'date-fns';
 import { updateStatusOfBooking } from '../../../services/bookings/bookingService';
+import { Plus } from 'lucide-react';
 
 // Status chip component for consistent styling
 const StatusChip = ({ status, type = 'booking' }) => {
@@ -57,7 +58,7 @@ const StatusChip = ({ status, type = 'booking' }) => {
                     return { color: "#6c757d", bg: "#f8f9fa", icon: null };
             }
         }
-        
+
         switch (status) {
             case "pending":
                 return { color: "#856404", bg: "#fff3cd", icon: <PendingIcon fontSize="small" /> };
@@ -92,48 +93,76 @@ const StatusChip = ({ status, type = 'booking' }) => {
 };
 
 // Section header component
-const SectionHeader = ({ title, icon }) => (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-        {icon}
-        <Typography variant="h6" fontWeight={600} color="#495057">
-            {title}
-        </Typography>
-    </Stack>
-);
+const SectionHeader = ({ title, icon }) => {
+    const muiTheme = useMuiTheme();
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+
+    return (
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: { xs: 1.5, sm: 2 } }}>
+            {React.cloneElement(icon, { fontSize: isMobile ? "small" : "medium" })}
+            <Typography
+                variant="h6"
+                fontWeight={600}
+                color="#495057"
+                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+            >
+                {title}
+            </Typography>
+        </Stack>
+    );
+};
 
 // Service card component
 const ServiceCard = ({ service }) => {
+    const muiTheme = useMuiTheme();
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+
     return (
-        <Paper 
-            elevation={0} 
-            sx={{ 
-                p: 2.5, 
-                borderRadius: 2, 
+        <Paper
+            elevation={0}
+            sx={{
+                p: { xs: 2, sm: 2.5 },
+                borderRadius: 2,
                 border: '1px solid #e9ecef',
                 mb: 2
             }}
         >
             <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} md={6}>
-                    <Typography variant="subtitle1" fontWeight={600} color="#212529" mb={1}>
+                    <Typography
+                        variant="subtitle1"
+                        fontWeight={600}
+                        color="#212529"
+                        mb={1}
+                        sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+                    >
                         {service.service?.name || "Unknown Service"}
                     </Typography>
                     {service.service?.description && (
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: 1, fontSize: { xs: '0.875rem', sm: '0.9rem' } }}
+                        >
                             {service.service.description}
                         </Typography>
                     )}
                 </Grid>
                 <Grid item xs={6} md={3}>
-                    <Typography variant="body2" color="#6c757d">
+                    <Typography variant="body2" color="#6c757d" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         Quantity: <strong>{service.quantity}</strong>
                     </Typography>
-                    <Typography variant="body2" color="#6c757d">
+                    <Typography variant="body2" color="#6c757d" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         Price: <strong>${service.service?.price?.toFixed(2) || '0.00'}</strong>
                     </Typography>
                 </Grid>
-                <Grid item xs={6} md={3} textAlign="right">
-                    <Typography variant="subtitle1" fontWeight={600} color="primary">
+                <Grid item xs={6} md={3} textAlign={isMobile ? "left" : "right"}>
+                    <Typography
+                        variant="subtitle1"
+                        fontWeight={600}
+                        color="primary"
+                        sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+                    >
                         ${service.totalPrice?.toFixed(2) || '0.00'}
                     </Typography>
                 </Grid>
@@ -189,8 +218,8 @@ const BookingDetails = () => {
                 <Alert severity="warning" sx={{ mb: 2 }}>
                     No booking details found. Please select a booking from the bookings list.
                 </Alert>
-                <Button 
-                    variant="contained" 
+                <Button
+                    variant="contained"
                     startIcon={<ArrowBackIcon />}
                     onClick={() => navigate('/service-provider/bookings')}
                 >
@@ -205,14 +234,14 @@ const BookingDetails = () => {
             setQuoteDialog({ open: true });
             return;
         }
-        
+
         const actionTitles = {
             confirmed: "Confirm Booking",
             declined: "Decline Booking",
             completed: "Complete Booking",
             cancelled: "Cancel Booking"
         };
-        
+
         setStatusDialog({
             open: true,
             action,
@@ -233,7 +262,7 @@ const BookingDetails = () => {
 
             if (requiresQuote && quoteItems.length > 0) {
                 requestData.requiresQuote = true;
-                requestData.quoteItems = quoteItems.flatMap(service => 
+                requestData.quoteItems = quoteItems.flatMap(service =>
                     service.items.map(item => ({
                         item: item.item,
                         serviceId: service.serviceId,
@@ -328,7 +357,7 @@ const BookingDetails = () => {
                 reason: 'Quote sent',
                 notes: '',
                 requiresQuote: true,
-                quoteItems: quoteItems.flatMap(service => 
+                quoteItems: quoteItems.flatMap(service =>
                     service.items.map(item => ({
                         item: item.item,
                         serviceId: service.serviceId,
@@ -431,70 +460,99 @@ const BookingDetails = () => {
     };
 
     return (
-        <Box sx={{ p: { xs: 0.8, sm: 1, md: 2, lg: 3 }, paddingTop: "50px !important" }}>
+        <Box sx={{
+            p: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+            paddingTop: "50px !important",
+            minHeight: '100vh'
+        }}>
             {/* Back button and booking status */}
-            <Stack 
-                direction="row" 
-                justifyContent="space-between" 
-                alignItems="center" 
-                sx={{ mb: 3 }}
+            <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{
+                    mb: { xs: 2, sm: 3 },
+                    px: { xs: 0.5, sm: 0 }
+                }}
                 flexWrap="wrap"
                 gap={1}
             >
                 <Button
-                    startIcon={<ArrowBackIcon />}
+                    startIcon={<ArrowBackIcon fontSize={isMobile ? "small" : "medium"} />}
                     onClick={() => navigate('/service-provider/bookings')}
-                    sx={{ mb: { xs: 1, sm: 0 } }}
+                    sx={{
+                        mb: { xs: 1, sm: 0 },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        py: { xs: 1, sm: 1.2 },
+                        px: { xs: 2, sm: 3 }
+                    }}
                 >
                     Back to Bookings
                 </Button>
-                <Stack direction="row" spacing={1}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        flexWrap: 'wrap',
+                        gap: 0.5,
+                        justifyContent: { xs: 'flex-start', sm: 'flex-end' }
+                    }}
+                >
                     <StatusChip status={booking.bookingStatus} />
                     <StatusChip status={booking.paymentStatus} type="payment" />
                 </Stack>
             </Stack>
 
             {/* Main content */}
-            <Grid container spacing={4}>
+            <Grid container spacing={isMobile ? 2 : 4}>
                 {/* Left column - Booking details */}
-                <Grid item xs={12} md={8}>
-                    <Paper 
-                        elevation={0} 
-                        sx={{ 
-                            p: 3, 
-                            borderRadius: 2, 
+                <Grid item xs={12} md={8} lg={7}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: { xs: 2, sm: 3 },
+                            borderRadius: 2,
                             border: '1px solid #e9ecef',
                             mb: 3
                         }}
                     >
                         {/* Booking header */}
-                        <Box sx={{ mb: 3 }}>
-                            <Typography variant="h5" fontWeight={700} color="#212529">
+                        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                            <Typography
+                                variant="h5"
+                                fontWeight={700}
+                                color="#212529"
+                                sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                            >
                                 Booking #{booking.bookingId || "N/A"}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mt: 0.5, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                            >
                                 Created on {formatDate(booking.createdAt)}
                             </Typography>
                         </Box>
 
-                        <Divider sx={{ mb: 3 }} />
+                        <Divider sx={{ mb: { xs: 2, sm: 3 } }} />
 
                         {/* Services section */}
-                        <Box sx={{ mb: 4 }}>
-                            <SectionHeader 
-                                title="Services" 
-                                icon={<ServiceIcon sx={{ color: muiTheme.palette.primary.main }} />} 
+                        <Box sx={{ mb: { xs: 3, sm: 4 } }}>
+                            <SectionHeader
+                                title="Services"
+                                icon={<ServiceIcon sx={{ color: muiTheme.palette.primary.main }} />}
                             />
-                            
+
                             {booking.services?.map((service, index) => (
                                 <ServiceCard key={index} service={service} />
                             ))}
 
                             {/* Booking total */}
-                            <Box 
-                                sx={{ 
-                                    mt: 2, 
-                                    p: 2, 
+                            <Box
+                                sx={{
+                                    mt: 2,
+                                    p: 2,
                                     bgcolor: alpha(muiTheme.palette.primary.main, 0.05),
                                     borderRadius: 2,
                                     display: 'flex',
@@ -509,58 +567,82 @@ const BookingDetails = () => {
 
                         {/* Customer and Service information */}
                         <Box>
-                            <SectionHeader 
-                                title="Customer & Service Information" 
-                                icon={<PersonIcon sx={{ color: muiTheme.palette.primary.main }} />} 
+                            <SectionHeader
+                                title="Customer & Service Information"
+                                icon={<PersonIcon sx={{ color: muiTheme.palette.primary.main }} />}
                             />
-                            
-                            <Grid container spacing={3}>
+
+                            <Grid container spacing={isMobile ? 2 : 3}>
                                 <Grid item xs={12} md={6}>
-                                    <Paper 
-                                        elevation={0} 
-                                        sx={{ 
-                                            p: 2.5, 
-                                            borderRadius: 2, 
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: { xs: 2, sm: 2.5 },
+                                            borderRadius: 2,
                                             border: '1px solid #e9ecef',
                                             height: '100%'
                                         }}
                                     >
-                                        <Typography variant="subtitle2" fontWeight={600} mb={2} color="#495057">
+                                        <Typography
+                                            variant="subtitle2"
+                                            fontWeight={600}
+                                            mb={2}
+                                            color="#495057"
+                                            sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}
+                                        >
                                             Customer Details
                                         </Typography>
-                                        
+
                                         <Stack spacing={2}>
                                             <Stack direction="row" spacing={2} alignItems="center">
-                                                <Avatar 
+                                                <Avatar
                                                     src={booking.crew?.profilePicture}
-                                                    sx={{ width: 50, height: 50 }}
+                                                    sx={{ width: { xs: 40, sm: 50 }, height: { xs: 40, sm: 50 } }}
                                                 >
                                                     {booking.crew?.firstName?.charAt(0) || 'U'}
                                                 </Avatar>
                                                 <Box>
-                                                    <Typography variant="body1" fontWeight={500}>
+                                                    <Typography
+                                                        variant="body1"
+                                                        fontWeight={500}
+                                                        sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                                                    >
                                                         {`${booking.crew?.firstName || ""} ${booking.crew?.lastName || ""}`}
                                                     </Typography>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Customer
                                                     </Typography>
                                                 </Box>
                                             </Stack>
-                                            
+
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <PhoneIcon fontSize="small" color="action" />
-                                                <Typography variant="body2">
+                                                <PhoneIcon fontSize={isMobile ? "small" : "small"} color="action" />
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{ fontSize: { xs: '0.875rem', sm: '0.9rem' } }}
+                                                >
                                                     {booking.crew?.phone || "N/A"}
                                                 </Typography>
                                             </Stack>
-                                            
+
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <PhoneIcon fontSize="small" color="action" />
+                                                <PhoneIcon fontSize={isMobile ? "small" : "small"} color="action" />
                                                 <Box>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Contact Phone
                                                     </Typography>
-                                                    <Typography variant="body2">
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ fontSize: { xs: '0.875rem', sm: '0.9rem' } }}
+                                                    >
                                                         {booking.contactPhone || "N/A"}
                                                     </Typography>
                                                 </Box>
@@ -568,65 +650,101 @@ const BookingDetails = () => {
                                         </Stack>
                                     </Paper>
                                 </Grid>
-                                
+
                                 <Grid item xs={12} md={6}>
-                                    <Paper 
-                                        elevation={0} 
-                                        sx={{ 
-                                            p: 2.5, 
-                                            borderRadius: 2, 
+                                    <Paper
+                                        elevation={0}
+                                        sx={{
+                                            p: { xs: 2, sm: 2.5 },
+                                            borderRadius: 2,
                                             border: '1px solid #e9ecef',
                                             height: '100%'
                                         }}
                                     >
-                                        <Typography variant="subtitle2" fontWeight={600} mb={2} color="#495057">
+                                        <Typography
+                                            variant="subtitle2"
+                                            fontWeight={600}
+                                            mb={2}
+                                            color="#495057"
+                                            sx={{ fontSize: { xs: '0.95rem', sm: '1rem' } }}
+                                        >
                                             Service Details
                                         </Typography>
-                                        
+
                                         <Stack spacing={2}>
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <BusinessIcon fontSize="small" color="action" />
+                                                <BusinessIcon fontSize={isMobile ? "small" : "small"} color="action" />
                                                 <Box>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Vendor
                                                     </Typography>
-                                                    <Typography variant="body1" fontWeight={500}>
+                                                    <Typography
+                                                        variant="body1"
+                                                        fontWeight={500}
+                                                        sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                                                    >
                                                         {booking.vendorName || "N/A"}
                                                     </Typography>
                                                 </Box>
                                             </Stack>
-                                            
+
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <LocationOnIcon fontSize="small" color="action" />
+                                                <LocationOnIcon fontSize={isMobile ? "small" : "small"} color="action" />
                                                 <Box>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Vendor Location
                                                     </Typography>
-                                                    <Typography variant="body2">
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ fontSize: { xs: '0.875rem', sm: '0.9rem' } }}
+                                                    >
                                                         {booking.vendorLocation || "N/A"}
                                                     </Typography>
                                                 </Box>
                                             </Stack>
-                                            
+
                                             <Stack direction="row" spacing={1} alignItems="flex-start">
-                                                <LocationOnIcon fontSize="small" color="action" sx={{ mt: 0.5 }} />
+                                                <LocationOnIcon fontSize={isMobile ? "small" : "small"} color="action" sx={{ mt: 0.5 }} />
                                                 <Box>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Service Location
                                                     </Typography>
-                                                    <Typography variant="body2">
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ fontSize: { xs: '0.875rem', sm: '0.9rem' } }}
+                                                    >
                                                         {booking.serviceLocation || "N/A"}
                                                     </Typography>
                                                 </Box>
                                             </Stack>
-                                            
+
                                             <Stack direction="row" spacing={1} alignItems="center">
-                                                <CalendarIcon fontSize="small" color="action" />
+                                                <CalendarIcon fontSize={isMobile ? "small" : "small"} color="action" />
                                                 <Box>
-                                                    <Typography variant="body2" color="text.secondary">
+                                                    <Typography
+                                                        variant="body2"
+                                                        color="text.secondary"
+                                                        sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                                                    >
                                                         Service Date & Time
                                                     </Typography>
-                                                    <Typography variant="body1" fontWeight={500}>
+                                                    <Typography
+                                                        variant="body1"
+                                                        fontWeight={500}
+                                                        sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                                                    >
                                                         {formatDateTime(booking.dateTime)}
                                                     </Typography>
                                                 </Box>
@@ -640,21 +758,26 @@ const BookingDetails = () => {
                 </Grid>
 
                 {/* Right column - Booking timeline and info */}
-                <Grid item xs={12} md={4}>
+                <Grid item xs={12} md={4} lg={5}>
                     {/* Booking information */}
-                    <Paper 
-                        elevation={0} 
-                        sx={{ 
-                            p: 3, 
-                            borderRadius: 2, 
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: { xs: 2, sm: 3 },
+                            borderRadius: 2,
                             border: '1px solid #e9ecef',
                             mb: 3
                         }}
                     >
-                        <Typography variant="h6" fontWeight={600} mb={2}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            mb={2}
+                            sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+                        >
                             Booking Information
                         </Typography>
-                        
+
                         <Stack spacing={2}>
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <BusinessIcon fontSize="small" color="action" />
@@ -667,7 +790,7 @@ const BookingDetails = () => {
                                     </Typography>
                                 </Box>
                             </Stack>
-                            
+
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <CalendarIcon fontSize="small" color="action" />
                                 <Box>
@@ -679,7 +802,7 @@ const BookingDetails = () => {
                                     </Typography>
                                 </Box>
                             </Stack>
-                            
+
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <ScheduleIcon fontSize="small" color="action" />
                                 <Box>
@@ -691,7 +814,7 @@ const BookingDetails = () => {
                                     </Typography>
                                 </Box>
                             </Stack>
-                            
+
                             <Stack direction="row" spacing={1} alignItems="center">
                                 <PaymentIcon fontSize="small" color="action" />
                                 <Box>
@@ -705,18 +828,23 @@ const BookingDetails = () => {
                     </Paper>
 
                     {/* Payment information */}
-                    <Paper 
-                        elevation={0} 
-                        sx={{ 
-                            p: 3, 
-                            borderRadius: 2, 
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: { xs: 2, sm: 3 },
+                            borderRadius: 2,
                             border: '1px solid #e9ecef'
                         }}
                     >
-                        <Typography variant="h6" fontWeight={600} mb={2}>
+                        <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            mb={2}
+                            sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+                        >
                             Payment Summary
                         </Typography>
-                        
+
                         <Stack spacing={2}>
                             {booking.services?.map((service, index) => (
                                 <Stack key={index} direction="row" justifyContent="space-between">
@@ -728,9 +856,9 @@ const BookingDetails = () => {
                                     </Typography>
                                 </Stack>
                             ))}
-                            
+
                             <Divider />
-                            
+
                             <Stack direction="row" justifyContent="space-between">
                                 <Typography variant="subtitle1" fontWeight={600}>
                                     Total Amount
@@ -744,37 +872,46 @@ const BookingDetails = () => {
 
                     {/* Status Update Actions */}
                     {getAvailableActions(booking.bookingStatus).length > 0 && (
-                        <Paper 
-                            elevation={0} 
-                            sx={{ 
-                                p: 3, 
-                                borderRadius: 2, 
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: { xs: 2, sm: 3 },
+                                borderRadius: 2,
                                 border: '1px solid #e9ecef',
                                 mt: 3
                             }}
                         >
-                            <Typography variant="h6" fontWeight={600} mb={2}>
+                            <Typography
+                                variant="h6"
+                                fontWeight={600}
+                                mb={2}
+                                sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}
+                            >
                                 Booking Actions
                             </Typography>
-                            
-                            <Stack direction={isMobile ? "column" : "column"} spacing={2}>
+
+                            <Stack direction="column" spacing={2}>
                                 {getAvailableActions(booking.bookingStatus).map((actionItem, index) => (
                                     <Button
                                         key={index}
                                         variant="contained"
                                         color={actionItem.color}
                                         onClick={() => handleStatusAction(actionItem.action)}
-                                        sx={{ 
-                                            borderRadius: 2,
-                                            minWidth: 140
+                                        sx={{
+                                            borderRadius: "10px",
+                                            fontWeight: 600,
+                                            py: { xs: 1.2, sm: 1.5 },
+                                            px: { xs: 2, sm: 4 },
+                                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                                            width: '100%'
                                         }}
                                         startIcon={
-                                            actionItem.action === "quote" ? <MoneyIcon /> :
-                                            actionItem.action === "confirmed" ? <CheckCircleIcon /> :
-                                            actionItem.action === "declined" ? <CancelIcon /> :
-                                            actionItem.action === "completed" ? <DoneIcon /> :
-                                            actionItem.action === "cancelled" ? <CancelIcon /> :
-                                            null
+                                            actionItem.action === "quote" ? <MoneyIcon fontSize={isMobile ? "small" : "medium"} /> :
+                                                actionItem.action === "confirmed" ? <CheckCircleIcon fontSize={isMobile ? "small" : "medium"} /> :
+                                                    actionItem.action === "declined" ? <CancelIcon fontSize={isMobile ? "small" : "medium"} /> :
+                                                        actionItem.action === "completed" ? <DoneIcon fontSize={isMobile ? "small" : "medium"} /> :
+                                                            actionItem.action === "cancelled" ? <CancelIcon fontSize={isMobile ? "small" : "medium"} /> :
+                                                                null
                                         }
                                     >
                                         {actionItem.label}
@@ -787,124 +924,164 @@ const BookingDetails = () => {
             </Grid>
 
             {/* Status Update Dialog */}
-            <Dialog 
-                open={statusDialog.open} 
+            <Dialog
+                open={statusDialog.open}
                 onClose={() => setStatusDialog({ open: false, action: null, title: "" })}
-                maxWidth="sm"
+                maxWidth={isMobile ? "xs" : "sm"}
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 2,
+                        borderRadius: { xs: 1, sm: 2 },
                         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        mx: { xs: 1, sm: 0 } // Add horizontal margin on mobile
                     }
                 }}
             >
-                <DialogTitle sx={{ 
-                    pb: 1,
-                    pt: 2.5,
-                    px: 3,
+                <DialogTitle sx={{
+                    pb: { xs: 0.5, sm: 1 },
+                    pt: { xs: 2, sm: 2.5 },
+                    px: { xs: 2, sm: 3 },
                     fontWeight: 600,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     bgcolor: (theme) => alpha(theme.palette.primary.main, 0.03),
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1,
+                    fontSize: { xs: '1.1rem', sm: '1.25rem' }
                 }}>
-                    {statusDialog.action === "confirmed" && <CheckCircleIcon color="success" />}
-                    {statusDialog.action === "declined" && <CancelIcon color="error" />}
-                    {statusDialog.action === "completed" && <DoneIcon color="primary" />}
-                    {statusDialog.action === "cancelled" && <CancelIcon color="error" />}
+                    {statusDialog.action === "confirmed" && <CheckCircleIcon color="success" fontSize={isMobile ? "small" : "medium"} />}
+                    {statusDialog.action === "declined" && <CancelIcon color="error" fontSize={isMobile ? "small" : "medium"} />}
+                    {statusDialog.action === "completed" && <DoneIcon color="primary" fontSize={isMobile ? "small" : "medium"} />}
+                    {statusDialog.action === "cancelled" && <CancelIcon color="error" fontSize={isMobile ? "small" : "medium"} />}
                     {statusDialog.title}
                 </DialogTitle>
-                <DialogContent sx={{ p: 3, pt: 3 }}>
-                    <Typography variant="body1" sx={{ mb: 3, fontWeight: 500 }}>
-                        Are you sure you want to {statusDialog.action === "declined" || statusDialog.action === "cancelled" 
-                            ? <span style={{ color: '#d32f2f' }}>{statusDialog.action}</span> 
+                <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
+                    {/* <Typography variant="body1" sx={{ my: 2, fontWeight: 500 }}>
+                        Are you sure you want to {statusDialog.action === "declined" || statusDialog.action === "cancelled"
+                            ? <span style={{ color: '#d32f2f' }}>{statusDialog.action}</span>
                             : <span style={{ color: '#1976d2' }}>{statusDialog.action}</span>} this booking?
-                    </Typography>
-                    
+                    </Typography> */}
+
                     <TextField
                         label="Reason"
                         fullWidth
                         multiline
-                        rows={3}
+                        rows={isMobile ? 2 : 3}
                         value={updateFormData.reason}
                         onChange={(e) => setUpdateFormData(prev => ({ ...prev, reason: e.target.value }))}
-                        sx={{ 
-                            mb: 2.5,
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 1.5,
-                                '&:hover fieldset': {
-                                    borderColor: 'primary.light',
+                        size="medium"
+                        sx={{
+                            my: { xs: 2, sm: 3 },
+                            "& .MuiOutlinedInput-root": {
+                                borderRadius: "10px",
+                                backgroundColor: "#F9FAFB",
+                                fontSize: { xs: '0.9rem', sm: '1rem' },
+                                "& fieldset": {
+                                    borderColor: "#E5E7EB",
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderWidth: '1px',
-                                }
-                            }
+                                "&:hover fieldset": {
+                                    borderColor: "#D1D5DB",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#0387D9",
+                                },
+                            },
                         }}
                         placeholder="Please provide a reason for this action..."
                         required
                         InputLabelProps={{
                             shrink: true,
-                            sx: { fontWeight: 500 }
+                            sx: { fontWeight: 500, fontSize: { xs: '0.9rem', sm: '1rem' } }
                         }}
                     />
-                    
+
                     <TextField
                         label="Additional Notes (Optional)"
                         fullWidth
                         multiline
-                        rows={2}
+                        rows={isMobile ? 1 : 2}
                         value={updateFormData.notes}
                         onChange={(e) => setUpdateFormData(prev => ({ ...prev, notes: e.target.value }))}
                         placeholder="Any additional notes or comments..."
-                        sx={{ 
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: 1.5,
-                                '&:hover fieldset': {
-                                    borderColor: 'primary.light',
+                        size="medium"
+                        sx={{
+                            mb: { xs: 1, sm: 2 },
+                            "& .MuiOutlinedInput-root": {
+                                borderRadius: "10px",
+                                backgroundColor: "#F9FAFB",
+                                fontSize: { xs: '0.9rem', sm: '1rem' },
+                                "& fieldset": {
+                                    borderColor: "#E5E7EB",
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderWidth: '1px',
-                                }
-                            }
+                                "&:hover fieldset": {
+                                    borderColor: "#D1D5DB",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#0387D9",
+                                },
+                            },
                         }}
                         InputLabelProps={{
                             shrink: true,
-                            sx: { fontWeight: 500 }
+                            sx: { fontWeight: 500, fontSize: { xs: '0.9rem', sm: '1rem' } }
                         }}
                     />
                 </DialogContent>
-                <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button 
+                <DialogActions sx={{
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1.5, sm: 2 },
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    gap: { xs: 1, sm: 0 },
+                    flexDirection: { xs: 'column', sm: 'row' }
+                }}>
+                    <Button
                         onClick={() => setStatusDialog({ open: false, action: null, title: "" })}
                         disabled={isUpdating}
-                        sx={{ 
-                            borderRadius: 1.5,
-                            px: 2,
-                            fontWeight: 500,
-                            textTransform: 'none'
+                        sx={{
+                            borderRadius: "8px",
+                            borderColor: "#D1D5DB",
+                            color: "inherit",
+                            fontWeight: 600,
+                            py: { xs: 1.2, sm: 1.5 },
+                            px: { xs: 2, sm: 4 },
+                            "&:hover": {
+                                borderColor: "#9CA3AF",
+                                backgroundColor: "#F9FAFB",
+                            },
+                            width: '100%',
+                            textTransform: 'none',
+                            fontSize: { xs: '0.9rem', sm: '1rem' }
                         }}
                     >
                         Cancel
                     </Button>
-                    <Button 
+                    <Button
                         onClick={handleUpdateStatus}
                         variant="contained"
                         color={statusDialog.action === "declined" || statusDialog.action === "cancelled" ? "error" : "primary"}
                         disabled={isUpdating || !updateFormData.reason.trim()}
-                        startIcon={isUpdating ? <CircularProgress size={20} /> : null}
-                        sx={{ 
-                            borderRadius: 1.5,
-                            px: 2.5,
-                            fontWeight: 500,
+                        startIcon={isUpdating ? <CircularProgress size={isMobile ? 16 : 20} /> : null}
+                        sx={{
+                            borderRadius: "8px",
+                            borderColor: "#D1D5DB",
+                            color: "#374151",
+                            fontWeight: 600,
+                            py: { xs: 1.2, sm: 1.5 },
+                            px: { xs: 2, sm: 4 },
+                            "&:hover": {
+                                borderColor: "#9CA3AF",
+                                backgroundColor: "#F9FAFB",
+                            },
+                            width: '100%',
                             textTransform: 'none',
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
                             boxShadow: (theme) => `0 2px 8px ${alpha(
-                                statusDialog.action === "declined" || statusDialog.action === "cancelled" 
-                                    ? theme.palette.error.main 
-                                    : theme.palette.primary.main, 
+                                statusDialog.action === "declined" || statusDialog.action === "cancelled"
+                                    ? theme.palette.error.main
+                                    : theme.palette.primary.main,
                                 0.25
                             )}`
                         }}
@@ -915,38 +1092,45 @@ const BookingDetails = () => {
             </Dialog>
 
             {/* Quote Dialog */}
-            <Dialog 
-                open={quoteDialog.open} 
+            <Dialog
+                open={quoteDialog.open}
                 onClose={() => setQuoteDialog({ open: false })}
-                maxWidth="md"
+                maxWidth={isMobile ? "sm" : "md"}
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: 2,
+                        borderRadius: { xs: 1, sm: 2 },
                         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        mx: { xs: 1, sm: 0 }
                     }
                 }}
             >
-                <DialogTitle sx={{ 
-                    pb: 1.5,
-                    pt: 2.5,
-                    px: 3,
+                <DialogTitle sx={{
+                    pb: { xs: 1, sm: 1.5 },
+                    pt: { xs: 2, sm: 2.5 },
+                    px: { xs: 2, sm: 3 },
                     fontWeight: 600,
                     borderBottom: '1px solid',
                     borderColor: 'divider',
                     bgcolor: (theme) => alpha(theme.palette.primary.main, 0.03),
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1.5
+                    gap: { xs: 1, sm: 1.5 },
+                    fontSize: { xs: '1.1rem', sm: '1.25rem' }
                 }}>
-                    <MoneyIcon color="primary" />
-                    Send Quote for Booking #{booking.bookingId}
+                    <MoneyIcon color="primary" fontSize={isMobile ? "small" : "medium"} />
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant={isMobile ? "h6" : "h6"} component="span">
+                            Send Quote for Booking #{booking.bookingId}
+                        </Typography>
+                    </Box>
                 </DialogTitle>
-                <DialogContent sx={{ p: 3, pt: 3 }}>
-                    <Box sx={{ 
-                        p: 2, 
-                        mb: 3, 
+                <DialogContent sx={{ p: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
+                    <Box sx={{
+                        p: 2,
+                        mb: 2,
+                        mt: 2,
                         bgcolor: (theme) => alpha(theme.palette.info.main, 0.08),
                         borderRadius: 1.5,
                         border: '1px solid',
@@ -956,12 +1140,12 @@ const BookingDetails = () => {
                             Add quote items for this booking or confirm without quote. All fields marked with * are required.
                         </Typography>
                     </Box>
-                    
+
                     {quoteItems.map((service, serviceIndex) => (
                         <Box key={serviceIndex} sx={{ mb: 4, pb: 3, borderBottom: serviceIndex < quoteItems.length - 1 ? '1px dashed' : 'none', borderColor: 'divider' }}>
-                            <Typography variant="h6" sx={{ 
-                                mb: 2.5, 
-                                color: 'primary.main', 
+                            <Typography variant="h6" sx={{
+                                mb: 2.5,
+                                color: 'primary.main',
                                 fontWeight: 600,
                                 display: 'flex',
                                 alignItems: 'center',
@@ -971,51 +1155,56 @@ const BookingDetails = () => {
                                 {service.serviceName}
                             </Typography>
                             {service.items.map((item, itemIndex) => (
-                                <Paper 
-                                    key={itemIndex} 
-                                    elevation={0}
-                                    sx={{ 
-                                        p: 2.5, 
-                                        mb: 2, 
-                                        borderRadius: 2,
-                                        border: '1px solid',
-                                        borderColor: 'divider',
-                                        transition: 'all 0.2s ease',
-                                        '&:hover': {
-                                            borderColor: 'primary.light',
-                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
-                                        }
+                                <Box
+                                    key={itemIndex}
+                                    sx={{
+                                        // p: 2.5,
+                                        mb: 2,
+                                        // borderRadius: 2,
+                                        // border: '1px solid',
+                                        // borderColor: 'divider',
+                                        // transition: 'all 0.2s ease',
+                                        // '&:hover': {
+                                        //     borderColor: 'primary.light',
+                                        //     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)'
+                                        // }
                                     }}
                                 >
-                                    <Grid container spacing={2.5} alignItems="center">
+                                    <Grid container spacing={isMobile ? 2 : 2.5} alignItems="center">
                                         <Grid item xs={12} sm={4}>
                                             <TextField
-                                                label="Item/Service *"
+                                                label="Item/Service"
                                                 fullWidth
                                                 value={item.item}
                                                 onChange={(e) => updateQuoteItem(serviceIndex, itemIndex, 'item', e.target.value)}
                                                 placeholder="e.g., Labor, Materials"
                                                 required
-                                                sx={{ 
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 1.5,
-                                                        '&:hover fieldset': {
-                                                            borderColor: 'primary.light',
+                                                size="medium"
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "10px",
+                                                        backgroundColor: "#F9FAFB",
+                                                        fontSize: { xs: '0.9rem', sm: '1rem' },
+                                                        "& fieldset": {
+                                                            borderColor: "#E5E7EB",
                                                         },
-                                                        '&.Mui-focused fieldset': {
-                                                            borderWidth: '1px',
-                                                        }
-                                                    }
+                                                        "&:hover fieldset": {
+                                                            borderColor: "#D1D5DB",
+                                                        },
+                                                        "&.Mui-focused fieldset": {
+                                                            borderColor: "#0387D9",
+                                                        },
+                                                    },
                                                 }}
                                                 InputLabelProps={{
                                                     shrink: true,
-                                                    sx: { fontWeight: 500 }
+                                                    sx: { fontWeight: 500, fontSize: { xs: '0.9rem', sm: '1rem' } }
                                                 }}
                                             />
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
                                             <TextField
-                                                label="Unit Price *"
+                                                label="Unit Price"
                                                 type="number"
                                                 fullWidth
                                                 value={item.unitPrice}
@@ -1023,74 +1212,90 @@ const BookingDetails = () => {
                                                 placeholder="0.00"
                                                 required
                                                 InputProps={{
-                                                    startAdornment: <Typography sx={{ mr: 0.5, color: 'text.secondary' }}>$</Typography>
+                                                    startAdornment: <Typography sx={{ mr: { xs: 0.3, sm: 0.5 }, color: 'text.secondary', fontSize: { xs: '0.9rem', sm: '1rem' } }}>$</Typography>
                                                 }}
-                                                sx={{ 
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 1.5,
-                                                        '&:hover fieldset': {
-                                                            borderColor: 'primary.light',
+                                                size="medium"
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "10px",
+                                                        backgroundColor: "#F9FAFB",
+                                                        fontSize: { xs: '0.9rem', sm: '1rem' },
+                                                        "& fieldset": {
+                                                            borderColor: "#E5E7EB",
                                                         },
-                                                        '&.Mui-focused fieldset': {
-                                                            borderWidth: '1px',
-                                                        }
-                                                    }
+                                                        "&:hover fieldset": {
+                                                            borderColor: "#D1D5DB",
+                                                        },
+                                                        "&.Mui-focused fieldset": {
+                                                            borderColor: "#0387D9",
+                                                        },
+                                                    },
                                                 }}
                                                 InputLabelProps={{
                                                     shrink: true,
-                                                    sx: { fontWeight: 500 }
+                                                    sx: { fontWeight: 500, fontSize: { xs: '0.9rem', sm: '1rem' } }
                                                 }}
                                             />
                                         </Grid>
                                         <Grid item xs={6} sm={3}>
                                             <TextField
-                                                label="Quantity *"
+                                                label="Quantity"
                                                 type="number"
                                                 fullWidth
                                                 value={item.quantity}
                                                 onChange={(e) => updateQuoteItem(serviceIndex, itemIndex, 'quantity', e.target.value)}
                                                 inputProps={{ min: 1 }}
                                                 required
-                                                sx={{ 
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: 1.5,
-                                                        '&:hover fieldset': {
-                                                            borderColor: 'primary.light',
+                                                size="medium"
+                                                sx={{
+                                                    "& .MuiOutlinedInput-root": {
+                                                        borderRadius: "10px",
+                                                        backgroundColor: "#F9FAFB",
+                                                        fontSize: { xs: '0.9rem', sm: '1rem' },
+                                                        "& fieldset": {
+                                                            borderColor: "#E5E7EB",
                                                         },
-                                                        '&.Mui-focused fieldset': {
-                                                            borderWidth: '1px',
-                                                        }
-                                                    }
+                                                        "&:hover fieldset": {
+                                                            borderColor: "#D1D5DB",
+                                                        },
+                                                        "&.Mui-focused fieldset": {
+                                                            borderColor: "#0387D9",
+                                                        },
+                                                    },
                                                 }}
                                                 InputLabelProps={{
                                                     shrink: true,
-                                                    sx: { fontWeight: 500 }
+                                                    sx: { fontWeight: 500, fontSize: { xs: '0.9rem', sm: '1rem' } }
                                                 }}
                                             />
                                         </Grid>
                                         <Grid item xs={12} sm={2}>
                                             <Button
-                                                color="error"
                                                 variant="outlined"
                                                 onClick={() => removeQuoteItem(serviceIndex, itemIndex)}
                                                 disabled={service.items.length === 1}
-                                                sx={{ 
-                                                    minWidth: 'auto', 
-                                                    p: 1,
+                                                sx={{
+                                                    width: '100%',
+                                                    bgcolor: 'error.main',
+                                                    color: '#fff',
+                                                    p: { xs: 0.8, sm: 1 },
                                                     borderRadius: 1.5,
                                                     textTransform: 'none',
-                                                    fontWeight: 500
+                                                    fontWeight: 600,
+                                                    fontSize: { xs: '0.8rem', sm: '0.875rem' }
                                                 }}
                                                 size="small"
                                             >
-                                                Remove
+                                                <span style={{ color: 'white' }}>
+                                                    Remove
+                                                </span>
                                             </Button>
                                         </Grid>
                                         {item.item && item.unitPrice && item.quantity && (
                                             <Grid item xs={12}>
-                                                <Box sx={{ 
-                                                    display: 'flex', 
-                                                    justifyContent: 'flex-end', 
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'flex-end',
                                                     mt: 1,
                                                     p: 1.5,
                                                     bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
@@ -1103,61 +1308,83 @@ const BookingDetails = () => {
                                             </Grid>
                                         )}
                                     </Grid>
-                                </Paper>
+                                </Box>
                             ))}
                             <Button
                                 variant="outlined"
                                 onClick={() => addQuoteItem(serviceIndex)}
-                                sx={{ 
+                                sx={{
+                                    bgcolor: 'primary.main',
+                                    color: 'white',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
                                     mb: 2,
                                     borderRadius: 1.5,
                                     textTransform: 'none',
-                                    fontWeight: 500,
+                                    fontWeight: 600,
                                     px: 2
                                 }}
-                                startIcon={<span>+</span>}
+                                startIcon={<Plus />}
                             >
                                 Add Item to {service.serviceName}
                             </Button>
                         </Box>
                     ))}
                 </DialogContent>
-                <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button 
+                <DialogActions sx={{
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1.5, sm: 2 },
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    gap: { xs: 1, sm: 0 },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    flexWrap: 'wrap'
+                }}>
+                    <Button
                         onClick={() => setQuoteDialog({ open: false })}
                         disabled={isUpdating}
-                        sx={{ 
-                            borderRadius: 1.5,
-                            px: 2,
-                            fontWeight: 500,
-                            textTransform: 'none'
+                        sx={{
+                            borderRadius: "10px",
+                            py: { xs: 1.2, sm: 1.5 },
+                            px: { xs: 2, sm: 4 },
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            width: { xs: '100%', sm: 'auto' }
                         }}
                     >
                         Cancel
                     </Button>
-                    <Button 
+                    <Button
                         onClick={handleConfirmWithoutQuote}
                         variant="outlined"
                         disabled={isUpdating}
-                        sx={{ 
-                            borderRadius: 1.5,
-                            px: 2,
-                            fontWeight: 500,
-                            textTransform: 'none'
+                        sx={{
+                            borderRadius: "10px",
+                            py: { xs: 1.2, sm: 1.5 },
+                            px: { xs: 2, sm: 4 },
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            width: { xs: '100%', sm: 'auto' }
                         }}
                     >
                         Confirm Without Quote
                     </Button>
-                    <Button 
+                    <Button
                         onClick={handleSendQuote}
                         variant="contained"
                         disabled={isUpdating || quoteItems.some(service => service.items.some(item => !item.item || !item.unitPrice))}
-                        startIcon={isUpdating ? <CircularProgress size={20} /> : <MoneyIcon />}
-                        sx={{ 
-                            borderRadius: 1.5,
-                            px: 2.5,
-                            fontWeight: 500,
+                        startIcon={isUpdating ? <CircularProgress size={isMobile ? 16 : 20} /> : <MoneyIcon fontSize={isMobile ? "small" : "medium"} />}
+                        sx={{
+                            borderRadius: "10px",
+                            py: { xs: 1.2, sm: 1.5 },
+                            px: { xs: 2, sm: 4 },
+                            fontWeight: 600,
                             textTransform: 'none',
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            width: { xs: '100%', sm: 'auto' },
                             boxShadow: (theme) => `0 2px 8px ${alpha(theme.palette.primary.main, 0.25)}`
                         }}
                     >

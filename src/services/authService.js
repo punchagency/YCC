@@ -115,6 +115,15 @@ export const logout = () => {
   window.location.href = "/login";
 };
 
+export const findUserByEmail = async (email) => {
+  try {
+    const response = await axios.get(buildApiUrl("auth/find-user-by-email/" + email));
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 export const verifyOtp = async (email, otp) => {
   try {
     const response = await axios.post(buildApiUrl("auth/verify-otp"), {

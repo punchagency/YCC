@@ -10,6 +10,14 @@ const api = axios.create({
   }
 });
 
+export const getServiceById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/services/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 // Get all services (public route - no auth required)
 export const getAllServices = async (type) => {
   try {

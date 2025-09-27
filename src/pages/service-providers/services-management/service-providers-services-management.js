@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useUser } from "../../../context/userContext";
 import { useTheme } from "../../../context/theme/themeContext";
 import { useOutletContext, useNavigate } from "react-router-dom";
@@ -51,6 +51,7 @@ import {
     Description as DescriptionIcon,
     Close as CloseIcon,
     Category as CategoryIcon,
+    CloudUpload as CloudUploadIcon,
 } from "@mui/icons-material";
 import { format } from 'date-fns';
 import { createService, deleteService, getAllServices, updateService } from '../../../services/service/newServiceEndpoints';
@@ -68,7 +69,9 @@ const ServiceProviderServiceManagement = () => {
     const [modalOpen, setModalOpen] = React.useState(false);
     const [modalMode, setModalMode] = React.useState('create');
     const [selectedService, setSelectedService] = React.useState({});
-    const [formData, setFormData] = React.useState({ name: '', price: '', description: '', category: '' });
+    const [formData, setFormData] = React.useState({ name: '', price: '', description: '', category: '', image: null });
+    const [imagePreview, setImagePreview] = React.useState(null);
+    const fileInputRef = React.useRef(null);
     const [searchQuery, setSearchQuery] = React.useState('');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -77,11 +80,11 @@ const ServiceProviderServiceManagement = () => {
     const [snackbar, setSnackbar] = React.useState({ open: false, message: '', severity: 'success' });
     const [fetchParams, setFetchParams] = React.useState({
         page: 1,
-        limit: 20,
+        limit: 10,
         search: '',
     });
 
-    const fetchServices = async () => {
+    const fetchServices = useCallback(async () => {
         setIsLoading(true);
         try {
             const response = await getAllServices({ ...fetchParams });
@@ -96,11 +99,11 @@ const ServiceProviderServiceManagement = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [fetchParams]);
 
     React.useEffect(() => {
         fetchServices();
-    }, [fetchParams]);
+    }, [fetchParams, fetchServices]);
 
     const handleSearch = (event) => {
         const value = event.target.value;
@@ -132,15 +135,17 @@ const ServiceProviderServiceManagement = () => {
 
     const handleCreateService = () => {
         setModalMode('create');
-        setFormData({ name: '', price: '', description: '', category: '' });
+        setFormData({ name: '', price: '', description: '', category: '', image: null });
         setSelectedService({});
+        setImagePreview(null);
         setModalOpen(true);
     };
 
     const handleEditService = (service) => {
         setModalMode('update');
-        setFormData({ name: service.name, price: service.price.toString(), description: service.description, category: service.category });
+        setFormData({ name: service.name, price: service.price.toString(), description: service.description, category: service.category, image: service.image || null });
         setSelectedService(service);
+        setImagePreview(service.image || null);
         setModalOpen(true);
         handleMenuClose();
     };
@@ -167,7 +172,7 @@ const ServiceProviderServiceManagement = () => {
 
     const handleFormSubmit = async () => {
         if (!formData.name || !formData.price) {
-            setSnackbar({ open: true, message: 'Please fill in all fields', severity: 'error' });
+            setSnackbar({ open: true, message: 'Please fill in all required fields', severity: 'error' });
             return;
         }
 
@@ -177,9 +182,10 @@ const ServiceProviderServiceManagement = () => {
                 name: formData.name,
                 price: parseFloat(formData.price),
                 description: formData.description || null,
-                category: formData.category || null
+                category: formData.category || null,
+                serviceImage: formData.image
             };
-
+            console.log({ formData });
             const response = modalMode === 'create'
                 ? await createService(serviceData)
                 : await updateService(selectedService._id, serviceData);
@@ -205,6 +211,12 @@ const ServiceProviderServiceManagement = () => {
     const handleFormChange = (field) => (event) => {
         if (field === 'category') {
             setFormData(prev => ({ ...prev, [field]: event }));
+        } else if (field === 'image') {
+            const file = event.target.files[0];
+            if (file) {
+                setFormData(prev => ({ ...prev, [field]: file }));
+                setImagePreview(URL.createObjectURL(file));
+            }
         } else {
             setFormData(prev => ({ ...prev, [field]: event.target.value }));
         }
@@ -217,9 +229,9 @@ const ServiceProviderServiceManagement = () => {
             return "Invalid Date";
         }
     };
-    const handleImportFromCSV = () => {
+    const handleImportFromCSV = useCallback(() => {
         navigate(`/service-provider/services/onboarding/${user._id}`);
-    };
+    }, [navigate, user._id]);
     React.useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
         const handleOpenCreateOrderModal = () => handleCreateService();
@@ -238,24 +250,105 @@ const ServiceProviderServiceManagement = () => {
                 handleImportFromCSV
             );
         };
-    }, []);
+    }, [handleImportFromCSV]);
 
     const ServiceSkeleton = () => (
         <Card sx={{ mb: 2, borderRadius: 2 }}>
             <CardContent sx={{ p: 2 }}>
                 <Stack spacing={2}>
-                    <Skeleton variant="text" width="60%" height={24} />
-                    <Skeleton variant="text" width="40%" height={20} />
-                    <Skeleton variant="text" width="80%" height={20} />
-                    <Skeleton variant="text" width="30%" height={20} />
+                    {/* Image and basic info row */}
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Skeleton variant="circular" width={50} height={50} />
+                        <Stack spacing={0.5} sx={{ flex: 1 }}>
+                            <Skeleton variant="text" width="70%" height={24} />
+                            <Skeleton variant="text" width="40%" height={18} />
+                        </Stack>
+                        <Skeleton variant="circular" width={24} height={24} />
+                    </Stack>
+
+                    {/* Category */}
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Skeleton variant="circular" width={16} height={16} />
+                        <Skeleton variant="text" width="50%" height={20} />
+                    </Stack>
+
+                    {/* Price */}
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <Skeleton variant="circular" width={16} height={16} />
+                        <Skeleton variant="text" width="30%" height={24} />
+                    </Stack>
+
+                    {/* Description */}
+                    <Stack direction="row" spacing={1} alignItems="flex-start">
+                        <Skeleton variant="circular" width={16} height={16} sx={{ mt: 0.5 }} />
+                        <Box sx={{ flex: 1 }}>
+                            <Skeleton variant="text" width="100%" height={16} />
+                            <Skeleton variant="text" width="85%" height={16} />
+                        </Box>
+                    </Stack>
+
+                    {/* Created date */}
+                    <Skeleton variant="text" width="45%" height={16} />
                 </Stack>
             </CardContent>
         </Card>
     );
 
+    const DesktopServiceSkeleton = () => (
+        <TableRow>
+            {/* Service Image */}
+            <TableCell>
+                <Skeleton variant="circular" width={50} height={50} />
+            </TableCell>
+
+            {/* Service Name */}
+            <TableCell>
+                <Skeleton variant="text" width="80%" height={20} />
+            </TableCell>
+
+            {/* Category */}
+            <TableCell>
+                <Skeleton variant="text" width="70%" height={20} />
+            </TableCell>
+
+            {/* Price */}
+            <TableCell>
+                <Skeleton variant="text" width="60%" height={20} />
+            </TableCell>
+
+            {/* Description */}
+            <TableCell>
+                <Skeleton variant="text" width="90%" height={18} />
+            </TableCell>
+
+            {/* Created Date */}
+            <TableCell>
+                <Skeleton variant="text" width="75%" height={18} />
+            </TableCell>
+
+            {/* Actions */}
+            <TableCell align="center">
+                <Skeleton variant="circular" width={24} height={24} />
+            </TableCell>
+        </TableRow>
+    );
+
     const MobileServiceCard = ({ service }) => (
         <Card sx={{ mb: 2, borderRadius: 2, overflow: 'hidden' }}>
             <Box sx={{ height: '4px', bgcolor: muiTheme.palette.primary.main, width: '100%' }} />
+            {service.image && (
+                <Box sx={{ height: 150, overflow: 'hidden', position: 'relative' }}>
+                    <img
+                        src={service.image}
+                        alt={service.name}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                        }}
+                    />
+                </Box>
+            )}
             <CardContent sx={{ p: 2 }}>
                 <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Typography variant="h6" fontWeight={600} sx={{ mb: 1 }}>
@@ -365,29 +458,64 @@ const ServiceProviderServiceManagement = () => {
                             ),
                             sx: { borderRadius: 2 }
                         }}
+                        size="medium"
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                borderRadius: "10px",
+                                backgroundColor: "#F9FAFB",
+                                "& fieldset": {
+                                    borderColor: "#E5E7EB",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "#D1D5DB",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#0387D9",
+                                },
+                            },
+                        }}
                     />
                 </Grid>
-                {/* <Grid item xs={12} md={4}>
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleCreateService}
-            sx={{ height: 56, borderRadius: 2, fontWeight: 600 }}
-          >
-            Create Service
-          </Button>
-        </Grid> */}
+
             </Grid>
 
             {/* Services Content */}
             <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
                 {isLoading ? (
-                    <Box sx={{ p: 2 }}>
-                        {[...Array(5)].map((_, index) => (
-                            <ServiceSkeleton key={index} />
-                        ))}
-                    </Box>
+                    <>
+                        {/* Desktop Table Skeleton */}
+                        {!isMobile && (
+                            <TableContainer>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell></TableCell>
+                                            <TableCell>Service Name</TableCell>
+                                            <TableCell>Category</TableCell>
+                                            <TableCell>Price</TableCell>
+                                            <TableCell>Description</TableCell>
+                                            <TableCell>Created Date</TableCell>
+                                            <TableCell align="center">Actions</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {[...Array(5)].map((_, index) => (
+                                            <DesktopServiceSkeleton key={index} />
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )}
+
+                        {/* Mobile Card Skeleton */}
+                        {isMobile && (
+                            <Box sx={{ p: 2 }}>
+                                {[...Array(5)].map((_, index) => (
+                                    <ServiceSkeleton key={index} />
+                                ))}
+                            </Box>
+                        )}
+                    </>
                 ) : services.services?.length === 0 ? (
                     <Box sx={{
                         py: 8,
@@ -434,6 +562,7 @@ const ServiceProviderServiceManagement = () => {
                                     <Table>
                                         <TableHead>
                                             <TableRow>
+                                                <TableCell></TableCell>
                                                 <TableCell>Service Name</TableCell>
                                                 <TableCell>Category</TableCell>
                                                 <TableCell>Price</TableCell>
@@ -445,6 +574,28 @@ const ServiceProviderServiceManagement = () => {
                                         <TableBody>
                                             {services.services?.map((service) => (
                                                 <TableRow key={service._id} hover>
+                                                    <TableCell>
+                                                        {service.image ? (
+                                                            <Avatar
+                                                                variant="rounded"
+                                                                src={service.image}
+                                                                alt={service.name}
+                                                                sx={{ width: 50, height: 50 }}
+                                                            />
+                                                        ) : (
+                                                            <Avatar
+                                                                variant="rounded"
+                                                                sx={{
+                                                                    width: 50,
+                                                                    height: 50,
+                                                                    bgcolor: alpha(muiTheme.palette.primary.main, 0.1),
+                                                                    color: muiTheme.palette.primary.main
+                                                                }}
+                                                            >
+                                                                <ServiceIcon />
+                                                            </Avatar>
+                                                        )}
+                                                    </TableCell>
                                                     <TableCell>
                                                         <Typography variant="body1" fontWeight={500}>
                                                             {service.name}
@@ -563,6 +714,100 @@ const ServiceProviderServiceManagement = () => {
                 </DialogTitle>
                 <DialogContent>
                     <Stack spacing={3} sx={{ mt: 1 }}>
+                        <Box>
+                            <Typography variant="subtitle2" fontWeight="600" color="#374151" mb={1}>
+                                Service Image
+                            </Typography>
+                            <Box
+                                sx={{
+                                    border: "1px dashed #D1D5DB",
+                                    borderRadius: "12px",
+                                    p: 2,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: "#F9FAFB",
+                                    position: "relative",
+                                    cursor: "pointer",
+                                    height: "160px",
+                                    overflow: "hidden",
+                                    transition: "all 0.2s ease",
+                                    "&:hover": {
+                                        borderColor: "#0387D9",
+                                        backgroundColor: "#F0F9FF",
+                                    },
+                                }}
+                            >
+                                {formData.image || imagePreview ? (
+                                    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+                                        <img
+                                            src={imagePreview || formData.image}
+                                            alt="Preview"
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                objectFit: "contain",
+                                            }}
+                                        />
+                                        <IconButton
+                                            size="small"
+                                            sx={{
+                                                position: "absolute",
+                                                top: 0,
+                                                right: 0,
+                                                backgroundColor: "rgba(255,255,255,0.8)",
+                                                "&:hover": { backgroundColor: "#fff" },
+                                            }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setFormData({ ...formData, image: null });
+                                                setImagePreview(null);
+                                                if (fileInputRef.current) fileInputRef.current.value = null;
+                                            }}
+                                        >
+                                            <CloseIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                ) : (
+                                    <Box
+                                        display="flex"
+                                        flexDirection="column"
+                                        alignItems="center"
+                                        gap={1}
+                                    >
+                                        <CloudUploadIcon sx={{ fontSize: 40, color: "#9CA3AF" }} />
+                                        <Typography variant="body2" color="#6B7280">
+                                            Drag and drop or click to upload
+                                        </Typography>
+                                        <Typography variant="caption" color="#9CA3AF">
+                                            Supports JPG, PNG or GIF up to 5MB
+                                        </Typography>
+                                    </Box>
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    style={{
+                                        position: "absolute",
+                                        width: "100%",
+                                        height: "100%",
+                                        opacity: 0,
+                                        cursor: "pointer",
+                                        left: 0,
+                                        top: 0,
+                                    }}
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setFormData({ ...formData, image: file });
+                                            setImagePreview(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                    ref={fileInputRef}
+                                />
+                            </Box>
+                        </Box>
                         <TextField
                             fullWidth
                             label="Service Name"
@@ -570,42 +815,63 @@ const ServiceProviderServiceManagement = () => {
                             onChange={handleFormChange('name')}
                             variant="outlined"
                             placeholder="Enter service name"
+                            size="medium"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    borderRadius: "10px",
+                                    backgroundColor: "#F9FAFB",
+                                    "& fieldset": {
+                                        borderColor: "#E5E7EB",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#D1D5DB",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#0387D9",
+                                    },
+                                },
+                            }}
                         />
-                        {/* Add a dropdown atocomplete to the service category 
-                        The userServiceCategories is an array of strings with the following structure:
-                        [
-                    "Vessel Management & Administration",
-                    "Maritime Legal & Compliance Assistance",
-                    "Crew Recruitment & Placement Services",
-                    "Customs & Immigration Assistance",
-                    "Insurance & Risk Management",
-                    "Security & Anti-Piracy Training",
-                    "Safety Equipment Inspections & Compliance",
-                    "IT & Cybersecurity Services for Yachts",
-                    "Charter & Itinerary Planning Assistance",
-                    "Satellite & Internet Connectivity Solutions",
-                    "Yacht Detailing & Washdowns",
-                    "Teak Deck Sanding & Restoration",
-                    "Varnishing & Paintwork Services",
-                    "Fiberglass & Gelcoat Repairs",
-                    "Docking & Line Handling Assistance",
-                    "Diving & Underwater Hull Cleaning",
-                    "Fender & Rope Supply & Maintenance",
-                    "Tender & Jet Ski Servicing",
-                    "Watersports Equipment Rental & Repairs",
-                    "Exterior Upholstery & Canvas Work",
-                    "Yacht Interior Cleaning & Housekeeping",
-                    "Custom Interior Design & Refurbishment",
-                    "Event & Party Planning Services"
-                ]
-                        */}
                         <Autocomplete
                             fullWidth
                             options={userServiceCategories}
                             getOptionLabel={(option) => option}
-                            renderInput={(params) => <TextField {...params} label="Service Category" />}
+                            renderInput={(params) => <TextField {...params} label="Service Category"
+                                size="medium"
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        borderRadius: "10px",
+                                        backgroundColor: "#F9FAFB",
+                                        "& fieldset": {
+                                            borderColor: "#E5E7EB",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "#D1D5DB",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#0387D9",
+                                        },
+                                    },
+                                }}
+                            />}
                             value={formData.category}
                             onChange={(e, value) => handleFormChange('category')(value)}
+                            size="medium"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    borderRadius: "10px",
+                                    backgroundColor: "#F9FAFB",
+                                    "& fieldset": {
+                                        borderColor: "#E5E7EB",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#D1D5DB",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#0387D9",
+                                    },
+                                },
+                            }}
                         />
                         <TextField
                             fullWidth
@@ -618,6 +884,22 @@ const ServiceProviderServiceManagement = () => {
                             InputProps={{
                                 startAdornment: <InputAdornment position="start">$</InputAdornment>,
                             }}
+                            size="medium"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    borderRadius: "10px",
+                                    backgroundColor: "#F9FAFB",
+                                    "& fieldset": {
+                                        borderColor: "#E5E7EB",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#D1D5DB",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#0387D9",
+                                    },
+                                },
+                            }}
                         />
                         <TextField
                             fullWidth
@@ -628,18 +910,59 @@ const ServiceProviderServiceManagement = () => {
                             multiline
                             rows={4}
                             placeholder="Describe your service"
+                            size="medium"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    borderRadius: "10px",
+                                    backgroundColor: "#F9FAFB",
+                                    "& fieldset": {
+                                        borderColor: "#E5E7EB",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#D1D5DB",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#0387D9",
+                                    },
+                                },
+                            }}
                         />
                     </Stack>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 1 }}>
-                    <Button onClick={() => setModalOpen(false)} sx={{ borderRadius: 2 }}>
+                    <Button onClick={() => setModalOpen(false)}
+                        sx={{
+                            borderRadius: "8px",
+                            borderColor: "#D1D5DB",
+                            color: "#374151",
+                            fontWeight: 600,
+                            py: 1.5,
+                            px: 4,
+                            "&:hover": {
+                                borderColor: "#9CA3AF",
+                                backgroundColor: "#F9FAFB",
+                            },
+                            width: { xs: "100%", sm: "auto" },
+                        }}
+                    >
                         Cancel
                     </Button>
                     <Button
                         variant="contained"
                         onClick={handleFormSubmit}
                         disabled={isLoading}
-                        sx={{ borderRadius: 2, fontWeight: 600, minWidth: 120 }}
+                        sx={{
+                            borderRadius: "8px",
+                            backgroundColor: "#0387D9",
+                            color: "#fff",
+                            fontWeight: 600,
+                            py: 1.5,
+                            px: 4,
+                            "&:hover": {
+                                backgroundColor: "#0369A1",
+                            },
+                            width: { xs: "100%", sm: "auto" },
+                        }}
                     >
                         {isLoading ? <CircularProgress size={20} /> : modalMode === 'create' ? 'Create Service' : 'Update Service'}
                     </Button>

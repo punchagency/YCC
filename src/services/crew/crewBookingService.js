@@ -20,11 +20,7 @@ export const createBooking = async (bookingData) => {
       },
     });
 
-    return {
-      status: true,
-      data: response.data,
-      booking: response.data.booking,
-    };
+    return response.data;
   } catch (error) {
     console.error("Error creating booking:", error);
     return {
@@ -145,4 +141,34 @@ export const fetchServicesByVendor = async ({ vendorId }) => {
       error: error.response?.data?.message || "Failed to fetch services by vendor",
     };
   }
+};
+// sortBy could be "name", "random", "price_asc" and "price_desc"
+export const fetchServicesForCrew = async({search = '', category = '', minPrice, maxPrice, page = 1, limit = 10, sortBy = 'random'}) => {
+
+ try {
+  const query = new URLSearchParams();
+  if(search) query.append('search', search);
+  if(category) query.append('category', category);
+  if(minPrice !== undefined) query.append('minPrice', minPrice);
+  if(maxPrice !== undefined) query.append('maxPrice', maxPrice);
+  if(page) query.append('page', page);
+  if(limit) query.append('limit', limit);
+  if(sortBy) query.append('sortBy', sortBy);
+  
+  const queryString = query.toString();
+  const url = queryString ? `${API_URL}/services/crew-services?${queryString}` : `${API_URL}/services/crew-services`;
+  
+  const response = await axios.get(url, {
+    headers: {
+      ...getAuthHeader(),
+    },
+  });
+
+  return response.data;
+ } catch (error) {
+  return {
+    status: false,
+    error: error.response?.data?.message || "Failed to fetch services."
+  }
+ }
 };
