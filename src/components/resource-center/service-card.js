@@ -1,176 +1,499 @@
-import { Box, Typography, Card, CardContent, CardActions, Button, Stack, Avatar, Chip, useTheme, useMediaQuery } from '@mui/material';
-import LocationOnIcon from "../../assets/images/pin-location.svg";
-import EmailIcon from "../../assets/images/email.svg";
-// import StarIcon from '@mui/icons-material/Star';
+import React, { useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Box,
+  Typography,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Button,
+  Stack,
+  Chip,
+  useTheme,
+  Tooltip
+} from '@mui/material';
+import { LocationOn, Email } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/authContext';
 import { getCategoryIcon } from './section4-resource-center';
 
-const ServiceCard = ({ service, type }) => {
+// Constants
+const CARD_HEIGHT = 400;
+const GRADIENT_COLORS = {
+  primary: 'linear-gradient(90deg, #0487D9 0%, #034D92 100%)',
+  hover: 'linear-gradient(90deg, #034D92 0%, #0487D9 100%)'
+};
+
+// State for image error handling
+const useImageError = () => {
+  const [imageError, setImageError] = React.useState(false);
+
+  const handleImageError = React.useCallback(() => {
+    setImageError(true);
+  }, []);
+
+  const handleImageLoad = React.useCallback(() => {
+    setImageError(false);
+  }, []);
+
+  const resetImageError = React.useCallback(() => {
+    setImageError(false);
+  }, []);
+
+  return {
+    imageError,
+    handleImageError,
+    handleImageLoad,
+    resetImageError
+  };
+};
+
+// Custom hook for navigation logic
+const useServiceNavigation = (type) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleAction = ({service}) => {
+  const handleAction = useCallback((service) => {
     const token = localStorage.getItem('token');
-    if (!isAuthenticated || !token) {
-      navigate('/login', {
-        state: {
-          from: '/resource-center',
-          service: service,
-          type: type
-        }
-      });
+
+    if ((!isAuthenticated || !token) && type === 'service') {
+        navigate(`/service-checkout/${service._id}`, {
+        state: { service }
+        });
+      return;
+    } else if ((!isAuthenticated || !token) && type === 'product') {
+        navigate(`/product-checkout/${service._id}`, {
+        state: { product: service }
+        });
       return;
     }
-    // TODO: Manage the routing conection between login and the service page
-    // If already authenticated, go to crew dashboard
-    if(type === 'service') {
-      navigate("/crew/booking", {
-        state: {
-          service: service
-        }
+
+    // Navigate based on type
+    if (type === 'service') {
+      navigate("/crew/booking/confirm-booking", {
+        state: { service }
       });
     } else {
       navigate("/crew/orders-management", {
-        state: {
-          service: service
-        }
+        state: { service }
       });
     }
+  }, [navigate, isAuthenticated, type]);
+
+  return { handleAction };
+};
+
+// Helper function to get display categories
+const getDisplayCategories = (service) => {
+  if (Array.isArray(service?.categories)) {
+    return service.categories;
+  }
+  if (service?.categories) {
+    return [service.categories];
+  }
+  if (service?.category) {
+    return [typeof service.category === 'string' ? service.category : service.category[0]];
+  }
+  return [];
+};
+
+// Helper function to get contact info
+const getContactInfo = (service) => {
+  return {
+    location: service.supplier?.location || service.location || 'Location not specified',
+    email: service.supplier?.email || service.email || service.vendor?.email || 'Email not specified'
   };
+};
+
+const ServiceCard = React.memo(({ service, type }) => {
+  const theme = useTheme();
+  const { imageError, handleImageError, handleImageLoad, resetImageError } = useImageError();
+  const { handleAction } = useServiceNavigation(type);
+
+  const displayCategories = useMemo(() => getDisplayCategories(service), [service]);
+  const contactInfo = useMemo(() => getContactInfo(service), [service]);
+
+  // Reset image error when service changes
+  React.useEffect(() => {
+    resetImageError();
+  }, [service?.image, resetImageError]);
+
+  const handleCardClick = useCallback(() => {
+    handleAction(service);
+  }, [handleAction, service]);
+
+  const handleKeyPress = useCallback((event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick();
+    }
+  }, [handleCardClick]);
 
   if (!service) {
     return null;
   }
 
   return (
+    <Tooltip title={`Click to ${type === 'service' ? 'request quote for' : 'order'} ${service.name}`} placement="top">
     <Card
+        component="article"
+        role="button"
+        tabIndex={0}
       className="service-card-hover"
+        onClick={handleCardClick}
+        onKeyDown={handleKeyPress}
+        aria-label={`${type === 'service' ? 'Service' : 'Product'} card for ${service.name}`}
       sx={{
-        borderRadius: 4,
-        boxShadow: 0,
-        background: '#f5f8fa',
-        p: 2,
-        height: '400px',
+          borderRadius: theme.spacing(2),
+          boxShadow: theme.shadows[1],
+          backgroundColor: theme.palette.grey[50],
+          height: CARD_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
-        transition: 'box-shadow 0.2s, transform 0.2s',
-      }}
-    >
+          transition: theme.transitions.create(['box-shadow', 'transform'], {
+            duration: theme.transitions.duration.short,
+          }),
+          cursor: 'pointer',
+          '&:hover': {
+            boxShadow: theme.shadows[4],
+            transform: 'translateY(-2px)',
+          },
+          '&:focus': {
+            outline: `2px solid ${theme.palette.primary.main}`,
+            outlineOffset: 2,
+          },
+          position: 'relative',
+        }}
+      >
+        {/* Image Section */}
+        <Box sx={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+          {!imageError ? (
+            <CardMedia
+              key={service._id}
+              component="img"
+              src={service.image || '/placeholder-service.jpg'}
+              alt={`${service.name} - ${type} image`}
+              loading="lazy"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                transition: theme.transitions.create('opacity'),
+              }}
+            />
+          ) : (
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+                bgcolor: theme.palette.grey[100],
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+                color: theme.palette.text.secondary,
+          }}
+              role="img"
+              aria-label={`${type} placeholder image`}
+        >
+              <Box sx={{ fontSize: 48, mb: 1 }}>
+                {getCategoryIcon(displayCategories[0] || '')}
+              </Box>
+          <Typography variant="caption" color="text.secondary">
+            {type === 'service' ? 'Service Image' : 'Product Image'}
+          </Typography>
+        </Box>
+      )}
+        </Box>
+
       <CardContent
         sx={{
-          p: 0,
+            p: theme.spacing(2),
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
-          '&:last-child': { pb: 0 }
-        }}
-      >
-        <Stack direction="row" alignItems="flex-start" spacing={2} mb={2}>
-          <Avatar sx={{ width: isMobile ? 56 : 76, height: isMobile ? 56 : 76, bgcolor: '#e3f2fd' }}>
-            {getCategoryIcon(service.category)}
-          </Avatar>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5, fontSize: "24px", color: "#131313", textTransform: 'capitalize' }}>
+            gap: theme.spacing(1),
+          }}
+        >
+          {/* Header Section */}
+          <Box>
+            <Typography
+              variant="h6"
+              component="h3"
+              sx={{
+                fontWeight: 600,
+                fontSize: '1.25rem',
+                color: theme.palette.common.black,
+                textTransform: 'capitalize',
+                mb: 1,
+                lineHeight: 1.2,
+              }}
+            >
               {service.name}
             </Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap">
-              {Array.isArray(service?.categories) ? (
-                service.categories.map((cat, index) => (
+
+            {/* Categories */}
+            {displayCategories.length > 0 && (
+              <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                {displayCategories.map((category, index) => (
                   <Chip
                     key={index}
-                    label={cat}
+                    label={category}
                     size="small"
-                    sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
+                    sx={{
+                      bgcolor: theme.palette.primary.light + '1A',
+                      color: theme.palette.primary.main,
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      height: 'auto',
+                      py: 0.5,
+                      '& .MuiChip-label': {
+                        px: 1.5,
+                      },
+                    }}
                   />
-                ))
-              ) : service?.categories ? (
-                <Chip
-                  label={service.categories}
-                  size="small"
-                  sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
-                />
-              ) : service?.category ? (
-                <Chip
-                  label={service.category}
-                  size="small"
-                  sx={{ bgcolor: '#0487D91A', color: '#0487D9', fontWeight: 500, fontSize: "16px", padding: "8px 12px" }}
-                />
-              ) : null}
+                ))}
             </Stack>
+            )}
           </Box>
-        </Stack>
 
-        <Typography 
-          sx={{ 
-            color: '#222', 
-            fontSize: 16, 
-            mb: 2, 
-            mt: 1,
+          {/* Description */}
+        <Typography
+            component="p"
+          sx={{
+              color: theme.palette.text.primary,
+              fontSize: '1rem',
+              lineHeight: 1.4,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
-            flex: 1
+              flex: 1,
           }}
         >
           {service.description}
         </Typography>
 
-        <Stack spacing={1} mb={2}>
+          {/* Contact Information */}
+          <Stack spacing={1.5}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <img src={LocationOnIcon} alt="Location" style={{ width: "20px", height: "20px" }} />
-            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
-              {service.supplier?.location || service.location || 'Location not specified'}
+              <LocationOn
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: '1.25rem',
+                  flexShrink: 0
+                }}
+                aria-hidden="true"
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={contactInfo.location}
+              >
+                {contactInfo.location}
             </Typography>
           </Stack>
 
-          {/* <Stack direction="row" alignItems="center" spacing={1}>
-            <StarIcon sx={{ color: '#FFD700', fontSize: 20 }} />
-            <Typography sx={{ color: '#333', fontSize: 14, fontWeight: 600 }}>
-              {service.rating || '4.9'}
-            </Typography>
-            <Typography sx={{ color: '#666', fontSize: 14 }}>
-              ({service.reviewCount || '86'} reviews)
-            </Typography>
-          </Stack> */}
-
           <Stack direction="row" alignItems="center" spacing={1}>
-            <img src={EmailIcon} alt="Email" style={{ width: "20px", height: "20px" }} />
-            <Typography sx={{ color: '#00000099', fontSize: "18px", fontWeight: 500, lineHeight: "148%", wordBreak: 'break-all' }}>
-              {service.supplier?.email || service.email || service.vendor?.email || 'Email not specified'}
+              <Email
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: '1.25rem',
+                  flexShrink: 0
+                }}
+                aria-hidden="true"
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  color: theme.palette.text.secondary,
+                  fontSize: '1rem',
+                  fontWeight: 500,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={contactInfo.email}
+              >
+                {contactInfo.email}
             </Typography>
           </Stack>
         </Stack>
       </CardContent>
-      <CardActions sx={{ pt: 0, px: 0, mt: 'auto' }}>
-        <Button 
-          fullWidth 
-          variant="contained" 
+
+        {/* Action Button */}
+        <CardActions
           sx={{
-            background: 'linear-gradient(90deg, #0487D9 0%, #034D92 100%)',
-            color: '#fff',
-            fontWeight: 600,
-            borderRadius: 2,
-            textTransform: 'none',
-            fontSize: 16,
-            boxShadow: 'none',
-            mt: 2,
-            '&:hover': {
-              background: 'linear-gradient(90deg, #034D92 0%, #0487D9 100%)',
-              boxShadow: 'none',
-            },
+            p: theme.spacing(2),
+            pt: 0,
+            mt: 'auto',
+            justifyContent: 'stretch',
           }}
-          onClick={() => handleAction({service})}
+        >
+        <Button
+          fullWidth
+          variant="contained"
+            size="large"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardClick();
+            }}
+          sx={{
+              background: GRADIENT_COLORS.primary,
+              color: theme.palette.common.white,
+            fontWeight: 600,
+              borderRadius: theme.spacing(1.5),
+            textTransform: 'none',
+              fontSize: '1rem',
+              py: 1.5,
+              boxShadow: 'none',
+              transition: theme.transitions.create(['background-color', 'transform']),
+              '&:hover': {
+                background: GRADIENT_COLORS.hover,
+                boxShadow: theme.shadows[2],
+                transform: 'translateY(-1px)',
+              },
+              '&:focus': {
+                boxShadow: theme.shadows[2],
+              },
+            }}
+            aria-label={`${type === 'service' ? 'Request quote for' : 'Order'} ${service.name}`}
         >
           {type === 'service' ? 'Request Quote' : 'Order Now'}
         </Button>
       </CardActions>
     </Card>
+    </Tooltip>
   );
+});
+
+// PropTypes validation
+ServiceCard.propTypes = {
+  service: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    categories: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
+    category: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
+    location: PropTypes.string,
+    email: PropTypes.string,
+    supplier: PropTypes.shape({
+      location: PropTypes.string,
+      email: PropTypes.string,
+    }),
+    vendor: PropTypes.shape({
+      email: PropTypes.string,
+    }),
+  }).isRequired,
+  type: PropTypes.oneOf(['service', 'product']).isRequired,
 };
 
-export default ServiceCard; 
+// Display name for debugging
+ServiceCard.displayName = 'ServiceCard';
+
+// Error Boundary Component
+class ServiceCardErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('ServiceCard Error:', error, errorInfo);
+    // Here you could send error to logging service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <Card
+          sx={{
+            borderRadius: 2,
+            p: 3,
+            textAlign: 'center',
+            bgcolor: 'error.light',
+            color: 'error.contrastText',
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Something went wrong with this service card
+          </Typography>
+          <Typography variant="body2">
+            Please try refreshing the page or contact support if the problem persists.
+          </Typography>
+          {process.env.NODE_ENV === 'development' && (
+            <Typography variant="caption" sx={{ mt: 2, display: 'block' }}>
+              {this.state.error?.message}
+            </Typography>
+          )}
+        </Card>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+ServiceCardErrorBoundary.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+// Higher-order component that wraps ServiceCard with error boundary
+const ServiceCardWithErrorBoundary = ({ service, type }) => (
+  <ServiceCardErrorBoundary>
+    <ServiceCard service={service} type={type} />
+  </ServiceCardErrorBoundary>
+);
+
+ServiceCardWithErrorBoundary.propTypes = {
+  service: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    categories: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
+    category: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.arrayOf(PropTypes.string)
+    ]),
+    location: PropTypes.string,
+    email: PropTypes.string,
+    supplier: PropTypes.shape({
+      location: PropTypes.string,
+      email: PropTypes.string,
+    }),
+    vendor: PropTypes.shape({
+      email: PropTypes.string,
+    }),
+  }).isRequired,
+  type: PropTypes.oneOf(['service', 'product']).isRequired,
+};
+
+ServiceCardWithErrorBoundary.displayName = 'ServiceCardWithErrorBoundary';
+
+export default ServiceCardWithErrorBoundary; 

@@ -811,7 +811,7 @@ export default function CalendarPage() {
 
       if (response.success) {
         // Fix: Set calendarEvents to the events array directly
-        setCalendarEvents(response.data);
+        setCalendarEvents(response.data.data);
       } else {
         toast.current.show({
           severity: "error",

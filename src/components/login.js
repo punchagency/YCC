@@ -42,7 +42,7 @@ const LoginForm = ({ onClose }) => {
     if (location.state?.message) {
       setError(location.state.message);
       // Clear the message from state to prevent showing it again on refresh
-      navigate(location.pathname, { replace: true, state: {} });
+      // navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, navigate]);
 
@@ -103,10 +103,8 @@ const LoginForm = ({ onClose }) => {
         // This handles the case where a user clicks on a service in the resource center
         // but needs to log in first. After login, we redirect them to the appropriate service page.
         // If navigation fails for any reason, we fall back to the default role-based navigation.
-        if (location.state?.from === "/resource-center" && location.state?.service) {
+        if ((location.state?.from === "/resource-center" || location.state?.from === "/service-checkout" || location.state?.from === "/product-checkout") && location.state?.service) {
           const { service, type } = location.state;
-          
-          console.log("User came from resource center:", { service, type });
           
           // Validate service object has required properties
           if (!service || typeof service !== 'object') {
@@ -118,10 +116,9 @@ const LoginForm = ({ onClose }) => {
           } else {
             // Route based on service type
             if (type === 'service') {
-              console.log("Routing to crew booking with service:", service);
               try {
-                navigate("/crew/booking", {
-                  state: { service: service }
+                navigate("/crew/booking/confirm-booking", {
+                  state: { service: service, type: type, from: location.state.from, formData: location.state.formData }
                 });
                 return; // Exit early to prevent role-based navigation
               } catch (error) {
@@ -129,10 +126,9 @@ const LoginForm = ({ onClose }) => {
                 // Fall back to role-based navigation
               }
             } else {
-              console.log("Routing to crew orders management with service:", service);
               try {
                 navigate("/crew/orders-management", {
-                  state: { service: service }
+                  state: { service: service, type: type, from: location.state.from, formData: location.state.formData }
                 });
                 return; // Exit early to prevent role-based navigation
               } catch (error) {

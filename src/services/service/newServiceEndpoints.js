@@ -11,10 +11,29 @@ const getAuthHeader = () => {
     };
 };
 
-export const createService = async ({ name, price, description, category }) => {
+export const createService = async ({ name, price, description, category, serviceImage }) => {
     try {
-        const response = await axios.post(`${API_URL}/services/create-service`, { name, price, description, category }, {
-            headers: getAuthHeader(),
+        let headers = getAuthHeader();
+        let formData;
+
+        if (serviceImage) {
+            formData = new FormData();
+            formData.append('name', name);
+            formData.append('price', Number(price));
+            formData.append('description', description || '');
+            formData.append('category', category || '');
+            formData.append('serviceImage', serviceImage);
+
+            headers = {
+                ...headers,
+                'Content-Type': 'multipart/form-data',
+            };
+        } else {
+            formData = { name, price, description, category };
+        }
+
+        const response = await axios.post(`${API_URL}/services/create-service`, formData, {
+            headers,
         });
 
         return {
@@ -48,10 +67,29 @@ export const getAllServices = async ({ search, page = 1, limit = 20}) => {
     }
 }
 
-export const updateService = async (service_id, { name, price, description, category}) => {
+export const updateService = async (service_id, { name, price, description, category, serviceImage }) => {
     try {
-        const response = await axios.put(`${API_URL}/services/update-service/${service_id}`, { name, price, description, category}, {
-            headers: getAuthHeader(),
+        let headers = getAuthHeader();
+        let formData;
+
+        if (serviceImage) {
+            formData = new FormData();
+            formData.append('name', name);
+            formData.append('price', Number(price));
+            formData.append('description', description || '');
+            formData.append('category', category || '');
+            formData.append('serviceImage', serviceImage);
+
+            headers = {
+                ...headers,
+                'Content-Type': 'multipart/form-data',
+            };
+        } else {
+            formData = { name, price, description, category };
+        }
+
+        const response = await axios.put(`${API_URL}/services/update-service/${service_id}`, formData, {
+            headers,
         });
 
         return {

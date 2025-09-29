@@ -25,7 +25,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import "./SignInButton.css";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-const LandingPageHeader = () => {
+const LandingPageHeader = ({ isServiceCheckout = false }) => {
   const location = useLocation();
   const { user } = useUser();
   const navigate = useNavigate();
@@ -119,9 +119,9 @@ const LandingPageHeader = () => {
         transition: "0.3s ease-in-out",
         backgroundColor: {
           xs: "white",
-          md: scrolled ? "rgba(0, 0, 0, 0.8)" : "transparent", // Change color on scroll
+          md: scrolled || isServiceCheckout ? "rgba(0, 0, 0, 0.8)" : "transparent", // Change color on scroll
         },
-        boxShadow: scrolled ? "0px 4px 10px rgba(0, 0, 0, 0.3)" : "none",
+        boxShadow: scrolled || isServiceCheckout ? "0px 4px 10px rgba(0, 0, 0, 0.3)" : "none",
         maxWidth: "100%",
       }}
     >
@@ -146,7 +146,7 @@ const LandingPageHeader = () => {
         }}
       >
         {/* Back Button */}
-        {window.history.length > 1 && !isLandingPage && (
+        {window.history.length > 1 && !isLandingPage && !isServiceCheckout && (
           <IconButton
             edge="start"
             color="inherit"
@@ -298,23 +298,6 @@ const LandingPageHeader = () => {
                   ))}
                 </Menu>
               </Box>
-            ) : item.external ? (
-              <Link to={item.link} target="_blank" rel="noopener noreferrer">
-                <GradientButton
-                  variant="contained"
-                  sx={{
-                    textTransform: "none",
-                    height: 40,
-                    minWidth: 120,
-                    fontSize: 16,
-                    padding: "8px 24px",
-                  }}
-                >
-                  <ButtonTypography sx={{ color: "white" }}>
-                    {item.title}
-                  </ButtonTypography>
-                </GradientButton>
-              </Link>
             ) : (
               <Button
                 key={item.title}
