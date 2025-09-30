@@ -15,7 +15,6 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TermsModal from "./TermsModal";
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import crewCenterAnchor from '../assets/images/crew-center-anchor.svg'
 
 const LandingPageFooter = () => {
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
@@ -86,7 +85,6 @@ const LandingPageFooter = () => {
                   <ButtonTypography sx={{ color: "white" }}>
                     Contact Yacht Crew Center, LLC
                   </ButtonTypography>
-                  <img src={crewCenterAnchor} alt="Yacht Crew Center" style={{ marginLeft: "10px" }} />
                 </GradientButton>
               </Link>
             </Box>
