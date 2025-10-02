@@ -543,22 +543,46 @@ const QuoteDetails = () => {
       </Grid>
 
       {/* Action confirmation dialog */}
-      <Dialog open={actionDialog.open} onClose={() => setActionDialog({ open: false, action: null })}>
-        <DialogTitle>
+      <Dialog 
+        open={actionDialog.open} 
+        onClose={() => setActionDialog({ open: false, action: null })}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            borderRadius: 2,
+            border: '1px solid #e0e0e0',
+            maxWidth: '400px',
+            width: '100%'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          borderBottom: '1px solid #f0f0f0', 
+          py: 2,
+          px: 3,
+          fontWeight: 500
+        }}>
           {actionDialog.action?.label || "Confirm Action"}
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Are you sure you want to {actionDialog.action?.label.toLowerCase()}?
-            {actionDialog.action?.action === 'accept' && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                This will approve the quote and initiate the payment process.
-              </Typography>
-            )}
+        <DialogContent sx={{ py: 3, px: 3 }}>
+          <Typography variant="body1" sx={{ fontWeight: 400, mt: 1 }}>
+            Are you sure you want to {actionDialog.action?.label?.toLowerCase()}?
           </Typography>
+          {actionDialog.action?.action === 'accept' && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              This will approve the quote and initiate the payment process.
+            </Typography>
+          )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setActionDialog({ open: false, action: null })} disabled={responding}>
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #f0f0f0' }}>
+          <Button 
+            onClick={() => setActionDialog({ open: false, action: null })} 
+            disabled={responding}
+            sx={{ 
+              textTransform: 'none',
+              fontWeight: 500
+            }}
+          >
             Cancel
           </Button>
           <Button
@@ -566,6 +590,12 @@ const QuoteDetails = () => {
             variant="contained"
             color={actionDialog.action?.color || "primary"}
             disabled={responding}
+            disableElevation
+            sx={{ 
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 3
+            }}
           >
             {responding ? "Processing..." : "Confirm"}
           </Button>

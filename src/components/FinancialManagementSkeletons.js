@@ -24,11 +24,11 @@ export const SummaryCardsSkeleton = () => {
             ? "1fr"
             : isTablet
             ? "repeat(2, 1fr)"
-            : "repeat(4, 1fr)",
+            : "repeat(3, 1fr)",
           gap: isMobile ? 3 : 4,
         }}
       >
-        {[1, 2, 3, 4].map((index) => (
+        {[1, 2, 3].map((index) => (
           <Card
             key={index}
             sx={{
@@ -198,6 +198,7 @@ export const InvoiceTableSkeleton = () => {
   return (
     <Card
       sx={{
+        width: "100%",
         background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
         borderRadius: 3,
         boxShadow:
@@ -381,7 +382,7 @@ export const FinancialManagementSkeleton = () => {
         </Box>
 
         {/* Invoice Table Skeleton */}
-        <Box>
+        <Box sx={{ width: "100%" }}>
           <InvoiceTableSkeleton />
         </Box>
       </Box>
