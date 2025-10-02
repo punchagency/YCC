@@ -485,7 +485,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                   <Box display="flex" justifyContent="flex-end" gap={1}>
                     <IconButton
                       size="small"
-                      onClick={() => handleViewDetails(item.bookingId || item._id)}
+                      onClick={() => handleViewDetails(item._id)}
                       sx={{
                         bgcolor: 'primary.main',
                         color: 'white',
@@ -494,7 +494,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                     >
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
-                    <IconButton
+                    {/* <IconButton
                       size="small"
                       sx={{
                         bgcolor: 'secondary.main',
@@ -503,7 +503,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                       }}
                     >
                       <EditIcon fontSize="small" />
-                    </IconButton>
+                    </IconButton> */}
                     <IconButton
                       size="small"
                       onClick={() => handleDownloadPDF(item)}
@@ -629,7 +629,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                       <Tooltip title="View Booking">
                         <IconButton
                           size="small"
-                          onClick={() => handleViewDetails(item.bookingId || item._id)}
+                          onClick={() => handleViewDetails(item._id)}
                           sx={{
                             bgcolor: 'primary.main',
                             color: 'white',

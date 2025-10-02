@@ -22,17 +22,17 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-  Pagination
+  Pagination,
+  Skeleton
 } from "@mui/material";
 import {
   Visibility,
-  Edit,
-  Delete,
   DeleteOutline
 } from "@mui/icons-material";
 import { visuallyHidden } from '@mui/utils';
+import { formatDateTime } from "../../../utils/formatters";
 
-const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
+const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, loading = false }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [sortField, setSortField] = useState(null);
@@ -41,136 +41,12 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
   const [selectAll, setSelectAll] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const invoices = React.useMemo(() => Array.isArray(financeData?.invoices) ? financeData?.invoices : [], [financeData]);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
 
-  // Sample invoice data
-  const invoices = [
-    {
-      id: "INV-001",
-      vendor: "John Doe",
-      date: "01/03/2025",
-      amount: 12000.0,
-      status: "In Progress",
-      details: {
-        invoiceNo: "INV-001",
-        serviceName: "Yacht Maintenance",
-        serviceFee: 11500,
-        taxRate: 5,
-        taxAmount: 575,
-        discount: 75,
-        total: 12000,
-        bookingDate: "01/03/2025",
-        paymentMethod: "Credit Card",
-        cardEnding: "4321",
-        paymentStatus: "In Progress",
-      },
-    },
-    {
-      id: "INV-002",
-      vendor: "Jane Smith",
-      date: "01/04/2025",
-      amount: 8500.0,
-      status: "Completed",
-      details: {
-        invoiceNo: "INV-002",
-        serviceName: "Crew Training",
-        serviceFee: 8000,
-        taxRate: 5,
-        taxAmount: 400,
-        discount: 0,
-        total: 8500,
-        bookingDate: "01/04/2025",
-        paymentMethod: "Bank Transfer",
-        cardEnding: "N/A",
-        paymentStatus: "Completed",
-      },
-    },
-    {
-      id: "INV-003",
-      vendor: "Alice Johnson",
-      date: "01/05/2025",
-      amount: 15200.0,
-      status: "Pending",
-      details: {
-        invoiceNo: "INV-003",
-        serviceName: "Engine Repair",
-        serviceFee: 14500,
-        taxRate: 5,
-        taxAmount: 725,
-        discount: 25,
-        total: 15200,
-        bookingDate: "01/05/2025",
-        paymentMethod: "Visa",
-        cardEnding: "7890",
-        paymentStatus: "Pending",
-      },
-    },
-    {
-      id: "INV-004",
-      vendor: "Bob Brown",
-      date: "01/06/2025",
-      amount: 9750.0,
-      status: "In Progress",
-      details: {
-        invoiceNo: "INV-004",
-        serviceName: "Interior Design",
-        serviceFee: 9500,
-        taxRate: 5,
-        taxAmount: 475,
-        discount: 225,
-        total: 9750,
-        bookingDate: "01/06/2025",
-        paymentMethod: "Mastercard",
-        cardEnding: "5678",
-        paymentStatus: "In Progress",
-      },
-    },
-    {
-      id: "INV-005",
-      vendor: "Carol White",
-      date: "01/07/2025",
-      amount: 22300.0,
-      status: "Completed",
-      details: {
-        invoiceNo: "INV-005",
-        serviceName: "Hull Painting",
-        serviceFee: 21000,
-        taxRate: 5,
-        taxAmount: 1050,
-        discount: 0,
-        total: 22300,
-        bookingDate: "01/07/2025",
-        paymentMethod: "American Express",
-        cardEnding: "9012",
-        paymentStatus: "Completed",
-      },
-    },
-    {
-      id: "INV-006",
-      vendor: "David Green",
-      date: "01/08/2025",
-      amount: 5600.0,
-      status: "Pending",
-      details: {
-        invoiceNo: "INV-006",
-        serviceName: "Safety Inspection",
-        serviceFee: 5500,
-        taxRate: 5,
-        taxAmount: 275,
-        discount: 175,
-        total: 5600,
-        bookingDate: "01/08/2025",
-        paymentMethod: "Visa",
-        cardEnding: "3456",
-        paymentStatus: "Pending",
-      },
-    },
-  ];
-
-  // Initialize filteredInvoices with invoices data
-  useEffect(() => {
+  React.useEffect(() => {
     setFilteredInvoices(invoices);
-  }, []);
+  }, [financeData]);
 
   // Filter invoices when activeFilter or searchQuery changes
   useEffect(() => {
@@ -256,7 +132,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
 
     if (checked) {
       // Select all items
-      const allItemIds = invoices.map((item) => item.id);
+      const allItemIds = invoices.map((item) => item.invoiceId);
       setSelectedItems(allItemIds);
     } else {
       // Deselect all
@@ -313,60 +189,87 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
       <Box sx={{ p: 2 }}>
         <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
           <CardContent sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
-              Payment & Invoice Tracker
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
-              Monitor outstanding invoices, track completed payments, and manage upcoming expenses.
-            </Typography>
-            
-            <Stack spacing={2}>
-              {sortedInvoices.map((invoice) => {
-                const statusStyle = getStatusColor(invoice.status);
-                return (
-                  <Card key={invoice.id} variant="outlined" sx={{ borderRadius: 2 }}>
-                    <CardContent sx={{ p: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                          {invoice.id}
-                        </Typography>
-                        <Chip
-                          label={invoice.status}
-                          size="small"
-                          sx={{
-                            bgcolor: statusStyle.bgcolor,
-                            color: statusStyle.color,
-                            fontWeight: 500,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      </Box>
-                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
-                        Vendor: {invoice.vendor}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
-                        Amount: ${invoice.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
-                        Date: {invoice.date}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                        <IconButton size="small" sx={{ fontSize: '14px' }} onClick={() => handleViewItem(invoice)}>
-                          <Visibility fontSize="small" />
-                          View Details
-                        </IconButton>
-                        {/* <IconButton size="small" onClick={() => handleEdit(0)}>
-                          <Edit fontSize="small" />
-                        </IconButton>
-                        <IconButton size="small" onClick={() => handleDelete(0)}>
-                          <Delete fontSize="small" color="error" />
-                        </IconButton> */}
-                      </Box>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </Stack>
+            {loading ? (
+              <>
+                <Skeleton variant="text" width="60%" height={28} sx={{ mb: 1 }} />
+                <Skeleton variant="text" width="80%" height={16} sx={{ mb: 3 }} />
+                <Stack spacing={2}>
+                  {[1, 2, 3, 4, 5].map((index) => (
+                    <Card key={index} variant="outlined" sx={{ borderRadius: 2 }}>
+                      <CardContent sx={{ p: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                          <Skeleton variant="text" width="40%" height={20} />
+                          <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 12 }} />
+                        </Box>
+                        <Skeleton variant="text" width="50%" height={16} sx={{ mb: 0.5 }} />
+                        <Skeleton variant="text" width="60%" height={16} sx={{ mb: 0.5 }} />
+                        <Skeleton variant="text" width="45%" height={16} sx={{ mb: 1 }} />
+                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                          <Skeleton variant="rectangular" width={90} height={32} sx={{ borderRadius: 1 }} />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </Stack>
+              </>
+            ) : (
+              <>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+                  Payment & Invoice Tracker
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#666', mb: 3 }}>
+                  Monitor outstanding invoices, track completed payments, and manage upcoming expenses.
+                </Typography>
+
+                <Stack spacing={2}>
+                  {sortedInvoices.map((invoice) => {
+                    const statusStyle = getStatusColor(invoice.status);
+                    return (
+                      <Card key={invoice.id} variant="outlined" sx={{ borderRadius: 2 }}>
+                        <CardContent sx={{ p: 2 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                              {invoice.id}
+                            </Typography>
+                            <Chip
+                              label={invoice.status}
+                              size="small"
+                              sx={{
+                                bgcolor: statusStyle.bgcolor,
+                                color: statusStyle.color,
+                                fontWeight: 500,
+                                fontSize: '0.75rem'
+                              }}
+                            />
+                          </Box>
+                          <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                            Vendor: {invoice.vendor}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#666', mb: 0.5 }}>
+                            Amount: ${invoice.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+                            Date: {invoice.date}
+                          </Typography>
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                            <IconButton size="small" sx={{ fontSize: '14px' }} onClick={() => handleViewItem(invoice)}>
+                              <Visibility fontSize="small" />
+                              View Details
+                            </IconButton>
+                            {/* <IconButton size="small" onClick={() => handleEdit(0)}>
+                              <Edit fontSize="small" />
+                            </IconButton>
+                            <IconButton size="small" onClick={() => handleDelete(0)}>
+                              <Delete fontSize="small" color="error" />
+                            </IconButton> */}
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </Stack>
+              </>
+            )}
           </CardContent>
         </Card>
         {renderDetailsModal()}
@@ -378,168 +281,224 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "" }) => {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
         <CardContent sx={{ p: 4 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
-            Payment & Invoice Tracker
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
-            Monitor outstanding invoices, track completed payments, and manage upcoming expenses. Use filters and sorting options for easy navigation and quick access to financial details.
-          </Typography>
+          {loading ? (
+            <>
+              <Skeleton variant="text" width="60%" height={28} sx={{ mb: 1 }} />
+              <Skeleton variant="text" width="80%" height={16} sx={{ mb: 4 }} />
 
-          <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: 2 }}>
-            <Table sx={{ minWidth: 650 }}>
-              <TableHead sx={{ bgcolor: '#f8f9fa' }}>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Checkbox
-                        checked={selectAll}
-                        onChange={handleSelectAll}
-                        size="small"
-                      />
-                      {selectedItems.length > 0 && (
-                        <IconButton
-                          size="small"
-                          onClick={handleBulkDelete}
-                          sx={{ color: '#f44336' }}
-                        >
-                          <DeleteOutline fontSize="small" />
-                        </IconButton>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    <TableSortLabel
-                      active={sortField === 'id'}
-                      direction={sortField === 'id' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('id')}
-                    >
-                      Inv. No.
-                      {sortField === 'id' ? (
-                        <Box component="span" sx={visuallyHidden}>
-                          {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                        </Box>
-                      ) : null}
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    <TableSortLabel
-                      active={sortField === 'vendor'}
-                      direction={sortField === 'vendor' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('vendor')}
-                    >
-                      Vendor
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    <TableSortLabel
-                      active={sortField === 'date'}
-                      direction={sortField === 'date' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('date')}
-                    >
-                      Date
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    <TableSortLabel
-                      active={sortField === 'amount'}
-                      direction={sortField === 'amount' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('amount')}
-                    >
-                      Amount
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                    <TableSortLabel
-                      active={sortField === 'status'}
-                      direction={sortField === 'status' ? sortDirection : 'asc'}
-                      onClick={() => handleSort('status')}
-                    >
-                      Status
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600, color: '#555' }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
+              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                <Table sx={{ minWidth: 650 }}>
+                  <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                    <TableRow>
+                      {['checkbox', 'Inv. No.', 'Invoice Type', 'Date', 'Amount', 'Status', 'Actions'].map((header, index) => (
+                        <TableCell key={index} sx={{ fontWeight: 600, color: '#555' }}>
+                          <Skeleton variant="text" width="80%" height={20} />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
 
-              <TableBody>
-                {sortedInvoices.map((invoice, index) => {
-                  const statusStyle = getStatusColor(invoice.status);
-                  return (
-                    <TableRow
-                      key={invoice.id}
-                      sx={{
-                        '&:hover': { bgcolor: '#f8f9fa' },
-                        '&:last-child td, &:last-child th': { border: 0 }
-                      }}
-                    >
+                  <TableBody>
+                    {[1, 2, 3, 4, 5].map((rowIndex) => (
+                      <TableRow key={rowIndex} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell padding="checkbox">
+                          <Skeleton variant="rectangular" width={20} height={20} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width="80%" height={20} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width="70%" height={20} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width="60%" height={20} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="text" width="50%" height={20} />
+                        </TableCell>
+                        <TableCell>
+                          <Skeleton variant="rectangular" width={80} height={24} sx={{ borderRadius: 12 }} />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Skeleton variant="circular" width={32} height={32} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Skeleton variant="rectangular" width={300} height={40} sx={{ borderRadius: 2 }} />
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 1, color: '#333' }}>
+                Payment & Invoice Tracker
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#666', mb: 4 }}>
+                Monitor outstanding invoices, track completed payments, and manage upcoming expenses. Use filters and sorting options for easy navigation and quick access to financial details.
+              </Typography>
+
+              <TableContainer component={Paper} sx={{ boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                <Table sx={{ minWidth: 650 }}>
+                  <TableHead sx={{ bgcolor: '#f8f9fa' }}>
+                    <TableRow>
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={selectedItems.includes(invoice.id)}
-                          onChange={(e) => handleSelectItem(e, invoice.id)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 500, color: '#333' }}>
-                        {invoice.id}
-                      </TableCell>
-                      <TableCell sx={{ color: '#666' }}>
-                        {invoice.vendor}
-                      </TableCell>
-                      <TableCell sx={{ color: '#666' }}>
-                        {invoice.date}
-                      </TableCell>
-                      <TableCell sx={{ color: '#666', fontWeight: 500 }}>
-                        ${invoice.amount.toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={invoice.status}
-                          size="small"
-                          sx={{
-                            bgcolor: statusStyle.bgcolor,
-                            color: statusStyle.color,
-                            fontWeight: 500,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                          <IconButton
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Checkbox
+                            checked={selectAll}
+                            onChange={handleSelectAll}
                             size="small"
-                            onClick={() => handleViewItem(invoice)}
-                            sx={{ fontSize: '14px' }}
-                          >
-                            <Visibility fontSize="small" />
-                            View Details
-                          </IconButton>
+                          />
+                          {selectedItems.length > 0 && (
+                            <IconButton
+                              size="small"
+                              onClick={handleBulkDelete}
+                              sx={{ color: '#f44336' }}
+                            >
+                              <DeleteOutline fontSize="small" />
+                            </IconButton>
+                          )}
                         </Box>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                        <TableSortLabel
+                          active={sortField === 'id'}
+                          direction={sortField === 'id' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('id')}
+                        >
+                          Inv. No.
+                          {sortField === 'id' ? (
+                            <Box component="span" sx={visuallyHidden}>
+                              {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                            </Box>
+                          ) : null}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                        <TableSortLabel
+                          active={sortField === 'type'}
+                          direction={sortField === 'type' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('type')}
+                        >
+                          Invoice Type
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                        <TableSortLabel
+                          active={sortField === 'date'}
+                          direction={sortField === 'date' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('date')}
+                        >
+                          Date
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                        <TableSortLabel
+                          active={sortField === 'amount'}
+                          direction={sortField === 'amount' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('amount')}
+                        >
+                          Amount
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: '#555' }}>
+                        <TableSortLabel
+                          active={sortField === 'status'}
+                          direction={sortField === 'status' ? sortDirection : 'asc'}
+                          onClick={() => handleSort('status')}
+                        >
+                          Status
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 600, color: '#555' }}>
+                        Actions
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
 
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-            <Pagination
-              count={Math.ceil(filteredInvoices.length / 10)}
-              page={1}
-              onChange={() => {}}
-              color="primary"
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  borderRadius: 2
-                }
-              }}
-            />
-          </Box>
+                  <TableBody>
+                    {sortedInvoices.map((invoice, index) => {
+                      const statusStyle = getStatusColor(invoice.status);
+                      return (
+                        <TableRow
+                          key={invoice?.invoiceId}
+                          sx={{
+                            '&:hover': { bgcolor: '#f8f9fa' },
+                            '&:last-child td, &:last-child th': { border: 0 }
+                          }}
+                        >
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              checked={selectedItems.includes(invoice?.invoiceId)}
+                              onChange={(e) => handleSelectItem(e, invoice?.invoiceId)}
+                              size="small"
+                            />
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: 500, color: '#333' }}>
+                            {invoice?.invoiceId}
+                          </TableCell>
+                          <TableCell sx={{ color: '#666', textTransform: 'capitalize' }}>
+                            {invoice.type}
+                          </TableCell>
+                          <TableCell sx={{ color: '#666' }}>
+                            {invoice?.invoiceDate && formatDateTime(invoice.invoiceDate)}
+                          </TableCell>
+                          <TableCell sx={{ color: '#666', fontWeight: 500 }}>
+                            ${invoice?.amount.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={invoice.status}
+                              size="small"
+                              sx={{
+                                bgcolor: statusStyle.bgcolor,
+                                color: statusStyle.color,
+                                fontWeight: 500,
+                                fontSize: '0.75rem',
+                                textTransform: 'capitalize'
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell align="center">
+                            <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleViewItem(invoice)}
+                                sx={{ fontSize: '14px' }}
+                              >
+                                <Visibility fontSize="small" />
+                                View Details
+                              </IconButton>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Pagination
+                  count={Math.ceil(filteredInvoices.length / 10)}
+                  page={1}
+                  onChange={() => {}}
+                  color="primary"
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      borderRadius: 2
+                    }
+                  }}
+                />
+              </Box>
+            </>
+          )}
         </CardContent>
       </Card>
       {renderDetailsModal()}
