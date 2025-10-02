@@ -6,7 +6,7 @@ import { Pagination } from "../../../components/pagination";
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useOutletContext } from "react-router-dom";
-import { CrewFinancialManagement } from '../../../services/crew/crewFinancialManagement.js'
+import { CrewFinancialManagement } from '../../../services/crew/crewFinancialManagement.js';
 
 const FinancialManagement = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -17,6 +17,7 @@ const FinancialManagement = () => {
   const [totalPages] = useState(0);
   const [totalItems] = useState(0);
   const [financeData, setFinanceData] = React.useState({});
+  const [loading, setLoading] = useState(true);
   const toast = React.useRef(null);
 
   const theme = useTheme();
@@ -37,6 +38,7 @@ const FinancialManagement = () => {
 
   const fetchFinanceData = async () => {
     try {
+      setLoading(true);
       const response = await CrewFinancialManagement();
       setFinanceData(response.data);
     } catch (error) {
@@ -46,6 +48,8 @@ const FinancialManagement = () => {
         detail: "Failed to fetch data. Please try again later.",
         life: 3000,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,13 +59,13 @@ const FinancialManagement = () => {
 
   return (
     <>
-      <Outstanding financeData={financeData} setFinanceData={setFinanceData} fetchData={fetchFinanceData} />
+      <Outstanding financeData={financeData} loading={loading} />
       <SearchFilters
         onFilterChange={handleFilterChange}
         onSearchChange={handleSearchChange}
         activeFilter={activeFilter}
       />
-      <Table activeFilter={activeFilter} searchQuery={searchQuery} />
+      <Table activeFilter={activeFilter} searchQuery={searchQuery} financeData={financeData} loading={loading} />
 
       <Pagination
         currentPage={page}

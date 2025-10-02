@@ -13,43 +13,6 @@ const getAuthHeader = () => {
   return header;
 };
 
-// Get user ID from localStorage with debugging
-// const getUserId = () => {
-//   try {
-//     // Log all localStorage keys to see what's available
-//     console.log("All localStorage keys:");
-//     for (let i = 0; i < localStorage.length; i++) {
-//       const key = localStorage.key(i);
-//       console.log(`${key}: ${localStorage.getItem(key)}`);
-//     }
-
-//     const id = localStorage.getItem("id");
-//     console.log("ID from localStorage:", id);
-
-//     // Try other possible keys
-//     const userId = localStorage.getItem("userId");
-//     console.log("userId from localStorage:", userId);
-
-//     const userStr = localStorage.getItem("user");
-//     console.log("user string from localStorage:", userStr);
-
-//     try {
-//       if (userStr) {
-//         const user = JSON.parse(userStr);
-//         console.log("Parsed user object:", user);
-//         if (user && user.id) return user.id;
-//       }
-//     } catch (e) {
-//       console.error("Error parsing user JSON:", e);
-//     }
-
-//     return id || userId || null;
-//   } catch (error) {
-//     console.error("Error getting user ID from localStorage:", error);
-//     return null;
-//   }
-// };
-
 export const createInventoryData = async (inventoryData) => {
   try {
     // Check if we're dealing with FormData
@@ -364,6 +327,20 @@ export const sendInventoryEmail = async (to, subject, message) => {
     };
   }
 };
+
+export const getProductById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory/product/${id}`, {
+      headers: getAuthHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    return {
+      success: false,
+      error: error.response?.data?.message || "Failed to fetch product",
+    };
+  }
+}
 
 export const getAllSuppliers = async () => {
   try {

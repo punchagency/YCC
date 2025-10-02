@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -25,7 +25,8 @@ import {
   useTheme,
   useMediaQuery,
   TableSortLabel,
-  Skeleton
+  Skeleton,
+  Tooltip
 } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
@@ -92,63 +93,219 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
     (booking) => {
       try {
         const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.width;
+        const pageHeight = doc.internal.pageSize.height;
+        const margin = 20;
+        let currentY = margin;
+
+        // Helper function to add new page if needed
+        const checkAndAddPage = (requiredHeight) => {
+          if (currentY + requiredHeight > pageHeight - margin) {
+            doc.addPage();
+            currentY = margin;
+          }
+        };
+
+        // Professional Header
+        doc.setFillColor(41, 128, 185); // Blue background
+        doc.rect(0, 0, pageWidth, 50, 'F');
+
+        // Company logo placeholder (you can add actual logo here)
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('YACHT CARE CONNECT', pageWidth / 2, 25, { align: 'center' });
+
+        // Subtitle
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Professional Yacht Services', pageWidth / 2, 35, { align: 'center' });
+
+        // Booking title
+        currentY = 60;
+        doc.setTextColor(41, 128, 185);
         doc.setFontSize(20);
-        doc.text("Booking Details", 14, 22);
+        doc.setFont('helvetica', 'bold');
+        doc.text('BOOKING DETAILS REPORT', pageWidth / 2, currentY, { align: 'center' });
+
+        // Booking info box
+        currentY += 15;
+        checkAndAddPage(30);
+        doc.setDrawColor(41, 128, 185);
+        doc.setFillColor(248, 249, 250);
+        doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 25, 3, 3, 'FD');
+
+        doc.setTextColor(52, 58, 64);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+
+        const bookingId = booking.bookingId || booking._id || "N/A";
+        const bookingDate = booking.dateTime
+          ? new Date(booking.dateTime).toLocaleString()
+          : "N/A";
+
+        doc.text(`Booking ID: ${bookingId}`, margin + 10, currentY + 10);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, margin + 10, currentY + 18);
+        doc.text(`Status: ${booking.bookingStatus || booking.status || "Pending"}`, pageWidth - margin - 60, currentY + 10);
+        doc.text(`Date: ${bookingDate}`, pageWidth - margin - 60, currentY + 18);
+
+        currentY += 35;
+
+        // Customer Information Section
+        checkAndAddPage(40);
+        doc.setFillColor(41, 128, 185);
+        doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(12);
-        doc.text(
-          `Booking ID: ${booking.bookingId || booking._id || "N/A"}`,
-          14,
-          32
-        );
-        doc.text(
-          `Date: ${
-            booking.dateTime
-              ? new Date(booking.dateTime).toLocaleString()
-              : "N/A"
-          }`,
-          14,
-          38
-        );
+        doc.setFont('helvetica', 'bold');
+        doc.text('CUSTOMER INFORMATION', margin + 5, currentY + 6);
 
-        doc.setFontSize(16);
-        doc.text("Vendor Information", 14, 48);
+        currentY += 12;
+        doc.setDrawColor(224, 224, 224);
+        doc.setFillColor(250, 250, 250);
+        doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 25, 2, 2, 'FD');
+
+        doc.setTextColor(52, 58, 64);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+
+        const customerName = booking.crew
+          ? `${booking.crew.firstName || ''} ${booking.crew.lastName || ''}`.trim()
+          : 'N/A';
+
+        doc.text(`Customer Name: ${customerName}`, margin + 5, currentY + 8);
+        doc.text(`Contact Phone: ${booking.contactPhone || booking.crew?.phone || 'N/A'}`, margin + 5, currentY + 15);
+        doc.text(`Email: ${booking.crew?.email || 'N/A'}`, margin + 5, currentY + 22);
+
+        currentY += 30;
+
+        // Service Details Section
+        checkAndAddPage(50);
+        doc.setFillColor(41, 128, 185);
+        doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(12);
-        doc.text(`Vendor: ${booking.vendorName || "N/A"}`, 14, 54);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SERVICE DETAILS', margin + 5, currentY + 6);
 
-        doc.setFontSize(16);
-        doc.text("Service Details", 14, 64);
+        currentY += 12;
+        doc.setDrawColor(224, 224, 224);
+        doc.setFillColor(250, 250, 250);
+        doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 35, 2, 2, 'FD');
+
+        doc.setTextColor(52, 58, 64);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+
+        doc.text(`Vendor: ${booking.vendorName || 'N/A'}`, margin + 5, currentY + 8);
+        doc.text(`Service Location: ${booking.serviceLocation || booking.deliveryAddress || 'N/A'}`, margin + 5, currentY + 15);
+        doc.text(`Vendor Location: ${booking.vendorLocation || 'N/A'}`, margin + 5, currentY + 22);
+        doc.text(`Total Amount: $${booking.totalAmount?.toFixed(2) || '0.00'}`, margin + 5, currentY + 29);
+
+        currentY += 40;
+
+        // Services Table
+        if (booking.services && booking.services.length > 0) {
+          checkAndAddPage(60);
+
+          doc.setFillColor(41, 128, 185);
+          doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+
+          doc.setTextColor(255, 255, 255);
+          doc.setFontSize(12);
+          doc.setFont('helvetica', 'bold');
+          doc.text('SERVICES BREAKDOWN', margin + 5, currentY + 6);
+
+          currentY += 12;
+
+          // Table headers
+          doc.setDrawColor(41, 128, 185);
+          doc.setFillColor(248, 249, 250);
+          doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 8, 2, 2, 'FD');
+
+          doc.setTextColor(41, 128, 185);
+          doc.setFontSize(9);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Service Name', margin + 5, currentY + 5);
+          doc.text('Quantity', pageWidth / 2 - 10, currentY + 5);
+          doc.text('Unit Price', pageWidth - margin - 40, currentY + 5);
+          doc.text('Total', pageWidth - margin - 15, currentY + 5);
+
+          currentY += 10;
+
+          // Table rows
+          doc.setFont('helvetica', 'normal');
+          booking.services.forEach((service, index) => {
+            const rowY = currentY + (index * 12);
+            checkAndAddPage(12);
+
+            if (index % 2 === 0) {
+              doc.setFillColor(255, 255, 255);
+              doc.roundedRect(margin, rowY - 2, pageWidth - 2 * margin, 10, 0, 0, 'F');
+            }
+
+            doc.setTextColor(52, 58, 64);
+            doc.setFontSize(8);
+
+            const serviceName = service.service?.name || 'Unknown Service';
+            const quantity = service.quantity || 1;
+            const unitPrice = service.service?.price || 0;
+            const total = quantity * unitPrice;
+
+            doc.text(serviceName, margin + 5, rowY + 3);
+            doc.text(quantity.toString(), pageWidth / 2 - 5, rowY + 3, { align: 'center' });
+            doc.text(`$${unitPrice.toFixed(2)}`, pageWidth - margin - 45, rowY + 3, { align: 'right' });
+            doc.text(`$${total.toFixed(2)}`, pageWidth - margin - 10, rowY + 3, { align: 'right' });
+            currentY += 12;
+          });
+
+          currentY += 5;
+        }
+
+        // Payment Information
+        checkAndAddPage(30);
+        doc.setFillColor(41, 128, 185);
+        doc.rect(margin, currentY, pageWidth - 2 * margin, 8, 'F');
+
+        doc.setTextColor(255, 255, 255);
         doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('PAYMENT INFORMATION', margin + 5, currentY + 6);
 
-        const serviceName =
-          booking.services &&
-          booking.services.length > 0 &&
-          booking.services[0].service
-            ? booking.services[0].service.name
-            : "N/A";
+        currentY += 12;
+        doc.setDrawColor(224, 224, 224);
+        doc.setFillColor(250, 250, 250);
+        doc.roundedRect(margin, currentY, pageWidth - 2 * margin, 20, 2, 2, 'FD');
 
-        const servicePrice =
-          booking.services &&
-          booking.services.length > 0 &&
-          booking.services[0].service
-            ? `$${booking.services[0].service.price}`
-            : "N/A";
+        doc.setTextColor(52, 58, 64);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
 
-        doc.text(`Service: ${serviceName}`, 14, 70);
-        doc.text(
-          `Location: ${
-            booking.serviceLocation || booking.deliveryAddress || "N/A"
-          }`,
-          14,
-          76
-        );
-        doc.text(`Price: ${servicePrice}`, 14, 82);
-        doc.text(`Status: ${booking.status || "Pending"}`, 14, 88);
+        doc.text(`Payment Status: ${booking.paymentStatus || 'Pending'}`, margin + 5, currentY + 8);
+        doc.text(`Total Amount: $${booking.totalAmount?.toFixed(2) || '0.00'}`, margin + 5, currentY + 15);
 
-        const filename = `booking-${
-          booking.bookingId || booking._id || "details"
-        }.pdf`;
+        currentY += 25;
 
+        // Footer
+        const footerY = pageHeight - 30;
+        doc.setFillColor(248, 249, 250);
+        doc.rect(0, footerY, pageWidth, 30, 'F');
+
+        doc.setDrawColor(224, 224, 224);
+        doc.line(margin, footerY, pageWidth - margin, footerY);
+
+        doc.setTextColor(128, 128, 128);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Generated by Yacht Care Connect System', pageWidth / 2, footerY + 10, { align: 'center' });
+        doc.text(`Report generated on ${new Date().toLocaleString()}`, pageWidth / 2, footerY + 18, { align: 'center' });
+
+        // Save the PDF
+        const filename = `booking-${bookingId.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().getTime()}.pdf`;
         doc.save(filename);
+
       } catch (error) {
         console.error("Error generating PDF:", error);
         showError("Failed to generate PDF. Please try again.");
@@ -229,8 +386,8 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
 
   if (error) {
     return (
-      <Alert 
-        severity="error" 
+      <Alert
+        severity="error"
         action={
           <Button color="inherit" size="small" onClick={() => window.location.reload()}>
             Try Again
@@ -260,8 +417,8 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
         <Grid container spacing={2}>
           {bookings.map((item, index) => (
             <Grid item xs={12} key={index}>
-              <Card 
-                sx={{ 
+              <Card
+                sx={{
                   borderRadius: 3,
                   boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
                   transition: 'all 0.2s ease',
@@ -276,14 +433,14 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                     <Typography variant="h6" fontWeight={600} color="primary">
                       {item.bookingId || 'N/A'}
                     </Typography>
-                    <Chip 
-                      label={item.bookingStatus || 'Pending'} 
+                    <Chip
+                      label={item.bookingStatus || 'Pending'}
                       color={getStatusColor(item.bookingStatus)}
                       size="small"
                       sx={{ textTransform: 'capitalize', fontWeight: 500 }}
                     />
                   </Box>
-                  
+
                   <Box mb={2}>
                     <Box display="flex" alignItems="center" mb={1}>
                       <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
@@ -291,7 +448,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                         {formatServices(item.services)}
                       </Typography>
                     </Box>
-                    
+
                     <Box display="flex" alignItems="center" mb={1}>
                       <Typography variant="body2" color="text.secondary" sx={{ minWidth: 60 }}>
                         Vendor:
@@ -300,14 +457,14 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                         {item.vendorName || 'N/A'}
                       </Typography>
                     </Box>
-                    
+
                     <Box display="flex" alignItems="center" mb={1}>
                       <LocationIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
                       <Typography variant="body2" noWrap>
                         {item.serviceLocation || item.deliveryAddress || 'N/A'}
                       </Typography>
                     </Box>
-                    
+
                     <Box display="flex" alignItems="center">
                       <CalendarIcon sx={{ fontSize: 16, color: 'text.secondary', mr: 1 }} />
                       <Typography variant="body2">
@@ -322,36 +479,36 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                       </Typography>
                     </Box>
                   </Box>
-                  
+
                   <Divider sx={{ my: 2 }} />
-                  
+
                   <Box display="flex" justifyContent="flex-end" gap={1}>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleViewDetails(item.bookingId || item._id)}
-                      sx={{ 
-                        bgcolor: 'primary.main', 
+                    <IconButton
+                      size="small"
+                      onClick={() => handleViewDetails(item._id)}
+                      sx={{
+                        bgcolor: 'primary.main',
                         color: 'white',
                         '&:hover': { bgcolor: 'primary.dark' }
                       }}
                     >
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
-                    <IconButton 
+                    {/* <IconButton
                       size="small"
-                      sx={{ 
-                        bgcolor: 'secondary.main', 
+                      sx={{
+                        bgcolor: 'secondary.main',
                         color: 'white',
                         '&:hover': { bgcolor: 'secondary.dark' }
                       }}
                     >
                       <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
+                    </IconButton> */}
+                    <IconButton
+                      size="small"
                       onClick={() => handleDownloadPDF(item)}
-                      sx={{ 
-                        bgcolor: 'success.main', 
+                      sx={{
+                        bgcolor: 'success.main',
                         color: 'white',
                         '&:hover': { bgcolor: 'success.dark' }
                       }}
@@ -366,9 +523,9 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
         </Grid>
       ) : (
         // Desktop Table Layout
-        <TableContainer 
-          component={Paper} 
-          sx={{ 
+        <TableContainer
+          component={Paper}
+          sx={{
             borderRadius: 3,
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
             overflow: 'hidden'
@@ -420,9 +577,9 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
             </TableHead>
             <TableBody>
               {bookings.map((item, index) => (
-                <TableRow 
+                <TableRow
                   key={index}
-                  sx={{ 
+                  sx={{
                     '&:hover': { bgcolor: 'grey.50' },
                     transition: 'background-color 0.2s ease'
                   }}
@@ -460,8 +617,8 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 2 }}>
-                    <Chip 
-                      label={item.bookingStatus || 'Pending'} 
+                    <Chip
+                      label={item.bookingStatus || 'Pending'}
                       color={getStatusColor(item.bookingStatus)}
                       size="small"
                       sx={{ textTransform: 'capitalize', fontWeight: 500 }}
@@ -469,38 +626,44 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                   </TableCell>
                   <TableCell sx={{ py: 2, textAlign: 'center' }}>
                     <Box display="flex" justifyContent="center" gap={1}>
-                      <IconButton 
-                        size="small" 
-                        onClick={() => handleViewDetails(item.bookingId || item._id)}
-                        sx={{ 
-                          bgcolor: 'primary.main', 
-                          color: 'white',
-                          '&:hover': { bgcolor: 'primary.dark' }
-                        }}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton 
-                        size="small"
-                        sx={{ 
-                          bgcolor: 'secondary.main', 
-                          color: 'white',
-                          '&:hover': { bgcolor: 'secondary.dark' }
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton 
-                        size="small" 
-                        onClick={() => handleDownloadPDF(item)}
-                        sx={{ 
-                          bgcolor: 'success.main', 
-                          color: 'white',
-                          '&:hover': { bgcolor: 'success.dark' }
-                        }}
-                      >
-                        <GetAppIcon fontSize="small" />
-                      </IconButton>
+                      <Tooltip title="View Booking">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleViewDetails(item._id)}
+                          sx={{
+                            bgcolor: 'primary.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'primary.dark' }
+                          }}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      {/* <Tooltip title="Edit Booking">
+                        <IconButton
+                          size="small"
+                          sx={{
+                            bgcolor: 'secondary.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'secondary.dark' }
+                          }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip> */}
+                      <Tooltip title="Download PDF">
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDownloadPDF(item)}
+                          sx={{
+                            bgcolor: 'success.main',
+                            color: 'white',
+                            '&:hover': { bgcolor: 'success.dark' }
+                          }}
+                        >
+                          <GetAppIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -509,7 +672,7 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
           </Table>
         </TableContainer>
       )}
-      
+
       <Box mt={3}>
         <Pagination
           currentPage={page}

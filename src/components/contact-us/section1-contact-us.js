@@ -16,8 +16,8 @@ const Section1ContactUs = () => {
     },
     {
       image: image,
-      title: "Global Yacht Services",
-      subtext: "+1 954 532 0550",
+      title: "Operational and WhatsApp AI Agent",
+      subtext: "+1 954 751 1756",
     },
   ];
 

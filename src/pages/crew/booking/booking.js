@@ -1,11 +1,9 @@
 import React from "react";
-import { Routes, Route, useOutletContext, useLocation } from "react-router-dom";
+import { Routes, Route, useOutletContext, useNavigate } from "react-router-dom";
 import CrewBookingsAndQuotes from "./CrewBookingsAndQuotes";
 import BookingDetails from "./details";
 import ModifyService from "./modifyservice";
-import CreateBooking from "./createBooking";
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { getVendorsAndServices } from "../../../services/crew/crewBookingService";
 import { useToast } from "../../../components/Toast";
 import { getBookings } from "../../../services/crew/crewBookingService";
 import { Box } from "@mui/material";
@@ -13,18 +11,8 @@ import { Box } from "@mui/material";
 const Booking = () => {
   const { showError } = useToast();
   const outletContext = useOutletContext();
-  const [openSelectServiceCategories, setOpenSelectServiceCategories] = React.useState(false);
-  const [openSelectVendors, setOpenSelectVendors] = React.useState(false);
-  const [openVendorServices, setOpenVendorServices] = React.useState(false);
-  const [openVendorProfile, setOpenVendorProfile] = React.useState(false);
-  const [openCreateBookingForm, setOpenCreateBookingForm] = React.useState(false);
-  
-  const [selectedServiceCategories, setSelectedServiceCategories] = React.useState([]);
-  const [selectedVendor, setSelectedVendor] = React.useState(null);
-  const [selectedServices, setSelectedServices] = React.useState([]);
-  const [vendorServices, setVendorServices] = React.useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
-  const [vendors, setVendors] = React.useState([]);
   const [bookings, setBookings] = React.useState([]);
   const [limit, setLimit] = React.useState(10);
   const [page, setPage] = React.useState(1);
@@ -32,10 +20,6 @@ const Booking = () => {
   const [totalItems, setTotalItems] = React.useState(0);
   const [error, setError] = React.useState(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const location = useLocation();
-  const { service } = location.state || {};
-  const [showVendorModal] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState('');
 
   const fetchBookings = React.useCallback(async (params = {}) => {
     const currentPage = params.page || page;
@@ -64,31 +48,10 @@ const Booking = () => {
   React.useEffect(() => {
     fetchBookings();
   }, [fetchBookings]);
-  const fetchVendors = React.useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await getVendorsAndServices();
-      if (response.status) {
-        // Extract unique vendors from services
-        const uniqueVendors = response.data.data.filter((vendor) => vendor.services.length > 0);
-        setVendors(uniqueVendors);
-      }
-    } catch (error) {
-      showError("Failed to fetch vendors");
-    } finally {
-      setLoading(false);
-    }
-  }, [showError]);
-
-  React.useEffect(() => {
-    if (showVendorModal) {
-      fetchVendors();
-    }
-  }, [showVendorModal, fetchVendors]);
 
   React.useEffect(() => {
     const handleCreateBookingClick = () => {
-      setOpenSelectServiceCategories(true);
+      navigate("/crew/booking/new-create-booking");
     };
     
     const handleBookingCreated = () => {
@@ -102,22 +65,8 @@ const Booking = () => {
       window.removeEventListener("openCreateBookingModal", handleCreateBookingClick);
       window.removeEventListener("bookingCreated", handleBookingCreated);
     };
-  }, [fetchBookings]);
+  }, []);
 
-  React.useEffect(() => {
-    if (service) {
-      setOpenSelectServiceCategories(true);
-      console.log("service", service);
-      const serviceCategories = service.categories;
-      if(Array.isArray(serviceCategories) && serviceCategories.length > 0) {
-        setSearchTerm(serviceCategories[0]);
-      }else if(typeof serviceCategories === 'string' && serviceCategories.length > 0) {
-        setSearchTerm(serviceCategories);
-      } else{
-        setSearchTerm("");
-      }
-    }
-  }, [service]);
 
   return (
     <Box sx={{ p: isMobile ? 0 : 2, paddingTop: isMobile ? "10px !important" : "40px !important", mx: "auto" }}>
@@ -129,33 +78,6 @@ const Booking = () => {
               {outletContext &&
                 outletContext.setPageTitle &&
                 outletContext.setPageTitle("Bookings")}
-              <CreateBooking 
-                openSelectServiceCategories={openSelectServiceCategories}
-                setOpenSelectServiceCategories={setOpenSelectServiceCategories}
-                openSelectVendors={openSelectVendors}
-                setOpenSelectVendors={setOpenSelectVendors}
-                openVendorServices={openVendorServices}
-                setOpenVendorServices={setOpenVendorServices}
-                openVendorProfile={openVendorProfile}
-                setOpenVendorProfile={setOpenVendorProfile}
-                openCreateBookingForm={openCreateBookingForm}
-                setOpenCreateBookingForm={setOpenCreateBookingForm}
-                selectedServiceCategories={selectedServiceCategories}
-                setSelectedServiceCategories={setSelectedServiceCategories}
-                selectedVendor={selectedVendor}
-                setSelectedVendor={setSelectedVendor}
-                selectedServices={selectedServices}
-                setSelectedServices={setSelectedServices}
-                vendors={vendors}
-                fetchBookings={fetchBookings}
-                setVendors={setVendors}
-                vendorServices={vendorServices}
-                setVendorServices={setVendorServices}
-                loading={loading}
-                setLoading={setLoading}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              />
               <CrewBookingsAndQuotes 
                 bookings={bookings}
                 loading={loading}

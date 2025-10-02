@@ -7,6 +7,7 @@ import "react-phone-input-2/lib/style.css";
 import Select from "react-select";
 import countryData from "../data/countries.json";
 import { motion, AnimatePresence } from "framer-motion";
+import { Divider } from "@mui/material";
 
 import captainLogo from "../assets/images/captain.png";
 import exteriorLogo from "../assets/images/exterior.png";
@@ -43,6 +44,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
   const [isCVUploading, setIsCVUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptNotifications, setAcceptNotifications] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -79,7 +81,12 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
 
   const handleSignup = async () => {
     if (!acceptTerms) {
-      setError("You must accept the Terms of Service.");
+      setError("You must accept the Terms of Service and Privacy Policy.");
+      return;
+    }
+
+    if (!acceptNotifications) {
+      setError("You must agree to receive notifications related to your Yacht Crew Center account.");
       return;
     }
 
@@ -933,6 +940,16 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   </div>
                 </div>
               </div>
+              <Divider sx={{ my: 3 }} />
+              <div className="" style={{ display: "flex", flexDirection: "row", alignItems: "start", margin: "16px 0" }}>
+                <input type="checkbox" style={{ marginRight: 3 }} checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} />
+                <label>I accept the <span style={{ color: "#034D92" }} onClick={() => navigate("/terms-and-conditions")}>Terms of Service</span> and <span style={{ color: "#034D92" }} onClick={() => navigate("/privacy-policy")}>Privacy Policy</span></label>
+              </div>
+
+              <div className="" style={{ display: "flex", flexDirection: "row", alignItems: "start", margin: "16px 0" }}>
+                <input type="checkbox" style={{ marginRight: 3 }} checked={acceptNotifications} onChange={(e) => setAcceptNotifications(e.target.checked)} />
+                <label>I agree to receive notifications related to my Yacht Crew Center account and platform activities only (no marketing or promotional messages).</label>
+              </div>
 
               <div className="form-group6">
                 <button className="prevbtn" onClick={handlePrevious}>
@@ -1357,6 +1374,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
               <div
                 style={{
                   display: "flex",
+                  flexDirection: "row",
                   alignItems: "center",
                   margin: "16px 0",
                 }}
@@ -1403,6 +1421,31 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 </span>
               </div>
 
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  margin: "16px 0",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={acceptNotifications}
+                  onChange={() => setAcceptNotifications(!acceptNotifications)}
+                  style={{ marginRight: 8 }}
+                />
+                <span
+                  style={{
+                    fontSize: 14,
+                    color: "#333",
+                    fontFamily: "Inter, sans-serif",
+                  }}
+                >
+                  I agree to receive notifications related to my Yacht Crew Center account and platform activities only (no marketing or promotional messages).
+                </span>
+              </div>
+
               <div className="button-group">
                 <button
                   className="prev-button"
@@ -1415,11 +1458,11 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                 <button
                   className="next-button"
                   onClick={handleSignup}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !acceptTerms || !acceptNotifications}
                   style={{
                     width: "100%",
                     marginLeft: "20px",
-                    background: isSubmitting
+                    background: (isSubmitting || !acceptTerms || !acceptNotifications)
                       ? "#ccc"
                       : "linear-gradient(to right, #034d92, #0487d9)",
                   }}

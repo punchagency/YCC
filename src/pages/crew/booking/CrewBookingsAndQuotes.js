@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { useTheme } from "../../../context/theme/themeContext";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { Skeleton, Box, Card, CardContent, Grid, Divider } from "@mui/material";
 import BookingTable from "./table";
 import QuotesTable from "../../quote-related-pages/customers/QuotesTable";
 
@@ -10,22 +9,6 @@ const CrewBookingsAndQuotes = ({ bookings, loading, error, fetchBookings, page, 
   const { theme } = useTheme();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isLargeDesktop = useMediaQuery("(min-width: 1400px)");
-
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case "Pending":
-        return "bg-blue-100 text-blue-800";
-      case "Confirmed":
-        return "bg-yellow-100 text-yellow-800";
-      case "Completed":
-        return "bg-green-100 text-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
 
   return (
     <div
@@ -43,7 +26,6 @@ const CrewBookingsAndQuotes = ({ bookings, loading, error, fetchBookings, page, 
           : {}),
       }}
     >
-      {/* Fixed filter buttons on mobile */}
       <div
         style={{
           position: isMobile ? "sticky" : "static",

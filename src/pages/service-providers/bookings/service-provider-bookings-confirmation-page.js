@@ -79,7 +79,7 @@ const StatusChip = ({ status, type = 'booking' }) => {
                     return { color: "#6c757d", bg: "#f8f9fa", icon: null };
             }
         }
-        
+
         switch (status) {
             case "pending":
                 return { color: "#856404", bg: "#fff3cd", label: "Pending" };
@@ -146,7 +146,7 @@ const ServiceProviderBookingsConfirmationPage = () => {
                 ? baseUrl.slice(0, -4)
                 : baseUrl;
             const apiUrl = `${cleanBaseUrl}/api/bookings/confirm?${queryParams.toString()}`;
-            
+
             const response = await fetch(apiUrl, {
                 method: "GET",
                 headers: {
@@ -196,7 +196,7 @@ const ServiceProviderBookingsConfirmationPage = () => {
             confirmed: "Confirm Booking",
             declined: "Decline Booking"
         };
-        
+
         setStatusDialog({
             open: true,
             action: actionType,
@@ -215,22 +215,22 @@ const ServiceProviderBookingsConfirmationPage = () => {
                 ? baseUrl.slice(0, -4)
                 : baseUrl;
             const apiUrl = `${cleanBaseUrl}/api/bookings/confirm?${queryParams.toString()}`;
-            
+
             const response = await fetch(apiUrl, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    status: updateFormData.status, 
-                    notes: updateFormData.notes, 
-                    reason: updateFormData.reason 
+                body: JSON.stringify({
+                    status: updateFormData.status,
+                    notes: updateFormData.notes,
+                    reason: updateFormData.reason
                 }),
             });
-            
+
             const data = await response.json();
             if (!response.ok || !data.status) {
                 throw new Error(data.message || "Failed to update status");
             }
-            
+
             setAction(updateFormData.status);
             setStatusDialog({ open: false, action: null, title: "" });
         } catch (error) {
@@ -612,7 +612,22 @@ const ServiceProviderBookingsConfirmationPage = () => {
                             rows={3}
                             value={updateFormData.reason}
                             onChange={(e) => setUpdateFormData(prev => ({ ...prev, reason: e.target.value }))}
-                            sx={{ mb: 2 }}
+                            size="medium"
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    borderRadius: "10px",
+                                    backgroundColor: "#F9FAFB",
+                                    "& fieldset": {
+                                        borderColor: "#E5E7EB",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: "#D1D5DB",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "#0387D9",
+                                    },
+                                },
+                            }}
                             placeholder="Please provide a reason for this action..."
                         />
                         <TextField
@@ -637,7 +652,7 @@ const ServiceProviderBookingsConfirmationPage = () => {
                             variant="contained"
                             color={statusDialog.action === 'declined' ? "error" : "primary"}
                             disabled={isUpdating || !updateFormData.reason.trim()}
-                            startIcon={isUpdating ? <CircularProgress size={20} /> : 
+                            startIcon={isUpdating ? <CircularProgress size={20} /> :
                                 statusDialog.action === 'confirmed' ? <CheckCircleIcon /> : <CancelIcon />}
                         >
                             {isUpdating ? "Updating..." : `Yes, ${statusDialog.action === 'confirmed' ? 'Confirm' : 'Decline'} Booking`}

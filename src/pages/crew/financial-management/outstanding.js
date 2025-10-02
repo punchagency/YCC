@@ -14,15 +14,17 @@ import {
   MenuItem,
   DialogActions,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Skeleton
 } from "@mui/material";
 import {
   AccountBalanceWallet,
   CheckCircle,
   Schedule
 } from "@mui/icons-material";
+import { formatCurrency } from "../../../utils/formatters";
 
-const Outstanding = () => {
+const Outstanding = ({ financeData, loading = false }) => {
   // New expense modal state
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [newExpense, setNewExpense] = useState({
@@ -54,14 +56,6 @@ const Outstanding = () => {
     }));
   };
 
-  // Handle date change specifically
-  const handleDateChange = (e) => {
-    setNewExpense((prev) => ({
-      ...prev,
-      date: e.value,
-    }));
-  };
-
   // Handle saving the expense
   const handleSaveExpense = () => {
     // Here you would typically save the expense data
@@ -74,26 +68,26 @@ const Outstanding = () => {
       description: "",
     });
   };
-
+  console.log({ financeData });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const cards = [
     {
       title: "Outstanding Invoices",
-      amount: "$4,000",
+      amount: financeData?.analytics?.totalOutstandingAmount,
       icon: <AccountBalanceWallet sx={{ fontSize: 40, color: '#ff9800' }} />,
       color: '#fff3e0'
     },
     {
       title: "Completed Payments",
-      amount: "$4,000",
+      amount: financeData?.analytics?.totalCompletedAmount,
       icon: <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />,
       color: '#e8f5e8'
     },
     {
-      title: "Upcoming Expenses",
-      amount: "$4,000",
+      title: "Overdue Invoices",
+      amount: financeData?.analytics?.totalOverdueAmount,
       icon: <Schedule sx={{ fontSize: 40, color: '#2196f3' }} />,
       color: '#e3f2fd'
     }
@@ -120,37 +114,49 @@ const Outstanding = () => {
               >
                 <CardContent sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar
-                      sx={{
-                        bgcolor: 'transparent',
-                        width: 60,
-                        height: 60
-                      }}
-                    >
-                      {card.icon}
-                    </Avatar>
-                    <Box>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#666',
-                          fontWeight: 500,
-                          mb: 0.5
-                        }}
-                      >
-                        {card.title}
-                      </Typography>
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontWeight: 700,
-                          color: '#333',
-                          fontSize: { xs: '1.5rem', md: '2rem' }
-                        }}
-                      >
-                        {card.amount}
-                      </Typography>
-                    </Box>
+                    {loading ? (
+                      <>
+                        <Skeleton variant="circular" width={60} height={60} />
+                        <Box sx={{ flex: 1 }}>
+                          <Skeleton variant="text" width="60%" height={20} sx={{ mb: 1 }} />
+                          <Skeleton variant="text" width="40%" height={32} />
+                        </Box>
+                      </>
+                    ) : (
+                      <>
+                        <Avatar
+                          sx={{
+                            bgcolor: 'transparent',
+                            width: 60,
+                            height: 60
+                          }}
+                        >
+                          {card.icon}
+                        </Avatar>
+                        <Box>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: '#666',
+                              fontWeight: 500,
+                              mb: 0.5
+                            }}
+                          >
+                            {card.title}
+                          </Typography>
+                          <Typography
+                            variant="h4"
+                            sx={{
+                              fontWeight: 700,
+                              color: '#333',
+                              fontSize: { xs: '1.5rem', md: '2rem' }
+                            }}
+                          >
+                            {formatCurrency(card.amount)}
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
                   </Box>
                 </CardContent>
               </Card>

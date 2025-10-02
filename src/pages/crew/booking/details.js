@@ -16,45 +16,60 @@ import {
   Chip,
   Button,
   TextField,
-  Divider,
   IconButton,
   Paper,
   CircularProgress,
   Alert,
-  useTheme,
-  useMediaQuery,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Stepper,
+  Step,
+  StepLabel,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from '@mui/material';
+import { approveQuoteAndPay } from "../../../services/bookings/quoteService";
 import {
-  CalendarToday as CalendarIcon,
   LocationOn as LocationIcon,
-  AttachMoney as MoneyIcon,
   Business as BusinessIcon,
-  Message as MessageIcon,
   Phone as PhoneIcon,
   History as HistoryIcon,
   ReportProblem as ReportIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  CheckCircle as CheckCircleIcon,
+  Schedule as ScheduleIcon,
+  Payment as PaymentIcon,
+  Description as DescriptionIcon,
+  AccessTime as AccessTimeIcon
 } from '@mui/icons-material';
 
 const BookingDetails = () => {
   const { bookingId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
   const outletContext = useOutletContext();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const [bookingDetails, setBookingDetails] = useState(
-    location.state?.bookingDetails || {}
-  );
+  const [bookingDetails, setBookingDetails] = useState({});
   const [loading, setLoading] = useState(!location.state?.bookingDetails);
   const [error, setError] = useState(null);
   const [showModificationHistory, setShowModificationHistory] = useState(false);
+  const [responding, setResponding] = useState(false);
+  const [actionDialog, setActionDialog] = useState({ open: false, action: null });
   const [issueDescription, setIssueDescription] = useState('');
 
   const fetchBookingById = useCallback(
@@ -62,7 +77,7 @@ const BookingDetails = () => {
       try {
         const response = await getBookingById(id);
         if (response.status) {
-          setBookingDetails(response.data);
+          setBookingDetails(response.data.data);
         } else {
           setError(response.error || "Failed to fetch booking details");
           showError(response.error || "Failed to fetch booking details");
@@ -78,10 +93,8 @@ const BookingDetails = () => {
   );
 
   useEffect(() => {
-    if (!location.state?.bookingDetails && bookingId) {
-      fetchBookingById(bookingId);
-    }
-  }, [bookingId, location.state, fetchBookingById]);
+    fetchBookingById(bookingId);
+  }, [bookingId, fetchBookingById]);
 
   const handleGoBack = useCallback(() => {
     navigate(-1);
@@ -100,28 +113,69 @@ const BookingDetails = () => {
       case 'completed': return 'success';
       case 'cancelled': return 'error';
       case 'declined': return 'error';
+      case 'paid': return 'success';
+      case 'partially_paid': return 'warning';
       default: return 'default';
     }
   };
 
-  const formatServices = (services) => {
-    if (!services || services.length === 0) return 'N/A';
-    return services.map(s => s.service?.name).filter(Boolean).join(', ') || 'N/A';
-  };
-
-  const getTotalPrice = (services) => {
-    if (!services || services.length === 0) return 'N/A';
-    const total = services.reduce((sum, s) => {
-      return sum + (s.service?.price || 0) * (s.quantity || 1);
+  const getQuoteTotal = (quote) => {
+    if (!quote || !quote.services) return 'N/A';
+    const total = quote.services.reduce((sum, item) => {
+      return sum + (item.totalPrice || item.unitPrice * item.quantity || 0);
     }, 0);
     return `$${total}`;
+  };
+
+  const getBookingSteps = (booking) => {
+    const steps = ['Requested', 'Quoted', 'Confirmed', 'In Progress', 'Completed'];
+    const currentStep = getCurrentStep(booking);
+    return steps.map((step, index) => ({
+      label: step,
+      completed: index < currentStep,
+      current: index === currentStep
+    }));
+  };
+
+  const getCurrentStep = (booking) => {
+    if (!booking) return 0;
+    if (booking.bookingStatus === 'completed') return 4;
+    if (booking.confirmedAt) return 3;
+    if (booking.quoteStatus === 'quoted' || booking.hasQuote) return 2;
+    if (booking.quoteStatus === 'pending') return 1;
+    return 0;
   };
 
   const handleSubmitIssue = () => {
     if (!issueDescription.trim()) return;
     // Handle issue submission logic here
     setIssueDescription('');
-    // Show success message
+    showSuccess('Issue reported successfully');
+  };
+
+  const canMakePayment = (booking) => {
+    return booking && (booking.paymentStatus === 'pending' || booking.paymentStatus === 'partially_paid');
+  };
+
+  const handleApproveAndPay = async () => {
+    try {
+      setResponding(true);
+      const response = await approveQuoteAndPay(bookingDetails.quote._id);
+      if (response.status) {
+        showSuccess("Quote approved successfully! Redirecting to payment...");
+        // Open invoice URL in new tab
+        if (response.data.invoiceUrl) {
+          window.open(response.data.invoiceUrl, '_blank');
+        }
+      } else {
+        throw new Error(response.error || "Failed to approve quote");
+      }
+    } catch (err) {
+      showError(err.message || "Failed to approve quote");
+    } finally {
+      setResponding(false);
+      setActionDialog({ open: false, action: null });
+    }
   };
 
   if (loading) {
@@ -135,7 +189,7 @@ const BookingDetails = () => {
   if (error) {
     return (
       <Box p={3}>
-        <Alert 
+        <Alert
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={handleGoBack}>
@@ -150,281 +204,649 @@ const BookingDetails = () => {
   }
 
   return (
-    <Box sx={{ p: 0, mx: 'auto' }}>
-      <Grid container spacing={3}>
-        {/* Main Booking Details Card */}
-        <Grid item xs={12} lg={8}>
-          <Card 
-            sx={{ 
-              borderRadius: 3,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-              mb: 3
-            }}
-          >
-            <CardContent sx={{ p: isMobile ? 2 : 3 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
-                <Box>
-                  <Typography variant="h4" fontWeight={600} color="primary" gutterBottom>
-                    Booking {bookingDetails.bookingId || bookingDetails._id || "N/A"}
-                  </Typography>
-                  <Chip 
-                    label={`Payment: ${bookingDetails.paymentStatus || 'N/A'}`}
-                    color={getStatusColor(bookingDetails.paymentStatus)}
-                    sx={{ textTransform: 'capitalize' }}
-                  />
-                </Box>
-                <Chip 
-                  label={bookingDetails.bookingStatus || 'Pending'}
-                  color={getStatusColor(bookingDetails.bookingStatus)}
-                  size="large"
-                  sx={{ 
-                    textTransform: 'capitalize',
-                    fontWeight: 600,
-                    fontSize: '0.875rem'
+    <Box sx={{ p: { xs: 1, md: 2 }, mx: 'auto', maxWidth: '1400px' }}>
+      {/* Header Section with Status and Actions */}
+      <Paper
+        sx={{
+          p: 3,
+          mb: 3,
+          borderRadius: 3,
+          background: 'linear-gradient(135deg, #003366 0%, #0066cc 100%)',
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -20,
+            right: -20,
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)',
+            zIndex: 0
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: -40,
+            left: -40,
+            width: 150,
+            height: 150,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.05)',
+            zIndex: 0
+          }}
+        />
+        <Grid container spacing={3} alignItems="center">
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" fontWeight={700} gutterBottom>
+              Booking {bookingDetails.bookingId || bookingDetails._id || "N/A"}
+            </Typography>
+            <Box display="flex" gap={2} flexWrap="wrap">
+              <Chip
+                label={`Status: ${bookingDetails.bookingStatus || 'Pending'}`}
+                color={getStatusColor(bookingDetails.bookingStatus)}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  fontWeight: 600,
+                  textTransform: 'capitalize'
+                }}
+              />
+              <Chip
+                label={`Payment: ${bookingDetails.paymentStatus || 'N/A'}`}
+                color={getStatusColor(bookingDetails.paymentStatus)}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  fontWeight: 600,
+                  textTransform: 'capitalize'
+                }}
+              />
+              {bookingDetails.hasQuote && (
+                <Chip
+                  label="Quote Available"
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.2)',
+                    color: 'white',
+                    fontWeight: 600
                   }}
                 />
+              )}
+            </Box>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Box display="flex" gap={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <Grid container spacing={3}>
+        {/* Main Content */}
+        <Grid item xs={12} lg={8}>
+          {/* Booking Progress */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <ScheduleIcon sx={{ mr: 1, color: 'primary.main', fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
+                Booking Progress
+              </Typography>
+              
+              {/* Desktop and Tablet View */}
+              <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                <Stepper activeStep={getCurrentStep(bookingDetails)} sx={{ mt: 2 }}>
+                  {getBookingSteps(bookingDetails).map((step, index) => (
+                    <Step key={index} completed={step.completed}>
+                      <StepLabel 
+                        sx={{
+                          '& .MuiStepLabel-label': {
+                            fontWeight: step.current ? 600 : 400,
+                            color: step.current ? 'primary.main' : 'text.secondary',
+                            fontSize: { sm: '0.875rem', lg: '1rem' }
+                          },
+                          '& .MuiStepIcon-root': {
+                            color: step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.400',
+                            filter: step.current ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none',
+                            transition: 'all 0.3s ease'
+                          }
+                        }}
+                      >
+                        {step.label}
+                      </StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
               </Box>
+              
+              {/* Mobile View - Vertical Steps */}
+              <Box sx={{ display: { xs: 'block', md: 'none' }, mt: 2 }}>
+                {getBookingSteps(bookingDetails).map((step, index) => (
+                  <Box 
+                    key={index} 
+                    sx={{ 
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      mb: 2,
+                      pb: 2,
+                      borderBottom: index < getBookingSteps(bookingDetails).length - 1 ? '1px dashed rgba(0,0,0,0.1)' : 'none'
+                    }}
+                  >
+                    <Box 
+                      sx={{ 
+                        width: 32, 
+                        height: 32, 
+                        borderRadius: '50%', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        bgcolor: step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.200',
+                        color: step.current || step.completed ? 'white' : 'grey.500',
+                        mr: 2,
+                        boxShadow: step.current ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      {step.completed ? <CheckCircleIcon fontSize="small" /> : index + 1}
+                    </Box>
+                    <Box>
+                      <Typography 
+                        variant="body1" 
+                        fontWeight={step.current ? 600 : 400}
+                        color={step.current ? 'primary.main' : 'text.primary'}
+                      >
+                        {step.label}
+                      </Typography>
+                      {step.current && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                          Current stage
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
 
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="h6" fontWeight={600} gutterBottom>
-                    Service Details
+          {/* Services & Quote Section */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <DescriptionIcon sx={{ mr: 1, color: 'primary.main' }} />
+                Services & Pricing
+              </Typography>
+
+              {bookingDetails.hasQuote && bookingDetails.quote ? (
+                <>
+                  <Alert 
+                    severity="info" 
+                    icon={<CheckCircleIcon fontSize="inherit" />}
+                    sx={{ 
+                      mb: 3, 
+                      borderRadius: 2,
+                      '& .MuiAlert-icon': {
+                        color: '#2196f3'
+                      }
+                    }}
+                  >
+                    A quote has been provided for this booking. Review the details below.
+                  </Alert>
+
+                  <Box 
+                    sx={{ 
+                      border: '1px solid rgba(0,0,0,0.08)', 
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <Box 
+                      sx={{ 
+                        p: 2, 
+                        bgcolor: 'primary.light', 
+                        color: 'primary.contrastText',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <PaymentIcon sx={{ mr: 1.5 }} />
+                        <Typography variant="h6" fontWeight={600}>
+                          Quote Details
+                        </Typography>
+                      </Box>
+                      <Typography variant="h6" fontWeight={700}>
+                        {getQuoteTotal(bookingDetails.quote)}
+                      </Typography>
+                    </Box>
+
+                    {/* Responsive Table Container */}
+                    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+                      {/* Desktop and Tablet View */}
+                      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <TableContainer>
+                          <Table size="medium">
+                            <TableHead>
+                              <TableRow sx={{ bgcolor: 'grey.50' }}>
+                                <TableCell sx={{ fontWeight: 600 }}>Service</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Item</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Qty</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Unit Price</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Total</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {bookingDetails.quote.services?.map((item, index) => (
+                                <TableRow key={index} sx={{ '&:nth-of-type(odd)': { bgcolor: 'rgba(0,0,0,0.02)' } }}>
+                                  <TableCell sx={{ py: 1.5 }}>
+                                    {bookingDetails.services?.find(s => s.service?._id === item.service)?.service?.name || 'Service'}
+                                  </TableCell>
+                                  <TableCell sx={{ py: 1.5 }}>{item.item || 'Service Item'}</TableCell>
+                                  <TableCell align="right" sx={{ py: 1.5 }}>{item.quantity || 1}</TableCell>
+                                  <TableCell align="right" sx={{ py: 1.5 }}>${item.unitPrice || 0}</TableCell>
+                                  <TableCell align="right" sx={{ py: 1.5 }}>${item.totalPrice || (item.unitPrice * item.quantity) || 0}</TableCell>
+                                </TableRow>
+                              ))}
+                              <TableRow>
+                                <TableCell colSpan={4} align="right" sx={{ fontWeight: 600, py: 2 }}>Total Amount:</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 700, color: 'primary.main', py: 2 }}>{getQuoteTotal(bookingDetails.quote)}</TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Box>
+
+                      {/* Mobile View */}
+                      <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                        {bookingDetails.quote.services?.map((item, index) => (
+                          <Paper 
+                            key={index} 
+                            elevation={0}
+                            sx={{ 
+                              p: 2, 
+                              mb: 2, 
+                              border: '1px solid rgba(0,0,0,0.08)',
+                              borderRadius: 2
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                              {bookingDetails.services?.find(s => s.service?._id === item.service)?.service?.name || 'Service'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              {item.item || 'Service Item'}
+                            </Typography>
+                            <Grid container spacing={1} sx={{ mt: 1 }}>
+                              <Grid item xs={4}>
+                                <Typography variant="caption" color="text.secondary">Quantity</Typography>
+                                <Typography variant="body2">{item.quantity || 1}</Typography>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <Typography variant="caption" color="text.secondary">Unit Price</Typography>
+                                <Typography variant="body2">${item.unitPrice || 0}</Typography>
+                              </Grid>
+                              <Grid item xs={4}>
+                                <Typography variant="caption" color="text.secondary">Total</Typography>
+                                <Typography variant="body2" fontWeight={600}>${item.totalPrice || (item.unitPrice * item.quantity) || 0}</Typography>
+                              </Grid>
+                            </Grid>
+                          </Paper>
+                        ))}
+                        <Box sx={{ 
+                          p: 2, 
+                          bgcolor: 'primary.light', 
+                          color: 'primary.contrastText',
+                          borderRadius: 2,
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}>
+                          <Typography variant="subtitle1" fontWeight={600}>Total Amount</Typography>
+                          <Typography variant="h6" fontWeight={700}>{getQuoteTotal(bookingDetails.quote)}</Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </>
+              ) : (
+                <Box sx={{ 
+                  p: 4, 
+                  textAlign: 'center', 
+                  bgcolor: 'grey.50', 
+                  borderRadius: 2,
+                  border: '1px dashed rgba(0,0,0,0.12)'
+                }}>
+                  <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.6 }} />
+                  <Typography variant="body1" color="text.secondary" gutterBottom>
+                    Original service pricing will be displayed here.
                   </Typography>
-                  
-                  <Box display="flex" alignItems="center" mb={2}>
-                    <BusinessIcon sx={{ color: 'primary.main', mr: 2 }} />
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Services
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {formatServices(bookingDetails.services)}
-                      </Typography>
-                    </Box>
-                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Quote will be available once vendor responds.
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
 
-                  <Box display="flex" alignItems="center" mb={2}>
-                    <CalendarIcon sx={{ color: 'primary.main', mr: 2 }} />
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Date & Time
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {bookingDetails.dateTime
-                          ? new Date(bookingDetails.dateTime).toLocaleString('en-US', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true
-                            })
-                          : "N/A"}
-                      </Typography>
-                    </Box>
-                  </Box>
+          {/* Vendor Information */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <BusinessIcon sx={{ mr: 1, color: 'primary.main' }} />
+                Vendor Information
+              </Typography>
 
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={8}>
+                  <Typography variant="h5" color="primary" gutterBottom fontWeight={600}>
+                    {bookingDetails.vendorName || "N/A"}
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary" gutterBottom>
+                    Service Provider
+                  </Typography>
                   <Box display="flex" alignItems="center" mb={2}>
-                    <LocationIcon sx={{ color: 'primary.main', mr: 2 }} />
-                    <Box>
+                    <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {bookingDetails.vendorLocation || 'Location not specified'}
+                    </Typography>
+                  </Box>
+                  {bookingDetails.vendorAssigned?.phone && (
+                    <Box display="flex" alignItems="center">
+                      <PhoneIcon sx={{ mr: 1, color: 'text.secondary' }} />
                       <Typography variant="body2" color="text.secondary">
-                        Location
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {bookingDetails.serviceLocation ||
-                          bookingDetails.vendorLocation ||
-                          "N/A"}
+                        {bookingDetails.vendorAssigned.phone}
                       </Typography>
                     </Box>
-                  </Box>
-
-                  <Box display="flex" alignItems="center">
-                    <MoneyIcon sx={{ color: 'primary.main', mr: 2 }} />
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Total Price
-                      </Typography>
-                      <Typography variant="body1" fontWeight={500}>
-                        {getTotalPrice(bookingDetails.services)}
-                      </Typography>
-                    </Box>
-                  </Box>
+                  )}
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                  <Typography variant="h6" fontWeight={600} gutterBottom>
-                    Vendor Information
-                  </Typography>
-                  
-                  <Box mb={3}>
-                    <Typography variant="h6" color="primary" gutterBottom>
-                      {bookingDetails.vendorName || "N/A"}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Service Provider
-                    </Typography>
-                    {bookingDetails.vendorLocation && (
-                      <Typography variant="body2" color="text.secondary">
-                        {bookingDetails.vendorLocation}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  <Box display="flex" gap={2} flexWrap="wrap">
-                    <Button
-                      variant="contained"
-                      startIcon={<MessageIcon />}
-                      sx={{
-                        bgcolor: '#1A9E6D',
-                        '&:hover': { bgcolor: '#16875A' },
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600
-                      }}
-                      onClick={() => alert("Message vendor")}
-                    >
-                      Message
-                    </Button>
+                <Grid item xs={12} md={4}>
+                  <Box display="flex" flexDirection="column" gap={2}>
                     <Button
                       variant="contained"
                       startIcon={<PhoneIcon />}
+                      onClick={() => window.open(`tel:${bookingDetails.vendorAssigned?.phone}`)}
+                      fullWidth
+                      disabled={!bookingDetails.vendorAssigned?.phone}
                       sx={{
-                        bgcolor: '#0387D9',
-                        '&:hover': { bgcolor: '#0369A1' },
+                        py: 1.5,
+                        px: 2,
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: 'primary.dark'
+                        },
+                        '&:disabled': {
+                          bgcolor: 'action.disabledBackground',
+                          color: 'text.disabled'
+                        },
                         borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                        transition: 'all 0.3s ease'
                       }}
-                      onClick={() => alert("Call vendor")}
                     >
-                      Call
+                      {bookingDetails.vendorAssigned?.phone ? 'Call Vendor' : 'No Phone Available'}
                     </Button>
                   </Box>
                 </Grid>
               </Grid>
             </CardContent>
           </Card>
-        </Grid>
 
-        {/* Booking History Card */}
-        <Grid item xs={12} lg={4}>
-          <Card 
-            sx={{ 
-              borderRadius: 3,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-              mb: 3
-            }}
-          >
+          {/* Booking Details */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
             <CardContent sx={{ p: 3 }}>
-              <Box display="flex" alignItems="center" mb={3}>
-                <HistoryIcon sx={{ color: 'primary.main', mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Booking History
-                </Typography>
-              </Box>
-              
-              <Paper 
-                sx={{ 
-                  p: 2, 
-                  bgcolor: 'grey.50',
-                  borderRadius: 2,
-                  border: '1px solid',
-                  borderColor: 'grey.200'
-                }}
-              >
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <DescriptionIcon sx={{ mr: 1, color: 'primary.main' }} />
+                Booking Information
+              </Typography>
+
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={3}>
                   <Box>
-                    <Typography variant="subtitle1" fontWeight={600}>
-                      {bookingDetails.vendorName || "N/A"}
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      Service Location
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {bookingDetails.dateTime
-                        ? new Date(bookingDetails.dateTime).toLocaleString()
-                        : "N/A"}
+                    <Typography variant="body1" fontWeight={500}>
+                      {bookingDetails.serviceLocation || 'Not specified'}
                     </Typography>
                   </Box>
-                  <Chip 
-                    label={bookingDetails.bookingStatus || 'N/A'}
-                    color={getStatusColor(bookingDetails.bookingStatus)}
-                    size="small"
-                    sx={{ textTransform: 'capitalize' }}
-                  />
-                </Box>
-              </Paper>
+                </Grid>
 
-              <Button
-                variant="outlined"
-                fullWidth
-                sx={{ mt: 2, textTransform: 'none' }}
-                onClick={() => setShowModificationHistory(true)}
-              >
-                View Full History
-              </Button>
+                <Grid item xs={12} sm={6} md={3}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      Contact Phone
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {bookingDetails.contactPhone || 'Not specified'}
+                    </Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      Scheduled Date
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {bookingDetails.dateTime
+                        ? new Date(bookingDetails.dateTime).toLocaleDateString()
+                        : 'Not scheduled'}
+                    </Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      Scheduled Time
+                    </Typography>
+                    <Typography variant="body1" fontWeight={500}>
+                      {bookingDetails.dateTime
+                        ? new Date(bookingDetails.dateTime).toLocaleTimeString()
+                        : 'Not scheduled'}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              {bookingDetails.internalNotes && (
+                <Box mt={3}>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Additional Notes
+                  </Typography>
+                  <Paper sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                    <Typography variant="body2">
+                      {bookingDetails.internalNotes}
+                    </Typography>
+                  </Paper>
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Report Issue Card */}
-        <Grid item xs={12}>
-          <Card 
-            sx={{ 
-              borderRadius: 3,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-            }}
-          >
-            <CardContent sx={{ p: 4 }}>
-              <Box display="flex" alignItems="center" mb={3}>
-                <ReportIcon sx={{ color: 'error.main', mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Report an Issue
-                </Typography>
+        {/* Sidebar */}
+        <Grid item xs={12} lg={4}>
+          {/* Quick Actions */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom>
+                Quick Actions
+              </Typography>
+
+              <Box display="flex" flexDirection="column" gap={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<HistoryIcon />}
+                  onClick={() => setShowModificationHistory(true)}
+                  fullWidth
+                  sx={{
+                    justifyContent: 'flex-start',
+                    borderRadius: 2,
+                    py: 1.5,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      transition: 'all 0.3s ease'
+                    }
+                  }}
+                >
+                  View History
+                </Button>
+
+                <Button
+                  variant="contained"
+                  color="success"
+                  startIcon={<PaymentIcon />}
+                  onClick={() => setActionDialog({ open: true, action: { action: 'accept', label: 'Make Payment', color: 'success', handler: handleApproveAndPay } })}
+                  disabled={!canMakePayment(bookingDetails)}
+                  fullWidth
+                  sx={{
+                    justifyContent: 'flex-start',
+                    borderRadius: 2,
+                    py: 1.5,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      transition: 'all 0.3s ease'
+                    },
+                    '&.Mui-disabled': {
+                      backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                      color: 'rgba(0, 0, 0, 0.26)'
+                    }
+                  }}
+                >
+                  Make Payment
+                </Button>
               </Box>
-              
+            </CardContent>
+          </Card>
+
+          {/* Status History Preview */}
+          <Card sx={{ mb: 3, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <AccessTimeIcon sx={{ mr: 1, color: 'primary.main' }} />
+                Recent Activity
+              </Typography>
+
+              {bookingDetails.statusHistory && bookingDetails.statusHistory.length > 0 ? (
+                <List dense>
+                  {bookingDetails.statusHistory.slice(0, 3).map((history, index) => (
+                    <ListItem key={index} sx={{ px: 0 }}>
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        {history.toStatus === 'confirmed' ? (
+                          <CheckCircleIcon color="success" fontSize="small" />
+                        ) : (
+                          <AccessTimeIcon color="primary" fontSize="small" />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2" fontWeight={500}>
+                            Status changed to {history.toStatus}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography variant="caption" color="text.secondary">
+                            {new Date(history.changedAt).toLocaleDateString()}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  No status changes recorded yet.
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Report Issue */}
+          <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" fontWeight={600} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+                <ReportIcon sx={{ mr: 1, color: 'error.main' }} />
+                Need Help?
+              </Typography>
+
               <TextField
                 fullWidth
                 multiline
-                rows={4}
-                placeholder="Describe the issue you're experiencing..."
+                rows={3}
+                placeholder="Describe any issues you're experiencing..."
                 value={issueDescription}
                 onChange={(e) => setIssueDescription(e.target.value)}
-                sx={{ mb: 3 }}
                 variant="outlined"
+                size="small"
+                sx={{
+                  mb: 2,
+                  "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      backgroundColor: "#F9FAFB",
+                      "& fieldset": {
+                          borderColor: "#E5E7EB",
+                      },
+                      "&:hover fieldset": {
+                          borderColor: "#D1D5DB",
+                      },
+                      "&.Mui-focused fieldset": {
+                          borderColor: "#0387D9",
+                      },
+                  },
+              }}
               />
-              
+
               <Button
                 variant="contained"
                 color="error"
                 onClick={handleSubmitIssue}
                 disabled={!issueDescription.trim()}
-                sx={{
+                fullWidth
+                sx={{ 
                   borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 4
+                  py: 1.5,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    transition: 'all 0.3s ease'
+                  }
                 }}
               >
-                Submit Report
+                Report Issue
               </Button>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
+      {/* Dialogs */}
       {/* Modification History Dialog */}
       <Dialog
         open={showModificationHistory}
         onClose={() => setShowModificationHistory(false)}
         maxWidth="md"
         fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3 }
-        }}
+        PaperProps={{ sx: { borderRadius: 3 } }}
       >
         <DialogTitle sx={{ pb: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6" fontWeight={600}>
-              Modification History
+              Booking History
             </Typography>
             <IconButton onClick={() => setShowModificationHistory(false)}>
               <CloseIcon />
@@ -434,56 +856,131 @@ const BookingDetails = () => {
             Booking #{bookingDetails.bookingId || bookingDetails._id || "N/A"}
           </Typography>
         </DialogTitle>
-        
+
         <DialogContent>
-          <Box mb={2}>
-            <Chip 
-              label={`Modification In ${bookingDetails.bookingStatus || 'N/A'}`}
-              color="info"
-              sx={{ mb: 2 }}
-            />
-          </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          {/* Sample modification entries */}
-          <Box mb={3}>
-            <Paper sx={{ p: 3, bgcolor: 'grey.50', borderRadius: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Requested:
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {bookingDetails.dateTime
-                      ? new Date(bookingDetails.dateTime).toLocaleString()
-                      : "N/A"}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Status:
-                  </Typography>
-                  <Chip label="Sent" color="success" size="small" />
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Response:
-                  </Typography>
-                  <Chip label="Pending" color="warning" size="small" />
-                </Grid>
-              </Grid>
-            </Paper>
-          </Box>
+          {bookingDetails.statusHistory && bookingDetails.statusHistory.length > 0 ? (
+            <List>
+              {bookingDetails.statusHistory.map((history, index) => (
+                <Paper key={index} sx={{ p: 3, mb: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Status Change
+                      </Typography>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Chip label={history.fromStatus} size="small" color="default" />
+                        <Typography>→</Typography>
+                        <Chip label={history.toStatus} size="small" color={getStatusColor(history.toStatus)} />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Changed By
+                      </Typography>
+                      <Typography variant="body1" fontWeight={500}>
+                        {history.userRole === 'service_provider' ? 'Vendor' : 'System'}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Date & Time
+                      </Typography>
+                      <Typography variant="body1">
+                        {new Date(history.changedAt).toLocaleString()}
+                      </Typography>
+                    </Grid>
+                    {history.notes && (
+                      <Grid item xs={12}>
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          Notes
+                        </Typography>
+                        <Typography variant="body1">
+                          {history.notes}
+                        </Typography>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Paper>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No status changes recorded yet.
+            </Typography>
+          )}
         </DialogContent>
-        
+
         <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button 
-            onClick={() => setShowModificationHistory(false)}
-            variant="outlined"
-            sx={{ textTransform: 'none' }}
+          <Button onClick={() => setShowModificationHistory(false)} variant="contained"
+            sx={{
+              borderRadius: 2,
+              px: 3,
+              py: 1,
+              boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+              transition: 'all 0.3s ease',
+            }}
           >
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Payment Dialog */}
+      <Dialog 
+        open={actionDialog.open} 
+        onClose={() => setActionDialog({ open: false, action: null })}
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            borderRadius: 2,
+            border: '1px solid #e0e0e0',
+            maxWidth: '400px',
+            width: '100%'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          borderBottom: '1px solid #f0f0f0', 
+          py: 2,
+          px: 3,
+          fontWeight: 500
+        }}>
+          {actionDialog.action?.label || "Confirm Action"}
+        </DialogTitle>
+        <DialogContent sx={{ py: 3, px: 3 }}>
+          <Typography variant="body1" sx={{ fontWeight: 400, mt: 1 }}>
+            Are you sure you want to {actionDialog.action?.label?.toLowerCase()}?
+          </Typography>
+          {actionDialog.action?.action === 'accept' && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              This will approve the quote and initiate the payment process.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #f0f0f0' }}>
+          <Button 
+            onClick={() => setActionDialog({ open: false, action: null })} 
+            disabled={responding}
+            sx={{ 
+              textTransform: 'none',
+              fontWeight: 500
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={actionDialog.action?.handler}
+            variant="contained"
+            color={actionDialog.action?.color || "primary"}
+            disabled={responding}
+            disableElevation
+            sx={{ 
+              textTransform: 'none',
+              fontWeight: 500,
+              px: 3
+            }}
+          >
+            {responding ? "Processing..." : "Confirm"}
           </Button>
         </DialogActions>
       </Dialog>
