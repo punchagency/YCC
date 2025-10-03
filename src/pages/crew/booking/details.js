@@ -204,7 +204,7 @@ const BookingDetails = () => {
   }
 
   return (
-    <Box sx={{ p: { xs: 1, md: 2 }, mx: 'auto', maxWidth: '1400px' }}>
+    <Box sx={{ p: { xs: 1, md: 2 }, mx: 'auto' }}>
       {/* Header Section with Status and Actions */}
       <Paper
         sx={{
@@ -287,7 +287,7 @@ const BookingDetails = () => {
         </Grid>
       </Paper>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} >
         {/* Main Content */}
         <Grid item xs={12} lg={8}>
           {/* Booking Progress */}
@@ -297,13 +297,13 @@ const BookingDetails = () => {
                 <ScheduleIcon sx={{ mr: 1, color: 'primary.main', fontSize: { xs: '1.2rem', sm: '1.5rem' } }} />
                 Booking Progress
               </Typography>
-              
+
               {/* Desktop and Tablet View */}
               <Box sx={{ display: { xs: 'none', md: 'block' } }}>
                 <Stepper activeStep={getCurrentStep(bookingDetails)} sx={{ mt: 2 }}>
                   {getBookingSteps(bookingDetails).map((step, index) => (
                     <Step key={index} completed={step.completed}>
-                      <StepLabel 
+                      <StepLabel
                         sx={{
                           '& .MuiStepLabel-label': {
                             fontWeight: step.current ? 600 : 400,
@@ -323,13 +323,13 @@ const BookingDetails = () => {
                   ))}
                 </Stepper>
               </Box>
-              
+
               {/* Mobile View - Vertical Steps */}
               <Box sx={{ display: { xs: 'block', md: 'none' }, mt: 2 }}>
                 {getBookingSteps(bookingDetails).map((step, index) => (
-                  <Box 
-                    key={index} 
-                    sx={{ 
+                  <Box
+                    key={index}
+                    sx={{
                       display: 'flex',
                       alignItems: 'flex-start',
                       mb: 2,
@@ -337,13 +337,13 @@ const BookingDetails = () => {
                       borderBottom: index < getBookingSteps(bookingDetails).length - 1 ? '1px dashed rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
-                    <Box 
-                      sx={{ 
-                        width: 32, 
-                        height: 32, 
-                        borderRadius: '50%', 
-                        display: 'flex', 
-                        alignItems: 'center', 
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
                         justifyContent: 'center',
                         bgcolor: step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.200',
                         color: step.current || step.completed ? 'white' : 'grey.500',
@@ -355,8 +355,8 @@ const BookingDetails = () => {
                       {step.completed ? <CheckCircleIcon fontSize="small" /> : index + 1}
                     </Box>
                     <Box>
-                      <Typography 
-                        variant="body1" 
+                      <Typography
+                        variant="body1"
                         fontWeight={step.current ? 600 : 400}
                         color={step.current ? 'primary.main' : 'text.primary'}
                       >
@@ -384,11 +384,11 @@ const BookingDetails = () => {
 
               {bookingDetails.hasQuote && bookingDetails.quote ? (
                 <>
-                  <Alert 
-                    severity="info" 
+                  <Alert
+                    severity="info"
                     icon={<CheckCircleIcon fontSize="inherit" />}
-                    sx={{ 
-                      mb: 3, 
+                    sx={{
+                      mb: 3,
                       borderRadius: 2,
                       '& .MuiAlert-icon': {
                         color: '#2196f3'
@@ -398,18 +398,18 @@ const BookingDetails = () => {
                     A quote has been provided for this booking. Review the details below.
                   </Alert>
 
-                  <Box 
-                    sx={{ 
-                      border: '1px solid rgba(0,0,0,0.08)', 
+                  <Box
+                    sx={{
+                      border: '1px solid rgba(0,0,0,0.08)',
                       borderRadius: 2,
                       overflow: 'hidden',
                       transition: 'all 0.3s ease'
                     }}
                   >
-                    <Box 
-                      sx={{ 
-                        p: 2, 
-                        bgcolor: 'primary.light', 
+                    <Box
+                      sx={{
+                        p: 2,
+                        bgcolor: 'primary.light',
                         color: 'primary.contrastText',
                         display: 'flex',
                         alignItems: 'center',
@@ -466,12 +466,12 @@ const BookingDetails = () => {
                       {/* Mobile View */}
                       <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                         {bookingDetails.quote.services?.map((item, index) => (
-                          <Paper 
-                            key={index} 
+                          <Paper
+                            key={index}
                             elevation={0}
-                            sx={{ 
-                              p: 2, 
-                              mb: 2, 
+                            sx={{
+                              p: 2,
+                              mb: 2,
                               border: '1px solid rgba(0,0,0,0.08)',
                               borderRadius: 2
                             }}
@@ -498,9 +498,9 @@ const BookingDetails = () => {
                             </Grid>
                           </Paper>
                         ))}
-                        <Box sx={{ 
-                          p: 2, 
-                          bgcolor: 'primary.light', 
+                        <Box sx={{
+                          p: 2,
+                          bgcolor: 'primary.light',
                           color: 'primary.contrastText',
                           borderRadius: 2,
                           display: 'flex',
@@ -515,21 +515,108 @@ const BookingDetails = () => {
                   </Box>
                 </>
               ) : (
-                <Box sx={{ 
-                  p: 4, 
-                  textAlign: 'center', 
-                  bgcolor: 'grey.50', 
-                  borderRadius: 2,
-                  border: '1px dashed rgba(0,0,0,0.12)'
-                }}>
-                  <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2, opacity: 0.6 }} />
-                  <Typography variant="body1" color="text.secondary" gutterBottom>
-                    Original service pricing will be displayed here.
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Quote will be available once vendor responds.
-                  </Typography>
-                </Box>
+                <>
+                  <Alert
+                    severity="info"
+                    icon={<CheckCircleIcon fontSize="inherit" />}
+                    sx={{
+                      mb: 3,
+                      borderRadius: 2,
+                      '& .MuiAlert-icon': {
+                        color: '#2196f3'
+                      }
+                    }}
+                  >
+                    No quote has been provided for this booking.
+                  </Alert>
+
+                  <Box
+                    sx={{
+                      border: '1px solid rgba(0,0,0,0.08)',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        p: 2,
+                        bgcolor: 'primary.light',
+                        color: 'primary.contrastText',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <PaymentIcon sx={{ mr: 1.5 }} />
+                        <Typography variant="h6" fontWeight={600}>
+                          Service Details
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Responsive Table Container */}
+                    <Box sx={{ p: { xs: 1, sm: 2 } }}>
+                      {/* Desktop and Tablet View */}
+                      <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                        <TableContainer>
+                          <Table size="medium">
+                            <TableHead>
+                              <TableRow sx={{ bgcolor: 'grey.50' }}>
+                                <TableCell ></TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Service</TableCell>
+                                <TableCell sx={{ fontWeight: 600 }}>Category</TableCell>
+                                <TableCell align="right" sx={{ fontWeight: 600 }}>Price</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {bookingDetails.services?.map((item, index) => (
+                                <TableRow key={index} sx={{ '&:nth-of-type(odd)': { bgcolor: 'rgba(0,0,0,0.02)' } }}>
+                                  <TableCell sx={{ py: 1.5 }}>
+                                    <img src={item.service.image} alt={item.service.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                  </TableCell>
+                                  <TableCell sx={{ py: 1.5 }}>{item.service.name || 'Service'}</TableCell>
+                                  <TableCell align="left" sx={{ py: 1.5 }}>{item.service.category || 'Category'}</TableCell>
+                                  <TableCell align="right" sx={{ py: 1.5 }}>${item.service.price || 0}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Box>
+
+                      {/* Mobile View */}
+                      <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                        {bookingDetails.services?.map((item, index) => (
+                          <Paper
+                            key={index}
+                            elevation={0}
+                            sx={{
+                              p: 2,
+                              mb: 2,
+                              border: '1px solid rgba(0,0,0,0.08)',
+                              borderRadius: 2
+                            }}
+                          >
+                            <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                              {item.service.name || 'Service'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              {item.service.category || 'Category'}
+                            </Typography>
+                            <Grid container spacing={1} sx={{ mt: 1 }}>
+                              <Grid item xs={4}>
+                                <Typography variant="caption" color="text.secondary">Price</Typography>
+                                <Typography variant="body2">${item.service.price || 0}</Typography>
+                              </Grid>
+                            </Grid>
+                          </Paper>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                </>
               )}
             </CardContent>
           </Card>
@@ -690,7 +777,7 @@ const BookingDetails = () => {
                   onClick={() => setShowModificationHistory(true)}
                   fullWidth
                   sx={{
-                    justifyContent: 'flex-start',
+                    justifyContent: 'center',
                     borderRadius: 2,
                     py: 1.5,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -703,7 +790,7 @@ const BookingDetails = () => {
                 >
                   View History
                 </Button>
-
+                {bookingDetails.paymentStatus === 'pending' && bookingDetails.hasQuote && (
                 <Button
                   variant="contained"
                   color="success"
@@ -712,7 +799,7 @@ const BookingDetails = () => {
                   disabled={!canMakePayment(bookingDetails)}
                   fullWidth
                   sx={{
-                    justifyContent: 'flex-start',
+                    justifyContent: 'center',
                     borderRadius: 2,
                     py: 1.5,
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -729,6 +816,7 @@ const BookingDetails = () => {
                 >
                   Make Payment
                 </Button>
+                )}
               </Box>
             </CardContent>
           </Card>
@@ -795,19 +883,19 @@ const BookingDetails = () => {
                 sx={{
                   mb: 2,
                   "& .MuiOutlinedInput-root": {
-                      borderRadius: "10px",
-                      backgroundColor: "#F9FAFB",
-                      "& fieldset": {
-                          borderColor: "#E5E7EB",
-                      },
-                      "&:hover fieldset": {
-                          borderColor: "#D1D5DB",
-                      },
-                      "&.Mui-focused fieldset": {
-                          borderColor: "#0387D9",
-                      },
+                    borderRadius: "10px",
+                    backgroundColor: "#F9FAFB",
+                    "& fieldset": {
+                      borderColor: "#E5E7EB",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#D1D5DB",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#0387D9",
+                    },
                   },
-              }}
+                }}
               />
 
               <Button
@@ -816,7 +904,7 @@ const BookingDetails = () => {
                 onClick={handleSubmitIssue}
                 disabled={!issueDescription.trim()}
                 fullWidth
-                sx={{ 
+                sx={{
                   borderRadius: 2,
                   py: 1.5,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -926,8 +1014,8 @@ const BookingDetails = () => {
       </Dialog>
 
       {/* Payment Dialog */}
-      <Dialog 
-        open={actionDialog.open} 
+      <Dialog
+        open={actionDialog.open}
         onClose={() => setActionDialog({ open: false, action: null })}
         PaperProps={{
           elevation: 0,
@@ -939,8 +1027,8 @@ const BookingDetails = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          borderBottom: '1px solid #f0f0f0', 
+        <DialogTitle sx={{
+          borderBottom: '1px solid #f0f0f0',
           py: 2,
           px: 3,
           fontWeight: 500
@@ -958,10 +1046,10 @@ const BookingDetails = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid #f0f0f0' }}>
-          <Button 
-            onClick={() => setActionDialog({ open: false, action: null })} 
+          <Button
+            onClick={() => setActionDialog({ open: false, action: null })}
             disabled={responding}
-            sx={{ 
+            sx={{
               textTransform: 'none',
               fontWeight: 500
             }}
@@ -974,7 +1062,7 @@ const BookingDetails = () => {
             color={actionDialog.action?.color || "primary"}
             disabled={responding}
             disableElevation
-            sx={{ 
+            sx={{
               textTransform: 'none',
               fontWeight: 500,
               px: 3

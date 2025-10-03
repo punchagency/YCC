@@ -940,16 +940,6 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                   </div>
                 </div>
               </div>
-              <Divider sx={{ my: 3 }} />
-              <div className="" style={{ display: "flex", flexDirection: "row", alignItems: "start", margin: "16px 0" }}>
-                <input type="checkbox" style={{ marginRight: 3 }} checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} />
-                <label>I accept the <span style={{ color: "#034D92" }} onClick={() => navigate("/terms-and-conditions")}>Terms of Service</span> and <span style={{ color: "#034D92" }} onClick={() => navigate("/privacy-policy")}>Privacy Policy</span></label>
-              </div>
-
-              <div className="" style={{ display: "flex", flexDirection: "row", alignItems: "start", margin: "16px 0" }}>
-                <input type="checkbox" style={{ marginRight: 3 }} checked={acceptNotifications} onChange={(e) => setAcceptNotifications(e.target.checked)} />
-                <label>I agree to receive notifications related to my Yacht Crew Center account and platform activities only (no marketing or promotional messages).</label>
-              </div>
 
               <div className="form-group6">
                 <button className="prevbtn" onClick={handlePrevious}>

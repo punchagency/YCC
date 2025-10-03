@@ -568,10 +568,11 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                     direction={sortField === 'dateTime' ? sortDirection : 'asc'}
                     onClick={() => handleSort('dateTime')}
                   >
-                    Date & Time
+                    Booking Date
                   </TableSortLabel>
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, py: 2 }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: 600, py: 2 }}>Created At</TableCell>
                 <TableCell sx={{ fontWeight: 600, py: 2, textAlign: 'center' }}>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -623,6 +624,18 @@ const BookingTable = ({ bookings, loading, error, fetchBookings, page, setPage, 
                       size="small"
                       sx={{ textTransform: 'capitalize', fontWeight: 500 }}
                     />
+                  </TableCell>
+                  <TableCell sx={{ py: 2 }}>
+                    <Typography variant="body2">
+                    {item.createdAt ? new Date(item.createdAt).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                      }) : 'N/A'}
+                    </Typography>
                   </TableCell>
                   <TableCell sx={{ py: 2, textAlign: 'center' }}>
                     <Box display="flex" justifyContent="center" gap={1}>
