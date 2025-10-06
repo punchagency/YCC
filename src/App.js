@@ -180,7 +180,7 @@ const AuthCheck = ({ children }) => {
   });
 
   if (!token && !isPublicRoute) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
