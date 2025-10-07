@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import three from "../../../../assets/images/crew/three.png";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import profilenoti from "../../../../assets/images/crew/profilenoti.png";
 
 
@@ -197,15 +197,15 @@ export const EventCard = ({
           )}
         </div>
         <div className="event-actions">
-          <img
-            src={three}
-            alt="menu"
+          <MoreVertIcon
+            fontSize="small"
+            onClick={handleMenuClick}
             style={{
+              color: "#667085",
               cursor: "pointer",
               transition: "transform 0.3s ease",
               transform: isHovered ? "scale(1.2)" : "scale(1)",
             }}
-            onClick={handleMenuClick}
           />
           <Menu
             anchorEl={anchorEl}

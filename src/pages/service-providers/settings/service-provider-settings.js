@@ -100,7 +100,30 @@ const Settings = () => {
     const [originalData, setOriginalData] = useState({});
 
     const departmentOptions = [
-        'Captain', 'Crew', 'Exterior', 'Interior', 'Engineering', 'Galley'
+        {
+            value: 'captain',
+            label: 'Captain'
+        },
+        {
+            value: 'crew',
+            label: 'Crew'
+        },
+        {
+            value: 'exterior',
+            label: 'Exterior'
+        },
+        {
+            value: 'interior',
+            label: 'Interior'
+        },
+        {
+            value: 'engineering',
+            label: 'Engineering'
+        },
+        {
+            value: 'galley',
+            label: 'Galley'
+        }
     ];
     React.useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -168,11 +191,7 @@ const Settings = () => {
             'Exterior Upholstery & Canvas Work'
         ],
         crew: [
-            'Mental Health Support',
-            'Confidential Therapy',
-            'Career Guidance',
-            'Legal Consultation',
-            'Financial Advisory'
+            
         ]
     };
 
@@ -639,14 +658,14 @@ const Settings = () => {
                                     <Autocomplete
                                         multiple
                                         options={departmentOptions}
-                                        value={formData.departments}
-                                        onChange={(e, value) => handleInputChange('departments', value)}
+                                        value={departmentOptions.filter(option => formData.departments.includes(option.value))}
+                                        onChange={(e, value) => handleInputChange('departments', value.map(option => option.value))}
                                         disabled={!isEditing}
                                         renderTags={(value, getTagProps) =>
                                             value.map((option, index) => (
                                                 <Chip
                                                     variant="outlined"
-                                                    label={option}
+                                                    label={option.label || option.value}
                                                     {...getTagProps({ index })}
                                                     sx={{
                                                         backgroundColor: alpha('#1976d2', 0.1),
@@ -719,7 +738,7 @@ const Settings = () => {
                                     <Autocomplete
                                         multiple
                                         options={getAvailableServices()}
-                                        value={formData.services}
+                                        value={getAvailableServices().filter(service => formData.services.includes(service))}
                                         onChange={(e, value) => handleInputChange('services', value)}
                                         disabled={!isEditing}
                                         renderTags={(value, getTagProps) =>
@@ -801,7 +820,7 @@ const Settings = () => {
                                     <Autocomplete
                                         multiple
                                         options={serviceAreaOptions}
-                                        value={formData.serviceAreas}
+                                        value={serviceAreaOptions.filter(area => formData.serviceAreas.includes(area))}
                                         onChange={(e, value) => handleInputChange('serviceAreas', value)}
                                         disabled={!isEditing}
                                         renderTags={(value, getTagProps) =>

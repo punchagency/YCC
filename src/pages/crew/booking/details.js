@@ -33,9 +33,6 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   List,
   ListItem,
   ListItemIcon,
@@ -49,7 +46,6 @@ import {
   History as HistoryIcon,
   ReportProblem as ReportIcon,
   Close as CloseIcon,
-  ExpandMore as ExpandMoreIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   Payment as PaymentIcon,
@@ -130,20 +126,42 @@ const BookingDetails = () => {
   const getBookingSteps = (booking) => {
     const steps = ['Requested', 'Quoted', 'Confirmed', 'In Progress', 'Completed'];
     const currentStep = getCurrentStep(booking);
+    const isCancelled = booking && (booking.bookingStatus?.toLowerCase() === 'cancelled' || booking.bookingStatus?.toLowerCase() === 'declined');
+
     return steps.map((step, index) => ({
-      label: step,
-      completed: index < currentStep,
-      current: index === currentStep
+      label: isCancelled && index === 0 ? 'Cancelled' : step,
+      completed: index < currentStep && !isCancelled,
+      current: index === currentStep,
+      cancelled: isCancelled && index === 0
     }));
   };
 
   const getCurrentStep = (booking) => {
     if (!booking) return 0;
-    if (booking.bookingStatus === 'completed') return 4;
-    if (booking.confirmedAt) return 3;
-    if (booking.quoteStatus === 'quoted' || booking.hasQuote) return 2;
-    if (booking.quoteStatus === 'pending') return 1;
-    return 0;
+
+    const status = booking.bookingStatus?.toLowerCase();
+
+    // Handle different booking statuses
+    switch (status) {
+      case 'completed':
+        return 4; // Completed step
+      case 'confirmed':
+        return 2; // Confirmed step
+      case 'pending':
+        // Check if there's a quote available to determine if we're at quoted step or just requested
+        if (booking.quoteStatus === 'quoted' || booking.hasQuote) return 2;
+        if (booking.quoteStatus === 'pending') return 1;
+        return 0; // Requested step
+      case 'cancelled':
+      case 'declined':
+        return 0; // Keep at requested state for cancelled/declined bookings
+      default:
+        // Fallback to original logic for backward compatibility
+        if (booking.confirmedAt) return 3;
+        if (booking.quoteStatus === 'quoted' || booking.hasQuote) return 2;
+        if (booking.quoteStatus === 'pending') return 1;
+        return 0;
+    }
   };
 
   const handleSubmitIssue = () => {
@@ -307,12 +325,12 @@ const BookingDetails = () => {
                         sx={{
                           '& .MuiStepLabel-label': {
                             fontWeight: step.current ? 600 : 400,
-                            color: step.current ? 'primary.main' : 'text.secondary',
+                            color: step.cancelled ? 'error.main' : step.current ? 'primary.main' : 'text.secondary',
                             fontSize: { sm: '0.875rem', lg: '1rem' }
                           },
                           '& .MuiStepIcon-root': {
-                            color: step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.400',
-                            filter: step.current ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none',
+                            color: step.cancelled ? 'error.main' : step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.400',
+                            filter: step.current || step.cancelled ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none',
                             transition: 'all 0.3s ease'
                           }
                         }}
@@ -345,10 +363,10 @@ const BookingDetails = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        bgcolor: step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.200',
-                        color: step.current || step.completed ? 'white' : 'grey.500',
+                        bgcolor: step.cancelled ? 'error.main' : step.current ? 'primary.main' : step.completed ? 'success.main' : 'grey.200',
+                        color: step.cancelled || step.current || step.completed ? 'white' : 'grey.500',
                         mr: 2,
-                        boxShadow: step.current ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
+                        boxShadow: step.current || step.cancelled ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
                         transition: 'all 0.3s ease'
                       }}
                     >
@@ -358,13 +376,18 @@ const BookingDetails = () => {
                       <Typography
                         variant="body1"
                         fontWeight={step.current ? 600 : 400}
-                        color={step.current ? 'primary.main' : 'text.primary'}
+                        color={step.cancelled ? 'error.main' : step.current ? 'primary.main' : 'text.primary'}
                       >
                         {step.label}
                       </Typography>
-                      {step.current && (
+                      {step.current && !step.cancelled && (
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
                           Current stage
+                        </Typography>
+                      )}
+                      {step.cancelled && (
+                        <Typography variant="caption" color="error.main" sx={{ display: 'block', mt: 0.5 }}>
+                          Booking cancelled
                         </Typography>
                       )}
                     </Box>

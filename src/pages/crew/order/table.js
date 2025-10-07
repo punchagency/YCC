@@ -145,6 +145,7 @@ const OrderTable = ({
               fontSize: "12px",
               display: "inline-flex",
               alignItems: "center",
+              textTransform: "capitalize",
               gap: "4px",
             }}
           >

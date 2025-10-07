@@ -6,9 +6,10 @@ import { InputSwitch } from "primereact/inputswitch";
 import { useUser } from "../../../context/userContext";
 import { useNotifications } from "../../../context/notificationsContext";
 import { Dialog } from "primereact/dialog";
-
+import { useToast } from "../../../components/Toast";
 const SettingsForm = ({ onSave, onCancel, loading }) => {
   const { user } = useUser();
+  const { showError } = useToast();
   const { notificationsEnabled, toggleNotifications } = useNotifications();
 
   const [name, setName] = useState("");
@@ -19,7 +20,6 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
   const [phone, setPhone] = useState("");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [accountVisibility, setAccountVisibility] = useState(true);
-  const [theme, setTheme] = useState("light");
   const [deleteAccountEnabled, setDeleteAccountEnabled] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -50,10 +50,8 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
   const handleSubmit = () => {
     // Validate form
     if (password && password !== confirmPassword) {
-      return {
-        success: false,
-        message: "New password and confirm password do not match",
-      };
+      showError("New password and confirm password do not match");
+      return;
     }
 
     // Prepare data for API
@@ -66,10 +64,8 @@ const SettingsForm = ({ onSave, onCancel, loading }) => {
     // Add password fields if changing password
     if (password) {
       if (!currentPassword) {
-        return {
-          success: false,
-          message: "Current password is required to change password",
-        };
+        showError("Current password is required to change password");
+        return;
       }
 
       settingsData.currentPassword = currentPassword;

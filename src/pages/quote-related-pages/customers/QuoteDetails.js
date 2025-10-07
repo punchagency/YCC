@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -11,7 +11,6 @@ import {
   Snackbar,
   Paper,
   Stack,
-  useMediaQuery,
   useTheme,
   alpha,
   CircularProgress,
@@ -134,9 +133,7 @@ const QuoteDetails = () => {
 
   const navigate = useNavigate();
   const { quoteId } = useParams();
-  const { state } = useLocation();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const fetchQuote = async () => {
     setLoading(true);

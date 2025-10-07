@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
-// import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-// import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import { useTheme } from "../../context/theme/themeContext";
 
@@ -38,13 +36,6 @@ const UpdatedCalendar = () => {
   useEffect(() => {
     fetchEventsByDate();
   }, []);
-
-  // Fetch events when currentDate (month) changes
-  // useEffect(() => {
-  //setStartDate(startOfMonth);
-  // setEndDate(endOfMonth);
-  //  fetchEventsByDate(startOfMonth, endOfMonth); // Fetch based on the new month
-  //}, [currentDate]);
 
   const handleCalendarChange = (arg) => {
     // This is triggered when the calendar's view changes

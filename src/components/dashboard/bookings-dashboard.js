@@ -414,8 +414,15 @@ const BookingsDashboard = () => {
                     <Box>
                       <FinancialSummaryButton mode={theme}
                         onClick={() => window.open(item.invoiceUrl, '_blank')}
+                        sx={{
+                          backgroundColor: "primary.main",
+                          color: "white",
+                          "&:hover": {
+                            opacity: 0.8,
+                          },
+                        }}
                       >
-                        <ViewButtonText mode={theme}>View</ViewButtonText>
+                        View
                       </FinancialSummaryButton>
                     </Box>
                   </Box>
@@ -494,9 +501,9 @@ const CustomSelect = styled(Select)({
   letterSpacing: "0%",
 });
 
-const FinancialSummaryButton = styled(Button)({
-  backgroundColor: "#EFEFEF",
-  color: "#565656",
+const FinancialSummaryButton = styled(Button)(({ theme }) => ({
+  backgroundColor: "primary.main",
+  color: "white",
   borderRadius: "8px",
   padding: "10px",
   textTransform: "none",
@@ -505,7 +512,7 @@ const FinancialSummaryButton = styled(Button)({
   fontFamily: "Plus Jakarta Sans",
   lineHeight: "150%",
   letterSpacing: "0%",
-});
+}));
 
 export const FinancialSummaryDescriptionText = styled(Typography)(
   ({ mode }) => ({

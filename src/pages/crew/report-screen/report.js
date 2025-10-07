@@ -414,7 +414,7 @@ const Reports = () => {
                   style={{ width: '100%' }}
                 />
               </Box>
-              <Typography sx={{ color: "#666", fontSize: { xs: '11px', sm: '12px' } }}>
+              <Typography sx={{ color: "#656565", fontSize: { xs: '11px', sm: '12px' } }}>
                 Select both start and end dates to generate report
               </Typography>
             </Box>
