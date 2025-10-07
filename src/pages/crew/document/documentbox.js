@@ -7,7 +7,7 @@ const documentTypeList = [
   "Certificates & Licenses",
   "Medical",
   "Employment",
-  "Yacht ",
+  "Yacht",
   "Insurance",
 ];
 
@@ -117,7 +117,7 @@ const DocumentBox = () => {
         ? "ENG1, vaccinations, medical certs"
         : title === "Employment"
         ? "Contracts, references, CV"
-        : title === "Yacht "
+        : title === "Yacht"
         ? "Ship registry, safety certificates"
         : title === "Insurance"
         ? "Health, travel, personal insurance"
