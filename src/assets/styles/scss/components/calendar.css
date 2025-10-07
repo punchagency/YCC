@@ -12,4 +12,18 @@
     padding: 0px !important;
     margin: 0px !important;
   }
+
+  /* Hover effect for regular day cells */
+  .custom-day-cell:not(.bg-blue-500):hover {
+    background-color: rgba(3, 135, 217, 0.1) !important; /* Light blue hover effect */
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+  }
+
+  /* Hover effect for today's cell (highlighted) */
+  .custom-day-cell.bg-blue-500:hover {
+    background-color: rgba(3, 135, 217, 0.8) !important; /* Darker blue on hover for today's cell */
+    cursor: pointer !important;
+    transition: background-color 0.2s ease !important;
+  }
   

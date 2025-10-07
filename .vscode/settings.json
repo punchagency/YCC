@@ -18,6 +18,5 @@
         "titleBar.inactiveBackground": "#f6780299",
         "titleBar.inactiveForeground": "#15202b99"
     },
-    "peacock.color": "#f67802",
-    "window.zoomLevel": 0.3
+    "peacock.color": "#f67802"
 }

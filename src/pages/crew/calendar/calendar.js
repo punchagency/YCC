@@ -3,13 +3,14 @@ import { Dialog as PrimeDialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import plus from "../../../assets/images/crew/plus.png";
+import profilenoti from "../../../assets/images/crew/profilenoti.png";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Toast } from "primereact/toast";
 import { EventCard } from "./components/EventCard";
 import { AllEventsModal } from "./components/AllEventsModal";
 import { DayEventsModal } from "./components/DayEventsModal";
-import three from "../../../assets/images/crew/three.png";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   createEvent,
   fetchEvents,
@@ -19,7 +20,10 @@ import {
 } from "../../../services/calendar/calendarService";
 import { Calendar } from "primereact/calendar";
 import { useOutletContext } from "react-router-dom";
-import { Dialog, DialogTitle, DialogContent } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 
 
@@ -57,9 +61,13 @@ export default function CrewCalendarPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [inviting, setInviting] = useState(false);
-  const [dragOverDay, setDragOverDay] = useState(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Menu state for upcoming events
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedEventForMenu, setSelectedEventForMenu] = useState(null);
+  const [isHovered, setIsHovered] = useState(null); // Track which event is being hovered
 
 
   // Success animation component
@@ -391,6 +399,61 @@ export default function CrewCalendarPage() {
 
   const handleSeeMore = () => {
     setShowAllEventsModal(true);
+  };
+
+  // Menu handling functions for upcoming events
+  const handleMenuClick = (event, selectedEvent) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setSelectedEventForMenu(selectedEvent);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedEventForMenu(null);
+  };
+
+  const handleUpcomingEventUpdate = () => {
+    if (selectedEventForMenu) {
+      setSelectedEvent(selectedEventForMenu);
+      setShowUpdateEventModal(true);
+      handleMenuClose();
+    }
+  };
+
+  const handleUpcomingEventDelete = () => {
+    if (selectedEventForMenu) {
+      setSelectedEvent(selectedEventForMenu);
+      setShowDeleteEventModal(true);
+      handleMenuClose();
+    }
+  };
+
+  const handleUpcomingEventAddGuest = () => {
+    if (selectedEventForMenu) {
+      setSelectedEvent(selectedEventForMenu);
+      setShowAddGuestModal(true);
+      handleMenuClose();
+    }
+  };
+
+  const handleMouseEnter = (eventId) => {
+    setIsHovered(eventId);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(null);
+  };
+
+  // Helper function to format location (similar to EventCard)
+  const formatLocation = (location) => {
+    const locationMap = {
+      zoom: "Virtual - Zoom Meeting",
+      "google-meet": "Virtual - Google Meet",
+      "ms-teams": "Virtual - Microsoft Teams",
+      "in-person": "In Person Meeting",
+    };
+    return locationMap[location] || location;
   };
 
   // Calendar component state and functions
@@ -1061,7 +1124,7 @@ export default function CrewCalendarPage() {
 
               {/* Upcoming Reminders: show the three soonest upcoming events */}
               <div>
-                <h4>Upcoming Reminders</h4>
+                <h4 style={{ marginBottom: "12px", color: "#333", fontWeight: "600" }}>Upcoming Reminders</h4>
                 <div>
                   {calendarEvents?.data &&
                     calendarEvents.data.length > 0 &&
@@ -1072,55 +1135,105 @@ export default function CrewCalendarPage() {
                       .map((event, idx) => (
                         <div
                           key={event._id || idx}
-                          className="flex items-center justify-between bg-#FFFFFF-500 p-2 mb-2"
+                          className="flex items-center bg-white p-3 mb-2"
                           style={{
-                            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                            boxShadow: isHovered === event._id ? "0 4px 12px rgba(0,0,0,0.1)" : "0 2px 4px rgba(0,0,0,0.05)",
+                            borderRadius: "8px",
+                            backgroundColor: isHovered === event._id ? "#f8f9fa" : "transparent",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            transform: isHovered === event._id ? "translateY(-2px)" : "translateY(0)",
                           }}
+                          onMouseEnter={() => handleMouseEnter(event._id)}
+                          onMouseLeave={handleMouseLeave}
                         >
-                          <div className="flex items-center justify-center">
-                            <div>
-                              <h3 className="text-2xl font-bold">
-                                {new Date(event.start).getDate()}
-                              </h3>
-                            </div>
-                            <div className="mt-3 ml-3">
-                              <p>
-                                {new Date(event.start).toLocaleDateString(
-                                  undefined,
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                  }
-                                )}
-                              </p>
-                              <p>{event.title}</p>
-                            </div>
+                          <div style={{ marginRight: "12px", width: "48px", height: "48px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "bold", flexShrink: 0 }}>
+                            {new Date(event.start).getDay()}
                           </div>
-                          <div className="mt-3">
-                            <div className="flex items-center justify-flex-end">
-                              <img
-                                src={three}
-                                alt="menu"
+                          <div
+                            style={{
+                              flex: 1,
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <div>
+                              <h3
                                 style={{
+                                  margin: "0 0 5px 0",
+                                  fontSize: "16px",
+                                  color: isHovered === event._id ? "#0387D9" : "#333",
+                                  transition: "color 0.3s ease",
+                                }}
+                              >
+                                {event.title}
+                              </h3>
+                              
+                              <p
+                                style={{
+                                  margin: 0,
+                                  color: "#666",
+                                  transition: "color 0.3s ease",
+                                }}
+                              >
+                                {event.location && formatLocation(event.location)}
+                              </p>
+                              {event.description && (
+                                <p
+                                  style={{
+                                    margin: "5px 0 0 0",
+                                    color: "#666",
+                                    transition: "color 0.3s ease",
+                                  }}
+                                >
+                                  {event.description}
+                                </p>
+                              )}
+                            </div>
+                            <div className="event-actions">
+                              <MoreVertIcon
+                                fontSize="small"
+                                onClick={(e) => handleMenuClick(e, event)}
+                                style={{
+                                  color: "#667085",
                                   cursor: "pointer",
-                                  marginBottom: "10px",
-                                  marginLeft: "55px",
+                                  transition: "transform 0.3s ease",
+                                  transform: isHovered === event._id ? "scale(1.2)" : "scale(1)",
                                 }}
                               />
                             </div>
-                            <span>
-                              <span>
-                                {new Date(event.start).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </span>
-                            </span>
                           </div>
                         </div>
                       ))}
                 </div>
               </div>
+
+              {/* Menu for upcoming events */}
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleUpcomingEventUpdate}>
+                  <ListItemIcon>
+                    <EditIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Update Event</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleUpcomingEventDelete}>
+                  <ListItemIcon>
+                    <DeleteIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Delete Event</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleUpcomingEventAddGuest}>
+                  <ListItemIcon>
+                    <PersonAddIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Add Guest</ListItemText>
+                </MenuItem>
+              </Menu>
 
               {/* Show See More button if there are more than 2 events */}
               {calendarEvents.data.length > 2 && (
@@ -1313,7 +1426,6 @@ export default function CrewCalendarPage() {
                     isCurrentMonth={true}
                     isToday={isToday(day)}
                     onClick={() => handleDayClick(day)}
-                    onDragOver={(day) => setDragOverDay(day)}
                     onDrop={(day, e) => {
                       // Handle drag and drop functionality here
                     }}
