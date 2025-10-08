@@ -23,6 +23,13 @@ const Order = () => {
 
   // Data fetching states
   const [orders, setOrders] = useState([]);
+  const [fetchOrdersQueries, setFetchOrdersQueries] = useState({
+    page: 1,
+    limit: 10,
+    status: "all",
+    sortDirection: "desc",
+    sortField: "orderDate",
+  });
   const [statusCounts, setStatusCounts] = useState({
     pending: 0,
     active: 0,
@@ -90,7 +97,9 @@ const Order = () => {
       const response = await getOrders({
         page: pagination.page,
         limit: pagination.limit,
-        status: currentStatus,
+        status: currentStatus === "all" ? undefined : currentStatus,
+        sortBy: fetchOrdersQueries.sortField,
+        sortDirection: fetchOrdersQueries.sortDirection,
       });
 
       if (response.status) {
@@ -138,7 +147,7 @@ const Order = () => {
   // Fetch orders data when component mounts, pagination changes, or status filter changes
   useEffect(() => {
     fetchOrdersData();
-  }, [pagination.page, pagination.limit, currentStatus]);
+  }, [pagination.page, pagination.limit, currentStatus, fetchOrdersQueries.sortField, fetchOrdersQueries.sortDirection]);
 
   // Handle filter changes from ActiveOrders component
   const handleFilterChange = (filterCriteria) => {
@@ -202,6 +211,19 @@ const Order = () => {
     setSearchParams(newSearchParams);
   };
 
+  const handleSortChange = (field, direction) => {
+    setFetchOrdersQueries(prev => ({
+      ...prev,
+      sortField: field,
+      sortDirection: direction,
+      page: 1
+    }));
+    setPagination(prev => ({
+      ...prev,
+      page: 1
+    }));
+  };
+
   // Handle order created
   const handleOrderCreated = (newOrder) => {
     setShowCreateModal(false);
@@ -256,6 +278,9 @@ const Order = () => {
           pagination={pagination}
           onPageChange={handlePageChange}
           onLimitChange={handleLimitChange}
+          currentSortField={fetchOrdersQueries.sortField}
+          currentSortDirection={fetchOrdersQueries.sortDirection}
+          onSortChange={handleSortChange}
         />
       </div>
 
