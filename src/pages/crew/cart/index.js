@@ -296,18 +296,102 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    if (
-      !checkoutData.street1 ||
-      !checkoutData.city ||
-      !checkoutData.state ||
-      !checkoutData.zip ||
-      !checkoutData.country ||
-      !checkoutData.deliveryDate
-    ) {
+    // Trim all string fields
+    const trimmedData = {
+      street1: checkoutData.street1?.trim(),
+      street2: checkoutData.street2?.trim(),
+      city: checkoutData.city?.trim(),
+      state: checkoutData.state?.trim(),
+      zip: checkoutData.zip?.trim(),
+      country: checkoutData.country,
+      deliveryDate: checkoutData.deliveryDate,
+      additionalNotes: checkoutData.additionalNotes?.trim(),
+    };
+
+    // Validate required fields
+    if (!trimmedData.street1) {
       toast.current.show({
         severity: "error",
-        summary: "Error",
-        detail: "Please fill in all required fields",
+        summary: "Validation Error",
+        detail: "Street address is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!trimmedData.city) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "City is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!trimmedData.state) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "State/Province/Region is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!trimmedData.zip) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Zip/Postal code is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validate zip/postal code format (alphanumeric, spaces, hyphens)
+    const zipRegex = /^[a-zA-Z0-9\s-]+$/;
+    if (!zipRegex.test(trimmedData.zip)) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Invalid zip/postal code format",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!trimmedData.country) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Country is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    if (!trimmedData.deliveryDate) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Delivery date is required",
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validate delivery date is not in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(trimmedData.deliveryDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      toast.current.show({
+        severity: "error",
+        summary: "Validation Error",
+        detail: "Delivery date cannot be in the past",
         life: 3000,
       });
       return;
@@ -317,14 +401,14 @@ const CartPage = () => {
       setCheckoutLoading(true);
 
       const response = await checkout({
-        street1: checkoutData.street1,
-        street2: checkoutData.street2,
-        city: checkoutData.city,
-        state: checkoutData.state,
-        zip: checkoutData.zip,
-        country: checkoutData.country,
-        deliveryDate: checkoutData.deliveryDate.toISOString(),
-        additionalNotes: checkoutData.additionalNotes,
+        street1: trimmedData.street1,
+        street2: trimmedData.street2 || "",
+        city: trimmedData.city,
+        state: trimmedData.state,
+        zip: trimmedData.zip,
+        country: trimmedData.country,
+        deliveryDate: trimmedData.deliveryDate.toISOString(),
+        additionalNotes: trimmedData.additionalNotes || "",
       });
 
       if (response.status) {
