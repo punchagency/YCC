@@ -186,6 +186,7 @@ const DocumentBox = () => {
         type="file"
         style={{ display: "none" }}
         multiple
+        accept="application/pdf,image/jpeg,image/png,image/jpg,image/webp,image/svg,image/svg+xml,application/docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         onChange={handleFileChange}
       />
       <div

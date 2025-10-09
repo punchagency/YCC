@@ -7,30 +7,33 @@ const getAuthHeader = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const CrewFinancialManagement = async() =>{
+export const CrewFinancialManagement = async ({ page = 1, limit = 10, invoiceType, status, startDate, endDate, search }) => {
+    const queryParams = new URLSearchParams();
+    if (page) queryParams.append("page", page.toString());
+    if (limit) queryParams.append("limit", limit.toString());
+    if (invoiceType) queryParams.append("invoiceType", invoiceType);
+    if (status) queryParams.append("status", status);
+    if (startDate) queryParams.append("startDate", startDate);
+    if (endDate) queryParams.append("endDate", endDate);
+    if (search) queryParams.append("search", search);
+    // if (sortBy) queryParams.append("sortBy", sortBy);
+    // if (sortDirection) queryParams.append("sortDirection", sortDirection);
     const URL = `${API_URL}/crew-financial-management/financial-analytics`;
     const headers = getAuthHeader();
     headers["Content-Type"] = "application/json";
     try {
-        const response = await axios.get(URL, { headers });
+        const response = await axios.get(URL, {
+            headers,
+            params: queryParams,
+        });
 
-        if(response.status === 200){
-            return {
-                success: true,
-                data: response.data.data,
-                message: response.data.message
-            };
-        }else{
-            return {
-                success: false,
-                error: response.data.message
-            }
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error(response.data.message);
         }
     } catch (error) {
-        return {
-            success: false,
-            error: error.response?.data?.message || "Failed to fetch crew financial management data"
-        };
+        throw new Error(error.response?.data?.message || "Failed to fetch crew financial management data");
     }
 
 }

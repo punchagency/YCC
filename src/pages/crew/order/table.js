@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaSortAmountUp, FaSortAmountDown } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -27,9 +27,13 @@ const OrderTable = ({
   onLimitChange,
   showUserColumn = false, // <-- new prop
   detailsBasePath = "/crew/orders-management/", // <-- new prop for details route
+  currentSortField = "orderDate",
+  currentSortDirection = "desc",
+  onSortChange = () => {},
 }) => {
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
+  // Remove local sort state
+  // const [sortField, setSortField] = useState(null);
+  // const [sortDirection, setSortDirection] = useState("asc");
 
   const navigate = useNavigate();
   const muiTheme = useMuiTheme();
@@ -53,17 +57,14 @@ const OrderTable = ({
   };
 
   const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
+    const isCurrent = currentSortField === field;
+    const newDirection = isCurrent ? (currentSortDirection === "asc" ? "desc" : "asc") : "asc";
+    onSortChange(field, newDirection);
   };
 
   const getSortIcon = (field) => {
-    if (sortField === field) {
-      return sortDirection === "asc" ? (
+    if (currentSortField === field) {
+      return currentSortDirection === "asc" ? (
         <FaSortAmountUp className="ml-1" />
       ) : (
         <FaSortAmountDown className="ml-1" />

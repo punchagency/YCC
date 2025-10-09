@@ -25,7 +25,7 @@ const OrderTableSkeleton = () => {
   ];
 
   // Generate skeleton rows
-  const skeletonRows = Array.from({ length: 5 }, (_, index) => index);
+  const skeletonRows = Array.from({ length: 10 }, (_, index) => index);
 
   return (
     <Box sx={{ width: "100%", bgcolor: "#F8FBFF", borderRadius: 2 }}>

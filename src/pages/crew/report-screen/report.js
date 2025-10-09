@@ -320,7 +320,7 @@ const Reports = () => {
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to generate report",
+        detail: error.message || "Failed to generate report",
         life: 3000,
       });
     } finally {

@@ -23,8 +23,10 @@ import {
 
 const SearchFilters = ({
   onFilterChange = () => {},
-  onSearchChange = () => {},
   activeFilter = "all",
+  onInvoiceTypeChange = () => {},
+  onStartDateChange = () => {},
+  onEndDateChange = () => {},
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -63,26 +65,58 @@ const SearchFilters = ({
               />
             ))}
           </Box>
-          <TextField
-            placeholder="Search Transactions"
-            variant="outlined"
-            size="small"
+          <FormControl 
+            size="small" 
             fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: '#666', fontSize: 20 }} />
-                </InputAdornment>
-              ),
-              sx: {
+            sx={{ 
+              '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                bgcolor: 'white',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#e0e0e0'
-                }
+                bgcolor: 'white'
               }
             }}
-            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+          >
+            <InputLabel>Invoice Type</InputLabel>
+            <Select
+              value={filterDropdown}
+              label="Invoice Type"
+              onChange={(e) => {
+                setFilterDropdown(e.target.value);
+                onInvoiceTypeChange(e.target.value);
+              }}
+              IconComponent={ExpandMore}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="order">Order</MenuItem>
+              <MenuItem value="quote">Quotation</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Start Date"
+            type="date"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'white'
+              }
+            }}
+            onChange={(e) => onStartDateChange(e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            size="small"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'white'
+              }
+            }}
+            onChange={(e) => onEndDateChange(e.target.value)}
           />
         </Stack>
       </Box>
@@ -92,8 +126,7 @@ const SearchFilters = ({
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+        display: 'flex',
         alignItems: 'center',
         flexWrap: { xs: 'wrap', lg: 'nowrap' },
         gap: 2
@@ -103,8 +136,7 @@ const SearchFilters = ({
             p: 0.5,
             borderRadius: 3,
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            minWidth: { xs: '100%', lg: 'auto' },
-            flex: { lg: 1 }
+            minWidth: { xs: '100%', lg: 'fit-content' },
           }}
         >
           <ToggleButtonGroup
@@ -157,41 +189,49 @@ const SearchFilters = ({
               }
             }}
           >
-            <InputLabel>Filter</InputLabel>
+            <InputLabel>Invoice Type</InputLabel>
             <Select
               value={filterDropdown}
-              label="Filter"
-              onChange={(e) => setFilterDropdown(e.target.value)}
+              label="Invoice Type"
+              onChange={(e) => {
+                setFilterDropdown(e.target.value);
+                onInvoiceTypeChange(e.target.value);
+              }}
               IconComponent={ExpandMore}
             >
-              <MenuItem value="date">Date Range</MenuItem>
-              <MenuItem value="amount">Amount Range</MenuItem>
-              <MenuItem value="vendor">Vendor</MenuItem>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="order">Order</MenuItem>
+              <MenuItem value="quote">Quotation</MenuItem>
             </Select>
           </FormControl>
 
           <TextField
-            placeholder="Search Transactions"
-            variant="outlined"
+            label="Start Date"
+            type="date"
             size="small"
+            InputLabelProps={{ shrink: true }}
             sx={{
-              minWidth: { xs: 200, md: 280 },
+              minWidth: { xs: 140, md: 160 },
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2,
-                bgcolor: 'white',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#e0e0e0'
-                }
+                bgcolor: 'white'
               }
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: '#666', fontSize: 20 }} />
-                </InputAdornment>
-              )
+            onChange={(e) => onStartDateChange(e.target.value)}
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            sx={{
+              minWidth: { xs: 140, md: 160 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                bgcolor: 'white'
+              }
             }}
-            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onChange={(e) => onEndDateChange(e.target.value)}
           />
         </Box>
       </Box>

@@ -22,7 +22,6 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-  Pagination,
   Skeleton
 } from "@mui/material";
 import {
@@ -32,98 +31,17 @@ import {
 import { visuallyHidden } from '@mui/utils';
 import { formatDateTime } from "../../../utils/formatters";
 
-const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, loading = false }) => {
+const FinancialTable = ({ invoices = [], loading = false, currentSortField, currentSortDirection, onSortChange }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [sortField, setSortField] = useState(null);
-  const [sortDirection, setSortDirection] = useState("asc");
+  // Removed local sort state
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const invoices = React.useMemo(() => Array.isArray(financeData?.invoices) ? financeData?.invoices : [], [financeData]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  // Removed local filtering and sorting
 
-  React.useEffect(() => {
-    setFilteredInvoices(invoices);
-  }, [financeData]);
-
-  // Filter invoices when activeFilter or searchQuery changes
-  useEffect(() => {
-    let filtered = [...invoices];
-
-    // Apply status filter
-    if (activeFilter !== "all") {
-      filtered = filtered.filter((invoice) => {
-        switch (activeFilter) {
-          case "pending":
-            return invoice.status === "Pending";
-          case "completed":
-            return invoice.status === "Completed";
-          case "upcoming":
-            return invoice.status === "In Progress";
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (invoice) =>
-          invoice.id.toLowerCase().includes(query) ||
-          invoice.vendor.toLowerCase().includes(query) ||
-          invoice.details?.serviceName.toLowerCase().includes(query)
-      );
-    }
-
-    setFilteredInvoices(filtered);
-  }, [activeFilter, searchQuery]);
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  // const getSortIcon = (field) => {
-  //   if (sortField === field) {
-  //     return sortDirection === "asc" ? (
-  //       <FaSortAmountUp className="ml-1" />
-  //     ) : (
-  //       <FaSortAmountDown className="ml-1" />
-  //     );
-  //   }
-  //   return <FaSortAmountUp className="ml-1 opacity-30" />;
-  // };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "In Progress":
-        return { bgcolor: '#e8f5e8', color: '#2e7d32' };
-      case "Completed":
-        return { bgcolor: '#e3f2fd', color: '#1976d2' };
-      case "Pending":
-        return { bgcolor: '#fff3e0', color: '#f57c00' };
-      default:
-        return { bgcolor: '#f5f5f5', color: '#666' };
-    }
-  };
-
-  const sortedInvoices = [...filteredInvoices].sort((a, b) => {
-    if (!sortField) return 0;
-    const aValue = a[sortField];
-    const bValue = b[sortField];
-    if (sortDirection === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    }
-    return aValue < bValue ? 1 : -1;
-  });
+  // Removed local sorting
 
   // Handle select all checkbox
   const handleSelectAll = (e) => {
@@ -174,6 +92,19 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
     setSelectedInvoice(null);
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "paid":
+        return { color: "success", bgcolor: "#dcfce7", textColor: "#166534" };
+      case "pending":
+        return { color: "warning", bgcolor: "#fef3c7", textColor: "#92400e" };
+      case "failed":
+        return { color: "error", bgcolor: "#fee2e2", textColor: "#991b1b" };
+      default:
+        return { color: "default", bgcolor: "#f3f4f6", textColor: "#374151" };
+    }
+  };
+
   // Edit handler
   const handleEdit = (index) => {
     // TODO: Implement edit functionality
@@ -222,7 +153,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
                 </Typography>
 
                 <Stack spacing={2}>
-                  {sortedInvoices.map((invoice) => {
+                  {invoices.map((invoice) => {
                     const statusStyle = getStatusColor(invoice.status);
                     return (
                       <Card key={invoice.id} variant="outlined" sx={{ borderRadius: 2 }}>
@@ -345,73 +276,32 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
                 <Table sx={{ minWidth: 650 }}>
                   <TableHead sx={{ bgcolor: '#f8f9fa' }}>
                     <TableRow>
-                      <TableCell padding="checkbox">
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Checkbox
-                            checked={selectAll}
-                            onChange={handleSelectAll}
-                            size="small"
-                          />
-                          {selectedItems.length > 0 && (
-                            <IconButton
-                              size="small"
-                              onClick={handleBulkDelete}
-                              sx={{ color: '#f44336' }}
-                            >
-                              <DeleteOutline fontSize="small" />
-                            </IconButton>
-                          )}
-                        </Box>
-                      </TableCell>
+
                       <TableCell sx={{ fontWeight: 600, color: '#555' }}>
                         <TableSortLabel
-                          active={sortField === 'id'}
-                          direction={sortField === 'id' ? sortDirection : 'asc'}
-                          onClick={() => handleSort('id')}
+                          active={currentSortField === 'id'}
+                          direction={currentSortField === 'id' ? currentSortDirection : 'asc'}
+                        // onClick={() => handleSort('id')}
                         >
                           Inv. No.
-                          {sortField === 'id' ? (
+                          {currentSortField === 'id' ? (
                             <Box component="span" sx={visuallyHidden}>
-                              {sortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                              {currentSortDirection === 'desc' ? 'sorted descending' : 'sorted ascending'}
                             </Box>
                           ) : null}
                         </TableSortLabel>
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                        <TableSortLabel
-                          active={sortField === 'type'}
-                          direction={sortField === 'type' ? sortDirection : 'asc'}
-                          onClick={() => handleSort('type')}
-                        >
-                          Invoice Type
-                        </TableSortLabel>
+                        Invoice Type
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                        <TableSortLabel
-                          active={sortField === 'date'}
-                          direction={sortField === 'date' ? sortDirection : 'asc'}
-                          onClick={() => handleSort('date')}
-                        >
-                          Date
-                        </TableSortLabel>
+                        Date
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                        <TableSortLabel
-                          active={sortField === 'amount'}
-                          direction={sortField === 'amount' ? sortDirection : 'asc'}
-                          onClick={() => handleSort('amount')}
-                        >
-                          Amount
-                        </TableSortLabel>
+                        Amount
                       </TableCell>
                       <TableCell sx={{ fontWeight: 600, color: '#555' }}>
-                        <TableSortLabel
-                          active={sortField === 'status'}
-                          direction={sortField === 'status' ? sortDirection : 'asc'}
-                          onClick={() => handleSort('status')}
-                        >
-                          Status
-                        </TableSortLabel>
+                        Status
                       </TableCell>
                       <TableCell align="center" sx={{ fontWeight: 600, color: '#555' }}>
                         Actions
@@ -420,7 +310,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
                   </TableHead>
 
                   <TableBody>
-                    {sortedInvoices.map((invoice, index) => {
+                    {invoices.map((invoice, index) => {
                       const statusStyle = getStatusColor(invoice.status);
                       return (
                         <TableRow
@@ -430,13 +320,6 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
                             '&:last-child td, &:last-child th': { border: 0 }
                           }}
                         >
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              checked={selectedItems.includes(invoice?.invoiceId)}
-                              onChange={(e) => handleSelectItem(e, invoice?.invoiceId)}
-                              size="small"
-                            />
-                          </TableCell>
                           <TableCell sx={{ fontWeight: 500, color: '#333' }}>
                             {invoice?.invoiceId}
                           </TableCell>
@@ -485,17 +368,7 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
               </TableContainer>
 
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                <Pagination
-                  count={Math.ceil(filteredInvoices.length / 10)}
-                  page={1}
-                  onChange={() => {}}
-                  color="primary"
-                  sx={{
-                    '& .MuiPaginationItem-root': {
-                      borderRadius: 2
-                    }
-                  }}
-                />
+                {/* Removed local pagination */}
               </Box>
             </>
           )}
@@ -595,11 +468,10 @@ const FinancialTable = ({ activeFilter = "all", searchQuery = "", financeData, l
                 <Typography sx={{ fontWeight: 500, color: '#666' }}>Payment Method</Typography>
                 <Typography sx={{ color: '#333' }}>
                   {selectedInvoice.details?.paymentMethod
-                    ? `${selectedInvoice.details.paymentMethod}${
-                        selectedInvoice.details.cardEnding !== "N/A"
-                          ? ` - Ending ${selectedInvoice.details.cardEnding}`
-                          : ""
-                      }`
+                    ? `${selectedInvoice.details.paymentMethod}${selectedInvoice.details.cardEnding !== "N/A"
+                      ? ` - Ending ${selectedInvoice.details.cardEnding}`
+                      : ""
+                    }`
                     : "Payment method not specified"}
                 </Typography>
               </Box>

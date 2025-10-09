@@ -85,6 +85,14 @@ const UpdatedCalendar = () => {
     setSelectedEvent(event);
   };
   return (
+    <>
+    <style>
+      {`
+        .fc-today-button.fc-button.fc-button-primary {
+          text-transform: capitalize !important;
+        }
+      `}
+    </style>
     <Box
       sx={{
         width: "100%",
@@ -241,6 +249,7 @@ const UpdatedCalendar = () => {
         event={selectedEvent}
       />
     </Box>
+    </>
   );
 };
 
