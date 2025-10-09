@@ -59,6 +59,14 @@ export const getOrders = async (params = {}) => {
       queryParams.status = params.status;
     }
 
+    // Add sort parameters if provided
+    if (params.sortBy) {
+      queryParams.sortBy = params.sortBy;
+    }
+    if (params.sortDirection) {
+      queryParams.sortDirection = params.sortDirection;
+    }
+
     const response = await axios.get(`${API_URL}/crew-orders`, {
       params: queryParams,
       headers: {
