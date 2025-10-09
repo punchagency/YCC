@@ -10,21 +10,28 @@ import {
   Dialog,
   DialogActions,
   styled,
+  Chip,
+  Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CalendarIcon from "@mui/icons-material/CalendarMonth";
-import { useCalendar } from "../../context/calendar/calendarContext";
+import { useCalendar } from '../../context/calendar/calendarContext';
 import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import EmailIcon from "@mui/icons-material/Email";
+import { addGuestService } from "../../services/calendar/calendarService";
+import { useToast } from '../../components/Toast';
 
 
 const ViewEventModal = ({ open, handleClose, event }) => {
-  const { addGuest } = useCalendar();
+  const { fetchEventsByDate } = useCalendar();
   const [openAddGuestModal, setOpenAddGuestModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [guestEmails, setGuestEmails] = useState([]);
   const [guestEmail, setGuestEmail] = useState("");
   const [eventId, setEventId] = useState("");
+  const { showError, showSuccess } = useToast();
 
   const formatDate = (date) =>
     new Date(date).toLocaleString("default", {
@@ -38,34 +45,54 @@ const ViewEventModal = ({ open, handleClose, event }) => {
 
   const handleAddGuestModal = () => {
     setOpenAddGuestModal(!openAddGuestModal);
+    if (!openAddGuestModal) {
+      setGuestEmails([]);
+      setGuestEmail("");
+    }
   };
-  const handleAddGuest = () => {
-    addGuest(eventId, guestEmails);
-    setGuestEmails([]);
-    setOpenAddGuestModal(false);
-    handleClose();
+  const handleAddGuest = async () => {
+    if (guestEmails.length === 0) return;
+    setLoading(true);
+
+    try {
+      const response = await addGuestService(eventId, guestEmails);
+
+      if (response.success) {
+        showSuccess(response.message);
+        fetchEventsByDate();
+      } else {
+        showError(response.error || "Failed to add guests");
+      }
+      setGuestEmails([]);
+      setOpenAddGuestModal(false);
+      handleClose();
+    } catch (error) {
+      showError("An error occurred while adding guests");
+    } finally {
+      setLoading(false);
+    }
   };
   if (!event) return null;
 
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx=
-      {{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: { xs: '90%', sm: '70%', md: '50%' },
-        maxHeight: '80vh',
-        overflowY: 'auto',
-        bgcolor: 'background.paper',
-        boxShadow: 24,
-        borderRadius: 2,
-        p: 3,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-      }}>
+        {{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: { xs: '90%', sm: '70%', md: '50%' },
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          borderRadius: 2,
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Event Details</Typography>
           <IconButton onClick={handleClose}>
@@ -131,72 +158,129 @@ const ViewEventModal = ({ open, handleClose, event }) => {
               >
                 Guest List:
                 {e.guests.map((guest, index) => (
-                  <Typography sx={{fontSize: "10px"}} key={index}>{guest.email}</Typography>
+                  <Typography sx={{ fontSize: "10px" }} key={index}>{guest.email}</Typography>
                 ))}
                 {e.guestEmails.map((guest, index) => (
-                  <Typography sx={{fontSize: "10px"}} key={index}>{guest}</Typography>
+                  <Typography sx={{ fontSize: "10px" }} key={index}>{guest}</Typography>
                 ))}
 
               </Box>
 
-              
-      {openAddGuestModal && (
-        <Dialog open={openAddGuestModal} onClose={handleAddGuestModal}>
-          <Box sx={{ p: 4, minWidth: "400px" }}>
-            <Typography variant="h6">Add Guests</Typography>
-            <TextField
-              label="Guest Email"
-              value={guestEmail}
-              onChange={(e) => setGuestEmail(e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-            <CustomAddIconButton
-            variant="outlined"
-              onClick={() => {
-                if (guestEmail.trim()) {
-                  setGuestEmails([...guestEmails, guestEmail.trim()]);
-                  setGuestEmail("");
-                }
-              }}
-            >
-            <AddIcon sx={{fontSize: "15px"}} />  Add
-            </CustomAddIconButton>
 
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle1">Guest List</Typography>
-              {guestEmails.map((email, i) => (
-                <Box
-                  key={i}
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography>{email}</Typography>
-                  <CustomRemoveIconButton
-                    size="small"
-                    variant="contained"
-                    onClick={() =>
-                      setGuestEmails(
-                        guestEmails.filter((_, index) => index !== i)
-                      )
+              {openAddGuestModal && (
+                <Dialog
+                  open={openAddGuestModal}
+                  onClose={handleAddGuestModal}
+                  maxWidth="sm"
+                  fullWidth
+                  PaperProps={{
+                    sx: {
+                      borderRadius: 3,
+                      p: { xs: 2, sm: 3 }
                     }
-                  >
-                    <RemoveIcon sx={{fontSize: "15px"}} /> Remove
-                  </CustomRemoveIconButton>
-                </Box>
-              ))}
-            </Box>
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                    <PersonAddIcon sx={{ color: '#0387d9', fontSize: 28 }} />
+                    <Typography variant="h5" fontWeight={600}>Add Guests</Typography>
+                  </Box>
 
-            <DialogActions sx={{ mt: 3 }}>
-              <CustomCancelButton variant="outlined" onClick={handleAddGuestModal}>Cancel</CustomCancelButton>
-              <CustomConfirmButton onClick={() => handleAddGuest()} variant="contained">
-                Confirm
-              </CustomConfirmButton>
-            </DialogActions>
-          </Box>
-        </Dialog>
-      )}
+                  <Box sx={{ mb: 3 }}>
+                    <TextField
+                      label="Guest Email"
+                      type="email"
+                      value={guestEmail}
+                      onChange={(e) => setGuestEmail(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && guestEmail.trim()) {
+                          const email = guestEmail.trim();
+                          if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                            if (!guestEmails.includes(email)) {
+                              setGuestEmails([...guestEmails, email]);
+                              setGuestEmail("");
+                            }
+                          }
+                        }
+                      }}
+                      fullWidth
+                      variant="outlined"
+                      placeholder="Enter email and press Enter or click Add"
+                      InputProps={{
+                        startAdornment: <EmailIcon sx={{ mr: 1, color: '#757575' }} />,
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: 2,
+                        }
+                      }}
+                    />
+                    <CustomAddIconButton
+                      fullWidth
+                      onClick={() => {
+                        const email = guestEmail.trim();
+                        if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                          if (!guestEmails.includes(email)) {
+                            setGuestEmails([...guestEmails, email]);
+                            setGuestEmail("");
+                          }
+                        }
+                      }}
+                      sx={{ mt: 1.5 }}
+                    >
+                      <AddIcon sx={{ fontSize: 18, mr: 0.5 }} /> Add Email
+                    </CustomAddIconButton>
+                  </Box>
+
+                  {guestEmails.length > 0 && (
+                    <Box sx={{ mb: 3 }}>
+                      <Typography variant="subtitle2" color="text.secondary" mb={1.5}>
+                        {guestEmails.length} Guest{guestEmails.length > 1 ? 's' : ''} Added
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        flexWrap="wrap"
+                        gap={1}
+                        sx={{
+                          maxHeight: 200,
+                          overflowY: 'auto',
+                          p: 2,
+                          bgcolor: '#f8f9fa',
+                          borderRadius: 2,
+                        }}
+                      >
+                        {guestEmails.map((email, i) => (
+                          <Chip
+                            key={i}
+                            label={email}
+                            onDelete={() => setGuestEmails(guestEmails.filter((_, index) => index !== i))}
+                            color="primary"
+                            variant="outlined"
+                            sx={{
+                              borderRadius: 2,
+                              '& .MuiChip-deleteIcon': {
+                                color: '#f44336',
+                                '&:hover': {
+                                  color: '#d32f2f',
+                                }
+                              }
+                            }}
+                          />
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
+
+                  <DialogActions sx={{ px: 0, pt: 2 }}>
+                    <CustomCancelButton onClick={handleAddGuestModal}>Cancel</CustomCancelButton>
+                    <CustomConfirmButton
+                      onClick={handleAddGuest}
+                      disabled={guestEmails.length === 0}
+                    >
+                      Add {guestEmails.length > 0 && `(${guestEmails.length})`} Guest{guestEmails.length !== 1 ? 's' : ''}
+                    </CustomConfirmButton>
+                  </DialogActions>
+                </Dialog>
+              )}
 
               <Box
                 display="flex"
@@ -206,12 +290,13 @@ const ViewEventModal = ({ open, handleClose, event }) => {
               >
                 <CustomConfirmButton
                   variant="contained"
+                  disabled={loading}
                   onClick={() => {
                     handleAddGuestModal();
                     setEventId(e._id);
                   }}
                 >
-                  Add Guests
+                  {loading ? "Adding..." : "Add Guests"}
                 </CustomConfirmButton>
               </Box>
             </Box>
@@ -226,54 +311,48 @@ const ViewEventModal = ({ open, handleClose, event }) => {
 };
 
 const CustomConfirmButton = styled(Button)({
-  bgcolor: "#0387d9",
+  backgroundColor: "#0387d9",
   color: "#ffffff",
   borderRadius: "10px",
   padding: "10px 20px",
   fontWeight: 500,
   textTransform: "none",
   fontSize: "12px",
-  ":hover": {
-    bgcolor: "rgba(3, 135, 217, 0.9)",
+  "&:hover": {
+    backgroundColor: "rgba(3, 135, 217, 0.9)",
+  },
+  "&:disabled": {
+    backgroundColor: "#ccc",
+    color: "#666",
   },
 });
 
 const CustomCancelButton = styled(Button)({
-  bgcolor: "#f0f0f0",
+  backgroundColor: "#f0f0f0",
   color: "#000000",
   borderRadius: "10px",
   padding: "10px 20px",
   fontWeight: 500,
   textTransform: "none",
   fontSize: "12px",
+  "&:hover": {
+    backgroundColor: "#e0e0e0",
+  },
 });
 
 const CustomAddIconButton = styled(Button)({
-  bgcolor: "#0387d9",
-  color: "black",
+  backgroundColor: "#0387d9",
+  color: "#ffffff",
   borderRadius: "10px",
   padding: "10px 20px",
   fontWeight: 500,
   textTransform: "none",
   fontSize: "12px",
-  ":hover": {
-    bgcolor: "rgba(3, 135, 217, 0.9)",
+  "&:hover": {
+    backgroundColor: "rgba(3, 135, 217, 0.9)",
   },
 });
 
-const CustomRemoveIconButton = styled(Button)({
-  backgroundColor: "#f44336", // red
-  color: "#fff",
-  borderRadius: "8px",
-  padding: "4px 10px",
-  fontWeight: 500,
-  textTransform: "none",
-  fontSize: "12px",
-  minWidth: "unset", // keeps it slim
-  lineHeight: 1.2,
-  "&:hover": {
-    backgroundColor: "#d32f2f",
-  },
-});
+
 
 export default ViewEventModal;
