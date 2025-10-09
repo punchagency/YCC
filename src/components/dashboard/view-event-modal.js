@@ -58,7 +58,7 @@ const ViewEventModal = ({ open, handleClose, event }) => {
       const response = await addGuestService(eventId, guestEmails);
 
       if (response.success) {
-        showSuccess(response.message);
+        showSuccess("Guests added successfully");
         fetchEventsByDate();
       } else {
         showError(response.error || "Failed to add guests");

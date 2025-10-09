@@ -432,7 +432,7 @@ const BookingDetails = () => {
                     <Box
                       sx={{
                         p: 2,
-                        bgcolor: 'primary.light',
+                        bgcolor: 'primary.main',
                         color: 'primary.contrastText',
                         display: 'flex',
                         alignItems: 'center',
@@ -523,7 +523,7 @@ const BookingDetails = () => {
                         ))}
                         <Box sx={{
                           p: 2,
-                          bgcolor: 'primary.light',
+                          bgcolor: 'primary.main',
                           color: 'primary.contrastText',
                           borderRadius: 2,
                           display: 'flex',
@@ -564,7 +564,7 @@ const BookingDetails = () => {
                     <Box
                       sx={{
                         p: 2,
-                        bgcolor: 'primary.light',
+                        bgcolor: 'primary.main',
                         color: 'primary.contrastText',
                         display: 'flex',
                         alignItems: 'center',
