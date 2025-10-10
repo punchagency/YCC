@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, TextField, Button, Grid } from "@mui/material";
-import { Dialog } from "primereact/dialog";
+import { Box, Typography, TextField, Button, Grid, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useCalendar } from "../../context/calendar/calendarContext";
 import EditIcon from "@mui/icons-material/Edit";
 import { Calendar as PrimeCalendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 
-const EditEventModal = ({ open, handleClose, eventData }) => {
-  console.log('EditEventModal rendered with props - open:', open, 'eventData:', eventData); // Debug log
+const EditEventModal = ({ open, handleClose, eventData, zIndex = 1300 }) => {
+  console.log('EditEventModal rendered with props - open:', open, 'eventData:', eventData, 'zIndex:', zIndex); // Debug log
   const { updateEvent } = useCalendar();
   const locationOptions = [
     { label: "Zoom", value: "Zoom" },
@@ -124,12 +124,26 @@ const EditEventModal = ({ open, handleClose, eventData }) => {
 
   return (
     <Dialog
-      visible={open}
-      onHide={handleModalClose}
-      header="Edit Event"
-      style={{ width: "500px" }}
+      open={open}
+      onClose={handleModalClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          p: 2
+        }
+      }}
     >
-      <Grid container spacing={2}>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
+        <Typography variant="h6" fontWeight={600}>Edit Event</Typography>
+        <IconButton onClick={handleModalClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      
+      <DialogContent>
+        <Grid container spacing={2}>
         <Grid item xs={12}>
           <Box sx={{ width: "100%" }}>
             <Typography
@@ -227,9 +241,10 @@ const EditEventModal = ({ open, handleClose, eventData }) => {
             />
           </Box>
         </Grid>
-      </Grid>
+        </Grid>
+      </DialogContent>
 
-      <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+      <DialogActions sx={{ p: 3, pt: 2 }}>
         <Button onClick={handleModalClose} variant="outlined">
           Cancel
         </Button>
@@ -252,7 +267,7 @@ const EditEventModal = ({ open, handleClose, eventData }) => {
         >
           Update Event
         </Button>
-      </Box>
+      </DialogActions>
     </Dialog>
   );
 };

@@ -1,18 +1,32 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { Dialog } from "primereact/dialog";
+import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelIcon from "@mui/icons-material/Cancel";
 
-const DeleteConfirmationModal = ({ open, handleClose, onConfirm, eventTitle }) => {
+const DeleteConfirmationModal = ({ open, handleClose, onConfirm, eventTitle, zIndex = 1300 }) => {
   return (
     <Dialog
-      visible={open}
-      onHide={handleClose}
-      header="Delete Event"
-      style={{ width: "400px" }}
+      open={open}
+      onClose={handleClose}
+      maxWidth="xs"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          p: 2
+        }
+      }}
     >
-      <Box sx={{ textAlign: "center", py: 2 }}>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
+        <Typography variant="h6" fontWeight={600}>Delete Event</Typography>
+        <IconButton onClick={handleClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      
+      <DialogContent>
+        <Box sx={{ textAlign: "center", py: 2 }}>
         <Typography
           variant="body1"
           sx={{ 
@@ -47,9 +61,10 @@ const DeleteConfirmationModal = ({ open, handleClose, onConfirm, eventTitle }) =
         >
           This action cannot be undone.
         </Typography>
-      </Box>
+        </Box>
+      </DialogContent>
 
-      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 2 }}>
+      <DialogActions sx={{ p: 3, pt: 2, justifyContent: "center" }}>
         <Button 
           onClick={handleClose} 
           variant="outlined"
@@ -89,7 +104,7 @@ const DeleteConfirmationModal = ({ open, handleClose, onConfirm, eventTitle }) =
         >
           Delete Event
         </Button>
-      </Box>
+      </DialogActions>
     </Dialog>
   );
 };
