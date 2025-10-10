@@ -1,4 +1,6 @@
-import { Box, Typography, styled, IconButton } from "@mui/material";
+import { Box, Typography, styled, IconButton, Dialog, Button, DialogTitle, DialogContent } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { useEffect, useState } from "react";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
@@ -7,7 +9,6 @@ import { useTheme } from "../../context/theme/themeContext";
 import { useCalendar } from "../../context/calendar/calendarContext";
 import CreateEventModal from "./create-event-modal";
 import EditEventModal from "./edit-event-modal";
-import DeleteConfirmationModal from "./delete-confirmation-modal";
 import EventOptionsMenu from "./event-options-menu";
 import AddGuestModal from "./add-guest-modal";
 
@@ -375,12 +376,52 @@ const BookingSummaryInfoCard = () => {
         handleClose={handleEditClose} 
         eventData={selectedEvent}
       />
-      <DeleteConfirmationModal
-        open={openDeleteModal}
-        handleClose={handleDeleteClose}
-        onConfirm={confirmDelete}
-        eventTitle={selectedEvent?.title || ""}
-      />
+      {/* Delete Confirmation Dialog - Consistent with calendar design */}
+      {openDeleteModal && (
+        <Dialog
+          open={openDeleteModal}
+          onClose={handleDeleteClose}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <WarningAmberIcon
+                sx={{ 
+                  fontSize: "2rem", 
+                  color: "#ff9800", 
+                  marginRight: "10px" 
+                }}
+              />
+              <Typography>Are you sure you want to delete this event?</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleDeleteClose}
+                variant="text"
+              >
+                No
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                Yes
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
       <EventOptionsMenu
         open={openOptionsMenu}
         handleClose={handleOptionsClose}

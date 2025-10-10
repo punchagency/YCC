@@ -9,6 +9,8 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogTitle,
+  DialogContent,
   styled,
   Chip,
   Stack,
@@ -22,55 +24,43 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { addGuestService } from "../../services/calendar/calendarService";
 import { useToast } from '../../components/Toast';
 import EditEventModal from "./edit-event-modal";
-import DeleteConfirmationModal from "./delete-confirmation-modal";
 
 
 // Main wrapper component that handles all modals
 const ViewEventModalWrapper = ({ open, handleClose, event }) => {
-  console.log('ViewEventModalWrapper rendered - open:', open, 'event:', event); // Debug log
-  console.log('ViewEventModalWrapper - props received:', { open, handleClose: !!handleClose, event }); // Debug log
-  
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedEventForEdit, setSelectedEventForEdit] = useState(null);
   const { removeEvent } = useCalendar();
-  
-  console.log('ViewEventModalWrapper - state:', { openEditModal, openDeleteModal, selectedEventForEdit }); // Debug log
 
   const handleEditEvent = (eventData) => {
-    console.log('handleEditEvent called with eventData:', eventData); // Debug log
-    console.log('Closing view-event-modal before opening edit modal'); // Debug log
     setSelectedEventForEdit(eventData);
     setOpenEditModal(true);
     handleClose(); // Close the main view-event-modal
   };
 
   const handleEditClose = () => {
-    console.log('handleEditClose called'); // Debug log
     setOpenEditModal(false);
     setSelectedEventForEdit(null);
   };
 
   const handleDeleteEvent = (eventData) => {
-    console.log('handleDeleteEvent called with eventData:', eventData); // Debug log
     setSelectedEventForEdit(eventData);
     setOpenDeleteModal(true);
   };
 
   const handleDeleteClose = () => {
-    console.log('handleDeleteClose called'); // Debug log
     setOpenDeleteModal(false);
     setSelectedEventForEdit(null);
   };
 
   const confirmDelete = () => {
-    console.log('confirmDelete called with selectedEventForEdit:', selectedEventForEdit); // Debug log
     if (selectedEventForEdit) {
       const eventId = selectedEventForEdit._id || selectedEventForEdit.id;
-      console.log('Deleting event with ID:', eventId); // Debug log
       
       if (!eventId) {
         console.error('No valid event ID found for deletion!');
@@ -100,22 +90,58 @@ const ViewEventModalWrapper = ({ open, handleClose, event }) => {
         eventData={selectedEventForEdit}
       />
       
-      {/* Delete Confirmation Modal - Material-UI Dialog automatically handles z-index */}
-      <DeleteConfirmationModal
-        open={openDeleteModal}
-        handleClose={handleDeleteClose}
-        onConfirm={confirmDelete}
-        eventTitle={selectedEventForEdit?.title || ""}
-      />
+      {/* Delete Confirmation Dialog - Consistent with calendar design */}
+      {openDeleteModal && (
+        <Dialog
+          open={openDeleteModal}
+          onClose={handleDeleteClose}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <WarningAmberIcon
+                sx={{ 
+                  fontSize: "2rem", 
+                  color: "#ff9800", 
+                  marginRight: "10px" 
+                }}
+              />
+              <Typography>Are you sure you want to delete this event?</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleDeleteClose}
+                variant="text"
+              >
+                No
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                Yes
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
 
 // The actual modal component (now receives handlers as props)
 const ViewEventModal = ({ open, handleClose, event, onEditEvent, onDeleteEvent }) => {
-  console.log('ViewEventModal rendered - open:', open, 'event:', event); // Debug log
-  console.log('ViewEventModal - event type:', typeof event, 'is array:', Array.isArray(event)); // Debug log
-  
   const { fetchEventsByDate } = useCalendar();
   const [openAddGuestModal, setOpenAddGuestModal] = useState(false);
   const [loading, setLoading] = useState(false);
