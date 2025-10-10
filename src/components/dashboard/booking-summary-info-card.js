@@ -1,13 +1,19 @@
-import { Box, Typography, styled } from "@mui/material";
+import { Box, Typography, styled, IconButton, Dialog, Button, DialogTitle, DialogContent } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { useEffect, useState } from "react";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useTheme } from "../../context/theme/themeContext";
 import { useCalendar } from "../../context/calendar/calendarContext";
 import CreateEventModal from "./create-event-modal";
+import EditEventModal from "./edit-event-modal";
+import EventOptionsMenu from "./event-options-menu";
+import AddGuestModal from "./add-guest-modal";
 
 const BookingSummaryInfoCard = () => {
-  const { events, fetchEventsByDate } = useCalendar();
+  const { events, fetchEventsByDate, removeEvent } = useCalendar();
   const { theme } = useTheme();
   const today = new Date();
   const tomorrow = new Date(today);
@@ -53,7 +59,72 @@ const BookingSummaryInfoCard = () => {
   }
 
   const [openModal, setOpenModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openOptionsMenu, setOpenOptionsMenu] = useState(false);
+  const [openAddGuestModal, setOpenAddGuestModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  
   const handleClose = () => setOpenModal(false);
+  const handleEditClose = () => {
+    setOpenEditModal(false);
+    setSelectedEvent(null);
+  };
+  const handleDeleteClose = () => {
+    setOpenDeleteModal(false);
+    setSelectedEvent(null);
+  };
+  const handleAddGuestClose = () => {
+    console.log('handleAddGuestClose called'); // Debug log
+    setOpenAddGuestModal(false);
+    setSelectedEvent(null);
+  };
+  const handleOptionsClose = () => {
+    setOpenOptionsMenu(false);
+    setAnchorEl(null);
+    // Don't reset selectedEvent here - keep it for the modals
+  };
+
+  const handleOptionsClick = (event, buttonElement) => {
+    setSelectedEvent(event);
+    setAnchorEl(buttonElement.currentTarget);
+    setOpenOptionsMenu(true);
+  };
+
+  const handleEdit = () => {
+    setOpenEditModal(true);
+    // Keep selectedEvent for the edit modal
+  };
+
+  const handleDelete = () => {
+
+    setOpenDeleteModal(true);
+    // Keep selectedEvent for the delete modal
+  };
+
+  const handleAddGuest = () => {
+    console.log('handleAddGuest called with selectedEvent:', selectedEvent); // Debug log
+    setOpenAddGuestModal(true);
+    // Keep selectedEvent for the add guest modal
+  };
+
+  const confirmDelete = () => {
+    if (selectedEvent) {
+      // Handle both possible ID formats
+      const eventId = selectedEvent.id || selectedEvent._id;
+      
+      if (!eventId) {
+        console.error('No valid event ID found!');
+        return;
+      }
+      
+      removeEvent(eventId);
+    } else {
+      console.error('No selectedEvent available for deletion');
+    }
+    handleDeleteClose();
+  };
 
   return (
     <Box
@@ -134,10 +205,23 @@ const BookingSummaryInfoCard = () => {
                   display: "flex",
                   flexDirection: "row",
                   alignItems: "center",
+                  justifyContent: "space-between",
                   width: "100%",
                 }}
               >
                 <BookingTitleText mode={theme}>{event.title}</BookingTitleText>
+                <IconButton
+                  onClick={(e) => handleOptionsClick(event, e)}
+                  sx={{
+                    padding: "4px",
+                    color: theme === "light" ? "#666666" : "#cccccc",
+                    "&:hover": {
+                      backgroundColor: theme === "light" ? "#f5f5f5" : "#333333",
+                    },
+                  }}
+                >
+                  <MoreVertIcon sx={{ fontSize: "18px" }} />
+                </IconButton>
               </Box>
             </EventCard>
 
@@ -244,10 +328,23 @@ const BookingSummaryInfoCard = () => {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
+                justifyContent: "space-between",
                 width: "100%",
               }}
             >
               <BookingTitleText mode={theme}>{event.title}</BookingTitleText>
+              <IconButton
+                onClick={(e) => handleOptionsClick(event, e)}
+                sx={{
+                  padding: "4px",
+                  color: theme === "light" ? "#666666" : "#cccccc",
+                  "&:hover": {
+                    backgroundColor: theme === "light" ? "#f5f5f5" : "#333333",
+                  },
+                }}
+              >
+                <MoreVertIcon sx={{ fontSize: "18px" }} />
+              </IconButton>
             </Box>
           </EventCard>
         ))
@@ -274,6 +371,70 @@ const BookingSummaryInfoCard = () => {
       )}
 
       <CreateEventModal open={openModal} handleClose={handleClose} />
+      <EditEventModal 
+        open={openEditModal} 
+        handleClose={handleEditClose} 
+        eventData={selectedEvent}
+      />
+      {/* Delete Confirmation Dialog - Consistent with calendar design */}
+      {openDeleteModal && (
+        <Dialog
+          open={openDeleteModal}
+          onClose={handleDeleteClose}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <WarningAmberIcon
+                sx={{ 
+                  fontSize: "2rem", 
+                  color: "#ff9800", 
+                  marginRight: "10px" 
+                }}
+              />
+              <Typography>Are you sure you want to delete this event?</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleDeleteClose}
+                variant="text"
+              >
+                No
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                Yes
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
+      <EventOptionsMenu
+        open={openOptionsMenu}
+        handleClose={handleOptionsClose}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onAddGuest={handleAddGuest}
+        anchorEl={anchorEl}
+      />
+      <AddGuestModal
+        open={openAddGuestModal}
+        handleClose={handleAddGuestClose}
+        selectedEvent={selectedEvent}
+      />
     </Box>
   );
 };

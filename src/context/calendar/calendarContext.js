@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useCallback } from "react";
-import { fetchEvents, createEvent, addGuestService } from "../../services/calendar/calendarService";
+import { fetchEvents, createEvent, addGuestService, updateEvent as updateEventService, deleteEvent as deleteEventService } from "../../services/calendar/calendarService";
 import { useToast } from '../toast/toastContext';
 export const CalendarContext = createContext();
 
@@ -92,6 +92,64 @@ endOfNextMonth.setHours(23, 59, 59, 999);
         }
         fetchEventsByDate();
     }
+
+    const updateEvent = async (eventId, eventData) => {
+        if (!eventId) {
+            console.error('No eventId provided to updateEvent');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No event ID provided' });
+            return;
+        }
+        
+        try {
+            const response = await updateEventService(eventId, eventData);
+            
+            if (response.success) {
+                // Update the events in state
+                setEvents(events.map(event => {
+                    const currentEventId = event._id || event.id;
+                    return currentEventId === eventId ? { ...event, ...eventData } : event;
+                }));
+                fetchEventsByDate();
+                fetchEventsForTodayAndTomorrow();
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Event updated successfully' });
+            } else {
+                console.error('Update failed:', response.error);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: response.error || 'Failed to update event' });
+            }
+        } catch (error) {
+            console.error('Error in updateEvent:', error);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'An unexpected error occurred' });
+        }
+    }
+
+    const removeEvent = async (eventId) => {
+        if (!eventId) {
+            console.error('No eventId provided to removeEvent');
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No event ID provided' });
+            return;
+        }
+        
+        try {
+            const response = await deleteEventService(eventId);
+            
+            if (response.success) {
+                // Remove the event from state
+                setEvents(events.filter(event => {
+                    const currentEventId = event._id || event.id;
+                    return currentEventId !== eventId;
+                }));
+                fetchEventsByDate();
+                fetchEventsForTodayAndTomorrow();
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Event deleted successfully' });
+            } else {
+                console.error('Delete failed:', response.error);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: response.error || 'Failed to delete event' });
+            }
+        } catch (error) {
+            console.error('Error in removeEvent:', error);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'An unexpected error occurred' });
+        }
+    }
         const value = {
             selectedDate,
             setSelectedDate,
@@ -99,6 +157,8 @@ endOfNextMonth.setHours(23, 59, 59, 999);
             setEvents,
             fetchEventsByDate,
             addEvent,
+            updateEvent,
+            removeEvent,
             startDate,
             setStartDate,
             endDate,
