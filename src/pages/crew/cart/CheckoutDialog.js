@@ -8,7 +8,6 @@ import {
   Button,
   Box,
   Typography,
-  Divider,
   CircularProgress,
 } from "@mui/material";
 import PaymentIcon from "@mui/icons-material/Payment";
@@ -47,27 +46,75 @@ const CheckoutDialog = ({
       currency: "USD",
     }).format(amount);
 
+  const fieldStyles = {
+    mb: 2.5,
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 2,
+      backgroundColor: '#f8fafc',
+      transition: 'all 0.2s',
+      '& fieldset': {
+        borderColor: '#e2e8f0',
+        borderWidth: 1.5
+      },
+      '&:hover fieldset': {
+        borderColor: '#cbd5e1'
+      },
+      '&.Mui-focused': {
+        backgroundColor: '#fff',
+        '& fieldset': {
+          borderColor: '#0387D9',
+          borderWidth: 2
+        }
+      }
+    },
+    '& .MuiInputLabel-root': {
+      color: '#64748b',
+      fontWeight: 500,
+      '&.Mui-focused': {
+        color: '#0387D9'
+      }
+    }
+  };
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="sm"
+      maxWidth="md"
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          boxShadow:
-            "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04)",
+          borderRadius: 4,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          overflow: 'hidden'
         },
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, color: "#111827" }}>
-          Complete Your Order
-        </Typography>
+      <DialogTitle sx={{
+        background: 'linear-gradient(135deg, #0387D9 0%, #0277bd 100%)',
+        color: '#fff',
+        py: 3,
+        px: 4
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <PaymentIcon sx={{ fontSize: 32 }} />
+          <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.5px' }}>
+            Complete Your Order
+          </Typography>
+        </Box>
       </DialogTitle>
-      <DialogContent sx={{ p: { xs: 1, md: 3 } }}>
-        <Box sx={{ mt: 2 }}>
+      <DialogContent sx={{ p: 4, backgroundColor: '#fafbfc' }}>
+        <Box sx={{
+          backgroundColor: '#fff',
+          borderRadius: 3,
+          p: 3,
+          mb: 3,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+        }}>
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 4, height: 24, backgroundColor: '#0387D9', borderRadius: 1 }} />
+            Shipping Address
+          </Typography>
           <TextField
             fullWidth
             label="Street Address 1"
@@ -76,7 +123,7 @@ const CheckoutDialog = ({
               setCheckoutData({ ...safeCheckoutData, street1: e.target.value })
             }
             required
-            sx={{ mb: 3 }}
+            sx={fieldStyles}
           />
           <TextField
             fullWidth
@@ -85,10 +132,10 @@ const CheckoutDialog = ({
             onChange={(e) =>
               setCheckoutData({ ...safeCheckoutData, street2: e.target.value })
             }
-            sx={{ mb: 3 }}
-            placeholder="Apartment, suite, unit, etc. (optional)"
+            sx={fieldStyles}
+            placeholder="Apartment, suite, unit, etc."
           />
-          <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 2.5 }}>
             <TextField
               label="City"
               value={safeCheckoutData.city || ""}
@@ -96,7 +143,7 @@ const CheckoutDialog = ({
                 setCheckoutData({ ...safeCheckoutData, city: e.target.value })
               }
               required
-              sx={{ flex: 1, minWidth: 120 }}
+              sx={fieldStyles}
             />
             <TextField
               label="State/Province/Region"
@@ -105,10 +152,10 @@ const CheckoutDialog = ({
                 setCheckoutData({ ...safeCheckoutData, state: e.target.value })
               }
               required
-              sx={{ flex: 1, minWidth: 120 }}
+              sx={fieldStyles}
             />
           </Box>
-          <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+          <Box sx={{ display: "grid", alignItems: "end", gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mb: 2.5 }}>
             <TextField
               label="Zip/Postal Code"
               value={safeCheckoutData.zip || ""}
@@ -116,12 +163,13 @@ const CheckoutDialog = ({
                 setCheckoutData({ ...safeCheckoutData, zip: e.target.value })
               }
               required
-              sx={{ flex: 1, minWidth: 120 }}
+              sx={fieldStyles}
             />
-            <Box sx={{ flex: 1, minWidth: 120 }}>
+
+            <Box>
               <Typography
                 variant="body2"
-                sx={{ mb: 0.5, color: "#374151", fontWeight: 500 }}
+                sx={{ mb: 1, color: "#64748b", fontWeight: 500, fontSize: '0.875rem' }}
               >
                 Country <span style={{ color: "#ef4444" }}>*</span>
               </Typography>
@@ -144,18 +192,25 @@ const CheckoutDialog = ({
                   control: (base, state) => ({
                     ...base,
                     borderRadius: 8,
-                    borderColor: state.isFocused ? "#0387D9" : "#d1d5db",
+                    backgroundColor: '#f8fafc',
+                    borderColor: state.isFocused ? "#0387D9" : "#e2e8f0",
+                    borderWidth: state.isFocused ? 2 : 1.5,
                     boxShadow: "none",
-                    minHeight: 40,
+                    minHeight: 56,
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      borderColor: '#cbd5e1'
+                    }
                   }),
                   option: (base, state) => ({
                     ...base,
                     backgroundColor: state.isSelected
                       ? "#0387D9"
                       : state.isFocused
-                      ? "#e0f2fe"
-                      : "white",
-                    color: state.isSelected ? "white" : "#111827",
+                        ? "#e0f2fe"
+                        : "white",
+                    color: state.isSelected ? "white" : "#1e293b",
+                    cursor: 'pointer'
                   }),
                 }}
                 required
@@ -179,7 +234,7 @@ const CheckoutDialog = ({
             }
             required
             InputLabelProps={{ shrink: true }}
-            sx={{ mb: 3 }}
+            sx={fieldStyles}
           />
           <TextField
             fullWidth
@@ -194,77 +249,106 @@ const CheckoutDialog = ({
               })
             }
             placeholder="Any special instructions or notes..."
+            sx={{ ...fieldStyles, mb: 0 }}
           />
-          <Divider sx={{ my: 3 }} />
-          <Typography
-            variant="h6"
-            sx={{ mb: 2, fontWeight: 600, color: "#111827" }}
-          >
+        </Box>
+        <Box sx={{
+          backgroundColor: '#fff',
+          borderRadius: 3,
+          p: 3,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+        }}>
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b', display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ width: 4, height: 24, backgroundColor: '#0387D9', borderRadius: 1 }} />
             Order Summary
           </Typography>
-          <Box sx={{ mb: 2 }}>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography variant="body1" sx={{ color: "#6b7280" }}>
+          <Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, py: 1.5, borderBottom: '1px solid #f1f5f9' }}>
+              <Typography variant="body1" sx={{ color: "#64748b", fontWeight: 500 }}>
                 Total Items:
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
                 {cart?.totalItems || 0}
               </Typography>
             </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography variant="body1" sx={{ color: "#6b7280" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2, py: 1.5, borderBottom: '1px solid #f1f5f9' }}>
+              <Typography variant="body1" sx={{ color: "#64748b", fontWeight: 500 }}>
                 Subtotal:
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
                 {formatCurrency(cart?.totalPrice || 0)}
               </Typography>
             </Box>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-            >
-              <Typography variant="body1" sx={{ color: "#6b7280" }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3, py: 1.5, borderBottom: '1px solid #f1f5f9' }}>
+              <Typography variant="body1" sx={{ color: "#64748b", fontWeight: 500 }}>
                 Platform Fee:
               </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 600 }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, color: '#1e293b' }}>
                 {formatCurrency(cart?.platformFee || 0)}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, color: "#111827" }}
-              >
+            <Box sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              p: 2,
+              backgroundColor: '#f0f9ff',
+              borderRadius: 2,
+              border: '2px solid #0387D9'
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "#1e293b" }}>
                 Grand Total:
               </Typography>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 700, color: "#0387D9" }}
-              >
+              <Typography variant="h6" sx={{ fontWeight: 700, color: "#0387D9" }}>
                 {formatCurrency(cart?.grandTotal || 0)}
               </Typography>
             </Box>
           </Box>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 1 }}>
-        <Button onClick={onClose} sx={{ color: "#6b7280" }} disabled={loading}>
+      <DialogActions sx={{
+        p: 3,
+        backgroundColor: '#f8fafc',
+        borderTop: '1px solid #e2e8f0',
+        gap: 2
+      }}>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          sx={{
+            color: "#64748b",
+            fontWeight: 600,
+            px: 3,
+            py: 1,
+            borderRadius: 2,
+            '&:hover': {
+              backgroundColor: '#f1f5f9'
+            }
+          }}
+        >
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={onCheckout}
           disabled={!isFormValid}
-          startIcon={loading ? <CircularProgress size={20} /> : <PaymentIcon />}
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PaymentIcon />}
           sx={{
-            backgroundColor: "#0387D9",
-            "&:hover": {
-              backgroundColor: "#0277bd",
-            },
+            background: 'linear-gradient(135deg, #0387D9 0%, #0277bd 100%)',
+            boxShadow: '0 4px 12px rgba(3, 135, 217, 0.3)',
             fontWeight: 600,
+            px: 4,
+            py: 1.5,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #0277bd 0%, #01579b 100%)',
+              boxShadow: '0 6px 16px rgba(3, 135, 217, 0.4)',
+            },
+            '&:disabled': {
+              background: '#cbd5e1',
+              color: '#94a3b8'
+            }
           }}
         >
           {loading ? "Processing..." : "Place Order"}
