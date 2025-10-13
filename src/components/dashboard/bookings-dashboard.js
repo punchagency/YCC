@@ -279,9 +279,9 @@ const BookingsDashboard = () => {
         maxWidth: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "hidden",
+        overflow: "visible", // FIXED: Changed from hidden to visible
         paddingTop: { xs: 0, md: 2 },
-        paddingBottom: 0,
+        paddingBottom: { xs: 2, md: 3 }, // FIXED: Added bottom padding
       }}
     >
       {/* Main Dashboard Container with Custom Responsive Layout */}
@@ -452,27 +452,16 @@ const BookingsDashboard = () => {
         </Box>
       </Box>
 
-      {/* Bottom Row Grid Container */}
-      <Grid2
-        container
-        spacing={1}
+      {/* Bottom Row - BookingSummary with full width */}
+      <Box
         sx={{
           width: "100%",
-          margin: 0,
           paddingX: { xs: 2, sm: 3 },
           paddingBottom: { xs: 2, md: 3 },
-          '& > .MuiGrid2-root': {
-            paddingLeft: { xs: 1, sm: 1.25, md: 1.5 },
-            paddingTop: { xs: 1, sm: 1.25, md: 1.5 },
-          }
         }}
       >
-
-        {/* Booking Summary - Equal width on larger screens */}
-        <Grid2 xs={12} md={12} lg={6} sx={{ flex: 1}} >
-          <BookingSummary />
-        </Grid2>
-      </Grid2>
+        <BookingSummary />
+      </Box>
     </Box>
   );
 };

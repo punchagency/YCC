@@ -13,11 +13,12 @@ const BookingSummary = () => {
         boxShadow: "0px 2px 8px 0px #0000001A",
         textAlign: "start",
         height: "auto",
-        minHeight: "100%",
+        minHeight: "auto",
+        maxHeight: "none",
         display: "flex",
         flexDirection: "column",
         backgroundColor: theme === "light" ? "white" : "#03141F",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <Box
@@ -38,38 +39,47 @@ const BookingSummary = () => {
             padding: { xs: "5px", sm: "8px", md: "10px" },
             flexDirection: "column",
             gap: { xs: "10px", sm: "15px", md: "20px" },
-            height: "100%",
+            height: "auto",
             width: "100%",
           }}
         >
-          <Grid
-            spacing={{ xs: 1, sm: 1.5, md: 2 }}
-            sx={{ height: "100%" }}
+          {/* REPLACED GRID WITH FLEXBOX FOR BETTER RELIABILITY */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                sm: "column", 
+                md: "column",
+                lg: "row"
+              },
+              gap: { xs: 2, sm: 2, md: 2, lg: 3 },
+              width: "100%",
+              height: "auto",
+            }}
           >
-            <Grid
-              xs={12}
-              md={6}
-              lg={7.5}
+            {/* Calendar Section */}
+            <Box
               sx={{
-                height: { xs: "auto", md: "100%" },
-                width: "100%",
-                mb: { xs: 2, md: 0 },
+                flex: { xs: "none", lg: "1 1 60%" },
+                width: { xs: "100%", lg: "auto" },
+                minWidth: 0,
               }}
             >
               <UpdatedCalendar />
-            </Grid>
-            <Grid
-              xs={12}
-              md={6}
-              lg={4.5}
+            </Box>
+            
+            {/* Info Card Section */}
+            <Box
               sx={{
-                height: { xs: "auto", md: "100%" },
-                width: "100%",
+                flex: { xs: "none", lg: "1 1 40%" },
+                width: { xs: "100%", lg: "auto" },
+                minWidth: 0,
               }}
             >
               <BookingSummaryInfoCard />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>
