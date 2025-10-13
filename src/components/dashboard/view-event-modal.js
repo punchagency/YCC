@@ -9,6 +9,8 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogTitle,
+  DialogContent,
   styled,
   Chip,
   Stack,
@@ -20,11 +22,126 @@ import { useCalendar } from '../../context/calendar/calendarContext';
 import AddIcon from "@mui/icons-material/Add";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { addGuestService } from "../../services/calendar/calendarService";
 import { useToast } from '../../components/Toast';
+import EditEventModal from "./edit-event-modal";
 
 
-const ViewEventModal = ({ open, handleClose, event }) => {
+// Main wrapper component that handles all modals
+const ViewEventModalWrapper = ({ open, handleClose, event }) => {
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedEventForEdit, setSelectedEventForEdit] = useState(null);
+  const { removeEvent } = useCalendar();
+
+  const handleEditEvent = (eventData) => {
+    setSelectedEventForEdit(eventData);
+    setOpenEditModal(true);
+    handleClose(); // Close the main view-event-modal
+  };
+
+  const handleEditClose = () => {
+    setOpenEditModal(false);
+    setSelectedEventForEdit(null);
+  };
+
+  const handleDeleteEvent = (eventData) => {
+    setSelectedEventForEdit(eventData);
+    setOpenDeleteModal(true);
+  };
+
+  const handleDeleteClose = () => {
+    setOpenDeleteModal(false);
+    setSelectedEventForEdit(null);
+  };
+
+  const confirmDelete = () => {
+    if (selectedEventForEdit) {
+      const eventId = selectedEventForEdit._id || selectedEventForEdit.id;
+      
+      if (!eventId) {
+        console.error('No valid event ID found for deletion!');
+        return;
+      }
+      
+      removeEvent(eventId);
+      handleClose(); // Close the main view modal after deletion
+    }
+    handleDeleteClose();
+  };
+
+  return (
+    <>
+      <ViewEventModal 
+        open={open} 
+        handleClose={handleClose} 
+        event={event}
+        onEditEvent={handleEditEvent}
+        onDeleteEvent={handleDeleteEvent}
+      />
+      
+      {/* Edit Event Modal - Material-UI Dialog automatically handles z-index */}
+      <EditEventModal 
+        open={openEditModal} 
+        handleClose={handleEditClose} 
+        eventData={selectedEventForEdit}
+      />
+      
+      {/* Delete Confirmation Dialog - Consistent with calendar design */}
+      {openDeleteModal && (
+        <Dialog
+          open={openDeleteModal}
+          onClose={handleDeleteClose}
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <WarningAmberIcon
+                sx={{ 
+                  fontSize: "2rem", 
+                  color: "#ff9800", 
+                  marginRight: "10px" 
+                }}
+              />
+              <Typography>Are you sure you want to delete this event?</Typography>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "0.5rem",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                onClick={handleDeleteClose}
+                variant="text"
+              >
+                No
+              </Button>
+              <Button
+                onClick={confirmDelete}
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+              >
+                Yes
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
+  );
+};
+
+// The actual modal component (now receives handlers as props)
+const ViewEventModal = ({ open, handleClose, event, onEditEvent, onDeleteEvent }) => {
   const { fetchEventsByDate } = useCalendar();
   const [openAddGuestModal, setOpenAddGuestModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -288,6 +405,34 @@ const ViewEventModal = ({ open, handleClose, event }) => {
                 gap={2}
                 alignItems="center"
               >
+                <CustomEditButton
+                  variant="contained"
+                  onClick={() => {
+                    if (onEditEvent) {
+                      onEditEvent(e);
+                    } else {
+                      console.error('onEditEvent handler not provided');
+                    }
+                  }}
+                  startIcon={<EditIcon />}
+                >
+                  Edit Event
+                </CustomEditButton>
+                
+                <CustomDeleteButton
+                  variant="contained"
+                  onClick={() => {
+                    if (onDeleteEvent) {
+                      onDeleteEvent(e);
+                    } else {
+                      console.error('onDeleteEvent handler not provided');
+                    }
+                  }}
+                  startIcon={<DeleteIcon />}
+                >
+                  Delete Event
+                </CustomDeleteButton>
+                
                 <CustomConfirmButton
                   variant="contained"
                   disabled={loading}
@@ -353,6 +498,30 @@ const CustomAddIconButton = styled(Button)({
   },
 });
 
+const CustomEditButton = styled(Button)({
+  backgroundColor: "#0387d9",
+  color: "#ffffff",
+  borderRadius: "10px",
+  padding: "10px 20px",
+  fontWeight: 500,
+  textTransform: "none",
+  fontSize: "12px",
+  "&:hover": {
+    backgroundColor: "rgba(3, 135, 217, 0.9)",
+  },
+});
 
+const CustomDeleteButton = styled(Button)({
+  backgroundColor: "#d32f2f",
+  color: "#ffffff",
+  borderRadius: "10px",
+  padding: "10px 20px",
+  fontWeight: 500,
+  textTransform: "none",
+  fontSize: "12px",
+  "&:hover": {
+    backgroundColor: "#b71c1c",
+  },
+});
 
-export default ViewEventModal;
+export default ViewEventModalWrapper;
