@@ -1,4 +1,7 @@
 import axios from "axios";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
 const API_URL = process.env.REACT_APP_API_URL;
 
 /**
@@ -172,15 +175,145 @@ export const exportReportCSV = async (reportType, params = {}) => {
 
 
 /**
+ * Convert JSON report data to CSV format
+ * @param {Object} reportData - Report data from server
+ * @returns {string} - CSV content
+ */
+const convertToCSV = (reportData) => {
+  let csvContent = '';
+
+  if (reportData.orders) {
+    csvContent += 'ORDERS\n';
+    csvContent += 'Order ID,Status,Total Price,Order Date,Created At,Delivery Address\n';
+    reportData.orders.forEach(order => {
+      csvContent += `${order.orderId},${order.overallStatus},${order.totalPrice},${order.orderDate},${order.createdAt},"${order.deliveryAddress?.recipientStreet || ''}"\n`;
+    });
+    csvContent += '\n';
+  }
+
+  if (reportData.bookings) {
+    csvContent += 'BOOKINGS\n';
+    csvContent += 'Booking ID,Status,Date Time,Vendor Name,Created At\n';
+    reportData.bookings.forEach(booking => {
+      csvContent += `${booking.bookingId},${booking.bookingStatus},${booking.dateTime},${booking.vendorName},${booking.createdAt}\n`;
+    });
+    csvContent += '\n';
+  }
+
+  if (reportData.activities) {
+    csvContent += 'RECENT ACTIVITIES\n';
+    csvContent += 'Type,ID,Status,Date,Created At\n';
+    reportData.activities.orders?.forEach(order => {
+      csvContent += `Order,${order.orderId},${order.overallStatus},${order.orderDate},${order.createdAt}\n`;
+    });
+    reportData.activities.bookings?.forEach(booking => {
+      csvContent += `Booking,${booking.bookingId},${booking.bookingStatus},${booking.dateTime},${booking.createdAt}\n`;
+    });
+  }
+
+  return csvContent;
+};
+
+/**
+ * Convert JSON report data to PDF format
+ * @param {Object} reportData - Report data from server
+ * @param {string} startDate - Start date for report
+ * @param {string} endDate - End date for report
+ * @returns {Blob} - PDF blob
+ */
+const convertToPDF = (reportData, startDate, endDate) => {
+  try {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Crew Report', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 28);
+    if (startDate && endDate) {
+      doc.text(`Period: ${startDate} to ${endDate}`, 14, 34);
+    }
+
+    let yPos = startDate && endDate ? 42 : 36;
+
+    if (reportData.orders) {
+      doc.setFontSize(14);
+      doc.text('Orders', 14, yPos);
+      autoTable(doc, {
+        startY: yPos + 4,
+        head: [['Order ID', 'Status', 'Total Price', 'Order Date', 'Created At']],
+        body: reportData.orders.map(order => [
+          order.orderId,
+          order.overallStatus,
+          `$${order.totalPrice}`,
+          new Date(order.orderDate).toLocaleDateString(),
+          new Date(order.createdAt).toLocaleDateString()
+        ])
+      });
+      yPos = doc.lastAutoTable.finalY + 10;
+    }
+
+    if (reportData.bookings) {
+      doc.setFontSize(14);
+      doc.text('Bookings', 14, yPos);
+      autoTable(doc, {
+        startY: yPos + 4,
+        head: [['Booking ID', 'Status', 'Date Time', 'Vendor Name', 'Created At']],
+        body: reportData.bookings.map(booking => [
+          booking.bookingId,
+          booking.bookingStatus,
+          new Date(booking.dateTime).toLocaleDateString(),
+          booking.vendorName,
+          new Date(booking.createdAt).toLocaleDateString()
+        ])
+      });
+      yPos = doc.lastAutoTable.finalY + 10;
+    }
+
+    if (reportData.activities) {
+      doc.setFontSize(14);
+      doc.text('Recent Activities', 14, yPos);
+      const activityRows = [];
+      reportData.activities.orders?.forEach(order => {
+        activityRows.push([
+          'Order',
+          order.orderId,
+          order.overallStatus,
+          new Date(order.orderDate).toLocaleDateString(),
+          new Date(order.createdAt).toLocaleDateString()
+        ]);
+      });
+      reportData.activities.bookings?.forEach(booking => {
+        activityRows.push([
+          'Booking',
+          booking.bookingId,
+          booking.bookingStatus,
+          new Date(booking.dateTime).toLocaleDateString(),
+          new Date(booking.createdAt).toLocaleDateString()
+        ]);
+      });
+      autoTable(doc, {
+        startY: yPos + 4,
+        head: [['Type', 'ID', 'Status', 'Date', 'Created At']],
+        body: activityRows
+      });
+    }
+
+    return doc.output('blob');
+  } catch (error) {
+    console.log(error)
+
+  }
+};
+
+/**
  * Generate and download report
  * @param {Object} params - Report parameters (reportType, startDate, endDate, frequency, fileType)
  * @returns {Promise<Object>} - Report data and file download
  */
 export const generateReport = async (params = {}) => {
   try {
-    const { fileType = 'pdf' } = params;
-    const responseType = fileType === 'csv' ? 'text' : 'arraybuffer';
-    
+    const { fileType = 'pdf', startDate, endDate } = params;
+
     const response = await axios.post(
       `${API_URL}/crew-reports/generate`,
       params,
@@ -188,39 +321,41 @@ export const generateReport = async (params = {}) => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        responseType,
       }
     );
-    if (fileType === 'csv') {
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
-      const link = document.createElement("a");
+
+    if (response.data.status) {
+      const reportData = response.data.data;
+      console.log({ reportData })
+      let blob, filename;
+
+      if (fileType === 'csv') {
+        const csvContent = convertToCSV(reportData);
+        blob = new Blob([csvContent], { type: 'text/csv' });
+        filename = `crew-report-${Date.now()}.csv`;
+      } else {
+        blob = convertToPDF(reportData, startDate, endDate);
+        filename = `crew-report-${Date.now()}.pdf`;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
       link.href = url;
-      link.setAttribute("download", `${params.reportType}_report.csv`);
+      link.setAttribute('download', filename);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+      window.URL.revokeObjectURL(url);
+
       return {
         status: true,
-        message: `${params.reportType} CSV report downloaded successfully`,
-      };
-    } else if(fileType === 'pdf') {
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `${params.reportType}_report.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      return {
-        status: true,
-        message: `${params.reportType} PDF report downloaded successfully`,
+        message: 'Report generated successfully',
       };
     } else {
       return {
         status: false,
-        message: `Invalid file type: ${fileType}`,
-      };
+        message: response.data.message || "Failed to generate reports."
+      }
     }
   } catch (error) {
     console.error(`Error generating ${params.reportType} report:`, error);
