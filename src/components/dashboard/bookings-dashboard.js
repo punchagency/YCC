@@ -284,23 +284,31 @@ const BookingsDashboard = () => {
         paddingBottom: 0,
       }}
     >
-      {/* Main Dashboard Grid Container */}
-      <Grid2
-        container
-        spacing={1}
+      {/* Main Dashboard Container with Custom Responsive Layout */}
+      <Box
         sx={{
           width: "100%",
-          margin: 0,
           paddingX: { xs: 2, sm: 3 },
           marginBottom: { xs: 2, md: 3 },
-          '& > .MuiGrid2-root': {
-            paddingLeft: { xs: 1, sm: 1.25, md: 1.5 },
-            paddingTop: { xs: 1, sm: 1.25, md: 1.5 },
+          display: "flex",
+          flexDirection: "column",  // Default to vertical
+          gap: { xs: 2, sm: 2.5, md: 3 },
+          '@media (min-width: 920px)': {
+            flexDirection: "row",  // Horizontal on screens 770px and above
           }
         }}
       >
         {/* Current Order Summary - Takes more space on larger screens */}
-        <Grid2 xs={12} md={12} lg={7} sx={{ flex: 1}} >
+        <Box 
+          sx={{ 
+            width: "100%",
+            minWidth: 0,
+            '@media (min-width: 920px)': {
+              flex: "1 1 60%",
+              width: "auto"
+            }
+          }} 
+        >
           {orderSummaryLoading ? (
             <OrderSummarySkeleton />
           ) : (
@@ -310,10 +318,19 @@ const BookingsDashboard = () => {
                 currentStatus={orderSummaryStatus}
               />
             )}
-        </Grid2>
+        </Box>
 
         {/* Financial Summary - Complementary width */}
-        <Grid2 xs={12} md={12} lg={5} sx={{ flex: 1}} >
+        <Box 
+          sx={{ 
+            width: "100%",
+            minWidth: 0,
+            '@media (min-width: 920px)': {
+              flex: "1 1 40%",
+              width: "auto"
+            }
+          }} 
+        >
           {invoicesLoading ? (
             <FinancialSummarySkeleton />
           ) : invoices && invoices.length > 0 ? (
@@ -432,8 +449,8 @@ const BookingsDashboard = () => {
           ) : (
             <FinancialSummaryEmptyState />
           )}
-        </Grid2>
-      </Grid2>
+        </Box>
+      </Box>
 
       {/* Bottom Row Grid Container */}
       <Grid2
