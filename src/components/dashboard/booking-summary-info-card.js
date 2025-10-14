@@ -135,8 +135,8 @@ const BookingSummaryInfoCard = () => {
         gap: { xs: "8px", sm: "10px" },
         width: "100%",
         height: "auto",
-        maxHeight: "400px",
-        overflowY: "auto",
+        maxHeight: { xs: "400px", md: "none" },
+        overflowY: { xs: "auto", md: "visible" },
         overflowX: "hidden",
         padding: "5px",
 

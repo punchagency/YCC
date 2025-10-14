@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, Typography, Button, Box, Chip, IconButton, useMediaQuery, useTheme } from "@mui/material"
+import { Card, CardContent, Typography, Button, Box, Chip, IconButton } from "@mui/material"
 import {
   Add as AddIcon,
   Remove as RemoveIcon,
@@ -10,8 +10,6 @@ import {
 } from "@mui/icons-material"
 
 const ProductCard = ({ product, onAddToCart, loading }) => {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
   const [quantity, setQuantity] = useState(1)
 
   // Handle quantity change
