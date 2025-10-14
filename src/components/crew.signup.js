@@ -885,7 +885,7 @@ const CrewSignUpForm = ({ setStep, currentStep, formData, setFormData }) => {
                     <input
                       id="certification-upload"
                       type="file"
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      accept=".pdf"
                       multiple
                       onChange={handleCertificationFilesChange}
                       disabled={certificationFiles.length >= 15}
