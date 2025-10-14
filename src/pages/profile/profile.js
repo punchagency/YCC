@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { useUser } from "../../context/userContext";
 import { useOutletContext } from "react-router-dom";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 import manprofile from "../../assets/images/crew/manprofile.png";
 import "./profile.css";
@@ -92,7 +94,7 @@ const ProfilePage = () => {
         const updateData = {
           firstName,
           lastName,
-          phone: formData.phone.replace(/^\+/, ""),
+          phone: `+${formData.phone}`,
           country: formData.location,
           yearsOfExperience: formData.yearsOfExperience,
           position: formData.department,
@@ -121,7 +123,7 @@ const ProfilePage = () => {
         name: formData.name,
         email: formData.email,
         location: formData.location,
-        phone: formData.phone.replace(/^\+/, ""), // Remove + prefix for backend
+        phone: `+${formData.phone}`,
         replyToEmail: replyToEmail,
       };
 
@@ -441,13 +443,14 @@ const ProfilePage = () => {
           </div>
           <div className="form-group">
             <label>Phone</label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
+            <PhoneInput
+              country={"us"}
+              value={formData.phone || ""}
+              onChange={(value) => setFormData({...formData, phone: value})}
               disabled={!isEditing}
-              className="form-input"
-              onChange={handleChange}
+              inputClass="phone-input-field"
+              // buttonClass="phone-input-button"
+              // containerClass="phone-input-container"
             />
           </div>
           {isCrew && (

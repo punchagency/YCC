@@ -163,6 +163,58 @@
   box-shadow: 0 0 0 4px rgba(4, 135, 217, 0.08);
 }
 
+
+.phone-input-field {
+  /* padding: 10px 14px 10px 52px !important; */
+  background: transparent !important;
+  border: 1.5px solid #D1D5DB !important;
+  border-radius: 8px !important;
+  /* font-size: 16px !important; */
+  color: #101828 !important;
+  width: 100% !important;
+  height: 42px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.phone-input-field:disabled {
+  background: transparent !important;
+  border-color: #eaecf0 !important;
+  cursor: not-allowed;
+}
+
+.phone-input-field:hover:not(:disabled) {
+  border-color: #0487D9 !important;
+}
+
+.phone-input-field:focus {
+  outline: none !important;
+  border-color: #0487D9 !important;
+  box-shadow: 0 0 0 4px rgba(4, 135, 217, 0.08) !important;
+}
+
+.phone-input-button {
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid #D1D5DB !important;
+  border-radius: 8px 0 0 8px !important;
+  height: 42px;
+}
+
+.phone-input-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.react-tel-input .flag-dropdown {
+  background: transparent !important;
+  border: none !important;
+}
+
+.react-tel-input .selected-flag:hover,
+.react-tel-input .selected-flag:focus {
+  background: transparent !important;
+}
+
 @media (max-width: 768px) {
   .profile-container-about {
     padding: 0 8px;
