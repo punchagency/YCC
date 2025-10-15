@@ -36,13 +36,16 @@ const SearchInterface = ({
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
   useEffect(() => {
-    // Fetch products on mount if none loaded yet
-    if (!loading && searchResults.length === 0 && searchQuery.trim().length > 2) {
-      setLocalSearchQuery(searchQuery);
-      onSearch(searchQuery, "all", 1);
-    } else if(!loading && searchResults.length === 0) {
-      setLocalSearchQuery("");
-      onSearch("", "all", 1);
+    // Always fetch products on mount - either with search query or all products
+    if (!loading && searchResults.length === 0) {
+      if (searchQuery.trim().length > 0) {
+        setLocalSearchQuery(searchQuery);
+        onSearch(searchQuery, selectedCategory, 1);
+      } else {
+        // Load all products by default when no search query
+        setLocalSearchQuery("");
+        onSearch("", selectedCategory, 1);
+      }
     }
     // eslint-disable-next-line
   }, []);
@@ -57,13 +60,8 @@ const SearchInterface = ({
   // Handle category change
   const handleCategoryChange = (e) => {
     const category = e.target.value;
-    // Always fetch when category changes, even if query is empty
-    if (category === "all") {
-      setLocalSearchQuery("");
-      onSearch("", "all", 1);
-    } else {
-      onSearch(localSearchQuery, category, 1);
-    }
+    // Always fetch when category changes
+    onSearch(localSearchQuery, category, 1);
   };
 
   // Handle clear search
@@ -77,11 +75,17 @@ const SearchInterface = ({
     onPageChange(newPage);
   };
 
-  // Category options for dropdown
+  // Calculate total count for all categories
+  const totalCount = categories.reduce((sum, cat) => sum + (cat.count || 0), 0);
+  
+  // Category options for dropdown with counts
   const categoryOptions = [
-    { label: "All Categories", value: "all" },
+    { 
+      label: `All Categories${totalCount > 0 ? ` (${totalCount})` : ''}`, 
+      value: "all" 
+    },
     ...categories.map((cat) => ({
-      label: cat.label,
+      label: `${cat.label}${cat.count ? ` (${cat.count})` : ''}`,
       value: cat.value,
     })),
   ];
