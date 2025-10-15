@@ -5,8 +5,6 @@ import {
   DialogContent,
   IconButton,
   Button,
-  Snackbar,
-  Alert,
   Box,
   Typography,
 } from "@mui/material";
@@ -21,11 +19,13 @@ import {
   getProductCategories,
 } from "../../../../services/order/orderService";
 import { useCart } from "../../../../context/cart/cartContext";
+import { useToast } from "../../../../context/toast/toastContext";
 import SearchInterface from "./SearchInterface";
 
 const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
   const navigate = useNavigate();
   const { addToCart: addToCartContext } = useCart();
+  const { toast } = useToast();
 
   // Search states
   // const [searchQuery, setSearchQuery] = useState("");
@@ -40,13 +40,6 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
     limit: 20,
     total: 0,
     totalPages: 0,
-  });
-
-  // Notification states
-  const [notification, setNotification] = useState({
-    open: false,
-    message: "",
-    severity: "success",
   });
 
   // Add to cart states
@@ -174,10 +167,15 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
         showNotification(response.message || "Failed to add to cart", "error");
       }
     } catch (error) {
-      showNotification(
-        error.message || "Failed to add product to cart",
-        "error"
-      );
+      // Extract error message from server response if available
+      let errorMessage = "Failed to add product to cart";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification(errorMessage, "error");
     } finally {
       setAddToCartLoadingId(null);
     }
@@ -194,18 +192,16 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
     handleSearch(searchQuery, selectedCategory, newPage);
   };
 
-  // Show notification
+  // Show notification using toast with higher z-index to appear above modal
   const showNotification = (message, severity = "success") => {
-    setNotification({
-      open: true,
-      message,
-      severity,
+    toast.current.show({
+      severity: severity,
+      summary: severity === "success" ? "Success" : "Error",
+      detail: message,
+      life: 3000,
+      styleClass: "toast-above-modal", // Custom CSS class for higher z-index
+      style: { zIndex: 1300 }, // Inline style as backup
     });
-  };
-
-  // Close notification
-  const handleCloseNotification = () => {
-    setNotification((prev) => ({ ...prev, open: false }));
   };
 
   // Debounce utility function
@@ -233,6 +229,16 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
             borderRadius: 3,
             maxHeight: "90vh",
           },
+        }}
+        sx={{
+          // Reduce z-index to allow toast to appear above
+          zIndex: 1200,
+          '& .MuiBackdrop-root': {
+            zIndex: 1200,
+          },
+          '& .MuiDialog-paper': {
+            zIndex: 1201,
+          }
         }}
       >
         <DialogTitle sx={{ p: 0 }}>
@@ -327,21 +333,6 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
           />
         </DialogContent>
       </Dialog>
-
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseNotification}
-          severity={notification.severity}
-          sx={{ width: "100%" }}
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
     </>
   );
 };
