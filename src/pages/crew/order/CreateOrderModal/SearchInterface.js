@@ -60,7 +60,7 @@ const SearchInterface = ({
   // Handle category change
   const handleCategoryChange = (e) => {
     const category = e.target.value;
-    // Always fetch when category changes
+    // Always fetch when category changes, reset to page 1
     onSearch(localSearchQuery, category, 1);
   };
 

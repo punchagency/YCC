@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -59,6 +59,15 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
     }
   }, [open]);
 
+  // Cleanup function to cancel pending requests
+  useEffect(() => {
+    return () => {
+      if (currentSearchRef.current) {
+        currentSearchRef.current.cancelled = true;
+      }
+    };
+  }, []);
+
   // Fetch categories
   const fetchCategories = async () => {
     try {
@@ -71,9 +80,21 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
     }
   };
 
+  // Ref to track current search request
+  const currentSearchRef = useRef(null);
+
   // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (query, category, page = 1) => {
+      // Cancel previous request if exists
+      if (currentSearchRef.current) {
+        currentSearchRef.current.cancelled = true;
+      }
+
+      // Create new search request tracker
+      const searchRequest = { cancelled: false };
+      currentSearchRef.current = searchRequest;
+
       try {
         setSearchLoading(true);
         const response = await searchProducts({
@@ -82,6 +103,11 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
           page,
           limit: pagination.limit,
         });
+
+        // Check if this request was cancelled
+        if (searchRequest.cancelled) {
+          return;
+        }
 
         if (response.status) {
           setSearchResults(response.data.products);
@@ -95,10 +121,17 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
           showNotification(response.message || "Search failed", "error");
         }
       } catch (error) {
+        // Check if this request was cancelled
+        if (searchRequest.cancelled) {
+          return;
+        }
         showNotification("Failed to search products", "error");
         setSearchResults([]);
       } finally {
-        setSearchLoading(false);
+        // Only update loading state if request wasn't cancelled
+        if (!searchRequest.cancelled) {
+          setSearchLoading(false);
+        }
       }
     }, 300),
     [pagination.limit]
@@ -108,6 +141,18 @@ const CreateOrderModal = ({ open, onClose, searchQuery, setSearchQuery }) => {
   const handleSearch = (query, category, page = 1) => {
     setSearchQuery(query);
     setSelectedCategory(category);
+    
+    // Clear previous results immediately when category changes to prevent mixing
+    if (page === 1) {
+      setSearchResults([]);
+      setPagination(prev => ({
+        ...prev,
+        page: 1,
+        total: 0,
+        totalPages: 0,
+      }));
+    }
+    
     debouncedSearch(query, category, page);
   };
 
