@@ -207,10 +207,19 @@ const CartPage = () => {
       }
     } catch (error) {
       console.error("Error updating quantity:", error);
+      
+      // Extract error message from server response if available
+      let errorMessage = "Failed to update quantity";
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast.current.show({
         severity: "error",
         summary: "Error",
-        detail: "Failed to update quantity",
+        detail: errorMessage,
         life: 3000,
       });
     } finally {

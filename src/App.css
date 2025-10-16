@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+
+/* Custom toast styling to appear above modals */
+.toast-above-modal {
+  z-index: 1300 !important;
+  position: fixed !important;
+}
+
+.toast-above-modal .p-toast-message {
+  z-index: 1300 !important;
+}
+
+.toast-above-modal .p-toast-message-content {
+  z-index: 1300 !important;
+}
+
+/* Ensure toast container appears above Material-UI modals */
+.p-toast.toast-above-modal {
+  z-index: 1300 !important;
+}
+
+/* Additional specificity for PrimeReact toast */
+.p-toast-top-right.toast-above-modal {
+  z-index: 1300 !important;
+}
+
+.p-toast-top-center.toast-above-modal {
+  z-index: 1300 !important;
+}
