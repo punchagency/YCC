@@ -214,18 +214,18 @@ const Invent = () => {
 
   // 1. Add state for search text and applied filters
   const [searchText, setSearchText] = useState("");
-  const [appliedStockStatus, setAppliedStockStatus] =
-    useState(stockStatusFilter);
+  const [appliedStockStatus, setAppliedStockStatus] = useState("all");
   const [appliedSearchText, setAppliedSearchText] = useState("");
 
   // Add this state to the Invent component
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   // Helper to get stock status
+  // Low: < 10, Medium: 10-100, High: > 100
   const getStockStatus = (quantity) => {
-    if (quantity >= 100) return "high";
-    if (quantity >= 50) return "medium";
-    return "low";
+    if (quantity > 100) return "high";
+    if (quantity >= 10 && quantity <= 100) return "medium";
+    return "low"; // < 10
   };
 
   const handleSelectAll = (event) => {
@@ -347,16 +347,18 @@ const Invent = () => {
 
   const fetchInventoryData = async (pageNum = 1) => {
     setIsLoading(true);
+    
     try {
+      // Always send "all" for stock status to backend and filter client-side
       const result = await getAllInventories(
         pageNum,
         pageSize,
         appliedSearchText,
-        appliedStockStatus
+        "all" // Always fetch all stock statuses, filter client-side
       );
 
       if (result.success) {
-        const formattedItems = result.data.flatMap(
+        let formattedItems = result.data.flatMap(
           (item) =>
             item.products?.map((product) => ({
               id: item._id,
@@ -384,9 +386,29 @@ const Invent = () => {
               weight: product.weight || 0,
             })) || []
         );
+
+        // CLIENT-SIDE FILTERING (since backend returns all products in inventory)
+        // Filter by product name if search text is provided
+        if (appliedSearchText && appliedSearchText.trim() !== "") {
+          const searchLower = appliedSearchText.toLowerCase().trim();
+          formattedItems = formattedItems.filter((item) =>
+            item.productName.toLowerCase().includes(searchLower)
+          );
+        }
+
+        // Filter by stock status if not "all"
+        if (appliedStockStatus && appliedStockStatus !== "all") {
+          formattedItems = formattedItems.filter((item) => {
+            const status = getStockStatus(item.stockQuantity);
+            return status === appliedStockStatus;
+          });
+        }
+
         setInventoryItems(formattedItems);
-        setTotalItems(result.pagination?.totalItems || formattedItems.length);
-        setTotalPages(result.pagination?.totalPages || 1);
+        // Use actual filtered count for totalItems
+        setTotalItems(formattedItems.length);
+        // Recalculate total pages based on filtered items
+        setTotalPages(Math.ceil(formattedItems.length / pageSize));
       } else {
         setInventoryItems([]);
         setTotalItems(0);
@@ -982,8 +1004,6 @@ const Invent = () => {
                       }}
                       onClick={() => {
                         setStockStatusFilter(opt.key);
-                        setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
-                        setPage(0); // Optionally reset to first page
                         setStockStatusDropdownOpen(false);
                       }}
                     >
@@ -997,6 +1017,13 @@ const Invent = () => {
             <TextField
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  setAppliedStockStatus(stockStatusFilter);
+                  setAppliedSearchText(searchText);
+                  setPage(0);
+                }
+              }}
               placeholder="Search by product name..."
               fullWidth
               size="small"
@@ -1016,16 +1043,37 @@ const Invent = () => {
               onClick={() => {
                 setAppliedStockStatus(stockStatusFilter);
                 setAppliedSearchText(searchText);
+                setPage(0);
               }}
               sx={{
-                minWidth: { sm: 120 },
+                minWidth: { sm: 100 },
                 height: 40,
                 borderRadius: 2,
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             >
-              Search
+              Apply
             </Button>
+            {(appliedSearchText || appliedStockStatus !== 'all') && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setSearchText("");
+                  setStockStatusFilter("all");
+                  setAppliedSearchText("");
+                  setAppliedStockStatus("all");
+                  setPage(0);
+                }}
+                sx={{
+                  minWidth: { sm: 100 },
+                  height: 40,
+                  borderRadius: 2,
+                }}
+              >
+                Clear
+              </Button>
+            )}
           </Stack>
         </Paper>
 
@@ -1455,8 +1503,6 @@ const Invent = () => {
                     }}
                     onClick={() => {
                       setStockStatusFilter(opt.key);
-                      setAppliedStockStatus(opt.key); // Immediately apply and trigger fetch
-                      setPage(0); // Optionally reset to first page
                       setStockStatusDropdownOpen(false);
                     }}
                   >
@@ -1473,16 +1519,26 @@ const Invent = () => {
               display: "flex",
               gap: 2,
               flex: 1,
+              flexWrap: "wrap",
               maxWidth: { xs: "100%", md: "50%" },
             }}
           >
             <TextField
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  setAppliedStockStatus(stockStatusFilter);
+                  setAppliedSearchText(searchText);
+                  setPage(0);
+                }
+              }}
               placeholder="Search by product name..."
               fullWidth
               size="small"
               sx={{
+                flex: 1,
+                minWidth: "200px",
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                   height: 40,
@@ -1498,6 +1554,7 @@ const Invent = () => {
               onClick={() => {
                 setAppliedStockStatus(stockStatusFilter);
                 setAppliedSearchText(searchText);
+                setPage(0);
               }}
               sx={{
                 minWidth: 100,
@@ -1506,8 +1563,28 @@ const Invent = () => {
                 boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
               }}
             >
-              Search
+              Apply
             </Button>
+            {(appliedSearchText || appliedStockStatus !== 'all') && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setSearchText("");
+                  setStockStatusFilter("all");
+                  setAppliedSearchText("");
+                  setAppliedStockStatus("all");
+                  setPage(0);
+                }}
+                sx={{
+                  minWidth: 100,
+                  height: 40,
+                  borderRadius: 2,
+                }}
+              >
+                Clear
+              </Button>
+            )}
           </Box>
         </Paper>
 
@@ -1819,27 +1896,27 @@ const Invent = () => {
                       >
                         {item.productName}
                       </TableCell>
-                      <TableCell
-                        sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                      >
-                        {item.category &&
-                          item.category.length > 0 &&
-                          item.category.slice(0, 2).map((cat) => (
-                            <Chip
-                              key={cat}
-                              label={cat}
-                              size="small"
-                              sx={{
-                                bgcolor:
-                                  theme === "light" ? "#f1f5f9" : "#1e293b",
-                                color:
-                                  theme === "light" ? "#334155" : "#94a3b8",
-                                fontWeight: 500,
-                                fontSize: "0.75rem",
-                                height: 24,
-                              }}
-                            />
-                          ))}
+                      <TableCell>
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                          {item.category &&
+                            item.category.length > 0 &&
+                            item.category.slice(0, 2).map((cat) => (
+                              <Chip
+                                key={cat}
+                                label={cat}
+                                size="small"
+                                sx={{
+                                  bgcolor:
+                                    theme === "light" ? "#f1f5f9" : "#1e293b",
+                                  color:
+                                    theme === "light" ? "#334155" : "#94a3b8",
+                                  fontWeight: 500,
+                                  fontSize: "0.75rem",
+                                  height: 24,
+                                }}
+                              />
+                            ))}
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Box
