@@ -367,7 +367,7 @@ const SupplierDashboard = () => {
                 {formatCurrency(stats.totalRevenue)}
               </Typography>
               <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
-                <Chip 
+                {/* <Chip 
                   size="small" 
                   label="View Reports" 
                   onClick={() => handleNavigate("/supplier/reports")} 
@@ -377,7 +377,7 @@ const SupplierDashboard = () => {
                     fontWeight: 500,
                     cursor: 'pointer'
                   }} 
-                />
+                /> */}
               </Box>
             </CardContent>
           </Card>
