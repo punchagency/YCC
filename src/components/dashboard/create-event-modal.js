@@ -14,11 +14,17 @@ const CreateEventModal = ({ open, handleClose }) => {
     { label: "Microsoft Teams", value: "Microsoft Teams" },
     { label: "In-Person", value: "In-Person" },
   ];
+  // Initialize with current date and time
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    return now;
+  };
+
   const [event, setEvent] = useState({
     title: "",
     description: "",
-    start: new Date(),
-    end: new Date(),
+    start: getCurrentDateTime(),
+    end: new Date(getCurrentDateTime().getTime() + 60 * 60 * 1000), // Default: 1 hour after start
     location: "",
   });
 
@@ -28,7 +34,26 @@ const CreateEventModal = ({ open, handleClose }) => {
   };
 
   const handleDateChange = (name, value) => {
-    setEvent((prev) => ({ ...prev, [name]: value }));
+    if (name === "start") {
+      // When start date changes, ensure end date is not before start date
+      setEvent((prev) => {
+        const newStart = value;
+        const currentEnd = prev.end;
+        
+        // If end date is before new start date, set end date to 1 hour after start
+        if (currentEnd < newStart) {
+          return {
+            ...prev,
+            start: newStart,
+            end: new Date(newStart.getTime() + 60 * 60 * 1000),
+          };
+        }
+        
+        return { ...prev, [name]: value };
+      });
+    } else {
+      setEvent((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = () => {
@@ -104,6 +129,7 @@ const CreateEventModal = ({ open, handleClose }) => {
               onChange={(e) => handleDateChange("start", e.value)}
               showTime
               showSeconds={false}
+              minDate={new Date()} // Prevent selecting past dates
               placeholder="Select start date and time"
               required
             />
@@ -124,6 +150,7 @@ const CreateEventModal = ({ open, handleClose }) => {
               onChange={(e) => handleDateChange("end", e.value)}
               showTime
               showSeconds={false}
+              minDate={event.start} // End date must be after start date
               placeholder="Select end date and time"
               required
             />
