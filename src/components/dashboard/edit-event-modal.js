@@ -81,7 +81,26 @@ const EditEventModal = ({ open, handleClose, eventData, zIndex = 1300 }) => {
   };
 
   const handleDateChange = (name, value) => {
-    setEvent((prev) => ({ ...prev, [name]: value }));
+    if (name === "start") {
+      // When start date changes, ensure end date is not before start date
+      setEvent((prev) => {
+        const newStart = value;
+        const currentEnd = prev.end;
+        
+        // If end date is before new start date, set end date to 1 hour after start
+        if (currentEnd < newStart) {
+          return {
+            ...prev,
+            start: newStart,
+            end: new Date(newStart.getTime() + 60 * 60 * 1000),
+          };
+        }
+        
+        return { ...prev, [name]: value };
+      });
+    } else {
+      setEvent((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = () => {
@@ -197,6 +216,7 @@ const EditEventModal = ({ open, handleClose, eventData, zIndex = 1300 }) => {
               onChange={(e) => handleDateChange("start", e.value)}
               showTime
               showSeconds={false}
+              minDate={new Date()} // Prevent selecting past dates for new events
               placeholder="Select start date and time"
               required
             />
@@ -217,6 +237,7 @@ const EditEventModal = ({ open, handleClose, eventData, zIndex = 1300 }) => {
               onChange={(e) => handleDateChange("end", e.value)}
               showTime
               showSeconds={false}
+              minDate={event.start} // End date must be after start date
               placeholder="Select end date and time"
               required
             />
