@@ -229,7 +229,7 @@ const QuoteDetails = () => {
       ];
     } else if (status === 'accepted' && awaitingPayment === true){
       return [
-        { action: "accept", label: "Finalized Payment", color: "success", handler: handleApproveAndPay },
+        { action: "accept", label: "Finalize Payment", color: "success", handler: handleApproveAndPay },
         // { action: "decline", label: "Decline Quote", color: "error", handler: handleDeclineQuote }
       ];
     } else {
